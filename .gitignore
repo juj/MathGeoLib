@@ -1,0 +1,5 @@
+*.o
+Debug/
+Release/
+*.filters
+*.user
