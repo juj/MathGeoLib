@@ -133,6 +133,13 @@ public:
         (when decomposed to axis-angle notation). */
     static float3x3 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
 
+    /// Creates a lookat matrix.
+    /// Creates a rotation matrix which orients the local (pre-transformed) axis specified by localForward 
+    /// towards targetDirection. Then tries to orient the localUp axis to point towards the
+    /// worldUp axis.
+    /// The given direction vectors are assumed to be normalized.
+    static float3x3 LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
+
     /// Returns a uniformly random 3x3 matrix that performs a rotation.
     static float3x3 RandomRotation(LCG &lcg);
 
@@ -203,7 +210,6 @@ public:
     static float3x3 Reflect(const Plane &p);
 
     /// Creates a new float3x3 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
-    static float3x3 OrthographicProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
     static float3x3 OrthographicProjection(const Plane &target);
     static float3x3 OrthographicProjectionYZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]
     static float3x3 OrthographicProjectionXZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]

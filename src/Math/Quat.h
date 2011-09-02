@@ -161,10 +161,12 @@ public:
     ///       SetFromAxisAngle to define this Quat using a rotation axis and an angle.
     void Set(float x, float y, float z, float w);
 
-    /// Applies a rotation to this quaternion so that the local (pre-transformed) axis specified by localForward 
-    /// looks towards targetDirection. Then tries to orient the localUp axis to point towards the
+    /// Creates a lookat quaternion.
+    /// Creates a rotation which orients the local (pre-transformed) axis specified by localForward 
+    /// towards targetDirection. Then tries to orient the localUp axis to point towards the
     /// worldUp axis.
-    void LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
+    /// The given direction vectors are assumed to be normalized.
+    static Quat LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
     /// Creates a new quaternion that rotates about the positive X axis by the given angle.
     static Quat RotateX(float angleRadians);

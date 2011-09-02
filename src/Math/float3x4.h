@@ -411,7 +411,7 @@ public:
         the vector targetPosition, and secondarily, rotates the localUp to coincide with the vector worldUp, as closely
         as possible while still retaining the localForward->targetPosition constraint.
         @note The resulting right vector for the matrix will be generated using the right-hand rule, to produce a right-handed matrix with determinant > 0. */
-    static float3x4 LookAtRH(const float3 &localForwardDir, const float3 &targetForwardDir, const float3 &localUp, const float3 &worldUp);
+    static float3x4 LookAt(const float3 &localForwardDir, const float3 &targetForwardDir, const float3 &localUp, const float3 &worldUp);
 
     /// Sets this float3x4 to represent the same transformation as the given float3x3.
     /// @important The translate part of this float3x4 is reset to zero.

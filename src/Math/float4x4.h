@@ -168,10 +168,12 @@ public:
     /// Creates a new float4x4 that rotates one coordinate system to coincide with another.
     /** This function rotates the sourceDirection vector to coincide with the targetDirection vector, and then 
             rotates sourceDirection2 (which was transformed by 1.) to targetDirection2, but keeping the constraint that 
-            sourceDirection must look at targetDirection.
-            Rotation is performed around the specified centerPoint. */
-    static float4x4 RotateFromTo(const float3 &centerPoint, const float3 &sourceDirection, const float3 &targetDirection,
+            sourceDirection must look at targetDirection. */
+    static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
         const float3 &sourceDirection2, const float3 &targetDirection2);
+    /** @param centerPoint If specified, rotation is performed using this point as the coordinate space origin. */
+    static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
+        const float3 &sourceDirection2, const float3 &targetDirection2, const float3 &centerPoint);
 
     /// Creates a new float4x4 that performs the rotation expressed by the given quaternion.
     static float4x4 FromQuat(const Quat &orientation);
@@ -460,7 +462,7 @@ public:
         axis as possible, while preserving an orthonormal coordinate frame.
         @param rightHanded If true, the third basis vector will be equal to worldUp x targetDirection (right-handed). 
                            Otherwise, the vector targetDirection x worldUp will be used (left-handed). */
-    static float4x4 LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp, bool rightHanded = true);
+    static float4x4 LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
     /// Sets this float4x4 to represent the same transformation as the given float3x3.
     /// @important The remaining entries of this matrix are set to identity.

@@ -6,11 +6,9 @@
     of the author(s). 
 */
 
-
 #include <string.h>
-
-#include "Math/MathFunc.h"
 #include "assume.h"
+#include "Math/MathFunc.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
 #include "Math/float3x3.h"
@@ -120,7 +118,7 @@ float3x3 float3x3::FromEulerXYX(float x2, float y, float x)
 {
     float3x3 r;
     Set3x3PartRotateEulerXYX(r, x2, y, x);
-    assert(r.Equals(float3x3::RotateX(x2) * float3x3::RotateY(y) * float3x3::RotateX(x)));
+    assume(r.Equals(float3x3::RotateX(x2) * float3x3::RotateY(y) * float3x3::RotateX(x)));
     return r;
 }
 
@@ -128,7 +126,7 @@ float3x3 float3x3::FromEulerXZX(float x2, float z, float x)
 {
     float3x3 r;
     Set3x3PartRotateEulerXZX(r, x2, z, x);
-    assert(r.Equals(float3x3::RotateX(x2) * float3x3::RotateZ(z) * float3x3::RotateX(x)));
+    assume(r.Equals(float3x3::RotateX(x2) * float3x3::RotateZ(z) * float3x3::RotateX(x)));
     return r;
 }
 
@@ -136,7 +134,7 @@ float3x3 float3x3::FromEulerYXY(float y2, float x, float y)
 {
     float3x3 r;
     Set3x3PartRotateEulerYXY(r, y2, x, y);
-    assert(r.Equals(float3x3::RotateY(y2) * float3x3::RotateX(x) * float3x3::RotateY(y)));
+    assume(r.Equals(float3x3::RotateY(y2) * float3x3::RotateX(x) * float3x3::RotateY(y)));
     return r;
 }
 
@@ -144,7 +142,7 @@ float3x3 float3x3::FromEulerYZY(float y2, float z, float y)
 {
     float3x3 r;
     Set3x3PartRotateEulerYZY(r, y2, z, y);
-    assert(r.Equals(float3x3::RotateY(y2) * float3x3::RotateZ(z) * float3x3::RotateY(y)));
+    assume(r.Equals(float3x3::RotateY(y2) * float3x3::RotateZ(z) * float3x3::RotateY(y)));
     return r;
 }
 
@@ -152,7 +150,7 @@ float3x3 float3x3::FromEulerZXZ(float z2, float x, float z)
 {
     float3x3 r;
     Set3x3PartRotateEulerZXZ(r, z2, x, z);
-    assert(r.Equals(float3x3::RotateZ(z2) * float3x3::RotateX(x) * float3x3::RotateZ(z)));
+    assume(r.Equals(float3x3::RotateZ(z2) * float3x3::RotateX(x) * float3x3::RotateZ(z)));
     return r;
 }
 
@@ -160,7 +158,7 @@ float3x3 float3x3::FromEulerZYZ(float z2, float y, float z)
 {
     float3x3 r;
     Set3x3PartRotateEulerZYZ(r, z2, y, z);
-    assert(r.Equals(float3x3::RotateZ(z2) * float3x3::RotateY(y) * float3x3::RotateZ(z)));
+    assume(r.Equals(float3x3::RotateZ(z2) * float3x3::RotateY(y) * float3x3::RotateZ(z)));
     return r;
 }
 
@@ -168,7 +166,7 @@ float3x3 float3x3::FromEulerXYZ(float x, float y, float z)
 {
     float3x3 r;
     Set3x3PartRotateEulerXYZ(r, x, y, z);
-    assert(r.Equals(float3x3::RotateX(x) * float3x3::RotateY(y) * float3x3::RotateX(z)));
+    assume(r.Equals(float3x3::RotateX(x) * float3x3::RotateY(y) * float3x3::RotateX(z)));
     return r;
 }
 
@@ -176,7 +174,7 @@ float3x3 float3x3::FromEulerXZY(float x, float z, float y)
 {
     float3x3 r;
     Set3x3PartRotateEulerXZY(r, x, z, y);
-    assert(r.Equals(float3x3::RotateX(x) * float3x3::RotateZ(z) * float3x3::RotateY(y)));
+    assume(r.Equals(float3x3::RotateX(x) * float3x3::RotateZ(z) * float3x3::RotateY(y)));
     return r;
 }
 
@@ -184,7 +182,7 @@ float3x3 float3x3::FromEulerYXZ(float y, float x, float z)
 {
     float3x3 r;
     Set3x3PartRotateEulerYXZ(r, y, x, z);
-    assert(r.Equals(float3x3::RotateY(y) * float3x3::RotateX(x) * float3x3::RotateZ(z)));
+    assume(r.Equals(float3x3::RotateY(y) * float3x3::RotateX(x) * float3x3::RotateZ(z)));
     return r;
 }
 
@@ -192,7 +190,7 @@ float3x3 float3x3::FromEulerYZX(float y, float z, float x)
 {
     float3x3 r;
     Set3x3PartRotateEulerYZX(r, y, z, x);
-    assert(r.Equals(float3x3::RotateY(y) * float3x3::RotateZ(z) * float3x3::RotateX(x)));
+    assume(r.Equals(float3x3::RotateY(y) * float3x3::RotateZ(z) * float3x3::RotateX(x)));
     return r;
 }
 
@@ -200,7 +198,7 @@ float3x3 float3x3::FromEulerZXY(float z, float x, float y)
 {
     float3x3 r;
     Set3x3PartRotateEulerZXY(r, z, x, y);
-    assert(r.Equals(float3x3::RotateZ(z) * float3x3::RotateX(x) * float3x3::RotateY(y)));
+    assume(r.Equals(float3x3::RotateZ(z) * float3x3::RotateX(x) * float3x3::RotateY(y)));
     return r;
 }
 
@@ -208,7 +206,7 @@ float3x3 float3x3::FromEulerZYX(float z, float y, float x)
 {
     float3x3 r;
     Set3x3PartRotateEulerZYX(r, z, y, x);
-    assert(r.Equals(float3x3::RotateZ(z) * float3x3::RotateY(y) * float3x3::RotateX(x)));
+    assume(r.Equals(float3x3::RotateZ(z) * float3x3::RotateY(y) * float3x3::RotateX(x)));
     return r;
 }
 
@@ -239,6 +237,8 @@ float3 float3x3::GetScale() const
 
 float3x3 float3x3::ShearX(float yFactor, float zFactor)
 {
+    assume(isfinite(yFactor));
+    assume(isfinite(zFactor));
     return float3x3(1.f, yFactor, zFactor,
                     0.f, 1.f, 0.f,
                     0.f, 0.f, 1.f);
@@ -246,6 +246,8 @@ float3x3 float3x3::ShearX(float yFactor, float zFactor)
 
 float3x3 float3x3::ShearY(float xFactor, float zFactor)
 {
+    assume(isfinite(xFactor));
+    assume(isfinite(zFactor));
     return float3x3(1.f, 0.f, 0.f,
                     xFactor, 1.f, zFactor,
                     0.f, 0.f, 1.f);
@@ -253,6 +255,8 @@ float3x3 float3x3::ShearY(float xFactor, float zFactor)
 
 float3x3 float3x3::ShearZ(float xFactor, float yFactor)
 {
+    assume(isfinite(xFactor));
+    assume(isfinite(yFactor));
     return float3x3(1.f, 0.f, 0.f,
                     0.f, 1.f, 0.f,
                     xFactor, yFactor, 1.f);
@@ -266,14 +270,9 @@ float3x3 float3x3::Reflect(const Plane &p)
     return v;
 }
 
-float3x3 float3x3::OrthographicProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize)
-{
-    assume(false && "Not implemented!");
-    return float3x3(); ///\todo
-}
-
 float3x3 float3x3::OrthographicProjection(const Plane &p)
 {
+    assume(p.normal.IsNormalized());
     assume(p.PassesThroughOrigin() && "A 3x3 matrix cannot represent projection onto planes which do not pass through the origin! Use float3x4::OrthographicProjection instead!");
     float3x3 v;
     SetMatrix3x3LinearPlaneProject(v, p.normal.x, p.normal.y, p.normal.z);
@@ -303,42 +302,85 @@ float3x3 float3x3::OrthographicProjectionXY()
 
 MatrixProxy<float3x3::Cols> &float3x3::operator[](int row)
 {
-    assert(row >= 0);
-    assert(row < Rows);
+    assume(row >= 0);
+    assume(row < Rows);
 
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows)
+        row = 0; // Benign failure, just give the first row.
+#endif
     return *(reinterpret_cast<MatrixProxy<Cols>*>(v[row]));
 }
 
 const MatrixProxy<float3x3::Cols> &float3x3::operator[](int row) const
 {
-    assert(row >= 0);
-    assert(row < Rows);
+    assume(row >= 0);
+    assume(row < Rows);
 
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows)
+        row = 0; // Benign failure, just give the first row.
+#endif
     return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[row]));
 }
 
 float &float3x3::At(int row, int col)
 {
+    assume(row >= 0);
+    assume(row < Rows);
+    assume(col >= 0);
+    assume(col < Cols);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows || col < 0 || col >= Cols)
+        return v[0][0]; // Benign failure, return the first element.
+#endif
     return v[row][col];
 }
 
 CONST_WIN32 float float3x3::At(int row, int col) const
 {
+    assume(row >= 0);
+    assume(row < Rows);
+    assume(col >= 0);
+    assume(col < Cols);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows || col < 0 || col >= Cols)
+        return v[0][0]; // Benign failure, return the first element.
+#endif
     return v[row][col];
 }
 
 float3 &float3x3::Row(int row)
 {
+    assume(row >= 0);
+    assume(row < Rows);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows)
+        row = 0; // Benign failure, just give the first row.
+#endif
     return reinterpret_cast<float3 &>(v[row]);
 }
 
 const float3 &float3x3::Row(int row) const
 {
+    assume(row >= 0);
+    assume(row < Rows);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows)
+        row = 0; // Benign failure, just give the first row.
+#endif
     return reinterpret_cast<const float3 &>(v[row]);
 }
 
 CONST_WIN32 float3 float3x3::Col(int col) const
 {
+    assume(col >= 0);
+    assume(col < Cols);
+#ifndef OPTIMIZED_RELEASE
+    if (col < 0 || col >= Cols)
+        col = 0; // Benign failure, just give the first col.
+#endif
+
     return float3(v[0][col], v[1][col], v[2][col]);
 }
 
@@ -349,11 +391,24 @@ CONST_WIN32 float3 float3x3::Diagonal() const
 
 void float3x3::ScaleRow(int row, float scalar)
 {
+    assume(row >= 0);
+    assume(row < Rows);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows)
+        return;
+#endif
+    assume(isfinite(scalar));
     Row(row) *= scalar;
 }
 
 void float3x3::ScaleCol(int col, float scalar)
 {
+    assume(col >= 0);
+    assume(col < Cols);
+#ifndef OPTIMIZED_RELEASE
+    if (col < 0 || col >= Cols)
+        return;
+#endif
     v[0][col] *= scalar;
     v[1][col] *= scalar;
     v[2][col] *= scalar;
@@ -386,6 +441,15 @@ const float *float3x3::ptr() const
 
 void float3x3::SetRow(int row, float x, float y, float z)
 {
+    assume(row >= 0);
+    assume(row < Rows);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows)
+        return;
+#endif
+    assume(isfinite(x));
+    assume(isfinite(y));
+    assume(isfinite(z));
     v[row][0] = x;
     v[row][1] = y;
     v[row][2] = z;
@@ -393,20 +457,30 @@ void float3x3::SetRow(int row, float x, float y, float z)
 
 void float3x3::SetRow(int row, const float3 &rowVector)
 {
-    v[row][0] = rowVector.x;
-    v[row][1] = rowVector.y;
-    v[row][2] = rowVector.z;
+    SetRow(row, rowVector.x, rowVector.y, rowVector.z);
 }
 
 void float3x3::SetRow(int row, const float *data)
 {
-    v[row][0] = data[0];
-    v[row][1] = data[1];
-    v[row][2] = data[2];
+    assume(data);
+#ifndef OPTIMIZED_RELEASE
+    if (!data)
+        return;
+#endif
+    SetRow(row, data[0], data[1], data[2]);
 }
 
 void float3x3::SetCol(int column, float x, float y, float z)
 {
+    assume(column >= 0);
+    assume(column < Cols);
+#ifndef OPTIMIZED_RELEASE
+    if (column < 0 || column >= Cols)
+        return;
+#endif
+    assume(isfinite(x));
+    assume(isfinite(y));
+    assume(isfinite(z));
     v[0][column] = x;
     v[1][column] = y;
     v[2][column] = z;
@@ -414,16 +488,17 @@ void float3x3::SetCol(int column, float x, float y, float z)
 
 void float3x3::SetCol(int column, const float3 &columnVector)
 {
-    v[0][column] = columnVector.x;
-    v[1][column] = columnVector.y;
-    v[2][column] = columnVector.z;
+    SetCol(column, columnVector.x, columnVector.y, columnVector.z);
 }
 
 void float3x3::SetCol(int column, const float *data)
 {
-    v[0][column] = data[0];
-    v[1][column] = data[1];
-    v[2][column] = data[2];
+    assume(data);
+#ifndef OPTIMIZED_RELEASE
+    if (!data)
+        return;
+#endif
+    SetCol(column, data[0], data[1], data[2]);
 }
 
 void float3x3::Set(float _00, float _01, float _02,
@@ -442,6 +517,11 @@ void float3x3::Set(const float3x3 &rhs)
 
 void float3x3::Set(const float *values)
 {
+    assume(values);
+#ifndef OPTIMIZED_RELEASE
+    if (!values)
+        return;
+#endif
     memcpy(ptr(), values, sizeof(float) * Rows * Cols);
 }
 
@@ -449,6 +529,10 @@ void float3x3::Set(int row, int col, float value)
 {
     assume(0 <= row && row <= 2);
     assume(0 <= col && col <= 2);
+#ifndef OPTIMIZED_RELEASE
+    if (row < 0 || row >= Rows || col < 0 || col >= Cols)
+        return;
+#endif
     v[row][col] = value;
 }
 
@@ -461,6 +545,14 @@ void float3x3::SetIdentity()
 
 void float3x3::SwapColumns(int col1, int col2)
 {
+    assume(col1 >= 0);
+    assume(col1 < Cols);
+    assume(col2 >= 0);
+    assume(col2 < Cols);
+#ifndef OPTIMIZED_RELEASE
+    if (col1 < 0 || col1 >= Cols || col2 < 0 || col2 >= Cols)
+        return;
+#endif
     Swap(v[0][col1], v[0][col2]);
     Swap(v[1][col1], v[1][col2]);
     Swap(v[2][col1], v[2][col2]);
@@ -468,6 +560,14 @@ void float3x3::SwapColumns(int col1, int col2)
 
 void float3x3::SwapRows(int row1, int row2)
 {
+    assume(row1 >= 0);
+    assume(row1 < Rows);
+    assume(row2 >= 0);
+    assume(row2 < Rows);
+#ifndef OPTIMIZED_RELEASE
+    if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
+        return;
+#endif
     Swap(v[row1][0], v[row2][0]);
     Swap(v[row1][1], v[row2][1]);
     Swap(v[row1][2], v[row2][2]);
@@ -498,6 +598,29 @@ void float3x3::SetRotatePart(const Quat &q)
     SetMatrixRotatePart(*this, q);
 }
 
+float3x3 float3x3::LookAt(const float3 &localForwardDir, const float3 &targetForwardDir, const float3 &localUp, const float3 &worldUp)
+{
+    assume(localForwardDir.IsNormalized());
+    assume(targetForwardDir.IsNormalized());
+    assume(localUp.IsNormalized());
+    assume(worldUp.IsNormalized());
+    assume(localForwardDir.IsPerpendicular(localUp));
+
+    float3 localRight = localUp.Cross(localForwardDir).Normalized();
+
+    float3 worldRight = worldUp.Cross(targetForwardDir).Normalized();
+    float3 perpWorldUp = targetForwardDir.Cross(worldRight).Normalized();
+
+    float3x3 m1(worldRight, perpWorldUp, targetForwardDir);
+    float3x3 m2;
+    m2.SetRow(0, localRight);
+    m2.SetRow(1, localUp);
+    m2.SetRow(2, localForwardDir);
+    m2 = m1 * m2;
+    m2.Orthonormalize(0, 1, 2);
+    return m2;
+}
+
 float3x3 &float3x3::operator =(const Quat &rhs)
 {
     SetRotatePart(rhs);
@@ -512,6 +635,7 @@ float3x3 &float3x3::operator =(const float3x3 &rhs)
 
 float float3x3::Determinant() const
 {
+    assume(IsFinite());
     const float a = v[0][0];
     const float b = v[0][1];
     const float c = v[0][2];
@@ -606,6 +730,8 @@ bool float3x3::InverseOrthogonal()
     v[1][0] *= scale1; v[1][1] *= scale2; v[1][2] *= scale3;
     v[2][0] *= scale1; v[2][1] *= scale2; v[2][2] *= scale3;
 
+    assume(IsFinite());
+    assume(IsOrthogonal());
     return true;
 }
 
@@ -621,6 +747,10 @@ bool float3x3::InverseOrthogonalUniformScale()
     v[0][0] *= scale; v[0][1] *= scale; v[0][2] *= scale;
     v[1][0] *= scale; v[1][1] *= scale; v[1][2] *= scale;
     v[2][0] *= scale; v[2][1] *= scale; v[2][2] *= scale;
+
+    assume(IsFinite());
+    assume(IsOrthogonal());
+    assume(HasUniformScale());
 
     return true;
 }
@@ -668,9 +798,11 @@ float float3x3::Trace() const
 void float3x3::Orthonormalize(int c0, int c1, int c2)
 {
     assume(c0 != c1 && c0 != c2 && c1 != c2);
+    assume(c0 >= 0 && c1 >= 0 && c2 >= 0 && c0 < Cols && c1 < Cols && c2 < Cols);
+#ifndef OPTIMIZED_RELEASE
     if (c0 == c1 || c0 == c2 || c1 == c2)
         return;
-
+#endif
     ///\todo Optimize away copies.
     float3 v0 = Col(c0);
     float3 v1 = Col(c1);
@@ -683,6 +815,7 @@ void float3x3::Orthonormalize(int c0, int c1, int c2)
 
 void float3x3::RemoveScale()
 {
+    assume(IsFinite());
     float x = Row(0).Normalize();
     float y = Row(1).Normalize();
     float z = Row(2).Normalize();
@@ -718,12 +851,14 @@ float4 float3x3::Transform(const float4 &vector) const
 
 void float3x3::BatchTransform(float3 *pointArray, int numPoints) const
 {
+    assume(pointArray);
     for(int i = 0; i < numPoints; ++i)
         pointArray[i] = *this * pointArray[i];
 }
 
 void float3x3::BatchTransform(float3 *pointArray, int numPoints, int stride) const
 {
+    assume(pointArray);
     assume(stride >= sizeof(float3));
     u8 *data = reinterpret_cast<u8*>(pointArray);
     for(int i = 0; i < numPoints; ++i)
@@ -735,12 +870,14 @@ void float3x3::BatchTransform(float3 *pointArray, int numPoints, int stride) con
 
 void float3x3::BatchTransform(float4 *vectorArray, int numVectors) const
 {
+    assume(vectorArray);
     for(int i = 0; i < numVectors; ++i)
         vectorArray[i] = *this * vectorArray[i];
 }
 
 void float3x3::BatchTransform(float4 *vectorArray, int numVectors, int stride) const
 {
+    assume(vectorArray);
     assume(stride >= sizeof(float4));
     u8 *data = reinterpret_cast<u8*>(vectorArray);
     for(int i = 0; i < numVectors; ++i)
@@ -752,6 +889,8 @@ void float3x3::BatchTransform(float4 *vectorArray, int numVectors, int stride) c
 
 float3x3 float3x3::operator *(const float3x3 &rhs) const
 {
+    assume(IsFinite());
+    assume(rhs.IsFinite());
     float3x3 r;
     const float *c0 = rhs.ptr();
     const float *c1 = rhs.ptr() + 1;
@@ -800,7 +939,6 @@ float3x3 float3x3::operator *(float scalar) const
 
 float3x3 float3x3::operator /(float scalar) const
 {
-    assume(!EqualAbs(scalar, 0));
     float3x3 r = *this;
     r /= scalar;
     return r;
@@ -831,6 +969,7 @@ float3x3 float3x3::operator -() const
 
 float3x3 &float3x3::operator *=(float scalar)
 {
+    assume(isfinite(scalar));
     for(int y = 0; y < Rows; ++y)
         for(int x = 0; x < Cols; ++x)
             v[y][x] *= scalar;
@@ -840,6 +979,7 @@ float3x3 &float3x3::operator *=(float scalar)
 
 float3x3 &float3x3::operator /=(float scalar)
 {
+    assume(isfinite(scalar));
     assume(!EqualAbs(scalar, 0));
     float invScalar = 1.f / scalar;
     for(int y = 0; y < Rows; ++y)
@@ -851,6 +991,7 @@ float3x3 &float3x3::operator /=(float scalar)
 
 float3x3 &float3x3::operator +=(const float3x3 &rhs)
 {
+    assume(rhs.IsFinite());
     for(int y = 0; y < Rows; ++y)
         for(int x = 0; x < Cols; ++x)
             v[y][x] += rhs[y][x];
@@ -860,6 +1001,7 @@ float3x3 &float3x3::operator +=(const float3x3 &rhs)
 
 float3x3 &float3x3::operator -=(const float3x3 &rhs)
 {
+    assume(rhs.IsFinite());
     for(int y = 0; y < Rows; ++y)
         for(int x = 0; x < Cols; ++x)
             v[y][x] -= rhs[y][x];
