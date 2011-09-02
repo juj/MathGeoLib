@@ -306,7 +306,7 @@ public:
     void ScaleRow(int row, float scalar);
 
     /// Scales the three first elements of the given column by a scalar.
-    void ScaleCol3(int row, float scalar);
+    void ScaleCol3(int col, float scalar);
 
     /// Scales the given column by a scalar.
     void ScaleCol(int col, float scalar);
