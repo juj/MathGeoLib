@@ -718,7 +718,7 @@ float3x3 float3x3::Inverted() const
 
 bool float3x3::InverseOrthogonal()
 {
-    assume(IsOrthogonal());
+    assume(IsColOrthogonal());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
@@ -731,13 +731,13 @@ bool float3x3::InverseOrthogonal()
     v[2][0] *= scale1; v[2][1] *= scale2; v[2][2] *= scale3;
 
     assume(IsFinite());
-    assume(IsOrthogonal());
+    assume(IsColOrthogonal());
     return true;
 }
 
 bool float3x3::InverseOrthogonalUniformScale()
 {
-    assume(IsOrthogonal());
+    assume(IsColOrthogonal());
     assume(HasUniformScale());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
@@ -749,7 +749,7 @@ bool float3x3::InverseOrthogonalUniformScale()
     v[2][0] *= scale; v[2][1] *= scale; v[2][2] *= scale;
 
     assume(IsFinite());
-    assume(IsOrthogonal());
+    assume(IsColOrthogonal());
     assume(HasUniformScale());
 
     return true;
@@ -1090,17 +1090,24 @@ bool float3x3::HasUniformScale(float epsilon) const
     return EqualAbs(scale.x, scale.y, epsilon) && EqualAbs(scale.x, scale.z, epsilon);
 }
 
-bool float3x3::IsOrthogonal(float epsilon) const
+bool float3x3::IsRowOrthogonal(float epsilon) const
 {
     return Row(0).IsPerpendicular(Row(1), epsilon)
         && Row(0).IsPerpendicular(Row(2), epsilon)
         && Row(1).IsPerpendicular(Row(2), epsilon);
 }
 
+bool float3x3::IsColOrthogonal(float epsilon) const
+{
+    return Col(0).IsPerpendicular(Col(1), epsilon)
+        && Col(0).IsPerpendicular(Col(2), epsilon)
+        && Col(1).IsPerpendicular(Col(2), epsilon);
+}
+
 bool float3x3::IsOrthonormal(float epsilon) const
 {
     ///\todo Epsilon magnitudes don't match.
-    return IsOrthogonal(epsilon) && Row(0).IsNormalized(epsilon) && Row(1).IsNormalized(epsilon) && Row(2).IsNormalized(epsilon);
+    return IsColOrthogonal(epsilon) && Row(0).IsNormalized(epsilon) && Row(1).IsNormalized(epsilon) && Row(2).IsNormalized(epsilon);
 }
 
 bool float3x3::Equals(const float3x3 &other, float epsilon) const
@@ -1156,7 +1163,7 @@ float3 float3x3::ExtractScale() const
 
 void float3x3::Decompose(Quat &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal());
+    assume(this->IsColOrthogonal());
 
     float3x3 r;
     Decompose(r, scale);
@@ -1168,7 +1175,7 @@ void float3x3::Decompose(Quat &rotate, float3 &scale) const
 
 void float3x3::Decompose(float3x3 &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal());
+    assume(this->IsColOrthogonal());
 
     rotate = *this;
     scale.x = rotate.Col(0).Length();

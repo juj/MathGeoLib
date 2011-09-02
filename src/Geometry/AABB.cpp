@@ -349,7 +349,7 @@ void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 
 void AABB::TransformAsAABB(const float3x3 &transform)
 {
-    assume(transform.IsOrthogonal());
+    assume(transform.IsColOrthogonal());
     assume(transform.HasUniformScale());
 
     AABBTransformAsAABB(*this, transform);
@@ -357,7 +357,7 @@ void AABB::TransformAsAABB(const float3x3 &transform)
 
 void AABB::TransformAsAABB(const float3x4 &transform)
 {
-    assume(transform.IsOrthogonal());
+    assume(transform.IsColOrthogonal());
     assume(transform.HasUniformScale());
 
     AABBTransformAsAABB(*this, transform);
@@ -366,7 +366,7 @@ void AABB::TransformAsAABB(const float3x4 &transform)
 
 void AABB::TransformAsAABB(const float4x4 &transform)
 {
-    assume(transform.IsOrthogonal3());
+    assume(transform.IsColOrthogonal3());
     assume(transform.HasUniformScale());
     assume(transform.Row(3).Equals(0,0,0,1));
 

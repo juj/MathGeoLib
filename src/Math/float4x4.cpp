@@ -1135,7 +1135,7 @@ float4x4 float4x4::Inverted() const
 
 bool float4x4::InverseOrthogonal()
 {
-    assume(IsOrthogonal3());
+    assume(IsColOrthogonal3());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
@@ -1149,13 +1149,13 @@ bool float4x4::InverseOrthogonal()
 
     SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 
-    assume(IsOrthogonal3());
+    assume(IsColOrthogonal3());
     return true;
 }
 
 bool float4x4::InverseOrthogonalUniformScale()
 {
-    assume(IsOrthogonal3());
+    assume(IsColOrthogonal3());
     assume(HasUniformScale());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
@@ -1168,7 +1168,7 @@ bool float4x4::InverseOrthogonalUniformScale()
 
     SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 
-    assume(IsOrthogonal3());
+    assume(IsColOrthogonal3());
     assume(HasUniformScale());
     return true;
 }
@@ -1670,17 +1670,24 @@ bool float4x4::HasUniformScale(float epsilon) const
     return EqualAbs(scale.x, scale.y, epsilon) && EqualAbs(scale.x, scale.z, epsilon);
 }
 
-bool float4x4::IsOrthogonal3(float epsilon) const
+bool float4x4::IsRowOrthogonal3(float epsilon) const
 {
     return Row3(0).IsPerpendicular(Row3(1), epsilon)
         && Row3(0).IsPerpendicular(Row3(2), epsilon)
         && Row3(1).IsPerpendicular(Row3(2), epsilon);
 }
 
+bool float4x4::IsColOrthogonal3(float epsilon) const
+{
+    return Col3(0).IsPerpendicular(Col3(1), epsilon)
+        && Col3(0).IsPerpendicular(Col3(2), epsilon)
+        && Col3(1).IsPerpendicular(Col3(2), epsilon);
+}
+
 bool float4x4::IsOrthonormal3(float epsilon) const
 {
     ///\todo Epsilon magnitudes don't match.
-    return IsOrthogonal3(epsilon) && Row3(0).IsNormalized(epsilon) && Row3(1).IsNormalized(epsilon) && Row3(2).IsNormalized(epsilon);
+    return IsColOrthogonal3(epsilon) && Row3(0).IsNormalized(epsilon) && Row3(1).IsNormalized(epsilon) && Row3(2).IsNormalized(epsilon);
 }
 
 bool float4x4::Equals(const float4x4 &other, float epsilon) const
@@ -1743,7 +1750,7 @@ float3 float4x4::ExtractScale() const
 
 void float4x4::Decompose(float3 &translate, Quat &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal3());
+    assume(this->IsColOrthogonal3());
 
     float3x3 r;
     Decompose(translate, r, scale);
@@ -1755,7 +1762,7 @@ void float4x4::Decompose(float3 &translate, Quat &rotate, float3 &scale) const
 
 void float4x4::Decompose(float3 &translate, float3x3 &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal3());
+    assume(this->IsColOrthogonal3());
 
     assume(Row(3).Equals(0,0,0,1));
     Float3x4Part().Decompose(translate, rotate, scale);
@@ -1766,7 +1773,7 @@ void float4x4::Decompose(float3 &translate, float3x3 &rotate, float3 &scale) con
 
 void float4x4::Decompose(float3 &translate, float3x4 &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal3());
+    assume(this->IsColOrthogonal3());
 
     float3x3 r;
     Decompose(translate, r, scale);
@@ -1779,7 +1786,7 @@ void float4x4::Decompose(float3 &translate, float3x4 &rotate, float3 &scale) con
 
 void float4x4::Decompose(float3 &translate, float4x4 &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal3());
+    assume(this->IsColOrthogonal3());
 
     float3x3 r;
     Decompose(translate, r, scale);

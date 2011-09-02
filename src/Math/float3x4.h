@@ -603,15 +603,11 @@ public:
     /// @note This function assumes that this matrix does not contain projection (the fourth row of this matrix is [0 0 0 1]).
     bool HasUniformScale(float epsilonSq = 1e-6f) const;
 
-    /// Returns true if the column and row vectors of the 3x3 top-left submatrix are all perpendicular to each other.
-    /** @note In math terms, a matrix is orthogonal iff its column and row vectors are orthogonal unit vectors.
-        In the terms of this library however, a matrix is orthogonal iff its column and row vectors are orthogonal (no need to be unitary).
-        @note This function only examines the upper 3-by-3 part of this matrix.
-        If this function returns true, one can use InverseOrthogonal() to compute the inverse of this matrix, instead
-        of the more expensive general Inverse(). If additionally IsUnitaryScale() returns true, then
-        it is possible to use InverseOrthonormal() to compute the inverse, which is the fastest way to compute
-        an inverse. */
-    bool IsOrthogonal(float epsilon = 1e-3f) const;
+    /// Returns true if the row vectors of 3x3 top-left submatrix are all perpendicular to each other.
+    bool IsRowOrthogonal(float epsilon = 1e-3f) const;
+
+    /// Returns true if the column vectors of 3x3 top-left submatrix are all perpendicular to each other.
+    bool IsColOrthogonal(float epsilon = 1e-3f) const;
 
     /// Returns true if the column and row vectors of the 3x3 top-left submatrix form an orthonormal set.
     /// @note In math terms, there does not exist such a thing as 'orthonormal matrix'. In math terms, a matrix 

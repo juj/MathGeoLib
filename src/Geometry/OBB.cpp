@@ -63,7 +63,7 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 
 void OBB::SetFrom(const AABB &aabb, const float3x3 &transform)
 {
-    assume(transform.IsOrthogonal());
+    assume(transform.IsColOrthogonal());
     OBBSetFrom(*this, aabb, transform);
 }
 
@@ -448,19 +448,19 @@ void OBBTransform(OBB &o, const Matrix &transform)
 
 void OBB::Transform(const float3x3 &transform)
 {
-    assume(transform.IsOrthogonal());
+    assume(transform.IsColOrthogonal());
     OBBTransform(*this, transform);
 }
 
 void OBB::Transform(const float3x4 &transform)
 {
-    assume(transform.IsOrthogonal());
+    assume(transform.IsColOrthogonal());
     OBBTransform(*this, transform);
 }
 
 void OBB::Transform(const float4x4 &transform)
 {
-    assume(transform.IsOrthogonal3());
+    assume(transform.IsColOrthogonal3());
     OBBTransform(*this, transform);
 }
 

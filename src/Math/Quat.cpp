@@ -351,7 +351,7 @@ void SetQuatFrom(Quat &q, const M &m)
 
 void Quat::Set(const float3x3 &m)
 {
-    assume(m.IsOrthogonal());
+    assume(m.IsColOrthogonal());
     assume(m.HasUnitaryScale());
     assume(!m.HasNegativeScale());
     SetQuatFrom(*this, m);
@@ -363,7 +363,7 @@ void Quat::Set(const float3x3 &m)
 
 void Quat::Set(const float3x4 &m)
 {
-    assume(m.IsOrthogonal());
+    assume(m.IsColOrthogonal());
     assume(m.HasUnitaryScale());
     assume(!m.HasNegativeScale());
     SetQuatFrom(*this, m);
@@ -374,7 +374,7 @@ void Quat::Set(const float3x4 &m)
 
 void Quat::Set(const float4x4 &m)
 {
-    assume(m.IsOrthogonal3());
+    assume(m.IsColOrthogonal3());
     assume(m.HasUnitaryScale());
     assume(!m.HasNegativeScale());
     assume(m.Row(3).Equals(0,0,0,1));

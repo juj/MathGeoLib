@@ -520,14 +520,11 @@ public:
     /// @note If the matrix does not really do any scaling, this function returns true (scaling uniformly by a factor of 1).
     bool HasUniformScale(float epsilonSq = 1e-6f) const;
 
-    /// Returns true if the column and row vectors of this matrix are all perpendicular to each other.
-    /** @note In math terms, a matrix is orthogonal iff its column and row vectors are orthogonal unit vectors.
-        In the terms of this library however, a matrix is orthogonal iff its column and row vectors are orthogonal (no need to be unitary).
-        If this function returns true, one can use InverseOrthogonal() to compute the inverse of this matrix, instead
-        of the more expensive general Inverse(). If additionally IsUnitaryScale() returns true, then
-        it is possible to use InverseOrthonormal() to compute the inverse, which is the fastest way to compute
-        an inverse. */
-    bool IsOrthogonal(float epsilon = 1e-3f) const;
+    /// Returns true if the row vectors of this matrix are all perpendicular to each other.
+    bool IsRowOrthogonal(float epsilon = 1e-3f) const;
+
+    /// Returns true if the column vectors of this matrix are all perpendicular to each other.
+    bool IsColOrthogonal(float epsilon = 1e-3f) const;
 
     /// Returns true if the column and row vectors of this matrix form an orthonormal set.
     /// @note In math terms, there does not exist such a thing as 'orthonormal matrix'. In math terms, a matrix 

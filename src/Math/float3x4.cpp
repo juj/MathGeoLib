@@ -804,7 +804,7 @@ float3x4 float3x4::Inverted() const
 
 bool float3x4::InverseOrthogonal()
 {
-    assume(IsOrthogonal());
+    assume(IsColOrthogonal());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
@@ -823,7 +823,7 @@ bool float3x4::InverseOrthogonal()
 
 bool float3x4::InverseOrthogonalUniformScale()
 {
-    assume(IsOrthogonal());
+    assume(IsColOrthogonal());
     assume(HasUniformScale());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
@@ -1246,17 +1246,24 @@ bool float3x4::HasUniformScale(float epsilon) const
     return EqualAbs(scale.x, scale.y, epsilon) && EqualAbs(scale.x, scale.z, epsilon);
 }
 
-bool float3x4::IsOrthogonal(float epsilon) const
+bool float3x4::IsRowOrthogonal(float epsilon) const
 {
     return Row(0).IsPerpendicular3(Row(1), epsilon)
         && Row(0).IsPerpendicular3(Row(2), epsilon)
         && Row(1).IsPerpendicular3(Row(2), epsilon);
 }
 
+bool float3x4::IsColOrthogonal(float epsilon) const
+{
+    return Col(0).IsPerpendicular(Col(1), epsilon)
+        && Col(0).IsPerpendicular(Col(2), epsilon)
+        && Col(1).IsPerpendicular(Col(2), epsilon);
+}
+
 bool float3x4::IsOrthonormal(float epsilon) const
 {
     ///\todo Epsilon magnitudes don't match.
-    return IsOrthogonal(epsilon) && Row3(0).IsNormalized(epsilon) && Row3(1).IsNormalized(epsilon) && Row3(2).IsNormalized(epsilon);
+    return IsColOrthogonal(epsilon) && Row3(0).IsNormalized(epsilon) && Row3(1).IsNormalized(epsilon) && Row3(2).IsNormalized(epsilon);
 }
 
 bool float3x4::Equals(const float3x4 &other, float epsilon) const
@@ -1314,7 +1321,7 @@ float3 float3x4::ExtractScale() const
 
 void float3x4::Decompose(float3 &translate, Quat &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal());
+    assume(this->IsColOrthogonal());
 
     float3x3 r;
     Decompose(translate, r, scale);
@@ -1326,7 +1333,7 @@ void float3x4::Decompose(float3 &translate, Quat &rotate, float3 &scale) const
 
 void float3x4::Decompose(float3 &translate, float3x3 &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal());
+    assume(this->IsColOrthogonal());
 
     translate = Col(3);
     rotate = RotatePart();
@@ -1346,7 +1353,7 @@ void float3x4::Decompose(float3 &translate, float3x3 &rotate, float3 &scale) con
 
 void float3x4::Decompose(float3 &translate, float3x4 &rotate, float3 &scale) const
 {
-    assume(this->IsOrthogonal());
+    assume(this->IsColOrthogonal());
 
     float3x3 r;
     Decompose(translate, r, scale);
