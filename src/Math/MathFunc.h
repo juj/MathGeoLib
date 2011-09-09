@@ -56,16 +56,6 @@
 
 #define DOT4DIR_xyz(vec4D, x, y, z) ((vec4D)[0] * (x) + (vec4D)[1] * (y) + (vec4D)[2] * (z))
 
-#if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
-#include <limits>
-#define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
-#define FLOAT_INF std::numeric_limits<float>::infinity()
-#define FLOAT_MAX std::numeric_limits<float>::max()
-#else
-#define FLOAT_MAX FLT_MAX
-#define FLOAT_NAN NAN
-#define FLOAT_INF INFINITY
-#endif
 /// Returns the given amount of degrees in radians.
 /// 180 degrees equals pi, 360 degrees is a full circle, and equals 2pi.
 inline float3 DegToRad(const float3 &degrees) { return degrees * (pi / 180.f); }

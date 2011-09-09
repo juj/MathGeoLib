@@ -33,3 +33,14 @@ const float e  =           (float)2.71828182845904523536028747135266249775724709
 const float pi =           (float)3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 /// \f$e^2\f$
 const float e2 =           (float)7.3890560989306502272304274605750078131803155705518473240871278225225737960790577633843124850791217948;
+
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
+#include <limits>
+#define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
+#define FLOAT_INF std::numeric_limits<float>::infinity()
+#define FLOAT_MAX std::numeric_limits<float>::max()
+#else
+#define FLOAT_MAX FLT_MAX
+#define FLOAT_NAN NAN
+#define FLOAT_INF INFINITY
+#endif
