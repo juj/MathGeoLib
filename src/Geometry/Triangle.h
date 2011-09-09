@@ -11,6 +11,9 @@
 #include "Math/float3.h"
 
 /// Specifies a triangle through three points in 3D space.
+/** This class stores three member vertices a,b and c to specify the triangle. To determine which side
+    of this triangle is the positive halfspace, the counter-clockwise (CCW) convention is used. This means that
+    the positive halfspace is the one from which viewed the vertices a,b and c wind up in CCW order. */
 class Triangle
 {
 public:
@@ -19,6 +22,9 @@ public:
     float3 c;
 
     Triangle() {}
+    /// Constructs a triangle given three points.
+    /// The normal of the plane will be constructed to point towards the halfspace where
+    /// the vertices a,b,c wind in counter-clockwise order.
     Triangle(const float3 &a, const float3 &b, const float3 &c);
 
     /// Expresses the given point in barycentric (u,v,w) coordinates with respect to this triangle.
@@ -37,8 +43,11 @@ public:
     /// Returns the surface area of this triangle.
     float Area() const;
 
-    /// Returns the plane this triangle lies on.
-    Plane GetPlane() const;
+    /// Returns the plane this triangle lies on. The normal of the returned plane points to the counter-clockwise direction of this triangle.
+    Plane PlaneCCW() const;
+
+    /// Returns the plane this triangle lies on. The normal of the returned plane points to the clockwise direction of this triangle.
+    Plane PlaneCW() const;
 
     /// Returns the triangle normal when the positive side of this triangle is treated to be the counter-clockwise winding order. 
 	/// That is, the resulting normal points to the direction where this plane is viewed to wind in CCW direction.

@@ -68,9 +68,14 @@ float Triangle::Area() const
     return 0.5f * Cross(b-a, c-a).Length();
 }
 
-Plane Triangle::GetPlane() const
+Plane Triangle::PlaneCCW() const
 {
     return Plane(a, b, c);
+}
+
+Plane Triangle::PlaneCW() const
+{
+    return Plane(a, c, b);
 }
 
 float3 Triangle::NormalCCW() const
@@ -115,7 +120,7 @@ bool Triangle::IsDegenerate(const float3 &a, const float3 &b, const float3 &c, f
 
 bool Triangle::Contains(const float3 &point, float triangleThickness) const
 {
-    if (GetPlane().Distance(point) > triangleThickness)
+    if (PlaneCCW().Distance(point) > triangleThickness) // The winding order of the triangle plane does not matter.s
         return false; ///\todo This test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
 
     float3 br = Barycentric(point);
@@ -276,14 +281,14 @@ static void FindIntersectingLineSegments(const Triangle &t, float da, float db, 
 bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 {
     // Is the triangle t2 completely on one side of the plane of this triangle?
-    Plane p1 = this->GetPlane();
+    Plane p1 = this->PlaneCCW();
     float t2da = p1.SignedDistance(t2.a);
     float t2db = p1.SignedDistance(t2.b);
     float t2dc = p1.SignedDistance(t2.c);
     if (t2da*t2db > 0.f && t2da*t2dc > 0.f)
         return false;
     // Is this triangle completely on one side of the plane of the triangle t2?
-    Plane p2 = t2.GetPlane();
+    Plane p2 = t2.PlaneCCW();
     float t1da = p2.SignedDistance(this->a);
     float t1db = p2.SignedDistance(this->b);
     float t1dc = p2.SignedDistance(this->c);
@@ -451,7 +456,7 @@ float3 Triangle::ClosestPoint(const LineSegment &line, float3 *otherPt) const
     if (success)
         return intersectionPoint;
 
-    Plane p = GetPlane();
+    Plane p = PlaneCCW();
     float d1 = p.Distance(line.a);
     float d2 = p.Distance(line.b);
     bool aProjectsInsideTriangle = BarycentricInsideTriangle(line.a);
