@@ -40,6 +40,10 @@ float3::float3(const float2 &xy, float z_)
 float3::float3(const float *data)
 {
     assert(data);
+#ifndef OPTIMIZED_RELEASE
+    if (!data)
+        return;
+#endif
     x = data[0];
     y = data[1];
     z = data[2];
@@ -59,6 +63,10 @@ CONST_WIN32 float float3::operator [](int index) const
 { 
     assert(index >= 0);
     assert(index < Size);
+#ifndef OPTIMIZED_RELEASE
+    if (index < 0 || index >= Size)
+        return FLOAT_NAN;
+#endif
     return ptr()[index];
 }
 
@@ -66,6 +74,10 @@ float &float3::operator [](int index)
 { 
     assert(index >= 0);
     assert(index < Size);
+#ifndef OPTIMIZED_RELEASE
+    if (index < 0 || index >= Size)
+        return ptr()[0];
+#endif
     return ptr()[index];
 }
 
@@ -95,9 +107,8 @@ float float3::Normalize()
     }
     else
     {
-//        printf("float3::Normalize called on a vector with 0 length!\n");
-        Set(1.f, 0.f, 0.f);
-        return 0;
+        Set(1.f, 0.f, 0.f); // We will always produce a normalized vector.
+        return 0; // But signal failure, so user knows we have generated an arbitrary normalization.
     }
 }
 

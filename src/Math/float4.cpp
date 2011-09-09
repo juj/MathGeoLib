@@ -41,6 +41,10 @@ float4::float4(const float2 &xy, float z_, float w_)
 float4::float4(const float *data)
 {
     assert(data);
+#ifndef OPTIMIZED_RELEASE
+    if (!data)
+        return;
+#endif
     x = data[0];
     y = data[1];
     z = data[2];
@@ -61,6 +65,10 @@ CONST_WIN32 float float4::operator [](int index) const
 { 
     assert(index >= 0);
     assert(index < Size);
+#ifndef OPTIMIZED_RELEASE
+    if (index < 0 || index >= Size)
+        return FLOAT_NAN;
+#endif
     return ptr()[index];
 }
 
@@ -68,6 +76,10 @@ float &float4::operator [](int index)
 { 
     assert(index >= 0);
     assert(index < Size);
+#ifndef OPTIMIZED_RELEASE
+    if (index < 0 || index >= Size)
+        return ptr()[0];
+#endif
     return ptr()[index];
 }
 
@@ -110,9 +122,8 @@ float float4::Normalize3()
     }
     else
     {
-//        printf("float4::Normalize3 called on a vector with 0 length!\n");
-        Set(1.f, 0.f, 0.f, w);
-        return 0;
+        Set(1.f, 0.f, 0.f, w); // We will always produce a normalized vector.
+        return 0; // But signal failure, so user knows we have generated an arbitrary normalization.
     }
 }
 
@@ -135,9 +146,8 @@ float float4::Normalize4()
     }
     else
     {
-        printf("float4::Normalize4 called on a vector with 0 length!\n");
-        Set(1.f, 0.f, 0.f, 0.f);
-        return false;
+        Set(1.f, 0.f, 0.f, 0.f); // We will always produce a normalized vector.
+        return 0; // But signal failure, so user knows we have generated an arbitrary normalization.
     }
 }
 
@@ -151,11 +161,7 @@ float4 float4::Normalized4() const
 
 bool float4::NormalizeW()
 {
-    if (fabs(w) < 1e-6f)
-    {
-        printf("float4::NormalizeW called on a vector with w=0!\n");
-        return false;
-    }
+    assume(fabs(w) > 1e-6f);
 
     float invW = 1.f / w;
     x *= invW;
@@ -617,12 +623,7 @@ float4 float4::operator -() const
 {
     return float4(-x, -y, -z, -w);
 }
-/*
-float4 float4::operator *(const float4 &rhs) const
-{
-    return float4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
-}
-*/
+
 float4 float4::operator *(float scalar) const
 {
     return float4(x * scalar, y * scalar, z * scalar, w * scalar);
@@ -632,23 +633,13 @@ float4 operator *(float scalar, const float4 &rhs)
 {
     return float4(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z, scalar * rhs.w);
 }
-/*
-float4 float4::operator /(const float4 &rhs) const
-{
-    return float4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
-}
-*/
+
 float4 float4::operator /(float scalar) const
 {
     float invScalar = 1.f / scalar;
     return float4(x * invScalar, y * invScalar, z * invScalar, w * invScalar);
 }
-/*
-float4 operator /(float scalar, const float4 &rhs)
-{
-    return float4(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z, scalar / rhs.w);
-}
-*/
+
 float4 &float4::operator +=(const float4 &rhs)
 {
     x += rhs.x;
@@ -668,17 +659,7 @@ float4 &float4::operator -=(const float4 &rhs)
 
     return *this;
 }
-/*
-float4 &float4::operator *=(const float4 &rhs)
-{
-    x *= rhs.x;
-    y *= rhs.y;
-    z *= rhs.z;
-    w *= rhs.w;
 
-    return *this;
-}
-*/
 float4 &float4::operator *=(float scalar)
 {
     x *= scalar;
@@ -688,17 +669,6 @@ float4 &float4::operator *=(float scalar)
 
     return *this;
 }
-/*
-float4 &float4::operator /=(const float4 &rhs)
-{
-    x /= rhs.x;
-    y /= rhs.y;
-    z /= rhs.z;
-    w /= rhs.w;
-
-    return *this;
-}
-*/
 
 float4 float4::Mul(const float4 &rhs) const
 {

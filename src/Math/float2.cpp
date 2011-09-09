@@ -27,6 +27,10 @@ float2::float2(float x_, float y_)
 float2::float2(const float *data)
 {
     assert(data);
+#ifndef OPTIMIZED_RELEASE
+    if (!data)
+        return;
+#endif
     x = data[0];
     y = data[1];
 }
@@ -45,6 +49,10 @@ CONST_WIN32 float float2::operator [](int index) const
 { 
     assert(index >= 0);
     assert(index < Size);
+#ifndef OPTIMIZED_RELEASE
+    if (index < 0 || index >= Size)
+        return FLOAT_NAN;
+#endif
     return ptr()[index];
 }
 
@@ -52,6 +60,10 @@ float &float2::operator [](int index)
 { 
     assert(index >= 0);
     assert(index < Size);
+#ifndef OPTIMIZED_RELEASE
+    if (index < 0 || index >= Size)
+        return ptr()[0];
+#endif
     return ptr()[index];
 }
 
@@ -76,9 +88,8 @@ float float2::Normalize()
     }
     else
     {
-        printf("float2::Normalize called on a vector with 0 length!\n");
-        Set(1.f, 0.f);
-        return 0;
+        Set(1.f, 0.f); // We will always produce a normalized vector.
+        return 0; // But signal failure, so user knows we have generated an arbitrary normalization.
     }
 }
 
