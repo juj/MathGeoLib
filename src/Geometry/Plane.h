@@ -74,6 +74,10 @@ public:
     /// Tests if given point is on the positive side of this plane.
     bool IsOnPositiveSide(const float3 &point) const;
 
+    /// Returns 1 if the whole triangle is on the positive side of this plane, -1 if the triangle
+    /// is on the negative side of this plane, and 0 if the triangle intersects this plane.
+    int ExamineSide(const Triangle &triangle) const;
+
     /// Tests if two points are on the same side of the plane.
     bool AreOnSameSide(const float3 &p1, const float3 &p2) const;
 

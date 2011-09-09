@@ -59,8 +59,9 @@ Plane::Plane(const LineSegment &lineSegment, const float3 &normal)
 
 void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
 {
-    assume(!Line::AreCollinear(v1, v2, v3));
-    normal = (v2-v1).Cross(v3-v1).Normalized();
+    normal = (v2-v1).Cross(v3-v1);
+    assume(!normal.IsZero());
+    normal.Normalize();
     d = Dot(v1, normal);
 }
 
@@ -114,6 +115,18 @@ bool Plane::IsInPositiveDirection(const float3 &directionVector) const
 bool Plane::IsOnPositiveSide(const float3 &point) const
 {
     return SignedDistance(point) >= 0.f;
+}
+
+int Plane::ExamineSide(const Triangle &triangle) const
+{
+    float a = SignedDistance(triangle.a);
+    float b = SignedDistance(triangle.b);
+    float c = SignedDistance(triangle.c);
+    if (a >= 0.f && b >= 0.f && c >= 0.f)
+        return 1;
+    else if (a <= 0.f && b <= 0.f && c <= 0.f)
+        return -1;
+    return 0;
 }
 
 bool Plane::AreOnSameSide(const float3 &p1, const float3 &p2) const
