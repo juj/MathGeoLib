@@ -287,6 +287,7 @@ public:
     bool Intersects(const Line &line, float *dNear, float *dFar) const;
     bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
     bool Intersects(const Plane &plane) const;
+    bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb) const;
     /// @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere.
     bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const;
