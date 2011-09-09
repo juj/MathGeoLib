@@ -313,8 +313,10 @@ public:
     float4 Div(float rhs) const { return *this / rhs; }
     float4 Neg() const { return -*this; }
 
-    /// Multiplies this vector by rhs *element-wise*, including the w-components.
+    /// Multiplies this vector by rhs *element-wise*, including the w-component.
     float4 Mul(const float4 &rhs) const;
+    /// Divides this vector by rhs *element-wise*, including the w-component.
+    float4 Div(const float4 &rhs) const;
 
 #ifdef OGRE_INTEROP
     float4(const Ogre::Vector4 &other) { x = other.x; y = other.y; z = other.z; w = other.w; }

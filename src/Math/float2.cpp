@@ -643,6 +643,11 @@ float2 float2::Mul(const float2 &rhs) const
     return float2(x * rhs.x, y * rhs.y);
 }
 
+float2 float2::Div(const float2 &rhs) const
+{
+    return float2(x / rhs.x, y / rhs.y);
+}
+
 float2 &float2::operator /=(float scalar)
 {
     float invScalar = 1.f / scalar;
