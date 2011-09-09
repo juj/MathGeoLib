@@ -190,7 +190,7 @@ float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 bool Line::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
 {
     ///\todo Improve this check to be distance length -invariant.
-    return (p2-p1).Dot(p3-p1) <= epsilon;
+    return Abs((p2-p1).Dot(p3-p1)) <= epsilon;
 }
 
 Ray Line::ToRay() const
