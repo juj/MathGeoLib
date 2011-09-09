@@ -560,12 +560,6 @@ float3 float3::operator -() const
     return float3(-x, -y, -z);
 }
 
-/*
-float3 float3::operator *(const float3 &rhs) const
-{
-    return float3(x * rhs.x, y * rhs.y, z * rhs.z);
-}
-*/
 float3 float3::operator *(float scalar) const
 {
     return float3(x * scalar, y * scalar, z * scalar);
@@ -575,12 +569,7 @@ float3 operator *(float scalar, const float3 &rhs)
 {
     return float3(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z);
 }
-/*
-float3 float3::operator /(const float3 &rhs) const
-{
-    return float3(x / rhs.x, y / rhs.y, z / rhs.z);
-}
-*/
+
 float3 float3::operator /(float scalar) const
 {
     float invScalar = 1.f / scalar;
@@ -609,16 +598,7 @@ float3 &float3::operator -=(const float3 &rhs)
 
     return *this;
 }
-/*
-float3 &float3::operator *=(const float3 &rhs)
-{
-    x *= rhs.x;
-    y *= rhs.y;
-    z *= rhs.z;
 
-    return *this;
-}
-*/
 float3 &float3::operator *=(float scalar)
 {
     x *= scalar;
@@ -627,20 +607,15 @@ float3 &float3::operator *=(float scalar)
 
     return *this;
 }
-/*
-float3 &float3::operator /=(const float3 &rhs)
-{
-    x /= rhs.x;
-    y /= rhs.y;
-    z /= rhs.z;
-
-    return *this;
-}
-*/
 
 float3 float3::Mul(const float3 &rhs) const
 {
     return float3(x * rhs.x, y * rhs.y, z * rhs.z);
+}
+
+float3 float3::Div(const float3 &rhs) const
+{
+    return float3(x / rhs.x, y / rhs.y, z / rhs.z);
 }
 
 float3 &float3::operator /=(float scalar)

@@ -582,12 +582,6 @@ float2 float2::operator -() const
     return float2(-x, -y);
 }
 
-/*
-float2 float2::operator *(const float2 &rhs) const
-{
-    return float2(x * rhs.x, y * rhs.y);
-}
-*/
 float2 float2::operator *(float scalar) const
 {
     return float2(x * scalar, y * scalar);
@@ -597,12 +591,7 @@ float2 operator *(float scalar, const float2 &rhs)
 {
     return float2(scalar * rhs.x, scalar * rhs.y);
 }
-/*
-float2 float2::operator /(const float2 &rhs) const
-{
-    return float2(x / rhs.x, y / rhs.y);
-}
-*/
+
 float2 float2::operator /(float scalar) const
 {
     float invScalar = 1.f / scalar;
@@ -629,15 +618,7 @@ float2 &float2::operator -=(const float2 &rhs)
 
     return *this;
 }
-/*
-float2 &float2::operator *=(const float2 &rhs)
-{
-    x *= rhs.x;
-    y *= rhs.y;
 
-    return *this;
-}
-*/
 float2 &float2::operator *=(float scalar)
 {
     x *= scalar;
@@ -645,15 +626,6 @@ float2 &float2::operator *=(float scalar)
 
     return *this;
 }
-/*
-float2 &float2::operator /=(const float2 &rhs)
-{
-    x /= rhs.x;
-    y /= rhs.y;
-
-    return *this;
-}
-*/
 
 float2 float2::Mul(const float2 &rhs) const
 {

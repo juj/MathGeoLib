@@ -264,27 +264,28 @@ public:
     float4 operator -(const float4 &rhs) const;
     /// Negates vector.
     float4 operator -() const;
-    /// Multiplies the x, y, z and w components of this and rhs elementwise.
-//    float4 operator *(const float4 &rhs) const;
     /// Multiplies the x, y, z and w components of this vector by the given scalar. Note that if w != 0, 
     /// this does NOT scale the length of the homogeneous 3D vector.
     float4 operator *(float scalar) const;
-    /// Divides all four components of this vector elementwise.
-//    float4 operator /(const float4 &rhs) const;
     /// Divides the x, y, z and w components of this vector by the given scalar. Note that if w != 0, 
     /// this does NOT scale the length of the homogeneous 3D vector.
     float4 operator /(float scalar) const;
 
     float4 &operator +=(const float4 &rhs);
     float4 &operator -=(const float4 &rhs);
-//    float4 &operator *=(const float4 &rhs);
     /// Multiplies the x, y, z and w components of this vector by the given scalar. Note that if w != 0, 
     /// this does NOT scale the length of the homogeneous 3D vector.
     float4 &operator *=(float scalar);
-//    float4 &operator /=(const float4 &rhs);
     /// Divides the x, y, z and w components of this vector by the given scalar. Note that if w != 0, 
     /// this does NOT scale the length of the homogeneous 3D vector.
     float4 &operator /=(float scalar);
+
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+    float4 operator *(const float4 &rhs) const { return this->Mul(rhs); }
+    float4 operator /(const float4 &rhs) const { return this->Div(rhs); }
+    float4 &operator *=(const float4 &rhs) { *this = this->Mul(rhs); return *this; }
+    float4 &operator /=(const float4 &rhs) { *this = this->Div(rhs); return *this; }
+#endif
 
     /// Specifies a compile-time constant float4 with value (0, 0, 0, 0).
     static const float4 zero;
@@ -345,7 +346,9 @@ std::ostream &operator <<(std::ostream &out, const float4 &rhs);
 /// this does NOT scale the length of the homogeneous 3D vector.
 float4 operator *(float scalar, const float4 &rhs);
 
-//float4 operator /(float scalar, const float4 &rhs);
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+inline float4 operator /(float scalar, const float4 &rhs) { return float4::FromScalar(scalar) / rhs; }
+#endif
 
 inline float Dot3(const float4 &a, const float4 &b) { return a.Dot3(b); }
 inline float Dot4(const float4 &a, const float4 &b) { return a.Dot4(b); }

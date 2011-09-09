@@ -243,17 +243,20 @@ public:
 
     float2 operator +(const float2 &rhs) const;
     float2 operator -(const float2 &rhs) const;
-//    float2 operator *(const float2 &rhs) const;
     float2 operator *(float scalar) const;
-//    float2 operator /(const float2 &rhs) const;
     float2 operator /(float scalar) const;
 
     float2 &operator +=(const float2 &rhs);
     float2 &operator -=(const float2 &rhs);
-//    float2 &operator *=(const float2 &rhs);
     float2 &operator *=(float scalar);
-//    float2 &operator /=(const float2 &rhs);
     float2 &operator /=(float scalar);
+
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+    float2 operator *(const float2 &rhs) const { return this->Mul(rhs); }
+    float2 operator /(const float2 &rhs) const { return this->Div(rhs); }
+    float2 &operator *=(const float2 &rhs) { *this = this->Mul(rhs); return *this; }
+    float2 &operator /=(const float2 &rhs) { *this = this->Div(rhs); return *this; }
+#endif
 
     float2 Add(const float2 &rhs) const { return *this + rhs; }
     float2 Sub(const float2 &rhs) const { return *this - rhs; }
@@ -262,6 +265,8 @@ public:
 
     /// Multiplies this vector by rhs *element-wise*.
     float2 Mul(const float2 &rhs) const;
+    /// Divides this vector by rhs *element-wise*.
+    float2 Div(const float2 &rhs) const;
 
     /// a compile-time constant float2 with value (0, 0).
     static const float2 zero;
@@ -300,7 +305,10 @@ std::ostream &operator <<(std::ostream &out, const float2 &rhs);
 #endif
 
 float2 operator *(float scalar, const float2 &rhs);
-//float2 operator /(float scalar, const float2 &rhs); 
+
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+inline float2 operator /(float scalar, const float2 &rhs) { return float2::FromScalar(scalar) / rhs; }
+#endif
 
 inline float Dot(const float2 &a, const float2 &b) { return a.Dot(b); }
 inline float2 Abs(const float2 &a) { return a.Abs(); }

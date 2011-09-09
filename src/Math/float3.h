@@ -258,17 +258,20 @@ public:
 
     float3 operator +(const float3 &rhs) const;
     float3 operator -(const float3 &rhs) const;
-//    float3 operator *(const float3 &rhs) const;
     float3 operator *(float scalar) const;
-//    float3 operator /(const float3 &rhs) const;
     float3 operator /(float scalar) const;
 
     float3 &operator +=(const float3 &rhs);
     float3 &operator -=(const float3 &rhs);
-//    float3 &operator *=(const float3 &rhs);
     float3 &operator *=(float scalar);
-//    float3 &operator /=(const float3 &rhs);
     float3 &operator /=(float scalar);
+
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+    float3 operator *(const float3 &rhs) const { return this->Mul(rhs); }
+    float3 operator /(const float3 &rhs) const { return this->Div(rhs); }
+    float3 &operator *=(const float3 &rhs) { *this = this->Mul(rhs); return *this; }
+    float3 &operator /=(const float3 &rhs) { *this = this->Div(rhs); return *this; }
+#endif
 
     float3 Add(const float3 &rhs) const { return *this + rhs; }
     float3 Sub(const float3 &rhs) const { return *this - rhs; }
@@ -277,6 +280,8 @@ public:
 
     /// Multiplies this vector by rhs *element-wise*.
     float3 Mul(const float3 &rhs) const;
+    /// Divides this vector by rhs *element-wise*.
+    float3 Div(const float3 &rhs) const;
 
     /// Specifies a compile-time constant float3 with value (0, 0, 0).
     static const float3 zero;
@@ -327,7 +332,10 @@ std::ostream &operator <<(std::ostream &out, const float3 &rhs);
 #endif
 
 float3 operator *(float scalar, const float3 &rhs);
-//float3 operator /(float scalar, const float3 &rhs);
+
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+inline float3 operator /(float scalar, const float3 &rhs) { return float3::FromScalar(scalar) / rhs; }
+#endif
 
 inline float Dot(const float3 &a, const float3 &b) { return a.Dot(b); }
 inline float3 Cross(const float3 &a, const float3 &b) { return a.Cross(b); }
