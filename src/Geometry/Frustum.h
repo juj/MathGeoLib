@@ -61,10 +61,39 @@ public:
     Plane TopPlane() const;
     Plane BottomPlane() const;
 
+    /// Returns the view->world matrix of this Frustum.
+    float3x4 WorldMatrix() const;
+
+    /// Returns the world->view matrix of this Frustum.
+    float3x4 ViewMatrix() const;
+
+    /// Returns the view->proj matrix of this Frustum.
     float4x4 ProjectionMatrix() const;
 
+    /// Returns the world->view->proj matrix of this Frustum.
+    /// The matrix returned by this function is simply the concatenation ProjectionMatrix()*ViewMatrix().
+    float4x4 ViewProjMatrix() const;
+
     /// Finds a ray in world space that originates at the eye point and looks in the given direction inside the frustum.
+    /// The (x,y) coordinate specifies the normalized viewport coordinate through which the ray passes.
+    /// Both x and y must be in the range [-1,1].
+	/// Specifying (-1, -1) returns the bottom-left corner of the near plane.
+	/// The point (1, 1) corresponds to the top-right corner of the near plane.
     Ray LookAt(float x, float y) const;
+
+    /// Like LookAt, but if the frustum type is PerspectiveFrustum, the ray originates at the near plane, 
+    /// and not at the camera eye point. For orthographic frustum, LookAt and LookAtFromNearPlane are identical
+    /// (always originates at near plane).
+    Ray LookAtFromNearPlane(float x, float y) const;
+
+    /// Projects the given point onto the near plane of this frustum.
+    /// The (x,y) component of the returned float3 gives the normalized viewport coordinates of the point on the
+    /// near plane. The z component gives the normalized depth of the point.
+    /// If the point is inside the frustum, x and y are in the range [-1, 1] and z is in the range [0, 1]. If the point
+    /// was behind the near plane, z will return a negative value. If the point lies exactly on the near plane, z==0
+    /// will be returned. If the point lies exactly on the far plane, z==1 will be returned, and if a z>1 is returned,
+    /// the given point was outside the far plane of this Frustum.
+    float3 Project(const float3 &point) const;
 
 	/// Returns a point on the near plane.
 	/// @param x A value in the range [-1, 1].
@@ -95,9 +124,6 @@ public:
 	/// (This mapping is affine).
 	static float2 ScreenToViewportSpace(float x, float y, int screenWidth, int screenHeight);
 	static float2 ScreenToViewportSpace(const float2 &point, int screenWidth, int screenHeight);
-
-    /// Tests if a point is inside the frustum.
-    bool Contains(const float3 &point) const;
 
     /// Returns true if the elements in this data structure contain valid finite float values.
     bool IsFinite() const;
@@ -138,6 +164,9 @@ public:
 
     /// Returns an OBB that encloses this frustum.
     OBB ToOBB() const;
+
+    /// Returns true if the given point is contained inside this frustum.
+    bool Contains(const float3 &point) const;
 
     /// Returns an exact polyhedron representation of this frustum.
 //    Polyhedron ToPolyhedron() const;

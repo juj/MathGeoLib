@@ -73,6 +73,30 @@ Plane Frustum::BottomPlane() const
     return Plane(pos, bottomSideNormal);
 }
 
+float3x4 Frustum::WorldMatrix() const
+{
+    assume(up.IsNormalized());
+    assume(front.IsNormalized());
+    float3x4 m;
+    m.SetCol(0, up.Cross(front).Normalized());
+    m.SetCol(1, up);
+    m.SetCol(2, front);
+    m.SetCol(3, pos);
+    return m;
+}
+
+float3x4 Frustum::ViewMatrix() const
+{
+    float3x4 world = WorldMatrix();
+    world.InverseOrthonormal();
+    return world;
+}
+
+float4x4 Frustum::ViewProjMatrix() const
+{
+    return ProjectionMatrix() * ViewMatrix();
+}
+
 float4x4 Frustum::ProjectionMatrix() const
 {
 	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
@@ -100,12 +124,12 @@ float3 Frustum::NearPlanePos(float x, float y) const
 		float frontPlaneHalfHeight = tan(verticalFov*0.5f)*nearPlaneDistance;
 		x = x * frontPlaneHalfWidth; // Map [-1,1] to [-width/2, width/2].
 		y = y * frontPlaneHalfHeight;  // Map [-1,1] to [-height/2, height/2].
-		float3 right = Cross(front, up).Normalized();
+		float3 right = Cross(up, front).Normalized();
 		return pos + front * nearPlaneDistance + x * right - y * up;
 	}
 	else
 	{
-		float3 right = Cross(front, up).Normalized();
+		float3 right = Cross(up, front).Normalized();
 		return pos + front * nearPlaneDistance 
 		           + x * orthographicWidth * 0.5f * right
 		           + y * orthographicHeight * 0.5f * up;
@@ -127,12 +151,12 @@ float3 Frustum::FarPlanePos(float x, float y) const
 		float farPlaneHalfHeight = tan(verticalFov*0.5f)*farPlaneDistance;
 		x = x * farPlaneHalfWidth;
 		y = y * farPlaneHalfHeight;
-		float3 right = Cross(front, up).Normalized();
+		float3 right = Cross(up, front).Normalized();
 		return pos + front * farPlaneDistance + x * right - y * up;
 	}
 	else
 	{
-		float3 right = Cross(front, up).Normalized();
+		float3 right = Cross(up, front).Normalized();
 		return pos + front * farPlaneDistance 
 		           + x * orthographicWidth * 0.5f * right
 		           + y * orthographicHeight * 0.5f * up;
@@ -166,14 +190,35 @@ float2 Frustum::ScreenToViewportSpace(const float2 &point, int screenWidth, int 
 
 Ray Frustum::LookAt(float x, float y) const
 {
+    if (type == PerspectiveFrustum)
+    {
+        float3 nearPlanePos = NearPlanePos(x, y);
+        return Ray(pos, (nearPlanePos - pos).Normalized());
+    }
+    else
+        return LookAtFromNearPlane(x, y);
+}
+
+Ray Frustum::LookAtFromNearPlane(float x, float y) const
+{
     float3 nearPlanePos = NearPlanePos(x, y);
-    return Ray(pos, (nearPlanePos - pos).Normalized());
+    float3 farPlanePos = FarPlanePos(x, y);
+    return Ray(nearPlanePos, (farPlanePos - nearPlanePos).Normalized());
+}
+
+float3 Frustum::Project(const float3 &point) const
+{
+    float4 projectedPoint = ViewProjMatrix().Mul(float4(point, 1.f));
+    projectedPoint /= projectedPoint.w; // Post-projective perspective divide.
+    return projectedPoint.xyz();
 }
 
 bool Frustum::Contains(const float3 &point) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    float3 projected = Project(point);
+    return projected.x >= -1.f && projected.x <= 1.f &&
+        projected.y >= -1.f && projected.y <= 1.f &&
+        projected.z >= 0.f && projected.z <= 1.f;
 }
 
 bool Frustum::IsFinite() const
