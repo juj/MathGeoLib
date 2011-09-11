@@ -63,6 +63,11 @@ void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
     assume(!normal.IsZero());
     normal.Normalize();
     d = Dot(v1, normal);
+
+    assert(EqualAbs(SignedDistance(v1), 0.f));
+    assert(EqualAbs(SignedDistance(v2), 0.f));
+    assert(EqualAbs(SignedDistance(v3), 0.f));
+    assert(EqualAbs(SignedDistance(v3 + normal), 1.f));
 }
 
 void Plane::Set(const float3 &point, const float3 &normal_)
@@ -70,6 +75,9 @@ void Plane::Set(const float3 &point, const float3 &normal_)
     normal = normal_;
     assume(normal.IsNormalized());
     d = Dot(point, normal);
+
+    assert(EqualAbs(SignedDistance(point), 0.f));
+    assert(EqualAbs(SignedDistance(point + normal_), 1.f));
 }
 
 float3 Plane::PointOnPlane() const
@@ -122,9 +130,10 @@ int Plane::ExamineSide(const Triangle &triangle) const
     float a = SignedDistance(triangle.a);
     float b = SignedDistance(triangle.b);
     float c = SignedDistance(triangle.c);
-    if (a >= 0.f && b >= 0.f && c >= 0.f)
+    const float epsilon = 1e-4f; // Allow a small epsilon amount for tests for floating point inaccuracies.
+    if (a >= -epsilon && b >= -epsilon && c >= -epsilon)
         return 1;
-    else if (a <= 0.f && b <= 0.f && c <= 0.f)
+    if (a <= epsilon && b <= epsilon && c <= epsilon)
         return -1;
     return 0;
 }
