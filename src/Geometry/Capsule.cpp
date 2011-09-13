@@ -6,9 +6,11 @@
 #include "Math/Quat.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Ray.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Circle.h"
+#include "Algorithm/Random/LCG.h"
 #include "assume.h"
 
 Capsule::Capsule(const LineSegment &endPoints, float radius)
@@ -74,11 +76,19 @@ float Capsule::SurfaceArea() const
     return 2.f * pi * r * LineLength() + 4.f * pi * r * r;
 }
 
-Circle Capsule::CrossSection(float l) const
+Circle Capsule::CrossSection(float yPos) const
 {
-    ///\todo Implement!
-    assume(false && "Not implemented!");
-    return Circle();
+    assume(yPos >= 0.f);
+    assume(yPos <= 1.f);
+    yPos *= Height();
+    float3 up = UpDirection();
+    float3 centerPos = Bottom() + up * yPos;
+    if (yPos < r) // First section, between Bottom() and lower point.
+        return Circle(centerPos, up, Sqrt(r*r - (r-yPos)*(r-yPos)));
+    if (yPos < l.Length() + r) // Second section, between lower and upper points.
+        return Circle(centerPos, up, r);
+    float d = yPos - r - l.Length(); // Third section, above upper point.
+    return Circle(centerPos, up, Sqrt(r*r - d*d));
 }
 
 LineSegment Capsule::HeightLineSegment() const
@@ -93,9 +103,8 @@ bool Capsule::IsFinite() const
 
 float3 Capsule::PointInside(float l, float a, float d) const
 {
-    ///\todo Implement!
-    assume(false && "Not implemented!");
-    return float3();
+    Circle c = CrossSection(l);
+    return c.GetPoint(a*2.f*pi, d);
 }
 
 float3 Capsule::UniformPointPerhapsInside(float l, float x, float y) const
@@ -139,9 +148,7 @@ float3 Capsule::RandomPointInside(LCG &rng) const
 
 float3 Capsule::RandomPointOnSurface(LCG &rng) const
 {
-    ///\todo Implement!
-    assume(false && "Not implemented!");
-    return float3();
+    return PointInside(rng.Float(), rng.Float(), 1.f);
 }
 
 void Capsule::Translate(const float3 &offset)
@@ -185,16 +192,16 @@ void Capsule::Transform(const Quat &transform)
 
 float3 Capsule::ClosestPoint(const float3 &targetPoint) const
 {
-    ///\todo Implement!
-    assume(false && "Not implemented!");
-    return float3();
+    float3 ptOnLine = l.ClosestPoint(targetPoint);
+    if (ptOnLine.DistanceSq(targetPoint) <= r*r)
+        return targetPoint;
+    else
+        return ptOnLine + (targetPoint - ptOnLine).ScaledToLength(r);
 }
 
 float Capsule::Distance(const float3 &point) const
 {
-    ///\todo Implement!
-    assume(false && "Not implemented!");
-    return 0;
+    return Max(0.f, l.Distance(point) - r);
 }
 
 bool Capsule::Contains(const float3 &point) const
@@ -206,40 +213,47 @@ bool Capsule::Contains(const LineSegment &lineSegment) const
 {
     return Contains(lineSegment.a) && Contains(lineSegment.b);
 }
-/*
-bool Capsule::Intersects(const Ray &ray, float *dNear, float *dFar) const
+
+bool Capsule::Intersects(const Ray &ray) const
 {
+    return l.Distance(ray) <= r;
 }
 
-bool Capsule::Intersects(const Line &line, float *dNear, float *dFar) const
+bool Capsule::Intersects(const Line &line) const
 {
+    return l.Distance(line) <= r;
 }
 
-bool Capsule::Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const
+bool Capsule::Intersects(const LineSegment &lineSegment) const
 {
+    return l.Distance(lineSegment) <= r;
 }
 
 bool Capsule::Intersects(const Plane &plane) const
 {
+    return l.Distance(plane) <= r;
 }
-
+/*
 bool Capsule::Intersects(const AABB &aabb) const
 {
+///\todo Implement
 }
 
 bool Capsule::Intersects(const OBB &obb) const
 {
-}
-
-bool Capsule::Intersects(const Sphere &sphere) const
-{
-}
-
-bool Capsule::Intersects(const Triangle &triangle) const
-{
+///\todo Implement
 }
 */
-
+bool Capsule::Intersects(const Sphere &sphere) const
+{
+    return l.Distance(sphere.pos) <= r + sphere.r;
+}
+/*
+bool Capsule::Intersects(const Triangle &triangle) const
+{
+///\todo Implement
+}
+*/
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Capsule::ToString() const
 {

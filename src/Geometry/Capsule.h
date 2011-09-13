@@ -98,7 +98,7 @@ public:
     float3 RandomPointInside(LCG &rng) const;
 
     /// Generates a random point on the surface of this Capsule.
-    /** The points are distributed uniformly. */
+    /** \note The points are NOT distributed uniformly. */
     float3 RandomPointOnSurface(LCG &rng) const;
 
     /// Translates this Capsule.
@@ -127,17 +127,17 @@ public:
 
     bool Contains(const float3 &point) const;
     bool Contains(const LineSegment &lineSegment) const;
-/*
+
     /// Tests if this Capsule intersects the given object.
-    bool Intersects(const Ray &ray, float *dNear, float *dFar) const;
-    bool Intersects(const Line &line, float *dNear, float *dFar) const;
-    bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
+    bool Intersects(const Ray &ray) const;
+    bool Intersects(const Line &line) const;
+    bool Intersects(const LineSegment &lineSegment) const;
     bool Intersects(const Plane &plane) const;
-    bool Intersects(const AABB &aabb) const;
-    bool Intersects(const OBB &obb) const;
     bool Intersects(const Sphere &sphere) const;
-    bool Intersects(const Triangle &triangle) const;
-    */
+//    bool Intersects(const AABB &aabb) const;
+//    bool Intersects(const OBB &obb) const;
+//    bool Intersects(const Triangle &triangle) const;
+
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this Capsule. Most useful for debugging purposes.
     /** The returned string specifies the line segment and the radius of this Capsule. */
