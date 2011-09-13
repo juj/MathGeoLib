@@ -25,7 +25,12 @@ float3 Circle::BasisV() const
 
 float3 Circle::GetPoint(float angleRadians) const
 {
-	return pos + cos(angleRadians) * r * BasisU() + sin(angleRadians) * r * BasisV();
+	return pos + r * (cos(angleRadians) * BasisU() + sin(angleRadians) * BasisV());
+}
+
+float3 Circle::GetPoint(float angleRadians, float d) const
+{
+	return pos + r * d * (cos(angleRadians) * BasisU() + sin(angleRadians) * BasisV());
 }
 
 Plane Circle::ContainingPlane() const

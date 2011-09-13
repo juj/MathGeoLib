@@ -39,7 +39,13 @@ public:
 	/// This vector lies on the plane of this circle.
 	float3 BasisV() const;
 
+    /// Returns a point at the edge of this circle.
 	float3 GetPoint(float angleRadians) const;
+
+    /// Returns a point inside this circle.
+    /// @param d A value in the range [0,1] to specify the distance from the center of the circle to get.
+    /// The range of d is not enforced, so this function can be used to generate points outside the [0, 1] range.
+	float3 GetPoint(float angleRadians, float d) const;
 
 	/// Returns the plane this circle is contained in.
 	Plane ContainingPlane() const;
