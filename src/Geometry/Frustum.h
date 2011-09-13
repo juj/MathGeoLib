@@ -186,6 +186,15 @@ public:
     bool Intersects(const Torus &torus) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 #ifdef QT_INTEROP

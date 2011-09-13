@@ -98,6 +98,15 @@ public:
 
     Ray ToRay() const;
     Line ToLine() const;
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this LineSegment. Most useful for debugging purposes.
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 LineSegment operator *(const float3x3 &transform, const LineSegment &line);

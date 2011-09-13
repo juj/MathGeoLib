@@ -98,6 +98,15 @@ public:
 
     /// Returns true if the given three points are collinear (they all lie on the same line).
     static bool AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon = 1e-3f);
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this Line. Most useful for debugging purposes.
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 Line operator *(const float3x3 &transform, const Line &line);

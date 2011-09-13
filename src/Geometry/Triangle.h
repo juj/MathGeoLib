@@ -105,6 +105,15 @@ public:
     float3 ClosestPoint(const Ray &other, float3 *otherPt) const;
     float3 ClosestPoint(const Line &other, float3 *otherPt) const;
     float3 ClosestPoint(const Triangle &other, float3 *otherPt) const;
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this Line. Most useful for debugging purposes.
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 Triangle operator *(const float3x3 &transform, const Triangle &t);

@@ -128,3 +128,13 @@ float3 Circle::ClosestPointToEdge(const Line &line, float *d) const
 	assume(false && "Not implemented!");
 	return float3();
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string Circle::ToString() const
+{
+    char str[256];
+    sprintf(str, "Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)", 
+        pos.x, pos.y, pos.z, normal.x, normal.y, normal.z, r);
+    return str;
+}
+#endif

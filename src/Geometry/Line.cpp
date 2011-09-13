@@ -222,3 +222,13 @@ Line operator *(const Quat &transform, const Line &l)
 {
     return Line(transform * l.pos, transform * l.dir);
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string Line::ToString() const
+{
+    char str[256];
+    sprintf(str, "Line(pos:(%.2f, %.2f, %.2f) dir:(%.2f, %.2f, %.2f))", 
+        pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+    return str;
+}
+#endif

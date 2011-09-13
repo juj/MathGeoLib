@@ -255,3 +255,13 @@ LineSegment operator *(const Quat &transform, const LineSegment &l)
 {
     return LineSegment(transform * l.a, transform * l.b);
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string LineSegment::ToString() const
+{
+    char str[256];
+    sprintf(str, "LineSegment(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f))", 
+        a.x, a.y, a.z, b.x, b.y, b.z);
+    return str;
+}
+#endif

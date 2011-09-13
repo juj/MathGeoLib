@@ -586,3 +586,13 @@ Triangle operator *(const Quat &transform, const Triangle &t)
 {
     return Triangle(transform*t.a, transform*t.b, transform*t.c);
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string Triangle::ToString() const
+{
+    char str[256];
+    sprintf(str, "Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))", 
+        a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+    return str;
+}
+#endif

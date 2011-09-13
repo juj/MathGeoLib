@@ -524,3 +524,12 @@ Plane operator *(const Quat &transform, const Plane &plane)
     p.Transform(transform);
     return p;
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string Plane::ToString() const
+{
+    char str[256];
+    sprintf(str, "Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
+    return str;
+}
+#endif

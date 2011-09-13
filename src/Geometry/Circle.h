@@ -75,6 +75,16 @@ public:
 	float3 ClosestPointToEdge(const Ray &ray, float *d) const;
 	float3 ClosestPointToEdge(const LineSegment &lineSegment, float *d) const;
 	float3 ClosestPointToEdge(const Line &line, float *d) const;
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this Circle. Most useful for debugging purposes.
+    /** The returned string specifies the center position, normal direction and the radius of this Circle. */
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 #ifdef QT_INTEROP

@@ -526,3 +526,13 @@ float3 Sphere::RandomPointOnSurface(LCG &lcg, const float3 &center, float radius
 {
     return Sphere(center, radius).RandomPointOnSurface(lcg);
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string Sphere::ToString() const
+{
+    char str[256];
+    sprintf(str, "Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)", 
+        pos.x, pos.y, pos.z, r);
+    return str;
+}
+#endif

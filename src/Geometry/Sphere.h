@@ -137,6 +137,15 @@ public:
 	///                   To generate a perfect geosphere, pass in a number of form 3 * 4 * 3^k for some k >= 0.
 	/// @return The actual number of vertices generated (== the number of elements written to outPos and outNormal).
 	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices);
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this Sphere. Most useful for debugging purposes.
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 #ifdef QT_INTEROP

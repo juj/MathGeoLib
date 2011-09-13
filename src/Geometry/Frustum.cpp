@@ -406,3 +406,27 @@ bool Frustum::Intersects(const Polyhedron &polyhedron) const
     assume(false && "Not implemented!");
     return false;
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+
+std::string FrustumTypeToString(FrustumType t)
+{
+    if (t == InvalidFrustum) return "InvalidFrustum";
+    if (t == OrthographicFrustum) return "OrthographicFrustum";
+    if (t == PerspectiveFrustum) return "PerspectiveFrustum";
+    return "(invalid frustum type)";
+}
+
+std::string Frustum::ToString() const
+{
+    char str[256];
+    sprintf(str, "Frustum(%s pos:(%.2f, %.2f, %.2f) front:(%.2f, %.2f, %.2f), up:(%.2f, %.2f, %.2f), near: %.2f, far: %.2f, %s: %.2f, %s: %.2f)", 
+        FrustumTypeToString(type).c_str(), pos.x, pos.y, pos.z, front.x, front.y, front.z, 
+        up.x, up.y, up.z, nearPlaneDistance, farPlaneDistance,
+        type == OrthographicFrustum ? "ortho width:" : "hFov",
+        horizontalFov,
+        type == OrthographicFrustum ? "ortho height:" : "vFov",
+        verticalFov);
+    return str;
+}
+#endif

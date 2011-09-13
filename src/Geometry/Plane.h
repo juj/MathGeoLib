@@ -191,6 +191,15 @@ public:
     Plane(const Ogre::Plane &other) { normal = other.normal; d = other.d; }
     operator Ogre::Plane() const { return Ogre::Plane(normal, d); }
 #endif
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+    /// Returns a human-readable representation of this Plane. Most useful for debugging purposes.
+    std::string ToString() const;
+#endif
+#ifdef QT_INTEROP
+    operator QString() const { return toString(); }
+    QString toString() const { return QString::fromStdString(ToString()); }
+#endif
 };
 
 Plane operator *(const float3x3 &transform, const Plane &plane);
