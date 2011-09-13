@@ -150,6 +150,13 @@ public:
     /// vector point away from the plane with the given normal.
     float2 Reflect(const float2 &normal) const;
 
+    /// Refracts this vector about a plane with the given normal. By convention, the this vector points towards the plane, 
+    /// and the returned vector points away from the plane.
+    /// @param normal Specifies the plane normal direction
+    /// @param negativeSideRefractionIndex The refraction index of the material we are exiting.
+    /// @param positiveSideRefractionIndex The refraction index of the material we are entering.
+    /// When the ray is going from a denser material to a lighter one, total internal reflection can occur.
+    /// In this case, this function will just return a reflected vector from a call to Reflect().
     float2 Refract(const float2 &normal, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const;
 
     /// Projects this vector onto the given unnormalized direction vector.

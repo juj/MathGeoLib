@@ -101,8 +101,14 @@ public:
     /// Mirrors the given point along this plane.
     float3 Reflect(const float3 &point) const;
 
-    /// Refracts the given normal vector along this plane.
-    float3 Refract(const float3 &normal, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const;
+    /// Refracts the given incident vector along this plane.
+    /// By convention, the input vector should point towards the plane, and the returned vector will point away from the plane.
+    /// @param vec Specifies the incident ray direction.
+    /// @param negativeSideRefractionIndex The refraction index of the material we are exiting.
+    /// @param positiveSideRefractionIndex The refraction index of the material we are entering.
+    /// When the ray is going from a denser material to a lighter one, total internal reflection can occur.
+    /// In this case, this function will just return a reflected vector from a call to Reflect().
+    float3 Refract(const float3 &vec, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const;
 
     /// Projects the given point onto this plane orthographically (finds the closest point on this plane).
     float3 Project(const float3 &point) const;

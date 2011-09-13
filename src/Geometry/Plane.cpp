@@ -177,10 +177,9 @@ float3 Plane::Reflect(const float3 &point) const
     return reflected;
 }
 
-float3 Plane::Refract(const float3 &normal, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const
+float3 Plane::Refract(const float3 &vec, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const
 {
-    assume(false && "Not implemented!"); ///\todo
-    return float3();
+    return float3(vec).Refract(normal, negativeSideRefractionIndex, positiveSideRefractionIndex);
 }
 
 float3 Plane::Project(const float3 &point) const
