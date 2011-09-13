@@ -79,6 +79,7 @@ float float2::Length() const
 
 float float2::Normalize()
 { 
+    assume(IsFinite());
     float lengthSq = LengthSq();
     if (lengthSq > 1e-6f)
     {

@@ -79,7 +79,8 @@ public:
     /// Returns the length of this vector.
     float Length() const;
     /// Normalizes this float3.
-    /// Returns the old length of this vector, or 0 if normalization failed.
+    /// Returns the old length of this vector, or 0 if normalization failed. In the case of failure,
+    /// this vector is set to (1, 0, 0), so that Normalize() function will never result in an unnormalized vector.
     float Normalize();
     /// Returns a normalized copy of this vector. If the vector is zero and cannot be normalized, the vector (1, 0, 0) is returned.
     float3 Normalized() const;

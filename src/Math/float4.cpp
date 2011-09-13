@@ -110,6 +110,7 @@ float float4::Length4() const
 
 float float4::Normalize3()
 { 
+    assume(IsFinite());
     float lengthSq = LengthSq3();
     if (lengthSq > 1e-6f)
     {
@@ -137,6 +138,7 @@ float4 float4::Normalized3() const
 
 float float4::Normalize4()
 { 
+    assume(IsFinite());
     float lengthSq = LengthSq4();
     if (lengthSq > 1e-6f)
     {

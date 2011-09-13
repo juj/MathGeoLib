@@ -82,10 +82,12 @@ public:
     /// Returns the length of this vector, taking into account the w component.
     float Length4() const;
     /// Normalizes the (x, y, z) part of this vector. This function ignores the w component of this vector.
-    /// Returns the old length of this vector, or 0 if normalization failed.
+    /// Returns the old length of this vector, or 0 if normalization failed. In the case of failure,
+    /// this vector is set to (1, 0, 0, oldW), so that Normalize() function will never result in an unnormalized vector.
     float Normalize3();
     /// Normalizes this vector.
-    /// Returns the old length of this vector, or 0 if normalization failed.
+    /// Returns the old length of this vector, or 0 if normalization failed. In the case of failure,
+    /// this vector is set to (1, 0, 0, 0), so that Normalize() function will never result in an unnormalized vector.
     float Normalize4();
     /// Returns a copy of this vector where the (x, y, z) part is normalized, and w is carried over unchanged.
     float4 Normalized3() const;
