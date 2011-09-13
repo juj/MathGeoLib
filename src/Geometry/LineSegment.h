@@ -52,6 +52,10 @@ public:
     float Length() const;
     float LengthSq() const;
 
+    /// Tests the members of this structure for NaNs and infs.
+    /** This function returns true if the member variables of this LineSegment are valid floats and do not contain NaNs or infs, and false otherwise. */
+    bool IsFinite() const;
+
     /// Returns true if this line segment contains the given point, i.e. if the squared
     /// distance to this point is smaller than the given threshold epsilon.
     bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
