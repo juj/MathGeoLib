@@ -77,30 +77,16 @@ public:
     float Distance(const Line &other, float *d = 0, float *d2 = 0) const;
     float Distance(const LineSegment &other, float *d = 0, float *d2 = 0) const;
 
+    ///\todo Output intersection point.
     bool Intersects(const Plane &plane) const;
     bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
     bool Intersects(const Sphere &s, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
     bool Intersects(const AABB &aabb, float *dNear = 0, float *dFar = 0) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
 
-/*
-    bool Intersect(const Plane &plane, float &outDistance) const;
-
-    bool Intersect(const Sphere &sphere) const;
-    bool Intersect(const Sphere &sphere, float &outDistance) const;
-
-    bool Intersect(const AABB &aabb) const;
-    bool Intersect(const AABB &aabb, float &outDistance) const;
-
-    bool Intersect(const OBB &aabb) const;
-    bool Intersect(const OBB &aabb, float &outDistance) const;
-
-    bool Intersect(const Triangle &triangle) const;
-    bool Intersect(const Triangle &triangle, float &outDistance) const;
-
-    bool Intersect(const Frustum &frustum) const;
-    bool Intersect(const Frustum &frustum, float &outDistance) const;
-*/
+    ///\todo Implement.
+//    bool Intersect(const Frustum &frustum) const;
+//    bool Intersect(const Frustum &frustum, float &outDistance) const;
 //    bool Intersect(const Polyhedron &polyhedron) const;
 //    bool Intersect(const Polyhedron &polyhedron, float &outDistance) const;
 
