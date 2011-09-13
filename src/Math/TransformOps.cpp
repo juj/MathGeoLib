@@ -157,7 +157,7 @@ float3x3 operator *(const ScaleOp &lhs, const float3x3 &rhs)
     ret.ScaleRow(2, lhs.z);
 
     // Our optimized form of multiplication must be the same as this.
-    assert(ret.Equals((float3x3)lhs * rhs));
+    assume(ret.Equals((float3x3)lhs * rhs));
     return ret;
 }
 
@@ -169,7 +169,7 @@ float3x3 operator *(const float3x3 &lhs, const ScaleOp &rhs)
     ret.ScaleCol(2, rhs.z);
 
     // Our optimized form of multiplication must be the same as this.
-    assert(ret.Equals(lhs * (float3x3)rhs));
+    assume(ret.Equals(lhs * (float3x3)rhs));
     return ret;
 }
 
@@ -180,7 +180,7 @@ float3x4 operator *(const ScaleOp &lhs, const float3x4 &rhs)
     ret[1][0] = rhs[1][0] * lhs.y; ret[1][1] = rhs[1][1] * lhs.y; ret[1][2] = rhs[1][2] * lhs.y; ret[1][3] = rhs[1][3] * lhs.y;
     ret[2][0] = rhs[2][0] * lhs.z; ret[2][1] = rhs[2][1] * lhs.z; ret[2][2] = rhs[2][2] * lhs.z; ret[2][3] = rhs[2][3] * lhs.z;
 
-    assert(ret.Equals(lhs.ToFloat3x4() * rhs));
+    assume(ret.Equals(lhs.ToFloat3x4() * rhs));
     return ret;
 }
 
@@ -191,7 +191,7 @@ float3x4 operator *(const float3x4 &lhs, const ScaleOp &rhs)
     ret[1][0] = lhs[1][0] * rhs.x; ret[1][1] = lhs[1][1] * rhs.y; ret[1][2] = lhs[1][2] * rhs.z; ret[1][3] = lhs[1][3];
     ret[2][0] = lhs[2][0] * rhs.x; ret[2][1] = lhs[2][1] * rhs.y; ret[2][2] = lhs[2][2] * rhs.z; ret[2][3] = lhs[2][3];
 
-    assert(ret.Equals(lhs * rhs.ToFloat3x4()));
+    assume(ret.Equals(lhs * rhs.ToFloat3x4()));
     return ret;
 }
 
@@ -203,7 +203,7 @@ float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
     ret[2][0] = rhs[2][0] * lhs.z; ret[2][1] = rhs[2][1] * lhs.z; ret[2][2] = rhs[2][2] * lhs.z; ret[2][3] = rhs[2][3] * lhs.z;
     ret[3][0] = rhs[3][0];         ret[3][1] = rhs[3][1];         ret[3][2] = rhs[3][2];         ret[3][3] = rhs[3][3];
 
-    assert(ret.Equals(lhs.ToFloat4x4() * rhs));
+    assume(ret.Equals(lhs.ToFloat4x4() * rhs));
     return ret;
 }
 
@@ -215,20 +215,30 @@ float4x4 operator *(const float4x4 &lhs, const ScaleOp &rhs)
     ret[2][0] = lhs[2][0] * rhs.x; ret[2][1] = lhs[2][1] * rhs.y; ret[2][2] = lhs[2][2] * rhs.z; ret[2][3] = lhs[2][3];
     ret[3][0] = lhs[3][0] * rhs.x; ret[3][1] = lhs[3][1] * rhs.y; ret[3][2] = lhs[3][2] * rhs.z; ret[3][3] = lhs[3][3];
 
-    assert(ret.Equals(lhs * rhs.ToFloat4x4()));
+    assume(ret.Equals(lhs * rhs.ToFloat4x4()));
     return ret;
 }
 
 float3x4 operator *(const ScaleOp &lhs, const TranslateOp &rhs)
 {
-    ///\todo Optimize.
-	return lhs.ToFloat3x4() * rhs;
+    float3x4 ret;
+    ret[0][0] = lhs.x; ret[0][1] =     0; ret[0][2] =     0; ret[0][3] = lhs.x * rhs.x;
+    ret[1][0] =     0; ret[1][1] = lhs.y; ret[1][2] =     0; ret[1][3] = lhs.y * rhs.y;
+    ret[2][0] =     0; ret[2][1] =     0; ret[2][2] = lhs.z; ret[2][3] = lhs.z * rhs.z;
+
+    assume(ret.Equals(lhs.ToFloat3x4() * rhs));
+    return ret;
 }
 
 float3x4 operator *(const TranslateOp &lhs, const ScaleOp &rhs)
 {
-    ///\todo Optimize.
-	return lhs.ToFloat3x4() * rhs;
+    float3x4 ret;
+    ret[0][0] = rhs.x; ret[0][1] =     0; ret[0][2] =     0; ret[0][3] = lhs.x;
+    ret[1][0] =     0; ret[1][1] = rhs.y; ret[1][2] =     0; ret[1][3] = lhs.y;
+    ret[2][0] =     0; ret[2][1] =     0; ret[2][2] = rhs.z; ret[2][3] = lhs.z;
+
+    assume(ret.Equals(lhs.ToFloat3x4() * rhs));
+    return ret;
 }
 
 float3 ScaleOp::Offset() const
