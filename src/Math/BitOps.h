@@ -15,8 +15,10 @@
 #include "Math/MathFwd.h"
 #include "Types.h"
 
+/// Parses a string of form "010101010" to a u32.
 u32 BinaryStringToValue(const char *str);
 
+/// Returns the number of 1's set in the given value.
 inline int CountBitsSet(u32 value)
 {
     int bits = 0;
