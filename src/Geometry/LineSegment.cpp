@@ -185,6 +185,20 @@ float LineSegment::Distance(const LineSegment &other, float *d, float *d2) const
     return GetPoint(u).Distance(other.GetPoint(u2));
 }
 
+float LineSegment::Distance(const Plane &other) const
+{
+    float aDist = other.SignedDistance(a);
+    float bDist = other.SignedDistance(b);
+    if (aDist * bDist < 0.f)
+        return 0.f; // There was an intersection, so the distance is zero.
+    return Min(Abs(aDist), Abs(bDist));
+}
+
+float LineSegment::Distance(const Sphere &other) const
+{
+    return Max(0.f, Distance(other.pos) - other.r);
+}
+
 bool LineSegment::Intersects(const Plane &plane) const
 {
     float d = plane.SignedDistance(a);
