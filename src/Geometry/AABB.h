@@ -57,7 +57,7 @@ public:
     /// which incrementally expand the contents of this AABB to enclose the given objects.
     void SetNegativeInfinity();
 
-    /// Sets this AABB by speciying the center and half-diagonal vector.
+    /// Sets this AABB by specifying the center and half-diagonal vector.
     void SetCenter(const float3 &center, const float3 &halfSize);
 
     /// Sets this AABB to enclose the given OBB.
