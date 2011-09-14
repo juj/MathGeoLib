@@ -64,7 +64,7 @@ void EnableMemoryLeakLoggingAtExit();
 /// Prints out a variadic message to the log channel User.
 #define LOGUSER(msg, ...) ( IsLogChannelActive(LogUser) && (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 
-#ifdef KNET_LOGGING_SUPPORT_ENABLED
+#ifndef LOGGING_SUPPORT_DISABLED
 
 #ifdef WIN32
 #include <stdio.h>
