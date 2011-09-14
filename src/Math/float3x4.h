@@ -601,7 +601,7 @@ public:
     /// @note If the matrix does not really do any scaling, this function returns true (scaling uniformly by a factor of 1).
     /// @note This function only examines the upper 3-by-3 part of this matrix.
     /// @note This function assumes that this matrix does not contain projection (the fourth row of this matrix is [0 0 0 1]).
-    bool HasUniformScale(float epsilonSq = 1e-6f) const;
+    bool HasUniformScale(float epsilon = 1e-3f) const;
 
     /// Returns true if the row vectors of 3x3 top-left submatrix are all perpendicular to each other.
     bool IsRowOrthogonal(float epsilon = 1e-3f) const;
