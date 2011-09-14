@@ -361,7 +361,6 @@ void AABB::TransformAsAABB(const float3x4 &transform)
     assume(transform.HasUniformScale());
 
     AABBTransformAsAABB(*this, transform);
-    minPoint += transform.TranslatePart();
 }
 
 void AABB::TransformAsAABB(const float4x4 &transform)
@@ -371,7 +370,6 @@ void AABB::TransformAsAABB(const float4x4 &transform)
     assume(transform.Row(3).Equals(0,0,0,1));
 
     AABBTransformAsAABB(*this, transform);
-    minPoint += transform.TranslatePart();
 }
 
 void AABB::TransformAsAABB(const Quat &transform)
