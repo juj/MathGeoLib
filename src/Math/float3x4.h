@@ -272,6 +272,7 @@ public:
     /// Returns the given column.
     /** @param col The zero-based index [0, 3] of the column to get. */
     CONST_WIN32 float3 Col(int col) const;
+    CONST_WIN32 float3 Col3(int col) const { return Col(col); }
 
     /// Returns the main diagonal.
     /** The main diagonal consists of the elements at m[0][0], m[1][1], m[2][2]. */
@@ -608,6 +609,7 @@ public:
 
     /// Returns true if the column vectors of 3x3 top-left submatrix are all perpendicular to each other.
     bool IsColOrthogonal(float epsilon = 1e-3f) const;
+    bool IsColOrthogonal3(float epsilon = 1e-3f) const { return IsColOrthogonal(epsilon); }
 
     /// Returns true if the column and row vectors of the 3x3 top-left submatrix form an orthonormal set.
     /// @note In math terms, there does not exist such a thing as 'orthonormal matrix'. In math terms, a matrix 

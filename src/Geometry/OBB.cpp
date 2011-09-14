@@ -51,14 +51,30 @@ void OBB::SetFrom(const AABB &aabb)
 template<typename Matrix>
 void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 {
+    assume(m.IsColOrthogonal()); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
+    assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
     obb.pos = m.MulPos(aabb.CenterPoint());
     float3 size = aabb.HalfSize();
-    obb.axis[0] = m.MulDir(float3(size.x, 0, 0));
-    obb.axis[1] = m.MulDir(float3(0, size.y, 0));
-    obb.axis[2] = m.MulDir(float3(0, 0, size.z));
-    obb.r.x = obb.axis[0].Normalize();
-    obb.r.y = obb.axis[1].Normalize();
-    obb.r.z = obb.axis[2].Normalize();
+    obb.axis[0] = m.Col(0);
+    obb.axis[1] = m.Col(1);
+    obb.axis[2] = m.Col(2);
+    obb.r.x = size.x;
+    obb.r.y = size.y;
+    obb.r.z = size.z;
+    // If the matrix m contains scaling, propagate the scaling from the axis vectors to the half-length vectors,
+    // since we want to keep the axis vectors always normalized in our representation.
+    float matrixScale = obb.axis[0].LengthSq();
+    matrixScale = Sqrt(matrixScale);
+    obb.r *= matrixScale;
+    matrixScale = 1.f / matrixScale;
+    obb.axis[0] *= matrixScale;
+    obb.axis[1] *= matrixScale;
+    obb.axis[2] *= matrixScale;
+
+//    mathassert(float3::AreOrthogonal(obb.axis[0], obb.axis[1], obb.axis[2]));
+//    mathassert(float3::AreOrthonormal(obb.axis[0], obb.axis[1], obb.axis[2]));
+    ///\todo Would like to simply do the above, but instead numerical stability requires to do the following:
+    float3::Orthonormalize(obb.axis[0], obb.axis[1], obb.axis[2]);
 }
 
 void OBB::SetFrom(const AABB &aabb, const float3x3 &transform)
@@ -74,7 +90,8 @@ void OBB::SetFrom(const AABB &aabb, const float3x4 &transform)
 
 void OBB::SetFrom(const AABB &aabb, const float4x4 &transform)
 {
-    OBBSetFrom(*this, aabb, transform);
+    assume(transform.Row(3).Equals(0,0,0,1));
+    OBBSetFrom(*this, aabb, transform.Float3x4Part());
 }
 
 void OBB::SetFrom(const AABB &aabb, const Quat &transform)
@@ -591,7 +608,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
     // A.x <cross> B.z
     ra = r.y * AbsR[2][2] + r.z * AbsR[1][2];
     rb = b.r.x * AbsR[0][1] + b.r.y * AbsR[0][0];
-    if (Abs(t.z * R[1][22] - t.y * R[2][2]) > ra + rb)
+    if (Abs(t.z * R[1][2] - t.y * R[2][2]) > ra + rb)
         return false;
 
     // A.y <cross> B.x
