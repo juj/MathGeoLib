@@ -26,8 +26,8 @@ float2::float2(float x_, float y_)
 
 float2::float2(const float *data)
 {
-    assert(data);
-#ifndef OPTIMIZED_RELEASE
+    assume(data);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -47,9 +47,9 @@ const float *float2::ptr() const
 
 CONST_WIN32 float float2::operator [](int index) const
 { 
-    assert(index >= 0);
-    assert(index < Size);
-#ifndef OPTIMIZED_RELEASE
+    assume(index >= 0);
+    assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (index < 0 || index >= Size)
         return FLOAT_NAN;
 #endif
@@ -58,9 +58,9 @@ CONST_WIN32 float float2::operator [](int index) const
 
 float &float2::operator [](int index)
 { 
-    assert(index >= 0);
-    assert(index < Size);
-#ifndef OPTIMIZED_RELEASE
+    assume(index >= 0);
+    assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (index < 0 || index >= Size)
         return ptr()[0];
 #endif
@@ -329,8 +329,8 @@ float float2::AngleBetween(const float2 &other) const
 
 float float2::AngleBetweenNorm(const float2 &other) const
 {
-    assert(this->IsNormalized());
-    assert(other.IsNormalized());
+    assume(this->IsNormalized());
+    assume(other.IsNormalized());
     return acos(Dot(other));
 }
 

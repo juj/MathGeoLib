@@ -356,9 +356,11 @@ void Quat::Set(const float3x3 &m)
     assume(!m.HasNegativeScale());
     SetQuatFrom(*this, m);
 
+#ifdef MATH_ASSERT_CORRECTNESS
     // Test that the conversion float3x3->Quat->float3x3 is correct.
     float3x3 f = this->ToFloat3x3();
-    assume(this->ToFloat3x3().Equals(m, 0.01f));
+    mathassert(this->ToFloat3x3().Equals(m, 0.01f));
+#endif
 }
 
 void Quat::Set(const float3x4 &m)
@@ -368,8 +370,10 @@ void Quat::Set(const float3x4 &m)
     assume(!m.HasNegativeScale());
     SetQuatFrom(*this, m);
 
+#ifdef MATH_ASSERT_CORRECTNESS
     // Test that the conversion float3x3->Quat->float3x3 is correct.
-    assume(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
+    mathassert(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
+#endif
 }
 
 void Quat::Set(const float4x4 &m)
@@ -380,8 +384,10 @@ void Quat::Set(const float4x4 &m)
     assume(m.Row(3).Equals(0,0,0,1));
     SetQuatFrom(*this, m);
 
+#ifdef MATH_ASSERT_CORRECTNESS
     // Test that the conversion float3x3->Quat->float3x3 is correct.
-    assume(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
+    mathassert(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
+#endif
 }
 
 void Quat::Set(float x_, float y_, float z_, float w_)

@@ -475,7 +475,7 @@ MatrixProxy<float4x4::Cols> &float4x4::operator[](int row)
 {
     assume(row >= 0);
     assume(row < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -486,7 +486,7 @@ const MatrixProxy<float4x4::Cols> &float4x4::operator[](int row) const
 {
     assume(row >= 0);
     assume(row < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -499,7 +499,7 @@ float &float4x4::At(int row, int col)
     assume(row < Rows);
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows || col < 0 || col >= Cols)
         return v[0][0]; // Benign failure, return the first element.
 #endif
@@ -512,9 +512,9 @@ CONST_WIN32 float float4x4::At(int row, int col) const
     assume(row < Rows);
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows || col < 0 || col >= Cols)
-        return v[0][0]; // Benign failure, return the first element.
+        return FLOAT_NAN;
 #endif
     return v[row][col];
 }
@@ -524,7 +524,7 @@ float4 &float4x4::Row(int row)
     assume(row >= 0);
     assume(row < Rows);
 
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -536,7 +536,7 @@ const float4 &float4x4::Row(int row) const
     assume(row >= 0);
     assume(row < Rows);
 
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -548,7 +548,7 @@ float3 &float4x4::Row3(int row)
     assume(row >= 0);
     assume(row < Rows);
 
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -560,7 +560,7 @@ const float3 &float4x4::Row3(int row) const
     assume(row >= 0);
     assume(row < Rows);
 
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -571,9 +571,9 @@ CONST_WIN32 float4 float4x4::Col(int col) const
 {
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col < 0 || col >= Cols)
-        col = 0; // Benign failure, just give the first col.
+        return float4::nan;
 #endif
     return float4(v[0][col], v[1][col], v[2][col], v[3][col]);
 }
@@ -582,9 +582,9 @@ CONST_WIN32 float3 float4x4::Col3(int col) const
 {
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col < 0 || col >= Cols)
-        col = 0; // Benign failure, just give the first col.
+        return float3::nan;
 #endif
     return float3(v[0][col], v[1][col], v[2][col]);
 }
@@ -616,7 +616,7 @@ void float4x4::ScaleCol3(int col, float scalar)
     assume(isfinite(scalar));
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col < 0 || col >= Cols)
         return; // Benign failure
 #endif
@@ -630,7 +630,7 @@ void float4x4::ScaleCol(int col, float scalar)
     assume(isfinite(scalar));
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col < 0 || col >= Cols)
         return; // Benign failure
 #endif
@@ -700,7 +700,7 @@ void float4x4::SetRow3(int row, const float3 &rowVector)
 void float4x4::SetRow3(int row, const float *data)
 {
     assume(data);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -714,7 +714,7 @@ void float4x4::SetRow3(int row, float m_r0, float m_r1, float m_r2)
     assume(isfinite(m_r0));
     assume(isfinite(m_r1));
     assume(isfinite(m_r2));
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         return; // Benign failure
 #endif
@@ -736,7 +736,7 @@ void float4x4::SetRow(int row, const float4 &rowVector)
 void float4x4::SetRow(int row, const float *data)
 {
     assume(data);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -751,7 +751,7 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
     assume(isfinite(m_r1));
     assume(isfinite(m_r2));
     assume(isfinite(m_r3));
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         return; // Benign failure
 #endif
@@ -769,7 +769,7 @@ void float4x4::SetCol3(int column, const float3 &columnVector)
 void float4x4::SetCol3(int column, const float *data)
 {
     assume(data);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -783,7 +783,7 @@ void float4x4::SetCol3(int column, float m_0c, float m_1c, float m_2c)
     assume(isfinite(m_0c));
     assume(isfinite(m_1c));
     assume(isfinite(m_2c));
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (column < 0 || column >= Cols)
         return; // Benign failure
 #endif
@@ -805,7 +805,7 @@ void float4x4::SetCol(int column, const float4 &columnVector)
 void float4x4::SetCol(int column, const float *data)
 {
     assume(data);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -820,7 +820,7 @@ void float4x4::SetCol(int column, float m_0c, float m_1c, float m_2c, float m_3c
     assume(isfinite(m_1c));
     assume(isfinite(m_2c));
     assume(isfinite(m_3c));
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (column < 0 || column >= Cols)
         return; // Benign failure
 #endif
@@ -849,7 +849,7 @@ void float4x4::Set(const float4x4 &rhs)
 void float4x4::Set(const float *values)
 {
     assume(values);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!values)
         return;
 #endif
@@ -862,7 +862,7 @@ void float4x4::Set(int row, int col, float value)
     assume(row < Rows);
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows || col < 0 || col >= Cols)
         return; // Benign failure
 #endif
@@ -899,7 +899,7 @@ void float4x4::SwapColumns(int col1, int col2)
     assume(col1 < Cols);
     assume(col2 >= 0);
     assume(col2 < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col1 < 0 || col1 >= Cols || col2 < 0 || col2 >= Cols)
         return; // Benign failure
 #endif
@@ -915,7 +915,7 @@ void float4x4::SwapColumns3(int col1, int col2)
     assume(col1 < Cols);
     assume(col2 >= 0);
     assume(col2 < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col1 < 0 || col1 >= Cols || col2 < 0 || col2 >= Cols)
         return; // Benign failure
 #endif
@@ -930,7 +930,7 @@ void float4x4::SwapRows(int row1, int row2)
     assume(row1 < Rows);
     assume(row2 >= 0);
     assume(row2 < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row1 < 0 || row1 >= Rows || row1 < 0 || row2 >= Rows)
         return; // Benign failure
 #endif
@@ -946,7 +946,7 @@ void float4x4::SwapRows3(int row1, int row2)
     assume(row1 < Rows);
     assume(row2 >= 0);
     assume(row2 < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row1 < 0 || row1 >= Rows || row1 < 0 || row2 >= Rows)
         return; // Benign failure
 #endif
@@ -1123,7 +1123,15 @@ bool float4x4::LUDecompose(float4x4 &outLower, float4x4 &outUpper) const
 
 bool float4x4::Inverse()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float4x4 copy = *this;
+    bool success = InverseMatrix(*this);
+    mathassert(!(success == false && Abs(Determinant4()) > 1e-3f));
+    mathassert(!success || (copy * *this).IsIdentity());
+    return success;
+#else
     return InverseMatrix(*this);
+#endif
 }
 
 float4x4 float4x4::Inverted() const
@@ -1135,6 +1143,9 @@ float4x4 float4x4::Inverted() const
 
 bool float4x4::InverseOrthogonal()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float4x4 orig = *this;
+#endif
     assume(IsColOrthogonal3());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
@@ -1150,11 +1161,15 @@ bool float4x4::InverseOrthogonal()
     SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 
     assume(IsColOrthogonal3());
+    mathassert((orig * *this).IsIdentity());
     return true;
 }
 
 bool float4x4::InverseOrthogonalUniformScale()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float4x4 orig = *this;
+#endif
     assume(IsColOrthogonal3());
     assume(HasUniformScale());
     Swap(v[0][1], v[1][0]);
@@ -1170,16 +1185,21 @@ bool float4x4::InverseOrthogonalUniformScale()
 
     assume(IsColOrthogonal3());
     assume(HasUniformScale());
+    mathassert((orig * *this).IsIdentity());
     return true;
 }
 
 void float4x4::InverseOrthonormal()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float4x4 orig = *this;
+#endif
     assume(IsOrthonormal3());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
     SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
+    mathassert((orig * *this).IsIdentity());
 }
 
 void float4x4::Transpose()
@@ -1224,7 +1244,7 @@ void float4x4::Orthogonalize3(int c0, int c1, int c2)
 {
     assume(c0 != c1 && c0 != c2 && c1 != c2);
     assume(c0 >= 0 && c1 >= 0 && c2 >= 0 && c0 < Cols && c1 < Cols && c2 < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (c0 == c1 || c0 == c2 || c1 == c2)
         return;
 #endif
@@ -1242,7 +1262,7 @@ void float4x4::Orthonormalize3(int c0, int c1, int c2)
 {
     assume(c0 != c1 && c0 != c2 && c1 != c2);
     assume(c0 >= 0 && c1 >= 0 && c2 >= 0 && c0 < Cols && c1 < Cols && c2 < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (c0 == c1 || c0 == c2 || c1 == c2)
         return;
 #endif
@@ -1329,7 +1349,7 @@ float4 float4x4::Transform(const float4 &vector) const
 void float4x4::TransformPos(float3 *pointArray, int numPoints) const
 {
     assume(pointArray);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!pointArray)
         return;
 #endif
@@ -1340,7 +1360,7 @@ void float4x4::TransformPos(float3 *pointArray, int numPoints) const
 void float4x4::TransformPos(float3 *pointArray, int numPoints, int strideBytes) const
 {
     assume(pointArray);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!pointArray)
         return;
 #endif
@@ -1356,7 +1376,7 @@ void float4x4::TransformPos(float3 *pointArray, int numPoints, int strideBytes) 
 void float4x4::TransformDir(float3 *dirArray, int numVectors) const
 {
     assume(dirArray);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!dirArray)
         return;
 #endif
@@ -1367,7 +1387,7 @@ void float4x4::TransformDir(float3 *dirArray, int numVectors) const
 void float4x4::TransformDir(float3 *dirArray, int numVectors, int strideBytes) const
 {
     assume(dirArray);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!dirArray)
         return;
 #endif
@@ -1383,7 +1403,7 @@ void float4x4::TransformDir(float3 *dirArray, int numVectors, int strideBytes) c
 void float4x4::Transform(float4 *vectorArray, int numVectors) const
 {
     assume(vectorArray);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!vectorArray)
         return;
 #endif
@@ -1394,7 +1414,7 @@ void float4x4::Transform(float4 *vectorArray, int numVectors) const
 void float4x4::Transform(float4 *vectorArray, int numVectors, int strideBytes) const
 {
     assume(vectorArray);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!vectorArray)
         return;
 #endif

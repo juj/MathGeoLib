@@ -305,7 +305,7 @@ MatrixProxy<float3x3::Cols> &float3x3::operator[](int row)
     assume(row >= 0);
     assume(row < Rows);
 
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -317,7 +317,7 @@ const MatrixProxy<float3x3::Cols> &float3x3::operator[](int row) const
     assume(row >= 0);
     assume(row < Rows);
 
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -330,7 +330,7 @@ float &float3x3::At(int row, int col)
     assume(row < Rows);
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows || col < 0 || col >= Cols)
         return v[0][0]; // Benign failure, return the first element.
 #endif
@@ -343,9 +343,9 @@ CONST_WIN32 float float3x3::At(int row, int col) const
     assume(row < Rows);
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows || col < 0 || col >= Cols)
-        return v[0][0]; // Benign failure, return the first element.
+        return FLOAT_NAN;
 #endif
     return v[row][col];
 }
@@ -354,7 +354,7 @@ float3 &float3x3::Row(int row)
 {
     assume(row >= 0);
     assume(row < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -365,7 +365,7 @@ const float3 &float3x3::Row(int row) const
 {
     assume(row >= 0);
     assume(row < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         row = 0; // Benign failure, just give the first row.
 #endif
@@ -376,9 +376,9 @@ CONST_WIN32 float3 float3x3::Col(int col) const
 {
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col < 0 || col >= Cols)
-        col = 0; // Benign failure, just give the first col.
+        return float3::nan;
 #endif
 
     return float3(v[0][col], v[1][col], v[2][col]);
@@ -393,7 +393,7 @@ void float3x3::ScaleRow(int row, float scalar)
 {
     assume(row >= 0);
     assume(row < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         return;
 #endif
@@ -405,7 +405,7 @@ void float3x3::ScaleCol(int col, float scalar)
 {
     assume(col >= 0);
     assume(col < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col < 0 || col >= Cols)
         return;
 #endif
@@ -443,7 +443,7 @@ void float3x3::SetRow(int row, float x, float y, float z)
 {
     assume(row >= 0);
     assume(row < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows)
         return;
 #endif
@@ -463,7 +463,7 @@ void float3x3::SetRow(int row, const float3 &rowVector)
 void float3x3::SetRow(int row, const float *data)
 {
     assume(data);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -474,7 +474,7 @@ void float3x3::SetCol(int column, float x, float y, float z)
 {
     assume(column >= 0);
     assume(column < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (column < 0 || column >= Cols)
         return;
 #endif
@@ -494,7 +494,7 @@ void float3x3::SetCol(int column, const float3 &columnVector)
 void float3x3::SetCol(int column, const float *data)
 {
     assume(data);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -518,7 +518,7 @@ void float3x3::Set(const float3x3 &rhs)
 void float3x3::Set(const float *values)
 {
     assume(values);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!values)
         return;
 #endif
@@ -529,7 +529,7 @@ void float3x3::Set(int row, int col, float value)
 {
     assume(0 <= row && row <= 2);
     assume(0 <= col && col <= 2);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row < 0 || row >= Rows || col < 0 || col >= Cols)
         return;
 #endif
@@ -549,7 +549,7 @@ void float3x3::SwapColumns(int col1, int col2)
     assume(col1 < Cols);
     assume(col2 >= 0);
     assume(col2 < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (col1 < 0 || col1 >= Cols || col2 < 0 || col2 >= Cols)
         return;
 #endif
@@ -564,7 +564,7 @@ void float3x3::SwapRows(int row1, int row2)
     assume(row1 < Rows);
     assume(row2 >= 0);
     assume(row2 < Rows);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
         return;
 #endif
@@ -684,6 +684,10 @@ float3x3 float3x3::Adjugate() const
 */
 bool float3x3::Inverse()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float3x3 orig = *this;
+#endif
+
     // There exists a generic matrix inverse calculator that uses Gaussian elimination.
     // It would be invoked by calling
     // return InverseMatrix(*this);
@@ -706,6 +710,8 @@ bool float3x3::Inverse()
     i[2][1] = d * (v[2][0] * v[0][1] - v[0][0] * v[2][1]);
     i[2][2] = d * (v[0][0] * v[1][1] - v[0][1] * v[1][0]);
     *this = i;
+
+    mathassert((orig * *this).IsIdentity());
     return true;
 }
 
@@ -718,6 +724,9 @@ float3x3 float3x3::Inverted() const
 
 bool float3x3::InverseOrthogonal()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float3x3 orig = *this;
+#endif
     assume(IsColOrthogonal());
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
@@ -732,17 +741,24 @@ bool float3x3::InverseOrthogonal()
 
     assume(IsFinite());
     assume(IsColOrthogonal());
+    mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
     return true;
 }
 
 bool float3x3::InverseOrthogonalUniformScale()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float3x3 orig = *this;
+#endif
     assume(IsColOrthogonal());
     assume(HasUniformScale());
+    float scale = float3(v[0][0], v[1][0], v[2][0]).LengthSq();
+    if (scale < 1e-8f)
+        return false;
+    scale = 1.f / Sqrt(scale);
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
-    const float scale = sqrtf(1.f / float3(v[0][0], v[0][1], v[0][2]).LengthSq());
 
     v[0][0] *= scale; v[0][1] *= scale; v[0][2] *= scale;
     v[1][0] *= scale; v[1][1] *= scale; v[1][2] *= scale;
@@ -752,13 +768,19 @@ bool float3x3::InverseOrthogonalUniformScale()
     assume(IsColOrthogonal());
     assume(HasUniformScale());
 
+    mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
+
     return true;
 }
 
 void float3x3::InverseOrthonormal()
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+    float3x3 orig = *this;
+#endif
     assume(IsOrthonormal());
     Transpose();
+    mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
 }
 
 void float3x3::Transpose()
@@ -799,7 +821,7 @@ void float3x3::Orthonormalize(int c0, int c1, int c2)
 {
     assume(c0 != c1 && c0 != c2 && c1 != c2);
     assume(c0 >= 0 && c1 >= 0 && c2 >= 0 && c0 < Cols && c1 < Cols && c2 < Cols);
-#ifndef OPTIMIZED_RELEASE
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (c0 == c1 || c0 == c2 || c1 == c2)
         return;
 #endif

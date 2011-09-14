@@ -40,8 +40,8 @@ float4::float4(const float2 &xy, float z_, float w_)
 
 float4::float4(const float *data)
 {
-    assert(data);
-#ifndef OPTIMIZED_RELEASE
+    assume(data);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (!data)
         return;
 #endif
@@ -63,9 +63,9 @@ const float *float4::ptr() const
 
 CONST_WIN32 float float4::operator [](int index) const
 { 
-    assert(index >= 0);
-    assert(index < Size);
-#ifndef OPTIMIZED_RELEASE
+    assume(index >= 0);
+    assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (index < 0 || index >= Size)
         return FLOAT_NAN;
 #endif
@@ -74,9 +74,9 @@ CONST_WIN32 float float4::operator [](int index) const
 
 float &float4::operator [](int index)
 { 
-    assert(index >= 0);
-    assert(index < Size);
-#ifndef OPTIMIZED_RELEASE
+    assume(index >= 0);
+    assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
     if (index < 0 || index >= Size)
         return ptr()[0];
 #endif
@@ -513,8 +513,8 @@ float float4::AngleBetween3(const float4 &other) const
 
 float float4::AngleBetweenNorm3(const float4 &other) const
 {
-    assert(this->IsNormalized3());
-    assert(other.IsNormalized3());
+    assume(this->IsNormalized3());
+    assume(other.IsNormalized3());
     return acos(Dot3(other));
 }
 
@@ -525,8 +525,8 @@ float float4::AngleBetween4(const float4 &other) const
 
 float float4::AngleBetweenNorm4(const float4 &other) const
 {
-    assert(this->IsNormalized4());
-    assert(other.IsNormalized4());
+    assume(this->IsNormalized4());
+    assume(other.IsNormalized4());
     return acos(Dot4(other));
 }
 

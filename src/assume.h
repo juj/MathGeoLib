@@ -24,6 +24,20 @@ void SetMathBreakOnAssume(bool isEnabled);
 /// The default startup value for this flag is false.
 bool MathBreakOnAssume();
 
+// If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test
+// that all forms of optimizations inside the math library produce proper results.
+#ifdef MATH_ASSERT_CORRECTNESS
+#define mathassert(x) assert(x)
+#else
+#define mathassert(x)
+#endif
+
+// If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
+// not be checked against at runtime.
+// If this flag is undefined (the default), all input is sanity checked so that user cannot crash the system 
+// e.g. with out-of-bounds accesses.
+//#define MATH_ENABLE_INSECURE_OPTIMIZATIONS
+
 #ifdef MATH_ASSERT_ON_ASSUME
 #define assume(x) assert(x)
 #elif !defined(MATH_SILENT_ASSUME) 
@@ -44,5 +58,6 @@ bool MathBreakOnAssume();
 #else
 #define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
 #endif
-
+#else
+#define assume(x) 
 #endif
