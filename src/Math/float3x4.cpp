@@ -806,26 +806,32 @@ float3x4 float3x4::Inverted() const
     return copy;
 }
 
-bool float3x4::InverseOrthogonal()
+bool float3x4::InverseColOrthogonal()
 {
 #ifdef MATH_ASSERT_CORRECTNESS
     float3x4 orig = *this;
 #endif
     assume(IsColOrthogonal());
+    float s1 = float3(v[0][0], v[1][0], v[2][0]).LengthSq();
+    float s2 = float3(v[0][1], v[1][1], v[2][1]).LengthSq();
+    float s3 = float3(v[0][2], v[1][2], v[2][2]).LengthSq();
+    if (s1 < 1e-8f || s2 < 1e-8f || s3 < 1e-8f)
+        return false;
+    s1 = 1.f / s1;
+    s2 = 1.f / s2;
+    s3 = 1.f / s3;
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
-    float scale1 = sqrtf(1.f / float3(v[0][0], v[0][1], v[0][2]).LengthSq());
-    float scale2 = sqrtf(1.f / float3(v[1][0], v[1][1], v[1][2]).LengthSq());
-    float scale3 = sqrtf(1.f / float3(v[2][0], v[2][1], v[2][2]).LengthSq());
 
-    v[0][0] *= scale1; v[0][1] *= scale2; v[0][2] *= scale3;
-    v[1][0] *= scale1; v[1][1] *= scale2; v[1][2] *= scale3;
-    v[2][0] *= scale1; v[2][1] *= scale2; v[2][2] *= scale3;
+    v[0][0] *= s1; v[0][1] *= s1; v[0][2] *= s1;
+    v[1][0] *= s2; v[1][1] *= s2; v[1][2] *= s2;
+    v[2][0] *= s3; v[2][1] *= s3; v[2][2] *= s3;
 
     SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 
     mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
+    mathassert(IsRowOrthogonal());
 
     return true;
 }
@@ -840,7 +846,10 @@ bool float3x4::InverseOrthogonalUniformScale()
     Swap(v[0][1], v[1][0]);
     Swap(v[0][2], v[2][0]);
     Swap(v[1][2], v[2][1]);
-    const float scale = sqrtf(1.f / float3(v[0][0], v[0][1], v[0][2]).LengthSq());
+    float scale = float3(v[0][0], v[1][0], v[2][0]).LengthSq();
+    if (scale < 1e-4f)
+        return false;
+    scale = 1.f / scale;
 
     v[0][0] *= scale; v[0][1] *= scale; v[0][2] *= scale;
     v[1][0] *= scale; v[1][1] *= scale; v[1][2] *= scale;

@@ -444,26 +444,34 @@ public:
     /// Gauss's method on the matrix.
     float3x4 Inverted() const;
 
-    /// Inverts a matrix that is a concatenation of only translate, rotate and scale operations. 
-    /// To call this function, the matrix can not contain any projection or shearing operations
-    /// about any of the axes (the matrix must preserve all angles, i.e. have orthogonal column vectors). 
-    /// This function is faster than the generic matrix Inverse() function.
+    /// Inverts a column-orthogonal matrix.
+    /// If a matrix is of form M=T*R*S, where T is an affine translation matrix,
+    /// R is a rotation matrix and S is a diagonal matrix with non-zero but potentially non-uniform scaling
+    /// factors (possibly mirroring), then the matrix M is column-orthogonal and this function can be used to compute the inverse.
+    /// Calling this function is faster than the calling the generic matrix Inverse() function.
     /// Returns true on success. On failure, the matrix is not modified. This function fails if any of the
-    /// elements of this vector are not finite, or if the matrix contains zero scale.
-    bool InverseOrthogonal();
+    /// elements of this vector are not finite, or if the matrix contains a zero scaling factor on X, Y or Z.
+    /// @note The returned matrix will be row-orthogonal, but not column-orthogonal in general. 
+    /// The returned matrix will be column-orthogonal iff the original matrix M was row-orthogonal as well. 
+    /// (in which case S had uniform scale, InverseOrthogonalUniformScale() could have been used instead)
+    bool InverseColOrthogonal();
 
     /// Inverts a matrix that is a concatenation of only translate, rotate and uniform scale operations. 
-    /// To call this function, the matrix can not contain any projection, shearing or non-uniform scaling 
-    /// operations about any of the axes.
-    /// This function is faster than InverseOrthogonal().
-    /// Returns true on success. On failure, the matrix is not modified. This function fails if it contains
-    /// a null column vector or if any of the elements of this vector are not finite.
+    /// If a matrix is of form M=T*R*S, where T is an affine translation matrix,
+    /// R is a rotation matrix and S is a diagonal matrix with non-zero and uniform scaling factors (possibly mirroring),
+    /// then the matrix M is both column- and row-orthogonal and this function can be used to compute the inverse.
+    /// This function is faster than calling InverseColOrthogonal() or the generic Inverse().
+    /// Returns true on success. On failure, the matrix is not modified. This function fails if any of the
+    /// elements of this vector are not finite, or if the matrix contains a zero scaling factor on X, Y or Z.
+    /// This function may not be called if this matrix contains any shearing or nonuniform scaling.
     bool InverseOrthogonalUniformScale();
 
     /// Inverts a matrix that is a concatenation of only translate and rotate operations.
-    /// To call this function, the matrix can not contain any projection, shearing or scaling operations
-    /// about any of the axes. Always succeeds (or rather, fails to detect if it fails).
-    /// This function is faster than InverseOrthogonalUniformScale().
+    /// If a matrix is of form M=T*R*S, where T is an affine translation matrix, R is a rotation
+    /// matrix and S is either identity or a mirroring matrix, then the matrix M is orthonormal and this function can be used to compute the inverse.
+    /// This function is faster than calling InverseOrthogonalUniformScale(), InverseColOrthogonal() or the
+    /// generic Inverse().
+    /// This function may not be called if this matrix contains any scaling or shearing, but it may contain mirroring.
     void InverseOrthonormal();
 
     /// Transposes the top-left 3x3 part of this matrix in-place. The fourth column (translation part) will

@@ -1141,65 +1141,22 @@ float4x4 float4x4::Inverted() const
     return copy;
 }
 
-bool float4x4::InverseOrthogonal()
+bool float4x4::InverseColOrthogonal()
 {
-#ifdef MATH_ASSERT_CORRECTNESS
-    float4x4 orig = *this;
-#endif
-    assume(IsColOrthogonal3());
-    Swap(v[0][1], v[1][0]);
-    Swap(v[0][2], v[2][0]);
-    Swap(v[1][2], v[2][1]);
-    float scale1 = sqrtf(1.f / float3(v[0][0], v[0][1], v[0][2]).LengthSq());
-    float scale2 = sqrtf(1.f / float3(v[1][0], v[1][1], v[1][2]).LengthSq());
-    float scale3 = sqrtf(1.f / float3(v[2][0], v[2][1], v[2][2]).LengthSq());
-
-    v[0][0] *= scale1; v[0][1] *= scale2; v[0][2] *= scale3;
-    v[1][0] *= scale1; v[1][1] *= scale2; v[1][2] *= scale3;
-    v[2][0] *= scale1; v[2][1] *= scale2; v[2][2] *= scale3;
-
-    SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
-
-    assume(IsColOrthogonal3());
-    mathassert((orig * *this).IsIdentity());
-    return true;
+    assume(!ContainsProjection());
+    return Float3x4Part().InverseColOrthogonal();
 }
 
 bool float4x4::InverseOrthogonalUniformScale()
 {
-#ifdef MATH_ASSERT_CORRECTNESS
-    float4x4 orig = *this;
-#endif
-    assume(IsColOrthogonal3());
-    assume(HasUniformScale());
-    Swap(v[0][1], v[1][0]);
-    Swap(v[0][2], v[2][0]);
-    Swap(v[1][2], v[2][1]);
-    const float scale = sqrtf(1.f / float3(v[0][0], v[0][1], v[0][2]).LengthSq());
-
-    v[0][0] *= scale; v[0][1] *= scale; v[0][2] *= scale;
-    v[1][0] *= scale; v[1][1] *= scale; v[1][2] *= scale;
-    v[2][0] *= scale; v[2][1] *= scale; v[2][2] *= scale;
-
-    SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
-
-    assume(IsColOrthogonal3());
-    assume(HasUniformScale());
-    mathassert((orig * *this).IsIdentity());
-    return true;
+    assume(!ContainsProjection());
+    return Float3x4Part().InverseOrthogonalUniformScale();
 }
 
 void float4x4::InverseOrthonormal()
 {
-#ifdef MATH_ASSERT_CORRECTNESS
-    float4x4 orig = *this;
-#endif
-    assume(IsOrthonormal3());
-    Swap(v[0][1], v[1][0]);
-    Swap(v[0][2], v[2][0]);
-    Swap(v[1][2], v[2][1]);
-    SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
-    mathassert((orig * *this).IsIdentity());
+    assume(!ContainsProjection());
+    return Float3x4Part().InverseOrthonormal();
 }
 
 void float4x4::Transpose()

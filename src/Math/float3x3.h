@@ -374,26 +374,34 @@ public:
     /// Gauss's method on the matrix.
     float3x3 Inverted() const;
 
-    /// Inverts a matrix that is a concatenation of only rotation, reflection and scale operations. 
-    /// To call this function, the matrix can not contain any projection or shearing operations
-    /// about any of the axes (the matrix must preserve all angles, i.e. have orthogonal column vectors). 
-    /// This function is faster than the generic matrix Inverse() function.
+    /// Inverts a column-orthogonal matrix.
+    /// If a matrix is of form M=R*S, where 
+    /// R is a rotation matrix and S is a diagonal matrix with non-zero but potentially non-uniform scaling
+    /// factors (possibly mirroring), then the matrix M is column-orthogonal and this function can be used to compute the inverse.
+    /// Calling this function is faster than the calling the generic matrix Inverse() function.
     /// Returns true on success. On failure, the matrix is not modified. This function fails if any of the
-    /// elements of this vector are not finite, or if the matrix contains zero scale.
-    bool InverseOrthogonal();
+    /// elements of this vector are not finite, or if the matrix contains a zero scaling factor on X, Y or Z.
+    /// @note The returned matrix will be row-orthogonal, but not column-orthogonal in general. 
+    /// The returned matrix will be column-orthogonal iff the original matrix M was row-orthogonal as well. 
+    /// (in which case S had uniform scale, InverseOrthogonalUniformScale() could have been used instead)
+    bool InverseColOrthogonal();
 
-    /// Inverts a matrix that is a concatenation of only rotation, reflection and uniform scale operations. 
-    /// To call this function, the matrix can not contain any projection, shearing or non-uniform scaling 
-    /// operations about any of the axes.
-    /// This function is faster than InverseOrthogonal().
-    /// Returns true on success. On failure, the matrix is not modified. This function fails if it contains
-    /// a null column vector or if any of the elements of this vector are not finite.
+    /// Inverts a matrix that is a concatenation of only rotate and uniform scale operations. 
+    /// If a matrix is of form M=R*S, where 
+    /// R is a rotation matrix and S is a diagonal matrix with non-zero and uniform scaling factors (possibly mirroring),
+    /// then the matrix M is both column- and row-orthogonal and this function can be used to compute the inverse.
+    /// This function is faster than calling InverseColOrthogonal() or the generic Inverse().
+    /// Returns true on success. On failure, the matrix is not modified. This function fails if any of the
+    /// elements of this vector are not finite, or if the matrix contains a zero scaling factor on X, Y or Z.
+    /// This function may not be called if this matrix contains any shearing or nonuniform scaling.
     bool InverseOrthogonalUniformScale();
 
-    /// Inverts a matrix that contains only rotation and/or reflection.
-    /// To call this function, the matrix can not contain any shearing, scaling or projection operations
-    /// about any of the axes. Always succeeds (or rather, fails to detect if it fails).
-    /// This function is faster than InverseOrthogonalUniformScale().
+    /// Inverts a rotation matrix.
+    /// If a matrix is of form M=R*S, where R is a rotation matrix and S is either identity or a mirroring matrix, then 
+    /// the matrix M is orthonormal and this function can be used to compute the inverse.
+    /// This function is faster than calling InverseOrthogonalUniformScale(), InverseColOrthogonal() or the
+    /// generic Inverse().
+    /// This function may not be called if this matrix contains any scaling or shearing, but it may contain mirroring.
     void InverseOrthonormal();
 
     /// Transposes this matrix.
@@ -522,7 +530,7 @@ public:
 
     /// Returns true if this matrix contains only uniform scaling, compared to the given epsilon.
     /// @note If the matrix does not really do any scaling, this function returns true (scaling uniformly by a factor of 1).
-    bool HasUniformScale(float epsilonSq = 1e-6f) const;
+    bool HasUniformScale(float epsilon = 1e-3f) const;
 
     /// Returns true if the row vectors of this matrix are all perpendicular to each other.
     bool IsRowOrthogonal(float epsilon = 1e-3f) const;
