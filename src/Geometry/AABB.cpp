@@ -454,6 +454,17 @@ bool AABB::Contains(const AABB &aabb) const
     return Contains(aabb.minPoint) && Contains(aabb.maxPoint);
 }
 
+bool AABB::Contains(const OBB &obb) const
+{
+    return Contains(obb.MinimalEnclosingAABB());
+}
+
+bool AABB::Contains(const Sphere &sphere) const
+{
+    ///\todo Optimize.
+    return Contains(sphere.MinimalEnclosingAABB());
+}
+
 bool AABB::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
