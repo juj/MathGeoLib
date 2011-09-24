@@ -103,6 +103,23 @@ bool Line::Contains(const float3 &point, float distanceThreshold) const
     return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
 }
 
+bool Line::Contains(const Ray &ray, float epsilon) const
+{
+    return Contains(ray.pos, epsilon) && dir.Equals(ray.dir, epsilon);
+}
+
+bool Line::Contains(const LineSegment &lineSegment, float epsilon) const
+{
+    return Contains(lineSegment.a, epsilon) && Contains(lineSegment.b, epsilon);
+}
+
+bool Line::Equals(const Line &line, float epsilon) const
+{
+    // If the point of the other line is on this line, and the two lines point to the same direction,
+    // they must be equal.
+    return Contains(line.pos, epsilon) && dir.Equals(line.dir, epsilon);
+}
+
 /// Returns the distance of the given point to this line.
 /// @param d [out] This element will receive the distance along this line that specifies the closest point on this line to the given point.
 float Line::Distance(const float3 &point, float *d) const
