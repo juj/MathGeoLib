@@ -161,6 +161,16 @@ bool Sphere::Contains(const float3 &point) const
     return pos.DistanceSq(point) <= r*r;
 }
 
+bool Sphere::Contains(const LineSegment &lineSegment) const
+{
+    return Contains(lineSegment.a) && Contains(lineSegment.b);
+}
+
+bool Sphere::Contains(const Triangle &triangle) const
+{
+    return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+
 Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
 {
     Sphere s;

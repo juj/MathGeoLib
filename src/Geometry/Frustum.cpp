@@ -221,6 +221,16 @@ bool Frustum::Contains(const float3 &point) const
         projected.z >= 0.f && projected.z <= 1.f;
 }
 
+bool Frustum::Contains(const LineSegment &lineSegment) const
+{
+    return Contains(lineSegment.a) && Contains(lineSegment.b);
+}
+
+bool Frustum::Contains(const Triangle &triangle) const
+{
+    return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+
 bool Frustum::IsFinite() const
 {
     return pos.IsFinite() && front.IsFinite() && up.IsFinite() && isfinite(nearPlaneDistance)

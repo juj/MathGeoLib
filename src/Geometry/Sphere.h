@@ -52,6 +52,8 @@ public:
     bool IsDegenerate() const;
 
     bool Contains(const float3 &point) const;
+    bool Contains(const LineSegment &lineSegment) const;
+    bool Contains(const Triangle &triangle) const;
 
     /// Returns a Sphere that bounds the given point array.
     /// This functions implements a fast approximate (though rather crude) algorithm of Jack Ritter.

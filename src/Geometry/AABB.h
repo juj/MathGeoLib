@@ -281,6 +281,7 @@ public:
     bool Contains(const float3 &point) const;
     bool Contains(const LineSegment &lineSegment) const;
     bool Contains(const AABB &aabb) const;
+    bool Contains(const Triangle &triangle) const;
 
     /// Tests if this AABB intersects the given object.
     bool Intersects(const Ray &ray, float *dNear, float *dFar) const;

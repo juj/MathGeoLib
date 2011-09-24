@@ -545,6 +545,11 @@ bool OBB::Contains(const OBB &obb) const
     return true;
 }
 
+bool OBB::Contains(const Triangle &triangle) const
+{
+    return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+
 bool OBB::Intersects(const AABB &aabb) const
 {
     return Intersects(OBB(aabb));

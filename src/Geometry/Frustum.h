@@ -167,6 +167,8 @@ public:
 
     /// Returns true if the given point is contained inside this frustum.
     bool Contains(const float3 &point) const;
+    bool Contains(const LineSegment &lineSegment) const;
+    bool Contains(const Triangle &triangle) const;
 
     /// Returns an exact polyhedron representation of this frustum.
 //    Polyhedron ToPolyhedron() const;

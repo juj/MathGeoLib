@@ -10,6 +10,7 @@
 #include "Geometry/Capsule.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Circle.h"
+#include "Geometry/Triangle.h"
 #include "Algorithm/Random/LCG.h"
 #include "assume.h"
 
@@ -212,6 +213,11 @@ bool Capsule::Contains(const float3 &point) const
 bool Capsule::Contains(const LineSegment &lineSegment) const
 {
     return Contains(lineSegment.a) && Contains(lineSegment.b);
+}
+
+bool Capsule::Contains(const Triangle &triangle) const
+{
+    return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
 }
 
 bool Capsule::Intersects(const Ray &ray) const

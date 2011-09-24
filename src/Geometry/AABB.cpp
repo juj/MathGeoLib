@@ -454,6 +454,11 @@ bool AABB::Contains(const AABB &aabb) const
     return Contains(aabb.minPoint) && Contains(aabb.maxPoint);
 }
 
+bool AABB::Contains(const Triangle &triangle) const
+{
+    return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+
 /** Computes the intersection of a ray and a AABB.
 	Based on "T. Kay, J. Kajiya. Ray Tracing Complex Scenes. SIGGRAPH 1986 vol 20, number 4. pp. 269-"
 	http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm

@@ -265,6 +265,7 @@ public:
     bool Contains(const LineSegment &lineSegment) const;
     bool Contains(const AABB &aabb) const;
     bool Contains(const OBB &obb) const;
+    bool Contains(const Triangle &triangle) const;
 
     /// Tests if this OBB intersects the given object.
     /** The first parameter of this function specifies the object to test against.
