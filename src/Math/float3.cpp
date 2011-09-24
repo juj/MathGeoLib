@@ -16,8 +16,15 @@
 #include "Math/float3.h"
 #include "Math/float4.h"
 #include "Math/float3x3.h"
+#include "Geometry/Line.h"
+#include "Geometry/Ray.h"
+#include "Geometry/LineSegment.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/AABB.h"
+#include "Geometry/OBB.h"
+#include "Geometry/Plane.h"
+#include "Geometry/Triangle.h"
+#include "Geometry/Capsule.h"
 #include "Math/MathFunc.h"
 
 using namespace std;
@@ -301,6 +308,16 @@ float float3::Distance(const float3 &rhs) const
 {
     return sqrtf(DistanceSq(rhs));
 }
+
+float float3::Distance(const Line &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const Ray &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const LineSegment &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const Plane &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const Triangle &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const AABB &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const OBB &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const Sphere &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const Capsule &rhs) const { return rhs.Distance(*this); }
 
 float float3::Dot(const float3 &rhs) const
 {

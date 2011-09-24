@@ -81,7 +81,7 @@ public:
     bool Contains(const float3 &point, float triangleThickness = 1e-3f) const;
 
     /// Returns the distance of the given point to this triangle.
-    float Distance(const float3 &point);
+    float Distance(const float3 &point) const;
 
     bool Intersects(const LineSegment &lineSegment, float *d, float3 *intersectionPoint) const;
     bool Intersects(const Line &line, float *d, float3 *intersectionPoint) const;

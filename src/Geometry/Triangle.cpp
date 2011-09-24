@@ -127,7 +127,7 @@ bool Triangle::Contains(const float3 &point, float triangleThickness) const
     return br.y >= 0.f && br.z >= 0.f && (br.y + br.z) <= 1.f;
 }
 
-float Triangle::Distance(const float3 &point)
+float Triangle::Distance(const float3 &point) const
 {
     return ClosestPoint(point).Distance(point);
 }

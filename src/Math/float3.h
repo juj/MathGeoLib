@@ -159,6 +159,16 @@ public:
 
     /// Computes the distance between this and the given float3.
     float Distance(const float3 &rhs) const;
+    /// Computes the distance between this and the given object.
+    float Distance(const Line &rhs) const;
+    float Distance(const Ray &rhs) const;
+    float Distance(const LineSegment &rhs) const;
+    float Distance(const Plane &rhs) const;
+    float Distance(const Triangle &rhs) const;
+    float Distance(const AABB &rhs) const;
+    float Distance(const OBB &rhs) const;
+    float Distance(const Sphere &rhs) const;
+    float Distance(const Capsule &rhs) const;
     /// Computes the squared distance between this and the given float3.
     float DistanceSq(const float3 &rhs) const;
     /// Computes the dot product of this and the given float3.
