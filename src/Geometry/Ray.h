@@ -49,6 +49,11 @@ public:
     /// distance to this point is smaller than the given threshold epsilon.
     bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
 
+    bool Contains(const LineSegment &lineSegment, float distanceThreshold = 1e-3f) const;
+
+    /// Returns true if these two objects represent the same set of points, up to the given epsilon.
+    bool Equals(const Ray &rhs, float epsilon = 1e-3f) const;
+
     /// Returns the distance of the given point to this ray.
     /// @param d [out] This element will receive the distance along this ray that specifies the closest point on this ray to the given point. This value can be negative.
     float Distance(const float3 &point, float *d = 0) const;

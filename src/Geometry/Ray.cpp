@@ -74,6 +74,16 @@ bool Ray::Contains(const float3 &point, float distanceThreshold) const
     return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
 }
 
+bool Ray::Contains(const LineSegment &lineSegment, float distanceThreshold) const
+{
+    return Contains(lineSegment.a, distanceThreshold) && Contains(lineSegment.b, distanceThreshold);
+}
+
+bool Ray::Equals(const Ray &rhs, float epsilon) const
+{
+    return pos.Equals(rhs.pos, epsilon) && dir.Equals(rhs.dir, epsilon);
+}
+
 /// Returns the distance of the given point to this line.
 /// @param d [out] This element will receive the distance along this line that specifies the closest point on this line to the given point.
 float Ray::Distance(const float3 &point, float *d) const
