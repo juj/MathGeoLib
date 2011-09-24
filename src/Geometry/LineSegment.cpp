@@ -92,6 +92,11 @@ float LineSegment::LengthSq() const
     return a.DistanceSq(b);
 }
 
+bool LineSegment::IsFinite() const
+{
+    return a.IsFinite() && b.IsFinite();
+}
+
 bool LineSegment::Contains(const float3 &point, float distanceThreshold) const
 {
     return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
