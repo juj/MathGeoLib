@@ -246,3 +246,9 @@ template<typename T> inline bool IsFiniteNumber(const T &value) { return true; }
 template<> inline bool IsFiniteNumber<float>(const float &value) { return isfinite(value) != 0; }
 template<> inline bool IsFiniteNumber<double>(const double &value) { return isfinite(value) != 0; }
 template<> inline bool IsFiniteNumber<long double>(const long double &value) { return isfinite(value) != 0; }
+
+template<typename T1, typename T2>
+float Distance(const T1 &lhs, const T2 &rhs)
+{
+    return lhs.Distance(rhs);
+}
