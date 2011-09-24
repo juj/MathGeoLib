@@ -102,6 +102,16 @@ bool LineSegment::Contains(const float3 &point, float distanceThreshold) const
     return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
 }
 
+bool LineSegment::Contains(const LineSegment &rhs, float distanceThreshold) const
+{
+    return Contains(rhs.a, distanceThreshold) && Contains(rhs.b, distanceThreshold);
+}
+
+bool LineSegment::Equals(const LineSegment &rhs, float e) const
+{
+    return (a.Equals(rhs.a, e) && b.Equals(rhs.b, e)) || (a.Equals(rhs.b, e) && b.Equals(rhs.a, e));
+}
+
 float3 LineSegment::ClosestPoint(const float3 &point, float *d) const
 {
     float3 dir = b - a;
