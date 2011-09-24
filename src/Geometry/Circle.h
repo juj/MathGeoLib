@@ -56,7 +56,8 @@ public:
 
 	/// Returns true if the given point lies inside this filled circle.
 	/// @param maxDistance The epsilon threshold to test the distance against.
-	bool DiscContains(const float3 &point, float maxDistance = 1e-6f) const;
+//	bool DiscContains(const float3 &point, float maxDistance = 1e-6f) const;
+//	bool DiscContains(const LineSegment &lineSegment, float maxDistance = 1e-6f) const;
 
 	/// Returns the distance of the given object to the edge of this circle.
     float DistanceToEdge(const float3 &point) const;

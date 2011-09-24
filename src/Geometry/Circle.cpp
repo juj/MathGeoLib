@@ -47,6 +47,11 @@ bool Circle::DiscContains(const float3 &point, float maxDistance) const
 {
 	return DistanceToDisc(point) <= maxDistance;
 }
+
+bool Circle::DiscContains(const LineSegment &lineSegment, float maxDistance = 1e-6f) const
+{
+}
+
 */
 float Circle::DistanceToEdge(const float3 &point) const
 {
