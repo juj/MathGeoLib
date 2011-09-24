@@ -47,8 +47,12 @@ public:
     /// Returns true if no two nonconsecutive edges have a point in common.
     bool IsSimple() const;
 
-    /// Returns the plane this polygon fits most well into.
-    Plane GetPlane() const;
+    float3 NormalCW() const;
+    float3 NormalCCW() const;
+
+    /// Returns the plane this polygon is contained in. Only call this function if this Polygon is planar.
+    Plane PlaneCW() const;
+    Plane PlaneCCW() const;
 
     /// Returns true if the edges of this polygon self-intersect.
     bool IsSelfIntersecting() const;

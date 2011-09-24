@@ -11,7 +11,7 @@
 #include <utility>
 #endif
 
-#include "Polygon.h"
+#include "Geometry/Polygon.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/LineSegment.h"
@@ -65,7 +65,19 @@ bool Polygon::IsSimple() const
 	return false;
 }
 
-Plane Polygon::GetPlane() const
+float3 Polygon::NormalCCW() const
+{
+    ///\todo Optimize temporaries.
+    return PlaneCCW().normal;
+}
+
+float3 Polygon::NormalCW() const
+{
+    ///\todo Optimize temporaries.
+    return PlaneCW().normal;
+}
+
+Plane Polygon::PlaneCCW() const
 {
 	if (points.size() >= 3)
 		return Plane(points[0], points[1], points[2]);
@@ -75,6 +87,18 @@ Plane Polygon::GetPlane() const
 		return Plane(points[0], float3(0,1,0));
 	return Plane();
 }
+
+Plane Polygon::PlaneCW() const
+{
+	if (points.size() >= 3)
+		return Plane(points[0], points[2], points[1]);
+	if (points.size() == 2)
+		return Plane(Line(points[0], points[1]), (points[0]-points[1]).Perpendicular());
+	if (points.size() == 1)
+		return Plane(points[0], float3(0,1,0));
+	return Plane();
+}
+
 /*
 /// Returns true if the edges of this polygon self-intersect.
 bool IsSelfIntersecting() const;
