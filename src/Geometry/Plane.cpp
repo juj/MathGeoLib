@@ -7,9 +7,10 @@
 */
 
 
-#include "Geometry/AABB.h"
-#include "Circle.h"
 #include "Math/MathFunc.h"
+//#include "Geometry/Polygon.h"
+#include "Geometry/AABB.h"
+#include "Geometry/Circle.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
@@ -198,6 +199,54 @@ float3 Plane::ObliqueProject(const float3 &point, const float3 &obliqueProjectio
 bool Plane::Contains(const float3 &point, float distanceThreshold) const
 {
     return Distance(point) <= distanceThreshold;
+}
+
+bool Plane::Contains(const Line &line, float epsilon) const
+{
+    return Contains(line.pos) && line.dir.IsPerpendicular(normal, epsilon);
+}
+
+bool Plane::Contains(const Ray &ray, float epsilon) const
+{
+    return Contains(ray.pos) && ray.dir.IsPerpendicular(normal, epsilon);
+}
+
+bool Plane::Contains(const LineSegment &lineSegment, float epsilon) const
+{
+    return Contains(lineSegment.a, epsilon) && Contains(lineSegment.b, epsilon);
+}
+
+bool Plane::Contains(const Triangle &triangle, float epsilon) const
+{
+    return Contains(triangle.a, epsilon) && Contains(triangle.b, epsilon) && Contains(triangle.c, epsilon);
+}
+
+bool Plane::Contains(const Circle &circle, float epsilon) const
+{
+    return Contains(circle.pos, epsilon) && (EqualAbs(Abs(Dot(normal, circle.normal)), 1.f) || circle.r <= epsilon);
+}
+/*
+bool Plane::Contains(const Polygon &polygon, float epsilon) const
+{
+    switch(polygon.points.size())
+    {
+    case 0: assume(false && "Plane::Contains(Polygon) called with a degenerate polygon of 0 vertices!"); return false;
+    case 1: return Contains(polygon.points[0], epsilon);
+    case 2: return Contains(polygon.points[0], epsilon) && Contains(polygon.points[1], epsilon);
+    default:
+        return SetEquals(polygon.PlaneCCW(), epsilon);
+      }
+}
+*/
+bool Plane::SetEquals(const Plane &plane, float epsilon) const
+{
+    return (normal.Equals(plane.normal) && EqualAbs(d, plane.d, epsilon)) ||
+        (normal.Equals(-plane.normal) && EqualAbs(-d, plane.d, epsilon));
+}
+
+bool Plane::SignedEquals(const Plane &plane, float epsilon) const
+{
+    return normal.Equals(plane.normal) && EqualAbs(d, plane.d, epsilon);
 }
 
 bool Plane::Intersects(const Plane &plane, Line *outLine) const

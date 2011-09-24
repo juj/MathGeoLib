@@ -123,6 +123,19 @@ public:
     /// @param distanceThreshold The epsilon value to use for the comparison.
     bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
 
+    bool Contains(const Line &line, float epsilon = 1e-3f) const;
+    bool Contains(const Ray &ray, float epsilon = 1e-3f) const;
+    bool Contains(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
+    bool Contains(const Triangle &triangle, float epsilon = 1e-3f) const;
+    bool Contains(const Circle &circle, float epsilon = 1e-3f) const;
+//    bool Contains(const Polygon &polygon, float epsilon = 1e-3f) const;
+
+    /// Returns true if this plane represents the same set of points than the other plane.
+    bool SetEquals(const Plane &plane, float epsilon = 1e-3f) const;
+
+    /// Returns true if the two planes are equal, and oriented to the same direction.
+    bool SignedEquals(const Plane &plane, float epsilon = 1e-3f) const;
+
     /// Computes the intersection of two planes.
     bool Intersects(const Plane &plane, Line *outLine = 0) const;
 
