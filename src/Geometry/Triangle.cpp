@@ -127,6 +127,28 @@ bool Triangle::Contains(const float3 &point, float triangleThickness) const
     return br.y >= 0.f && br.z >= 0.f && (br.y + br.z) <= 1.f;
 }
 
+bool Triangle::Contains(const LineSegment &lineSegment, float triangleThickness) const
+{
+    return Contains(lineSegment.a, triangleThickness) && Contains(lineSegment.b, triangleThickness);
+}
+
+bool Triangle::Contains(const Triangle &triangle, float triangleThickness) const
+{
+    return Contains(triangle.a, triangleThickness) && Contains(triangle.b, triangleThickness)
+      && Contains(triangle.c, triangleThickness);
+}
+
+/*
+bool Triangle::Contains(const Polygon &polygon, float triangleThickness) const
+{
+    if (polygon.points.size() == 0)
+        return false;
+    for(int i = 0; i < polygon.points.size(); ++i)
+        if (!Contains(polygon.points[i], triangleThickness))
+            return false;
+    return true;
+}
+*/
 float Triangle::Distance(const float3 &point) const
 {
     return ClosestPoint(point).Distance(point);

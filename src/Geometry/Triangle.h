@@ -79,6 +79,8 @@ public:
     /// @param triangleThickness The epsilon value to use for this test. This specifies the maximum distance
     /// the point lie from the plane defined by this triangle.
     bool Contains(const float3 &point, float triangleThickness = 1e-3f) const;
+    bool Contains(const LineSegment &lineSegment, float triangleThickness = 1e-3f) const;
+    bool Contains(const Triangle &triangle, float triangleThickness = 1e-3f) const;
 
     /// Returns the distance of the given point to this triangle.
     float Distance(const float3 &point) const;
