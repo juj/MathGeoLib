@@ -15,6 +15,7 @@
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Ray.h"
+#include "Geometry/Capsule.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Triangle.h"
 #include "Geometry/LineSegment.h"
@@ -152,6 +153,16 @@ float Plane::Distance(const float3 &point) const
 float Plane::Distance(const LineSegment &lineSegment) const
 {
     return lineSegment.Distance(*this);
+}
+
+float Plane::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
+
+float Plane::Distance(const Capsule &capsule) const
+{
+    return Max(0.f, Distance(capsule.l) - capsule.r);
 }
 
 float Plane::SignedDistance(const float3 &point) const

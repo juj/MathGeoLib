@@ -17,6 +17,7 @@
 #include "Geometry/Plane.h"
 #include "Math/Quat.h"
 #include "Geometry/Sphere.h"
+#include "Geometry/Capsule.h"
 #include "Geometry/Triangle.h"
 #include "Math/MathFunc.h"
 
@@ -91,6 +92,11 @@ float Ray::Distance(const float3 &point, float *d) const
     return ClosestPoint(point, d).Distance(point);
 }
 
+float Ray::Distance(const float3 &point) const
+{
+    return Distance(point, 0);
+}
+
 /// Returns the distance of the given ray to this line.
 /// @param d [out] Receives the distance along this line that specifies the closest point on this line to the given point.
 /// @param d2 [out] Receives the distance along the other line that specifies the closest point on that line to this line.
@@ -102,6 +108,11 @@ float Ray::Distance(const Ray &other, float *d, float *d2) const
     return c.Distance(other.GetPoint(u2));
 }
 
+float Ray::Distance(const Ray &ray) const
+{
+    return Distance(ray, 0, 0);
+}
+
 float Ray::Distance(const Line &other, float *d, float *d2) const
 {
     float u2;
@@ -110,12 +121,32 @@ float Ray::Distance(const Line &other, float *d, float *d2) const
     return c.Distance(other.GetPoint(u2));
 }
 
+float Ray::Distance(const Line &line) const
+{
+    return Distance(line, 0, 0);
+}
+
 float Ray::Distance(const LineSegment &other, float *d, float *d2) const
 {
     float u2;
     float3 c = ClosestPoint(other, d, &u2);
     if (d2) *d2 = u2;
     return c.Distance(other.GetPoint(u2));
+}
+
+float Ray::Distance(const LineSegment &lineSegment) const
+{
+    return Distance(lineSegment, 0, 0);
+}
+
+float Ray::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
+
+float Ray::Distance(const Capsule &capsule) const
+{
+    return Max(0.f, Distance(capsule.l) - capsule.r);
 }
 
 float3 Ray::ClosestPoint(const float3 &targetPoint, float *d) const

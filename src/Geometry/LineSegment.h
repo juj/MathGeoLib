@@ -84,6 +84,7 @@ public:
     float Distance(const LineSegment &other, float *d = 0, float *d2 = 0) const;
     float Distance(const Plane &other) const;
     float Distance(const Sphere &other) const;
+    float Distance(const Capsule &other) const;
 
     ///\todo Output intersection point.
     bool Intersects(const Plane &plane) const;

@@ -154,6 +154,11 @@ float Triangle::Distance(const float3 &point) const
     return ClosestPoint(point).Distance(point);
 }
 
+float Triangle::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
+
 /** Calculates the intersection between a ray and a triangle. The facing is not accounted for, so
 	rays are reported to intersect triangles that are both front and backfacing.
 	According to "T. Möller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."

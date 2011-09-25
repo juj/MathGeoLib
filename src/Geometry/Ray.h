@@ -56,14 +56,20 @@ public:
 
     /// Returns the distance of the given point to this ray.
     /// @param d [out] This element will receive the distance along this ray that specifies the closest point on this ray to the given point. This value can be negative.
-    float Distance(const float3 &point, float *d = 0) const;
+    float Distance(const float3 &point, float *d) const;
+    float Distance(const float3 &point) const;
 
     /// Returns the distance of the given ray/line/linesegment to this ray.
     /// @param d [out] Receives the distance along this ray that specifies the closest point on this ray to the given point.
     /// @param d2 [out] Receives the distance along the other line that specifies the closest point on that line to this line.
-    float Distance(const Ray &other, float *d = 0, float *d2 = 0) const;
-    float Distance(const Line &other, float *d = 0, float *d2 = 0) const;
-    float Distance(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+    float Distance(const Ray &other, float *d, float *d2 = 0) const;
+    float Distance(const Ray &other) const;
+    float Distance(const Line &other, float *d, float *d2 = 0) const;
+    float Distance(const Line &other) const;
+    float Distance(const LineSegment &other, float *d, float *d2 = 0) const;
+    float Distance(const LineSegment &other) const;
+    float Distance(const Sphere &sphere) const;
+    float Distance(const Capsule &capsule) const;
 
     /// Returns the closest point on <b>this</b> ray to the given object.
     float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;

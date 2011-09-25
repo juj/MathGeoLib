@@ -84,6 +84,7 @@ public:
 
     /// Returns the distance of the given point to this triangle.
     float Distance(const float3 &point) const;
+    float Distance(const Sphere &sphere) const;
 
     bool Intersects(const LineSegment &lineSegment, float *d, float3 *intersectionPoint) const;
     bool Intersects(const Line &line, float *d, float3 *intersectionPoint) const;

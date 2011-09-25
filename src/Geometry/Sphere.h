@@ -81,6 +81,10 @@ public:
     float Distance(const Capsule &capsule) const;
     float Distance(const AABB &aabb) const;
     float Distance(const OBB &obb) const;
+    float Distance(const Plane &plane) const;
+    float Distance(const Triangle &triangle) const;
+    float Distance(const Ray &ray) const;
+    float Distance(const Line &line) const;
     float Distance(const LineSegment &lineSegment) const;
 
     /// Returns the closest point inside this sphere to the given point.

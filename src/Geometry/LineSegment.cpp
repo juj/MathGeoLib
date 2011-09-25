@@ -19,6 +19,7 @@
 #include "Geometry/OBB.h"
 #include "Math/Quat.h"
 #include "Geometry/Sphere.h"
+#include "Geometry/Capsule.h"
 #include "Geometry/Triangle.h"
 
 LineSegment::LineSegment(const float3 &a_, const float3 &b_)
@@ -212,6 +213,11 @@ float LineSegment::Distance(const Plane &other) const
 float LineSegment::Distance(const Sphere &other) const
 {
     return Max(0.f, Distance(other.pos) - other.r);
+}
+
+float LineSegment::Distance(const Capsule &other) const
+{
+    return Max(0.f, Distance(other.l) - other.r);
 }
 
 bool LineSegment::Intersects(const Plane &plane) const

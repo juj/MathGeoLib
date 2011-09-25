@@ -18,6 +18,7 @@
 #include "Geometry/Plane.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/AABB.h"
+#include "Geometry/Capsule.h"
 #include "Math/MathFunc.h"
 
 /// This code is adapted from http://paulbourke.net/geometry/lineline3d/ .
@@ -138,6 +139,11 @@ float Line::Distance(const Ray &other, float *d, float *d2) const
     return c.Distance(other.GetPoint(u2));
 }
 
+float Line::Distance(const Ray &other) const
+{
+    return Distance(other, 0, 0);
+}
+
 float Line::Distance(const Line &other, float *d, float *d2) const
 {
     float u2;
@@ -146,12 +152,32 @@ float Line::Distance(const Line &other, float *d, float *d2) const
     return c.Distance(other.GetPoint(u2));
 }
 
+float Line::Distance(const Line &other) const
+{
+    return Distance(other, 0, 0);
+}
+
 float Line::Distance(const LineSegment &other, float *d, float *d2) const
 {
     float u2;
     float3 c = ClosestPoint(other, d, &u2);
     if (d2) *d2 = u2;
     return c.Distance(other.GetPoint(u2));
+}
+
+float Line::Distance(const LineSegment &other) const
+{
+    return Distance(other, 0, 0);
+}
+
+float Line::Distance(const Sphere &other) const
+{
+    return Max(0.f, Distance(other.pos) - other.r);
+}
+
+float Line::Distance(const Capsule &other) const
+{
+    return Max(0.f, Distance(other.l) - other.r);
 }
 
 bool Line::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const

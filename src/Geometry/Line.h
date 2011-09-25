@@ -56,9 +56,15 @@ public:
     /// Returns the distance of the given ray/line/linesegment to this line.
     /// @param d [out] Receives the distance along this line that specifies the closest point on this line to the given point.
     /// @param d2 [out] Receives the distance along the other line that specifies the closest point on that line to this line.
-    float Distance(const Ray &other, float *d = 0, float *d2 = 0) const;
-    float Distance(const Line &other, float *d = 0, float *d2 = 0) const;
-    float Distance(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+    float Distance(const Ray &other, float *d, float *d2 = 0) const;
+    float Distance(const Ray &other) const;
+    float Distance(const Line &other, float *d, float *d2 = 0) const;
+    float Distance(const Line &other) const;
+    float Distance(const LineSegment &other, float *d, float *d2 = 0) const;
+    float Distance(const LineSegment &other) const;
+    float Distance(const Sphere &other) const;
+    float Distance(const Capsule &other) const;
+
 
     bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
     bool Intersects(const Plane &plane, float *d) const;

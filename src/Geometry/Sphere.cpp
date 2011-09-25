@@ -273,9 +273,29 @@ float Sphere::Distance(const OBB &obb) const
     return obb.Distance(*this);
 }
 
+float Sphere::Distance(const Plane &plane) const
+{
+    return plane.Distance(*this);
+}
+
+float Sphere::Distance(const Triangle &triangle) const
+{
+    return triangle.Distance(*this);
+}
+
+float Sphere::Distance(const Ray &ray) const
+{
+    return ray.Distance(*this);
+}
+
 float Sphere::Distance(const LineSegment &lineSegment) const
 {
     return lineSegment.Distance(*this);
+}
+
+float Sphere::Distance(const Line &line) const
+{
+    return line.Distance(*this);
 }
 
 float3 Sphere::ClosestPoint(const float3 &point) const

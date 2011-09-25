@@ -6,7 +6,10 @@
 #include "Math/Quat.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Plane.h"
 #include "Geometry/Ray.h"
+#include "Geometry/Line.h"
+#include "Geometry/LineSegment.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Circle.h"
@@ -205,9 +208,34 @@ float Capsule::Distance(const float3 &point) const
     return Max(0.f, l.Distance(point) - r);
 }
 
+float Capsule::Distance(const Capsule &capsule) const
+{
+    return Max(0.f, l.Distance(capsule.l) - r - capsule.r);
+}
+
+float Capsule::Distance(const Plane &plane) const
+{
+    return plane.Distance(*this);
+}
+
 float Capsule::Distance(const Sphere &sphere) const
 {
     return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
+
+float Capsule::Distance(const Ray &ray) const
+{
+    return ray.Distance(*this);
+}
+
+float Capsule::Distance(const Line &line) const
+{
+    return line.Distance(*this);
+}
+
+float Capsule::Distance(const LineSegment &lineSegment) const
+{
+    return lineSegment.Distance(*this);
 }
 
 bool Capsule::Contains(const float3 &point) const
