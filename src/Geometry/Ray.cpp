@@ -228,7 +228,12 @@ bool Ray::Intersects(const Capsule &capsule) const
 {
     return capsule.Intersects(*this);
 }
-
+/*
+bool Ray::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
+}
+*/
 Line Ray::ToLine() const
 {
     return Line(pos, dir);

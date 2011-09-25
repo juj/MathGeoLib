@@ -71,6 +71,7 @@ public:
     bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const Capsule &capsule) const;
+//    bool Intersects(const Polygon &polygon) const;
 
     /// Returns the closest point on <b>this</b> line to the given object.
     float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;

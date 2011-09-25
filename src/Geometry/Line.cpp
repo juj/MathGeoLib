@@ -209,7 +209,12 @@ bool Line::Intersects(const Capsule &capsule) const
 {
     return capsule.Intersects(*this);
 }
-
+/*
+bool Line::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
+}
+*/
 float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const
 {
     float u = Dot(targetPoint - pos, dir);

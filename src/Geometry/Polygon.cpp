@@ -14,55 +14,145 @@
 #include "Geometry/Polygon.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
+#include "Geometry/Ray.h"
 #include "Geometry/LineSegment.h"
 #include "Math/MathFunc.h"
+#include "Math/float2.h"
 
 int Polygon::NumEdges() const
 {
-	return points.size();
+	return p.size();
 }
 
 LineSegment Polygon::Edge(int i) const
 {
-	if (points.size() == 0)
+	if (p.size() == 0)
 		return LineSegment(float3::nan, float3::nan);
-	if (points.size() == 1)
-		return LineSegment(points[0], points[0]);
-	return LineSegment(points[i], points[(i+1)%points.size()]);
+	if (p.size() == 1)
+		return LineSegment(p[0], p[0]);
+	return LineSegment(p[i], p[(i+1)%p.size()]);
+}
+
+LineSegment Polygon::Edge2D(int i) const
+{
+    return LineSegment(float3(MapTo2D(i), 0), float3(MapTo2D((i+1)%p.size()), 0));
 }
 
 bool Polygon::DiagonalExists(int i, int j) const
 {
-	assume(false && "Not implemented!");
-	return false;
+    assume(IsPlanar());
+    assume(i != j);
+    if (i > j)
+        Swap(i, j);
+    if ((i+1)%p.size() == j)
+        return true;
+
+    Plane polygonPlane = PlaneCCW();
+    LineSegment diagonal = polygonPlane.Project(LineSegment(p[i], p[j]));
+
+    // First check that this diagonal line is not intersected by an edge of this polygon.
+    for(size_t k = 0; k < p.size(); ++k)
+        if (!(k == i || k+1 == i || k == j))
+            if (polygonPlane.Project(LineSegment(p[k], p[k+1])).Intersects(diagonal))
+                return false;
+
+    return IsConvex();
+}
+
+float3 Polygon::BasisU() const
+{
+    if (p.size() < 2)
+        return float3::unitX;
+    float3 u = p[1] - p[0];
+    u.Normalize(); // Always succeeds, even if u was zero (generates (1,0,0)).
+    return u;
+}
+
+float3 Polygon::BasisV() const
+{
+    if (p.size() < 2)
+        return float3::unitY;
+    return Cross(BasisU(), PlaneCCW().normal).Normalized();
 }
 
 LineSegment Polygon::Diagonal(int i, int j) const
 {
-	return LineSegment(points[i], points[j]);
+	return LineSegment(p[i], p[j]);
 }
 
 bool Polygon::IsConvex() const
 {
-	assume(false && "Not implemented!");
-	return false;
+    assume(IsPlanar());
+    if (p.size() == 0)
+        return false;
+	if (p.size() <= 3)
+		return true;
+    size_t i = p.size()-2;
+    size_t j = p.size()-1;
+    size_t k = 0;
+
+    while(k < p.size())
+    {
+        float2 a = MapTo2D(i);
+        float2 b = MapTo2D(j);
+        float2 c = MapTo2D(k);
+        if (!float2::OrientedCCW(a, b, c))
+            return false;
+        i = j;
+        j = k;
+        ++k;
+    }
+    return true;
+}
+
+float2 Polygon::MapTo2D(int i) const
+{
+    return MapTo2D(p[i]);
+}
+
+float2 Polygon::MapTo2D(const float3 &point) const
+{
+    float3 basisU = BasisU();
+    float3 basisV = BasisV();
+    float3 pt = point - p[0];
+    return float2(Dot(pt, basisU), Dot(pt, basisV));
+}
+
+float3 Polygon::MapFrom2D(const float2 &point) const
+{
+    return p[0] + point.x * BasisU() + point.y * BasisV();
 }
 
 bool Polygon::IsPlanar(float epsilon) const
 {
-	if (points.size() <= 3)
+    if (p.size() == 0)
+        return false;
+	if (p.size() <= 3)
 		return true;
-	Plane p(points[0], points[1], points[2]);
-	for(size_t i = 3; i < points.size(); ++i)
-		if (p.Distance(points[i]) > epsilon)
+	Plane plane(p[0], p[1], p[2]);
+	for(size_t i = 3; i < p.size(); ++i)
+		if (plane.Distance(p[i]) > epsilon)
 			return false;
 	return true;
 }
 
 bool Polygon::IsSimple() const
 {
-	assume(false && "Not implemented!");
-	return false;
+    assume(IsPlanar());
+    Plane plane = PlaneCCW();
+    for(size_t i = 0; i < p.size(); ++i)
+    {
+        LineSegment si = plane.Project(Edge(i));
+        for(size_t j = i+2; j < p.size(); ++j)
+        {
+            if (i == 0 && j == p.size() - 1)
+                continue; // These two edges are consecutive and share a vertex. Don't check that pair.
+            LineSegment sj = plane.Project(Edge(j));
+            if (si.Intersects(sj))
+                return false;
+        }
+    }
+    return true;
 }
 
 float3 Polygon::NormalCCW() const
@@ -79,24 +169,65 @@ float3 Polygon::NormalCW() const
 
 Plane Polygon::PlaneCCW() const
 {
-	if (points.size() >= 3)
-		return Plane(points[0], points[1], points[2]);
-	if (points.size() == 2)
-		return Plane(Line(points[0], points[1]), (points[0]-points[1]).Perpendicular());
-	if (points.size() == 1)
-		return Plane(points[0], float3(0,1,0));
+	if (p.size() >= 3)
+		return Plane(p[0], p[1], p[2]);
+	if (p.size() == 2)
+		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
+	if (p.size() == 1)
+		return Plane(p[0], float3(0,1,0));
 	return Plane();
 }
 
 Plane Polygon::PlaneCW() const
 {
-	if (points.size() >= 3)
-		return Plane(points[0], points[2], points[1]);
-	if (points.size() == 2)
-		return Plane(Line(points[0], points[1]), (points[0]-points[1]).Perpendicular());
-	if (points.size() == 1)
-		return Plane(points[0], float3(0,1,0));
+	if (p.size() >= 3)
+		return Plane(p[0], p[2], p[1]);
+	if (p.size() == 2)
+		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
+	if (p.size() == 1)
+		return Plane(p[0], float3(0,1,0));
 	return Plane();
+}
+
+bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) const
+{
+    if (PlaneCCW().Distance(worldSpacePoint) > polygonThickness)
+        return false;
+    return Contains(MapTo2D(worldSpacePoint));
+}
+
+bool Polygon::Contains(const float2 &localSpacePoint) const
+{
+    LineSegment l(float3(localSpacePoint, 0), float3(localSpacePoint,0) + float3(1,1,0).Normalized());
+    int numIntersections = 0;
+    for(size_t i = 0; i < p.size(); ++i)
+        if (Edge2D(i).Intersects(l))
+            ++numIntersections;
+    return numIntersections % 2 == 1;
+}
+
+bool Polygon::Intersects(const Line &line) const
+{
+    float d;
+    if (!PlaneCCW().Intersects(line, &d))
+        return false;
+    return Contains(line.GetPoint(d));
+}
+
+bool Polygon::Intersects(const Ray &ray) const
+{
+    float d;
+    if (!PlaneCCW().Intersects(ray, &d))
+        return false;
+    return Contains(ray.GetPoint(d));
+}
+
+bool Polygon::Intersects(const LineSegment &lineSegment) const
+{
+    float d;
+    if (!PlaneCCW().Intersects(lineSegment, &d))
+        return false;
+    return Contains(lineSegment.GetPoint(d));
 }
 
 /*
