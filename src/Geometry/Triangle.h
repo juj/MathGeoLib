@@ -43,6 +43,10 @@ public:
     /// Returns the surface area of this triangle.
     float Area() const;
 
+    /// Returns the given edge of this Triangle.
+    /// @param i The edge of this triangle: 0, 1 or 2.
+    LineSegment Edge(int i) const;
+
     /// Returns the plane this triangle lies on. The normal of the returned plane points to the counter-clockwise direction of this triangle.
     Plane PlaneCCW() const;
 

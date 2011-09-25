@@ -68,6 +68,17 @@ float Triangle::Area() const
     return 0.5f * Cross(b-a, c-a).Length();
 }
 
+LineSegment Triangle::Edge(int i) const
+{
+    assume(0 <= i);
+    assume(i <= 2);
+    if (i == 0)
+        return LineSegment(a, b);
+    if (i == 1)
+        return LineSegment(b, c);
+    return LineSegment(c, a);
+}
+
 Plane Triangle::PlaneCCW() const
 {
     return Plane(a, b, c);
