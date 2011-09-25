@@ -116,6 +116,9 @@ public:
     /// Projects the given point onto this plane orthographically (finds the closest point on this plane).
     float3 Project(const float3 &point) const;
 
+    /// Projects the given LineSegment onto this plane orthographically.
+    LineSegment Project(const LineSegment &lineSegment) const;
+
     /// Returns the closest point on this plane to the given point. This is an alias to Plane::Project(const float3 &point).
     float3 ClosestPoint(const float3 &point) const { return Project(point); }
     /// Returns the closest point on this plane to the given object.

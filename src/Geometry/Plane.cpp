@@ -206,6 +206,11 @@ float3 Plane::Project(const float3 &point) const
     return projected;
 }
 
+LineSegment Plane::Project(const LineSegment &lineSegment) const
+{
+    return LineSegment(Project(lineSegment.a), Project(lineSegment.b));
+}
+
 float3 Plane::ClosestPoint(const Ray &ray) const
 {
     ///\todo Output parametric d as well.

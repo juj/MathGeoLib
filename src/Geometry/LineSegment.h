@@ -94,6 +94,8 @@ public:
     bool Intersects(const AABB &aabb, float *dNear = 0, float *dFar = 0) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const Capsule &capsule) const;
+    bool Intersects(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
+//    bool Intersects(const Polygon &polygon) const;
 
     ///\todo Implement.
 //    bool Intersect(const Frustum &frustum) const;

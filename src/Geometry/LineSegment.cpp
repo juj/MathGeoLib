@@ -257,6 +257,17 @@ bool LineSegment::Intersects(const OBB &obb, float *dNear, float *dFar) const
     return obb.Intersects(*this, dNear, dFar);
 }
 
+bool LineSegment::Intersects(const LineSegment &lineSegment, float epsilon) const
+{
+    return Distance(lineSegment) <= epsilon;
+}
+
+/*
+bool LineSegment::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
+}
+*/
 Ray LineSegment::ToRay() const
 {
     return Ray(a, Dir());
