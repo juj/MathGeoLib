@@ -96,9 +96,11 @@ public:
 
     /// Returns true if the given point lies inside this polygon.
     bool Contains(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
+    bool Contains(const LineSegment &worldSpaceLineSegment, float polygonThickness = 1e-3f) const;
 
     /// Returns true if the given 2D point is contained inside this polygon.
-    bool Contains(const float2 &localSpacePoint) const;
+    bool Contains2D(const float2 &localSpacePoint) const;
+    bool Contains2D(const LineSegment &localSpaceLineSegment) const;
 
     bool Intersects(const Line &line) const;
     bool Intersects(const Ray &ray) const;

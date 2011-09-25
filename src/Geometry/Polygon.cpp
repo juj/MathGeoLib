@@ -35,6 +35,10 @@ LineSegment Polygon::Edge(int i) const
 
 LineSegment Polygon::Edge2D(int i) const
 {
+	if (p.size() == 0)
+		return LineSegment(float3::nan, float3::nan);
+	if (p.size() == 1)
+        return LineSegment(float3::zero, float3::zero);
     return LineSegment(float3(MapTo2D(i), 0), float3(MapTo2D((i+1)%p.size()), 0));
 }
 
@@ -193,17 +197,58 @@ bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) co
 {
     if (PlaneCCW().Distance(worldSpacePoint) > polygonThickness)
         return false;
-    return Contains(MapTo2D(worldSpacePoint));
+    return Contains2D(MapTo2D(worldSpacePoint));
 }
 
-bool Polygon::Contains(const float2 &localSpacePoint) const
+bool Polygon::Contains2D(const float2 &localSpacePoint) const
 {
+    if (p.size() < 3)
+        return false;
+
     LineSegment l(float3(localSpacePoint, 0), float3(localSpacePoint,0) + float3(1,1,0).Normalized());
     int numIntersections = 0;
     for(size_t i = 0; i < p.size(); ++i)
         if (Edge2D(i).Intersects(l))
             ++numIntersections;
     return numIntersections % 2 == 1;
+}
+
+bool Polygon::Contains(const LineSegment &worldSpaceLineSegment, float polygonThickness) const
+{
+    if (p.size() < 3)
+        return false;
+
+    Plane plane = PlaneCCW();
+    if (plane.Distance(worldSpaceLineSegment.a) > polygonThickness ||
+        plane.Distance(worldSpaceLineSegment.b) > polygonThickness)
+        return false;
+
+    // For robustness, project onto the polygon plane.
+    LineSegment l = plane.Project(worldSpaceLineSegment);
+
+    if (!Contains(l.a) || !Contains(l.b))
+        return false;
+
+    for(size_t i = 0; i < p.size(); ++i)
+        if (plane.Project(Edge(i)).Intersects(l))
+            return false;
+
+    return true;
+}
+
+bool Polygon::Contains2D(const LineSegment &localSpaceLineSegment) const
+{
+    if (p.size() < 3)
+        return false;
+
+    if (!Contains2D(localSpaceLineSegment.a.xy()) || !Contains2D(localSpaceLineSegment.b.xy()))
+        return false;
+
+    for(size_t i = 0; i < p.size(); ++i)
+        if (Edge2D(i).Intersects(localSpaceLineSegment))
+            return false;
+
+    return true;
 }
 
 bool Polygon::Intersects(const Line &line) const
