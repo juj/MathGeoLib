@@ -221,6 +221,11 @@ bool LineSegment::Intersects(const Plane &plane) const
     return d * d2 <= 0.f;
 }
 
+bool LineSegment::Intersects(const Plane &plane, float *d) const
+{
+    return plane.Intersects(*this, d);
+}
+
 bool LineSegment::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const
 {
     return triangle.Intersects(*this, d, intersectionPoint);

@@ -115,6 +115,9 @@ public:
 
     /// Returns the closest point on this plane to the given point. This is an alias to Plane::Project(const float3 &point).
     float3 ClosestPoint(const float3 &point) const { return Project(point); }
+    /// Returns the closest point on this plane to the given object.
+    float3 ClosestPoint(const Ray &ray) const;
+    float3 ClosestPoint(const LineSegment &lineSegment) const;
 
     /// Projects the given point onto this plane in the given oblique projection direction.
     float3 ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const;

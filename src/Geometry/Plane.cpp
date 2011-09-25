@@ -190,6 +190,29 @@ float3 Plane::Project(const float3 &point) const
     return projected;
 }
 
+float3 Plane::ClosestPoint(const Ray &ray) const
+{
+    ///\todo Output parametric d as well.
+    float d;
+    if (ray.Intersects(*this, &d))
+        return ray.GetPoint(d);
+    else
+        return Project(ray.pos);
+}
+
+float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
+{
+    ///\todo Output parametric d as well.
+    float d;
+    if (lineSegment.Intersects(*this, &d))
+        return lineSegment.GetPoint(d);
+    else
+        if (Distance(lineSegment.a) < Distance(lineSegment.b))
+            return Project(lineSegment.a);
+        else
+            return Project(lineSegment.b);
+}
+
 float3 Plane::ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const
 {
     assume(false && "Not implemented!"); ///\todo
