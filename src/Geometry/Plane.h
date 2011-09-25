@@ -158,6 +158,7 @@ public:
     bool Intersects(const OBB &obb) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Frustum &frustum) const;
+    bool Intersects(const Capsule &capsule) const;
 //    bool Intersect(const Polyhedron &polyhedron) const;
 
     /// Clips a line segment against this plane.

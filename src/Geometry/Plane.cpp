@@ -405,6 +405,11 @@ bool Plane::Intersects(const Sphere &sphere) const
     return Distance(sphere.pos) <= sphere.r;
 }
 
+bool Plane::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
+}
+
 /// Set Christer Ericson's Real-Time Collision Detection, p.164.
 bool Plane::Intersects(const AABB &aabb) const
 {

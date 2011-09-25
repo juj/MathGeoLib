@@ -224,6 +224,11 @@ bool Ray::Intersects(const OBB &obb) const
     return obb.Intersects(*this, 0, 0);
 }
 
+bool Ray::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
+}
+
 Line Ray::ToLine() const
 {
     return Line(pos, dir);

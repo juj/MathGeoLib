@@ -310,6 +310,11 @@ bool Sphere::Intersects(const Sphere &sphere) const
     return (pos - sphere.pos).LengthSq() <= r*r + sphere.r*sphere.r;
 }
 
+bool Sphere::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
+}
+
 bool IntersectLineSphere(const float3 &lPos, const float3 &lDir, const Sphere &s, float &t)
 {
     assume(lDir.IsNormalized());

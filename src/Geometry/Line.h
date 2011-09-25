@@ -65,12 +65,12 @@ public:
     float Distance(const Sphere &other) const;
     float Distance(const Capsule &other) const;
 
-
     bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
     bool Intersects(const Plane &plane, float *d) const;
     bool Intersects(const Sphere &s, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
     bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
+    bool Intersects(const Capsule &capsule) const;
 
     /// Returns the closest point on <b>this</b> line to the given object.
     float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;

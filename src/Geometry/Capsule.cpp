@@ -285,8 +285,16 @@ bool Capsule::Intersects(const OBB &obb) const
 */
 bool Capsule::Intersects(const Sphere &sphere) const
 {
+    ///\todo Optimize to avoid square roots.
     return l.Distance(sphere.pos) <= r + sphere.r;
 }
+
+bool Capsule::Intersects(const Capsule &capsule) const
+{
+    ///\todo Optimize to avoid square roots.
+    return l.Distance(capsule.l) <= r + capsule.r;
+}
+
 /*
 bool Capsule::Intersects(const Triangle &triangle) const
 {

@@ -205,6 +205,11 @@ bool Line::Intersects(const OBB &obb, float *dNear, float *dFar) const
     return obb.Intersects(*this, dNear, dFar);
 }
 
+bool Line::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
+}
+
 float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const
 {
     float u = Dot(targetPoint - pos, dir);

@@ -175,19 +175,19 @@ public:
 
     /// \todo Instead of returning a bool, return a value that specifies if the object lies completely
     ///       on the negative or positive halfspace.
-    bool Intersects(const Ray &ray, float &outDistance) const;
-    bool Intersects(const Line &line, float &outDistance) const;
-    bool Intersects(const LineSegment &lineSegment, float &outDistance) const;
-    bool Intersects(const AABB &aabb) const;
-    bool Intersects(const OBB &obb) const;
+//    bool Intersects(const Ray &ray, float &outDistance) const;
+//    bool Intersects(const Line &line, float &outDistance) const;
+//    bool Intersects(const LineSegment &lineSegment, float &outDistance) const;
+//    bool Intersects(const AABB &aabb) const;
+//    bool Intersects(const OBB &obb) const;
     bool Intersects(const Plane &plane) const;
-    bool Intersects(const Sphere &sphere) const;
-    bool Intersects(const Ellipsoid &ellipsoid) const;
-    bool Intersects(const Triangle &triangle) const;
-    bool Intersects(const Cylinder &cylinder) const;
-    bool Intersects(const Torus &torus) const;
-    bool Intersects(const Frustum &frustum) const;
-    bool Intersects(const Polyhedron &polyhedron) const;
+//    bool Intersects(const Sphere &sphere) const;
+//    bool Intersects(const Ellipsoid &ellipsoid) const;
+//    bool Intersects(const Triangle &triangle) const;
+//    bool Intersects(const Cylinder &cylinder) const;
+//    bool Intersects(const Torus &torus) const;
+//    bool Intersects(const Frustum &frustum) const;
+//    bool Intersects(const Polyhedron &polyhedron) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.

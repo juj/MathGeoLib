@@ -105,6 +105,7 @@ public:
     bool Intersects(const AABB &aabb, float3 *closestPointOnAABB) const;
     bool Intersects(const OBB &obb, float3 *closestPointOnOBB) const;
     bool Intersects(const Triangle &triangle, float3 *closestPointOnTriangle) const;
+    bool Intersects(const Capsule &capsule) const;
 
     /*
     float Distance(const float3 &point, float3 &outClosestPointOnSphere) const;

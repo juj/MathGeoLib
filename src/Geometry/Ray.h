@@ -87,6 +87,7 @@ public:
     bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const OBB &obb) const;
+    bool Intersects(const Capsule &capsule) const;
 
 /*
     bool Intersect(const Plane &plane) const;

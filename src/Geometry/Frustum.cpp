@@ -339,6 +339,8 @@ Polyhedron Frustum::ToPolyhedron() const
     return Polyhedron();
 }
 */
+
+/*
 bool Frustum::Intersects(const Ray &ray, float &outDistance) const
 {
     assume(false && "Not implemented!");
@@ -368,13 +370,12 @@ bool Frustum::Intersects(const OBB &obb) const
     assume(false && "Not implemented!");
     return false;
 }
-
+*/
 bool Frustum::Intersects(const Plane &plane) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    return plane.Intersects(*this);
 }
-
+/*
 bool Frustum::Intersects(const Sphere &sphere) const
 {
     assume(false && "Not implemented!");
@@ -416,7 +417,7 @@ bool Frustum::Intersects(const Polyhedron &polyhedron) const
     assume(false && "Not implemented!");
     return false;
 }
-
+*/
 #ifdef MATH_ENABLE_STL_SUPPORT
 
 std::string FrustumTypeToString(FrustumType t)

@@ -227,6 +227,11 @@ bool LineSegment::Intersects(const Plane &plane) const
     return d * d2 <= 0.f;
 }
 
+bool LineSegment::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
+}
+
 bool LineSegment::Intersects(const Plane &plane, float *d) const
 {
     return plane.Intersects(*this, d);
