@@ -211,6 +211,44 @@ LineSegment Plane::Project(const LineSegment &lineSegment) const
     return LineSegment(Project(lineSegment.a), Project(lineSegment.b));
 }
 
+Line Plane::Project(const Line &line, bool *nonDegenerate) const
+{
+    Line l;
+    l.pos = Project(line.pos);
+    l.dir = l.dir - l.dir.ProjectToNorm(normal);
+    float len = l.dir.Normalize();
+    *nonDegenerate = (len > 0.f);
+    return l;
+}
+
+Ray Plane::Project(const Ray &ray, bool *nonDegenerate) const
+{
+    Ray r;
+    r.pos = Project(ray.pos);
+    r.dir = r.dir - r.dir.ProjectToNorm(normal);
+    float len = r.dir.Normalize();
+    *nonDegenerate = (len > 0.f);
+    return r;
+}
+
+Triangle Plane::Project(const Triangle &triangle) const
+{
+    Triangle t;
+    t.a = Project(triangle.a);
+    t.b = Project(triangle.b);
+    t.c = Project(triangle.c);
+    return t;
+}
+/*
+Polygon Plane::Project(const Polygon &polygon) const
+{
+    Polygon p;
+    for(size_t i = 0; i < polygon.p.size(); ++i)
+        p.p.push_back(Project(polygon.p[i]));
+
+    return p;
+}
+*/
 float3 Plane::ClosestPoint(const Ray &ray) const
 {
     ///\todo Output parametric d as well.

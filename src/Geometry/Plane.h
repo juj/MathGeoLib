@@ -118,6 +118,15 @@ public:
 
     /// Projects the given LineSegment onto this plane orthographically.
     LineSegment Project(const LineSegment &lineSegment) const;
+    /// Projects the given line or ray to this plane.
+    /// Important: If the line or ray is perpendicular to the plane, the projection is a single point.
+    /// In that case, the .pos parameter of the returned object will specify the point location, the .dir
+    /// parameter of the object will be undefined and the nonDenerate pointer will be set to false.
+    Line Project(const Line &line, bool *nonDegenerate) const;
+    Ray Project(const Ray &ray, bool *nonDegenerate) const;
+
+    Triangle Project(const Triangle &triangle) const;
+//    Polygon Project(const Polygon &polygon) const;
 
     /// Returns the closest point on this plane to the given point. This is an alias to Plane::Project(const float3 &point).
     float3 ClosestPoint(const float3 &point) const { return Project(point); }
