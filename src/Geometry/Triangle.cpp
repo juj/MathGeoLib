@@ -79,6 +79,17 @@ LineSegment Triangle::Edge(int i) const
     return LineSegment(c, a);
 }
 
+float3 Triangle::Vertex(int i) const
+{
+    assume(0 <= i);
+    assume(i <= 2);
+    if (i == 0)
+        return a;
+    if (i == 1)
+        return b;
+    return c;
+}
+
 Plane Triangle::PlaneCCW() const
 {
     return Plane(a, b, c);

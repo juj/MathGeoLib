@@ -47,6 +47,10 @@ public:
     /// @param i The edge of this triangle: 0, 1 or 2.
     LineSegment Edge(int i) const;
 
+    /// Returns the given vertex of this Triangle.
+    /// @param i The vertex of this triangle: 0, 1 or 2.
+    float3 Vertex(int i) const;
+
     /// Returns the plane this triangle lies on. The normal of the returned plane points to the counter-clockwise direction of this triangle.
     Plane PlaneCCW() const;
 
