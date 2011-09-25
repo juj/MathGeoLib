@@ -13,6 +13,7 @@
 #include "Container/Array.h"
 #include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
+#include "Geometry/Capsule.h"
 #include "Algorithm/Random/LCG.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
@@ -250,6 +251,31 @@ Sphere Sphere::ApproximateEnclosingSphere(const float3 *pointArray, int numPoint
 float Sphere::Distance(const float3 &point) const
 {
     return Max(0.f, pos.Distance(point) - r);
+}
+
+float Sphere::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, pos.Distance(sphere.pos) - r - sphere.r);
+}
+
+float Sphere::Distance(const Capsule &capsule) const
+{
+    return capsule.Distance(*this);
+}
+
+float Sphere::Distance(const AABB &aabb) const
+{
+    return aabb.Distance(*this);
+}
+
+float Sphere::Distance(const OBB &obb) const
+{
+    return obb.Distance(*this);
+}
+
+float Sphere::Distance(const LineSegment &lineSegment) const
+{
+    return lineSegment.Distance(*this);
 }
 
 float3 Sphere::ClosestPoint(const float3 &point) const

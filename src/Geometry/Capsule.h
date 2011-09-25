@@ -124,6 +124,7 @@ public:
 
     /// Computes the distance of this Capsule to the given object.
     float Distance(const float3 &point) const;
+    float Distance(const Sphere &sphere) const;
 
     bool Contains(const float3 &point) const;
     bool Contains(const LineSegment &lineSegment) const;

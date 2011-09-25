@@ -420,6 +420,11 @@ float AABB::Distance(const float3 &point) const
     return ClosestPoint(point).Distance(point);
 }
 
+float AABB::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
+
 /*
 float AABB::Distance(const Ray &ray, float3 *outClosestPoint, float *outClosestDistance) const
 float Distance(const Line &line, float3 *outClosestPoint, float *outClosestdistance) const;

@@ -252,6 +252,7 @@ public:
             is returned.
         @return The distance between outClosestPoint and outClosestPointOther is returned. */
     float Distance(const float3 &point) const;
+    float Distance(const Sphere &sphere) const;
     /** @param outClosestDistance [out, optional] For ray, line and line segment queries, this parameter will receive the distance along
             the ray that specifies the closest point on that object to this AABB. This parameter may be left null, in which case the 
             actual distance along the ray is not computed. */

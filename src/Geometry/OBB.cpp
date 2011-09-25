@@ -495,22 +495,10 @@ float OBB::Distance(const float3 &point) const
     return point.Distance(closestPoint);
 }
 
-/*
-float Distance(const Ray &ray, float3 *outClosestPoint, float *outClosestDistance) const;
-float Distance(const Line &line, float3 *outClosestPoint, float *outClosestdistance) const;
-float Distance(const LineSegment &lineSegment, float3 *outClosestPoint, float *outClosestDistance) const;
-float Distance(const AABB &aabb, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const OBB &obb, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Plane &plane, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Sphere &sphere, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Ellipsoid &ellipsoid, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Triangle &triangle, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Cylinder &cylinder, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Capsule &capsule, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Torus &torus, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Frustum &frustum, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-float Distance(const Polygon &polygon, float3 *outClosestPoint, float3 *outClosestPointOther) const; */
-//    float Distance(const Polyhedron &polyhedron, float3 *outClosestPoint, float3 *outClosestPointOther) const;
+float OBB::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
 
 bool OBB::Contains(const float3 &point) const
 {

@@ -149,6 +149,11 @@ float Plane::Distance(const float3 &point) const
     return Abs(SignedDistance(point));
 }
 
+float Plane::Distance(const LineSegment &lineSegment) const
+{
+    return lineSegment.Distance(*this);
+}
+
 float Plane::SignedDistance(const float3 &point) const
 {
     return normal.Dot(point) - d;

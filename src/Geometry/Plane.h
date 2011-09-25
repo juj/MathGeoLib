@@ -83,6 +83,7 @@ public:
 
     /// Returns the distance of this plane to the given point.
     float Distance(const float3 &point) const;
+    float Distance(const LineSegment &lineSegment) const;
 
     /// Returns the signed distance of this plane to the given point.
     /// If this function returns a negative value, the given point lies in the negative halfspace of this plane.

@@ -77,6 +77,11 @@ public:
 */
     /// Returns the distance of this sphere to the given point.
     float Distance(const float3 &point) const;
+    float Distance(const Sphere &sphere) const;
+    float Distance(const Capsule &capsule) const;
+    float Distance(const AABB &aabb) const;
+    float Distance(const OBB &obb) const;
+    float Distance(const LineSegment &lineSegment) const;
 
     /// Returns the closest point inside this sphere to the given point.
     float3 ClosestPoint(const float3 &point) const;

@@ -238,15 +238,17 @@ public:
     /** @param outClosestDistance [out, optional] For ray, line and line segment queries, this parameter will receive the distance along
             the ray that specifies the closest point on that object to this OBB. This parameter may be left null, in which case the 
             actual distance along the ray is not computed. */
-    float Distance(const Ray &ray, float3 *outClosestPoint, float *outClosestDistance) const;
-    float Distance(const Line &line, float3 *outClosestPoint, float *outClosestdistance) const;
-    float Distance(const LineSegment &lineSegment, float3 *outClosestPoint, float *outClosestDistance) const;
+//    float Distance(const Ray &ray, float3 *outClosestPoint, float *outClosestDistance) const;
+ //   float Distance(const Line &line, float3 *outClosestPoint, float *outClosestdistance) const;
+//    float Distance(const LineSegment &lineSegment, float3 *outClosestPoint, float *outClosestDistance) const;
     /** @param outClosestPointOther [out, optional] If not null, this parameter will receive the closest point to this OBB on the surface
             of the other object. This parameter may be left null, if the actual point is not important. The closest point 
             may not be unique, in which case an arbitrary point on the surface of the other object is returned.*/
-    float Distance(const AABB &aabb, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-    float Distance(const OBB &obb, float3 *outClosestPoint, float3 *outClosestPointOther) const;
-    float Distance(const Plane &plane, float3 *outClosestPoint, float3 *outClosestPointOther) const;/*
+//    float Distance(const AABB &aabb, float3 *outClosestPoint, float3 *outClosestPointOther) const;
+//    float Distance(const OBB &obb, float3 *outClosestPoint, float3 *outClosestPointOther) const;
+//    float Distance(const Plane &plane, float3 *outClosestPoint, float3 *outClosestPointOther) const;
+    float Distance(const Sphere &sphere) const;
+    /*
     float Distance(const Sphere &sphere, float3 *outClosestPoint, float3 *outClosestPointOther) const;
     float Distance(const Ellipsoid &ellipsoid, float3 *outClosestPoint, float3 *outClosestPointOther) const;
     float Distance(const Triangle &triangle, float3 *outClosestPoint, float3 *outClosestPointOther) const;

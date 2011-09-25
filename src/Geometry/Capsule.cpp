@@ -205,6 +205,11 @@ float Capsule::Distance(const float3 &point) const
     return Max(0.f, l.Distance(point) - r);
 }
 
+float Capsule::Distance(const Sphere &sphere) const
+{
+    return Max(0.f, Distance(sphere.pos) - sphere.r);
+}
+
 bool Capsule::Contains(const float3 &point) const
 {
     return l.Distance(point) <= r;
