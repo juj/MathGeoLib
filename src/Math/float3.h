@@ -271,6 +271,7 @@ public:
     static float3 RandomSphere(LCG &lcg, const float3 &center, float radius);
     /// Generates a random point inside an axis-aligned box.
     static float3 RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax);
+    static float3 RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues);
 
     float3 operator -() const;
 

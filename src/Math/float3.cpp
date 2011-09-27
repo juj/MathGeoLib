@@ -577,7 +577,12 @@ float3 float3::RandomSphere(LCG &lcg, const float3 &center, float radius)
 
 float3 float3::RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
 {
-    return AABB(float3(xmin, ymin, zmin), float3(xmax, ymax, zmax)).RandomPointInside(lcg);
+    return RandomBox(lcg, float3(xmin, ymin, zmin), float3(xmax, ymax, zmax));
+}
+
+float3 float3::RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues)
+{
+    return AABB(minValues, maxValues).RandomPointInside(lcg);
 }
 
 float3 float3::operator +(const float3 &rhs) const
