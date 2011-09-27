@@ -217,7 +217,7 @@ bool EqualAbsT(const T &a, const T &b, const T &epsilon)
 }
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */
-bool EqualAbs(float a, float b, float epsilon = 1e-6f);
+bool EqualAbs(float a, float b, float epsilon = 1e-3f);
 
 /** Compares the two values for equality, allowing the given amount of relative error. 
     Beware that for values very near 0, the relative error is significant. */
