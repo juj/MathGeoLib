@@ -16,6 +16,7 @@
 #include "Geometry/Line.h"
 #include "Geometry/Ray.h"
 #include "Geometry/LineSegment.h"
+#include "Geometry/Triangle.h"
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 
@@ -234,6 +235,13 @@ bool Polygon::Contains(const LineSegment &worldSpaceLineSegment, float polygonTh
             return false;
 
     return true;
+}
+
+bool Polygon::Contains(const Triangle &worldSpaceTriangle, float polygonThickness) const
+{
+    return Contains(worldSpaceTriangle.Edge(0), polygonThickness) &&
+        Contains(worldSpaceTriangle.Edge(1), polygonThickness) &&
+        Contains(worldSpaceTriangle.Edge(2), polygonThickness);
 }
 
 bool Polygon::Contains2D(const LineSegment &localSpaceLineSegment) const
