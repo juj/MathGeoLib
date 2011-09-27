@@ -1,5 +1,6 @@
 #include <set>
 #include <utility>
+#include "assume.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
@@ -36,7 +37,7 @@ std::vector<std::pair<int, int> > Polyhedron::EdgeIndices() const
         for(size_t j = 0; j < f[i].v.size(); ++j)
         {
             int y = f[i].v[j];
-            uniqueEdges.insert(std::make_pair(x, y));
+            uniqueEdges.insert(std::make_pair(std::min(x, y), std::max(x, y)));
             x = y;
         }
     }
@@ -63,4 +64,45 @@ Plane Polyhedron::FacePlaneCCW(int faceIndex) const
 Plane Polyhedron::FacePlaneCW(int faceIndex) const
 {
     return FacePolygon(faceIndex).PlaneCW();
+}
+
+bool Polyhedron::IsClosed() const
+{
+    std::set<std::pair<int, int> > uniqueEdges;
+    for(int i = 0; i < NumFaces(); ++i)
+    {
+        assume(FacePolygon(i).IsPlanar());
+        assume(FacePolygon(i).IsSimple());
+        int x = f[i].v.back();
+        for(size_t j = 0; j < f[i].v.size(); ++j)
+        {
+            int y = f[i].v[j];
+            if (uniqueEdges.find(std::make_pair(x, y)) != uniqueEdges.end())
+                return false; // This edge is being used twice! Cannot be simple and closed.
+            uniqueEdges.insert(std::make_pair(x, y));
+            x = y;
+        }
+    }
+
+    for(std::set<std::pair<int, int> >::iterator iter = uniqueEdges.begin(); 
+        iter != uniqueEdges.end(); ++iter)
+    {
+        std::pair<int, int> reverse = std::make_pair(iter->second, iter->first);
+        if (uniqueEdges.find(reverse) == uniqueEdges.end())
+            return false;
+    }
+
+    return true;
+}
+
+bool Polyhedron::IsConvex() const
+{
+    for(int f = 0; f < NumFaces(); ++f)
+    {
+        Plane p = FacePlaneCCW(f);
+        for(int i = 0; i < NumVertices(); ++i)
+            if (p.SignedDistance(Vertex(i)) > 1e-3f)
+                return false;
+    }
+    return true;
 }

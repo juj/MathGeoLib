@@ -63,13 +63,20 @@ public:
 
     /// Returns all the (unique) edges of this polyhedron, as indices to the polyhedron vertex array.
     std::vector<std::pair<int, int> > EdgeIndices() const;
-
+#ifndef _WINDOWS_
     /// Returns a polygon representing the given face.
     /// The winding order of the polygon will be the same as in the input.
     Polygon FacePolygon(int faceIndex) const;
-
+#endif
     /// Returns the plane of the given polygon, treating the positive (visible) direction to be the one where the 
     /// vertices are wound in counter-clockwise order.
     Plane FacePlaneCCW(int faceIndex) const;
     Plane FacePlaneCW(int faceIndex) const;
+
+    /// Returns true if this polyhedron is closed and does not have any gaps.
+    /// \note This function performs a quick check, which might not be complete.
+    bool IsClosed() const;
+
+    /// Returns true if this polyhedron is convex.
+    bool IsConvex() const;
 };

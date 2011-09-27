@@ -66,10 +66,10 @@ void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
     normal.Normalize();
     d = Dot(v1, normal);
 
-    assert(EqualAbs(SignedDistance(v1), 0.f));
-    assert(EqualAbs(SignedDistance(v2), 0.f));
-    assert(EqualAbs(SignedDistance(v3), 0.f));
-    assert(EqualAbs(SignedDistance(v3 + normal), 1.f));
+    assume(EqualAbs(SignedDistance(v1), 0.f));
+    assume(EqualAbs(SignedDistance(v2), 0.f));
+    assume(EqualAbs(SignedDistance(v3), 0.f));
+    assume(EqualAbs(SignedDistance(v3 + normal), 1.f));
 }
 
 void Plane::Set(const float3 &point, const float3 &normal_)
@@ -78,8 +78,8 @@ void Plane::Set(const float3 &point, const float3 &normal_)
     assume(normal.IsNormalized());
     d = Dot(point, normal);
 
-    assert(EqualAbs(SignedDistance(point), 0.f));
-    assert(EqualAbs(SignedDistance(point + normal_), 1.f));
+    assume(EqualAbs(SignedDistance(point), 0.f));
+    assume(EqualAbs(SignedDistance(point + normal_), 1.f));
 }
 
 float3 Plane::PointOnPlane() const
@@ -190,7 +190,7 @@ float3 Plane::Reflect(const float3 &point) const
 {
     assume(normal.IsNormalized());
     float3 reflected = point - 2.f * (Dot(point, normal) + d) * normal;
-    assert(reflected.Equals(ReflectionMatrix().MulPos(point)));
+    assume(reflected.Equals(ReflectionMatrix().MulPos(point)));
     return reflected;
 }
 
@@ -202,7 +202,7 @@ float3 Plane::Refract(const float3 &vec, float negativeSideRefractionIndex, floa
 float3 Plane::Project(const float3 &point) const
 {
     float3 projected = point - (Dot(normal, point) - d) * normal;
-    assert(projected.Equals(OrthoProjection().MulPos(point)));
+    assume(projected.Equals(OrthoProjection().MulPos(point)));
     return projected;
 }
 

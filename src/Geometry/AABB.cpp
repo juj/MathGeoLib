@@ -5,6 +5,7 @@
     personal advantage and may NOT be copied or redistributed without prior consent
     of the author(s). 
 */
+#define _WINDOWS_
 
 #include "Math/MathFunc.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -17,6 +18,7 @@
 #include "Algorithm/Random/LCG.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
@@ -75,7 +77,35 @@ void AABB::SetFrom(const float3 *pointArray, int numPoints)
         Enclose(pointArray[i]);
 }
 
-//    Polyhedron ToPolyhedron() const;
+Polyhedron AABB::ToPolyhedron() const
+{
+    Polyhedron p;
+    // Populate the corners of this AABB.
+    // The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
+    for(int i = 0; i < 8; ++i)
+        p.v.push_back(CornerPoint(i));
+
+    // Generate the 6 faces of this AABB.
+    const int faces[6][4] = 
+    { 
+        { 0, 1, 3, 2 }, // X-
+        { 4, 6, 7, 5 }, // X+
+        { 0, 4, 5, 1 }, // Y-
+        { 7, 6, 2, 3 }, // Y+
+        { 0, 2, 6, 4 }, // Z-
+        { 1, 5, 7, 3 }, // Z+
+    };
+
+    for(int f = 0; f < 6; ++f)
+    {
+        Polyhedron::Face face;
+        for(int v = 0; v < 4; ++v)
+            face.v.push_back(faces[f][v]);
+        p.f.push_back(face);
+    }
+
+    return p;
+}
 
 OBB AABB::ToOBB() const
 {
@@ -267,6 +297,12 @@ void AABB::ExtremePointsAlongAABB(const float3 *pts, int numPoints, int &minx, i
         if (pts[i].z < pts[minz].z) minz = i;
         if (pts[i].z > pts[maxz].z) maxz = i;
     }
+}
+
+AABB AABB::FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize)
+{
+    float3 halfSize = aabbSize * 0.5f;
+    return AABB(aabbCenterPos - halfSize, aabbCenterPos + halfSize);
 }
 
 float3 AABB::Size() const

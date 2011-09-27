@@ -16,6 +16,7 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
@@ -115,7 +116,35 @@ void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
     assume(false && "Not implemented!");
 }
 
-//    Polyhedron ToPolyhedron() const;
+Polyhedron OBB::ToPolyhedron() const
+{
+    Polyhedron p;
+    // Populate the corners of this OBB.
+    // The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
+    for(int i = 0; i < 8; ++i)
+        p.v.push_back(CornerPoint(i));
+
+    // Generate the 6 faces of this OBB.
+    const int faces[6][4] = 
+    { 
+        { 0, 1, 3, 2 }, // X-
+        { 4, 6, 7, 5 }, // X+
+        { 0, 4, 5, 1 }, // Y-
+        { 7, 6, 2, 3 }, // Y+
+        { 0, 2, 6, 4 }, // Z-
+        { 1, 5, 7, 3 }, // Z+
+    };
+
+    for(int f = 0; f < 6; ++f)
+    {
+        Polyhedron::Face face;
+        for(int v = 0; v < 4; ++v)
+            face.v.push_back(faces[f][v]);
+        p.f.push_back(face);
+    }
+
+    return p;
+}
 
 AABB OBB::MinimalEnclosingAABB() const
 {

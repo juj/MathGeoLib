@@ -84,7 +84,8 @@ public:
     /// Converts this to a polyhedron.
     /** This function returns a polyhedron representation of this AABB. This conversion is exact, meaning that the returned
         polyhedron represents the same set of points than this AABB. */
-//    Polyhedron ToPolyhedron() const;
+    Polyhedron ToPolyhedron() const;
+
     /// Converts this to an oriented bounding box.
     /** This function returns an OBB representation of this AABB. This conversion is exact, meaning that the returned
         OBB represents the same set of points than this AABB. */
@@ -161,6 +162,9 @@ public:
     /// @param minx [out] Receives the point that has the smallest x coordinate.
     /// @param maxx [out] Receives the point that has the largest x coordinate.
     static void ExtremePointsAlongAABB(const float3 *pointArray, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz);
+
+    /// Creates a new AABB given is center position and size along the X, Y and Z axes.
+    static AABB FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize);
 
     /// Returns the side lengths of this AABB in x, y and z directions.
     /// The returned vector is equal to the diagonal vector of this AABB, i.e. it spans from the

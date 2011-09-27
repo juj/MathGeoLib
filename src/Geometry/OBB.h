@@ -69,7 +69,7 @@ public:
     /// Converts this to a polyhedron.
     /** This function returns a polyhedron representation of this OBB. This conversion is exact, meaning that the returned
         polyhedron represents the same set of points than this OBB. */
-//    Polyhedron ToPolyhedron() const;
+    Polyhedron ToPolyhedron() const;
 
     /// Returns the smallest AABB that this OBB is inside of.
     /** This function computes the optimal minimum volume AABB that encloses this OBB. */
