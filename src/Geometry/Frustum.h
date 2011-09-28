@@ -139,14 +139,10 @@ public:
 
     float3 RandomPointInside(LCG &rng) const;
 
-    /// Translates this Frustum by the given amount.
+    /// Translates this Frustum in-place by the given offset vector.
     void Translate(const float3 &offset);
 
-    /// Scales this Frustum by with respect to the given center point.
-    void Scale(const float3 &centerPoint, float uniformScaleFactor);
-    void Scale(const float3 &centerPoint, const float3 &nonuniformScaleFactors);
-
-    /// Transforms this Frustum.
+    /// Transforms this Frustum in-place by the given transform.
     void Transform(const float3x3 &transform);
     void Transform(const float3x4 &transform);
     void Transform(const float4x4 &transform);

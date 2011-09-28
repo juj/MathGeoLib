@@ -276,34 +276,47 @@ void Frustum::Translate(const float3 &offset)
     pos += offset;
 }
 
-void Frustum::Scale(const float3 &centerPoint, float uniformScaleFactor)
-{
-    assume(false && "Not implemented!");
-}
-
-void Frustum::Scale(const float3 &centerPoint, const float3 &nonuniformScaleFactors)
-{
-    assume(false && "Not implemented!");
-}
-
 void Frustum::Transform(const float3x3 &transform)
 {
-    assume(false && "Not implemented!");
+    assume(transform.HasUniformScale());
+    pos = transform * pos;
+    front = transform * front;
+    float scaleFactor = front.Normalize();
+    up = (transform * up).Normalized();
+    nearPlaneDistance *= scaleFactor;
+    farPlaneDistance *= scaleFactor;
+    if (type == OrthographicFrustum)
+    {
+        orthographicWidth *= scaleFactor;
+        orthographicHeight *= scaleFactor;
+    }
 }
 
 void Frustum::Transform(const float3x4 &transform)
 {
-    assume(false && "Not implemented!");
+    assume(transform.HasUniformScale());
+    pos = transform.MulPos(pos);
+    front = transform.MulDir(front);
+    float scaleFactor = front.Normalize();
+    up = transform.MulDir(up).Normalized();
+    nearPlaneDistance *= scaleFactor;
+    farPlaneDistance *= scaleFactor;
+    if (type == OrthographicFrustum)
+    {
+        orthographicWidth *= scaleFactor;
+        orthographicHeight *= scaleFactor;
+    }
 }
 
 void Frustum::Transform(const float4x4 &transform)
 {
-    assume(false && "Not implemented!");
+    assume(transform.Row(3).Equals(0,0,0,1));
+    Transform(transform.Float3x4Part());
 }
 
 void Frustum::Transform(const Quat &transform)
 {
-    assume(false && "Not implemented!");
+    Transform(transform.ToFloat3x3());
 }
 
 void Frustum::GetPlanes(Plane *outArray) const
