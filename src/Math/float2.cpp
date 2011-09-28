@@ -287,6 +287,11 @@ float float2::Dot(const float2 &rhs) const
     return x * rhs.x + y * rhs.y;
 }
 
+float2 float2::Perp() const
+{
+    return float2(-y, x);
+}
+
 float float2::PerpDot(const float2 &rhs) const
 {
     return -y * rhs.x + x * rhs.y;

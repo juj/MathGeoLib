@@ -144,6 +144,10 @@ public:
     float DistanceSq(const float2 &rhs) const;
     /// Computes the dot product of this and the given float2.
     float Dot(const float2 &rhs) const;
+    /// Returns this vector with the "perp-operator" applied to it.
+    /** The perp operator rotates a vector 90 degrees ccw (around the "z axis"). I.e.
+        for a 2D vector (x,y), this function returns the vector (-y, x). */
+    float2 Perp() const;
     /// Computes the perp-dot product of this and the given float2 in the order this^perp <dot> rhs.
     float PerpDot(const float2 &rhs) const;
 
