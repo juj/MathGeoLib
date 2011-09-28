@@ -301,14 +301,9 @@ public:
     HitInfo Intersect(const Polygon &polygon) const; */
 //    HitInfo Intersect(const Polyhedron &polyhedron) const;
 
-    /// Expands this OBB to enclose the given object.
-    /** This function computes the OBB that encloses both this OBB and the specified object, and stores the resulting
-        OBB into this.
-        @return For the polyhedron case, this function returns true if the polyhedron is closed and computing the enclosure
-            succeeded. If the polyhedron is not closed (it has infinite volume), this function returns false, and this OBB
-            is not modified. For other object types, this function always succeeds, and does not return a value. */
-/*    void Enclose(const float3 &point);
-    void Enclose(const LineSegment &lineSegment);
+    /// Expands this OBB to enclose the given object. The axis directions of this OBB remain intact.
+    void Enclose(const float3 &point);
+/*    void Enclose(const LineSegment &lineSegment);
     void Enclose(const AABB &aabb);
     void Enclose(const OBB &obb);
     void Enclose(const Sphere &sphere);

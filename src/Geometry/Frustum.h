@@ -155,23 +155,29 @@ public:
     /// Returns all the frustum planes in the order { near, far, left, right, top, bottom }.
     void GetPlanes(Plane *outArray) const;
 
+    /// Returns all the corner points of this array.
+    /// @param outPointArray The array to receive the corner point list. Must contain space for 8 elements.
     void GetCornerPoints(float3 *outPointArray) const;
 
+    /** This function generates one of the eight corner points of this Frustum. 
+        @param cornerIndex The index of the corner point to generate, in the range [0, 7].
+         The points are returned in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
+         (corresponding the left-up-forward axis directions). */
     float3 CornerPoint(int cornerIndex) const;
 
     /// Returns the minimal enclosing AABB of this frustum.
-    AABB ToAABB() const;
+    AABB MinimalEnclosingAABB() const;
 
     /// Returns an OBB that encloses this frustum.
-    OBB ToOBB() const;
+    OBB MinimalEnclosingOBB() const;
+
+    /// Returns an exact polyhedron representation of this frustum.
+    Polyhedron ToPolyhedron() const;
 
     /// Returns true if the given point is contained inside this frustum.
     bool Contains(const float3 &point) const;
     bool Contains(const LineSegment &lineSegment) const;
     bool Contains(const Triangle &triangle) const;
-
-    /// Returns an exact polyhedron representation of this frustum.
-//    Polyhedron ToPolyhedron() const;
 
     /// \todo Instead of returning a bool, return a value that specifies if the object lies completely
     ///       on the negative or positive halfspace.

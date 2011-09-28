@@ -118,6 +118,8 @@ void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
 
 Polyhedron OBB::ToPolyhedron() const
 {
+    // Note for maintainer: This function is an exact copy of AABB:ToPolyhedron() and Frustum::ToPolyhedron().
+
     Polyhedron p;
     // Populate the corners of this OBB.
     // The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
@@ -570,6 +572,22 @@ bool OBB::Contains(const Triangle &triangle) const
 bool OBB::Intersects(const AABB &aabb) const
 {
     return Intersects(OBB(aabb));
+}
+
+void OBB::Enclose(const float3 &point)
+{
+    float3 p = point - pos;
+    for(int i = 0; i < 3; ++i)
+    {
+        float dist = p.Dot(axis[i]);
+        if (Abs(dist) > r[i])
+        {
+            pos += axis[i] * (dist - r[i]) * 0.5f;
+            r[i] += Abs(dist - r[i]) * 0.5f;
+        }
+    }
+    // Should now contain the point.
+    assume(Distance(point) <= 1e-3f);
 }
 
 /** The following code is from Christer Ericson's book Real-Time Collision Detection, pp. 101-106.

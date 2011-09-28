@@ -14,6 +14,7 @@
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Triangle.h"
@@ -312,33 +313,85 @@ void Frustum::GetPlanes(Plane *outArray) const
 
 void Frustum::GetCornerPoints(float3 *outPointArray) const
 {
-    assume(false && "Not implemented!");
+    assume(outPointArray);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outPointArray)
+        return;
+#endif
+    for(int i = 0; i < 8; ++i)
+        outPointArray[i] = CornerPoint(i);
 }
 
 float3 Frustum::CornerPoint(int cornerIndex) const
 {
-    assume(false && "Not implemented!");
-    return float3();
+    assume(0 <= cornerIndex && cornerIndex <= 7);
+    switch(cornerIndex)
+    {
+        default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
+        case 0: return NearPlanePos(-1, -1);
+        case 1: return FarPlanePos(-1, -1);
+        case 2: return NearPlanePos(-1, 1);
+        case 3: return FarPlanePos(-1, 1);
+        case 4: return NearPlanePos(1, -1);
+        case 5: return FarPlanePos(1, -1);
+        case 6: return NearPlanePos(1, 1);
+        case 7: return FarPlanePos(1, 1);
+    }
 }
 
-AABB Frustum::ToAABB() const
+AABB Frustum::MinimalEnclosingAABB() const
 {
-    assume(false && "Not implemented!");
-    return AABB();
+    AABB aabb;
+    aabb.SetNegativeInfinity();
+    for(int i = 0; i < 8; ++i)
+        aabb.Enclose(CornerPoint(i));
+    return aabb;
 }
 
-OBB Frustum::ToOBB() const
+OBB Frustum::MinimalEnclosingOBB() const
 {
-    assume(false && "Not implemented!");
-    return OBB();
+    OBB obb;
+    obb.pos = (NearPlanePos(0, 0) + FarPlanePos(0, 0)) * 0.5f;
+    obb.axis[1] = up;
+    obb.axis[2] = -front;
+    obb.axis[0] = Cross(obb.axis[1], obb.axis[2]);
+    obb.r = float3::zero;
+    for(int i = 0; i < 8; ++i)
+        obb.Enclose(CornerPoint(i));
+    return obb;
 }
-/*
+
 Polyhedron Frustum::ToPolyhedron() const
 {
-    assume(false && "Not implemented!");
-    return Polyhedron();
+    // Note for maintainer: This function is an exact copy of AABB:ToPolyhedron() and OBB::ToPolyhedron().
+
+    Polyhedron p;
+    // Populate the corners of this Frustum.
+    // The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
+    for(int i = 0; i < 8; ++i)
+        p.v.push_back(CornerPoint(i));
+
+    // Generate the 6 faces of this Frustum.
+    const int faces[6][4] = 
+    { 
+        { 0, 1, 3, 2 }, // X-
+        { 4, 6, 7, 5 }, // X+
+        { 0, 4, 5, 1 }, // Y-
+        { 7, 6, 2, 3 }, // Y+
+        { 0, 2, 6, 4 }, // Z-
+        { 1, 5, 7, 3 }, // Z+
+    };
+
+    for(int f = 0; f < 6; ++f)
+    {
+        Polyhedron::Face face;
+        for(int v = 0; v < 4; ++v)
+            face.v.push_back(faces[f][v]);
+        p.f.push_back(face);
+    }
+
+    return p;
 }
-*/
 
 /*
 bool Frustum::Intersects(const Ray &ray, float &outDistance) const
