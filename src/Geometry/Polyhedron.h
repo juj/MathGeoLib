@@ -124,6 +124,7 @@ public:
     bool Intersects(const LineSegment &lineSegment) const;
     bool Intersects(const Line &line) const;
     bool Intersects(const Ray &ray) const;
+    bool Intersects(const Plane &plane) const;
     bool Intersects(const Polyhedron &polyhedron) const;
     bool IntersectsConvex(const Line &line) const;
     bool IntersectsConvex(const Ray &ray) const;

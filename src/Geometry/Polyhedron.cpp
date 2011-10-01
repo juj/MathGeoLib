@@ -324,6 +324,11 @@ bool Polyhedron::Intersects(const Ray &ray) const
     return false;
 }
 
+bool Polyhedron::Intersects(const Plane &plane) const
+{
+    return plane.Intersects(*this);
+}
+
 /** This very naive algorithm is from Christer Ericson's Real-Time Collision Detection, p. 384.
     \todo Used now only as a placeholder, implement a proper efficient method. */
 bool Polyhedron::Intersects(const Polyhedron &polyhedron) const

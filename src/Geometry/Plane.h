@@ -172,6 +172,7 @@ public:
     bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb) const;
     bool Intersects(const Polygon &polygon) const;
+    bool Intersects(const Polyhedron &polyhedron) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Capsule &capsule) const;

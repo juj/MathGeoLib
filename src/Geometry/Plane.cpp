@@ -14,6 +14,7 @@
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Sphere.h"
@@ -495,6 +496,17 @@ bool Plane::Intersects(const Frustum &frustum) const
     bool sign = IsOnPositiveSide(frustum.CornerPoint(0));
     for(int i = 1; i < 8; ++i)
         if (sign != IsOnPositiveSide(frustum.CornerPoint(i)))
+            return true;
+    return false;
+}
+
+bool Plane::Intersects(const Polyhedron &polyhedron) const
+{
+    if (polyhedron.NumVertices() == 0)
+        return false;
+    bool sign = IsOnPositiveSide(polyhedron.Vertex(0));
+    for(int i = 1; i < polyhedron.NumVertices(); ++i)
+        if (sign != IsOnPositiveSide(polyhedron.Vertex(i)))
             return true;
     return false;
 }
