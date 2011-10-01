@@ -75,20 +75,53 @@ public:
     /// The normal of the plane points outwards from this polyhedron.
     Plane FacePlane(int faceIndex) const;
 
+    /// Returns the index of the vertex of this polyhedron that reaches farthest in the given direction.
+    /// @param dir The direction vector to query for. This vector can be unnormalized.
+    /// @return The supporting point of this polyhedron that reaches farthest in the given direction.
+    int ExtremeVertex(const float3 &dir) const;
+    // float3 SupportingPoint(const float3 &dir) const;
+    // bool IsSupportingPlane(const Plane &plane) const;
+
+    /// Returns the arithmetic mean of all the corner vertices.
+    float3 Centroid() const;
+
+    AABB MinimalEnclosingAABB() const;
+
     /// Returns true if this polyhedron is closed and does not have any gaps.
     /// \note This function performs a quick check, which might not be complete.
     bool IsClosed() const;
 
+    /// Returns true if this polyhedron forms a single connected solid volume.
+//    bool IsConnected() const;
+
     /// Returns true if this polyhedron is convex.
+    /// The running time is O(F*V) ~ O(N^2).
     bool IsConvex() const;
 
-    /// Returns true if this polyhedron contains the given point.
-//    bool Contains(const float3 &point) const;
+    /// Returns true if the Euler formula (V + F - E == 2) holds for this Polyhedron.
+    bool EulerFormulaHolds() const;
 
-    /// Tests if this polyhedron contains the given point.
+    /// Returns true if this polyhedron contains the given point.
+    bool Contains(const float3 &point) const;
+    bool Contains(const LineSegment &lineSegment) const;
+    bool Contains(const Triangle &triangle) const;
+    bool Contains(const Polygon &polygon) const;
+    bool Contains(const AABB &aabb) const;
+    bool Contains(const OBB &obb) const;
+    bool Contains(const Frustum &frustum) const;
+    bool Contains(const Polyhedron &polyhedron) const;
+
+    /// Tests if this convex polyhedron contains the given point.
     /// This function is exactly like Contains(float3), except this version of the containment test 
     /// this polyhedron is convex, and uses a faster method of testing containment.
     bool ContainsConvex(const float3 &point) const;
     bool ContainsConvex(const LineSegment &lineSegment) const;
     bool ContainsConvex(const Triangle &triangle) const;
+
+    /// Returns the closest point on this convex polyhedron to the given point.
+    float3 ClosestPointConvex(const float3 &point) const;
+
+    bool IntersectsConvex(const Line &line) const;
+    bool IntersectsConvex(const Ray &ray) const;
+    bool IntersectsConvex(const LineSegment &lineSegment) const;
 };

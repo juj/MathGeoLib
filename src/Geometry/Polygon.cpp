@@ -11,6 +11,7 @@
 #include <utility>
 #endif
 
+#include "Geometry/AABB.h"
 #include "Geometry/Polygon.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
@@ -20,9 +21,19 @@
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 
+int Polygon::NumVertices() const
+{
+	return p.size();
+}
+
 int Polygon::NumEdges() const
 {
 	return p.size();
+}
+
+float3 Polygon::Vertex(int vertexIndex) const
+{
+    return p[vertexIndex];
 }
 
 LineSegment Polygon::Edge(int i) const
@@ -283,6 +294,33 @@ bool Polygon::Intersects(const LineSegment &lineSegment) const
     return Contains(lineSegment.GetPoint(d));
 }
 
+float3 Polygon::ClosestPointConvex(const float3 &point) const
+{
+    assume(IsPlanar());
+
+    float3 ptOnPlane = PlaneCCW().Project(point);
+    if (Contains(ptOnPlane))
+        return ptOnPlane;
+
+    for(int i = 0; i < NumEdges(); ++i)
+    {
+        Plane edgePlane = EdgePlane(i);
+        if (edgePlane.SignedDistance(ptOnPlane) > 0.f)
+            ptOnPlane = edgePlane.Project(ptOnPlane);
+    }
+    return ptOnPlane;
+}
+
+float3 Polygon::EdgeNormal(int edgeIndex) const
+{
+    return Cross(Edge(edgeIndex).Dir(), PlaneCCW().normal).Normalized();
+}
+
+Plane Polygon::EdgePlane(int edgeIndex) const
+{
+    return Plane(Edge(edgeIndex).a, EdgeNormal(edgeIndex));
+}
+
 /*
 /// Returns true if the edges of this polygon self-intersect.
 bool IsSelfIntersecting() const;
@@ -301,8 +339,26 @@ float Area() const;
 /// Returns the total edge length of this polygon.
 float Perimeter() const;
 
-float3 Centroid() const;
+*/
 
+float3 Polygon::Centroid() const
+{
+    float3 centroid = float3::zero;
+    for(int i = 0; i < NumVertices(); ++i)
+        centroid += Vertex(i);
+    return centroid / (float)NumVertices();
+}
+
+AABB Polygon::MinimalEnclosingAABB() const
+{
+    AABB aabb;
+    aabb.SetNegativeInfinity();
+    for(int i = 0; i < NumVertices(); ++i)
+        aabb.Enclose(Vertex(i));
+    return aabb;
+}
+
+/*
 /// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.
 bool IsConcaveVertex(int i) const;
 

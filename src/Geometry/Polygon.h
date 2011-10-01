@@ -29,31 +29,42 @@ public:
     /// @note The default ctor does not initialize any member values.
     Polygon() {}
 
+    /// Stores the vertices of this polygon.
     std::vector<float3> p;
 
     /// Returns the number of edges in this polygon. Since the polygon is always closed and connected,
-    /// ther number of edges is equal to the number of points.
+    /// ther number of edges is equal to the number of vertices.
     int NumEdges() const;
+
+    /// Returns the number of vertices in this polygon. Since the polygon is always closed and connected,
+    /// ther number of edges is equal to the number of vertices.
+    int NumVertices() const;
+
+    /// Returns a vertex of this polygon.
+    float3 Vertex(int vertexIndex) const;
 
     /// Returns the given line segment between two vertices.
     /// @param i [0, NumEdges()-1].
-    LineSegment Edge(int i) const;
+    LineSegment Edge(int edgeIndex) const;
 
     /// Returns the given local space line segment between two vertices.
     /// The z-coordinates of the returned line segment are zero.
-    LineSegment Edge2D(int i) const;
+    LineSegment Edge2D(int edgeIndex) const;
+
+    float3 EdgeNormal(int edgeIndex) const;
+    Plane EdgePlane(int edgeIndex) const;
 
     /// Returns true if the given diagonal exists.
-    /// If this function returns true, the diagonal that joins the vertices i and j lies inside this polygon.
+    /// If this function returns true, the diagonal that joins the two given vertices lies inside this polygon.
     /// This function may only be called if this Polygon is planar.
-    bool DiagonalExists(int i, int j) const;
+    bool DiagonalExists(int vertexIndex1, int vertexIndex2) const;
 
-    /// Returns the diagonal that joins vertices i and j.
+    /// Returns the diagonal that joins the two given vertices.
     /// If |i-j| == 1, then this returns an edge of this Polygon.
     /// If i==j, then a degenerate line segment is returned.
-    /// Otherwise, the line segment that join i and j is returned. Note that if the polygon is not planar or convex,
+    /// Otherwise, the line segment that joins the two given vertices is returned. Note that if the polygon is not planar or convex,
     /// this line segment might not lie inside the polygon.
-    LineSegment Diagonal(int i, int j) const;
+    LineSegment Diagonal(int vertexIndex1, int vertexIndex2) const;
 
     /// Tests if this polygon is convex.
     bool IsConvex() const;
@@ -98,6 +109,8 @@ public:
     bool Contains(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
     bool Contains(const LineSegment &worldSpaceLineSegment, float polygonThickness = 1e-3f) const;
     bool Contains(const Triangle &worldSpaceTriangle, float polygonThickness = 1e-3f) const;
+    ///\todo Add RTCD, p. 202. 
+    //bool ContainsConvex(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
 
     /// Returns true if the given 2D point is contained inside this polygon.
     bool Contains2D(const float2 &localSpacePoint) const;
@@ -107,6 +120,10 @@ public:
     bool Intersects(const Ray &ray) const;
     bool Intersects(const LineSegment &lineSegment) const;
 
+    /// Returns the closest point on this polygon to the given point.
+    /// This function assumes that this polygon is convex.
+    float3 ClosestPointConvex(const float3 &point) const;
+
     /// Returns the surface area of this polygon.
     float Area() const;
 
@@ -114,6 +131,8 @@ public:
     float Perimeter() const;
 
     float3 Centroid() const;
+
+    AABB MinimalEnclosingAABB() const;
 
     /// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.
     bool IsConcaveVertex(int i) const;
