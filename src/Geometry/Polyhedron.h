@@ -24,6 +24,9 @@ public:
     {
         /// Specifies the indices of the corner vertices of this polyhedron.
         /// Indices point to the polyhedron vertex array.
+        /// The face vertices should all lie on the same plane.
+        /// The positive direction of the plane (the direction the face outwards normal points to) 
+        /// is the one where the vertices are wound in counter-clockwise order.
         std::vector<int> v;
     };
 
@@ -68,10 +71,9 @@ public:
     /// The winding order of the polygon will be the same as in the input.
     Polygon FacePolygon(int faceIndex) const;
 #endif
-    /// Returns the plane of the given polygon, treating the positive (visible) direction to be the one where the 
-    /// vertices are wound in counter-clockwise order.
-    Plane FacePlaneCCW(int faceIndex) const;
-    Plane FacePlaneCW(int faceIndex) const;
+    /// Returns the plane of the given polyhedron face.
+    /// The normal of the plane points outwards from this polyhedron.
+    Plane FacePlane(int faceIndex) const;
 
     /// Returns true if this polyhedron is closed and does not have any gaps.
     /// \note This function performs a quick check, which might not be complete.
@@ -79,4 +81,14 @@ public:
 
     /// Returns true if this polyhedron is convex.
     bool IsConvex() const;
+
+    /// Returns true if this polyhedron contains the given point.
+//    bool Contains(const float3 &point) const;
+
+    /// Tests if this polyhedron contains the given point.
+    /// This function is exactly like Contains(float3), except this version of the containment test 
+    /// this polyhedron is convex, and uses a faster method of testing containment.
+    bool ContainsConvex(const float3 &point) const;
+    bool ContainsConvex(const LineSegment &lineSegment) const;
+    bool ContainsConvex(const Triangle &triangle) const;
 };

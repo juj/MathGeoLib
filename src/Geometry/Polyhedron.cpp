@@ -5,6 +5,7 @@
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/LineSegment.h"
+#include "Geometry/Triangle.h"
 
 int Polyhedron::NumEdges() const
 {
@@ -56,14 +57,9 @@ Polygon Polyhedron::FacePolygon(int faceIndex) const
     return p;
 }
 
-Plane Polyhedron::FacePlaneCCW(int faceIndex) const
+Plane Polyhedron::FacePlane(int faceIndex) const
 {
     return FacePolygon(faceIndex).PlaneCCW();
-}
-
-Plane Polyhedron::FacePlaneCW(int faceIndex) const
-{
-    return FacePolygon(faceIndex).PlaneCW();
 }
 
 bool Polyhedron::IsClosed() const
@@ -99,10 +95,36 @@ bool Polyhedron::IsConvex() const
 {
     for(int f = 0; f < NumFaces(); ++f)
     {
-        Plane p = FacePlaneCCW(f);
+        Plane p = FacePlane(f);
         for(int i = 0; i < NumVertices(); ++i)
-            if (p.SignedDistance(Vertex(i)) > 1e-3f)
+            if (p.SignedDistance(Vertex(i)) > 1e-3f) // Tolerate a small epsilon error.
                 return false;
     }
     return true;
+}
+/*
+bool Polyhedron::Contains(const float3 &point) const
+{
+    assume(false && "Not implemented!");
+}
+*/
+
+bool Polyhedron::ContainsConvex(const float3 &point) const
+{
+    assume(IsConvex());
+    for(int i = 0; i < NumFaces(); ++i)
+        if (FacePlane(i).SignedDistance(point) > 0.f)
+            return false;
+
+    return true;
+}
+
+bool Polyhedron::ContainsConvex(const LineSegment &lineSegment) const
+{
+    return ContainsConvex(lineSegment.a) && ContainsConvex(lineSegment.b);
+}
+
+bool Polyhedron::ContainsConvex(const Triangle &triangle) const
+{
+    return ContainsConvex(triangle.a) && ContainsConvex(triangle.b) && ContainsConvex(triangle.c);
 }
