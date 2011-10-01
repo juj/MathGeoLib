@@ -113,8 +113,8 @@ public:
     /// Returns the closest point on this triangle to the target object.
     float3 ClosestPoint(const float3 &targetPoint) const;
     float3 ClosestPoint(const LineSegment &other, float3 *otherPt) const;
-    float3 ClosestPoint(const Ray &other, float3 *otherPt) const;
-    float3 ClosestPoint(const Line &other, float3 *otherPt) const;
+//    float3 ClosestPoint(const Ray &other, float3 *otherPt) const;
+//    float3 ClosestPoint(const Line &other, float3 *otherPt) const;
     float3 ClosestPoint(const Triangle &other, float3 *otherPt) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
