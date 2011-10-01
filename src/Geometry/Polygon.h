@@ -120,6 +120,7 @@ public:
     bool Intersects(const Line &line) const;
     bool Intersects(const Ray &ray) const;
     bool Intersects(const LineSegment &lineSegment) const;
+    bool Intersects(const Plane &plane) const;
 
     /// Returns the closest point on this polygon to the given point.
     /// This function assumes that this polygon is convex.

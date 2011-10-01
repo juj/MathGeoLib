@@ -122,6 +122,8 @@ public:
     float3 ClosestPointConvex(const float3 &point) const;
 
     bool Intersects(const LineSegment &lineSegment) const;
+    bool Intersects(const Line &line) const;
+    bool Intersects(const Ray &ray) const;
     bool Intersects(const Polyhedron &polyhedron) const;
     bool IntersectsConvex(const Line &line) const;
     bool IntersectsConvex(const Ray &ray) const;

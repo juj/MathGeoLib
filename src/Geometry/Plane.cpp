@@ -8,12 +8,12 @@
 
 
 #include "Math/MathFunc.h"
-//#include "Geometry/Polygon.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Circle.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Polygon.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Sphere.h"
@@ -245,7 +245,7 @@ Triangle Plane::Project(const Triangle &triangle) const
     t.c = Project(triangle.c);
     return t;
 }
-/*
+
 Polygon Plane::Project(const Polygon &polygon) const
 {
     Polygon p;
@@ -254,7 +254,7 @@ Polygon Plane::Project(const Polygon &polygon) const
 
     return p;
 }
-*/
+
 float3 Plane::ClosestPoint(const Ray &ray) const
 {
     ///\todo Output parametric d as well.
@@ -313,19 +313,19 @@ bool Plane::Contains(const Circle &circle, float epsilon) const
 {
     return Contains(circle.pos, epsilon) && (EqualAbs(Abs(Dot(normal, circle.normal)), 1.f) || circle.r <= epsilon);
 }
-/*
+
 bool Plane::Contains(const Polygon &polygon, float epsilon) const
 {
-    switch(polygon.points.size())
+    switch(polygon.NumVertices())
     {
     case 0: assume(false && "Plane::Contains(Polygon) called with a degenerate polygon of 0 vertices!"); return false;
-    case 1: return Contains(polygon.points[0], epsilon);
-    case 2: return Contains(polygon.points[0], epsilon) && Contains(polygon.points[1], epsilon);
+    case 1: return Contains(polygon.Vertex(0), epsilon);
+    case 2: return Contains(polygon.Vertex(0), epsilon) && Contains(polygon.Vertex(1), epsilon);
     default:
         return SetEquals(polygon.PlaneCCW(), epsilon);
       }
 }
-*/
+
 bool Plane::SetEquals(const Plane &plane, float epsilon) const
 {
     return (normal.Equals(plane.normal) && EqualAbs(d, plane.d, epsilon)) ||
@@ -405,6 +405,11 @@ bool Plane::Intersects(const Plane &plane, const Plane &plane2, Line *outLine, f
     if (outPoint)
         *outPoint = m * float3(d, plane.d, plane2.d);
     return true;
+}
+
+bool Plane::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
 }
 
 /// Computes the intersection of a line and a plane.

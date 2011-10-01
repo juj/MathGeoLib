@@ -302,6 +302,15 @@ bool Polygon::Intersects(const LineSegment &lineSegment) const
     return Contains(lineSegment.GetPoint(d));
 }
 
+bool Polygon::Intersects(const Plane &plane) const
+{
+    Line intersectLine;
+    bool intersects = plane.Intersects(PlaneCCW(), &intersectLine);
+    if (!intersects)
+        return false;
+    return Intersects(intersectLine);
+}
+
 float3 Polygon::ClosestPointConvex(const float3 &point) const
 {
     assume(IsPlanar());

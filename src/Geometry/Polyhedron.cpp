@@ -306,6 +306,24 @@ bool Polyhedron::Intersects(const LineSegment &lineSegment) const
     return false;
 }
 
+bool Polyhedron::Intersects(const Line &line) const
+{
+    for(int i = 0; i < NumFaces(); ++i)
+        if (FacePolygon(i).Intersects(line))
+            return true;
+
+    return false;
+}
+
+bool Polyhedron::Intersects(const Ray &ray) const
+{
+    for(int i = 0; i < NumFaces(); ++i)
+        if (FacePolygon(i).Intersects(ray))
+            return true;
+
+    return false;
+}
+
 /** This very naive algorithm is from Christer Ericson's Real-Time Collision Detection, p. 384.
     \todo Used now only as a placeholder, implement a proper efficient method. */
 bool Polyhedron::Intersects(const Polyhedron &polyhedron) const

@@ -129,7 +129,7 @@ public:
     Ray Project(const Ray &ray, bool *nonDegenerate) const;
 
     Triangle Project(const Triangle &triangle) const;
-//    Polygon Project(const Polygon &polygon) const;
+    Polygon Project(const Polygon &polygon) const;
 
     /// Returns the closest point on this plane to the given point. This is an alias to Plane::Project(const float3 &point).
     float3 ClosestPoint(const float3 &point) const { return Project(point); }
@@ -149,7 +149,7 @@ public:
     bool Contains(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
     bool Contains(const Triangle &triangle, float epsilon = 1e-3f) const;
     bool Contains(const Circle &circle, float epsilon = 1e-3f) const;
-//    bool Contains(const Polygon &polygon, float epsilon = 1e-3f) const;
+    bool Contains(const Polygon &polygon, float epsilon = 1e-3f) const;
 
     /// Returns true if this plane represents the same set of points than the other plane.
     bool SetEquals(const Plane &plane, float epsilon = 1e-3f) const;
@@ -171,6 +171,7 @@ public:
     bool Intersects(const Sphere &sphere) const;
     bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb) const;
+    bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Capsule &capsule) const;
