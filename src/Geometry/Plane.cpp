@@ -82,6 +82,12 @@ void Plane::Set(const float3 &point, const float3 &normal_)
     assume(EqualAbs(SignedDistance(point + normal_), 1.f));
 }
 
+void Plane::ReverseNormal()
+{
+    normal = -normal;
+    d = -d;
+}
+
 float3 Plane::PointOnPlane() const
 {
     return normal * d;

@@ -57,6 +57,9 @@ public:
     /// @param normal The direction the plane is facing. This vector must have been normalized in advance.
     void Set(const float3 &point, const float3 &normal);
 
+    /// Reverses the direction of the plane normal, while still representing the same set of points.
+    void ReverseNormal();
+
     /// Returns a point on this plane.
     /// @note This point has the property that the line passing through the origin and the returned point is
     ///       perpendicular to this plane (directed towards the normal vector of this plane).
