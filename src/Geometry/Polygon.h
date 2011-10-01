@@ -109,6 +109,7 @@ public:
     bool Contains(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
     bool Contains(const LineSegment &worldSpaceLineSegment, float polygonThickness = 1e-3f) const;
     bool Contains(const Triangle &worldSpaceTriangle, float polygonThickness = 1e-3f) const;
+    bool Contains(const Polygon &worldSpacePolygon, float polygonThickness = 1e-3f) const;
     ///\todo Add RTCD, p. 202. 
     //bool ContainsConvex(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
 

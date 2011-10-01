@@ -212,6 +212,14 @@ bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) co
     return Contains2D(MapTo2D(worldSpacePoint));
 }
 
+bool Polygon::Contains(const Polygon &worldSpacePolygon, float polygonThickness) const
+{
+    for(int i = 0; i < worldSpacePolygon.NumVertices(); ++i)
+        if (!Contains(worldSpacePolygon.Vertex(i), polygonThickness))
+            return false;
+    return true;
+}
+
 bool Polygon::Contains2D(const float2 &localSpacePoint) const
 {
     if (p.size() < 3)
