@@ -295,6 +295,39 @@ bool ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir, con
     return true;
 }
 
+bool Polyhedron::Intersects(const LineSegment &lineSegment) const
+{
+    if (Contains(lineSegment))
+        return true;
+    for(int i = 0; i < NumFaces(); ++i)
+        if (FacePolygon(i).Intersects(lineSegment))
+            return true;
+
+    return false;
+}
+
+/** This very naive algorithm is from Christer Ericson's Real-Time Collision Detection, p. 384.
+    \todo Used now only as a placeholder, implement a proper efficient method. */
+bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
+{
+    if (polyhedron.Contains(this->Centroid()))
+        return true;
+    if (this->Contains(polyhedron.Centroid()))
+        return true;
+
+    std::vector<LineSegment> edges = this->Edges();
+    for(size_t i = 0; i < edges.size(); ++i)
+        if (polyhedron.Intersects(edges[i]))
+            return true;
+
+    edges = polyhedron.Edges();
+    for(size_t i = 0; i < edges.size(); ++i)
+        if (this->Intersects(edges[i]))
+            return true;
+
+    return false;
+}
+
 bool Polyhedron::IntersectsConvex(const Line &line) const
 {
     float tFirst = -FLOAT_MAX;

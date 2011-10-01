@@ -121,6 +121,8 @@ public:
     /// Returns the closest point on this convex polyhedron to the given point.
     float3 ClosestPointConvex(const float3 &point) const;
 
+    bool Intersects(const LineSegment &lineSegment) const;
+    bool Intersects(const Polyhedron &polyhedron) const;
     bool IntersectsConvex(const Line &line) const;
     bool IntersectsConvex(const Ray &ray) const;
     bool IntersectsConvex(const LineSegment &lineSegment) const;
