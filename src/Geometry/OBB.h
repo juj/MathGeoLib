@@ -268,6 +268,9 @@ public:
     bool Contains(const AABB &aabb) const;
     bool Contains(const OBB &obb) const;
     bool Contains(const Triangle &triangle) const;
+//    bool Contains(const Polygon &polygon) const;
+    bool Contains(const Frustum &frustum) const;
+    bool Contains(const Polyhedron &polyhedron) const;
 
     /// Tests if this OBB intersects the given object.
     /** The first parameter of this function specifies the object to test against.

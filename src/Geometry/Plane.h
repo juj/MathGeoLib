@@ -215,6 +215,9 @@ public:
     /// Tests if two planes are the same, up to the given epsilon.
     bool Equals(const Plane &other, float epsilon = 1e-3f) const;
 
+    /// Returns true if this plane is a separating plane for the given two objects.
+//    bool IsSeparatingPlane(const Polyhedron &obj1, const Polyhedron &obj2) const;
+
     /// Returns a circle that lies on this plane, with its center as close as possible to the specified center point,
     /// and the radius as specified.
     Circle GenerateCircle(const float3 &circleCenter, float radius) const;

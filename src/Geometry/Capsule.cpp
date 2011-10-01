@@ -6,11 +6,14 @@
 #include "Math/Quat.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "Geometry/Frustum.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Line.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Capsule.h"
+#include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Circle.h"
 #include "Geometry/Triangle.h"
@@ -251,6 +254,51 @@ bool Capsule::Contains(const LineSegment &lineSegment) const
 bool Capsule::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+
+bool Capsule::Contains(const Polygon &polygon) const
+{
+    for(int i = 0; i < polygon.NumVertices(); ++i)
+        if (!Contains(polygon.Vertex(i)))
+            return false;
+    return true;
+}
+
+bool Capsule::Contains(const AABB &aabb) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(aabb.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool Capsule::Contains(const OBB &obb) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(obb.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool Capsule::Contains(const Frustum &frustum) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(frustum.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool Capsule::Contains(const Polyhedron &polyhedron) const
+{
+    assume(polyhedron.IsClosed());
+    for(int i = 0; i < polyhedron.NumVertices(); ++i)
+        if (!Contains(polyhedron.Vertex(i)))
+            return false;
+
+    return true;
 }
 
 bool Capsule::Intersects(const Ray &ray) const

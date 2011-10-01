@@ -134,6 +134,11 @@ public:
     bool Contains(const float3 &point) const;
     bool Contains(const LineSegment &lineSegment) const;
     bool Contains(const Triangle &triangle) const;
+    bool Contains(const Polygon &polygon) const;
+    bool Contains(const AABB &aabb) const;
+    bool Contains(const OBB &obb) const;
+    bool Contains(const Frustum &frustum) const;
+    bool Contains(const Polyhedron &polyhedron) const;
 
     /// Tests if this Capsule intersects the given object.
     bool Intersects(const Ray &ray) const;

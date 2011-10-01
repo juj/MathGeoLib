@@ -12,12 +12,14 @@
 #include <utility>
 #endif
 #include "Geometry/AABB.h"
+#include "Geometry/Frustum.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
 #include "Geometry/Ray.h"
 #include "Algorithm/Random/LCG.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
 #include "Math/float3x3.h"
@@ -510,6 +512,21 @@ bool AABB::Contains(const Sphere &sphere) const
 bool AABB::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+/*
+bool AABB::Contains(const Polygon &polygon) const
+{
+    return Contains(polygon.MinimalEnclosingAABB());
+}
+*/
+bool AABB::Contains(const Frustum &frustum) const
+{
+    return Contains(frustum.MinimalEnclosingAABB());
+}
+
+bool AABB::Contains(const Polyhedron &polyhedron) const
+{
+    return Contains(polyhedron.MinimalEnclosingAABB());
 }
 
 /** Computes the intersection of a ray and a AABB.

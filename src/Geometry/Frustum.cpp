@@ -15,6 +15,7 @@
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Polyhedron.h"
+#include "Geometry/Polygon.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Triangle.h"
@@ -230,6 +231,51 @@ bool Frustum::Contains(const LineSegment &lineSegment) const
 bool Frustum::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+
+bool Frustum::Contains(const Polygon &polygon) const
+{
+    for(int i = 0; i < polygon.NumVertices(); ++i)
+        if (!Contains(polygon.Vertex(i)))
+            return false;
+    return true;
+}
+
+bool Frustum::Contains(const AABB &aabb) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(aabb.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool Frustum::Contains(const OBB &obb) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(obb.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool Frustum::Contains(const Frustum &frustum) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(frustum.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool Frustum::Contains(const Polyhedron &polyhedron) const
+{
+    assume(polyhedron.IsClosed());
+    for(int i = 0; i < polyhedron.NumVertices(); ++i)
+        if (!Contains(polyhedron.Vertex(i)))
+            return false;
+
+    return true;
 }
 
 bool Frustum::IsFinite() const

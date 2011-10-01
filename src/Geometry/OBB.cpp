@@ -12,6 +12,7 @@
 #include "Math/MathFunc.h"
 #include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
+#include "Geometry/Frustum.h"
 #include "Algorithm/Random/LCG.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
@@ -567,6 +568,33 @@ bool OBB::Contains(const OBB &obb) const
 bool OBB::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+}
+/*
+bool OBB::Contains(const Polygon &polygon) const
+{
+    for(int i = 0; i < polygon.NumVertices(); ++i)
+        if (!Contains(polygon.Vertex(i)))
+            return false;
+    return true;
+}
+*/
+bool OBB::Contains(const Frustum &frustum) const
+{
+    for(int i = 0; i < 8; ++i)
+        if (!Contains(frustum.CornerPoint(i)))
+            return false;
+
+    return true;
+}
+
+bool OBB::Contains(const Polyhedron &polyhedron) const
+{
+    assume(polyhedron.IsClosed());
+    for(int i = 0; i < polyhedron.NumVertices(); ++i)
+        if (!Contains(polyhedron.Vertex(i)))
+            return false;
+
+    return true;
 }
 
 bool OBB::Intersects(const AABB &aabb) const

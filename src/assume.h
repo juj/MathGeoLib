@@ -5,6 +5,8 @@
 #include <assert.h>
 #endif
 
+#define MATH_ASSERT_ON_ASSUME
+
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
 
 // The assume() macro is used to check preconditions on the math-related functions, e.g. whether vectors are normalized, check that division by zero doesn't occur, orthonormal bases, and so on.

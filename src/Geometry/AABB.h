@@ -289,6 +289,9 @@ public:
     bool Contains(const OBB &obb) const;
     bool Contains(const Sphere &sphere) const;
     bool Contains(const Triangle &triangle) const;
+//    bool Contains(const Polygon &polygon) const;
+    bool Contains(const Frustum &frustum) const;
+    bool Contains(const Polyhedron &polyhedron) const;
 
     /// Tests if this AABB intersects the given object.
     bool Intersects(const Ray &ray, float *dNear, float *dFar) const;
