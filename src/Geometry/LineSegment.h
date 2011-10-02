@@ -95,13 +95,14 @@ public:
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const Capsule &capsule) const;
     bool Intersects(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
-//    bool Intersects(const Polygon &polygon) const;
-
+#ifndef _WINDOWS_
+    bool Intersects(const Polygon &polygon) const;
+#endif
+    bool Intersects(const Frustum &frustum) const;
+    bool Intersects(const Polyhedron &polyhedron) const;
     ///\todo Implement.
-//    bool Intersect(const Frustum &frustum) const;
-//    bool Intersect(const Frustum &frustum, float &outDistance) const;
-//    bool Intersect(const Polyhedron &polyhedron) const;
-//    bool Intersect(const Polyhedron &polyhedron, float &outDistance) const;
+//    bool Intersects(const Frustum &frustum, float &outDistance) const;
+//    bool Intersects(const Polyhedron &polyhedron, float &outDistance) const;
 
     Ray ToRay() const;
     Line ToLine() const;

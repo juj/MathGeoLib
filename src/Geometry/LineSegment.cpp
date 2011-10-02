@@ -13,6 +13,9 @@
 #include "Geometry/Ray.h"
 #include "Geometry/Line.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
+#include "Geometry/Frustum.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
 #include "Math/float4x4.h"
@@ -262,12 +265,23 @@ bool LineSegment::Intersects(const LineSegment &lineSegment, float epsilon) cons
     return Distance(lineSegment) <= epsilon;
 }
 
-/*
+#ifndef _WINDOWS_
 bool LineSegment::Intersects(const Polygon &polygon) const
 {
     return polygon.Intersects(*this);
 }
-*/
+#endif
+
+bool LineSegment::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool LineSegment::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 Ray LineSegment::ToRay() const
 {
     return Ray(a, Dir());

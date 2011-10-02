@@ -15,6 +15,9 @@
 #include "Math/float4x4.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
+#include "Geometry/Frustum.h"
 #include "Math/Quat.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Capsule.h"
@@ -228,12 +231,23 @@ bool Ray::Intersects(const Capsule &capsule) const
 {
     return capsule.Intersects(*this);
 }
-/*
+#ifndef _WINDOWS_
 bool Ray::Intersects(const Polygon &polygon) const
 {
     return polygon.Intersects(*this);
 }
-*/
+#endif
+
+bool Ray::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool Ray::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 Line Ray::ToLine() const
 {
     return Line(pos, dir);

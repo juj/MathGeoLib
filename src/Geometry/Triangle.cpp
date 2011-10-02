@@ -14,6 +14,7 @@
 #include "Math/float3x4.h"
 #include "Math/float4x4.h"
 #include "Math/Quat.h"
+#include "Geometry/Frustum.h"
 #include "Geometry/Triangle.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Polygon.h"
@@ -444,6 +445,21 @@ bool Triangle::Intersects(const AABB &aabb) const
 bool Triangle::Intersects(const OBB &obb) const
 {
     return obb.Intersects(*this);
+}
+
+bool Triangle::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
+}
+
+bool Triangle::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool Triangle::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
 }
 
 void Triangle::ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const

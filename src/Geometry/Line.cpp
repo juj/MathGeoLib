@@ -14,8 +14,11 @@
 #include "Math/float4x4.h"
 #include "Geometry/OBB.h"
 #include "Math/Quat.h"
+#include "Geometry/Frustum.h"
 #include "Geometry/Triangle.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Capsule.h"
@@ -209,12 +212,24 @@ bool Line::Intersects(const Capsule &capsule) const
 {
     return capsule.Intersects(*this);
 }
-/*
+
+#ifndef _WINDOWS_
 bool Line::Intersects(const Polygon &polygon) const
 {
     return polygon.Intersects(*this);
 }
-*/
+#endif
+
+bool Line::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool Line::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const
 {
     float u = Dot(targetPoint - pos, dir);

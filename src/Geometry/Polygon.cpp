@@ -12,6 +12,8 @@
 #endif
 
 #include "Geometry/AABB.h"
+#include "Geometry/OBB.h"
+#include "Geometry/Frustum.h"
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Plane.h"
@@ -310,6 +312,36 @@ bool Polygon::Intersects(const Plane &plane) const
     if (!intersects)
         return false;
     return Intersects(intersectLine);
+}
+/*
+bool Polygon::Intersects(const AABB &aabb) const
+{
+    return aabb.Intersects(*this);
+}
+*/
+bool Polygon::Intersects(const OBB &obb) const
+{
+    return obb.Intersects(*this);
+}
+
+bool Polygon::Intersects(const Triangle &triangle) const
+{
+    return ToPolyhedron().Intersects(triangle);
+}
+
+bool Polygon::Intersects(const Polygon &polygon) const
+{
+    return ToPolyhedron().Intersects(polygon);
+}
+
+bool Polygon::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool Polygon::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
 }
 
 float3 Polygon::ClosestPointConvex(const float3 &point) const
