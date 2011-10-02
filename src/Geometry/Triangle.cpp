@@ -16,6 +16,8 @@
 #include "Math/Quat.h"
 #include "Geometry/Triangle.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Line.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Ray.h"
@@ -118,6 +120,20 @@ float3 Triangle::UnnormalizedNormalCCW() const
 float3 Triangle::UnnormalizedNormalCW() const
 {
     return Cross(c-a, b-a);
+}
+
+Polygon Triangle::ToPolygon() const
+{
+    Polygon p;
+    p.p.push_back(a);
+    p.p.push_back(b);
+    p.p.push_back(c);
+    return p;
+}
+
+Polyhedron Triangle::ToPolyhedron() const
+{
+    return ToPolygon().ToPolyhedron();
 }
 
 float Triangle::Area2D(const float2 &p1, const float2 &p2, const float2 &p3)

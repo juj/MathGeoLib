@@ -134,6 +134,13 @@ public:
 
     float3 Centroid() const;
 
+    /// Converts this Polygon to a Polyhedron representation.
+    /// This function will create a Polyhedron with two faces, one for the front face of this Polygon,
+    /// and one for the back face. These faces will be extruded along the Polygon normal so that they
+    /// lie polygonThickness units apart from each other.
+    Polyhedron ToPolyhedron() const;
+//    Polyhedron ToPolyhedron(float polygonThickness = 0.f) const; ///\todo Add support for this form.
+
     AABB MinimalEnclosingAABB() const;
 
     /// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.

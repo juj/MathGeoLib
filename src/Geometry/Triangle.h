@@ -69,6 +69,12 @@ public:
     float3 UnnormalizedNormalCCW() const;
     float3 UnnormalizedNormalCW() const;
 
+    /// Returns a Polygon representation of this Triangle.
+    Polygon ToPolygon() const;
+
+    /// Returns a Polyhedron representation of this Triangle.
+    Polyhedron ToPolyhedron() const;
+
     /// Returns the surface area of the given 2D triangle.
     static float Area2D(const float2 &p1, const float2 &p2, const float2 &p3);
 

@@ -13,6 +13,7 @@
 
 #include "Geometry/AABB.h"
 #include "Geometry/Polygon.h"
+#include "Geometry/Polyhedron.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/Ray.h"
@@ -364,6 +365,20 @@ float3 Polygon::Centroid() const
     for(int i = 0; i < NumVertices(); ++i)
         centroid += Vertex(i);
     return centroid / (float)NumVertices();
+}
+
+Polyhedron Polygon::ToPolyhedron() const
+{
+    Polyhedron poly;
+    poly.v = p;
+    poly.f.push_back(Polyhedron::Face());
+    poly.f.push_back(Polyhedron::Face());
+    for(int i = 0; i < NumVertices(); ++i)
+    {
+        poly.f[0].v.push_back(i);
+        poly.f[0].v.push_back(NumVertices()-1-i);
+    }
+    return poly;
 }
 
 AABB Polygon::MinimalEnclosingAABB() const
