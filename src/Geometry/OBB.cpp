@@ -773,6 +773,21 @@ bool OBB::Intersects(const Triangle &triangle) const
     return t.Intersects(aabb);
 }
 
+bool OBB::Intersects(const Polygon &polygon) const
+{
+    return ToPolyhedron().Intersects(polygon);
+}
+
+bool OBB::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool OBB::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 /*
 HitInfo Intersect(const Ray &ray, float *outDistance) const;
 HitInfo Intersect(const Ray &ray, float maxDistance, float *outDistance) const;

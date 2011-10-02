@@ -363,6 +363,16 @@ bool Polyhedron::Intersects(const OBB &obb) const
     return Intersects(obb.ToPolyhedron());
 }
 
+bool Polyhedron::Intersects(const Triangle &triangle) const
+{
+    return Intersects(triangle.ToPolyhedron());
+}
+
+bool Polyhedron::Intersects(const Polygon &polygon) const
+{
+    return Intersects(polygon.ToPolyhedron());
+}
+
 bool Polyhedron::Intersects(const Frustum &frustum) const
 {
     ///\todo This is a naive test. Implement a faster version.

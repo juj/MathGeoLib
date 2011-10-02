@@ -303,6 +303,11 @@ public:
     /// @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere.
     bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const;
     bool Intersects(const Triangle &triangle) const;
+#ifndef _WINDOWS_
+    bool Intersects(const Polygon &polygon) const;
+#endif
+    bool Intersects(const Frustum &frustum) const;
+    bool Intersects(const Polyhedron &polyhedron) const;
 
     /// Projects this AABB onto the given axis.
     /// @param axis The axis to project onto. This vector can be unnormalized.

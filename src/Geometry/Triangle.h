@@ -70,8 +70,9 @@ public:
     float3 UnnormalizedNormalCW() const;
 
     /// Returns a Polygon representation of this Triangle.
+#ifndef _WINDOWS_
     Polygon ToPolygon() const;
-
+#endif
     /// Returns a Polyhedron representation of this Triangle.
     Polyhedron ToPolyhedron() const;
 

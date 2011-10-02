@@ -486,6 +486,19 @@ bool Frustum::Intersects(const Plane &plane) const
 {
     return plane.Intersects(*this);
 }
+
+bool Frustum::Intersects(const Triangle &triangle) const
+{
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(triangle);
+}
+
+bool Frustum::Intersects(const Polygon &polygon) const
+{
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(polygon);
+}
+
 /*
 bool Frustum::Intersects(const Sphere &sphere) const
 {
@@ -494,12 +507,6 @@ bool Frustum::Intersects(const Sphere &sphere) const
 }
 
 bool Frustum::Intersects(const Ellipsoid &ellipsoid) const
-{
-    assume(false && "Not implemented!");
-    return false;
-}
-
-bool Frustum::Intersects(const Triangle &triangle) const
 {
     assume(false && "Not implemented!");
     return false;

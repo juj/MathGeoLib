@@ -186,9 +186,10 @@ public:
     bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb) const;
     bool Intersects(const Plane &plane) const;
+    bool Intersects(const Triangle &triangle) const;
+    bool Intersects(const Polygon &polygon) const;
 //    bool Intersects(const Sphere &sphere) const;
 //    bool Intersects(const Ellipsoid &ellipsoid) const;
-//    bool Intersects(const Triangle &triangle) const;
 //    bool Intersects(const Cylinder &cylinder) const;
 //    bool Intersects(const Torus &torus) const;
     bool Intersects(const Frustum &frustum) const;

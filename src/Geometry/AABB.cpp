@@ -669,6 +669,23 @@ bool AABB::Intersects(const Triangle &triangle) const
     return triangle.Intersects(*this);
 }
 
+#ifndef _WINDOWS_
+bool AABB::Intersects(const Polygon &polygon) const
+{
+    return ToPolyhedron().Intersects(polygon);
+}
+#endif
+
+bool AABB::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool AABB::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 void AABB::ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const
 {
     float3 c = CenterPoint();
