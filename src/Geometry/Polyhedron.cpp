@@ -351,6 +351,24 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
     return false;
 }
 
+bool Polyhedron::Intersects(const AABB &aabb) const
+{
+    ///\todo This is a naive test. Implement a faster version.
+    return Intersects(aabb.ToPolyhedron());
+}
+
+bool Polyhedron::Intersects(const OBB &obb) const
+{
+    ///\todo This is a naive test. Implement a faster version.
+    return Intersects(obb.ToPolyhedron());
+}
+
+bool Polyhedron::Intersects(const Frustum &frustum) const
+{
+    ///\todo This is a naive test. Implement a faster version.
+    return Intersects(frustum.ToPolyhedron());
+}
+
 bool Polyhedron::IntersectsConvex(const Line &line) const
 {
     float tFirst = -FLOAT_MAX;

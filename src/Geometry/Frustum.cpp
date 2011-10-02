@@ -452,37 +452,36 @@ Polyhedron Frustum::ToPolyhedron() const
     return p;
 }
 
-/*
-bool Frustum::Intersects(const Ray &ray, float &outDistance) const
+bool Frustum::Intersects(const Ray &ray) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(ray);
 }
 
-bool Frustum::Intersects(const Line &line, float &outDistance) const
+bool Frustum::Intersects(const Line &line) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(line);
 }
 
-bool Frustum::Intersects(const LineSegment &lineSegment, float &outDistance) const
+bool Frustum::Intersects(const LineSegment &lineSegment) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(lineSegment);
 }
 
 bool Frustum::Intersects(const AABB &aabb) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(aabb);
 }
 
 bool Frustum::Intersects(const OBB &obb) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(obb);
 }
-*/
+
 bool Frustum::Intersects(const Plane &plane) const
 {
     return plane.Intersects(*this);
@@ -517,19 +516,18 @@ bool Frustum::Intersects(const Torus &torus) const
     assume(false && "Not implemented!");
     return false;
 }
-
+*/
 bool Frustum::Intersects(const Frustum &frustum) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(frustum);
 }
 
 bool Frustum::Intersects(const Polyhedron &polyhedron) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    return this->ToPolyhedron().Intersects(polyhedron);
 }
-*/
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 
 std::string FrustumTypeToString(FrustumType t)

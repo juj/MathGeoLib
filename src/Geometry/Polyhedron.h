@@ -126,6 +126,9 @@ public:
     bool Intersects(const Ray &ray) const;
     bool Intersects(const Plane &plane) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    bool Intersects(const AABB &aabb) const;
+    bool Intersects(const OBB &obb) const;
+    bool Intersects(const Frustum &frustum) const;
     bool IntersectsConvex(const Line &line) const;
     bool IntersectsConvex(const Ray &ray) const;
     bool IntersectsConvex(const LineSegment &lineSegment) const;
