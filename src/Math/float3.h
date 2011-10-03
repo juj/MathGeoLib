@@ -31,6 +31,8 @@
 #include "LinearMath/btVector3.h"
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A vector of form (x,y,z).
 class float3
 {
@@ -365,6 +367,8 @@ inline float3 Clamp(const float3 &a, float floor, float ceil) { return a.Clamp(f
 inline float3 Clamp(const float3 &a, const float3 &floor, const float3 &ceil) { return a.Clamp(floor, ceil); }
 inline float3 Clamp01(const float3 &a) { return a.Clamp01(); }
 inline float3 Lerp(const float3 &a, const float3 &b, float t) { return a.Lerp(b, t); }
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(float3)

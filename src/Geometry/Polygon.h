@@ -16,6 +16,8 @@
 #include <vector>
 //#endif
 
+MATH_BEGIN_NAMESPACE
+
 /// Represents a two-dimensional closed surface in 3D space.
 /** A polygon is defined by N endpoints, or corner vertices. To be a valid polygon, there must be
    at least 3 vertices (a triangle).
@@ -162,6 +164,8 @@ public:
     /// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
     static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Polygon)

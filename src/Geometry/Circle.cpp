@@ -6,6 +6,8 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
 
+MATH_BEGIN_NAMESPACE
+
 Circle::Circle(const float3 &center, const float3 &n, float radius)
 :pos(center),
 normal(n),
@@ -143,3 +145,5 @@ std::string Circle::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

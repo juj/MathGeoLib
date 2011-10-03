@@ -26,6 +26,8 @@
 #include <OgreQuaternion.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// Represents a rotation or an orientation of a 3D object.
 class Quat
 {
@@ -338,6 +340,8 @@ std::ostream &operator <<(std::ostream &out, const Quat &rhs);
 
 Quat Lerp(const Quat &a, const Quat &b, float t);
 Quat Slerp(const Quat &a, const Quat &b, float t);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Quat)

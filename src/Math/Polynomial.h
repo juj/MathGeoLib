@@ -9,6 +9,10 @@
 */
 #pragma once
 
+#include "Math/MathNamespace.h"
+
+MATH_BEGIN_NAMESPACE
+
 class Polynomial
 {
 public:
@@ -25,3 +29,4 @@ public:
     // @todo add Newton's method functions.
 };
 
+MATH_END_NAMESPACE

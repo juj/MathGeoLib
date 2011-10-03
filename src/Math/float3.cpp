@@ -27,6 +27,8 @@
 #include "Geometry/Capsule.h"
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 using namespace std;
 
 float3::float3(float x_, float y_, float z_)
@@ -222,7 +224,7 @@ float float3::AverageOfElements() const
 
 float float3::MinElement() const
 {
-    return ::Min(::Min(x, y), z);
+    return MATH_NS::Min(MATH_NS::Min(x, y), z);
 }
 
 int float3::MinElementIndex() const
@@ -235,7 +237,7 @@ int float3::MinElementIndex() const
 
 float float3::MaxElement() const
 {
-    return ::Max(::Max(x, y), z);
+    return MATH_NS::Max(MATH_NS::Max(x, y), z);
 }
 
 int float3::MaxElementIndex() const
@@ -263,22 +265,22 @@ float3 float3::Recip() const
 
 float3 float3::Min(float ceil) const
 {
-    return float3(::Min(x, ceil), ::Min(y, ceil), ::Min(z, ceil));
+    return float3(MATH_NS::Min(x, ceil), MATH_NS::Min(y, ceil), MATH_NS::Min(z, ceil));
 }
 
 float3 float3::Min(const float3 &ceil) const
 {
-    return float3(::Min(x, ceil.x), ::Min(y, ceil.y), ::Min(z, ceil.z));
+    return float3(MATH_NS::Min(x, ceil.x), MATH_NS::Min(y, ceil.y), MATH_NS::Min(z, ceil.z));
 }
 
 float3 float3::Max(float floor) const
 {
-    return float3(::Max(x, floor), ::Max(y, floor), ::Max(z, floor));
+    return float3(MATH_NS::Max(x, floor), MATH_NS::Max(y, floor), MATH_NS::Max(z, floor));
 }
 
 float3 float3::Max(const float3 &floor) const
 {
-    return float3(::Max(x, floor.x), ::Max(y, floor.y), ::Max(z, floor.z));
+    return float3(MATH_NS::Max(x, floor.x), MATH_NS::Max(y, floor.y), MATH_NS::Max(z, floor.z));
 }
 
 float3 float3::Clamp(const float3 &floor, const float3 &ceil) const
@@ -684,3 +686,5 @@ const float3 float3::unitY = float3(0, 1, 0);
 const float3 float3::unitZ = float3(0, 0, 1);
 const float3 float3::nan = float3(FLOAT_NAN, FLOAT_NAN, FLOAT_NAN);
 const float3 float3::inf = float3(FLOAT_INF, FLOAT_INF, FLOAT_INF);
+
+MATH_END_NAMESPACE

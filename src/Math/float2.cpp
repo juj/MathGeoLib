@@ -17,6 +17,8 @@
 #include "Algorithm/Random/LCG.h"
 #include "assume.h"
 
+MATH_BEGIN_NAMESPACE
+
 using namespace std;
 
 float2::float2(float x_, float y_)
@@ -202,7 +204,7 @@ float float2::AverageOfElements() const
 
 float float2::MinElement() const
 {
-    return ::Min(x, y);
+    return MATH_NS::Min(x, y);
 }
 
 int float2::MinElementIndex() const
@@ -212,7 +214,7 @@ int float2::MinElementIndex() const
 
 float float2::MaxElement() const
 {
-    return ::Max(x, y);
+    return  MATH_NS::Max(x, y);
 }
 
 int float2::MaxElementIndex() const
@@ -237,32 +239,32 @@ float2 float2::Recip() const
 
 float2 float2::Min(float floor) const
 {
-    return float2(::Min(x, floor), ::Min(x, floor));
+    return float2(MATH_NS::Min(x, floor),  MATH_NS::Min(x, floor));
 }
 
 float2 float2::Min(const float2 &floor) const
 {
-    return float2(::Min(x, floor.x), ::Min(x, floor.x));
+    return float2(MATH_NS::Min(x, floor.x),  MATH_NS::Min(x, floor.x));
 }
 
 float2 float2::Max(float ceil) const
 {
-    return float2(::Max(x, ceil), ::Max(x, ceil));
+    return float2(MATH_NS::Max(x, ceil),  MATH_NS::Max(x, ceil));
 }
 
 float2 float2::Max(const float2 &ceil) const
 {
-    return float2(::Max(x, ceil.x), ::Max(x, ceil.x));
+    return float2(MATH_NS::Max(x, ceil.x),  MATH_NS::Max(x, ceil.x));
 }
 
 float2 float2::Clamp(const float2 &floor, const float2 &ceil) const
 {
-    return float2(::Clamp(x, floor.x, ceil.x), ::Clamp(y, floor.y, ceil.y));
+    return float2(MATH_NS::Clamp(x, floor.x, ceil.x),  MATH_NS::Clamp(y, floor.y, ceil.y));
 }
 
 float2 float2::Clamp(float floor, float ceil) const
 {
-    return float2(::Clamp(x, floor, ceil), ::Clamp(y, floor, ceil));
+    return float2(MATH_NS::Clamp(x, floor, ceil),  MATH_NS::Clamp(y, floor, ceil));
 }
 
 float2 float2::Clamp01() const
@@ -480,7 +482,7 @@ int float2::ConvexHullInPlace(float2 *points, int nPoints)
 		if (lineBLen >= 1e-5f)
 			lineB /= sqrt(lineBLen);
 		float2 normal = float2(-lineA.y, lineA.x);
-        if (dropLastPointFromHull || ::Dot(normal, lineB) > 0.f || (::Dot(normal,lineB) > -1e-4f && lineBLen >= lineALen))// || (Length2(points[i] - points[nPointsInHull-1]) <= 1e-5f)) // lineB is to the left of lineA?
+        if (dropLastPointFromHull ||  MATH_NS::Dot(normal, lineB) > 0.f || (MATH_NS::Dot(normal,lineB) > -1e-4f && lineBLen >= lineALen))// || (Length2(points[i] - points[nPointsInHull-1]) <= 1e-5f)) // lineB is to the left of lineA?
 		{
 			// Points[n-1] is not part of the convex hull. Drop that point and decrement i to reprocess the current point.
 			// (It may be that the current point will cause lots of points to drop out of the convex hull.
@@ -515,7 +517,7 @@ int float2::ConvexHullInPlace(float2 *points, int nPoints)
 		dirA.Normalize();
 		float2 dirB = points[i] - points[(i+nPointsInHull-1)%nPointsInHull];
 		dirB.Normalize();
-        if (::Dot(dirA, dirB) >= 1.f - 1e-3f)
+        if (MATH_NS::Dot(dirA, dirB) >= 1.f - 1e-3f)
 		{
 			for(int j = i; j+1 < nPointsInHull; ++j)
 				points[j] = points[j+1];
@@ -555,10 +557,10 @@ float float2::MinAreaRect(const float2 *pts, int numPoints, float2 &center, floa
         for(int k = 0; k < numPoints; ++k)
         {
             float2 d = pts[k] - pts[j];
-            float dot = ::Dot(d, e0);
+            float dot =  MATH_NS::Dot(d, e0);
             if (dot < min0) min0 = dot;
             if (dot > max0) max0 = dot;
-            dot = ::Dot(d, e1);
+            dot =  MATH_NS::Dot(d, e1);
             if (dot < min1) min1 = dot;
             if (dot > max1) max1 = dot;
         }
@@ -684,3 +686,5 @@ const float2 float2::unitX = float2(1, 0);
 const float2 float2::unitY = float2(0, 1);
 const float2 float2::nan = float2(FLOAT_NAN, FLOAT_NAN);
 const float2 float2::inf = float2(FLOAT_INF, FLOAT_INF);
+
+MATH_END_NAMESPACE

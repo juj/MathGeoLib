@@ -24,6 +24,8 @@
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 
+MATH_BEGIN_NAMESPACE
+
 int Polygon::NumVertices() const
 {
 	return p.size();
@@ -436,3 +438,5 @@ bool IsSupportingPoint(const float3 &point) const;
 /// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
 static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 */
+
+MATH_END_NAMESPACE

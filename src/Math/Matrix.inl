@@ -10,6 +10,8 @@
 #include <utility>
 #include "Math/Quat.h"
 
+MATH_BEGIN_NAMESPACE
+
 /** Sets the top-left 3x3 area of the matrix to the rotation matrix about the X-axis. Elements
 	outside the top-left 3x3 area are ignored.
 	@param m The matrix to store the result.
@@ -785,3 +787,5 @@ void SetMatrix3x4AffinePlaneProject(Matrix &m, float x, float y, float z, float 
     m[1][3] = d * y;
     m[2][3] = d * z;
 }
+
+MATH_END_NAMESPACE

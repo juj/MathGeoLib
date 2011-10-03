@@ -31,6 +31,8 @@
 #include "Math/Quat.h"
 #include "Geometry/Triangle.h"
 
+MATH_BEGIN_NAMESPACE
+
 Sphere::Sphere(const float3 &center, float radius)
 :pos(center), r(radius) 
 {
@@ -645,3 +647,5 @@ std::string Sphere::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

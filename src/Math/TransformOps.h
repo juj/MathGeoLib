@@ -12,6 +12,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A structure which represents translation of 3D objects.
 /// This structure is used to optimize special cases of 3D transformation concatenations.
 class TranslateOp
@@ -71,6 +73,8 @@ float4x4 operator *(const float4x4 &lhs, const ScaleOp &rhs);
 
 float3x4 operator *(const ScaleOp &lhs, const TranslateOp &rhs);
 float3x4 operator *(const TranslateOp &lhs, const ScaleOp &rhs);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(TranslateOp)

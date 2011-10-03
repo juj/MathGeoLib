@@ -16,6 +16,8 @@
 #include <OgrePlane.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// Specifies an plane in 3D space. This plane is an affine 2D subspace of the 3D space, meaning
 /// that its sides extend to infinity, and it does not necessarily pass through the origin.
 class Plane
@@ -173,9 +175,13 @@ public:
     bool Intersects(const OBB &obb) const;
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    /// \todo Add a version of Plane-Triangle intersection which returns the line segment of intersection.
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Capsule &capsule) const;
+    /// Returns the number of intersections that were found: 0, 1 or 2.
+    /// The actual intersection points are output in pt1 and pt2.
+    int Intersects(const Circle &circle, float3 *pt1 = 0, float3 *pt2 = 0) const;
 //    bool Intersect(const Polyhedron &polyhedron) const;
 
     /// Clips a line segment against this plane.
@@ -246,6 +252,8 @@ Plane operator *(const float3x3 &transform, const Plane &plane);
 Plane operator *(const float3x4 &transform, const Plane &plane);
 Plane operator *(const float4x4 &transform, const Plane &plane);
 Plane operator *(const Quat &transform, const Plane &plane);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Plane)

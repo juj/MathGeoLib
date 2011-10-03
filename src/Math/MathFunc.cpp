@@ -15,6 +15,8 @@
 
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 bool mathBreakOnAssume = false;
 
 void SetMathBreakOnAssume(bool isEnabled)
@@ -111,3 +113,5 @@ float PowInt(float base, int exponent)
     else
         return PowUInt(base, (u32)exponent);
 }
+
+MATH_END_NAMESPACE

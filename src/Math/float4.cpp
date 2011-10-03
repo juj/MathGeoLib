@@ -21,6 +21,8 @@
 #include "Math/float4x4.h"
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 using namespace std;
 
 float4::float4(float x_, float y_, float z_, float w_)
@@ -292,7 +294,7 @@ float float4::AverageOfElements() const
 
 float float4::MinElement() const
 {
-    return ::Min(::Min(x, y), ::Min(z, w));
+    return MATH_NS::Min(MATH_NS::Min(x, y), MATH_NS::Min(z, w));
 }
 
 int float4::MinElementIndex() const
@@ -315,7 +317,7 @@ int float4::MinElementIndex() const
 
 float float4::MaxElement() const
 {
-    return ::Max(::Max(x, y), ::Min(z, w));
+    return MATH_NS::Max(MATH_NS::Max(x, y), MATH_NS::Min(z, w));
 }
 
 int float4::MaxElementIndex() const
@@ -363,46 +365,46 @@ float4 float4::Recip4() const
 
 float4 float4::Min(float ceil) const
 {
-    return float4(::Min(x, ceil), ::Min(y, ceil), ::Min(z, ceil), ::Min(w, ceil));
+    return float4(MATH_NS::Min(x, ceil), MATH_NS::Min(y, ceil), MATH_NS::Min(z, ceil), MATH_NS::Min(w, ceil));
 }
 
 float4 float4::Min(const float4 &ceil) const
 {
-    return float4(::Min(x, ceil.x), ::Min(y, ceil.y), ::Min(z, ceil.z), ::Min(w, ceil.w));
+    return float4(MATH_NS::Min(x, ceil.x), MATH_NS::Min(y, ceil.y), MATH_NS::Min(z, ceil.z), MATH_NS::Min(w, ceil.w));
 }
 
 float4 float4::Max(float floor) const
 {
-    return float4(::Max(x, floor), ::Max(y, floor), ::Max(z, floor), ::Max(w, floor));
+    return float4(MATH_NS::Max(x, floor), MATH_NS::Max(y, floor), MATH_NS::Max(z, floor), MATH_NS::Max(w, floor));
 }
 
 float4 float4::Max(const float4 &floor) const
 {
-    return float4(::Max(x, floor.x), ::Max(y, floor.y), ::Max(z, floor.z), ::Max(w, floor.w));
+    return float4(MATH_NS::Max(x, floor.x), MATH_NS::Max(y, floor.y), MATH_NS::Max(z, floor.z), MATH_NS::Max(w, floor.w));
 }
 
 float4 float4::Clamp(const float4 &floor, const float4 &ceil) const
 {
-    return float4(::Clamp(x, floor.x, ceil.x),
-                  ::Clamp(y, floor.y, ceil.y),
-                  ::Clamp(z, floor.z, ceil.z),
-                  ::Clamp(w, floor.w, ceil.w));
+    return float4(MATH_NS::Clamp(x, floor.x, ceil.x),
+                  MATH_NS::Clamp(y, floor.y, ceil.y),
+                  MATH_NS::Clamp(z, floor.z, ceil.z),
+                  MATH_NS::Clamp(w, floor.w, ceil.w));
 }
 
 float4 float4::Clamp01() const
 {
-    return float4(::Clamp(x, 0.f, 1.f),
-                  ::Clamp(y, 0.f, 1.f),
-                  ::Clamp(z, 0.f, 1.f),
-                  ::Clamp(w, 0.f, 1.f));
+    return float4(MATH_NS::Clamp(x, 0.f, 1.f),
+                  MATH_NS::Clamp(y, 0.f, 1.f),
+                  MATH_NS::Clamp(z, 0.f, 1.f),
+                  MATH_NS::Clamp(w, 0.f, 1.f));
 }
 
 float4 float4::Clamp(float floor, float ceil) const
 {
-    return float4(::Clamp(x, floor, ceil),
-                  ::Clamp(y, floor, ceil),
-                  ::Clamp(z, floor, ceil),
-                  ::Clamp(w, floor, ceil));
+    return float4(MATH_NS::Clamp(x, floor, ceil),
+                  MATH_NS::Clamp(y, floor, ceil),
+                  MATH_NS::Clamp(z, floor, ceil),
+                  MATH_NS::Clamp(w, floor, ceil));
 }
 
 float float4::Distance3Sq(const float4 &rhs) const
@@ -710,3 +712,5 @@ const float4 float4::unitZ = float4(0, 0, 1, 0);
 const float4 float4::unitW = float4(0, 0, 0, 1);
 const float4 float4::nan = float4(FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN);
 const float4 float4::inf = float4(FLOAT_INF, FLOAT_INF, FLOAT_INF, FLOAT_INF);
+
+MATH_END_NAMESPACE

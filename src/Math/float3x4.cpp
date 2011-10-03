@@ -21,6 +21,8 @@
 #include "Geometry/Plane.h"
 #include "TransformOps.h"
 
+MATH_BEGIN_NAMESPACE
+
 float3x4::float3x4(float _00, float _01, float _02, float _03,
          float _10, float _11, float _12, float _13,
          float _20, float _21, float _22, float _23)
@@ -1430,3 +1432,5 @@ float4 float3x4::Mul(const float4 &vector) const { return *this * vector; }
 const float3x4 float3x4::zero     = float3x4(0,0,0,0, 0,0,0,0, 0,0,0,0);
 const float3x4 float3x4::identity = float3x4(1,0,0,0, 0,1,0,0, 0,0,1,0);
 const float3x4 float3x4::nan = float3x4(FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN);
+
+MATH_END_NAMESPACE

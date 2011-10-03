@@ -6,8 +6,8 @@
     of the author(s). 
 */
 
-
 #include "Math/MathFunc.h"
+#include "Math/Polynomial.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Circle.h"
 #include "Geometry/Plane.h"
@@ -24,7 +24,9 @@
 #include "Math/float3x4.h"
 #include "Math/float4.h"
 #include "Math/Quat.h"
-#include "Frustum.h"
+#include "Geometry/Frustum.h"
+
+MATH_BEGIN_NAMESPACE
 
 Plane::Plane(const float3 &normal_, float d_)
 :normal(normal_), d(d_)
@@ -511,6 +513,28 @@ bool Plane::Intersects(const Polyhedron &polyhedron) const
     return false;
 }
 
+int Plane::Intersects(const Circle &circle, float3 *pt1, float3 *pt2) const
+{
+    Line line;
+    bool planeIntersects = Intersects(circle.ContainingPlane(), &line);
+    if (!planeIntersects)
+        return false;
+
+    // Offset both line and circle position so the circle origin is at center.
+    line.pos -= circle.pos;
+
+    float a = 1.f;
+    float b = 2.f * Dot(line.pos, line.dir);
+    float c = line.pos.LengthSq() - circle.r * circle.r;
+    float r1, r2;
+    int numRoots = Polynomial::SolveQuadratic(a, b, c, r1, r2);
+    if (numRoots >= 1 && pt1)
+        *pt1 = circle.pos + line.GetPoint(r1);
+    if (numRoots >= 2 && pt2)
+        *pt2 = circle.pos + line.GetPoint(r2);
+    return numRoots;
+}
+
 bool Plane::Clip(float3 &a, float3 &b) const
 {
     float t;
@@ -692,3 +716,5 @@ std::string Plane::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

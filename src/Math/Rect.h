@@ -14,6 +14,8 @@
 #include <windows.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A 2D integral (x,y),(w,h) -rectangle.
 class Rect
 {
@@ -50,3 +52,5 @@ public:
     }
 #endif
 };
+
+MATH_END_NAMESPACE

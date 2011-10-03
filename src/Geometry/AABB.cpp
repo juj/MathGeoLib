@@ -5,8 +5,6 @@
     personal advantage and may NOT be copied or redistributed without prior consent
     of the author(s). 
 */
-#define _WINDOWS_
-
 #include "Math/MathFunc.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
@@ -28,6 +26,8 @@
 #include "Math/float4x4.h"
 #include "Math/Quat.h"
 #include "Geometry/Triangle.h"
+
+MATH_BEGIN_NAMESPACE
 
 AABB::AABB(const float3 &minPoint_, const float3 &maxPoint_)
 :minPoint(minPoint_), maxPoint(maxPoint_)
@@ -669,12 +669,10 @@ bool AABB::Intersects(const Triangle &triangle) const
     return triangle.Intersects(*this);
 }
 
-#ifndef _WINDOWS_
 bool AABB::Intersects(const Polygon &polygon) const
 {
     return ToPolyhedron().Intersects(polygon);
 }
-#endif
 
 bool AABB::Intersects(const Frustum &frustum) const
 {
@@ -782,3 +780,5 @@ AABB AABB::Intersection(const AABB &aabb) const
 //    Polyhedron Intersection(const OBB &obb) const;
 
 //    Polyhedron Intersection(const Polyhedron &polyhedron) const;
+
+MATH_END_NAMESPACE

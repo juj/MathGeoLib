@@ -16,6 +16,8 @@
 #include <vector>
 //#endif
 
+MATH_BEGIN_NAMESPACE
+
 /// Represents a three-dimensional closed geometric solid defined by flat polygonal faces.
 class Polyhedron
 {
@@ -66,11 +68,11 @@ public:
 
     /// Returns all the (unique) edges of this polyhedron, as indices to the polyhedron vertex array.
     std::vector<std::pair<int, int> > EdgeIndices() const;
-#ifndef _WINDOWS_
+
     /// Returns a polygon representing the given face.
     /// The winding order of the polygon will be the same as in the input.
     Polygon FacePolygon(int faceIndex) const;
-#endif
+
     /// Returns the plane of the given polyhedron face.
     /// The normal of the plane points outwards from this polyhedron.
     Plane FacePlane(int faceIndex) const;
@@ -135,3 +137,5 @@ public:
     bool IntersectsConvex(const Ray &ray) const;
     bool IntersectsConvex(const LineSegment &lineSegment) const;
 };
+
+MATH_END_NAMESPACE

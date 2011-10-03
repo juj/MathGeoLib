@@ -12,6 +12,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A line in 3D space runs through two points and extends to infinity in two directions.
 class Line
 {
@@ -71,9 +73,7 @@ public:
     bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const Capsule &capsule) const;
-#ifndef _WINDOWS_
     bool Intersects(const Polygon &polygon) const;
-#endif
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
 
@@ -137,6 +137,8 @@ Line operator *(const Quat &transform, const Line &line);
 // Internal helper functions.
 float Dmnop(const float3 *v, int m, int n, int o, int p);
 float3 LineLine(float3 start0, float3 end0, float3 start1, float3 end1, float *d, float *d2);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Line)

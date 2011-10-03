@@ -24,6 +24,8 @@
 #include "Geometry/Triangle.h"
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 Ray::Ray(const float3 &pos_, const float3 &dir_)
 :pos(pos_), dir(dir_)
 {
@@ -231,12 +233,11 @@ bool Ray::Intersects(const Capsule &capsule) const
 {
     return capsule.Intersects(*this);
 }
-#ifndef _WINDOWS_
+
 bool Ray::Intersects(const Polygon &polygon) const
 {
     return polygon.Intersects(*this);
 }
-#endif
 
 bool Ray::Intersects(const Frustum &frustum) const
 {
@@ -286,3 +287,5 @@ Ray operator *(const Quat &transform, const Ray &ray)
 {
     return Ray(transform * ray.pos, transform * ray.dir);
 }
+
+MATH_END_NAMESPACE

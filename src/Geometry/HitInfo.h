@@ -9,6 +9,8 @@
 */
 #pragma once
 
+MATH_BEGIN_NAMESPACE
+
 struct HitInfo
 {
     enum HitResult
@@ -31,6 +33,8 @@ struct HitInfo
     /// Specifies the surface normal of the other object at the point of intersection.
     float3 normalB;
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(HitInfo)

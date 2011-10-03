@@ -13,6 +13,8 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Triangle.h"
 
+MATH_BEGIN_NAMESPACE
+
 int Polyhedron::NumEdges() const
 {
     return EdgeIndices().size();
@@ -399,3 +401,5 @@ bool Polyhedron::IntersectsConvex(const LineSegment &lineSegment) const
     float tLast = 1.f;
     return ClipLineSegmentToConvexPolyhedron(lineSegment.a, lineSegment.b - lineSegment.a, *this, tFirst, tLast);
 }
+
+MATH_END_NAMESPACE

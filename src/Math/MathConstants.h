@@ -13,6 +13,10 @@
 */
 #pragma once
 
+#include "Math/MathNamespace.h"
+
+MATH_BEGIN_NAMESPACE
+
 /// \f$\frac{1}{\sqrt{2\pi}}\f$
 const float recipSqrt2Pi = (float)0.3989422804014326779399460599343818684758586311649346576659258296706579258993018385012523339073069364;
 /// \f$\cos{1}\f$
@@ -34,6 +38,8 @@ const float pi =           (float)3.14159265358979323846264338327950288419716939
 /// \f$e^2\f$
 const float e2 =           (float)7.3890560989306502272304274605750078131803155705518473240871278225225737960790577633843124850791217948;
 
+MATH_END_NAMESPACE
+
 #if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
 #include <limits>
 #define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
@@ -44,3 +50,4 @@ const float e2 =           (float)7.38905609893065022723042746057500781318031557
 #define FLOAT_NAN NAN
 #define FLOAT_INF INFINITY
 #endif
+

@@ -15,6 +15,8 @@
 #include "Math/MathFwd.h"
 #include "Types.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// Parses a string of form "010101010" to a u32.
 u32 BinaryStringToValue(const char *str);
 
@@ -153,3 +155,5 @@ void ExtractBits(int pos, int bits, ResultType &out, const InputType &in)
 {
     out = (ResultType)(in >> pos & BitMask(0, bits));
 }
+
+MATH_END_NAMESPACE

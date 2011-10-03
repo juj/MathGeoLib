@@ -10,6 +10,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// Specifies a triangle through three points in 3D space.
 /** This class stores three member vertices a,b and c to specify the triangle. To determine which side
     of this triangle is the positive halfspace, the counter-clockwise (CCW) convention is used. This means that
@@ -70,9 +72,8 @@ public:
     float3 UnnormalizedNormalCW() const;
 
     /// Returns a Polygon representation of this Triangle.
-#ifndef _WINDOWS_
     Polygon ToPolygon() const;
-#endif
+
     /// Returns a Polyhedron representation of this Triangle.
     Polyhedron ToPolyhedron() const;
 
@@ -141,6 +142,8 @@ Triangle operator *(const float3x3 &transform, const Triangle &t);
 Triangle operator *(const float3x4 &transform, const Triangle &t);
 Triangle operator *(const float4x4 &transform, const Triangle &t);
 Triangle operator *(const Quat &transform, const Triangle &t);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Triangle)

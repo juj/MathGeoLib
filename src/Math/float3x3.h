@@ -27,8 +27,7 @@
 #include "LinearMath/btMatrix3x3.h"
 #endif
 
-class float3x3;
-class Plane;
+MATH_BEGIN_NAMESPACE
 
 /// A 3-by-3 matrix for linear transformations of 3D geometry.
 /** This matrix can represent any kind of linear transformations of 3D geometry, which include rotation, 
@@ -642,6 +641,8 @@ float3 operator *(const float3 &lhs, const float3x3 &rhs);
 /// (Remember that M * v != v * M in general).
 /// This function ignores the w component of the given input vector. This component is assumed to be either 0 or 1.
 float4 operator *(const float4 &lhs, const float3x3 &rhs);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(float3x3)

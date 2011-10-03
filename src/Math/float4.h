@@ -23,6 +23,8 @@
 #include <OgreVector4.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A 3D vector of form (x,y,z,w) in a 4D homogeneous coordinate space.
 /** This class has two sets of member functions. The functions ending in a suffix '3' operate only on the
     (x, y, z) part, ignoring the w component (or assuming a value of 0 or 1, where expectable). The functions
@@ -364,6 +366,8 @@ inline float4 Clamp(const float4 &a, float floor, float ceil) { return a.Clamp(f
 inline float4 Clamp(const float4 &a, const float4 &floor, const float4 &ceil) { return a.Clamp(floor, ceil); }
 inline float4 Clamp01(const float4 &a) { return a.Clamp01(); }
 inline float4 Lerp(const float4 &a, const float4 &b, float t) { return a.Lerp(b, t); }
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(float4)

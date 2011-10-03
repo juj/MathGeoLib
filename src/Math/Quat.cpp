@@ -18,6 +18,8 @@
 #include "assume.h"
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 Quat::Quat(const float *data)
 :x(data[0]),
 y(data[1]),
@@ -606,3 +608,5 @@ float4 Quat::Mul(const float4 &vector) const { return this->Transform(vector); }
 
 const Quat Quat::identity = Quat(0.f, 0.f, 0.f, 1.f);
 const Quat Quat::nan = Quat(FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN);
+
+MATH_END_NAMESPACE

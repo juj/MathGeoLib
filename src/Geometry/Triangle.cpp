@@ -6,7 +6,6 @@
     of the author(s). 
 */
 
-
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 #include "Math/float3.h"
@@ -25,6 +24,8 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+
+MATH_BEGIN_NAMESPACE
 
 Triangle::Triangle(const float3 &a_, const float3 &b_, const float3 &c_)
 :a(a_), b(b_), c(c_)
@@ -677,3 +678,5 @@ std::string Triangle::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

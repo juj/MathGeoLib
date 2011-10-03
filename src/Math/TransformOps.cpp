@@ -12,6 +12,8 @@
 #include "Math/float3x4.h"
 #include "Math/float4x4.h"
 
+MATH_BEGIN_NAMESPACE
+
 TranslateOp::TranslateOp(float tx, float ty, float tz)
 :x(tx), y(ty), z(tz)
 {
@@ -246,3 +248,5 @@ float3 ScaleOp::Offset() const
 {
     return float3(x, y, z);
 }
+
+MATH_END_NAMESPACE

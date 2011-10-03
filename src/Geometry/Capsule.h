@@ -10,6 +10,8 @@
 #include "Math/MathFwd.h"
 #include "Geometry/LineSegment.h"
 
+MATH_BEGIN_NAMESPACE
+
 class Capsule
 {
 public:
@@ -161,6 +163,8 @@ public:
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Capsule)

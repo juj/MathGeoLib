@@ -10,6 +10,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A two-dimensional circle in 3D space.
 /** This class represents both a hollow circle (only edge) and a solid circle (disc). */
 class Circle
@@ -87,6 +89,8 @@ public:
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Circle)

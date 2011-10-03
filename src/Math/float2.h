@@ -24,6 +24,8 @@
 #include <OgreVector2.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A vector of form (x,y).
 class float2
 {
@@ -330,6 +332,8 @@ inline float2 Clamp(const float2 &a, float floor, float ceil) { return a.Clamp(f
 inline float2 Clamp(const float2 &a, const float2 &floor, const float2 &ceil) { return a.Clamp(floor, ceil); }
 inline float2 Clamp01(const float2 &a) { return a.Clamp01(); }
 inline float2 Lerp(const float2 &a, const float2 &b, float t) { return a.Lerp(b, t); }
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(float2)

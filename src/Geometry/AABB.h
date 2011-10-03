@@ -14,6 +14,8 @@
 #include <OgreAxisAlignedBox.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A 3D axis-aligned bounding box.
 /** This data structure can be used to represent coarse bounds of objects, in situations where detailed triangle-level
     computations can be avoided. In physics systems, bounding boxes are used as an efficient early-out test for geometry
@@ -303,9 +305,7 @@ public:
     /// @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere.
     bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const;
     bool Intersects(const Triangle &triangle) const;
-#ifndef _WINDOWS_
     bool Intersects(const Polygon &polygon) const;
-#endif
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
 
@@ -390,7 +390,10 @@ public:
 #endif
 };
 
+MATH_END_NAMESPACE
+
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(AABB)
 Q_DECLARE_METATYPE(AABB*)
 #endif
+

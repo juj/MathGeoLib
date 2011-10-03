@@ -20,6 +20,8 @@
 #include "Algorithm/Random/LCG.h"
 #include "assume.h"
 
+MATH_BEGIN_NAMESPACE
+
 Capsule::Capsule(const LineSegment &endPoints, float radius)
 :l(endPoints), r(radius)
 {
@@ -357,3 +359,5 @@ std::string Capsule::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

@@ -28,6 +28,8 @@
 
 #include "assume.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// Computes the dot product of two 2D vectors, the elements are accessed using array notation.
 #define DOT2(v1, v2) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[1])
 
@@ -252,3 +254,5 @@ float Distance(const T1 &lhs, const T2 &rhs)
 {
     return lhs.Distance(rhs);
 }
+
+MATH_END_NAMESPACE

@@ -8,6 +8,8 @@
 
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 /** Compares the two values for equality, allowing the given amount of absolute error. */
 bool EqualAbs(float a, float b, float epsilon)
 {
@@ -35,3 +37,5 @@ bool EqualUlps(float a, float b, int maxUlps)
         return true;
     return false;
 }
+
+MATH_END_NAMESPACE

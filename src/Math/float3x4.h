@@ -17,6 +17,8 @@
 #include "MatrixProxy.h"
 #include "CoordinateAxisConvention.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A 3-by-4 matrix for affine transformations of 3D geometry.
 /** This matrix type can represent affine operations in addition to linear ones. Affine operations translate
     the geometry with respect to the origin point, whereas linear transformations retain the origin of the coordinate
@@ -708,6 +710,8 @@ float3x4 operator *(const float3x3 &lhs, const float3x4 &rhs);
 /// of multiplication is against the convention of this math system. Please use the M * v notation instead.
 /// (Remember that M * v != v * M in general).
 float4 operator *(const float4 &lhs, const float3x4 &rhs);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(float3x4)

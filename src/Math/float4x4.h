@@ -24,6 +24,8 @@
 #include <QMatrix4x4>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A 4-by-4 matrix for affine transformations and perspective projections of 3D geometry.
 /** This matrix can represent the most generic form of transformations for 3D objects, including perspective
     projections, which float3x4 cannot store, and translations, which float3x3 cannot represent.
@@ -819,6 +821,8 @@ float4x4 operator *(const float3x3 &lhs, const float4x4 &rhs);
 /// of multiplication is against the convention of this math system. Please use the M * v notation instead.
 /// (Remember that M * v != v * M in general).
 float4 operator *(const float4 &lhs, const float4x4 &rhs);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(float4x4)

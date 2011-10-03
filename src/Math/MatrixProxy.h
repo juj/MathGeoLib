@@ -9,6 +9,8 @@
 
 #include "Math/MathFwd.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A proxy class for double brackets [][] element access in matrices.
 template<int Cols>
 class MatrixProxy
@@ -32,3 +34,5 @@ public:
         return v[col];
     }
 };
+
+MATH_END_NAMESPACE

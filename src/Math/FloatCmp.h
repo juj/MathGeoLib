@@ -11,7 +11,11 @@
 #include <cassert>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 bool Equal(double a, double b, double epsilon = 1e-6)
 {
 	return std::abs(a-b) < epsilon;
 }
+
+MATH_END_NAMESPACE

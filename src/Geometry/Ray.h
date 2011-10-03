@@ -16,6 +16,8 @@
 #include <OgreRay.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A ray in 3D space is a line that starts from an origin point and extends to infinity in one direction.
 class Ray
 {
@@ -88,9 +90,7 @@ public:
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const OBB &obb) const;
     bool Intersects(const Capsule &capsule) const;
-#ifndef _WINDOWS_
     bool Intersects(const Polygon &polygon) const;
-#endif
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
 
@@ -149,6 +149,8 @@ Ray operator *(const float3x3 &transform, const Ray &ray);
 Ray operator *(const float3x4 &transform, const Ray &ray);
 Ray operator *(const float4x4 &transform, const Ray &ray);
 Ray operator *(const Quat &transform, const Ray &ray);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Ray)

@@ -24,6 +24,8 @@
 #include "Geometry/Capsule.h"
 #include "Math/MathFunc.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// This code is adapted from http://paulbourke.net/geometry/lineline3d/ .
 /// dmnop = (xm - xn)(xo - xp) + (ym - yn)(yo - yp) + (zm - zn)(zo - zp).
 /// @param v An array of four floats: [0]: line 0 start. [1]: line 0 end. [2]: line 1 start. [3]: line 1 end.
@@ -213,12 +215,10 @@ bool Line::Intersects(const Capsule &capsule) const
     return capsule.Intersects(*this);
 }
 
-#ifndef _WINDOWS_
 bool Line::Intersects(const Polygon &polygon) const
 {
     return polygon.Intersects(*this);
 }
-#endif
 
 bool Line::Intersects(const Frustum &frustum) const
 {
@@ -300,3 +300,5 @@ std::string Line::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

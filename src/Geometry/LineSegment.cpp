@@ -6,7 +6,6 @@
     of the author(s). 
 */
 
-
 #include "Math/MathFunc.h"
 #include "Geometry/AABB.h"
 #include "Geometry/LineSegment.h"
@@ -24,6 +23,8 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Triangle.h"
+
+MATH_BEGIN_NAMESPACE
 
 LineSegment::LineSegment(const float3 &a_, const float3 &b_)
 :a(a_), b(b_)
@@ -265,12 +266,10 @@ bool LineSegment::Intersects(const LineSegment &lineSegment, float epsilon) cons
     return Distance(lineSegment) <= epsilon;
 }
 
-#ifndef _WINDOWS_
 bool LineSegment::Intersects(const Polygon &polygon) const
 {
     return polygon.Intersects(*this);
 }
-#endif
 
 bool LineSegment::Intersects(const Frustum &frustum) const
 {
@@ -321,3 +320,5 @@ std::string LineSegment::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

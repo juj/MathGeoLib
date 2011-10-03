@@ -13,8 +13,8 @@
 #include <iostream>
 #endif
 
-namespace math
-{
+MATH_BEGIN_NAMESPACE
+
 /** @brief Fixed-precision decimal number.
 
     BaseT is the base type that is used to hold the value (it should be able to represent negative
@@ -291,7 +291,7 @@ std::ostream &operator<<(std::ostream &out, const FixedPoint<T, F> &f)
 }
 #endif
 
-} // ~math
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(FixedPoint)

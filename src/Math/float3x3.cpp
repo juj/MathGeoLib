@@ -20,6 +20,8 @@
 #include "Geometry/Plane.h"
 #include "TransformOps.h"
 
+MATH_BEGIN_NAMESPACE
+
 float3x3::float3x3(float _00, float _01, float _02,
          float _10, float _11, float _12,
          float _20, float _21, float _22)
@@ -1253,3 +1255,5 @@ float4 operator *(const float4 &lhs, const float3x3 &rhs)
 const float3x3 float3x3::zero     = float3x3(0,0,0, 0,0,0, 0,0,0);
 const float3x3 float3x3::identity = float3x3(1,0,0, 0,1,0, 0,0,1);
 const float3x3 float3x3::nan = float3x3(FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN);
+
+MATH_END_NAMESPACE

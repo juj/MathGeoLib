@@ -12,6 +12,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A 3D arbitrarily oriented bounding box.
 /** This data structure represents a box in 3D space. The local axes of this box can be arbitrarily oriented/rotated
     with respect to the global world coordinate system. This allows OBBs to more tightly bound objects than AABBs do, 
@@ -292,9 +294,7 @@ public:
     bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
     bool Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const;
     bool Intersects(const Triangle &triangle) const;
-#ifndef _WINDOWS_
     bool Intersects(const Polygon &polygon) const;
-#endif
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
 
@@ -348,6 +348,8 @@ public:
         and the given Polyhedron. */
 //    Polyhedron Intersection(const Polyhedron &polyhedron) const;
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(OBB)

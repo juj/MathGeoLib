@@ -6,7 +6,6 @@
     of the author(s). 
 */
 
-
 #include "Geometry/AABB.h"
 #include "Circle.h"
 #include "Math/MathFunc.h"
@@ -25,6 +24,8 @@
 #include "Math/float3x4.h"
 #include "Math/float4.h"
 #include "Math/Quat.h"
+
+MATH_BEGIN_NAMESPACE
 
 float Frustum::AspectRatio() const
 {
@@ -558,3 +559,5 @@ std::string Frustum::ToString() const
     return str;
 }
 #endif
+
+MATH_END_NAMESPACE

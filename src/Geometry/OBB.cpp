@@ -27,6 +27,8 @@
 #include "Geometry/Ray.h"
 #include "Geometry/Triangle.h"
 
+MATH_BEGIN_NAMESPACE
+
 OBB::OBB(const AABB &aabb)
 {
     SetFrom(aabb);
@@ -836,3 +838,5 @@ std::string OBB::ToString() const
 //    Polyhedron Intersection(const OBB &obb) const;
 
 //    Polyhedron Intersection(const Polyhedron &polyhedron) const;
+
+MATH_END_NAMESPACE

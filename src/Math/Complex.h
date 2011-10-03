@@ -7,6 +7,8 @@
 */
 #pragma once
 
+MATH_BEGIN_NAMESPACE
+
 /// A complex value of form a + bi.
 class Complex
 {
@@ -46,6 +48,8 @@ public:
     static const Complex unitOne;
     static const Complex unitI;
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Complex)

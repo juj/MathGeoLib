@@ -7,6 +7,8 @@
 */
 #pragma once
 
+#include "Math/MathNamespace.h"
+
 // The CONST_WIN32 is a #define which resolves to 'const' on Windows, and null on other
 // platforms. This #define is used on Windows to detect accidental programming errors
 // occurring from an expression "const float3 vec; vec[1] = 5;". Trying to return
@@ -22,6 +24,8 @@
 #include <stdio.h>
 #define assert(x) do { if (!(x)) { printf("Error: assert(%s) failed!\n", #x); } } while(0)
 #endif
+
+MATH_BEGIN_NAMESPACE
 
 class float2;
 class float3;
@@ -47,7 +51,6 @@ class Frustum;
 struct HitInfo;
 class Line;
 class LineSegment;
-class LCG;
 class OBB;
 class Plane;
 class Polygon;
@@ -61,3 +64,7 @@ class TranslateOp;
 class Torus;
 class ScaleOp;
 class Triangle;
+
+MATH_END_NAMESPACE
+
+class LCG;

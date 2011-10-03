@@ -11,6 +11,8 @@
 
 #include "BitOps.h"
 
+MATH_BEGIN_NAMESPACE
+
 u32 BinaryStringToValue(const char *str)
 {
     u32 val = 0;
@@ -20,3 +22,5 @@ u32 BinaryStringToValue(const char *str)
             val |= 1 << i;
     return val;
 }
+
+MATH_END_NAMESPACE

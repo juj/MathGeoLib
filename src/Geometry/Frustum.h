@@ -12,6 +12,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 enum FrustumType
 {
 	InvalidFrustum,
@@ -204,6 +206,8 @@ public:
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(Frustum)

@@ -12,6 +12,8 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 /// A line segment in 3D space is a finite line with a start and end point.
 class LineSegment
 {
@@ -95,9 +97,7 @@ public:
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
     bool Intersects(const Capsule &capsule) const;
     bool Intersects(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
-#ifndef _WINDOWS_
     bool Intersects(const Polygon &polygon) const;
-#endif
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
     ///\todo Implement.
@@ -121,6 +121,8 @@ LineSegment operator *(const float3x3 &transform, const LineSegment &line);
 LineSegment operator *(const float3x4 &transform, const LineSegment &line);
 LineSegment operator *(const float4x4 &transform, const LineSegment &line);
 LineSegment operator *(const Quat &transform, const LineSegment &line);
+
+MATH_END_NAMESPACE
 
 #ifdef QT_INTEROP
 Q_DECLARE_METATYPE(LineSegment)
