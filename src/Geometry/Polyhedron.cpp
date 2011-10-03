@@ -94,6 +94,26 @@ float3 Polyhedron::Centroid() const
     return centroid / (float)NumVertices();
 }
 
+float Polyhedron::SurfaceArea() const
+{
+    float area = 0.f;
+    for(int i = 0; i < NumFaces(); ++i)
+        area += FacePolygon(i).Area(); ///\todo Optimize temporary copies.
+    return area;
+}
+
+/** The implementation of this function is based on Graphics Gems 2, p. 170: "IV.1. Area of Planar Polygons and Volume of Polyhedra." */
+float Polyhedron::Volume() const
+{
+    float volume = 0.f;
+    for(int i = 0; i < NumFaces(); ++i)
+    {
+        Polygon face = FacePolygon(i); ///\todo Optimize temporary copies.
+        volume += face.Vertex(0).Dot(face.NormalCCW()) * face.Area();
+    }
+    return Abs(volume) / 3.f;
+}
+
 AABB Polyhedron::MinimalEnclosingAABB() const
 {
     AABB aabb;

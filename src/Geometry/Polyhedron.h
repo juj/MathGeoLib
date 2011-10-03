@@ -87,6 +87,12 @@ public:
     /// Returns the arithmetic mean of all the corner vertices.
     float3 Centroid() const;
 
+    /// Computes the total surface area of the faces of this polyhedron.
+    float SurfaceArea() const;
+
+    /// Computes the internal volume of this polyhedron.
+    float Volume() const;
+
     AABB MinimalEnclosingAABB() const;
 
     /// Returns true if this polyhedron is closed and does not have any gaps.
