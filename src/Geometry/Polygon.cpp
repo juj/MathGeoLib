@@ -385,13 +385,30 @@ bool IsSelfIntersecting(const float3 &viewDirection) const;
 
 bool Contains(const float3 &point, const float3 &viewDirection) const;
 
-/// Returns the surface area of this polygon.
-float Area() const;
-
-/// Returns the total edge length of this polygon.
-float Perimeter() const;
-
 */
+
+/** Implementation based on Graphics Gems 2, p. 170: "IV.1. Area of Planar Polygons and Volume of Polyhedra." */
+float Polygon::Area() const
+{
+    assume(IsPlanar());
+    float3 area = float3::zero;
+
+    int i = NumEdges()-1;
+    for(int j = 0; j < NumEdges(); ++j)
+    {
+        area += Vertex(i).Cross(Vertex(j));
+        i = j;
+    }
+    return 0.5f * Abs(NormalCCW().Dot(area));
+}
+
+float Polygon::Perimeter() const
+{
+    float perimeter = 0.f;
+    for(int i = 0; i < NumEdges(); ++i)
+        perimeter += Edge(i).Length();
+    return perimeter;
+}
 
 float3 Polygon::Centroid() const
 {
