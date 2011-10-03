@@ -63,21 +63,25 @@ public:
 
 	/// Returns the distance of the given object to the edge of this circle.
     float DistanceToEdge(const float3 &point) const;
-    float DistanceToEdge(const Ray &ray, float *d, float3 *closestPoint) const;
-    float DistanceToEdge(const LineSegment &lineSegment, float *d, float3 *closestPoint) const;
-    float DistanceToEdge(const Line &line, float *d, float3 *closestPoint) const;
-/*
-	/// Returns the distance of the given object to this filled circle.
+//    float DistanceToEdge(const Ray &ray, float *d, float3 *closestPoint) const;
+//    float DistanceToEdge(const LineSegment &lineSegment, float *d, float3 *closestPoint) const;
+//    float DistanceToEdge(const Line &line, float *d, float3 *closestPoint) const;
+
+    /// Returns the distance of the given object to this filled circle.
     float DistanceToDisc(const float3 &point) const;
+/*
     float DistanceToDisc(const Ray &ray, float *d, float3 *closestPoint) const;
     float DistanceToDisc(const LineSegment &lineSegment, float *d, float3 *closestPoint) const;
     float DistanceToDisc(const Line &line, float *d, float3 *closestPoint) const;
 */
 	/// Returns the closest point on the edge of this circle to the given object.
 	float3 ClosestPointToEdge(const float3 &point) const;
-	float3 ClosestPointToEdge(const Ray &ray, float *d) const;
-	float3 ClosestPointToEdge(const LineSegment &lineSegment, float *d) const;
-	float3 ClosestPointToEdge(const Line &line, float *d) const;
+//	float3 ClosestPointToEdge(const Ray &ray, float *d) const;
+//	float3 ClosestPointToEdge(const LineSegment &lineSegment, float *d) const;
+//	float3 ClosestPointToEdge(const Line &line, float *d) const;
+
+    /// Returns the closest point on the disc of this circle to the given object.
+	float3 ClosestPointToDisc(const float3 &point) const;
 
     /// Tests this circle for an intersection against the given plane.
     /// Returns the number of intersection points found for this circle and the given plane.

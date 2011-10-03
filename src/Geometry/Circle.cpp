@@ -59,7 +59,7 @@ float Circle::DistanceToEdge(const float3 &point) const
 {
 	return ClosestPointToEdge(point).Distance(point);
 }
-
+/*
 float Circle::DistanceToEdge(const Ray &ray, float *d, float3 *closestPoint) const
 {
 	float t;
@@ -92,11 +92,12 @@ float Circle::DistanceToEdge(const Line &line, float *d, float3 *closestPoint) c
 		*d = t;
 	return cp.Distance(line.GetPoint(t));
 }
-/*
+*/
 float Circle::DistanceToDisc(const float3 &point) const
 {
+    return ClosestPointToDisc(point).Distance(point);
 }
-
+/*
 float Circle::DistanceToDisc(const Ray &ray, float *d, float3 *closestPoint) const
 {
 }
@@ -118,6 +119,17 @@ float3 Circle::ClosestPointToEdge(const float3 &point) const
 	return pos + diff.ScaledToLength(r);
 }
 
+float3 Circle::ClosestPointToDisc(const float3 &point) const
+{
+	float3 pointOnPlane = ContainingPlane().Project(point);
+	float3 diff = pointOnPlane - pos;
+    float dist = diff.LengthSq();
+    if (dist > r*r)
+        diff = diff * (r / Sqrt(dist));
+
+    return pos + diff;
+}
+/*
 float3 Circle::ClosestPointToEdge(const Ray &ray, float *d) const
 {
 	assume(false && "Not implemented!");
@@ -135,7 +147,7 @@ float3 Circle::ClosestPointToEdge(const Line &line, float *d) const
 	assume(false && "Not implemented!");
 	return float3();
 }
-
+*/
 int Circle::Intersects(const Plane &plane, float3 *pt1, float3 *pt2) const
 {
     return plane.Intersects(*this, pt1, pt2);
