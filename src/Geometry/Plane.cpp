@@ -535,6 +535,11 @@ int Plane::Intersects(const Circle &circle, float3 *pt1, float3 *pt2) const
     return numRoots;
 }
 
+int Plane::Intersects(const Circle &circle) const
+{
+    return Intersects(circle, 0, 0);
+}
+
 bool Plane::Clip(float3 &a, float3 &b) const
 {
     float t;

@@ -22,6 +22,7 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Capsule.h"
+#include "Geometry/Circle.h"
 #include "Math/MathFunc.h"
 
 MATH_BEGIN_NAMESPACE
@@ -228,6 +229,11 @@ bool Line::Intersects(const Frustum &frustum) const
 bool Line::Intersects(const Polyhedron &polyhedron) const
 {
     return polyhedron.Intersects(*this);
+}
+
+bool Line::IntersectsDisc(const Circle &disc) const
+{
+    return disc.IntersectsDisc(*this);
 }
 
 float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const

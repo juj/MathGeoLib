@@ -76,6 +76,7 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    bool IntersectsDisc(const Circle &disc) const;
 
     /// Returns the closest point on <b>this</b> line to the given object.
     float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;

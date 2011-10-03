@@ -136,6 +136,43 @@ float3 Circle::ClosestPointToEdge(const Line &line, float *d) const
 	return float3();
 }
 
+int Circle::Intersects(const Plane &plane, float3 *pt1, float3 *pt2) const
+{
+    return plane.Intersects(*this, pt1, pt2);
+}
+
+int Circle::Intersects(const Plane &plane) const
+{
+    return plane.Intersects(*this);
+}
+
+bool Circle::IntersectsDisc(const Line &line) const
+{
+    float d;
+    bool intersectsPlane = line.Intersects(ContainingPlane(), &d);
+    if (intersectsPlane)
+        return false;
+    return line.GetPoint(d).DistanceSq(pos) <= r*r;
+}
+
+bool Circle::IntersectsDisc(const LineSegment &lineSegment) const
+{
+    float d;
+    bool intersectsPlane = lineSegment.Intersects(ContainingPlane(), &d);
+    if (intersectsPlane)
+        return false;
+    return lineSegment.GetPoint(d).DistanceSq(pos) <= r*r;
+}
+
+bool Circle::IntersectsDisc(const Ray &ray) const
+{
+    float d;
+    bool intersectsPlane = ray.Intersects(ContainingPlane(), &d);
+    if (intersectsPlane)
+        return false;
+    return ray.GetPoint(d).DistanceSq(pos) <= r*r;
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Circle::ToString() const
 {

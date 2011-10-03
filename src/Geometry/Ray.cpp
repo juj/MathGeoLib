@@ -22,6 +22,7 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Triangle.h"
+#include "Geometry/Circle.h"
 #include "Math/MathFunc.h"
 
 MATH_BEGIN_NAMESPACE
@@ -247,6 +248,11 @@ bool Ray::Intersects(const Frustum &frustum) const
 bool Ray::Intersects(const Polyhedron &polyhedron) const
 {
     return polyhedron.Intersects(*this);
+}
+
+bool Ray::IntersectsDisc(const Circle &disc) const
+{
+    return disc.IntersectsDisc(*this);
 }
 
 Line Ray::ToLine() const

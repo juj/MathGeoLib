@@ -100,6 +100,8 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    bool IntersectsDisc(const Circle &disc) const;
+
     ///\todo Implement.
 //    bool Intersects(const Frustum &frustum, float &outDistance) const;
 //    bool Intersects(const Polyhedron &polyhedron, float &outDistance) const;

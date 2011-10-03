@@ -79,6 +79,14 @@ public:
 	float3 ClosestPointToEdge(const LineSegment &lineSegment, float *d) const;
 	float3 ClosestPointToEdge(const Line &line, float *d) const;
 
+    /// Tests this circle for an intersection against the given plane.
+    /// Returns the number of intersection points found for this circle and the given plane.
+    int Intersects(const Plane &plane, float3 *pt1, float3 *pt2) const;
+    int Intersects(const Plane &plane) const;
+    bool IntersectsDisc(const Line &line) const;
+    bool IntersectsDisc(const LineSegment &lineSegment) const;
+    bool IntersectsDisc(const Ray &ray) const;
+
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this Circle. Most useful for debugging purposes.
     /** The returned string specifies the center position, normal direction and the radius of this Circle. */

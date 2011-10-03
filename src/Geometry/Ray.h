@@ -93,6 +93,7 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    bool IntersectsDisc(const Circle &disc) const;
 
 /*
     bool Intersect(const Plane &plane) const;

@@ -181,7 +181,8 @@ public:
     bool Intersects(const Capsule &capsule) const;
     /// Returns the number of intersections that were found: 0, 1 or 2.
     /// The actual intersection points are output in pt1 and pt2.
-    int Intersects(const Circle &circle, float3 *pt1 = 0, float3 *pt2 = 0) const;
+    int Intersects(const Circle &circle, float3 *pt1, float3 *pt2) const;
+    int Intersects(const Circle &circle) const;
 //    bool Intersect(const Polyhedron &polyhedron) const;
 
     /// Clips a line segment against this plane.
