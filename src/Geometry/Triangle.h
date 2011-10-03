@@ -128,6 +128,10 @@ public:
 //    float3 ClosestPoint(const Line &other, float3 *otherPt) const;
     float3 ClosestPoint(const Triangle &other, float3 *otherPt) const;
 
+    /// Generates a random point inside this Triangle.
+    /** The points are distributed uniformly. */
+    float3 RandomPointInside(LCG &rng) const;
+
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this Line. Most useful for debugging purposes.
     std::string ToString() const;

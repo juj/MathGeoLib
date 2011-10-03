@@ -24,6 +24,7 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
+#include "Algorithm/Random/LCG.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -647,6 +648,22 @@ float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const
     if (otherPt)
         *otherPt = closestOther;
     return closestThis;
+}
+
+/** The implementation of this function is based on Graphics Gems 1, p. 25: 
+    "1.5 Generating random points in triangles. Method 2." The Method 1 presented in the book
+    uses a sqrt() instead of the if(). */
+float3 Triangle::RandomPointInside(LCG &rng) const
+{
+    ///\todo rng.Float() returns [0,1[, but to be completely uniform, we'd need [0,1] here.
+    float s = rng.Float();
+    float t = rng.Float();
+    if (s + t > 1.f)
+    {
+        s = 1.f - s;
+        t = 1.f - t;
+    }
+    return Point(s, t);
 }
 
 Triangle operator *(const float3x3 &transform, const Triangle &t)
