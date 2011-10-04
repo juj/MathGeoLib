@@ -83,6 +83,8 @@ public:
     float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
     float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
     float3 ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+
+    float3 ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const;
 /*
     bool Intersect(const Plane &plane) const;
     bool Intersect(const Plane &plane, float &outDistance) const;
