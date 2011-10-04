@@ -119,6 +119,7 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    bool Intersects(const Capsule &capsule) const;
 
     /// Projects this Triangle to the given axis.
     /// @param axis The axis to project onto. This vector can be unnormalized.

@@ -151,7 +151,7 @@ public:
     bool Intersects(const Capsule &capsule) const;
 //    bool Intersects(const AABB &aabb) const;
 //    bool Intersects(const OBB &obb) const;
-//    bool Intersects(const Triangle &triangle) const;
+    bool Intersects(const Triangle &triangle) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this Capsule. Most useful for debugging purposes.

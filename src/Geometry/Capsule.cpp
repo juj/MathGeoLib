@@ -345,12 +345,13 @@ bool Capsule::Intersects(const Capsule &capsule) const
     return l.Distance(capsule.l) <= r + capsule.r;
 }
 
-/*
 bool Capsule::Intersects(const Triangle &triangle) const
 {
-///\todo Implement
+    float3 thisPoint;
+    float3 trianglePoint = triangle.ClosestPoint(l, &thisPoint);
+    return thisPoint.DistanceSq(trianglePoint) <= r*r;
 }
-*/
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Capsule::ToString() const
 {
