@@ -107,6 +107,9 @@ public:
     /// Returns true if the edges of this polygon self-intersect when viewed from the given direction.
     bool IsSelfIntersecting(const float3 &viewDirection) const;
 
+    /// Returns true if there exists edges (p_{i-1}, p_i) and (p_i, p_{i+1}) which are collinear.
+    bool HasCollinearEdges() const;
+
     /// Returns true if the given point lies inside this polygon.
     bool Contains(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
     bool Contains(const LineSegment &worldSpaceLineSegment, float polygonThickness = 1e-3f) const;
@@ -149,6 +152,9 @@ public:
     /// lie polygonThickness units apart from each other.
     Polyhedron ToPolyhedron() const;
 //    Polyhedron ToPolyhedron(float polygonThickness = 0.f) const; ///\todo Add support for this form.
+
+    // Triangulates this Polygon using the ear-clipping method.
+    std::vector<Triangle> Triangulate() const;
 
     AABB MinimalEnclosingAABB() const;
 

@@ -9,6 +9,7 @@
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <cassert>
 #include <utility>
+#include <list>
 #endif
 
 #include "Geometry/AABB.h"
@@ -431,6 +432,117 @@ Polyhedron Polygon::ToPolyhedron() const
         poly.f[0].v.push_back(NumVertices()-1-i);
     }
     return poly;
+}
+
+// A(u) = a1 + u * (a2-a1).
+// B(v) = b1 + v * (b2-b1).
+// Returns (u,v).
+bool IntersectLineLine2D(const float2 &a1, const float2 &a2, const float2 &b1, const float2 &b2, float2 &out)
+{
+    float u = (b2.x - b1.x)*(a1.y - b1.y) - (b2.y - b1.y)*(a1.x - b1.x);
+    float v = (a2.x - a1.x)*(a1.y - b1.y) - (a2.y - a1.y)*(a1.x - b1.x);
+
+    float det = (b2.y - b1.y)*(a2.x - a1.x) - (b2.x - b1.x)*(a2.y - a1.y);
+    if (Abs(det) < 1e-4f)
+        return false;
+    det = 1.f / det;
+    out.x = u * det;
+    out.y = v * det;
+
+    return true;
+}
+
+bool IntersectLineSegmentLineSegment2D(const float2 &a1, const float2 &a2, const float2 &b1, const float2 &b2, float2 &out)
+{
+    bool ret = IntersectLineLine2D(a1, a2, b1, b2, out);
+    return ret && out.x >= 0.f && out.x <= 1.f && out.y >= 0.f && out.y <= 1.f;
+}
+
+/// Returns true if poly[i+1] is an ear.
+/// Precondition: i+2 == j (mod poly.size()).
+bool IsAnEar(const std::vector<float2> &poly, int i, int j)
+{
+    float2 dummy;
+    int x = poly.size()-1;
+    for(int y = 0; y < i; ++y)
+    {
+        if (IntersectLineSegmentLineSegment2D(poly[i], poly[j], poly[x], poly[y], dummy))
+            return false;
+        x = y;
+    }
+    x = j+1;
+    for(size_t y = x+1; y < poly.size(); ++y)
+    {
+        if (IntersectLineSegmentLineSegment2D(poly[i], poly[j], poly[x], poly[y], dummy))
+            return false;
+        x = y;
+    }
+    return true;
+}
+
+/** The implementation of this function is based on the paper
+    "Kong, Everett, Toussant. The Graham Scan Triangulates Simple Polygons."
+    See also p. 772-775 of Geometric Tools for Computer Graphics.
+    The running time of this function is O(n^2). */
+std::vector<Triangle> Polygon::Triangulate() const
+{
+    assume(IsPlanar());
+
+    std::vector<Triangle> t;
+    // Handle degenerate cases.
+    if (NumVertices() < 3)
+        return t;
+    if (NumVertices() == 3)
+    {
+        t.push_back(Triangle(Vertex(0), Vertex(1), Vertex(2)));
+        return t;
+    }
+    std::vector<float2> p2d;
+    std::vector<int> polyIndices;
+    for(int i = 0; i < NumVertices(); ++i)
+    {
+        p2d.push_back(MapTo2D(i));
+        polyIndices.push_back(i);
+    }
+
+    // Clip ears of the polygon until it has been reduced to a triangle.
+    int i = 0;
+    int j = 1;
+    int k = 2;
+    size_t numTries = 0; // Avoid creating an infinite loop.
+    while(p2d.size() > 3 && numTries < p2d.size())
+    {
+        if (float2::OrientedCCW(p2d[i], p2d[j], p2d[k]) && IsAnEar(p2d, i, k))
+        {
+            // The vertex j is an ear. Clip it off.
+            t.push_back(Triangle(p[polyIndices[i]], p[polyIndices[j]], p[polyIndices[k]]));
+            p2d.erase(p2d.begin() + j);
+            polyIndices.erase(polyIndices.begin() + j);
+
+            // The previous index might now have become an ear. Move back one index to see if so.
+            if (i > 0)
+            {
+                i = (i + p2d.size() - 1) % p2d.size();
+                j = (j + p2d.size() - 1) % p2d.size();
+                k = (k + p2d.size() - 1) % p2d.size();
+            }
+            numTries = 0;
+        }
+        else
+        {
+            // The vertex at j is not an ear. Move to test next vertex.
+            i = j;
+            j = k;
+            k = (k+1) % p2d.size();
+            ++numTries;
+        }
+    }
+    
+    // Add the last poly.
+    assert(p2d.size() == 3);
+    t.push_back(Triangle(p[polyIndices[0]], p[polyIndices[1]], p[polyIndices[2]]));
+
+    return t;
 }
 
 AABB Polygon::MinimalEnclosingAABB() const
