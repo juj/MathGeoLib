@@ -308,8 +308,7 @@ Plane Frustum::GetPlane(int faceIndex) const
 
 float Frustum::Volume() const
 {
-    assume(false && "Not implemented!");
-    return -1.f;
+    return ToPolyhedron().Volume();
 }
 
 float3 Frustum::RandomPointInside(LCG &rng) const
