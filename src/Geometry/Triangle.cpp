@@ -542,6 +542,8 @@ float3 Triangle::ClosestPoint(const LineSegment &line, float3 *otherPt) const
     Plane p = PlaneCCW();
     float d1 = p.Distance(line.a);
     float d2 = p.Distance(line.b);
+    /// \bug The following two lines are not correct. This algorithm does not
+    /// produce correct answers. Rewrite.
     bool aProjectsInsideTriangle = BarycentricInsideTriangle(line.a);
     bool bProjectsInsideTriangle = BarycentricInsideTriangle(line.b);
 
