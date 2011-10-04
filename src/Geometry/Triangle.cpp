@@ -537,6 +537,38 @@ float3 Triangle::ClosestPoint(const float3 &p) const
     float w = vc * denom;
     return a + ab * v + ac * w;
 }
+
+float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const
+{
+    ///\todo This is naive. Optimize!
+    float3 closestToA = ClosestPoint(lineSegment.a);
+    float3 closestToB = ClosestPoint(lineSegment.b);
+    float d;
+    float3 closestToSegment = ClosestPointToTriangleEdge(lineSegment, 0, 0, &d);
+    float3 segmentPt = lineSegment.GetPoint(d);
+    float distA = closestToA.DistanceSq(lineSegment.a);
+    float distB = closestToB.DistanceSq(lineSegment.b);
+    float distC = closestToSegment.DistanceSq(segmentPt);
+    if (distA <= distB && distA <= distC)
+    {
+        if (otherPt)
+            *otherPt = lineSegment.a;
+        return closestToA;
+    }
+    else if (distB <= distC)
+    {
+        if (otherPt)
+            *otherPt = lineSegment.b;
+        return closestToB;
+    }
+    else
+    {
+        if (otherPt)
+            *otherPt = segmentPt;
+        return closestToSegment;
+    }
+}
+
 /*
 float3 Triangle::ClosestPoint(const LineSegment &line, float3 *otherPt) const
 {
@@ -624,6 +656,40 @@ float3 Triangle::ClosestPointToTriangleEdge(const Line &other, float *outU, floa
     float dist1 = pt1.DistanceSq(other.GetPoint(d1));
     float dist2 = pt2.DistanceSq(other.GetPoint(d2));
     float dist3 = pt3.DistanceSq(other.GetPoint(d3));
+    if (dist1 <= dist2 && dist1 <= dist3)
+    {
+        if (outU) *outU = BarycentricUV(pt1).x;
+        if (outV) *outV = BarycentricUV(pt1).y;
+        if (outD) *outD = d1;
+        return pt1;
+    }
+    else if (dist2 <= dist3)
+    {
+        if (outU) *outU = BarycentricUV(pt2).x;
+        if (outV) *outV = BarycentricUV(pt2).y;
+        if (outD) *outD = d2;
+        return pt2;
+    }
+    else
+    {
+        if (outU) *outU = BarycentricUV(pt3).x;
+        if (outV) *outV = BarycentricUV(pt3).y;
+        if (outD) *outD = d3;
+        return pt3;
+    }
+}
+
+float3 Triangle::ClosestPointToTriangleEdge(const LineSegment &lineSegment, float *outU, float *outV, float *outD) const
+{
+    ///\todo Optimize!
+    // The line is parallel to the triangle.
+    float d1, d2, d3;
+    float3 pt1 = Edge(0).ClosestPoint(lineSegment, 0, &d1);
+    float3 pt2 = Edge(1).ClosestPoint(lineSegment, 0, &d2);
+    float3 pt3 = Edge(2).ClosestPoint(lineSegment, 0, &d3);
+    float dist1 = pt1.DistanceSq(lineSegment.GetPoint(d1));
+    float dist2 = pt2.DistanceSq(lineSegment.GetPoint(d2));
+    float dist3 = pt3.DistanceSq(lineSegment.GetPoint(d3));
     if (dist1 <= dist2 && dist1 <= dist3)
     {
         if (outU) *outU = BarycentricUV(pt1).x;

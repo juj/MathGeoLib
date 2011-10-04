@@ -128,13 +128,14 @@ public:
 
     /// Returns the closest point on this triangle to the target object.
     float3 ClosestPoint(const float3 &targetPoint) const;
-//    float3 ClosestPoint(const LineSegment &other, float3 *otherPt) const;
+    float3 ClosestPoint(const LineSegment &other, float3 *otherPt) const;
 //    float3 ClosestPoint(const Ray &other, float3 *otherPt) const;
     float3 ClosestPoint(const Line &other, float *outU, float *outV, float *outD) const;
     float3 ClosestPoint(const Triangle &other, float3 *otherPt) const;
 
     /// Returns the closest point on the edge of this triangle to the given object.
-    float3 ClosestPointToTriangleEdge(const Line &other, float *outU, float *outV, float *outD) const;
+    float3 ClosestPointToTriangleEdge(const Line &line, float *outU, float *outV, float *outD) const;
+    float3 ClosestPointToTriangleEdge(const LineSegment &lineSegment, float *outU, float *outV, float *outD) const;
 
     /// Generates a random point inside this Triangle.
     /** The points are distributed uniformly. */
