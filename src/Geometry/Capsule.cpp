@@ -352,6 +352,11 @@ bool Capsule::Intersects(const Triangle &triangle) const
     return thisPoint.DistanceSq(trianglePoint) <= r*r;
 }
 
+bool Capsule::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Capsule::ToString() const
 {

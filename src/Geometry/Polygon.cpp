@@ -359,6 +359,17 @@ bool Polygon::Intersects(const Sphere &sphere) const
     return false;
 }
 
+bool Polygon::Intersects(const Capsule &capsule) const
+{
+    ///\todo Optimize.
+    std::vector<Triangle> tris = Triangulate();
+    for(size_t i = 0; i < tris.size(); ++i)
+        if (tris[i].Intersects(capsule))
+            return true;
+
+    return false;
+}
+
 float3 Polygon::ClosestPointConvex(const float3 &point) const
 {
     assume(IsPlanar());

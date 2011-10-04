@@ -133,6 +133,7 @@ public:
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
     bool Intersects(const Sphere &sphere) const;
+    bool Intersects(const Capsule &capsule) const;
 
     /// Returns the closest point on this polygon to the given point.
     /// This function assumes that this polygon is convex.
