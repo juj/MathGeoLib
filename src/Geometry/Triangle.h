@@ -30,7 +30,9 @@ public:
     Triangle(const float3 &a, const float3 &b, const float3 &c);
 
     /// Expresses the given point in barycentric (u,v,w) coordinates with respect to this triangle.
-    float3 Barycentric(const float3 &point) const;
+    float3 BarycentricUVW(const float3 &point) const;
+
+    float2 BarycentricUV(const float3 &point) const;
 
     /// Returns true if the given barycentric coordinates lie inside a triangle.
     /// That is, 0 <= u,v,w <= 1 and u+v+w==1.
@@ -38,9 +40,12 @@ public:
 
     /// Returns a point at the given barycentric coordinates.
     /// The inputted u, v and w should sum up to 1.
+    /// Returns u*a + v*b + w*c.
     float3 Point(float u, float v, float w) const;
-    float3 Point(float u, float v) const { return Point(u, v, 1.f - u - v); }
+    /// The same as above, except reads the u,v and w from the x,y and z components of the input vector.
     float3 Point(const float3 &barycentric) const;
+    /// Returns a + (b-a)*u + (c-a)*v.
+    float3 Point(float u, float v) const { return a + (b-a) * u + (c-a) * v; }
 
     /// Returns the surface area of this triangle.
     float Area() const;
@@ -123,10 +128,13 @@ public:
 
     /// Returns the closest point on this triangle to the target object.
     float3 ClosestPoint(const float3 &targetPoint) const;
-    float3 ClosestPoint(const LineSegment &other, float3 *otherPt) const;
+//    float3 ClosestPoint(const LineSegment &other, float3 *otherPt) const;
 //    float3 ClosestPoint(const Ray &other, float3 *otherPt) const;
-//    float3 ClosestPoint(const Line &other, float3 *otherPt) const;
+    float3 ClosestPoint(const Line &other, float *outU, float *outV, float *outD) const;
     float3 ClosestPoint(const Triangle &other, float3 *otherPt) const;
+
+    /// Returns the closest point on the edge of this triangle to the given object.
+    float3 ClosestPointToTriangleEdge(const Line &other, float *outU, float *outV, float *outD) const;
 
     /// Generates a random point inside this Triangle.
     /** The points are distributed uniformly. */

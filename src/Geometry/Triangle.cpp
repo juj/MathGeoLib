@@ -33,7 +33,7 @@ Triangle::Triangle(const float3 &a_, const float3 &b_, const float3 &c_)
 {
 }
 
-float3 Triangle::Barycentric(const float3 &point) const
+float3 Triangle::BarycentricUVW(const float3 &point) const
 {
     /// @note An alternate mechanism to compute the barycentric is given in Christer Ericson's
     /// Real-Time Collision Detection, pp. 51-52, which might be slightly faster.
@@ -50,6 +50,12 @@ float3 Triangle::Barycentric(const float3 &point) const
     float w = (d00 * d21 - d01 * d20) * denom;
     float u = 1.0f - v - w;
     return float3(u, v, w);
+}
+
+float2 Triangle::BarycentricUV(const float3 &point) const
+{
+    float3 uvw = BarycentricUVW(point);
+    return float2(uvw.y, uvw.z);
 }
 
 bool Triangle::BarycentricInsideTriangle(const float3 &barycentric)
@@ -164,7 +170,7 @@ bool Triangle::Contains(const float3 &point, float triangleThickness) const
     if (PlaneCCW().Distance(point) > triangleThickness) // The winding order of the triangle plane does not matter.s
         return false; ///\todo This test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
 
-    float3 br = Barycentric(point);
+    float3 br = BarycentricUVW(point);
     return br.y >= 0.f && br.z >= 0.f && (br.y + br.z) <= 1.f;
 }
 
@@ -531,7 +537,7 @@ float3 Triangle::ClosestPoint(const float3 &p) const
     float w = vc * denom;
     return a + ab * v + ac * w;
 }
-
+/*
 float3 Triangle::ClosestPoint(const LineSegment &line, float3 *otherPt) const
 {
     float3 intersectionPoint;
@@ -603,6 +609,208 @@ float3 Triangle::ClosestPoint(const LineSegment &line, float3 *otherPt) const
         if (otherPt)
             *otherPt = line.b;
         return p.Project(line.b);
+    }
+}
+*/
+
+float3 Triangle::ClosestPointToTriangleEdge(const Line &other, float *outU, float *outV, float *outD) const
+{
+    ///\todo Optimize!
+    // The line is parallel to the triangle.
+    float d1, d2, d3;
+    float3 pt1 = Edge(0).ClosestPoint(other, 0, &d1);
+    float3 pt2 = Edge(1).ClosestPoint(other, 0, &d2);
+    float3 pt3 = Edge(2).ClosestPoint(other, 0, &d3);
+    float dist1 = pt1.DistanceSq(other.GetPoint(d1));
+    float dist2 = pt2.DistanceSq(other.GetPoint(d2));
+    float dist3 = pt3.DistanceSq(other.GetPoint(d3));
+    if (dist1 <= dist2 && dist1 <= dist3)
+    {
+        if (outU) *outU = BarycentricUV(pt1).x;
+        if (outV) *outV = BarycentricUV(pt1).y;
+        if (outD) *outD = d1;
+        return pt1;
+    }
+    else if (dist2 <= dist3)
+    {
+        if (outU) *outU = BarycentricUV(pt2).x;
+        if (outV) *outV = BarycentricUV(pt2).y;
+        if (outD) *outD = d2;
+        return pt2;
+    }
+    else
+    {
+        if (outU) *outU = BarycentricUV(pt3).x;
+        if (outV) *outV = BarycentricUV(pt3).y;
+        if (outD) *outD = d3;
+        return pt3;
+    }
+}
+
+/** The implementation of this function is based on the pseudo-code in 
+    Schneider, Eberly. Geometric Tools for Computer Graphics pp. 433 - 441. */
+float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float *outD) const
+{
+    ///\todo This code is currently untested. Run tests to ensure the following code works properly.
+
+    // Point on triangle: T(u,v) = a + u*b + v*c;
+    // Point on line:  L(t) = p + t*d;
+    // Minimize the function Q(u,v,t) = ||T(u,v) - L(t)||.
+
+    float3 e0 = b-a;
+    float3 e1 = c-a;
+    float3 d = other.dir;
+
+    const float d_e0e0 = Dot(e0, e0);
+    const float d_e0e1 = Dot(e0, e1);
+    const float d_e0d = Dot(e0, d);
+    const float d_e1e1 = Dot(e1, e1);
+    const float d_e1d = Dot(e1, d);
+    const float d_dd = Dot(d, d);
+
+    float3x3 m;
+    m[0][0] = d_e0e0;  m[0][1] = d_e0e1;  m[0][2] = -d_e0d;
+    m[1][0] = d_e0e1;  m[1][1] = d_e1e1;  m[1][2] = -d_e1d;
+    m[2][0] = -d_e0d;  m[2][1] = -d_e1d;  m[2][2] = d_dd;
+
+    ///\todo Add optimized float3x3::InverseSymmetric().
+    bool inv = m.Inverse();
+    if (!inv)
+        return ClosestPointToTriangleEdge(other, outU, outV, outD);
+
+    float3 v_m_p = a - other.pos;
+    float v_m_p_e0 = v_m_p.Dot(e0);
+    float v_m_p_e1 = v_m_p.Dot(e1);
+    float v_m_p_d = v_m_p.Dot(d);
+    float3 b = float3(-v_m_p_e0, -v_m_p_e1, v_m_p_d);
+    float3 uvt = m * b;
+    // We cannot simply clamp the solution to (uv) inside the constraints, since the expression we
+    // are minimizing is quadratic. 
+    // So, examine case-by-case which part of the space the solution lies in. Because the function is convex,
+    // we can clamp the search space to the boundary planes.
+    float u = uvt.x;
+    float v = uvt.y;
+    float t = uvt.z;
+    if (u < 0)
+    {
+        if (outU) *outU = 0;
+
+        // Solve 2x2 matrix for the (v,t) solution when u == 0.
+        float m00 = m[2][2];
+        float m01 = -m[2][1];
+        float m10 = -m[1][2];
+        float m11 = m[1][1];
+        float det = m00*m11 - m01*m10;
+
+        // 2x2 * 2 matrix*vec mul.
+        v = m00*b[1] + m01*b[2];
+        t = m10*b[1] + m11*b[2];
+        if (outD) *outD = t;
+
+        // Check if the solution is still out of bounds.
+        if (v <= 0)
+        {
+            if (outV) *outV = 0;
+            t = v_m_p_d / d_dd;
+            return Point(0, 0);
+        }
+        else if (v >= 1)
+        {
+            if (outV) *outV = 1;
+            t = (v_m_p_d - d_e1d) / d_dd;
+            return Point(0, 1);
+        }
+        else // (0 <= v <= 1).
+        {
+            if (outV) *outV = v;
+            return Point(0, v);
+        }
+    }
+    else if (v <= 0)
+    {
+        if (outV) *outV = 0;
+
+        // Solve 2x2 matrix for the (u,t) solution when v == 0.
+        float m00 = m[2][2];
+        float m01 = -m[2][0];
+        float m10 = -m[0][2];
+        float m11 = m[0][0];
+        float det = 1.f / (m00*m11 - m01*m10);
+
+        // 2x2 * 2 matrix*vec mul.
+        u = (m00*b[0] + m01*b[2]) * det;
+        t = (m10*b[0] + m11*b[2]) * det;
+        if (outD) *outD = t;
+
+        // Check if the solution is still out of bounds.
+        if (u <= 0)
+        {
+            if (outU) *outU = 0;
+            t = v_m_p_d / d_dd;
+            return Point(0, 0);
+        }
+        else if (u >= 1)
+        {
+            if (outU) *outU = 1;
+            t = (v_m_p_d - d_e0d) / d_dd;
+            return Point(1, 0);
+        }
+        else // (0 <= u <= 1).
+        {
+            if (outU) *outU = u;
+            return Point(u, 0);
+        }
+    }
+    else if (u + v >= 1.f)
+    {
+        // Set v = 1-u.
+        float m00 = d_e0e0 + d_e1e1 - 2.f * d_e0e1;
+        float m01 = -d_e0d + d_e1d;
+        float m10 = -d_e0d + d_e1d;
+        float m11 = d_dd;
+        float det = 1.f / (m00*m11 - m01*m10);
+
+        float b0 = d_e1e1 - d_e0e1 + v_m_p_e0 - v_m_p_e1;
+        float b1 = d_e1d + v_m_p_d;
+        // Inverse 2x2 matrix.
+        Swap(m00, m11);
+        Swap(m01, m10);
+        m01 = -m01;
+        m10 = -m10;
+
+        // 2x2 * 2 matrix*vec mul.
+        u = (m00*b0 + m01*b1) * det;
+        t = (m10*b0 + m11*b1) * det;
+        if (outD) *outD = t;
+
+        // Check if the solution is still out of bounds.
+        if (u <= 0)
+        {
+            if (outU) *outU = 0;
+            if (outV) *outV = 1;
+            t = (d_e1d + v_m_p_d) / d_dd;
+            return Point(0, 1);
+        }
+        else if (u >= 1)
+        {
+            if (outU) *outU = 1;
+            if (outV) *outV = 0;
+            t = (v_m_p_d + d_e0d) / d_dd;
+            return Point(1, 0);
+        }
+        else // (0 <= u <= 1).
+        {
+            if (outU) *outU = u;
+            if (outV) *outV = 1.f - u;
+            return Point(u, 1.f - u);
+        }
+    }
+    else // Each u, v and t are in appropriate range.
+    {
+        if (outU) *outU = u;
+        if (outV) *outV = v;
+        if (outD) *outD = t;
+        return Point(u, v);
     }
 }
 
