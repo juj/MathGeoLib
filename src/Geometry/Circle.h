@@ -49,6 +49,9 @@ public:
     /// The range of d is not enforced, so this function can be used to generate points outside the [0, 1] range.
 	float3 GetPoint(float angleRadians, float d) const;
 
+    /// Returns the center of mass of this Circle.
+    float3 Centroid() const { return pos; }
+
 	/// Returns the plane this circle is contained in.
 	Plane ContainingPlane() const;
 

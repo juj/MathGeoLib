@@ -75,6 +75,11 @@ float3 Triangle::Point(const float3 &b) const
     return Point(b.x, b.y, b.z);
 }
 
+float3 Triangle::Centroid() const
+{
+    return (a + b + c) / 3.f;
+}
+
 float Triangle::Area() const
 {
     return 0.5f * Cross(b-a, c-a).Length();

@@ -140,6 +140,7 @@ public:
     /// Returns the total edge length of this polygon.
     float Perimeter() const;
 
+    /// Returns the center of mass of this polygon.
     float3 Centroid() const;
 
     /// Converts this Polygon to a Polyhedron representation.

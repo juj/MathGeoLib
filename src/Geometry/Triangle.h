@@ -47,6 +47,9 @@ public:
     /// Returns a + (b-a)*u + (c-a)*v.
     float3 Point(float u, float v) const { return a + (b-a) * u + (c-a) * v; }
 
+    /// Returns the center of mass of this Triangle.
+    float3 Centroid() const;
+
     /// Returns the surface area of this triangle.
     float Area() const;
 

@@ -49,6 +49,9 @@ public:
 
     float SurfaceArea() const;
 
+    /// Returns the center of mass of this Sphere.
+    float3 Centroid() const { return pos; }
+
     bool IsFinite() const;
 
     bool IsDegenerate() const;

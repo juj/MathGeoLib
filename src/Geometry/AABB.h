@@ -111,6 +111,9 @@ public:
 
     /// Returns the center point of this AABB.
     float3 CenterPoint() const;
+    
+    /// Returns the center of mass of this AABB.
+    float3 Centroid() const { return CenterPoint(); }
 
     /// Generates a point inside this AABB.
     /// @param x A normalized value between [0,1]. This specifies the point position along the world x axis.

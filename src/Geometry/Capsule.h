@@ -63,6 +63,9 @@ public:
     /// Returns the surface area of this Capsule.
     float SurfaceArea() const;
 
+    /// Returns the center of mass of this Capsule.
+    float3 Centroid() const { return l.CenterPoint(); }
+
     /// Returns the cross-section circle at the given height of this Capsule.
     /// @param l A normalized parameter between [0,1]. l == 0 returns a degenerate circle of radius 0 at the bottom of this Capsule, and l == 1
     ///         will return a degenerate circle of radius 0 at the top of this Capsule.

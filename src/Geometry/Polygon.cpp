@@ -410,6 +410,7 @@ float Polygon::Perimeter() const
     return perimeter;
 }
 
+///\bug This function does not properly compute the centroid.
 float3 Polygon::Centroid() const
 {
     float3 centroid = float3::zero;

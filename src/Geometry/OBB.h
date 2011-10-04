@@ -119,6 +119,9 @@ public:
     /// Returns the center point of this OBB.
     float3 CenterPoint() const;
 
+    /// Returns the center of mass of this OBB.
+    float3 Centroid() const { return CenterPoint(); }
+
     /// Generates a point inside this OBB.
     /// @param x A normalized value between [0,1]. This specifies the point position along the local x axis of the OBB.
     /// @param y A normalized value between [0,1]. This specifies the point position along the local y axis of the OBB.
