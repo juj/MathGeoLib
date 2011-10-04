@@ -336,6 +336,11 @@ bool Triangle::Intersects(const Sphere &sphere, float3 *closestPointOnTriangle) 
     return pt.DistanceSq(sphere.pos) <= sphere.r * sphere.r;
 }
 
+bool Triangle::Intersects(const Sphere &sphere) const
+{
+    return Intersects(sphere, 0);
+}
+
 static void FindIntersectingLineSegments(const Triangle &t, float da, float db, float dc, LineSegment &l1, LineSegment &l2)
 {
     if (da*db > 0.f)

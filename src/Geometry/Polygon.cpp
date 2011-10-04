@@ -22,6 +22,7 @@
 #include "Geometry/Ray.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Triangle.h"
+#include "Geometry/Sphere.h"
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 
@@ -316,12 +317,12 @@ bool Polygon::Intersects(const Plane &plane) const
         return false;
     return Intersects(intersectLine);
 }
-/*
+
 bool Polygon::Intersects(const AABB &aabb) const
 {
     return aabb.Intersects(*this);
 }
-*/
+
 bool Polygon::Intersects(const OBB &obb) const
 {
     return obb.Intersects(*this);
@@ -345,6 +346,17 @@ bool Polygon::Intersects(const Frustum &frustum) const
 bool Polygon::Intersects(const Polyhedron &polyhedron) const
 {
     return polyhedron.Intersects(*this);
+}
+
+bool Polygon::Intersects(const Sphere &sphere) const
+{
+    ///\todo Optimize.
+    std::vector<Triangle> tris = Triangulate();
+    for(size_t i = 0; i < tris.size(); ++i)
+        if (tris[i].Intersects(sphere))
+            return true;
+
+    return false;
 }
 
 float3 Polygon::ClosestPointConvex(const float3 &point) const

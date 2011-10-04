@@ -456,6 +456,11 @@ bool Sphere::Intersects(const Triangle &triangle, float3 *closestPointOnTriangle
     return triangle.Intersects(*this, closestPointOnTriangle);
 }
 
+bool Sphere::Intersects(const Polygon &polygon) const
+{
+    return polygon.Intersects(*this);
+}
+
 /*
 float Sphere::Distance(const float3 &point, float3 &outClosestPointOnSphere) const
 

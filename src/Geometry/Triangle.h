@@ -115,6 +115,7 @@ public:
     bool Intersects(const Ray &ray, float *d, float3 *intersectionPoint) const;
     bool Intersects(const Plane &plane) const;
     bool Intersects(const Sphere &sphere, float3 *closestPointOnTriangle) const;
+    bool Intersects(const Sphere &sphere) const;
     /// @param outLine [out] Specifies the line segment of intersection if the two triangles intersect.
     bool Intersects(const Triangle &triangle, LineSegment *outLine) const;
     bool Intersects(const AABB &aabb) const;

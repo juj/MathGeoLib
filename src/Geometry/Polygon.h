@@ -126,12 +126,13 @@ public:
     bool Intersects(const Ray &ray) const;
     bool Intersects(const LineSegment &lineSegment) const;
     bool Intersects(const Plane &plane) const;
-//    bool Intersects(const AABB &aabb) const;
+    bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    bool Intersects(const Sphere &sphere) const;
 
     /// Returns the closest point on this polygon to the given point.
     /// This function assumes that this polygon is convex.
