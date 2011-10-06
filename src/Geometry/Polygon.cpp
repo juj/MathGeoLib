@@ -402,6 +402,12 @@ float3 Polygon::ClosestPoint(const float3 &point) const
     return ptOnPlane;
 }
 
+float Polygon::Distance(const float3 &point) const
+{
+    float3 pt = ClosestPoint(point);
+    return pt.Distance(point);
+}
+
 float3 Polygon::EdgeNormal(int edgeIndex) const
 {
     return Cross(Edge(edgeIndex).Dir(), PlaneCCW().normal).Normalized();

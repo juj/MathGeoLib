@@ -29,6 +29,7 @@
 #include "Geometry/Ray.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Triangle.h"
+#include "Geometry/Sphere.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -320,6 +321,12 @@ float3 Polyhedron::ClosestPoint(const float3 &point) const
     return closestPoint;
 }
 
+float Polyhedron::Distance(const float3 &point) const
+{
+    float3 pt = ClosestPoint(point);
+    return pt.Distance(point);
+}
+
 /// Clips the line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast, inside the given polyhedron.
 /// Code adapted from Christer Ericson's Real-time Collision Detection, p. 199.
 /// Returns true if the outputted range [tFirst, tLast] did not become degenerate, and these two variables contain
@@ -436,6 +443,12 @@ bool Polyhedron::Intersects(const Frustum &frustum) const
 {
     ///\todo This is a naive test. Implement a faster version.
     return Intersects(frustum.ToPolyhedron());
+}
+
+bool Polyhedron::Intersects(const Sphere &sphere) const
+{
+    float3 closestPt = ClosestPoint(sphere.pos);
+    return closestPt.DistanceSq(sphere.pos) <= sphere.r * sphere.r;
 }
 
 bool Polyhedron::IntersectsConvex(const Line &line) const

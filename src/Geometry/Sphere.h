@@ -125,6 +125,8 @@ public:
     bool Intersects(const Triangle &triangle, float3 *closestPointOnTriangle) const;
     bool Intersects(const Capsule &capsule) const;
     bool Intersects(const Polygon &polygon) const;
+    bool Intersects(const Frustum &frustum) const;
+    bool Intersects(const Polyhedron &polyhedron) const;
 
     /*
     float Distance(const float3 &point, float3 &outClosestPointOnSphere) const;

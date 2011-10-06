@@ -293,6 +293,12 @@ float3 Frustum::ClosestPoint(const float3 &point) const
     return ToPolyhedron().ClosestPointConvex(point);
 }
 
+float Frustum::Distance(const float3 &point) const
+{
+    float3 pt = ClosestPoint(point);
+    return pt.Distance(point);
+}
+
 bool Frustum::IsFinite() const
 {
     return pos.IsFinite() && front.IsFinite() && up.IsFinite() && isfinite(nearPlaneDistance)
@@ -513,31 +519,12 @@ bool Frustum::Intersects(const Polygon &polygon) const
     return this->ToPolyhedron().Intersects(polygon);
 }
 
-/*
 bool Frustum::Intersects(const Sphere &sphere) const
 {
-    assume(false && "Not implemented!");
-    return false;
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(sphere);
 }
 
-bool Frustum::Intersects(const Ellipsoid &ellipsoid) const
-{
-    assume(false && "Not implemented!");
-    return false;
-}
-
-bool Frustum::Intersects(const Cylinder &cylinder) const
-{
-    assume(false && "Not implemented!");
-    return false;
-}
-
-bool Frustum::Intersects(const Torus &torus) const
-{
-    assume(false && "Not implemented!");
-    return false;
-}
-*/
 bool Frustum::Intersects(const Frustum &frustum) const
 {
     ///\todo This is a naive test. Implement a faster version.

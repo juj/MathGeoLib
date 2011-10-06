@@ -470,19 +470,18 @@ bool Sphere::Intersects(const Polygon &polygon) const
     return polygon.Intersects(*this);
 }
 
+bool Sphere::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool Sphere::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 /*
 float Sphere::Distance(const float3 &point, float3 &outClosestPointOnSphere) const
-
-bool Sphere::Intersect(const AABB &aabb) const
-bool Sphere::Intersect(const OBB &obb) const
-bool Sphere::Intersect(const Plane &plane) const
-bool Sphere::Intersect(const Ellipsoid &ellipsoid) const
-bool Sphere::Intersect(const Triangle &triangle) const
-bool Sphere::Intersect(const Cylinder &cylinder) const
-bool Sphere::Intersect(const Torus &torus) const
-bool Sphere::Intersect(const Frustum &frustum) const
-bool Sphere::Intersect(const Polygon &polygon) const
-bool Sphere::Intersect(const Polyhedron &polyhedron) const
 
 void Sphere::Enclose(const Triangle &triangle)
 void Sphere::Enclose(const Polygon &polygon)

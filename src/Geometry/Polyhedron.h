@@ -140,6 +140,8 @@ public:
 
     float3 ClosestPoint(const float3 &point) const;
 
+    float Distance(const float3 &point) const;
+
     bool Intersects(const LineSegment &lineSegment) const;
     bool Intersects(const Line &line) const;
     bool Intersects(const Ray &ray) const;
@@ -150,6 +152,7 @@ public:
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
+    bool Intersects(const Sphere &sphere) const;
     bool IntersectsConvex(const Line &line) const;
     bool IntersectsConvex(const Ray &ray) const;
     bool IntersectsConvex(const LineSegment &lineSegment) const;
