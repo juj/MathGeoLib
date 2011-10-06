@@ -36,6 +36,7 @@
 #include "Math/float4x4.h"
 #include "Math/Quat.h"
 #include "Geometry/Triangle.h"
+#include "Geometry/Capsule.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -751,22 +752,45 @@ void AABB::Enclose(const OBB &obb)
         Enclose(obb.CornerPoint(i));
 }
 
-/*
-void AABB::Enclose(const OBB &obb)
-{
-}
-*/
 void AABB::Enclose(const Sphere &sphere)
 {
     Enclose(sphere.pos - float3(sphere.r,sphere.r,sphere.r));
     Enclose(sphere.pos + float3(sphere.r,sphere.r,sphere.r));
 }
-/*
-void Enclose(const Ellipsoid &ellipsoid);
-void Enclose(const Triangle &triangle);
-void Enclose(const Cylinder &cylinder);
-void Enclose(const Frustum &frustum);
-*/
+
+void AABB::Enclose(const Triangle &triangle)
+{
+    Enclose(triangle.a);
+    Enclose(triangle.b);
+    Enclose(triangle.c);
+}
+
+void AABB::Enclose(const Capsule &capsule)
+{
+    Enclose(capsule.l.a - float3(capsule.r, capsule.r, capsule.r));
+    Enclose(capsule.l.a + float3(capsule.r, capsule.r, capsule.r));
+    Enclose(capsule.l.b - float3(capsule.r, capsule.r, capsule.r));
+    Enclose(capsule.l.b + float3(capsule.r, capsule.r, capsule.r));
+}
+
+void AABB::Enclose(const Frustum &frustum)
+{
+    for(int i = 0; i < 8; ++i)
+        Enclose(frustum.CornerPoint(i));
+}
+
+void AABB::Enclose(const Polygon &polygon)
+{
+    for(int i = 0; i < polygon.NumVertices(); ++i)
+        Enclose(polygon.Vertex(i));
+}
+
+void AABB::Enclose(const Polyhedron &polyhedron)
+{
+    for(int i = 0; i < polyhedron.NumVertices(); ++i)
+        Enclose(polyhedron.Vertex(i));
+}
+
 void AABB::Enclose(const float3 *pointArray, int numPoints)
 {
     for(int i = 0; i < numPoints; ++i)

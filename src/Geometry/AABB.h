@@ -353,23 +353,17 @@ public:
 */
     /// Expands this AABB to enclose the given object.
     /** This function computes the AABB that encloses both this AOBB and the specified object, and stores the resulting
-        AABB into this.
-        @return For the polyhedron case, this function returns true if the polyhedron is closed and computing the enclosure
-            succeeded. If the polyhedron is not closed (it has infinite volume), this function returns false, and this AABB
-            is not modified. For other object types, this function always succeeds, and does not return a value. */
+        AABB into this. */
     void Enclose(const float3 &point);
     void Enclose(const LineSegment &lineSegment);
     void Enclose(const AABB &aabb);
     void Enclose(const OBB &obb);
     void Enclose(const Sphere &sphere);
-//    void Enclose(const Ellipsoid &ellipsoid);
-//    void Enclose(const Triangle &triangle);
-//    void Enclose(const Cylinder &cylinder);
-//    void Enclose(const Capsule &capsule);
-//    void Enclose(const Torus &torus);
-//    void Enclose(const Frustum &frustum);
-//    void Enclose(const Polygon &polygon);
-//    bool Enclose(const Polyhedron &polyhedron);
+    void Enclose(const Triangle &triangle);
+    void Enclose(const Capsule &capsule);
+    void Enclose(const Frustum &frustum);
+    void Enclose(const Polygon &polygon);
+    void Enclose(const Polyhedron &polyhedron);
     /// [noscript]
     void Enclose(const float3 *pointArray, int numPoints);
 
