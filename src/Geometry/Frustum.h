@@ -190,6 +190,8 @@ public:
     bool Contains(const Frustum &frustum) const;
     bool Contains(const Polyhedron &polyhedron) const;
 
+    float3 ClosestPoint(const float3 &point) const;
+
     bool Intersects(const Ray &ray) const;
     bool Intersects(const Line &line) const;
     bool Intersects(const LineSegment &lineSegment) const;

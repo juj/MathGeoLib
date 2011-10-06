@@ -288,6 +288,11 @@ bool Frustum::Contains(const Polyhedron &polyhedron) const
     return true;
 }
 
+float3 Frustum::ClosestPoint(const float3 &point) const
+{
+    return ToPolyhedron().ClosestPointConvex(point);
+}
+
 bool Frustum::IsFinite() const
 {
     return pos.IsFinite() && front.IsFinite() && up.IsFinite() && isfinite(nearPlaneDistance)
