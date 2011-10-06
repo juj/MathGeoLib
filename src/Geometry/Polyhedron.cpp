@@ -321,6 +321,45 @@ float3 Polyhedron::ClosestPoint(const float3 &point) const
     return closestPoint;
 }
 
+float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment) const
+{
+    return ClosestPoint(lineSegment, 0);
+}
+
+float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const
+{
+    if (Contains(lineSegment.a))
+    {
+        if (lineSegmentPt)
+            *lineSegmentPt = lineSegment.a;
+        return lineSegment.a;
+    }
+    if (Contains(lineSegment.b))
+    {
+        if (lineSegmentPt)
+            *lineSegmentPt = lineSegment.b;
+        return lineSegment.b;
+    }
+    float3 closestPt;
+    float closestDistance = FLOAT_MAX;
+    float3 closestLineSegmentPt;
+    for(int i = 0; i < NumFaces(); ++i)
+    {
+        float3 lineSegmentPt;
+        float3 pt = FacePolygon(i).ClosestPoint(lineSegment, &lineSegmentPt);
+        float d = pt.DistanceSq(lineSegmentPt);
+        if (d < closestDistance)
+        {
+            closestDistance = d;
+            closestPt = pt;
+            closestLineSegmentPt = lineSegmentPt;
+        }
+    }
+    if (lineSegmentPt)
+        *lineSegmentPt = closestLineSegmentPt;
+    return closestPt;
+}
+
 float Polyhedron::Distance(const float3 &point) const
 {
     float3 pt = ClosestPoint(point);

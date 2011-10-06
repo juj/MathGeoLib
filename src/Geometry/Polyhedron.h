@@ -139,6 +139,8 @@ public:
     float3 ClosestPointConvex(const float3 &point) const;
 
     float3 ClosestPoint(const float3 &point) const;
+    float3 ClosestPoint(const LineSegment &lineSegment) const;
+    float3 ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const;
 
     float Distance(const float3 &point) const;
 
