@@ -402,6 +402,34 @@ float3 Polygon::ClosestPoint(const float3 &point) const
     return ptOnPlane;
 }
 
+float3 Polygon::ClosestPoint(const LineSegment &lineSegment) const
+{
+    return ClosestPoint(lineSegment, 0);
+}
+
+float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const
+{
+    std::vector<Triangle> tris = Triangulate();
+    float3 closestPt;
+    float3 closestLineSegmentPt;
+    float closestDist = FLOAT_MAX;
+    for(size_t i = 0; i < tris.size(); ++i)
+    {
+        float3 lineSegmentPt;
+        float3 pt = ClosestPoint(lineSegment, &lineSegmentPt);
+        float d = pt.DistanceSq(closestLineSegmentPt);
+        if (d < closestDist)
+        {
+            closestPt = pt;
+            closestLineSegmentPt = lineSegmentPt;
+            closestDist = d;
+        }
+    }
+    if (lineSegmentPt)
+        *lineSegmentPt = closestLineSegmentPt;
+    return closestPt;
+}
+
 float Polygon::Distance(const float3 &point) const
 {
     float3 pt = ClosestPoint(point);

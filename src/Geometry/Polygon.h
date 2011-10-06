@@ -146,6 +146,9 @@ public:
     /// Returns the closest point on this polygon to the given point.
     float3 ClosestPoint(const float3 &point) const;
 
+    float3 ClosestPoint(const LineSegment &lineSegment) const;
+    float3 ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const;
+
     float Distance(const float3 &point) const;
 
     /// Returns the surface area of this polygon.
