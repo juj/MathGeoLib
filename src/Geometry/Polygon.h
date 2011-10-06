@@ -144,8 +144,7 @@ public:
     bool Intersects(const Capsule &capsule) const;
 
     /// Returns the closest point on this polygon to the given point.
-    /// This function assumes that this polygon is convex.
-    float3 ClosestPointConvex(const float3 &point) const;
+    float3 ClosestPoint(const float3 &point) const;
 
     /// Returns the surface area of this polygon.
     float Area() const;

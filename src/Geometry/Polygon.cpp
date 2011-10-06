@@ -379,7 +379,7 @@ bool Polygon::Intersects(const Capsule &capsule) const
     return false;
 }
 
-float3 Polygon::ClosestPointConvex(const float3 &point) const
+float3 Polygon::ClosestPoint(const float3 &point) const
 {
     assume(IsPlanar());
 
@@ -387,11 +387,17 @@ float3 Polygon::ClosestPointConvex(const float3 &point) const
     if (Contains(ptOnPlane))
         return ptOnPlane;
 
+    float3 closestPt;
+    float closestDist = FLOAT_MAX;
     for(int i = 0; i < NumEdges(); ++i)
     {
-        Plane edgePlane = EdgePlane(i);
-        if (edgePlane.SignedDistance(ptOnPlane) > 0.f)
-            ptOnPlane = edgePlane.Project(ptOnPlane);
+        float3 pt = Edge(i).ClosestPoint(point);
+        float d = pt.DistanceSq(point);
+        if (d < closestDist)
+        {
+            closestPt = pt;
+            closestDist = d;
+        }
     }
     return ptOnPlane;
 }

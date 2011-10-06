@@ -283,13 +283,33 @@ bool Polyhedron::ContainsConvex(const Triangle &triangle) const
 
 float3 Polyhedron::ClosestPointConvex(const float3 &point) const
 {
+    assume(IsConvex());
     if (ContainsConvex(point))
         return point;
     float3 closestPoint;
     float closestDistance = FLOAT_MAX;
     for(int i = 0; i < NumFaces(); ++i)
     {
-        float3 closestOnPoly = FacePolygon(i).ClosestPointConvex(point);
+        float3 closestOnPoly = FacePolygon(i).ClosestPoint(point);
+        float d = closestOnPoly.DistanceSq(point);
+        if (d < closestDistance)
+        {
+            closestPoint = closestOnPoly;
+            closestDistance = d;
+        }
+    }
+    return closestPoint;
+}
+
+float3 Polyhedron::ClosestPoint(const float3 &point) const
+{
+    if (Contains(point))
+        return point;
+    float3 closestPoint;
+    float closestDistance = FLOAT_MAX;
+    for(int i = 0; i < NumFaces(); ++i)
+    {
+        float3 closestOnPoly = FacePolygon(i).ClosestPoint(point);
         float d = closestOnPoly.DistanceSq(point);
         if (d < closestDistance)
         {

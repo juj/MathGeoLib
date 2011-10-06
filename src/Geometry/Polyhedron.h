@@ -135,7 +135,10 @@ public:
     bool ContainsConvex(const Triangle &triangle) const;
 
     /// Returns the closest point on this convex polyhedron to the given point.
+    /// Assumes that this polyhedron is convex.
     float3 ClosestPointConvex(const float3 &point) const;
+
+    float3 ClosestPoint(const float3 &point) const;
 
     bool Intersects(const LineSegment &lineSegment) const;
     bool Intersects(const Line &line) const;
