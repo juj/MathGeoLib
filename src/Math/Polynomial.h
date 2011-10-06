@@ -1,12 +1,20 @@
+/* Copyright 2011 Jukka Jylänki
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License. */
+
 /** @file Polynomial.h
     @author Jukka Jylänki
-
-    This work is copyrighted material and may NOT be used for any kind of commercial or 
-    personal advantage and may NOT be copied or redistributed without prior consent
-    of the author(s). 
-
-    @brief
-*/
+    @brief */
 #pragma once
 
 #include "Math/MathNamespace.h"
@@ -20,7 +28,7 @@ public:
     /// Solves a quadratic equation ax^2 + bx + c = 0 for x. Returns the number of roots found.
     static int SolveQuadratic(float a, float b, float c, float &root1, float &root2);
 
-    /// Solves a cubic equation ax^3 + bx^2 + cx + d = 0 for x. Returns the number of roots found.
+    /// Solves a cubic equation x^3 + ax^2 + bx +  = 0 for x. Returns the number of roots found.
     static int SolveCubic(float a, float b, float c, float d, float &root1, float &root2, float &root3);
 
     /// Solves a quartic equation ax^4 + bx^3 + cx^2 + dx + e = 0 for x. Returns the number of roots found.
