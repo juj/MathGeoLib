@@ -22,6 +22,7 @@
 
 MATH_BEGIN_NAMESPACE
 
+/// A 3D cylinder with spherical ends.
 class Capsule
 {
 public:
