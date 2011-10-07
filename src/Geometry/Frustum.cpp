@@ -525,6 +525,12 @@ bool Frustum::Intersects(const Sphere &sphere) const
     return this->ToPolyhedron().Intersects(sphere);
 }
 
+bool Frustum::Intersects(const Capsule &capsule) const
+{
+    ///\todo This is a naive test. Implement a faster version.
+    return this->ToPolyhedron().Intersects(capsule);
+}
+
 bool Frustum::Intersects(const Frustum &frustum) const
 {
     ///\todo This is a naive test. Implement a faster version.

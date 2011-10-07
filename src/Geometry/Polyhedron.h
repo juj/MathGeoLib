@@ -155,6 +155,7 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Sphere &sphere) const;
+    bool Intersects(const Capsule &capsule) const;
     bool IntersectsConvex(const Line &line) const;
     bool IntersectsConvex(const Ray &ray) const;
     bool IntersectsConvex(const LineSegment &lineSegment) const;

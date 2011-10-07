@@ -30,6 +30,7 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Triangle.h"
 #include "Geometry/Sphere.h"
+#include "Geometry/Capsule.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -488,6 +489,13 @@ bool Polyhedron::Intersects(const Sphere &sphere) const
 {
     float3 closestPt = ClosestPoint(sphere.pos);
     return closestPt.DistanceSq(sphere.pos) <= sphere.r * sphere.r;
+}
+
+bool Polyhedron::Intersects(const Capsule &capsule) const
+{
+    float3 pt, ptOnLineSegment;
+    pt = ClosestPoint(capsule.l, &ptOnLineSegment);
+    return pt.DistanceSq(ptOnLineSegment) <= capsule.r;
 }
 
 bool Polyhedron::IntersectsConvex(const Line &line) const
