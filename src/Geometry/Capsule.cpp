@@ -374,6 +374,16 @@ bool Capsule::Intersects(const Polygon &polygon) const
     return polygon.Intersects(*this);
 }
 
+bool Capsule::Intersects(const Frustum &frustum) const
+{
+    return frustum.Intersects(*this);
+}
+
+bool Capsule::Intersects(const Polyhedron &polyhedron) const
+{
+    return polyhedron.Intersects(*this);
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Capsule::ToString() const
 {

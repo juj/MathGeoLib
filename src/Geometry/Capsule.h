@@ -166,6 +166,8 @@ public:
 //    bool Intersects(const OBB &obb) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Polygon &polygon) const;
+    bool Intersects(const Frustum &frustum) const;
+    bool Intersects(const Polyhedron &polyhedron) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this Capsule. Most useful for debugging purposes.
