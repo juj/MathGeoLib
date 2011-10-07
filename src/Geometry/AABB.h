@@ -148,16 +148,24 @@ public:
 
     /// Returns the point at the center of the given face of this AABB.
     /// @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
+    ///                  This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
     float3 FaceCenterPoint(int faceIndex) const;
 
     /// Generates a point at the surface of the given face of this AABB.
     /// @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
+    ///                  This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
     /// @param u A normalized value between [0, 1].
     /// @param v A normalized value between [0, 1].
     float3 FacePoint(int faceIndex, float u, float v) const;
 
+    /// Returns the surface normal direction vector the given face points towards.
+    /// @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
+    ///                  This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
+    float3 FaceNormal(int faceIndex) const;
+
     /// Computes the plane equation of the given face of this AABB.
     /// @param faceIndex The index of the AABB face. The valid range is [0, 5].
+    ///                  This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
     /// @return The plane equation the specified face lies on. The normal of this plane points outwards from this AABB.
     Plane FacePlane(int faceIndex) const;
 
@@ -367,6 +375,20 @@ public:
     void Enclose(const Polyhedron &polyhedron);
     /// [noscript]
     void Enclose(const float3 *pointArray, int numPoints);
+
+	/// Generates an unindexed triangle mesh representation of this AABB.
+    /// @param x The number of faces to generate along the X axis. This value must be >= 1.
+    /// @param y The number of faces to generate along the Y axis. This value must be >= 1.
+    /// @param z The number of faces to generate along the Z axis. This value must be >= 1.
+	/// @param outPos [out] An array of size numVertices which will receive a triangle list 
+    ///                     of vertex positions. Cannot be null.
+	/// @param outNormal [out] An array of size numVertices which will receive vertex normals. 
+    ///                        If this parameter is null, vertex normals are not returned.
+	/// @param outUV [out] An array of size numVertices which will receive vertex UV coordinates. 
+    ///                        If this parameter is null, a UV mapping is not generated.
+    /// The number of vertices that outPos, outNormal and outUV must be able to contain is
+    /// (x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required.
+    void Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this AABB. Most useful for debugging purposes.

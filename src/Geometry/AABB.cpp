@@ -30,6 +30,7 @@
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
+#include "Math/float2.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
 #include "Math/float4.h"
@@ -262,19 +263,25 @@ float3 AABB::FacePoint(int faceIndex, float u, float v) const
     }
 }
 
-Plane AABB::FacePlane(int faceIndex) const
+float3 AABB::FaceNormal(int faceIndex) const
 {
     assume(0 <= faceIndex && faceIndex <= 5);
     switch(faceIndex)
     {
     default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-    case 0: return Plane(FaceCenterPoint(0), float3(-1,0,0));
-    case 1: return Plane(FaceCenterPoint(1), float3( 1,0,0));
-    case 2: return Plane(FaceCenterPoint(2), float3(0,-1,0));
-    case 3: return Plane(FaceCenterPoint(3), float3(0, 1,0));
-    case 4: return Plane(FaceCenterPoint(4), float3(0,0,-1));
-    case 5: return Plane(FaceCenterPoint(5), float3(0,0, 1));
+    case 0: return float3(-1,0,0);
+    case 1: return float3( 1,0,0);
+    case 2: return float3(0,-1,0);
+    case 3: return float3(0, 1,0);
+    case 4: return float3(0,0,-1);
+    case 5: return float3(0,0, 1);
     }
+}
+
+Plane AABB::FacePlane(int faceIndex) const
+{
+    assume(0 <= faceIndex && faceIndex <= 5);
+    return Plane(FaceCenterPoint(faceIndex), FaceNormal(faceIndex));
 }
 
 void AABB::GetCornerPoints(float3 *outPointArray) const
@@ -800,6 +807,69 @@ void AABB::Enclose(const float3 *pointArray, int numPoints)
 {
     for(int i = 0; i < numPoints; ++i)
         Enclose(pointArray[i]);
+}
+
+void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outPos, float3 *outNormal, float2 *outUV) const
+{
+    assume(numFacesX >= 1);
+    assume(numFacesY >= 1);
+    assume(numFacesZ >= 1);
+    // A single quad comprises of two triangles, so therefore requires six vertices.
+    int numFaces = numFacesX * numFacesY * numFacesZ;
+
+    // Generate both X-Y planes.
+    int i = 0;
+    for(int face = 0; face < 6; ++face) // Faces run in the order -X, +X, -Y, +Y, -Z, +Z.
+    {
+        int numFacesU;
+        int numFacesV;
+        if (face == 0 || face == 1)
+        {
+            numFacesU = numFacesY;
+            numFacesV = numFacesZ;
+        }
+        else if (face == 2 || face == 3)
+        {
+            numFacesU = numFacesX;
+            numFacesV = numFacesZ;
+        }
+        else// if (face == 4 || face == 5)
+        {
+            numFacesU = numFacesX;
+            numFacesV = numFacesY;
+        }
+        for(int x = 0; x < numFacesU; ++x)
+            for(int y = 0; y < numFacesV; ++y)
+            {
+                float u = (float)x / (numFacesU);
+                float v = (float)y / (numFacesV);
+                float u2 = (float)(x+1) / (numFacesU);
+                float v2 = (float)(y+1) / (numFacesV);
+            
+                outPos[i]   = FacePoint(face, u, v);
+                outPos[i+1] = FacePoint(face, u, v2);
+                outPos[i+2] = FacePoint(face, u2, v);
+                outPos[i+3] = outPos[i+2];
+                outPos[i+4] = outPos[i+1];
+                outPos[i+5] = FacePoint(face, u2, v2);
+
+                if (outUV)
+                {
+                    outUV[i]   = float2(u,v);
+                    outUV[i+1] = float2(u,v2);
+                    outUV[i+2] = float2(u2,v);
+                    outUV[i+3] = float2(u2,v);
+                    outUV[i+4] = float2(u,v2);
+                    outUV[i+5] = float2(u2,v2);
+                }
+
+                if (outNormal)
+                    for(int j = 0; j < 6; ++j)
+                        outNormal[i+j] = FaceNormal(face);
+
+                i += 6;
+            }
+    }
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
