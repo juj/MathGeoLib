@@ -339,17 +339,17 @@ bool Capsule::Intersects(const Plane &plane) const
 {
     return l.Distance(plane) <= r;
 }
-/*
+
 bool Capsule::Intersects(const AABB &aabb) const
 {
-///\todo Implement
+    return Intersects(aabb.ToPolyhedron());
 }
 
 bool Capsule::Intersects(const OBB &obb) const
 {
-///\todo Implement
+    return Intersects(obb.ToPolyhedron());
 }
-*/
+
 bool Capsule::Intersects(const Sphere &sphere) const
 {
     ///\todo Optimize to avoid square roots.

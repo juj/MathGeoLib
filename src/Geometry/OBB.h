@@ -304,6 +304,7 @@ public:
     bool Intersects(const Line &line, float *dNear, float *dFar) const;
     bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
     bool Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const;
+    bool Intersects(const Capsule &capsule) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;

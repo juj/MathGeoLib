@@ -28,6 +28,7 @@
 #include "Geometry/Plane.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
+#include "Geometry/Capsule.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
 #include "Math/float4.h"
@@ -775,6 +776,11 @@ bool OBB::Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const
         *closestPointOnOBB = pt;
 
     return pt.DistanceSq(sphere.pos) <= sphere.r * sphere.r;
+}
+
+bool OBB::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
 }
 
 bool OBB::Intersects(const Triangle &triangle) const

@@ -317,6 +317,7 @@ public:
     bool Intersects(const OBB &obb) const;
     /// @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere.
     bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const;
+    bool Intersects(const Capsule &capsule) const;
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;

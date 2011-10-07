@@ -675,6 +675,11 @@ bool AABB::Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const
     return pt.DistanceSq(sphere.pos) <= sphere.r * sphere.r;
 }
 
+bool AABB::Intersects(const Capsule &capsule) const
+{
+    return capsule.Intersects(*this);
+}
+
 bool AABB::Intersects(const Triangle &triangle) const
 {
     return triangle.Intersects(*this);
