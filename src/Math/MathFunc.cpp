@@ -21,6 +21,7 @@
 #endif
 
 #include "Math/MathFunc.h"
+#include "Math/float2.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -35,6 +36,241 @@ void SetMathBreakOnAssume(bool isEnabled)
 bool MathBreakOnAssume()
 {
     return mathBreakOnAssume;
+}
+
+float Sin(float angleRadians)
+{
+	return sin(angleRadians);
+}
+
+float Cos(float angleRadians)
+{
+	return cos(angleRadians);
+}
+
+float Tan(float angleRadians)
+{
+	return tan(angleRadians);
+}
+
+float2 SinCos(float angleRadians)
+{
+	return float2(sin(angleRadians), cos(angleRadians));
+}
+
+float Asin(float x)
+{
+	return asin(x);
+}
+
+float Acos(float x)
+{
+	return acos(x);
+}
+
+float Atan(float x)
+{
+	return atan(x);
+}
+
+float Atan2(float y, float x)
+{
+	return atan2(y, x);
+}
+
+float Sinh(float x)
+{
+	return sinh(x);
+}
+
+float Cosh(float x)
+{
+	return cosh(x);
+}
+
+float Tanh(float x)
+{
+	return tanh(x);
+}
+
+bool IsPow2(unsigned int number)
+{
+	return (number & (number-1)) == 0;
+}
+
+unsigned int RoundUpPow2(unsigned int x)
+{
+	assert(sizeof(unsigned int) <= 4);
+	--x;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	++x;
+
+	return x;
+}
+
+unsigned int RoundDownPow2(unsigned int x)
+{
+	assert(sizeof(unsigned int) <= 4);
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	return x - (x >> 1);
+}
+
+float Pow(float base, float exponent)
+{
+	return pow(base, exponent);
+}
+
+float Exp(float exponent)
+{
+	return exp(exponent);
+}
+
+float Log(float base, float value)
+{
+	return log(value) / log(base);
+}
+
+float Log2(float value)
+{
+	return Log(2.f, value);
+}
+
+float Ln(float value)
+{
+	return log(value);
+}
+
+float Log10(float value)
+{
+	return Log(10.f, value);
+}
+
+float Ceil(float x)
+{
+	return ceilf(x);
+}
+
+int CeilInt(float x)
+{
+	return (int)ceilf(x);
+}
+
+float Floor(float x)
+{
+	return floorf(x);
+}
+
+int FloorInt(float x)
+{
+	return (int)floorf(x);
+}
+
+float Round(float x)
+{
+	return Floor(x+0.5f);
+}
+
+int RoundInt(float x)
+{
+	return (int)Round(x);
+}
+
+float Sign(float x)
+{
+	return x >= 0.f ? 1.f : -1.f;
+}
+
+float SignOrZero(float x, float epsilon)
+{
+	return Abs(x) <= epsilon ? 0.f : Sign(x);
+}
+
+float Lerp(float a, float b, float t)
+{
+	return a + t * (b-a);
+}
+
+float LerpMod(float a, float b, float mod, float t)
+{
+	a = ModPos(a, mod);
+	b = ModPos(b, mod);
+	if (Abs(b-a) * 2.f <= mod)
+		return Lerp(a, b, t);
+	else
+	{
+		if (a < b)
+			return ModPos(Lerp(a + mod, b, t), mod);
+		else
+			return ModPos(Lerp(a, b + mod, t), mod);
+	}
+}
+
+float InvLerp(float a, float b, float x)
+{
+	assume(Abs(b-a) > eps);
+	return (x - a) / (b - a);
+}
+
+float Step(float y, float x)
+{
+	return (x >= y) ? 1.f : 0.f;
+}
+
+float SmoothStep(float min, float max, float x)
+{
+	return x <= min ? 0.f : (x >= max ? 1.f : (x - min) / (max - min));
+}
+
+float PingPongMod(float x, float mod)
+{
+	x = Mod(x, mod * 2.f);
+	return x >= mod ? (2.f * mod - x) : x;
+}
+
+float Mod(float x, float mod)
+{
+	return fmod(x, mod);
+}
+
+float Mod(float x, int mod)
+{
+	///\todo Optimize.
+	return fmod(x, (float)mod);
+}
+
+float ModPos(float x, float mod)
+{
+	float m = fmod(x, mod);
+	return m >= 0.f ? m : (m + mod);
+}
+
+float ModPos(float x, int mod)
+{
+	///\todo Optimize.
+	return ModPos(x, (float)mod);
+}
+
+float Frac(float x)
+{
+	return x - Floor(x);
+}
+
+float Sqrt(float x)
+{
+	return sqrtf(x);
+}
+
+float RSqrt(float x)
+{
+	return 1.f / sqrtf(x);
 }
 
 /** Uses a recursive approach, not the fastest/brightest method.

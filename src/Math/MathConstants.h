@@ -21,7 +21,29 @@
 */
 #pragma once
 
+#include "Types.h"
 #include "Math/MathNamespace.h"
+
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <limits>
+#define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
+#define FLOAT_INF std::numeric_limits<float>::infinity()
+#define FLOAT_MAX std::numeric_limits<float>::max()
+#else
+#define FLOAT_MAX FLT_MAX
+#define FLOAT_NAN NAN
+#define FLOAT_INF INFINITY
+#endif
+
 
 MATH_BEGIN_NAMESPACE
 
@@ -45,17 +67,82 @@ const float e  =           (float)2.71828182845904523536028747135266249775724709
 const float pi =           (float)3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
 /// \f$e^2\f$
 const float e2 =           (float)7.3890560989306502272304274605750078131803155705518473240871278225225737960790577633843124850791217948;
+/// A very small epsilon value to use in floating point equality comparisons.
+const float eps =          (float)1e-5f;
+/// The floating point representation for +\inf.
+const float inf =          FLOAT_INF;
+/// The floating point representation for -\inf.
+const float negInf =       -FLOAT_INF;
+/// Represents a floating-point not-a-number. \note Never compare a float against nan, use isfinite() instead!
+const float nan =          FLOAT_NAN;
+/// Stores the largest positive non-infinite value for a float.
+const float floatMax =     FLOAT_MAX;
+/// Stores the largest negative non-infinite value for a float.
+const float floatMin =     -FLOAT_MAX;
+
+/// Integral base to an integral power.
+template<u32 Base, u32 Power>
+class PowT
+{
+public:
+    enum { val = Base * PowT<Base,Power-1>::val };
+};
+
+/** @cond FULL */
+
+/// End recursion for Base^1.
+template<u32 Base>
+class PowT<Base, 1>
+{
+public:
+    enum { val = Base };
+};
+/// @endcond
+
+/// Factorial<N> unfolds to N!.
+template<int N>
+class FactorialT
+{
+public:
+    enum { val = N * FactorialT<N-1>::val };
+};
+
+/** @cond FULL */
+
+/// Specialize 0! = 1 to end factorial recursion.
+template<>
+class FactorialT<0>
+{
+public:
+    enum { val = 1 };
+};
+/// @endcond
+
+/// Combinatorial<N, K> unfolds to (N nCr K).
+template<int N, int K>
+class CombinatorialT
+{
+public:
+    enum { val = CombinatorialT<N-1,K-1>::val + CombinatorialT<N-1,K>::val };
+};
+
+/** @cond FULL */
+
+/// Specialize (N nCr 0) = 1 to end recursion.
+template<int N>
+class CombinatorialT<N, 0>
+{
+public:
+    enum { val = 1 };
+};
+
+/// Specialize (N nCr N) = 1 to end recursion.
+template<int N>
+class CombinatorialT<N, N>
+{
+public:
+    enum { val = 1 };
+};
+/// @endcond
 
 MATH_END_NAMESPACE
-
-#if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
-#include <limits>
-#define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
-#define FLOAT_INF std::numeric_limits<float>::infinity()
-#define FLOAT_MAX std::numeric_limits<float>::max()
-#else
-#define FLOAT_MAX FLT_MAX
-#define FLOAT_NAN NAN
-#define FLOAT_INF INFINITY
-#endif
-

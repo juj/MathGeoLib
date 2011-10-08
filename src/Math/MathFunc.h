@@ -24,14 +24,14 @@
 #include <float.h>
 
 #include "Types.h"
-#include "MathConstants.h"
+#include "Math/MathConstants.h"
 #include "Math/float3.h"
 
 #ifdef WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-//#include <Windows.h> // For DebugBreak();
+#include <Windows.h> // For DebugBreak();
 #endif
 
 #include "assume.h"
@@ -45,6 +45,8 @@ MATH_BEGIN_NAMESPACE
 #define DOT3(v1, v2) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[1] + (v1)[2] * (v2)[2])
 
 /// Computes the dot product of two 3D vectors, but takes the absolute value of each element before summation.
+/// @param v1 A vector of type float3.
+/// @param v2 A vector of type float3.
 #define ABSDOT3(v1, v2) (Abs((v1)[0] * (v2)[0]) + Abs((v1)[1] * (v2)[1]) + Abs((v1)[2] * (v2)[2]))
 
 #define DOT3_xyz(v1, x, y, z) ((v1)[0] * (x) + (v1)[1] * (y) + (v1)[2] * (z))
@@ -74,77 +76,99 @@ inline float DegToRad(float degrees) { return degrees * (pi / 180.f); }
 inline float3 RadToDeg(const float3 &radians) { return radians * (180.f / pi); }
 inline float RadToDeg(float radians) { return radians * (180.f / pi); }
 
-inline float Cos(float angleRadians) { return cos(angleRadians); }
-inline float Sin(float angleRadians) { return sin(angleRadians); }
-inline float Sqrt(float v) { return sqrt(v); }
-inline float Pow(float base, float exp) { return pow(base, exp); }
+/// Computes the function sin(x).
+float Sin(float angleRadians);
+/// Computes the function cos(x).
+float Cos(float angleRadians);
+/// Computes the function tan(x).
+float Tan(float angleRadians);
+/// Simultaneously computes both sin(x) and cos(x), which yields a small performance increase over to
+/// computing them separately.
+float2 SinCos(float angleRadians);
+/// Computes the function arcsin(x), in radians.
+float Asin(float x);
+/// Computes the function arccos(x), in radians.
+float Acos(float x);
+/// Computes the function arctan(x), in radians.
+float Atan(float x);
+/// Computes the signed (principal value) arc-tangent of y/x, in radians.
+float Atan2(float y, float x);
+/// Returns the hyperbolic sine of x.
+float Sinh(float x);
+/// Returns the hyperbolic cosine of x.
+float Cosh(float x);
+/// Returns the hyperbolic tangent of x.
+float Tanh(float x);
 
-/// Integral base to an integral power.
-template<u32 Base, u32 Power>
-class PowIntT
-{
-public:
-    enum { val = Base * PowIntT<Base,Power-1>::val };
-};
+/// Returns true if the given number is a power of 2.
+bool IsPow2(unsigned int number);
+/// Returns the smallest power-of-2 number greater or equal than the given number.
+unsigned int RoundUpPow2(unsigned int number);
+/// Returns the largest power-of-2 number smaller or equal than the given number.
+unsigned int RoundDownPow2(unsigned int number);
+/// Raises the given base to an integral exponent.
+float PowInt(float base, int exponent);
+/// Raises the given base to a float exponent.
+float Pow(float base, float exponent);
+/// Returns e (the constant 2.71828...) raised to the given power.
+float Exp(float exponent);
+/// Computes a logarithm of the given value in the specified base.
+float Log(float base, float value);
+/// Computes a logarithm in base-2.
+float Log2(float value);
+/// Computes a logarithm in the natural base (using e=2.71828... as the base)
+float Ln(float value);
+/// Computes a logarithm in base-10.
+float Log10(float value);
+/// Rounds f up to the next integer.
+float Ceil(float f);
+int CeilInt(float f);
+/// Rounds f down to the previous integer.
+float Floor(float f);
+int FloorInt(float f);
+/// Rounds f to the nearest integer.
+float Round(float f);
+int RoundInt(float f);
+/// Returns -1 or 1 depending on the sign of f.
+float Sign(float f);
+/// Returns 0 if f is zero up to the given epsilon. Otherwise returns -1 or 1 depending on the sign of f.
+float SignOrZero(float f, float epsilon = 1e-8f);
 
-/** @cond FULL */
+/// Linearly interpolates between a and b.
+/// @param t A value between [0,1]. 
+/// @return This function computes a + t*(b-a). That is, if t==0, this function returns a. If t==1, this function returns b.
+///        Otherwise, the returned value linearly moves from a to b as t ranges from 0 to 1.
+float Lerp(float a, float b, float t);
+/// Linearly interpolates from a to b, under the modulus mod.
+/// This function takes evaluates a and b in the range [0, mod] and takes the shorter path to reach from a to b.
+float LerpMod(float a, float b, float mod, float t);
+/// Computes the lerp factor a and b have to be Lerp()ed to get x.
+float InvLerp(float a, float b, float x);
+/// See http://msdn.microsoft.com/en-us/library/bb509665(v=VS.85).aspx
+float Step(float y, float x);
+/// See http://msdn.microsoft.com/en-us/library/bb509658(v=vs.85).aspx
+float SmoothStep(float min, float max, float x);
+/// Limits x to the range [0, mod], but instead of wrapping around from mod to 0, the result will move back 
+/// from mod to 0 as x goes from mod to 2*mod.
+float PingPongMod(float x, float mod);
+/// Computes a floating-point modulus.
+/// This function returns a value in the range ]-mod, mod[.
+float Mod(float x, float mod);
+/// Computes a floating-point modulus using an integer as the modulus.
+float Mod(float x, int mod);
+/// Computes a floating-point modulus, but restricts the output to the range [0, mod[.
+float ModPos(float x, float mod);
+/// Computes a floating-point modulus, but restricts the output to the range [0, mod[.
+float ModPos(float x, int mod);
+/// Returns the fractional part of x.
+float Frac(float x);
 
-/// End recursion for Base^1.
-template<u32 Base>
-class PowIntT<Base, 1>
-{
-public:
-    enum { val = Base };
-};
-/// @endcond
+/// Returns the square root of x.
+float Sqrt(float x);
+/// Returns 1/sqrt(x). (The reciprocal of the square root of x)
+float RSqrt(float x);
 
-/// Factorial<N> unfolds to N!.
-template<int N>
-class FactorialT
-{
-public:
-    enum { val = N * FactorialT<N-1>::val };
-};
-
-/** @cond FULL */
-
-/// Specialize 0! = 1 to end factorial recursion.
-template<>
-class FactorialT<0>
-{
-public:
-    enum { val = 1 };
-};
-/// @endcond
-
-/// Combinatorial<N, K> unfolds to (N nCr K).
-template<int N, int K>
-class CombinatorialT
-{
-public:
-    enum { val = CombinatorialT<N-1,K-1>::val + CombinatorialT<N-1,K>::val };
-};
-
-/** @cond FULL */
-
-/// Specialize (N nCr 0) = 1 to end recursion.
-template<int N>
-class CombinatorialT<N, 0>
-{
-public:
-    enum { val = 1 };
-};
-
-/// Specialize (N nCr N) = 1 to end recursion.
-template<int N>
-class CombinatorialT<N, N>
-{
-public:
-    enum { val = 1 };
-};
-/// @endcond
-
-/// Calculates n! at runtime. Use class Factorial<N> to evaluate factorials at compile-time.
+/// Calculates n! at runtime. Use class FactorialT<N> to evaluate factorials at compile-time.
 int Factorial(int n); 
 
 /// Calculates (N nCr K) at runtime with recursion, running time is exponential to n. 
@@ -154,9 +178,6 @@ int CombinatorialRec(int n, int k);
 /// Calculates (N nCr K) at runtime, running time is proportional to n*k. 
 /// Use class Combinatorial<N, K> to evaluate combinatorials at compile-time.
 int CombinatorialTab(int n, int k);
-
-/// Raises a float to an integer power.
-float PowInt(float base, int exponent);
 
 /// Returns the given scalar clamped to the range [min, max].
 template<typename T>
@@ -181,6 +202,30 @@ template<typename T>
 const T Max(const T &a, const T &b)
 {
     return a >= b ? a : b;
+}
+
+template<typename T>
+const T Min(const T &a, const T &b, const T &c)
+{
+	return Min(Min(a, b), c);
+}
+
+template<typename T>
+const T Max(const T &a, const T &b, const T &c)
+{
+	return Max(Max(a, b), c);
+}
+
+template<typename T>
+const T Min(const T &a, const T &b, const T &c, const T &d)
+{
+	return Min(Min(a, b), Min(c, d));
+}
+
+template<typename T>
+const T Max(const T &a, const T &b, const T &c, const T &d)
+{
+	return Max(Max(a, b), Max(c, d));
 }
 
 /// Swaps the two values.
@@ -219,25 +264,13 @@ bool Equal(const T &a, const T &b)
     return a == b;
 }
 
-/** Compares the two values for equality, allowing the given amount of absolute error. */
-template<typename T>
-bool EqualAbsT(const T &a, const T &b, const T &epsilon)
-{
-    return Abs(a-b) < epsilon;
-}
+/** Compares the two values for equality up to a small epsilon. */
+template<> bool inline Equal(const float &a, const float &b) { return Abs(a-b) <= eps; }
+template<> bool inline Equal(const double &a, const double &b) { return Abs(a-b) <= eps; }
+template<> bool inline Equal(const long double &a, const long double &b) { return Abs(a-b) <= eps; }
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */
-bool EqualAbs(float a, float b, float epsilon = 1e-3f);
-
-/** Compares the two values for equality, allowing the given amount of relative error. 
-    Beware that for values very near 0, the relative error is significant. */
-template<typename T>
-bool EqualRelT(const T &a, const T &b, const T &maxRelError)
-{
-    if (a == b) return true; // Handles the special case where a and b are both zero.
-    float relativeError = Abs((a-b)/b);
-    return relativeError <= maxRelError;
-}
+bool EqualAbs(float a, float b, float epsilon = 1e-6f);
 
 /** Compares the two values for equality, allowing the given amount of relative error. 
     Beware that for values very near 0, the relative error is significant. */
@@ -252,15 +285,15 @@ bool EqualUlps(float a, float b, int maxUlps = 10000);
 #define isfinite(x) _finite(x)
 #endif
 
-template<typename T> inline bool IsFiniteNumber(const T &value) { return true; }
-template<> inline bool IsFiniteNumber<float>(const float &value) { return isfinite(value) != 0; }
-template<> inline bool IsFiniteNumber<double>(const double &value) { return isfinite(value) != 0; }
-template<> inline bool IsFiniteNumber<long double>(const long double &value) { return isfinite(value) != 0; }
+/// Returns true if the given value is not an inf or a nan.
+template<typename T> inline bool IsFinite(const T &value) { return true; }
+template<> inline bool IsFinite<float>(const float &value) { return isfinite(value) != 0; }
+template<> inline bool IsFinite<double>(const double &value) { return isfinite(value) != 0; }
+template<> inline bool IsFinite<long double>(const long double &value) { return isfinite(value) != 0; }
 
-template<typename T1, typename T2>
-float Distance(const T1 &lhs, const T2 &rhs)
-{
-    return lhs.Distance(rhs);
-}
+/// Returns true if the given value is +inf or -inf.
+float IsInf(float value);
+/// Returns true if the given value is a not-a-number.
+float IsNan(float value);
 
 MATH_END_NAMESPACE
