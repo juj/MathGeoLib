@@ -630,6 +630,29 @@ void OBB::Enclose(const float3 &point)
     assume(Distance(point) <= 1e-3f);
 }
 
+void OBB::Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const
+{
+    AABB aabb(float3(0,0,0), float3(r.x*2.f,r.y*2.f,r.z*2.f));
+    aabb.Triangulate(x, y, z, outPos, outNormal, outUV);
+    float3x4 localToWorld = LocalToWorld();
+    assume(localToWorld.HasUnitaryScale()); // Transforming of normals will fail otherwise.
+    localToWorld.BatchTransformPos(outPos, NumVerticesInTriangulation(x,y,z), sizeof(float3));
+    localToWorld.BatchTransformDir(outNormal, NumVerticesInTriangulation(x,y,z), sizeof(float3));
+}
+
+void OBB::ToEdgeList(float3 *outPos) const
+{
+    assume(outPos);
+    if (!outPos)
+        return;
+    for(int i = 0; i < 12; ++i)
+    {
+        LineSegment edge = Edge(i);
+        outPos[i*2] = edge.a;
+        outPos[i*2+1] = edge.b;
+    }
+}
+
 /** The following code is from Christer Ericson's book Real-Time Collision Detection, pp. 101-106.
     http://realtimecollisiondetection.net/ */
 bool OBB::Intersects(const OBB &b, float epsilon) const

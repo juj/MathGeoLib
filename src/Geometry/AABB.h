@@ -387,8 +387,23 @@ public:
 	/// @param outUV [out] An array of size numVertices which will receive vertex UV coordinates. 
     ///                        If this parameter is null, a UV mapping is not generated.
     /// The number of vertices that outPos, outNormal and outUV must be able to contain is
-    /// (x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required.
+    /// (x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call
+    /// NumVerticesInTriangulation to obtain this value.
     void Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const;
+
+    static int NumVerticesInTriangulation(int numFacesX, int numFacesY, int numFacesZ)
+    {
+        return (numFacesX*numFacesY + numFacesX*numFacesZ + numFacesY*numFacesZ)*2*6;
+    }
+    
+    /// Generates an edge list representation of the edges of this AABB.
+    /// @param outPos [out] An array that contains space for at least 24 vertices (NumVerticesInEdgeList()).
+    void ToEdgeList(float3 *outPos) const;
+
+    static int NumVerticesInEdgeList()
+    {
+        return 4*3*2;
+    }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
     /// Returns a human-readable representation of this AABB. Most useful for debugging purposes.

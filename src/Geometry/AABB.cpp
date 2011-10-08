@@ -814,6 +814,11 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
     assume(numFacesX >= 1);
     assume(numFacesY >= 1);
     assume(numFacesZ >= 1);
+
+    assume(outPos);
+    if (!outPos)
+        return;
+
     // A single quad comprises of two triangles, so therefore requires six vertices.
     int numFaces = numFacesX * numFacesY * numFacesZ;
 
@@ -823,6 +828,7 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
     {
         int numFacesU;
         int numFacesV;
+        bool flip = (face == 1 || face == 2 || face == 5);
         if (face == 0 || face == 1)
         {
             numFacesU = numFacesY;
@@ -849,6 +855,8 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
                 outPos[i]   = FacePoint(face, u, v);
                 outPos[i+1] = FacePoint(face, u, v2);
                 outPos[i+2] = FacePoint(face, u2, v);
+                if (flip)
+                    Swap(outPos[i+1], outPos[i+2]);
                 outPos[i+3] = outPos[i+2];
                 outPos[i+4] = outPos[i+1];
                 outPos[i+5] = FacePoint(face, u2, v2);
@@ -858,8 +866,10 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
                     outUV[i]   = float2(u,v);
                     outUV[i+1] = float2(u,v2);
                     outUV[i+2] = float2(u2,v);
-                    outUV[i+3] = float2(u2,v);
-                    outUV[i+4] = float2(u,v2);
+                    if (flip)
+                        Swap(outUV[i+1], outUV[i+2]);
+                    outUV[i+3] = outUV[i+2];
+                    outUV[i+4] = outUV[i+1];
                     outUV[i+5] = float2(u2,v2);
                 }
 
@@ -869,6 +879,20 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
 
                 i += 6;
             }
+    }
+    assert(i == NumVerticesInTriangulation(numFacesX, numFacesY, numFacesZ));
+}
+
+void AABB::ToEdgeList(float3 *outPos) const
+{
+    assume(outPos);
+    if (!outPos)
+        return;
+    for(int i = 0; i < 12; ++i)
+    {
+        LineSegment edge = Edge(i);
+        outPos[i*2] = edge.a;
+        outPos[i*2+1] = edge.b;
     }
 }
 
