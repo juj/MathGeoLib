@@ -141,7 +141,9 @@ AABB Sphere::MinimalEnclosingAABB() const
 AABB Sphere::MaximalContainedAABB() const
 {
     AABB aabb;
-    aabb.SetCenter(pos, float3(r,r,r));
+    static const float recipSqrt3 = RSqrt(3);
+    float halfSideLength = r * recipSqrt3;
+    aabb.SetCenter(pos, float3(halfSideLength,halfSideLength,halfSideLength));
     return aabb;
 }
 
@@ -231,6 +233,17 @@ bool Sphere::Contains(const Polyhedron &polyhedron) const
     return true;
 }
 
+bool Sphere::Contains(const Sphere &sphere) const
+{
+    return pos.Distance(sphere.pos) + sphere.r <= r;
+}
+
+bool Sphere::Contains(const Capsule &capsule) const
+{
+    return pos.Distance(capsule.l.a) + capsule.r <= r &&
+        pos.Distance(capsule.l.b) + capsule.r <= r;
+}
+
 Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
 {
     Sphere s;
@@ -271,7 +284,7 @@ Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
     return s;
 }
 
-/** This implementation was adapted from Christer Ericson's Real-time Collision Detection, pp. 99-100. */
+/* This implementation was adapted from Christer Ericson's Real-time Collision Detection, pp. 99-100. */
 /*
 Sphere WelzlSphere(const float3 *pts, int numPoints, float3 *support, int numSupports)
 {
@@ -288,7 +301,7 @@ Sphere WelzlSphere(const float3 *pts, int numPoints, float3 *support, int numSup
         }
     }
 
-    ///\todo The following recursion can easily crash the stack for large inputs.  Convert this to proper form.
+    // todo The following recursion can easily crash the stack for large inputs.  Convert this to proper form.
     Sphere smallestSphere = WelzlSphere(pts, numPoints - 1, support, numSupports);
     if (smallestSphere.Contains(pts[numPoints-1]))
         return smallestSphere;
@@ -480,14 +493,6 @@ bool Sphere::Intersects(const Polyhedron &polyhedron) const
     return polyhedron.Intersects(*this);
 }
 
-/*
-float Sphere::Distance(const float3 &point, float3 &outClosestPointOnSphere) const
-
-void Sphere::Enclose(const Triangle &triangle)
-void Sphere::Enclose(const Polygon &polygon)
-bool Sphere::Enclose(const Polyhedron &polyhedron)
-*/
-
 void Sphere::Enclose(const float3 &point)
 {
     float3 d = point - pos;
@@ -619,7 +624,7 @@ float3 Sphere::RandomPointInside(LCG &lcg)
 	}
     assume(false && "Sphere::RandomPointInside failed!");
 
-	/// Failed to generate a point inside this sphere. Return the sphere center as fallback.
+	// Failed to generate a point inside this sphere. Return the sphere center as fallback.
 	return pos;
 }
 
@@ -637,7 +642,7 @@ float3 Sphere::RandomPointOnSurface(LCG &lcg)
 	}
     assume(false && "Sphere::RandomPointOnSurface failed!");
 
-	/// Failed to generate a point inside this sphere. Return an arbitrary point on the surface as fallback.
+	// Failed to generate a point inside this sphere. Return an arbitrary point on the surface as fallback.
 	return pos + float3(r, 0, 0);
 }
 
