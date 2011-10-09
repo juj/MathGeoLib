@@ -46,7 +46,7 @@ Triangle::Triangle(const float3 &a_, const float3 &b_, const float3 &c_)
 float3 Triangle::BarycentricUVW(const float3 &point) const
 {
     /// @note An alternate mechanism to compute the barycentric is given in Christer Ericson's
-    /// Real-Time Collision Detection, pp. 51-52, which might be slightly faster.
+    /// Real-Time Collision Detection, pp. 51-52, which might be slightly faster than the current implementation.
     float3 v0 = b - a;
     float3 v1 = c - a;
     float3 v2 = point - a;
@@ -84,6 +84,11 @@ float3 Triangle::Point(const float3 &b) const
     return Point(b.x, b.y, b.z);
 }
 
+float3 Triangle::Point(const float2 &b) const
+{
+    return Point(b.x, b.y);
+}
+
 float3 Triangle::Centroid() const
 {
     return (a + b + c) / 3.f;
@@ -94,15 +99,23 @@ float Triangle::Area() const
     return 0.5f * Cross(b-a, c-a).Length();
 }
 
+float Triangle::Perimeter() const
+{
+    return a.Distance(b) + b.Distance(c) + c.Distance(a);
+}
+
 LineSegment Triangle::Edge(int i) const
 {
     assume(0 <= i);
     assume(i <= 2);
     if (i == 0)
         return LineSegment(a, b);
-    if (i == 1)
+    else if (i == 1)
         return LineSegment(b, c);
-    return LineSegment(c, a);
+    else if (i == 2)
+        return LineSegment(c, a);
+    else
+        return LineSegment(float3::nan, float3::nan);
 }
 
 float3 Triangle::Vertex(int i) const
@@ -111,9 +124,12 @@ float3 Triangle::Vertex(int i) const
     assume(i <= 2);
     if (i == 0)
         return a;
-    if (i == 1)
+    else if (i == 1)
         return b;
-    return c;
+    else if (i == 2)
+        return c;
+    else
+        return float3::nan;
 }
 
 Plane Triangle::PlaneCCW() const
@@ -182,8 +198,8 @@ bool Triangle::IsDegenerate(const float3 &a, const float3 &b, const float3 &c, f
 
 bool Triangle::Contains(const float3 &point, float triangleThickness) const
 {
-    if (PlaneCCW().Distance(point) > triangleThickness) // The winding order of the triangle plane does not matter.s
-        return false; ///\todo This test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
+    if (PlaneCCW().Distance(point) > triangleThickness) // The winding order of the triangle plane does not matter.
+        return false; ///\todo The plane-point distance test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
 
     float3 br = BarycentricUVW(point);
     return br.y >= 0.f && br.z >= 0.f && (br.y + br.z) <= 1.f;
@@ -223,7 +239,7 @@ float Triangle::Distance(const Sphere &sphere) const
 
 /** Calculates the intersection between a ray and a triangle. The facing is not accounted for, so
 	rays are reported to intersect triangles that are both front and backfacing.
-	According to "T. Möller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
+	According to "T. M&ouml;ller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
 	http://jgt.akpeters.com/papers/MollerTrumbore97/
 	@param ray The ray to test.
 	@param v0 Vertex 0 of the triangle.
@@ -233,7 +249,7 @@ float Triangle::Distance(const Sphere &sphere) const
 	@param v [out] The barycentric v coordinate is returned here if an intersection occurred.
 	@param t [out] The signed distance from ray origin to ray intersection position will be returned here. (if intersection occurred)
 	@return True if an intersection occurred. If no intersection, then u,v and t will contain undefined values. */
-bool IntersectLineTri(const float3 &linePos, const float3 &lineDir,
+bool Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 		const float3 &v0, const float3 &v1, const float3 &v2,
 		float &u, float &v, float &t)
 {
@@ -281,8 +297,12 @@ bool IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 //	return (det < 0.f) ? IntersectBackface : IntersectFrontface;
 }
 
+/// [groupSyntax]
 bool Triangle::Intersects(const LineSegment &l, float *d, float3 *intersectionPoint) const
 {
+    /** The Triangle-Line/LineSegment/Ray intersection tests are based on M&ouml;ller-Trumbore method:
+        "T. M&ouml;ller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
+	    http://jgt.akpeters.com/papers/MollerTrumbore97/. */
     float u, v, t;
     bool success = IntersectLineTri(l.a, l.Dir(), a, b, c, u, v, t);
     if (!success)
@@ -334,7 +354,8 @@ bool Triangle::Intersects(const Plane &plane) const
     return plane.Intersects(*this);
 }
 
-/// See Christer Ericson's Real-Time Collision Detection, p.167.
+/// [groupSyntax]
+/** For Triangle-Sphere intersection code, see Christer Ericson's Real-Time Collision Detection, p.167. */
 bool Triangle::Intersects(const Sphere &sphere, float3 *closestPointOnTriangle) const
 {
     float3 pt = ClosestPoint(sphere.pos);
@@ -369,9 +390,10 @@ static void FindIntersectingLineSegments(const Triangle &t, float da, float db, 
     }
 }
 
-/// Implementation based on pseudo-code from Tomas Möller's 
-/// "A Fast Triangle-Triangle Intersection Test". http://jgt.akpeters.com/papers/Moller97/
-/// See also Christer Ericson's Real-Time Collision Detection, p. 172.
+/// [groupSyntax]
+/** The Triangle-Triangle test implementation is based on pseudo-code from Tomas M&ouml;ller's 
+    "A Fast Triangle-Triangle Intersection Test": http://jgt.akpeters.com/papers/Moller97/.
+    See also Christer Ericson's Real-Time Collision Detection, p. 172. */
 bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 {
     // Is the triangle t2 completely on one side of the plane of this triangle?
@@ -428,10 +450,12 @@ bool RangesOverlap(float start1, float end1, float start2, float end2)
     return end1 >= start2 && end2 >= start1;
 }
 
-/// Implementation based on the pseudo-code in Christer Ericson's Real-Time Collision Detection, pp. 169-172.
+/// [groupSyntax]
 bool Triangle::Intersects(const AABB &aabb) const
 {
-    ///\todo This test can be greatly optimized by manually unrolling loops, trivial math and by avoiding 
+/** The AABB-Triangle test implementation is based on the pseudo-code in 
+    Christer Ericson's Real-Time Collision Detection, pp. 169-172. */
+    ///\todo The Triangle-AABB intersection test can be greatly optimized by manually unrolling loops, trivial math and by avoiding 
     /// unnecessary copying.
     float t1, t2, a1, a2;
     const float3 e[3] = { float3(1,0,0), float3(0,1,0), float3(0,0,1) };
@@ -506,9 +530,11 @@ void Triangle::ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const
     dMax = Max(t, dMax);
 }
 
-/// Code from Christer Ericson's Real-Time Collision Detection, pp. 141-142.
+/// [groupSyntax]
 float3 Triangle::ClosestPoint(const float3 &p) const
 {
+    /** The code for Triangle-float3 test is from Christer Ericson's Real-Time Collision Detection, pp. 141-142. */
+
     // Check if P is in vertex region outside A.
     float3 ab = b - a;
     float3 ac = c - a;
@@ -563,9 +589,10 @@ float3 Triangle::ClosestPoint(const float3 &p) const
     return a + ab * v + ac * w;
 }
 
+/// [groupSyntax]
 float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const
 {
-    ///\todo This is naive. Optimize!
+    ///\todo The Triangle-LineSegment test is naive. Optimize!
     float3 closestToA = ClosestPoint(lineSegment.a);
     float3 closestToB = ClosestPoint(lineSegment.b);
     float d;
@@ -738,11 +765,12 @@ float3 Triangle::ClosestPointToTriangleEdge(const LineSegment &lineSegment, floa
     }
 }
 
-/** The implementation of this function is based on the pseudo-code in 
-    Schneider, Eberly. Geometric Tools for Computer Graphics pp. 433 - 441. */
+/// [groupSyntax]
 float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float *outD) const
 {
-    ///\todo This code is currently untested. Run tests to ensure the following code works properly.
+    /** The implementation of the Triangle-Line test is based on the pseudo-code in 
+        Schneider, Eberly. Geometric Tools for Computer Graphics pp. 433 - 441. */
+    ///\todo The Triangle-Line code is currently untested. Run tests to ensure the following code works properly.
 
     // Point on triangle: T(u,v) = a + u*b + v*c;
     // Point on line:  L(t) = p + t*d;
@@ -905,9 +933,12 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
     }
 }
 
-/// Implemented based on pseudo-code from Christer Ericson's Real-Time Collision Detection, pp. 155-156.
+/// [groupSyntax]
 float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const
 {
+    /** The code for computing the closest point pair on two Triangles is based 
+        on pseudo-code from Christer Ericson's Real-Time Collision Detection, pp. 155-156. */
+
     // First detect if the two triangles are intersecting.
     LineSegment l;
     bool success = this->Intersects(other, &l);
@@ -951,9 +982,6 @@ float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const
     return closestThis;
 }
 
-/** The implementation of this function is based on Graphics Gems 1, p. 25: 
-    "1.5 Generating random points in triangles. Method 2." The Method 1 presented in the book
-    uses a sqrt() instead of the if(). */
 float3 Triangle::RandomPointInside(LCG &rng) const
 {
     ///\todo rng.Float() returns [0,1[, but to be completely uniform, we'd need [0,1] here.
@@ -965,6 +993,27 @@ float3 Triangle::RandomPointInside(LCG &rng) const
         t = 1.f - t;
     }
     return Point(s, t);
+}
+
+float3 Triangle::RandomVertex(LCG &rng) const
+{
+    return Vertex(rng.Int(0, 2));
+}
+
+float3 Triangle::RandomPointOnEdge(LCG &rng) const
+{
+    assume(!IsDegenerate());
+    float ab = a.Distance(b);
+    float bc = b.Distance(c);
+    float ca = c.Distance(a);
+    float r = rng.Float(0, ab + bc + ca);
+    if (r < ab)
+        return a + (b-a) * r / ab;
+    r -= ab;
+    if (r < bc)
+        return b + (c-b) * r / bc;
+    r -= bc;
+    return c + (a-c) * r / ca;
 }
 
 Triangle operator *(const float3x3 &transform, const Triangle &t)
