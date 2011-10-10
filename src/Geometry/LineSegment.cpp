@@ -133,7 +133,7 @@ float3 LineSegment::ClosestPoint(const float3 &point, float *d) const
     float u = Clamp01(Dot(point - a, dir) / dir.LengthSq());
     if (d)
         *d = u;
-    return a + *d * dir;
+    return a + u * dir;
 }
 
 float3 LineSegment::ClosestPoint(const Ray &other, float *d, float *d2) const

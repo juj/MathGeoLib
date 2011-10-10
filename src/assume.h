@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Math/MathNamespace.h"
 #include <stdio.h>
 #ifdef WIN32
 #include <assert.h>
 #endif
 
-#define MATH_ASSERT_ON_ASSUME
+//#define MATH_ASSERT_ON_ASSUME
 
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
 
@@ -19,6 +20,8 @@
 //  - Other: if MathBreakOnAssume() == true, the assume() macro is equal to the assert() macro.
 //  -   All: if MathBreakOnAssume() == false, the assume() macro uses printf() to log warnings of failed math-related assumptions.
 
+MATH_BEGIN_NAMESPACE
+
 /// Assigns mathBreakOnAssume = isEnabled;
 void SetMathBreakOnAssume(bool isEnabled);
 
@@ -26,13 +29,7 @@ void SetMathBreakOnAssume(bool isEnabled);
 /// The default startup value for this flag is false.
 bool MathBreakOnAssume();
 
-// If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test
-// that all forms of optimizations inside the math library produce proper results.
-#ifdef MATH_ASSERT_CORRECTNESS
-#define mathassert(x) assert(x)
-#else
-#define mathassert(x)
-#endif
+MATH_END_NAMESPACE
 
 // If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
 // not be checked against at runtime.
@@ -62,4 +59,12 @@ bool MathBreakOnAssume();
 #endif
 #else
 #define assume(x) 
+#endif
+
+// If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test
+// that all forms of optimizations inside the math library produce proper results.
+#ifdef MATH_ASSERT_CORRECTNESS
+#define mathassert(x) assert(x)
+#else
+#define mathassert(x)
 #endif

@@ -107,16 +107,16 @@ public:
     Plane PlaneCCW() const;
 
     /// Returns true if the edges of this polygon self-intersect.
-    bool IsSelfIntersecting() const;
+//    bool IsSelfIntersecting() const;
 
     /// Projects all vertices of this polygon to the given plane.
-    void ProjectToPlane(const Plane &plane);
+//    void ProjectToPlane(const Plane &plane);
 
     /// Returns true if the edges of this polygon self-intersect when viewed from the given direction.
-    bool IsSelfIntersecting(const float3 &viewDirection) const;
+//    bool IsSelfIntersecting(const float3 &viewDirection) const;
 
     /// Returns true if there exists edges (p_{i-1}, p_i) and (p_i, p_{i+1}) which are collinear.
-    bool HasCollinearEdges() const;
+//    bool HasCollinearEdges() const;
 
     /// Returns true if the given point lies inside this polygon.
     bool Contains(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
@@ -173,17 +173,17 @@ public:
     AABB MinimalEnclosingAABB() const;
 
     /// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.
-    bool IsConcaveVertex(int i) const;
+//    bool IsConcaveVertex(int i) const;
 
     /// Computes the conves hull of this polygon.
-    Polygon ConvexHull() const;
+//    Polygon ConvexHull() const;
 
-    bool IsSupportingPoint(int i) const;
+//    bool IsSupportingPoint(int i) const;
 
-    bool IsSupportingPoint(const float3 &point) const;
+//    bool IsSupportingPoint(const float3 &point) const;
 
     /// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
-    static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
+//    static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 };
 
 MATH_END_NAMESPACE

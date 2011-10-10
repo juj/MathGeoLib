@@ -533,7 +533,6 @@ void float3x4::ScaleCol(int col, float scalar)
     v[0][col] *= scalar;
     v[1][col] *= scalar;
     v[2][col] *= scalar;
-    v[3][col] *= scalar;
 }
 
 CONST_WIN32 float3x3 float3x4::Float3x3Part() const
@@ -721,7 +720,7 @@ void float3x4::SwapRows(int row1, int row2)
     assume(row2 >= 0);
     assume(row2 < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-    if (row1 < 0 || row1 >= Rows || row1 < 0 || row2 >= Rows)
+    if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
         return; // Benign failure
 #endif
     Swap(v[row1][0], v[row2][0]);
@@ -1237,10 +1236,7 @@ bool float3x4::IsUpperTriangular(float epsilon) const
 {
     return EqualAbs(v[1][0], 0.f, epsilon)
         && EqualAbs(v[2][0], 0.f, epsilon)
-        && EqualAbs(v[3][0], 0.f, epsilon)
-        && EqualAbs(v[2][1], 0.f, epsilon)
-        && EqualAbs(v[3][1], 0.f, epsilon)
-        && EqualAbs(v[3][2], 0.f, epsilon);
+        && EqualAbs(v[2][1], 0.f, epsilon);
 }
 
 bool float3x4::IsInvertible(float epsilon) const

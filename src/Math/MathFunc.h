@@ -183,7 +183,7 @@ int CombinatorialTab(int n, int k);
 template<typename T>
 inline T Clamp(const T &val, const T &floor, const T &ceil)
 {
-    assert(floor <= ceil);
+    assume(floor <= ceil);
     return val <= ceil ? (val >= floor ? val : floor) : ceil;
 }
 

@@ -252,7 +252,11 @@ Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
         s.SetNegativeInfinity();
         return s;
     }
-    assert(pts);
+    assume(pts || numPoints == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!pts)
+        return Sphere();
+#endif
 
     // First pass: Pick the cardinal axis (X,Y or Z) which has the two most distant points.
     int minx, maxx, miny, maxy, minz, maxz;
@@ -538,6 +542,11 @@ void Sphere::Enclose(const LineSegment &lineSegment)
 
 void Sphere::Enclose(const float3 *pointArray, int numPoints)
 {
+    assume(pointArray || numPoints == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!pointArray)
+        return;
+#endif
     ///\todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
     for(int i = 0; i < numPoints; ++i)
         Enclose(pointArray[i]);
@@ -545,7 +554,11 @@ void Sphere::Enclose(const float3 *pointArray, int numPoints)
 
 int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices)
 {
-	assert(outPos != 0);
+	assume(outPos);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outPos)
+        return 0;
+#endif
 	assume(this->r > 0.f);
 
 	Array<Triangle> temp;

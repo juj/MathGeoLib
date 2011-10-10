@@ -235,7 +235,8 @@ Line Plane::Project(const Line &line, bool *nonDegenerate) const
     l.pos = Project(line.pos);
     l.dir = l.dir - l.dir.ProjectToNorm(normal);
     float len = l.dir.Normalize();
-    *nonDegenerate = (len > 0.f);
+    if (nonDegenerate)
+        *nonDegenerate = (len > 0.f);
     return l;
 }
 
@@ -245,7 +246,8 @@ Ray Plane::Project(const Ray &ray, bool *nonDegenerate) const
     r.pos = Project(ray.pos);
     r.dir = r.dir - r.dir.ProjectToNorm(normal);
     float len = r.dir.Normalize();
-    *nonDegenerate = (len > 0.f);
+    if (nonDegenerate)
+        *nonDegenerate = (len > 0.f);
     return r;
 }
 

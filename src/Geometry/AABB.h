@@ -90,7 +90,7 @@ public:
     /** This function computes the smallest possible AABB (in terms of volume) that contains the given sphere, and stores the result in this structure. */
     void SetFrom(const Sphere &s);
 
-    /// Sets this AABB to enclose the given set of points. [noscript]
+    /// Sets this AABB to enclose the given set of points. [noscript] [notest]
     void SetFrom(const float3 *pointArray, int numPoints);
 
     /// Converts this to a polyhedron.

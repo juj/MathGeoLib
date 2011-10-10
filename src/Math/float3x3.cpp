@@ -889,14 +889,22 @@ float4 float3x3::Transform(const float4 &vector) const
 
 void float3x3::BatchTransform(float3 *pointArray, int numPoints) const
 {
-    assume(pointArray);
+    assume(pointArray || numPoints == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!pointArray)
+        return;
+#endif
     for(int i = 0; i < numPoints; ++i)
         pointArray[i] = *this * pointArray[i];
 }
 
 void float3x3::BatchTransform(float3 *pointArray, int numPoints, int stride) const
 {
-    assume(pointArray);
+    assume(pointArray || numPoints == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!pointArray)
+        return;
+#endif
     assume(stride >= sizeof(float3));
     u8 *data = reinterpret_cast<u8*>(pointArray);
     for(int i = 0; i < numPoints; ++i)
@@ -908,14 +916,22 @@ void float3x3::BatchTransform(float3 *pointArray, int numPoints, int stride) con
 
 void float3x3::BatchTransform(float4 *vectorArray, int numVectors) const
 {
-    assume(vectorArray);
+    assume(vectorArray || numVectors == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!vectorArray)
+        return;
+#endif
     for(int i = 0; i < numVectors; ++i)
         vectorArray[i] = *this * vectorArray[i];
 }
 
 void float3x3::BatchTransform(float4 *vectorArray, int numVectors, int stride) const
 {
-    assume(vectorArray);
+    assume(vectorArray || numVectors == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!vectorArray)
+        return;
+#endif
     assume(stride >= sizeof(float4));
     u8 *data = reinterpret_cast<u8*>(vectorArray);
     for(int i = 0; i < numVectors; ++i)

@@ -39,10 +39,28 @@ int Polyhedron::NumEdges() const
     return EdgeIndices().size();
 }
 
-LineSegment Polyhedron::Edge(int i) const
+float3 Polyhedron::Vertex(int vertexIndex) const
 {
+    assume(vertexIndex >= 0);
+    assume(vertexIndex < v.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (vertexIndex < 0 || vertexIndex >= v.size())
+        return float3::nan;
+#endif
+    
+    return v[vertexIndex];
+}
+
+LineSegment Polyhedron::Edge(int edgeIndex) const
+{
+    assume(edgeIndex >= 0);
     std::vector<LineSegment> edges = Edges();
-    return edges[i];
+    assume(edgeIndex < edges.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (edgeIndex < 0 || edgeIndex >= edges.size())
+        return LineSegment(float3::nan, float3::nan);
+#endif
+    return edges[edgeIndex];
 }
 
 std::vector<LineSegment> Polyhedron::Edges() const
@@ -61,6 +79,9 @@ std::vector<std::pair<int, int> > Polyhedron::EdgeIndices() const
     std::set<std::pair<int, int> > uniqueEdges;
     for(int i = 0; i < NumFaces(); ++i)
     {
+        assume(f[i].v.size() >= 3);
+        if (f[i].v.size() < 3)
+            continue; // Degenerate face with less than three vertices, skip!
         int x = f[i].v.back();
         for(size_t j = 0; j < f[i].v.size(); ++j)
         {
@@ -78,6 +99,13 @@ std::vector<std::pair<int, int> > Polyhedron::EdgeIndices() const
 Polygon Polyhedron::FacePolygon(int faceIndex) const
 {
     Polygon p;
+    assume(faceIndex >= 0);
+    assume(faceIndex < f.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (faceIndex < 0 || faceIndex >= f.size())
+        return Polygon();
+#endif
+
     p.p.reserve(f[faceIndex].v.size());
     for(size_t v = 0; v < f[faceIndex].v.size(); ++v)
         p.p.push_back(Vertex(f[faceIndex].v[v]));

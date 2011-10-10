@@ -98,7 +98,7 @@ float LCG::Float()
 
 float LCG::Float(float a, float b)
 {
-	assert(a <= b && "Error in range!");
+	assume(a <= b && "LCG::Float(a,b): Error in range: b < a!");
 
 	return Float()*(b-a)+a;
 }

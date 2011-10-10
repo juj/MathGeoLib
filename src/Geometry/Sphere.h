@@ -128,7 +128,7 @@ public:
     static Sphere ApproximateEnclosingSphere(const float3 *pointArray, int numPoints);
 
 */
-    void dummytodoremoveme();
+    void dummytodoremoveme(){}
 
     /// Returns the distance between this sphere and the given object.
     /** This function finds the nearest pair of points on this and the given object, and computes their distance.

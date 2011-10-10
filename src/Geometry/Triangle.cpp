@@ -186,6 +186,11 @@ float Triangle::SignedArea(const float3 &pt, const float3 &a, const float3 &b, c
     return Dot(Cross(b-pt, c-pt), Cross(b-a, c-a).Normalized());
 }
 
+bool Triangle::IsFinite() const
+{
+    return a.IsFinite() && b.IsFinite() && c.IsFinite();
+}
+
 bool Triangle::IsDegenerate(float epsilon) const
 {
     return IsDegenerate(a, b, c);

@@ -86,7 +86,10 @@ void AABB::SetFrom(const Sphere &s)
 
 void AABB::SetFrom(const float3 *pointArray, int numPoints)
 {
+    assume(pointArray || numPoints == 0);
     SetNegativeInfinity();
+    if (!pointArray)
+        return;
     for(int i = 0; i < numPoints; ++i)
         Enclose(pointArray[i]);
 }
@@ -286,14 +289,22 @@ Plane AABB::FacePlane(int faceIndex) const
 
 void AABB::GetCornerPoints(float3 *outPointArray) const
 {
-    assert(outPointArray);
+    assume(outPointArray);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outPointArray)
+        return;
+#endif
     for(int i = 0; i < 8; ++i)
         outPointArray[i] = CornerPoint(i);
 }
 
 void AABB::GetFacePlanes(Plane *outPlaneArray) const
 {
-    assert(outPlaneArray);
+    assume(outPlaneArray);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outPlaneArray)
+        return;
+#endif
     for(int i = 0; i < 6; ++i)
         outPlaneArray[i] = FacePlane(i);
 }
@@ -307,7 +318,9 @@ AABB AABB::MinimalEnclosingAABB(const float3 *pointArray, int numPoints)
 
 void AABB::ExtremePointsAlongAABB(const float3 *pts, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz)
 {
-    assert(pts || numPoints == 0);
+    assume(pts || numPoints == 0);
+    if (!pts)
+        return;
     minx = maxx = miny = maxy = minz = maxz = 0;
     for(int i = 1; i < numPoints; ++i)
     {
@@ -805,6 +818,9 @@ void AABB::Enclose(const Polyhedron &polyhedron)
 
 void AABB::Enclose(const float3 *pointArray, int numPoints)
 {
+    assume(pointArray || numPoints == 0);
+    if (!pointArray)
+        return;
     for(int i = 0; i < numPoints; ++i)
         Enclose(pointArray[i]);
 }

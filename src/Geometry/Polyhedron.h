@@ -63,7 +63,7 @@ public:
     int NumEdges() const;
 
     /// Returns the i'th vertex of this polyhedron.
-    float3 Vertex(int vertexIndex) const { return v[vertexIndex]; }
+    float3 Vertex(int vertexIndex) const;
 
     /// Returns the i'th edge of this polyhedron.
     /// Performance warning: Use this function only if you are interested in a single edge of this Polyhedron.

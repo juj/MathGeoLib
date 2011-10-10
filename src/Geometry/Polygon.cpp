@@ -49,6 +49,12 @@ int Polygon::NumEdges() const
 
 float3 Polygon::Vertex(int vertexIndex) const
 {
+    assume(vertexIndex >= 0);
+    assume(vertexIndex < p.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (vertexIndex < 0 || vertexIndex >= p.size())
+        return float3::nan;
+#endif
     return p[vertexIndex];
 }
 
@@ -72,6 +78,15 @@ LineSegment Polygon::Edge2D(int i) const
 
 bool Polygon::DiagonalExists(int i, int j) const
 {
+    assume(p.size() >= 3);
+    assume(i >= 0);
+    assume(j >= 0);
+    assume(i < p.size());
+    assume(j < p.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (p.size() < 3 || i < 0 || j < 0 || i >= p.size() || j >= p.size())
+        return false;
+#endif
     assume(IsPlanar());
     assume(i != j);
     if (i > j)
@@ -109,6 +124,14 @@ float3 Polygon::BasisV() const
 
 LineSegment Polygon::Diagonal(int i, int j) const
 {
+    assume(i >= 0);
+    assume(j >= 0);
+    assume(i < p.size());
+    assume(j < p.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (i < 0 || j < 0 || i >= p.size() || j >= p.size())
+        return LineSegment(float3::nan, float3::nan);
+#endif
 	return LineSegment(p[i], p[j]);
 }
 
@@ -139,11 +162,22 @@ bool Polygon::IsConvex() const
 
 float2 Polygon::MapTo2D(int i) const
 {
+    assume(i >= 0);
+    assume(i < p.size());
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (i < 0 || i >= p.size())
+        return float2::nan;
+#endif
     return MapTo2D(p[i]);
 }
 
 float2 Polygon::MapTo2D(const float3 &point) const
 {
+    assume(p.size() > 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (p.size() == 0)
+        return float2::nan;
+#endif
     float3 basisU = BasisU();
     float3 basisV = BasisV();
     float3 pt = point - p[0];
@@ -152,6 +186,11 @@ float2 Polygon::MapTo2D(const float3 &point) const
 
 float3 Polygon::MapFrom2D(const float2 &point) const
 {
+    assume(p.size() > 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (p.size() == 0)
+        return float3::nan;
+#endif
     return p[0] + point.x * BasisU() + point.y * BasisV();
 }
 
@@ -416,7 +455,7 @@ float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegment
     for(size_t i = 0; i < tris.size(); ++i)
     {
         float3 lineSegmentPt;
-        float3 pt = ClosestPoint(lineSegment, &lineSegmentPt);
+        float3 pt = tris[i].ClosestPoint(lineSegment, &lineSegmentPt);
         float d = pt.DistanceSq(closestLineSegmentPt);
         if (d < closestDist)
         {
@@ -571,10 +610,10 @@ std::vector<Triangle> Polygon::Triangulate() const
     }
     std::vector<float2> p2d;
     std::vector<int> polyIndices;
-    for(int i = 0; i < NumVertices(); ++i)
+    for(int v = 0; v < NumVertices(); ++v)
     {
-        p2d.push_back(MapTo2D(i));
-        polyIndices.push_back(i);
+        p2d.push_back(MapTo2D(v));
+        polyIndices.push_back(v);
     }
 
     // Clip ears of the polygon until it has been reduced to a triangle.
@@ -609,9 +648,21 @@ std::vector<Triangle> Polygon::Triangulate() const
             ++numTries;
         }
     }
-    
+
+    assume(p2d.size() == 3);
+    if (p2d.size() > 3) // If this occurs, then the polygon is NOT counter-clockwise oriented.
+        return t;
+    /*
+    {
+        // For conveniency, create a copy that has the winding order fixed, and triangulate that instead.
+        // (Causes a large performance hit!)
+        Polygon p2 = *this;
+        for(size_t i = 0; i < p2.p.size()/2; ++i)
+            std::swap(p2.p[i], p2.p[p2.p.size()-1-i]);
+        return p2.Triangulate();
+    }*/
+
     // Add the last poly.
-    assert(p2d.size() == 3);
     t.push_back(Triangle(p[polyIndices[0]], p[polyIndices[1]], p[polyIndices[2]]));
 
     return t;

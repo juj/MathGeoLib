@@ -336,14 +336,22 @@ Plane OBB::FacePlane(int faceIndex) const
 
 void OBB::GetCornerPoints(float3 *outPointArray) const
 {
-    assert(outPointArray);
+    assume(outPointArray);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outPointArray)
+        return;
+#endif
     for(int i = 0; i < 8; ++i)
         outPointArray[i] = CornerPoint(i);
 }
 
 void OBB::GetFacePlanes(Plane *outPlaneArray) const
 {
-    assert(outPlaneArray);
+    assume(outPlaneArray);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outPlaneArray)
+        return;
+#endif
     for(int i = 0; i < 6; ++i)
         outPlaneArray[i] = FacePlane(i);
 }
@@ -353,6 +361,12 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 {
     assume(idxSmallest || idxLargest);
     assume(pointArray || numPoints == 0);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!pointArray)
+        return;
+    if (!idxSmallest && !idxLargest)
+        return;
+#endif
 
     int smallest = 0;
     int largest = 0;
@@ -374,7 +388,7 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
     }
     if (idxSmallest)
         *idxSmallest = smallest;
-    if (idxLargest)
+    else //if (idxLargest)
         *idxLargest = largest;
 }
 

@@ -941,7 +941,7 @@ void float4x4::SwapRows(int row1, int row2)
     assume(row2 >= 0);
     assume(row2 < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-    if (row1 < 0 || row1 >= Rows || row1 < 0 || row2 >= Rows)
+    if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
         return; // Benign failure
 #endif
     Swap(v[row1][0], v[row2][0]);
@@ -957,7 +957,7 @@ void float4x4::SwapRows3(int row1, int row2)
     assume(row2 >= 0);
     assume(row2 < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-    if (row1 < 0 || row1 >= Rows || row1 < 0 || row2 >= Rows)
+    if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
         return; // Benign failure
 #endif
     Swap(v[row1][0], v[row2][0]);
