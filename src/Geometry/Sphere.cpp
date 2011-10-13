@@ -51,6 +51,8 @@ Sphere::Sphere(const float3 &pointA, const float3 &pointB)
 {
     pos = (pointA + pointB) / 2.f;
     r = (pointB - pos).Length();
+    assume(pos.IsFinite());
+    assume(r >= 0.f);
 }
 
 Sphere::Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC)

@@ -195,7 +195,7 @@ float3x4 Plane::OrthoProjection() const
 
 float3x4 Plane::ObliqueProjection(const float3 &obliqueProjectionDir) const
 {
-    assume(false && "Not implemented!"); ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
     return float3x4();
 }
 
@@ -294,7 +294,7 @@ float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
 
 float3 Plane::ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const
 {
-    assume(false && "Not implemented!"); ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
     return float3();
 }
 
@@ -681,7 +681,7 @@ bool Plane::PassesThroughOrigin(float epsilon) const
 
 float Plane::DihedralAngle(const Plane &plane) const
 {
-    assume(false && "Not implemented!"); ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
     return false;
 }
 
@@ -692,7 +692,7 @@ bool Plane::Equals(const Plane &other, float epsilon) const
 
 Circle Plane::GenerateCircle(const float3 &circleCenter, float radius) const
 {
-    assume(false && "Not implemented!"); ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
     return Circle();
 }
 

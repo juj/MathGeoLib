@@ -364,7 +364,7 @@ float3x4 float3x4::Reflect(const Plane &p)
 
 float3x4 float3x4::OrthographicProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize)
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
     return float3x3(); ///\todo
 }
 

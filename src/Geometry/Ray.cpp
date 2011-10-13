@@ -53,14 +53,12 @@ Ray::Ray(const LineSegment &lineSegment)
 {
 }
 
-/// Returns a point on this line.
 float3 Ray::GetPoint(float d) const
 {
     assert(dir.IsNormalized());
     return pos + d * dir;
 }
 
-/// Applies a transformation to this line.
 void Ray::Transform(const float3x3 &transform)
 {
     pos = transform.Transform(pos);
@@ -100,8 +98,6 @@ bool Ray::Equals(const Ray &rhs, float epsilon) const
     return pos.Equals(rhs.pos, epsilon) && dir.Equals(rhs.dir, epsilon);
 }
 
-/// Returns the distance of the given point to this line.
-/// @param d [out] This element will receive the distance along this line that specifies the closest point on this line to the given point.
 float Ray::Distance(const float3 &point, float *d) const
 {
     return ClosestPoint(point, d).Distance(point);
@@ -112,9 +108,6 @@ float Ray::Distance(const float3 &point) const
     return Distance(point, 0);
 }
 
-/// Returns the distance of the given ray to this line.
-/// @param d [out] Receives the distance along this line that specifies the closest point on this line to the given point.
-/// @param d2 [out] Receives the distance along the other line that specifies the closest point on that line to this line.
 float Ray::Distance(const Ray &other, float *d, float *d2) const
 {
     float u2;
@@ -174,7 +167,7 @@ float3 Ray::ClosestPoint(const float3 &targetPoint, float *d) const
 
 float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
-    ///\todo Properly cap d2.
+    ///\bug Properly cap d2.
     return LineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
 }
 
@@ -185,7 +178,7 @@ float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 
 float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
-    ///\todo Properly cap d2.
+    ///\bug Properly cap d2.
     return LineLine(pos, pos + dir, other.a, other.b, d, d2);
 }
 

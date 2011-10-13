@@ -170,6 +170,29 @@ AABB Polyhedron::MinimalEnclosingAABB() const
     return aabb;
 }
 
+bool Polyhedron::FaceIndicesValid() const
+{
+    // Test condition 1: Face indices in proper range.
+    for(size_t i = 0; i < NumFaces(); ++i)
+        for(size_t j = 0; j < f[i].v.size(); ++j)
+            if (f[i].v[j] < 0 || f[i].v[j] >= v.size())
+                return false;
+
+    // Test condition 2: Each face has at least three vertices.
+    for(size_t i = 0; i < NumFaces(); ++i)
+        if (f[i].v.size() < 3)
+            return false;
+
+    // Test condition 3: Each face may refer to a vertex at most once. (Complexity O(n^2)).
+    for(size_t i = 0; i < NumFaces(); ++i)
+        for(size_t j = 0; j < f[i].v.size(); ++j)
+            for(size_t k = j+1; k < f[i].v.size(); ++k)
+                if (f[i].v[j] == f[i].v[k])
+                    return false;
+
+    return true;
+}
+
 bool Polyhedron::IsClosed() const
 {
     std::set<std::pair<int, int> > uniqueEdges;
@@ -202,7 +225,7 @@ bool Polyhedron::IsClosed() const
 bool Polyhedron::IsConvex() const
 {
     // This function is O(n^2).
-    /* Real-Time Collision Detection, p. 64:
+    /** @todo Real-Time Collision Detection, p. 64:
         "A faster O(n) approach is to compute for each face F of P the centroid C of F,
         and for all neighboring faces G of F test if C lies behind the supporting plane of
         G. If some C fails to lie behind the supporting plane of one or more neighboring
@@ -395,18 +418,14 @@ float Polyhedron::Distance(const float3 &point) const
     return pt.Distance(point);
 }
 
-/// Clips the line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast, inside the given polyhedron.
-/// Code adapted from Christer Ericson's Real-time Collision Detection, p. 199.
-/// Returns true if the outputted range [tFirst, tLast] did not become degenerate, and these two variables contain
-/// valid data. If false, the whole line segment was clipped away (it was outside the polyhedron completely).
-bool ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir, const Polyhedron &polyhedron, 
-                                       float &tFirst, float &tLast)
+bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir, 
+                                                   float &tFirst, float &tLast) const
 {
-    assume(polyhedron.IsConvex());
+    assume(IsConvex());
     // Intersect line segment against each plane.
-    for(int i = 0; i < polyhedron.NumFaces(); ++i)
+    for(int i = 0; i < NumFaces(); ++i)
     {
-        Plane p = polyhedron.FacePlane(i);
+        Plane p = FacePlane(i);
         float denom = Dot(p.normal, dir);
         float dist = p.d - Dot(p.normal, ptA);
         // Test if segment runs parallel to the plane.
@@ -463,10 +482,11 @@ bool Polyhedron::Intersects(const Plane &plane) const
     return plane.Intersects(*this);
 }
 
-/** This very naive algorithm is from Christer Ericson's Real-Time Collision Detection, p. 384.
-    \todo Used now only as a placeholder, implement a proper efficient method. */
+/** The algorithm for Polyhedron-Polyhedron intersection is from Christer Ericson's Real-Time Collision Detection, p. 384.
+    As noted by the author, the algorithm is very naive (and here unoptimized), and better methods exist. [groupSyntax] */
 bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 {
+    ///\todo Implement a more efficient algorithm.
     if (polyhedron.Contains(this->Centroid()))
         return true;
     if (this->Contains(polyhedron.Centroid()))
@@ -530,21 +550,21 @@ bool Polyhedron::IntersectsConvex(const Line &line) const
 {
     float tFirst = -FLOAT_MAX;
     float tLast = FLOAT_MAX;
-    return ClipLineSegmentToConvexPolyhedron(line.pos, line.dir, *this, tFirst, tLast);
+    return ClipLineSegmentToConvexPolyhedron(line.pos, line.dir, tFirst, tLast);
 }
 
 bool Polyhedron::IntersectsConvex(const Ray &ray) const
 {
     float tFirst = 0.f;
     float tLast = FLOAT_MAX;
-    return ClipLineSegmentToConvexPolyhedron(ray.pos, ray.dir, *this, tFirst, tLast);
+    return ClipLineSegmentToConvexPolyhedron(ray.pos, ray.dir, tFirst, tLast);
 }
 
 bool Polyhedron::IntersectsConvex(const LineSegment &lineSegment) const
 {
     float tFirst = 0.f;
     float tLast = 1.f;
-    return ClipLineSegmentToConvexPolyhedron(lineSegment.a, lineSegment.b - lineSegment.a, *this, tFirst, tLast);
+    return ClipLineSegmentToConvexPolyhedron(lineSegment.a, lineSegment.b - lineSegment.a, tFirst, tLast);
 }
 
 MATH_END_NAMESPACE

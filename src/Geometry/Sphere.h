@@ -38,12 +38,14 @@ public:
     Sphere() {}
 
     /// Constructs a sphere with a given position and radius.
+    /** @param radius A value > 0 constructs a sphere with positive volume. A value of <= 0 is valid, and constructs a degenerate sphere.
+        @see IsFinite(), IsDegenerate() */
     Sphere(const float3 &center, float radius);
 
     /// Constructs a sphere that passes through the given two points.
     /** The constructed sphere will be the minimal sphere that encloses the given two points. The center point of this 
         sphere will lie midway between pointA and pointB, and the radius will be half the distance between pointA and 
-        pointB. */
+        pointB. Both input points are assumed to be finite. */
     Sphere(const float3 &pointA, const float3 &pointB);
 
     /// Constructs a sphere that passes through the given three points.
@@ -80,6 +82,8 @@ public:
     float SurfaceArea() const;
 
     /// Returns the center of mass of this sphere.
+    /** @return pos.
+        @see pos */
     float3 Centroid() const { return pos; }
 
     /// Tests if this Sphere is finite.
@@ -112,24 +116,26 @@ public:
     /** This functions implements a fast approximate (though rather crude) algorithm of Jack Ritter.
         See "An Efficient Bounding Sphere", in Graphics Gems 1, pp. 301-303,
         or Christer Ericson's Real-time Collision Detection, pp. 89-91.
-        This algorithm performs two linear passes over the data set, i.e. it is O(n).
-        @param pointArray An array of points to compute an enclosing sphere for. This pointer may not be null.
-        @param numPoints The number of elements in the input array pointArray. */      
+        This algorithm performs two linear passes over the data set, i.e. it has a time complexity of O(n).
+        @param pointArray An array of points to compute an enclosing sphere for. This pointer must not be null.
+        @param numPoints The number of elements in the input array pointArray.
+        @see OptimalEnclosingSphere(). */
     static Sphere FastEnclosingSphere(const float3 *pointArray, int numPoints);
 
     /// Returns a Sphere that bounds the given point array.
     /** This function implements Emo Welzl's optimal enclosing sphere algorithm.
         See "Smallest enclosing disks (balls and ellipsoids)", Lecture Notes in Computer Science 555 (1991) pp. 359-370.
         The running time is expected linear time, but compared to Ritter's algorithm (the FastEnclosingSphere() function),
-        this algorithm is considerably slower.   
-//    static Sphere OptimalEnclosingSphere(const float3 *pointArray, int numPoints);
+        this algorithm is considerably slower.
+        @param pointArray An array of points to compute an enclosing sphere for. This pointer must not be null.
+        @param numPoints The number of elements in the input array pointArray.
+        @see FastEnclosingSphere(). */
+    static Sphere OptimalEnclosingSphere(const float3 *pointArray, int numPoints);
 
 /*
     static Sphere ApproximateEnclosingSphere(const float3 *pointArray, int numPoints);
 
 */
-    void dummytodoremoveme(){}
-
     /// Returns the distance between this sphere and the given object.
     /** This function finds the nearest pair of points on this and the given object, and computes their distance.
         If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
@@ -147,7 +153,9 @@ public:
     float Distance(const LineSegment &lineSegment) const;
 
     /// Computes the closest point on this sphere to the given object.
-    /** @see Contains(), Distance(), Intersects(). 
+    /** If the other object intersects this sphere, this function will return an arbitrary point inside
+        the region of intersection.
+        @see Contains(), Distance(), Intersects(). 
         @todo Add Sphere::ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
     float3 ClosestPoint(const float3 &point) const;
 
@@ -192,7 +200,7 @@ public:
         it is assumed that this sphere is not degenerate, i.e. it has a positive radius.
         A fixed number of 1000 tries is performed, after which the sphere center position is returned as a fallback.
         @param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
-        @see class LCG, RandomPointOnSurface().
+        @see class LCG, RandomPointOnSurface(), IsDegenerate().
         @todo Add Sphere::Point(polarYaw, polarPitch, radius). */
 	float3 RandomPointInside(LCG &lcg);
 	static float3 RandomPointInside(LCG &lcg, const float3 &center, float radius);
@@ -202,7 +210,7 @@ public:
         it is assumed that this sphere is not degenerate, i.e. it has a positive radius.
         A fixed number of 1000 tries is performed, after which a fixed point on the surface is returned as a fallback.
         @param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
-        @see class LCG, RandomPointInside().
+        @see class LCG, RandomPointInside(), IsDegenerate().
         @todo Add Sphere::PointOnSurface(polarYaw, polarPitch). */
 	float3 RandomPointOnSurface(LCG &lcg);
 	static float3 RandomPointOnSurface(LCG &lcg, const float3 &center, float radius);
@@ -213,7 +221,8 @@ public:
 
 	/// Produces a geosphere-triangulation of this sphere.
 	/** @param outPos [out] An array of size numVertices which will receive a triangle list of vertex positions. Cannot be null.
-	    @param outNormal [out] An array of size numVertices which will receive vertex normals. If this parameter is null, vertex normals are not returned.
+	    @param outNormal [out] An array of size numVertices which will receive vertex normals. If this parameter is null, vertex normals are not generated.
+        @param outUV [out] An array of size numVertices which will receive UV coordinates. If this parameter is null, UV coordinates are not generated.
 	    @param numVertices The size of the input arrays outPos and outNormal. This value should be of form 12 + 6*n for some n >= 0.
 	                      To generate a perfect geosphere, pass in a number of form 3 * 4 * 3^k for some k >= 0.
 	    @return The actual number of vertices generated (== the number of elements written to outPos and outNormal). */

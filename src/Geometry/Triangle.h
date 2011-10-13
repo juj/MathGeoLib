@@ -210,7 +210,7 @@ public:
     bool Contains(const LineSegment &lineSegment, float triangleThickness = 1e-3f) const;
     bool Contains(const Triangle &triangle, float triangleThickness = 1e-3f) const;
 
-    /// Returns the distance between this triangle and the given object.
+    /// Computes the distance between this triangle and the given object.
     /** This function finds the nearest pair of points on this and the given object, and computes their distance.
         If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
         @todo Add Triangle::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron). 
@@ -263,7 +263,9 @@ public:
     void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
 
     /// Computes the closest point on this triangle to the given object.
-    /** @see Contains(), Distance(), Intersects(), ClosestPointToTriangleEdge(). */
+    /** If the other object intersects this triangle, this function will return an arbitrary point inside
+        the region of intersection.
+        @see Contains(), Distance(), Intersects(), ClosestPointToTriangleEdge(). */
     float3 ClosestPoint(const float3 &point) const;
     /** @param otherPt [out] If specified, receives the closest point on the other object to this triangle.
         This pointer may be null. */

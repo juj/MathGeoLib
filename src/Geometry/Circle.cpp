@@ -148,19 +148,19 @@ float3 Circle::ClosestPointToDisc(const float3 &point) const
 /*
 float3 Circle::ClosestPointToEdge(const Ray &ray, float *d) const
 {
-	assume(false && "Not implemented!");
+	assume(false && "Not implemented!"); /// @todo Implement.
 	return float3();
 }
 
 float3 Circle::ClosestPointToEdge(const LineSegment &lineSegment, float *d) const
 {
-	assume(false && "Not implemented!");
+	assume(false && "Not implemented!"); /// @todo Implement.
 	return float3();
 }
 
 float3 Circle::ClosestPointToEdge(const Line &line, float *d) const
 {
-	assume(false && "Not implemented!");
+	assume(false && "Not implemented!"); /// @todo Implement.
 	return float3();
 }
 */

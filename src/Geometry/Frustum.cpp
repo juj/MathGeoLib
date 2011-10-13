@@ -114,7 +114,7 @@ float4x4 Frustum::ProjectionMatrix() const
 	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
 	if (type == PerspectiveFrustum)
 	{
-		assume(false && "Not implemented!");
+		assume(false && "Not implemented!"); /// @todo Implement.
 		return float4x4();
 	}
 	else
@@ -307,7 +307,7 @@ bool Frustum::IsFinite() const
 
 bool Frustum::IsDegenerate() const
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
     return false;
 }
 
@@ -333,7 +333,7 @@ float Frustum::Volume() const
 
 float3 Frustum::RandomPointInside(LCG &rng) const
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
     return float3();
 }
 
@@ -387,7 +387,7 @@ void Frustum::Transform(const Quat &transform)
 
 void Frustum::GetPlanes(Plane *outArray) const
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
 }
 
 void Frustum::GetCornerPoints(float3 *outPointArray) const

@@ -405,7 +405,7 @@ float4x4 float4x4::Reflect(const Plane &p)
 
 float4x4 float4x4::PerspectiveProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalFov, float verticalFov)
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
     return float4x4(); ///\todo
 }
 

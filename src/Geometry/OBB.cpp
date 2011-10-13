@@ -126,7 +126,7 @@ void OBB::SetFrom(const Sphere &sphere)
 
 void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
 }
 
 Polyhedron OBB::ToPolyhedron() const
@@ -170,7 +170,7 @@ AABB OBB::MinimalEnclosingAABB() const
 
 AABB OBB::MaximalContainedAABB() const
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
     return AABB();
 }
 
@@ -394,7 +394,7 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 
 OBB OBB::PCAEnclosingOBB(const float3 *pointArray, int numPoints)
 {
-    assume(false && "Not implemented!");
+    assume(false && "Not implemented!"); /// @todo Implement.
     return OBB();
 }
 
