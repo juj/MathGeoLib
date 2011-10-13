@@ -111,7 +111,7 @@ void Plane::Transform(const float3x3 &transform)
     normal = it * normal;
 }
 
-/// See Eric Lengyel's Mathematics for 3D Game Programming And Computer Graphics 2nd ed., p.110, chapter 4.2.3.
+/// For Plane-float3x4 transform code, see Eric Lengyel's Mathematics for 3D Game Programming And Computer Graphics 2nd ed., p.110, chapter 4.2.3. [groupSyntax]
 void Plane::Transform(const float3x4 &transform)
 {
     ///\todo Could optimize this function by switching to plane convention ax+by+cz+d=0 instead of ax+by+cz=d.
@@ -136,7 +136,6 @@ void Plane::Transform(const Quat &transform)
 
 bool Plane::IsInPositiveDirection(const float3 &directionVector) const
 {
-    assume(directionVector.IsNormalized());
     return normal.Dot(directionVector) >= 0.f;
 }
 
@@ -195,20 +194,20 @@ float3x4 Plane::OrthoProjection() const
 
 float3x4 Plane::ObliqueProjection(const float3 &obliqueProjectionDir) const
 {
-    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement.
     return float3x4();
 }
 
-float3x4 Plane::ReflectionMatrix() const
+float3x4 Plane::MirrorMatrix() const
 {
-    return float3x4::Reflect(*this);
+    return float3x4::Mirror(*this);
 }
 
-float3 Plane::Reflect(const float3 &point) const
+float3 Plane::Mirror(const float3 &point) const
 {
     assume(normal.IsNormalized());
     float3 reflected = point - 2.f * (Dot(point, normal) + d) * normal;
-    assume(reflected.Equals(ReflectionMatrix().MulPos(point)));
+    assume(reflected.Equals(MirrorMatrix().MulPos(point)));
     return reflected;
 }
 
@@ -294,7 +293,7 @@ float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
 
 float3 Plane::ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const
 {
-    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement.
     return float3();
 }
 
@@ -346,9 +345,9 @@ bool Plane::SetEquals(const Plane &plane, float epsilon) const
         (normal.Equals(-plane.normal) && EqualAbs(-d, plane.d, epsilon));
 }
 
-bool Plane::SignedEquals(const Plane &plane, float epsilon) const
+bool Plane::Equals(const Plane &other, float epsilon) const
 {
-    return normal.Equals(plane.normal) && EqualAbs(d, plane.d, epsilon);
+    return IsParallel(other, epsilon) && EqualAbs(d, other.d, epsilon);
 }
 
 bool Plane::Intersects(const Plane &plane, Line *outLine) const
@@ -478,7 +477,7 @@ bool Plane::Intersects(const Capsule &capsule) const
     return capsule.Intersects(*this);
 }
 
-/// Set Christer Ericson's Real-Time Collision Detection, p.164.
+/// The Plane-AABB intersection is implemented according to Christer Ericson's Real-Time Collision Detection, p.164. [groupSyntax]
 bool Plane::Intersects(const AABB &aabb) const
 {
     float3 c = aabb.CenterPoint();
@@ -681,18 +680,13 @@ bool Plane::PassesThroughOrigin(float epsilon) const
 
 float Plane::DihedralAngle(const Plane &plane) const
 {
-    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement.
     return false;
-}
-
-bool Plane::Equals(const Plane &other, float epsilon) const
-{
-    return IsParallel(other, epsilon) && EqualAbs(d, other.d, epsilon);
 }
 
 Circle Plane::GenerateCircle(const float3 &circleCenter, float radius) const
 {
-    assume(false && "Not implemented!"); /// @todo Implement. ///\todo
+    assume(false && "Not implemented!"); /// @todo Implement.
     return Circle();
 }
 

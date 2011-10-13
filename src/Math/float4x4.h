@@ -249,10 +249,10 @@ public:
     static float4x4 ShearY(float xFactor, float zFactor); ///< [similarOverload: ShearX] [hideIndex]
     static float4x4 ShearZ(float xFactor, float yFactor); ///< [similarOverload: ShearX] [hideIndex]
 
-    /// Creates a new matrix that reflects along the given plane.
+    /// Creates a new matrix that mirrors with respect to the given plane.
     /** Points lying on one side of the plane will end up at the opposite side of the plane, at the same distance of the plane
         they were. */
-    static float4x4 Reflect(const Plane &p);
+    static float4x4 Mirror(const Plane &p);
 
     /// Creates a new float4x4 that performs perspective projection.
     /// @note The returned matrix contains a last row that differs from [0 0 0 1].

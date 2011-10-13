@@ -355,10 +355,10 @@ float3x4 float3x4::ShearZ(float xFactor, float yFactor)
                     xFactor, yFactor, 1.f, 0.f);
 }
 
-float3x4 float3x4::Reflect(const Plane &p)
+float3x4 float3x4::Mirror(const Plane &p)
 {
     float3x4 v;
-    SetMatrix3x4AffinePlaneReflect(v, p.normal.x, p.normal.y, p.normal.z, p.d);
+    SetMatrix3x4AffinePlaneMirror(v, p.normal.x, p.normal.y, p.normal.z, p.d);
     return v;
 }
 

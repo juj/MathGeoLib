@@ -763,7 +763,7 @@ void SetMatrixRotatePart(Matrix &m, const Quat &q)
 
 /// See e.g. http://en.wikipedia.org/wiki/Transformation_matrix#reflection
 template<typename Matrix>
-void SetMatrix3x3LinearPlaneReflect(Matrix &m, float x, float y, float z)
+void SetMatrix3x3LinearPlaneMirror(Matrix &m, float x, float y, float z)
 {
     assume(float3(x,y,z).IsNormalized());
     m[0][0] = 1.f - 2.f*x*x; m[0][1] =      -2.f*y*x; m[0][2] =      -2.f*z*x;
@@ -772,9 +772,9 @@ void SetMatrix3x3LinearPlaneReflect(Matrix &m, float x, float y, float z)
 }
 
 template<typename Matrix>
-void SetMatrix3x4AffinePlaneReflect(Matrix &m, float x, float y, float z, float d)
+void SetMatrix3x4AffinePlaneMirror(Matrix &m, float x, float y, float z, float d)
 {
-    SetMatrix3x3LinearPlaneReflect(m, x, y, z);
+    SetMatrix3x3LinearPlaneMirror(m, x, y, z);
     m[0][3] = 2.f * d * x;
     m[1][3] = 2.f * d * y;
     m[2][3] = 2.f * d * z;

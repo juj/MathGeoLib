@@ -31,129 +31,186 @@ MATH_BEGIN_NAMESPACE
 class Plane
 {
 public:
-    /// @note The default ctor does not initialize any member values.
-    Plane() {}
-    /// Constructs a plane by directly specifying the normal and distance parameters.
-    /// @param normal The direction the plane is facing. This vector must have been normalized in advance.
-    /// @param d The signed distance of this plane from the origin.
-    Plane(const float3 &normal, float d);
-    /// Constructs a plane by specifying three points on the plane. The normal of the plane will point to 
-    /// the halfspace from which the points are observed to be oriented in counter-clockwise order.
-    /// @note The points v1, v2 and v3 must not all lie on the same line.
-    Plane(const float3 &v1, const float3 &v2, const float3 &v3);
-    /// Constructs a plane by specifying a single point on the plane, and the surface normal.
-    /// @param normal The direction the plane is facing. This vector must have been normalized in advance.
-    Plane(const float3 &point, const float3 &normal);
-	/// Constructs a plane by specifying a line that lies on the plane, and the plane normal.
-	Plane(const Ray &ray, const float3 &normal);
-	Plane(const Line &line, const float3 &normal);
-	Plane(const LineSegment &lineSegment, const float3 &normal);
-
     /// The direction this plane is facing at.
+    /** This direction vector is always normalized. If you assign to this directly, please remember to only
+        assign normalized direction vectors. */
     float3 normal;
-    /// The offset of this plane from the origin.
-    /// -d gives the signed distance of this plane from origin.
-    /// This class uses the convention ax+by+cz = d, which means that:
-    ///  - If this variable is positive, the origin is on the negative side of this plane.
-    ///  - If this variable is negative, the origin is on the on the positive side of this plane.
-    /// (some sources use the convention ax+by+cz+d = 0 for the variable d)
+    /// The offset of this plane from the origin. [similarOverload: normal]
+    /** The value -d gives the signed distance of this plane from origin.
+        This class uses the convention ax+by+cz = d, which means that:
+         - If this variable is positive, the vector space origin (0,0,0) is on the negative side of this plane.
+         - If this variable is negative, the vector space origin (0,0,0) is on the on the positive side of this plane.
+        @note Some sources use the opposite convention ax+by+cz+d = 0 to define the variable d. When comparing equations
+            and algorithm regarding planes, always make sure you know which convention is being used, since it affects the
+            sign of d. */
     float d;
 
-    /// Sets this plane by specifying three points on the plane. The normal of the plane will point to 
-    /// the halfspace from which the points are observed to be oriented in counter-clockwise order.
-    /// @note The points v1, v2 and v3 must not all lie on the same line.
+    /// The default constructor does not initialize any members of this class.
+    /** This means that the values of the members normal and d are undefined after creating a new Plane using this
+        default constructor. Remember to assign to them before use.
+        @see normal, d. */
+    Plane() {}
+    /// Constructs a plane by directly specifying the normal and distance parameters.
+    /** @param normal The direction the plane is facing. This vector must have been normalized in advance.
+        @param d The offset of this plane from the origin. The value -d gives the signed distance of this plane from the origin.
+        @see normal, d. */
+    Plane(const float3 &normal, float d);
+    /// Constructs a plane by specifying three points on the plane. 
+    /** The normal of the plane will point to 
+        the halfspace from which the points are observed to be oriented in counter-clockwise order.
+        @note The points v1, v2 and v3 must not all lie on the same line.
+        @see Set(). */
+    Plane(const float3 &v1, const float3 &v2, const float3 &v3);
+    /// Constructs a plane by specifying a single point on the plane, and the surface normal.
+    /** @param normal The direction the plane is facing. This vector must have been normalized in advance. 
+        @see Set(). */
+    Plane(const float3 &point, const float3 &normal);
+	/// Constructs a plane by specifying a line that lies on the plane, and the plane normal.
+    /** @param line The line object that is to be contained in the newly constructed plane.
+        @param normal The direction the plane if facing. This vector must have been normalized in advance. The normal
+            of the line must not be collinear with the direction of this normal. If a line segment is specified, the line
+            segment must not be degenerate. */
+	Plane(const Ray &line, const float3 &normal);
+	Plane(const Line &line, const float3 &normal);
+	Plane(const LineSegment &line, const float3 &normal);
+
+    /// Sets this plane by specifying three points on the plane. 
+    /** The normal of the plane will point to the halfspace from which the points are observed to be oriented in 
+        counter-clockwise order.
+        @note The points v1, v2 and v3 must not all lie on the same line. */
     void Set(const float3 &v1, const float3 &v2, const float3 &v3);
     /// Sets this plane by specifying a single point on the plane, and the surface normal.
-    /// @param normal The direction the plane is facing. This vector must have been normalized in advance.
+    /** @param normal The direction the plane is facing. This vector must have been normalized in advance. */
     void Set(const float3 &point, const float3 &normal);
 
     /// Reverses the direction of the plane normal, while still representing the same set of points.
+    /** This function sets normal = -normal and d = -d for this plane.
+        @see normal, d. */
     void ReverseNormal();
 
     /// Returns a point on this plane.
-    /// @note This point has the property that the line passing through the origin and the returned point is
-    ///       perpendicular to this plane (directed towards the normal vector of this plane).
+    /** @note This point has the special property that the line passing through the vector space origin (0,0,0) 
+              and the returned point is perpendicular to this plane (directed towards the normal vector of this plane). */
     float3 PointOnPlane() const;
 
     /// Applies a transformation to this plane.
+    /** This function operates in-place.
+        @see classes float3x3, float3x4, float4x4, Quat. */
     void Transform(const float3x3 &transform);
     void Transform(const float3x4 &transform);
     void Transform(const float4x4 &transform);
     void Transform(const Quat &transform);
 
-    /// Tests if given direction vector points towards the positive side of this plane.
+    /// Tests if the given direction vector points towards the positive side of this plane.
+    /** @param directionVector The direction vector to compare with the normal of this plane. This vector
+        may be unnormalized.
+        @see IsOnPositiveSide. */
     bool IsInPositiveDirection(const float3 &directionVector) const;
 
-    /// Tests if given point is on the positive side of this plane.
+    /// Tests if the given point lies on the positive side of this plane.
+    /** A plane divides the space in three sets: the negative halfspace, the plane itself, and the positive halfspace.
+        The normal vector of the plane points towards the positive halfspace.
+        @return This function returns true if the given point lies either on this plane itself, or in the positive 
+            halfspace of this plane.
+        @see IsInPositiveDirection, AreOnSameSide(), Distance(), SignedDistance(). */
     bool IsOnPositiveSide(const float3 &point) const;
 
-    /// Returns 1 if the whole triangle is on the positive side of this plane, -1 if the triangle
-    /// is on the negative side of this plane, and 0 if the triangle intersects this plane.
+    /// Performs a Triangle-Plane intersection test.
+    /** @return This function returns the value 1 if the whole triangle is on the positive side of this plane, the
+            value -1 if the whole triangle lies in the negative side of this plane, and 0 if the triangle intersects this plane.
+        @see Intersects(), AreOnSameSide(), Distance(), SignedDistance(), Contains(). */
     int ExamineSide(const Triangle &triangle) const;
 
-    /// Tests if two points are on the same side of the plane.
+    /// Tests if two points are on the same side of this plane.
+    /** @return This function returns true if both p1 and p2 are on the positive side or this plane, or if both p1 and p2
+            are on the negative side of this plane.
+        @see IsOnPositiveSide(), Distance(), SignedDistance(). */
     bool AreOnSameSide(const float3 &p1, const float3 &p2) const;
 
-    /// Returns the distance of this plane to the given point.
+    /// Returns the distance of this plane to the given object.
+    /** If the given object intersects or lies in this plane, then the returned distance is zero.
+        @note This function always returns a positive distance value, even when the given object lies on the negative side 
+            of this plane. See the SignedDistance() function to produce a distance value that differentiates between the
+            front and back sides of this plane.
+        @see SignedDistance(), Intersects(), Contains(). */
     float Distance(const float3 &point) const;
     float Distance(const LineSegment &lineSegment) const;
     float Distance(const Sphere &sphere) const;
     float Distance(const Capsule &capsule) const;
 
     /// Returns the signed distance of this plane to the given point.
-    /// If this function returns a negative value, the given point lies in the negative halfspace of this plane.
-    /// Conversely, if a positive value is returned, then the given point lies in the positive halfspace of this plane.
+    /** If this function returns a negative value, the given point lies in the negative halfspace of this plane.
+        Conversely, if a positive value is returned, then the given point lies in the positive halfspace of this plane.
+        @see Distance(), IsOnPositiveSide(), AreOnSameSide(). */
     float SignedDistance(const float3 &point) const;
 
-    /// Returns the affine transformation that projects orthographically onto this plane.
+    /// Computes the affine transformation matrix that projects orthographically onto this plane.
+    /** @see ObliqueProjection(), MirrorMatrix(), Project(). */
     float3x4 OrthoProjection() const;
 
-    /// Returns the affine transformation that projects onto this plane in an oblique angle.
-    float3x4 ObliqueProjection(const float3 &obliqueProjectionDir) const;
-
-    /// Returns the transformation matrix that mirrors objects along this plane.
-    float3x4 ReflectionMatrix() const;
-
-    /// Mirrors the given point along this plane.
-    float3 Reflect(const float3 &point) const;
-
-    /// Refracts the given incident vector along this plane.
-    /// By convention, the input vector should point towards the plane, and the returned vector will point away from the plane.
-    /// @param vec Specifies the incident ray direction.
-    /// @param negativeSideRefractionIndex The refraction index of the material we are exiting.
-    /// @param positiveSideRefractionIndex The refraction index of the material we are entering.
-    /// When the ray is going from a denser material to a lighter one, total internal reflection can occur.
-    /// In this case, this function will just return a reflected vector from a call to Reflect().
-    float3 Refract(const float3 &vec, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const;
-
-    /// Projects the given point onto this plane orthographically (finds the closest point on this plane).
+    /// Projects the given object onto this plane orthographically.
+    /** @note This mapping can be expressed as a float3x4 matrix operation. See the OrthoProjection() function.
+        @see OrthoProjection(). */
     float3 Project(const float3 &point) const;
-
-    /// Projects the given LineSegment onto this plane orthographically.
     LineSegment Project(const LineSegment &lineSegment) const;
-    /// Projects the given line or ray to this plane.
-    /// Important: If the line or ray is perpendicular to the plane, the projection is a single point.
-    /// In that case, the .pos parameter of the returned object will specify the point location, the .dir
-    /// parameter of the object will be undefined and the nonDenerate pointer will be set to false.
+    /** @param nonDegenerate [out] If the line or ray is perpendicular to the plane, the projection is 
+        a single point. In that case, the .pos parameter of the returned object will specify the point 
+        location, the .dir parameter of the object will be undefined and the nonDegenerate pointer will be 
+        set to false. This pointer may be null. */
     Line Project(const Line &line, bool *nonDegenerate) const;
     Ray Project(const Ray &ray, bool *nonDegenerate) const;
 
     Triangle Project(const Triangle &triangle) const;
     Polygon Project(const Polygon &polygon) const;
 
-    /// Returns the closest point on this plane to the given point. This is an alias to Plane::Project(const float3 &point).
+    /// Computes the affine transformation matrix that projects onto this plane in an oblique (slanted) angle.
+    /** @param obliqueProjectionDir The projection direction. This vector must be normalized. If a vector collinear to the
+            normal of this plane is specified, this function returns the same matrix as calling OrthoProjection() would.
+        @see OrthoProjection(), MirrorMatrix(), ObliqueProject(). */
+    float3x4 ObliqueProjection(const float3 &obliqueProjectionDir) const;
+
+    /// Projects the given point onto this plane in the given oblique projection direction.
+    /** @param obliqueProjectionDir The projection direction. This vector must be normalized. If a vector collinear to the
+            normal of this plane is specified, this function returns the same matrix as calling OrthoProjection() would.
+        @note This mapping can be expressed as a float3x4 operation. See the ObliqueProjection() function.
+        @see ObliqueProjection(), Project(). */
+    float3 ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const;
+
+    /// Returns the transformation matrix that mirrors objects along this plane.
+    /** This matrix maps each point to its mirror point on the opposite side of this plane.
+        @see Mirror(). */
+    float3x4 MirrorMatrix() const;
+
+    /// Mirrors the given point with respect to this plane.
+    /** This function maps the given point to its mirror point on the opposite side of this plane.
+        @note This operation can be expressed as a float3x4 matrix operation. To compute the mirror matrix for this
+            plane, use the MirrorMatrix() function.
+        @see MirrorMatrix(). */
+    float3 Mirror(const float3 &point) const;
+
+    /// Refracts the given incident vector along this plane.
+    /** By convention, the input vector should point towards the plane, and the returned vector will point away from the plane.
+        When the ray is going from a denser material to a lighter one, total internal reflection can occur.
+        In this case, this function will just return a reflected vector from a call to Reflect().
+        @param vec Specifies the incident ray direction.
+        @param negativeSideRefractionIndex The refraction index of the material we are exiting.
+        @param positiveSideRefractionIndex The refraction index of the material we are entering.
+        @todo Add Plane::Reflect. */
+    float3 Refract(const float3 &vec, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const;
+
+    /// Computes the closest point on this plane to the given object.
+    /** If the other object intersects this plane, this function will return an arbitrary point inside
+        the region of intersection.
+        @see Contains(), Distance(), Intersects(). */
     float3 ClosestPoint(const float3 &point) const { return Project(point); }
-    /// Returns the closest point on this plane to the given object.
     float3 ClosestPoint(const Ray &ray) const;
     float3 ClosestPoint(const LineSegment &lineSegment) const;
 
-    /// Projects the given point onto this plane in the given oblique projection direction.
-    float3 ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const;
-
-    /// Returns true if this plane contains the given point.
-    /// @param distanceThreshold The epsilon value to use for the comparison.
-    bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
-
+    /// Tests if this plane contains the given object.
+    /** @param epsilon Since a plane is a 2D object in a 3D space, an distance threshold is used for the test.
+        This value gives a "thickness" to this plane for the purposes of the test.
+        @return True if the given object is contained in this plane, up to the given epsilon distance. */
+    bool Contains(const float3 &point, float epsilon = 1e-3f) const;
     bool Contains(const Line &line, float epsilon = 1e-3f) const;
     bool Contains(const Ray &ray, float epsilon = 1e-3f) const;
     bool Contains(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
@@ -162,19 +219,42 @@ public:
     bool Contains(const Polygon &polygon, float epsilon = 1e-3f) const;
 
     /// Returns true if this plane represents the same set of points than the other plane.
+    /** For this test, the surface normals of the two planes may point in opposite directions, as long as
+        the set of points is the same.
+        @see Equals(), IsParallel(), DihedralAngle(). */
     bool SetEquals(const Plane &plane, float epsilon = 1e-3f) const;
 
-    /// Returns true if the two planes are equal, and oriented to the same direction.
-    bool SignedEquals(const Plane &plane, float epsilon = 1e-3f) const;
+    /// Returns true if the two planes are equal, and their normals are oriented to the same direction.
+    /** @see SetEquals(), IsParallel(), DihedralAngle(). */
+    bool Equals(const Plane &other, float epsilon = 1e-3f) const;
 
-    /// Computes the intersection of two planes.
-    bool Intersects(const Plane &plane, Line *outLine = 0) const;
+    /// Tests if two planes are parallel.
+    /** @see SetEquals(), Equals(), DihedralAngle(). */
+    bool IsParallel(const Plane &plane, float epsilon = 1e-3f) const;
+
+    /// Returns the angle of intersection between two planes, in radians.
+    /** @see SetEquals(), Equals(), IsParallel(). */
+    float DihedralAngle(const Plane &plane) const;
 
     /// Computes the intersection of three planes.
-    /// @note If two of the planes are identical, the intersection will be a line.
-    ///       does not detect this case, and only returns a single point on the line.
+    /** This function computes the intersection of this plane, and the given two planes.
+        @param outLine [out] If the three planes are configured in such a manner that intersection is a line,
+            this parameter receives the line of intersection. This pointer may be null.
+        @param outPoint [out] If the three planes are configured in such a manner that the interesction is a point,
+            this parameter receives the point of intersection. This pointer may be null.
+        @bug This function never outputs outLine.
+        @return True if the intersection was a point, in which case outPoint is written to.
+        @see Contains(), Distance(), ClosestPoint(). */
     bool Intersects(const Plane &plane, const Plane &plane2, Line *outLine = 0, float3 *outPoint = 0) const;
-    
+
+    /// Tests whether this plane and the given object intersect.
+    /** @param outLine [out] The intersection of two planes forms a line. If an intersection occurs, this parameter will receive 
+        the line of intersection. This pointer may be null.
+        @return True if the given object intersects with this plane. */
+    bool Intersects(const Plane &plane, Line *outLine = 0) const;
+    /** @param d [out] If specified, this parameter will receive the parametric distance of 
+            the intersection point along the line object. Use the GetPoint(d) function of the line class
+            to get the actual point of intersection. This pointer may be null. */
     bool Intersects(const Ray &ray, float *d) const;
     bool Intersects(const Line &line, float *d) const;
     bool Intersects(const LineSegment &lineSegment, float *d) const;
@@ -187,56 +267,52 @@ public:
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Capsule &capsule) const;
-    /// Returns the number of intersections that were found: 0, 1 or 2.
-    /// The actual intersection points are output in pt1 and pt2.
+    /// Tests if this plane intersects with the given circle.
+    /** @param pt1 [out] If specified, receives the first point of intersection. This pointer may be null.
+        @param pt2 [out] If specified, receives the second point of intersection. This pointer may be null.
+        @return The number of intersections that occurred: 0, 1 or 2. */
     int Intersects(const Circle &circle, float3 *pt1, float3 *pt2) const;
     int Intersects(const Circle &circle) const;
-//    bool Intersect(const Polyhedron &polyhedron) const;
 
     /// Clips a line segment against this plane.
-    /// This function removes the part of the line segment which lies in the negative halfspace of this plane.
-    /// The clipping operation is performed in-place. If the whole line segment is clipped, the input variables
-    /// are not modified.
-    /// @return If this function returns true, the line segment after clipping did not become degenerate.
-    ///         If false is returned, the whole line segment lies in the negative halfspace, and no output line segment
-    ///         was generated.
+    /** This function removes the part of the line segment which lies in the negative halfspace of this plane.
+        The clipping operation is performed in-place. If the whole line segment is clipped, the input variables
+        are not modified.
+        @return If this function returns true, the line segment after clipping did not become degenerate.
+                If false is returned, the whole line segment lies in the negative halfspace, and no output line segment
+                was generated. */
     bool Clip(LineSegment &line) const;
     bool Clip(float3 &a, float3 &b) const;
 
     /// Clips a line against this plane.
-    /// This function removes the part of the line which lies in the negative halfspace of this plane.
-    /// @return If the clipping removed the whole line, the value 0 is returned.
-    ///         If the clipping resulted in a ray, the value 1 is returned.
-    ///         If the clipping resulted in a line, the value 2 is returned.
+    /** This function removes the part of the line which lies in the negative halfspace of this plane.
+        @param line The line to clip. If this function returns 2, then the input line should be preserved.
+        @param outRay [out] If this function returns 1, then this parameter will receive the ray object that was formed.
+        @return If the clipping removed the whole line, the value 0 is returned.
+                If the clipping resulted in a ray, the value 1 is returned.
+                If the clipping resulted in a line, the value 2 is returned. */
     int Clip(const Line &line, Ray &outRay) const;
 
     /// Clips a triangle against this plane.
-    /// This function removes the part of the triangle which lies in the negative halfspace of this plane.
-    /// @return This function reports how many output triangles were generated.
-    ///         If the whole input triangle was clipped, the value 0 is returned.
-    ///         If this function returns 1, the value t1 will receive the generated output triangle.
-    ///         If this function returns 2, t1 and t2 will receive the generated output triangles.
+    /** This function removes the part of the triangle which lies in the negative halfspace of this plane.
+        @return This function reports how many output triangles were generated.
+                If the whole input triangle was clipped, the value 0 is returned.
+                If this function returns 1, the value t1 will receive the generated output triangle.
+                If this function returns 2, t1 and t2 will receive the generated output triangles. */
     int Clip(const Triangle &triangle, Triangle &t1, Triangle &t2) const;
 
-    /// Tests if two planes are parallel.
-    bool IsParallel(const Plane &plane, float epsilon = 1e-3f) const;
-
     /// Returns true if this plane contains the origin.
-    /// The test is performed up to the given epsilon.
-    /// @note A plane passes through the origin iff d == 0 for the plane.
+    /** The test is performed up to the given epsilon.
+        @note A plane passes through the origin if and only if d == 0 for the plane.
+        @see d. */
     bool PassesThroughOrigin(float epsilon = 1e-3f) const;
 
-    /// Returns the angle of intersection between two planes, in radians.
-    float DihedralAngle(const Plane &plane) const;
-
-    /// Tests if two planes are the same, up to the given epsilon.
-    bool Equals(const Plane &other, float epsilon = 1e-3f) const;
-
-    /// Returns true if this plane is a separating plane for the given two objects.
+    // Returns true if this plane is a separating plane for the given two objects.
 //    bool IsSeparatingPlane(const Polyhedron &obj1, const Polyhedron &obj2) const;
 
-    /// Returns a circle that lies on this plane, with its center as close as possible to the specified center point,
-    /// and the radius as specified.
+    /// Returns a circle that lies on this plane.
+    /** @return The generated circle has its center as close as possible to the specified center point,
+        and the radius is as specified. */
     Circle GenerateCircle(const float3 &circleCenter, float radius) const;
 
 //    float3 RandomPointInsideCircle(const float3 &circleCenter, float radius) const;

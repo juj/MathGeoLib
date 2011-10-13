@@ -238,10 +238,10 @@ public:
     static float3x4 ShearY(float xFactor, float zFactor); ///< [similarOverload: ShearX] [hideIndex]
     static float3x4 ShearZ(float xFactor, float yFactor); ///< [similarOverload: ShearX] [hideIndex]
 
-    /// Creates a new matrix that reflects along the given plane.
+    /// Creates a new matrix that mirrors with respect to the given plane.
     /** Points lying on one side of the plane will end up at the opposite side of the plane, at the same distance of the plane
         they were. */
-    static float3x4 Reflect(const Plane &p);
+    static float3x4 Mirror(const Plane &p);
 
     /// Creates a new float3x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
     static float3x4 OrthographicProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
