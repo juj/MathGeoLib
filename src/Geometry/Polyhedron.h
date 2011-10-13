@@ -49,7 +49,7 @@ public:
         simple polygon in counter-clockwise winding order. */
     std::vector<Face> f;
 
-    /// The default constructur creates a null polyhedron.
+    /// The default constructor creates a null polyhedron.
     /** A null polyhedron has 0 vertices and 0 faces.
         @see IsNull(). */
     Polyhedron() {}

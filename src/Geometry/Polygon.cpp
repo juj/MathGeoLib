@@ -89,10 +89,13 @@ bool Polygon::DiagonalExists(int i, int j) const
 #endif
     assume(IsPlanar());
     assume(i != j);
+    if (i == j) // Degenerate if i == j.
+        return false;
     if (i > j)
         Swap(i, j);
-    if ((i+1)%p.size() == j)
-        return true;
+    assume(i+1 != j);
+    if (i+1 == j) // Is this LineSegment an edge of this polygon?
+        return false;
 
     Plane polygonPlane = PlaneCCW();
     LineSegment diagonal = polygonPlane.Project(LineSegment(p[i], p[j]));
@@ -224,6 +227,25 @@ bool Polygon::IsSimple() const
         }
     }
     return true;
+}
+
+bool Polygon::IsNull() const
+{
+    return p.size() == 0;
+}
+
+bool Polygon::IsFinite() const
+{
+    for(size_t i = 0; i < p.size(); ++i)
+        if (!p[i].IsFinite())
+            return false;
+
+    return true;
+}
+
+bool Polygon::IsDegenerate(float epsilon) const
+{
+    return p.size() < 3 || Area() <= epsilon;
 }
 
 float3 Polygon::NormalCCW() const
