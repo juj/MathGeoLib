@@ -96,7 +96,7 @@ void AABB::SetFrom(const float3 *pointArray, int numPoints)
 
 Polyhedron AABB::ToPolyhedron() const
 {
-    // Note for maintainer: This function is an exact copy of OBB:ToPolyhedron() and Frustum::ToPolyhedron().
+    // Note to maintainer: This function is an exact copy of OBB:ToPolyhedron() and Frustum::ToPolyhedron().
     Polyhedron p;
     // Populate the corners of this AABB.
     // The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.

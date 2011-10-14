@@ -26,6 +26,7 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
 #include "Geometry/Plane.h"
+#include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"
 #include "Geometry/Capsule.h"
@@ -122,7 +123,11 @@ void OBB::SetFrom(const Sphere &sphere)
     axis[2] = float3(0,0,1);
 }
 
-//    bool SetFrom(const Polyhedron &polyhedron);
+bool OBB::SetFrom(const Polyhedron &polyhedron)
+{
+    assume(false && "Not implemented!"); /// @todo Implement.
+    return false;
+}
 
 void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
 {
@@ -131,7 +136,7 @@ void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
 
 Polyhedron OBB::ToPolyhedron() const
 {
-    // Note for maintainer: This function is an exact copy of AABB:ToPolyhedron() and Frustum::ToPolyhedron().
+    // Note to maintainer: This function is an exact copy of AABB:ToPolyhedron() and Frustum::ToPolyhedron().
 
     Polyhedron p;
     // Populate the corners of this OBB.
@@ -197,7 +202,7 @@ bool OBB::IsFinite() const
 
 bool OBB::IsDegenerate() const
 {
-    return r.x < 0.f || r.y < 0.f || r.z < 0.f;
+    return r.x <= 0.f || r.y <= 0.f || r.z <= 0.f;
 }
 
 float3 OBB::CenterPoint() const
@@ -452,7 +457,7 @@ float3x4 OBB::LocalToWorld() const
     return m;
 }
 
-/// Implementation from Christer Ericson's Real-Time Collision Detection, p.133.
+/// The implementation of this function is from Christer Ericson's Real-Time Collision Detection, p.133.
 float3 OBB::ClosestPoint(const float3 &targetPoint) const
 {
     float3 d = targetPoint - pos;
@@ -470,7 +475,7 @@ float OBB::Volume() const
 
 float OBB::SurfaceArea() const
 {
-    float3 size = Size();
+    const float3 size = Size();
     return 2.f * (size.x*size.y + size.x*size.z + size.y*size.z);
 }
 
@@ -506,6 +511,7 @@ void OBB::Scale(const float3 &centerPoint, float scaleFactor)
 
 void OBB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
 {
+    ///@bug This scales in global axes, not local axes.
     float3x4 transform = float3x4::Scale(scaleFactor, centerPoint);
     Transform(transform);
 }
@@ -595,7 +601,7 @@ bool OBB::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
 }
-/*
+
 bool OBB::Contains(const Polygon &polygon) const
 {
     for(int i = 0; i < polygon.NumVertices(); ++i)
@@ -603,7 +609,7 @@ bool OBB::Contains(const Polygon &polygon) const
             return false;
     return true;
 }
-*/
+
 bool OBB::Contains(const Frustum &frustum) const
 {
     for(int i = 0; i < 8; ++i)
@@ -667,8 +673,8 @@ void OBB::ToEdgeList(float3 *outPos) const
     }
 }
 
-/** The following code is from Christer Ericson's book Real-Time Collision Detection, pp. 101-106.
-    http://realtimecollisiondetection.net/ */
+/** The OBB-OBB intersection test is from Christer Ericson's book Real-Time Collision Detection, p. 101-106. 
+    See http://realtimecollisiondetection.net/ [groupSyntax] */
 bool OBB::Intersects(const OBB &b, float epsilon) const
 {
     assume(pos.IsFinite());
@@ -769,7 +775,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
     return true;
 }
 
-/// Code taken from Christer Ericson's Real-Time Collision Detection, p. 163.
+/// The implementation of OBB-Plane intersection test follows Christer Ericson's Real-Time Collision Detection, p. 163. [groupSyntax]
 bool OBB::Intersects(const Plane &p) const
 {
     // Compute the projection interval radius of this OBB onto L(t) = this->pos + x * p.normal;
@@ -802,7 +808,7 @@ bool OBB::Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) 
     return aabb.Intersects(l, dNear, dFar);
 }
 
-/// See Christer Ericson's Real-Time Collision Detection, p. 166.
+/// The implementation of the OBB-Sphere intersection test follows Christer Ericson's Real-Time Collision Detection, p. 166. [groupSyntax]
 bool OBB::Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const
 {
     // Find the point on this AABB closest to the sphere center.
@@ -842,39 +848,6 @@ bool OBB::Intersects(const Polyhedron &polyhedron) const
     return polyhedron.Intersects(*this);
 }
 
-/*
-HitInfo Intersect(const Ray &ray, float *outDistance) const;
-HitInfo Intersect(const Ray &ray, float maxDistance, float *outDistance) const;
-HitInfo Intersect(const Line &line, float *outDistance) const;
-HitInfo Intersect(const LineSegment &lineSegment, float *outDistance) const;
-
-HitInfo Intersect(const OBB &obb) const;
-
-HitInfo Intersect(const Plane &plane) const;
-HitInfo Intersect(const Sphere &sphere) const;
-HitInfo Intersect(const Ellipsoid &ellipsoid) const;
-HitInfo Intersect(const Triangle &triangle) const;
-HitInfo Intersect(const Cylinder &cylinder) const;
-HitInfo Intersect(const Capsule &capsule) const;
-HitInfo Intersect(const Torus &torus) const;
-HitInfo Intersect(const Frustum &frustum) const;
-HitInfo Intersect(const Polygon &polygon) const; */
-
-/*    void Enclose(const float3 &point);
-void Enclose(const LineSegment &lineSegment);
-void Enclose(const AABB &aabb);
-void Enclose(const OBB &obb);
-void Enclose(const Sphere &sphere);
-void Enclose(const Ellipsoid &ellipsoid);
-void Enclose(const Triangle &triangle);
-void Enclose(const Cylinder &cylinder);
-void Enclose(const Capsule &capsule);
-void Enclose(const Torus &torus);
-void Enclose(const Frustum &frustum);
-void Enclose(const Polygon &polygon);
-bool Enclose(const Polyhedron &polyhedron);
-void Enclose(const float3 *pointArray, int numPoints);*/
-
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string OBB::ToString() const
 {
@@ -884,11 +857,5 @@ std::string OBB::ToString() const
     return str;
 }
 #endif
-
-//    Polyhedron Intersection(const AABB &aabb) const;
-
-//    Polyhedron Intersection(const OBB &obb) const;
-
-//    Polyhedron Intersection(const Polyhedron &polyhedron) const;
 
 MATH_END_NAMESPACE

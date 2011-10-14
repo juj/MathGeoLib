@@ -442,7 +442,7 @@ OBB Frustum::MinimalEnclosingOBB() const
 
 Polyhedron Frustum::ToPolyhedron() const
 {
-    // Note for maintainer: This function is an exact copy of AABB:ToPolyhedron() and OBB::ToPolyhedron().
+    // Note to maintainer: This function is an exact copy of AABB:ToPolyhedron() and OBB::ToPolyhedron().
 
     Polyhedron p;
     // Populate the corners of this Frustum.
