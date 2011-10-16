@@ -226,12 +226,12 @@ bool Polyhedron::IsConvex() const
 {
     // This function is O(n^2).
     /** @todo Real-Time Collision Detection, p. 64:
-        "A faster O(n) approach is to compute for each face F of P the centroid C of F,
+        A faster O(n) approach is to compute for each face F of P the centroid C of F,
         and for all neighboring faces G of F test if C lies behind the supporting plane of
         G. If some C fails to lie behind the supporting plane of one or more neighboring
         faces, P is concave, and is otherwise assumed convex. However, note that just as the
         corresponding polygonal convexity test may fail for a pentagram this test may fail for,
-        for example, a pentagram extruded out of its plane and capped at the ends." */
+        for example, a pentagram extruded out of its plane and capped at the ends. */
 
     for(int f = 0; f < NumFaces(); ++f)
     {

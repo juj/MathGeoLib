@@ -20,7 +20,7 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreAxisAlignedBox.h>
 #endif
 
@@ -410,7 +410,7 @@ public:
     /** The returned string specifies the center point and the half-axes of this AABB. */
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -429,7 +429,7 @@ public:
         and the given Polyhedron. */
 //    Polyhedron Intersection(const Polyhedron &polyhedron) const;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }
     operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
 #endif
@@ -437,7 +437,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(AABB)
 Q_DECLARE_METATYPE(AABB*)
 #endif

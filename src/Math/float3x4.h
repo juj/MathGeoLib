@@ -698,7 +698,7 @@ public:
     float3 MulDir(const float3 &directionVector) const;
     float4 Mul(const float4 &vector) const;
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return ToString2().c_str(); }
 #endif
@@ -721,7 +721,7 @@ float4 operator *(const float4 &lhs, const float3x4 &rhs);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float3x4)
 Q_DECLARE_METATYPE(float3x4*)
 #endif

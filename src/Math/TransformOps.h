@@ -84,7 +84,7 @@ float3x4 operator *(const TranslateOp &lhs, const ScaleOp &rhs);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(TranslateOp)
 Q_DECLARE_METATYPE(TranslateOp*)
 Q_DECLARE_METATYPE(ScaleOp)

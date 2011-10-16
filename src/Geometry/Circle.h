@@ -109,7 +109,7 @@ public:
     /** The returned string specifies the center position, normal direction and the radius of this Circle. */
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -117,7 +117,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Circle)
 Q_DECLARE_METATYPE(Circle*)
 #endif

@@ -61,7 +61,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Complex)
 Q_DECLARE_METATYPE(Complex*)
 #endif

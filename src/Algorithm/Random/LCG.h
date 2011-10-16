@@ -86,7 +86,7 @@ private:
 	u32 lastNumber;
 };
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(LCG)
 Q_DECLARE_METATYPE(LCG*)
 #endif

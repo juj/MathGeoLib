@@ -20,7 +20,7 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgrePlane.h>
 #endif
 
@@ -318,7 +318,7 @@ public:
 //    float3 RandomPointInsideCircle(const float3 &circleCenter, float radius) const;
 //    float3 RandomPointOnCircleEdge(const float3 &circleCenter, float radius) const;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     Plane(const Ogre::Plane &other) { normal = other.normal; d = other.d; }
     operator Ogre::Plane() const { return Ogre::Plane(normal, d); }
 #endif
@@ -327,7 +327,7 @@ public:
     /// Returns a human-readable representation of this Plane. Most useful for debugging purposes.
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -340,7 +340,7 @@ Plane operator *(const Quat &transform, const Plane &plane);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Plane)
 Q_DECLARE_METATYPE(Plane*)
 #endif

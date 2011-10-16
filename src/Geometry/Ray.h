@@ -20,7 +20,7 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreRay.h>
 #endif
 
@@ -177,12 +177,12 @@ public:
     /** The returned string specifies the position and direction of this Ray. */
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     Ray(const Ogre::Ray &other) { pos = other.getOrigin(); dir = other.getDirection(); }
     operator Ogre::Ray() const { return Ogre::Ray(pos, dir); }
 #endif
@@ -196,7 +196,7 @@ Ray operator *(const Quat &transform, const Ray &ray);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Ray)
 Q_DECLARE_METATYPE(Ray*)
 #endif

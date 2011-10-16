@@ -23,19 +23,19 @@
 
 #include "Math/MathFwd.h"
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 #include <QVector3D>
 #endif
 /*
-#ifdef IRRLICHT_INTEROP
+#ifdef MATH_IRRLICHT_INTEROP
 #include "Math/float3.h"
 #endif
 */
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreVector3.h>
 #endif
 
-#ifdef BULLET_INTEROP
+#ifdef MATH_BULLET_INTEROP
 #include "LinearMath/btVector3.h"
 #endif
 
@@ -330,17 +330,17 @@ public:
     /// A compile-time constant float3 with value (+infinity, +infinity, +infinity).
     static const float3 inf;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     float3(const Ogre::Vector3 &other) { x = other.x; y = other.y; z = other.z; }
     operator Ogre::Vector3() const { return Ogre::Vector3(x, y, z); }
 #endif
 /*
-#ifdef IRRLICHT_INTEROP
+#ifdef MATH_IRRLICHT_INTEROP
     float3(const Vector3df &other) { x = other.x; y = other.y; z = other.z; }
     operator Vector3df() const { return Vector3df(x, y, z); }
 #endif
 */
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     float3(const QVector3D &other) { x = other.x(); y = other.y(); z = other.z(); }
     operator QVector3D() const { return QVector3D(x, y, z); }
     operator QString() const { return "float3(" + QString::number(x) + "," + QString::number(y) + "," + QString::number(z) + ")"; }
@@ -349,7 +349,7 @@ public:
     static float3 FromQVector3D(const QVector3D &v) { return (float3)v; }
     static float3 FromString(const QString &str) { return FromString(str.toStdString()); }
 #endif
-#ifdef BULLET_INTEROP
+#ifdef MATH_BULLET_INTEROP
     float3(const btVector3 &other) { x = other.x(); y = other.y(); z = other.z(); }
     operator btVector3() const { return btVector3(x, y, z); }
 #endif
@@ -378,7 +378,7 @@ inline float3 Lerp(const float3 &a, const float3 &b, float t) { return a.Lerp(b,
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float3)
 Q_DECLARE_METATYPE(float3*)
 #endif

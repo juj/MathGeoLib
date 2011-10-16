@@ -24,11 +24,11 @@
 
 #include "Math/MathFwd.h"
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 #include <QVector2D>
 #endif
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreVector2.h>
 #endif
 
@@ -306,11 +306,11 @@ public:
     /// A compile-time constant float2 with value (+infinity, +infinity).
     static const float2 inf;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     float2(const Ogre::Vector2 &other) { x = other.x; y = other.y; }
     operator Ogre::Vector2() const { return Ogre::Vector2(x, y); }
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     float2(const QVector2D &other) { x = other.x(); y = other.y(); }
     operator QVector2D() const { return QVector2D(x, y); }
     operator QString() const { return "float2(" + QString::number(x) + "," + QString::number(y) + ")"; }
@@ -343,7 +343,7 @@ inline float2 Lerp(const float2 &a, const float2 &b, float t) { return a.Lerp(b,
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float2)
 Q_DECLARE_METATYPE(float2*)
 #endif

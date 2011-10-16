@@ -27,11 +27,11 @@
 #include "Math/float3.h"
 #include "CoordinateAxisConvention.h"
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreMatrix3.h>
 #endif
 
-#ifdef BULLET_INTEROP
+#ifdef MATH_BULLET_INTEROP
 #include "LinearMath/btMatrix3x3.h"
 #endif
 
@@ -614,17 +614,17 @@ public:
     float3 MulPos(const float3 &rhs) const { return Mul(rhs); }
     float3 MulDir(const float3 &rhs) const { return Mul(rhs); }
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     float3x3(const Ogre::Matrix3 &m) { Set(&m[0][0]); }
     operator Ogre::Matrix3() { return Ogre::Matrix3(v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]); } 
 #endif
 
-#ifdef BULLET_INTEROP
+#ifdef MATH_BULLET_INTEROP
     float3x3(const btMatrix3x3 &m) { Set(m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]); }
     operator btMatrix3x3() { return btMatrix3x3(v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]); }
 #endif
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return ToString2().c_str(); }
 #endif
@@ -652,7 +652,7 @@ float4 operator *(const float4 &lhs, const float3x3 &rhs);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float3x3)
 Q_DECLARE_METATYPE(float3x3*)
 #endif

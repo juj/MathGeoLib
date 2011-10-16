@@ -24,11 +24,11 @@
 #include "MatrixProxy.h"
 #include "CoordinateAxisConvention.h"
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreMatrix4.h>
 #endif
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 #include <QMatrix4x4>
 #endif
 
@@ -792,12 +792,12 @@ public:
     void Decompose(float3 &translate, float3x4 &rotate, float3 &scale) const;
     void Decompose(float3 &translate, float4x4 &rotate, float3 &scale) const;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     float4x4(const Ogre::Matrix4 &m) { Set(&m[0][0]); }
     operator Ogre::Matrix4() { return Ogre::Matrix4(v[0][0], v[0][1], v[0][2], v[0][3], v[1][0], v[1][1], v[1][2], v[1][3], v[2][0], v[2][1], v[2][2], v[2][3], v[3][0], v[3][1], v[3][2], v[3][3]); } 
 #endif
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     float4x4(const QMatrix4x4 &m) { Set(m(0,0), m(0,1), m(0,2), m(0,3), m(1,0), m(1,1), m(1,2), m(1,3), m(2,0), m(2,1), m(2,2), m(2,3), m(3,0), m(3,1), m(3,2), m(3,3)); }
     operator QMatrix4x4() const { return QMatrix4x4(v[0][0], v[0][1], v[0][2], v[0][3], v[1][0], v[1][1], v[1][2], v[1][3], v[2][0], v[2][1], v[2][2], v[2][3], v[3][0], v[3][1], v[3][2], v[3][3]); }
     operator QString() const { return toString(); }
@@ -832,7 +832,7 @@ float4 operator *(const float4 &lhs, const float4x4 &rhs);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float4x4)
 Q_DECLARE_METATYPE(float4x4*)
 #endif

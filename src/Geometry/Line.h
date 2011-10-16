@@ -134,7 +134,7 @@ public:
     /// Returns a human-readable representation of this Line. Most useful for debugging purposes.
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -151,7 +151,7 @@ float3 LineLine(float3 start0, float3 end0, float3 start1, float3 end1, float *d
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Line)
 Q_DECLARE_METATYPE(Line*)
 #endif

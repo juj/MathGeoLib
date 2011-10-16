@@ -175,7 +175,7 @@ public:
     /** The returned string specifies the line segment and the radius of this Capsule. */
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -183,7 +183,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Capsule)
 Q_DECLARE_METATYPE(Capsule*)
 #endif

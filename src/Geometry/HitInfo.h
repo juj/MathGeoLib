@@ -44,7 +44,7 @@ struct HitInfo
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(HitInfo)
 Q_DECLARE_METATYPE(HitInfo*)
 #endif

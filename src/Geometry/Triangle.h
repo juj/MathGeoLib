@@ -320,7 +320,7 @@ public:
     /// Returns a human-readable representation of this Line. Most useful for debugging purposes.
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -333,7 +333,7 @@ Triangle operator *(const Quat &transform, const Triangle &t);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Triangle)
 Q_DECLARE_METATYPE(Triangle*)
 #endif

@@ -23,11 +23,11 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 #include <QVector4D>
 #endif
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreVector4.h>
 #endif
 
@@ -330,12 +330,12 @@ public:
     /// Divides this vector by rhs *element-wise*, including the w-component.
     float4 Div(const float4 &rhs) const;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     float4(const Ogre::Vector4 &other) { x = other.x; y = other.y; z = other.z; w = other.w; }
     float4 &operator =(const Ogre::Vector4 &other) { x = other.x; y = other.y; z = other.z; w = other.w; return *this; }
     operator Ogre::Vector4() const { return Ogre::Vector4(x, y, z, w); }
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     float4(const QVector4D &other) { x = other.x(); y = other.y(); z = other.z(); w = other.w(); }
     operator QVector4D() const { return QVector4D(x, y, z, w); }
     operator QString() const { return "float4(" + QString::number(x) + "," + QString::number(y) + "," + QString::number(z) + "," + QString::number(w) + ")"; }
@@ -344,7 +344,7 @@ public:
     static float4 FromQVector4D(const QVector4D &v) { return (float4)v; }
     static float4 FromString(const QString &str) { return FromString(str.toStdString()); }
 #endif
-#ifdef BULLET_INTEROP
+#ifdef MATH_BULLET_INTEROP
     // Bullet uses the same btVector3 class for both 3- and 4 -tuples (due to SSE).
     float4(const btVector3 &other) { x = other.x(); y = other.y(); z = other.z(); w = other.w(); }
     operator btVector3() const { btVector3 v(x, y, z); v.setW(w); return v; }
@@ -377,7 +377,7 @@ inline float4 Lerp(const float4 &a, const float4 &b, float t) { return a.Lerp(b,
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float4)
 Q_DECLARE_METATYPE(float4*)
 #endif

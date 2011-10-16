@@ -211,7 +211,7 @@ public:
     /// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -219,7 +219,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Frustum)
 Q_DECLARE_METATYPE(Frustum*)
 #endif

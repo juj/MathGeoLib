@@ -425,7 +425,7 @@ public:
     /** The returned string specifies the center point and the half-axes of this OBB. */
     std::string ToString() const;
 #endif
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     operator QString() const { return toString(); }
     QString toString() const { return QString::fromStdString(ToString()); }
 #endif
@@ -446,7 +446,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(OBB)
 Q_DECLARE_METATYPE(OBB*)
 #endif

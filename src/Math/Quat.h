@@ -22,15 +22,15 @@
 #endif
 #include "Math/MathFwd.h"
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 #include <QQuaternion>
 #endif
 /*
-#ifdef IRRLICHT_INTEROP
+#ifdef MATH_IRRLICHT_INTEROP
 #include "Quaternion.h"
 #endif
 */
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
 #include <OgreQuaternion.h>
 #endif
 
@@ -283,17 +283,17 @@ public:
     /// Divides a quaternion by another. Division "a / b" results in a quaternion that rotates the orientation b to coincide with the orientation a.
     Quat operator /(const Quat &rhs) const;
 
-#ifdef OGRE_INTEROP
+#ifdef MATH_OGRE_INTEROP
     Quat(const Ogre::Quaternion &other) { w = other.w; x = other.x; y = other.y; z = other.z; }
     operator Ogre::Quaternion() const { return Ogre::Quaternion(w, x, y, z); }
 #endif
 /*
-#ifdef IRRLICHT_INTEROP
+#ifdef MATH_IRRLICHT_INTEROP
     Quat(const Quaternion &other) { w = other.w; x = other.x; y = other.y; z = other.z; }
     operator Quaternion() const { return Quaternion(x, y, z, w); }
 #endif
 */
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
     Quat(const QQuaternion &other) { w = other.scalar(); x = other.x(); y = other.y(); z = other.z(); }
     operator QQuaternion() const { return QQuaternion(w, x, y, z); }
     operator QString() const { return toString(); }
@@ -302,7 +302,7 @@ public:
     static Quat FromQQuaternion(const QQuaternion &q) { return (Quat)q; }
     static Quat FromString(const QString &str) { return FromString(str.toStdString()); }
 #endif
-#ifdef BULLET_INTEROP
+#ifdef MATH_BULLET_INTEROP
     Quat(const btQuaternion &other) { w = other.w(); x = other.x(); y = other.y(); z = other.z(); }
     operator btQuaternion() const { return btQuaternion(x, y, z, w); }
 #endif
@@ -351,7 +351,7 @@ Quat Slerp(const Quat &a, const Quat &b, float t);
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Quat)
 Q_DECLARE_METATYPE(Quat*)
 #endif

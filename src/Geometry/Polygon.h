@@ -326,7 +326,7 @@ public:
 
 MATH_END_NAMESPACE
 
-#ifdef QT_INTEROP
+#ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Polygon)
 Q_DECLARE_METATYPE(Polygon*)
 #endif
