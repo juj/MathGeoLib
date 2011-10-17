@@ -137,7 +137,7 @@ float3 LineSegment::ClosestPoint(const float3 &point, float *d) const
 float3 LineSegment::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
     float u, u2;
-    LineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
+    Line::ClosestPointLineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
     u = Clamp01(u); // This is a line segment - cap both ends.
     if (d)
         *d = u;
@@ -150,7 +150,7 @@ float3 LineSegment::ClosestPoint(const Ray &other, float *d, float *d2) const
 float3 LineSegment::ClosestPoint(const Line &other, float *d, float *d2) const
 {
     float u, u2;
-    LineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
+    Line::ClosestPointLineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
     u = Clamp01(u); // This is a line segment - cap both ends.
     if (d)
         *d = u;
@@ -162,7 +162,7 @@ float3 LineSegment::ClosestPoint(const Line &other, float *d, float *d2) const
 float3 LineSegment::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
     float u, u2;
-    LineLine(a, b, other.a, other.b, &u, &u2);
+    Line::ClosestPointLineLine(a, b, other.a, other.b, &u, &u2);
     u = Clamp01(u); // This is a line segment - cap both ends.
     if (d)
         *d = u;

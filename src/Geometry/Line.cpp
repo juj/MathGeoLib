@@ -36,19 +36,27 @@
 
 MATH_BEGIN_NAMESPACE
 
-/// This code is adapted from http://paulbourke.net/geometry/lineline3d/ .
-/// dmnop = (xm - xn)(xo - xp) + (ym - yn)(yo - yp) + (zm - zn)(zo - zp).
-/// @param v An array of four floats: [0]: line 0 start. [1]: line 0 end. [2]: line 1 start. [3]: line 1 end.
+/// A helper function to compute the line-line closest point.
+/** This code is adapted from http://paulbourke.net/geometry/lineline3d/ .
+    dmnop = (xm - xn)(xo - xp) + (ym - yn)(yo - yp) + (zm - zn)(zo - zp).
+    @param v An array of four floats: [0]: line 0 start. [1]: line 0 end. [2]: line 1 start. [3]: line 1 end. */
 float Dmnop(const float3 *v, int m, int n, int o, int p)
 {
     return (v[m].x - v[n].x) * (v[o].x - v[p].x) + (v[m].y - v[n].y) * (v[o].y - v[p].y) + (v[m].z - v[n].z) * (v[o].z - v[p].z);
 }
 
-/// Computes the closest points on both lines start0<->end0 and start1<->end1 to each other.
-/// @param d [out] The normalize distance along the first line that specifies the closest point is returned here.
-/// @param d2 [out] The normalize distance along the second line that specifies the closest point is returned here.
-/// @return Returns the closest point on line start0<->end0 to the second line.
-float3 LineLine(float3 start0, float3 end0, float3 start1, float3 end1, float *d, float *d2)
+/// Computes the closest point pair on two lines.
+/** The first line is specified by two points start0 and end0. The second line is specified by
+    two points start1 and end1.
+    The implementation of this function follows http://paulbourke.net/geometry/lineline3d/ .
+    @param d [out] If specified, receives the normalized distance of the closest point along the first line.
+        This pointer may be left null.
+    @param d2 [out] If specified, receives the normalized distance of the closest point along the second line.
+        This pointer may be left null.
+    @return Returns the closest point on line start0<->end0 to the second line.
+    @note This is a low-level utility function. You probably want to use ClosestPoint() or Distance() instead.
+    @see ClosestPoint(), Distance(). */
+float3 Line::ClosestPointLineLine(float3 start0, float3 end0, float3 start1, float3 end1, float *d, float *d2)
 {
     const float3 v[4] = { start0, end0, start1, end1 };
 
@@ -82,14 +90,12 @@ Line::Line(const LineSegment &lineSegment)
 {
 }
 
-/// Returns a point on this line.
 float3 Line::GetPoint(float d) const
 {
     assert(dir.IsNormalized());
     return pos + d * dir;
 }
 
-/// Applies a transformation to this line.
 void Line::Transform(const float3x3 &transform)
 {
     pos = transform.Transform(pos);
@@ -131,21 +137,18 @@ bool Line::Contains(const LineSegment &lineSegment, float epsilon) const
 
 bool Line::Equals(const Line &line, float epsilon) const
 {
-    // If the point of the other line is on this line, and the two lines point to the same direction,
+    assume(dir.IsNormalized());
+    assume(line.dir.IsNormalized());
+    // If the point of the other line is on this line, and the two lines point to the same, or exactly reverse directions,
     // they must be equal.
-    return Contains(line.pos, epsilon) && dir.Equals(line.dir, epsilon);
+    return Contains(line.pos, epsilon) && EqualAbs(Abs(dir.Dot(line.dir)), 1.f, epsilon);
 }
 
-/// Returns the distance of the given point to this line.
-/// @param d [out] This element will receive the distance along this line that specifies the closest point on this line to the given point.
 float Line::Distance(const float3 &point, float *d) const
 {
     return ClosestPoint(point, d).Distance(point);
 }
 
-/// Returns the distance of the given ray to this line.
-/// @param d [out] Receives the distance along this line that specifies the closest point on this line to the given point.
-/// @param d2 [out] Receives the distance along the other line that specifies the closest point on that line to this line.
 float Line::Distance(const Ray &other, float *d, float *d2) const
 {
     float u2;
@@ -256,18 +259,18 @@ float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const
 float3 Line::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
     ///\bug Properly cap d2.
-    return LineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+    return ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
 }
 
 float3 Line::ClosestPoint(const Line &other, float *d, float *d2) const
 {
-    return LineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+    return ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
 }
 
 float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
     ///\bug Properly cap d2.
-    return LineLine(pos, pos + dir, other.a, other.b, d, d2);
+    return ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
 }
 
 float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const

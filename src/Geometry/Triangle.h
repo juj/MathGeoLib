@@ -41,11 +41,13 @@ public:
 
     /// The default constructor does not initialize any members of this class.
     /** This means that the values of the members a, b and c are undefined after creating a new Triangle using this
-        default constructor. Remember to assign to them before use. */
+        default constructor. Remember to assign to them before use.
+        @see a, b, c. */
     Triangle() {}
     /// Constructs a triangle from three given endpoints.
     /** The normal of the plane will be constructed to point towards the halfspace where
-        the vertices a, b and c wind in counter-clockwise order. */
+        the vertices a, b and c wind in counter-clockwise order.
+        @see a, b, c. */
     Triangle(const float3 &a, const float3 &b, const float3 &c);
 
     /// Expresses the given point in barycentric (u,v,w) coordinates.

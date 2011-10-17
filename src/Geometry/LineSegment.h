@@ -174,6 +174,9 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
+    /** @param epsilon If testing intersection between two line segments, a distance threshold value is used to account
+            for floating-point inaccuracies. */
+    bool Intersects(const LineSegment &lineSegment, float epsilon = 1e-3f) const;
     /// Tests if this line segment intersects the given disc.
     /// @todo This signature will be moved to bool Intersects(const Disc &disc) const;
     bool IntersectsDisc(const Circle &disc) const;

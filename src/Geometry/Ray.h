@@ -34,22 +34,26 @@ public:
     float3 pos;
 
     /// The normalized direction vector of this ray. [similarOverload: pos]
+    /** @note For proper functionality, this direction vector needs to always be normalized. If you set to this
+        member manually, remember to make sure you only assign normalized direction vectors. */
     float3 dir;
 
     /// The default constructor does not initialize any members of this class.
     /** This means that the values of the members pos and dir are undefined after creating a new Ray using this
-        default constructor. Remember to assign to them before use. */
+        default constructor. Remember to assign to them before use.
+        @see pos, dir. */
     Ray() {}
 
     /// Constructs a new ray by explicitly specifying the member variables.
     /** @param pos The origin position of the ray.
-        @param dir The direction of the ray. This vector must be normalized.
+        @param dir The direction of the ray. This vector must be normalized, this function will not normalize
+            the vector for you (for performance reasons).
         @see pos, dir. */
     Ray(const float3 &pos, const float3 &dir);
 
     /// Converts a Line to a Ray.
     /** This conversion simply copies the members pos and dir over from the given Line to this Ray. 
-        This means that the new Ray starts at the same position, but only extends to one direction,
+        This means that the new Ray starts at the same position, but only extends to one direction in space,
         instead of two.
         @see class Line, ToLine(). */
     explicit Ray(const Line &line);
@@ -99,7 +103,7 @@ public:
     float Distance(const float3 &point) const;
 
     /** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
-        closest point on that line to this line. The value returned here can be negative. This pointer may
+        closest point on that line to this ray. The value returned here can be negative. This pointer may
         be null. */
     float Distance(const Ray &other, float *d, float *d2 = 0) const;
     float Distance(const Ray &other) const;
@@ -119,7 +123,7 @@ public:
         @see Contains(), Distance(), Intersects(), GetPoint(). */
     float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;
     /** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
-        closest point on that line to this line. The value returned here can be negative. This pointer may
+        closest point on that line to this ray. The value returned here can be negative. This pointer may
         be null. */
     float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
     float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
@@ -139,14 +143,14 @@ public:
     bool Intersects(const Triangle &triangle) const;
     bool Intersects(const Plane &plane, float *d) const;
     bool Intersects(const Plane &plane) const;
-    /** @param intersectionPoint [out] If specified, receives the surface normal of the other object at
+    /** @param intersectionNormal [out] If specified, receives the surface normal of the other object at
         the point of intersection. This pointer may be null. */
     bool Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const;
     bool Intersects(const Sphere &s) const;
     /** @param dNear [out] If specified, receives the distance along this ray to where the ray enters
-        the AABB. This pointer may be null.
+        the bounding box. This pointer may be null.
         @param dFar [out] If specified, receives the distance along this ray to where the ray exits
-        the AABB. This pointer may be null. */
+        the bounding box. This pointer may be null. */
     bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
     bool Intersects(const AABB &aabb) const;
     bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
@@ -163,17 +167,17 @@ public:
     /** The pos and dir members of the returned Line will be equal to this Ray. The only difference is
         that a Line extends to infinity in two directions, whereas the Ray spans only in the positive
         direction.
-        @see Ray::Ray, class Line, ToLineSegment(). */
+        @see dir, Ray::Ray, class Line, ToLineSegment(). */
     Line ToLine() const;
     /// Converts this Ray to a LineSegment.
     /** @param d Specifies the position of the other endpoint along this Ray. This parameter may be negative,
         in which case the returned LineSegment does not lie inside this Ray.
         @return A LineSegment with point a at pos, and point b at pos + d * dir.
-        @see Ray::Ray, class LineSegment, ToLine(). */
+        @see pos, dir, Ray::Ray, class LineSegment, ToLine(). */
     LineSegment ToLineSegment(float d) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-    /// Returns a human-readable representation of this Ray. Most useful for debugging purposes.
+    /// Returns a human-readable representation of this Ray.
     /** The returned string specifies the position and direction of this Ray. */
     std::string ToString() const;
 #endif
