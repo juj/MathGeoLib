@@ -22,7 +22,7 @@
 
 MATH_BEGIN_NAMESPACE
 
-/// A line in 3D space runs through two points and extends to infinity in two directions.
+/// A line in 3D space runs through two specified points and extends to infinity in two directions.
 class Line
 {
 public:

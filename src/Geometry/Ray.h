@@ -155,7 +155,7 @@ public:
     bool Intersects(const Polygon &polygon) const;
     bool Intersects(const Frustum &frustum) const;
     bool Intersects(const Polyhedron &polyhedron) const;
-    /// Tests if this ray interects the given disc.
+    /// Tests if this ray intersects the given disc.
     /// @todo This signature will be moved to bool Intersects(const Disc &disc) const;
     bool IntersectsDisc(const Circle &disc) const;
 

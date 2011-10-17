@@ -51,7 +51,6 @@ LineSegment::LineSegment(const Line &line, float d)
 {
 }
 
-/// Returns a point on the line segment.
 float3 LineSegment::GetPoint(float d) const
 {
     return (1.f - d) * a + d * b;
@@ -72,7 +71,6 @@ float3 LineSegment::Dir() const
     return (b - a).Normalized();
 }
 
-/// Applies a transformation to this line.
 void LineSegment::Transform(const float3x3 &transform)
 {
     a = transform * a;
