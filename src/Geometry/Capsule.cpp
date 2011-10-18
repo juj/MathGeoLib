@@ -350,12 +350,14 @@ bool Capsule::Intersects(const OBB &obb) const
     return Intersects(obb.ToPolyhedron());
 }
 
+/// [groupSyntax]
 bool Capsule::Intersects(const Sphere &sphere) const
 {
     ///\todo Optimize to avoid square roots.
     return l.Distance(sphere.pos) <= r + sphere.r;
 }
 
+/// [groupSyntax]
 bool Capsule::Intersects(const Capsule &capsule) const
 {
     ///\todo Optimize to avoid square roots.
