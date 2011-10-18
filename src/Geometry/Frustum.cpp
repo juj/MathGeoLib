@@ -94,6 +94,7 @@ float3x4 Frustum::WorldMatrix() const
     m.SetCol(1, up);
     m.SetCol(2, front);
     m.SetCol(3, pos);
+    assume(!m.HasNegativeScale());
     return m;
 }
 
@@ -305,12 +306,6 @@ bool Frustum::IsFinite() const
         && isfinite(farPlaneDistance) && isfinite(horizontalFov) && isfinite(verticalFov);
 }
 
-bool Frustum::IsDegenerate() const
-{
-    assume(false && "Not implemented!"); /// @todo Implement.
-    return false;
-}
-
 Plane Frustum::GetPlane(int faceIndex) const
 {
     assume(0 <= faceIndex && faceIndex <= 5);
@@ -387,7 +382,13 @@ void Frustum::Transform(const Quat &transform)
 
 void Frustum::GetPlanes(Plane *outArray) const
 {
-    assume(false && "Not implemented!"); /// @todo Implement.
+    assume(outArray);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+    if (!outArray)
+        return;
+#endif
+    for(int i = 0; i < 6; ++i)
+        outArray[i] = GetPlane(i);
 }
 
 void Frustum::GetCornerPoints(float3 *outPointArray) const

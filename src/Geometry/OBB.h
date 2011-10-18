@@ -104,7 +104,7 @@ public:
         @see SetFrom(), ToPolyhedron(), PCAEnclosingOBB(). */
     void SetFromApproximate(const float3 *pointArray, int numPoints);
 
-    /// Converts this to a polyhedron.
+    /// Converts this OBB to a polyhedron.
     /** This function returns a polyhedron representation of this OBB. This conversion is exact, meaning that the returned
         polyhedron represents the same set of points than this OBB. */
     Polyhedron ToPolyhedron() const;
@@ -113,24 +113,24 @@ public:
     /** This function computes the optimal minimum volume AABB that encloses this OBB.
         @note Since an AABB cannot generally represent an OBB, this conversion is not exact, but the returned AABB
             specifies a larger volume.            
-        @see SetFrom(), MinimalEnclosingAABB(). */
+        @see SetFrom(), MaximalContainedAABB(), MinimalEnclosingSphere(), MaximalContainedSphere(). */
     AABB MinimalEnclosingAABB() const;
 
     /// Returns the largest AABB that can fit inside this OBB.
     /** This function computes the largest AABB that can fit inside this OBB. This AABB is unique up to the center point of the
         AABB. The returned AABB will be centered to the center point of this OBB.
-        @see MaximalContainedAABB(). */
+        @see MinimalEnclosingAABB(), MinimalEnclosingSphere(), MaximalContainedSphere(). */
     AABB MaximalContainedAABB() const;
 
     /// Returns the smallest sphere that contains this OBB.
     /** This function computes the optimal minimum volume sphere that encloses this OBB.
-        @see MinimalEnclosingAABB(), MaximalContainedSphere(). */
+        @see MinimalEnclosingAABB(), MaximalContainedAABB(), MaximalContainedSphere(). */
     Sphere MinimalEnclosingSphere() const;
 
     /// Returns the largest sphere that can fit inside this OBB. [similarOverload: MinimalEnclosingSphere]
     /** This function computes the largest sphere that can fit inside this OBB. This sphere is unique up to the center point 
         of the sphere. The returned sphere will be positioned to the same center point as this OBB.
-        @see MinimalEnclosingSphere(), MaximalContainedAABB(). */
+        @see MinimalEnclosingSphere(), MaximalContainedAABB(), MaximalContainedSphere(). */
     Sphere MaximalContainedSphere() const;
 
     /// Returns the side lengths of this OBB in its local x, y and z directions.
@@ -317,6 +317,7 @@ public:
     /// Applies a transformation to this OBB.
     /** @param transform The transformation to apply to this OBB. This transformation must be affine, and
         must contain an orthogonal set of column vectors (may not contain shear or projection).
+        The transformation can only contain uniform scale, and may not contain mirroring.
         @see Translate(), Scale(), classes float3x3, float3x4, float4x4, Quat. */
     void Transform(const float3x3 &transform);
     void Transform(const float3x4 &transform);
@@ -355,7 +356,7 @@ public:
     /// Tests whether this OBB and the given object intersect.       
     /** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
         another, this function still returns true. (e.g. in case a line segment is contained inside this OBB, 
-        or this OBB is contained inside a sphere, etc.)
+        or this OBB is contained inside a Sphere, etc.)
         The first parameter of this function specifies the other object to test against.
         @see Contains(), Distance(), ClosestPoint().
         @todo Add Intersects(Circle/Disc). */
