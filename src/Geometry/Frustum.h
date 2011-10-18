@@ -39,11 +39,11 @@ public:
     /** Specifies the position of the camera (the eye point) for this frustum in world (global) space. [similarOverload: type] */
     float3 pos;
     /// The normalized direction this frustum is watching towards. [similarOverload: type]
-    /** This vector is specified in world (global) space. This vector must be normalized. 
+    /** This vector is specified in world (global) space. This vector is always normalized. 
         If you assign to this member directly, be sure to only assign normalized vectors. */
     float3 front;
     /// The normalized up direction for this frustum. [similarOverload: type]
-    /** This vector is specified in world (global) space. This vector must be normalized. 
+    /** This vector is specified in world (global) space. This vector is always normalized. 
         If you assign to this member directly, be sure to only assign normalized vectors.
         @note The vectors front and up must always be orthogonal to each other. */
     float3 up;
