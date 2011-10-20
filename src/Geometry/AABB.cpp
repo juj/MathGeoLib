@@ -62,8 +62,9 @@ void AABB::SetNegativeInfinity()
     maxPoint.SetFromScalar(-FLOAT_INF);
 }
 
-void AABB::SetCenter(const float3 &center, const float3 &halfSize)
+void AABB::SetFromCenterAndSize(const float3 &center, const float3 &size)
 {
+    float3 halfSize = 0.5f * size;
     minPoint = center - halfSize;
     maxPoint = center + halfSize;
 }
@@ -71,13 +72,9 @@ void AABB::SetCenter(const float3 &center, const float3 &halfSize)
 void AABB::SetFrom(const OBB &obb)
 {
     float3 halfSize = Abs(obb.axis[0]*obb.r[0]) + Abs(obb.axis[1]*obb.r[1]) + Abs(obb.axis[2]*obb.r[2]);
-    SetCenter(obb.pos, halfSize);
+    SetFromCenterAndSize(obb.pos, 2.f*halfSize);
 }
  
-//    bool AABB::SetFrom(const Polyhedron &polyhedron)
-//{
-//}
-
 void AABB::SetFrom(const Sphere &s)
 {
     minPoint = s.pos - float3(s.r, s.r, s.r);
@@ -354,7 +351,6 @@ float AABB::Volume() const
     return Size().ProductOfElements();
 }
 
-    /// Returns the surface area of the faces of this AABB.
 float AABB::SurfaceArea() const
 {
     float3 size = Size();
@@ -495,23 +491,6 @@ float AABB::Distance(const Sphere &sphere) const
     return Max(0.f, Distance(sphere.pos) - sphere.r);
 }
 
-/*
-float AABB::Distance(const Ray &ray, float3 *outClosestPoint, float *outClosestDistance) const
-float Distance(const Line &line, float3 *outClosestPoint, float *outClosestdistance) const;
-float Distance(const LineSegment &lineSegment, float3 *outClosestPoint, float *outClosestDistance) const;
-float Distance(const AABB &aabb, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const OBB &obb, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const Plane &plane, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const Sphere &sphere, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const Ellipsoid &ellipsoid, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const Triangle &triangle, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const Cylinder &cylinder, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-//    float Distance(const Capsule &capsule, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-//    float Distance(const Torus &torus, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-float Distance(const Frustum &frustum, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-//    float Distance(const Polygon &polygon, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-//    float Distance(const Polyhedron &polyhedron, float3 *outClosestPoint, float3 *outClosestPointOther) const; ///< [noscript]
-*/
 bool AABB::Contains(const float3 &point) const
 {
     return minPoint.x <= point.x && point.x <= maxPoint.x &&
@@ -544,12 +523,12 @@ bool AABB::Contains(const Triangle &triangle) const
 {
     return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
 }
-/*
+
 bool AABB::Contains(const Polygon &polygon) const
 {
     return Contains(polygon.MinimalEnclosingAABB());
 }
-*/
+
 bool AABB::Contains(const Frustum &frustum) const
 {
     return Contains(frustum.MinimalEnclosingAABB());
@@ -560,17 +539,7 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
     return Contains(polyhedron.MinimalEnclosingAABB());
 }
 
-/** Computes the intersection of a ray and a AABB.
-	Based on "T. Kay, J. Kajiya. Ray Tracing Complex Scenes. SIGGRAPH 1986 vol 20, number 4. pp. 269-"
-	http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
-	@param r The ray to test. The ray direction vector must be normalized!
-	@param aabb The aabb to test.
-	@param tNear [out] If intersection occurs, the signed distance from ray origin to the ray entry point in aabb
-		is returned here.
-	@param tFar [out] If intersection occurs, the signed distance from ray origin to the ray exit point in aabb
-		is returned here.
-	@return True if an intersection occurs, false otherwise. */
-bool IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, const AABB &aabb, float &tNear, float &tFar)
+bool AABB::IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const
 {
     assume(rayDir.IsNormalized());
     tNear = -FLOAT_INF;
@@ -579,13 +548,13 @@ bool IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, const AABB &aa
 	for(int i = 0; i < 3; ++i) // loop for each AABB plane (X,Y,Z)
 	{
 		if (EqualAbs(rayDir[i], 0.f)) // ray is parallel to plane in question
-            if (rayPos[i] < aabb.minPoint[i] || rayPos[i] > aabb.maxPoint[i]) // early-out if the ray can't possibly enter the box.
+            if (rayPos[i] < minPoint[i] || rayPos[i] > maxPoint[i]) // early-out if the ray can't possibly enter the box.
 				return false;
 
         // intersection distances to plane.
         float recipDir = 1.f / rayDir[i];
-        float t1 = (aabb.minPoint[i] - rayPos[i]) * recipDir;
-		float t2 = (aabb.maxPoint[i] - rayPos[i]) * recipDir;
+        float t1 = (minPoint[i] - rayPos[i]) * recipDir;
+		float t2 = (maxPoint[i] - rayPos[i]) * recipDir;
 
 		if (t1 > t2) Swap(t1, t2); // swap so that t1 is the distance to nearer of the two planes.
 		if (t1 > tNear) tNear = t1; // tNear tracks distance to intersect the AABB.
@@ -629,7 +598,7 @@ bool IntersectLineAABB(const float3 &linePos, const float3 &lineDir, const AABB 
 bool AABB::Intersects(const Ray &ray, float *dNear, float *dFar) const
 {
     float tNear, tFar;
-    bool success = IntersectRayAABB(ray.pos, ray.dir, *this, tNear, tFar);
+    bool success = IntersectRayAABB(ray.pos, ray.dir, tNear, tFar);
     if (dNear)
         *dNear = tNear;
     if (dFar)
@@ -682,7 +651,8 @@ bool AABB::Intersects(const OBB &obb) const
     return obb.Intersects(*this);
 }
 
-/// See Christer Ericson's Real-Time Collision Detection, p. 165.
+/// For reference documentation on the Sphere-AABB intersection test, see 
+/// Christer Ericson's Real-Time Collision Detection, p. 165. [groupSyntax]
 bool AABB::Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const
 {
     // Find the point on this AABB closest to the sphere center.
@@ -735,24 +705,6 @@ void AABB::ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const
         Swap(dMin, dMax);
 }
 
-/*
-HitInfo Intersect(const Ray &ray, float *outDistance) const; ///< [noscript]
-HitInfo Intersect(const Ray &ray, float maxDistance, float *outDistance) const; ///< [noscript]
-HitInfo Intersect(const Line &line, float *outDistance) const; ///< [noscript]
-HitInfo Intersect(const LineSegment &lineSegment, float *outDistance) const; ///< [noscript]
-HitInfo Intersect(const AABB &aabb) const; ///< [noscript]
-HitInfo Intersect(const OBB &obb) const; ///< [noscript]
-HitInfo Intersect(const Plane &plane) const; ///< [noscript]
-HitInfo Intersect(const Sphere &sphere) const; ///< [noscript]
-HitInfo Intersect(const Ellipsoid &ellipsoid) const; ///< [noscript]
-HitInfo Intersect(const Triangle &triangle) const; ///< [noscript]
-HitInfo Intersect(const Cylinder &cylinder) const; ///< [noscript]
-//    HitInfo Intersect(const Capsule &capsule) const; ///< [noscript]
-//    HitInfo Intersect(const Torus &torus) const; ///< [noscript]
-HitInfo Intersect(const Frustum &frustum) const; ///< [noscript]
-//    HitInfo Intersect(const Polygon &polygon) const; ///< [noscript]
-//    HitInfo Intersect(const Polyhedron &polyhedron) const; ///< [noscript]
-*/
 void AABB::Enclose(const float3 &point)
 {
     minPoint = Min(minPoint, point);
@@ -925,9 +877,5 @@ AABB AABB::Intersection(const AABB &aabb) const
 {
     return AABB(Max(minPoint, aabb.minPoint), Min(maxPoint, aabb.maxPoint));
 }
-
-//    Polyhedron Intersection(const OBB &obb) const;
-
-//    Polyhedron Intersection(const Polyhedron &polyhedron) const;
 
 MATH_END_NAMESPACE

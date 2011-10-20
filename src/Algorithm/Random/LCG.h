@@ -21,15 +21,20 @@
 	http://en.wikipedia.org/wiki/Linear_congruential_generator
 	http://www.math.rutgers.edu/~greenfie/currentcourses/sem090/pdfstuff/jp.pdf 
 
-	Pros: * Easy to implement.
-	      * Fast.
+    Pros:
+    <ul>
+        <li> Easy to implement.
+        <li> Fast.
+    </ul>
 
-	Cons: * NOT safe for cryptography because of the easily calculatable sequential 
+    Cons:
+    <ul>
+        <li> NOT safe for cryptography because of the easily calculatable sequential 
 	        correlation between successive calls. A case study:
 	        http://www.cigital.com/papers/download/developer_gambling.php
 
-			* Tends to have less random low-order bits (compared to the high-order bits)
-	        Thus, NEVER do something like this:
+		<li> Tends to have less random low-order bits (compared to the high-order bits)
+	         Thus, NEVER do something like this:
 
 	           u32 numBetween1And10 = 1 + LCGRand.Int() % 10;
 
@@ -39,7 +44,8 @@
 	                                                      /(LCGRand.Max()+1.0));
 	         or simply
 	
-	           u32 numBetween1And10 = LCGRand.Float(1.f, 10.f); */
+	           u32 numBetween1And10 = LCGRand.Float(1.f, 10.f);
+    </ul> */
 class LCG
 {
 public:

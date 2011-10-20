@@ -293,12 +293,12 @@ public:
         @see class LCG, CornerPoint(), RandomPointInside(), RandomPointOnSurface(), RandomPointOnEdge(). */
     float3 RandomCornerPoint(LCG &rng) const;
 
-    /// Translates this OBB in the world space.
+    /// Translates this OBB in world space.
     /** @param offset The amount of displacement to apply to this OBB, in world space coordinates.
         @see Scale(), Transform(). */
     void Translate(const float3 &offset);
 
-    /// Applies an uniform scale to this OBB.
+    /// Applies a uniform scale to this OBB.
     /** This function scales this OBB structure in-place, using the given center point as the origin 
         for the scaling operation.
         @param centerPoint Specifies the center of the scaling operation, in global (world) space.
@@ -316,8 +316,8 @@ public:
 
     /// Applies a transformation to this OBB.
     /** @param transform The transformation to apply to this OBB. This transformation must be affine, and
-        must contain an orthogonal set of column vectors (may not contain shear or projection).
-        The transformation can only contain uniform scale, and may not contain mirroring.
+            must contain an orthogonal set of column vectors (may not contain shear or projection).
+            The transformation can only contain uniform scale, and may not contain mirroring.
         @see Translate(), Scale(), classes float3x3, float3x4, float4x4, Quat. */
     void Transform(const float3x3 &transform);
     void Transform(const float3x4 &transform);
@@ -341,7 +341,7 @@ public:
     /// Tests if the given object is fully contained inside this OBB.
     /** This function returns true if the given object lies inside this OBB, and false otherwise.
         @note The comparison is performed using less-or-equal, so the faces of this OBB count as being inside, but
-        due to float inaccuracies, this cannot generally be relied upon.
+            due to float inaccuracies, this cannot generally be relied upon.
         @todo Add Contains(Circle/Disc/Sphere/Capsule).
         @see Distance(), Intersects(), ClosestPoint(). */
     bool Contains(const float3 &point) const;

@@ -145,7 +145,7 @@ AABB Sphere::MaximalContainedAABB() const
     AABB aabb;
     static const float recipSqrt3 = RSqrt(3);
     float halfSideLength = r * recipSqrt3;
-    aabb.SetCenter(pos, float3(halfSideLength,halfSideLength,halfSideLength));
+    aabb.SetFromCenterAndSize(pos, float3(halfSideLength,halfSideLength,halfSideLength));
     return aabb;
 }
 

@@ -135,16 +135,16 @@ float3 Capsule::PointInside(float l, float a, float d) const
 
 float3 Capsule::UniformPointPerhapsInside(float l, float x, float y) const
 {
-    return EnclosingOBB().PointInside(l, x, y);
+    return MinimalEnclosingOBB().PointInside(l, x, y);
 }
 
-AABB Capsule::EnclosingAABB() const
+AABB Capsule::MinimalEnclosingAABB() const
 {
     AABB aabb(Min(l.a, l.b) - float3(r, r, r), Max(l.a, l.b) + float3(r, r, r));
     return aabb;
 }
 
-OBB Capsule::EnclosingOBB() const
+OBB Capsule::MinimalEnclosingOBB() const
 {
     OBB obb;
     obb.axis[0] = UpDirection();
@@ -161,7 +161,7 @@ float3 Capsule::RandomPointInside(LCG &rng) const
 {
     assume(IsFinite());
 
-    OBB obb = EnclosingOBB();
+    OBB obb = MinimalEnclosingOBB();
     for(int i = 0; i < 1000; ++i)
     {
         float3 pt = obb.RandomPointInside(rng);
