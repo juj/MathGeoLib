@@ -35,6 +35,11 @@ float2::float2(float x_, float y_)
 {
 }
 
+float2::float2(float scalar)
+:x(scalar), y(scalar)
+{
+}
+
 float2::float2(const float *data)
 {
     assume(data);

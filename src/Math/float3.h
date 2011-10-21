@@ -79,7 +79,7 @@ public:
     float3(const float2 &xy, float z);
 
     /// Constructs this float3 from a C array, to the value (data[0], data[1], data[2]).
-    /** @param data An array containing three elements for x, y and z. */
+    /** @param data An array containing three elements for x, y and z. This pointer may not be null. */
     explicit float3(const float *data);
 
     /// Casts this float3 to a C array. 
@@ -149,8 +149,9 @@ public:
     float3 Add(const float3 &v) const { return *this + v; }
 
     /// Adds the vector (s,s,s) to this vector.
-    /// @note Mathematically, the addition of a vector and scalar is undefined.
-    /// @return (x+s,y+s,z+s).
+    /// @note Mathematically, the addition of a vector and scalar is not defined in linear space structures, 
+    ///     but this function is provided here for syntactical convenience.
+    /// @return (x+s, y+s, z+s).
     float3 Add(float s) const;
 
     /// Subtracts a vector from this vector. [similarOverload: Add] [hideIndex]
@@ -158,17 +159,20 @@ public:
     float3 Sub(const float3 &v) const { return *this - v; }
 
     /// Subtracts the vector (s,s,s) from this vector. [similarOverload: Add] [hideIndex]
-    /// @note Mathematically, the subtraction of a vector by a scalar is undefined.
-    /// @return (x-s,y-s,z-s).
+    /// @note Mathematically, the subtraction of a vector by a scalar is not defined in linear space structures, 
+    ///     but this function is provided here for syntactical convenience.
+    /// @return (x-s, y-s, z-s).
     float3 Sub(float s) const;
 
     /// Subtracts this vector from the vector (s,s,s). [similarOverload: Add] [hideIndex]
-    /// @note Mathematically, the subtraction of a scalar by a vector is undefined.
+    /// @note Mathematically, the subtraction of a scalar by a vector is not defined in linear space structures, 
+    ///     but this function is provided here for syntactical convenience.
     /// @return (s-x, s-y, s-z).
     float3 SubLeft(float s) const;
 
     /// Multiplies this vector by a vector, element-wise. [similarOverload: Add] [hideIndex]
-    /// @note Mathematically, the multiplication of two vectors is undefined.
+    /// @note Mathematically, the multiplication of two vectors is not defined in linear space structures, 
+    ///     but this function is provided here for syntactical convenience.
     /// @return (x*v.x, y*v.y, z*v.z).
     float3 Mul(const float3 &v) const;
 
@@ -177,7 +181,8 @@ public:
     float3 Mul(float s) const { return *this * s; }
 
     /// Divides this vector by a vector, element-wise. [similarOverload: Add] [hideIndex]
-    /// @note Mathematically, the division of two vectors is undefined.
+    /// @note Mathematically, the division of two vectors is not defined in linear space structures, 
+    ///     but this function is provided here for syntactical convenience.
     /// @return (x/v.x, y/v.y, z/v.z).
     float3 Div(const float3 &v) const;
 
@@ -186,7 +191,8 @@ public:
     float3 Div(float s) const { return *this / s; }
     
     /// Divides the vector (s,s,s) by this vector, element-wise. [similarOverload: Add] [hideIndex]
-    /// @note Mathematically, the division of a scalar by a vector is undefined.
+    /// @note Mathematically, the division of a scalar by a vector is not defined in linear space structures, 
+    ///     but this function is provided here for syntactical convenience.
     /// @return (s/x, s/y, s/z).
     float3 DivLeft(float s) const;
 
@@ -323,7 +329,7 @@ public:
 
     /// Tests if two vectors are equal, up to the given epsilon.
     /** @see IsPerpendicular(). */
-    bool Equals(const float3 &rhs, float epsilon = 1e-3f) const;
+    bool Equals(const float3 &other, float epsilon = 1e-3f) const;
     bool Equals(float x, float y, float z, float epsilon = 1e-3f) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -417,12 +423,12 @@ public:
         you can compare by using DistanceSq(), instead of Distance(), since Sqrt() is an order-preserving
         (monotonous and non-decreasing) function.
         @see Distance(), Length(), LengthSq(). */
-    float DistanceSq(const float3 &rhs) const;
+    float DistanceSq(const float3 &point) const;
 
     /// Computes the dot product of this and the given vector.
     /** The dot product has a geometric interpretation of measuring how close two direction vectors are to pointing
         in the same direction, computing angles between vectors, or the length of a projection of one vector to another.
-        @return x*v.x + y*v.y + z*v.z;
+        @return x*v.x + y*v.y + z*v.z.
         @see AngleBetween(), ProjectTo(), ProjectToNorm(), Cross(), OuterProduct(), ScalarTripleProduct(). */
     float Dot(const float3 &v) const;
 
