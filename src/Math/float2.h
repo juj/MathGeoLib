@@ -63,6 +63,12 @@ public:
     /// Accesses the elements (x,y) using array notation. x: *this[0], y: *this[1].
     float &operator [](int index);
 
+    /// Performs a 2D swizzled access to this vector. [indexTitle: xx/xy/yx/yy]
+    float2 xx() const { return float2(x,x); }
+    float2 xy() const { return float2(x,y); }
+    float2 yx() const { return float2(y,x); }
+    float2 yy() const { return float2(y,y); }
+
     /// Returns the squared length of this vector. Calling this function is faster than calling Length(), so e.g.
     /// instead of comparing the lengths of vectors, you can compare the squared lengths, and avoid expensive square roots.
     float LengthSq() const;
