@@ -245,7 +245,7 @@ public:
     float3 Size() const;
 
     /// [similarOverload: Size]
-    /** @return Size()/2.
+    /** Returns Size()/2.
         @see Size(), HalfDiagonal(). */
     float3 HalfSize() const;
 
@@ -256,7 +256,7 @@ public:
     float3 Diagonal() const { return Size(); }
 
     /// [similarOverload: Diagonal]
-    /** @return Diagonal()/2.
+    /** Returns Diagonal()/2.
         @see Diagonal(), HalfSize(). */
     float3 HalfDiagonal() const { return HalfSize(); }
 

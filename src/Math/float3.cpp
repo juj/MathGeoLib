@@ -99,10 +99,15 @@ float &float3::operator [](int index)
     return ptr()[index];
 }
 
-float2 float3::xy() const
-{
-    return float2(x, y);
-}
+float2 float3::xx() const { return float2(x,x); }
+float2 float3::xy() const { return float2(x,y); }
+float2 float3::xz() const { return float2(x,z); }
+float2 float3::yx() const { return float2(y,x); }
+float2 float3::yy() const { return float2(y,y); }
+float2 float3::yz() const { return float2(y,z); }
+float2 float3::zx() const { return float2(z,x); }
+float2 float3::zy() const { return float2(z,y); }
+float2 float3::zz() const { return float2(z,z); }
 
 float float3::LengthSq() const
 { 
@@ -143,7 +148,10 @@ float float3::ScaleToLength(float newLength)
 {
     float length = LengthSq();
     if (length < 1e-6f)
+    {
+        Set(newLength, 0, 0); // Will always produce a vector of the requested length.
         return 0.f;
+    }
 
     length = sqrtf(length);
     float scalar = newLength / length;
@@ -659,6 +667,21 @@ float3 &float3::operator *=(float scalar)
     return *this;
 }
 
+float3 float3::Add(float scalar) const
+{
+    return float3(x + scalar, y + scalar, z + scalar);
+}
+
+float3 float3::Sub(float scalar) const
+{
+    return float3(x - scalar, y - scalar, z - scalar);
+}
+
+float3 float3::SubLeft(float scalar) const
+{
+    return float3(scalar - x, scalar - y, scalar - z);
+}
+
 float3 float3::Mul(const float3 &rhs) const
 {
     return float3(x * rhs.x, y * rhs.y, z * rhs.z);
@@ -667,6 +690,11 @@ float3 float3::Mul(const float3 &rhs) const
 float3 float3::Div(const float3 &rhs) const
 {
     return float3(x / rhs.x, y / rhs.y, z / rhs.z);
+}
+
+float3 float3::DivLeft(float scalar) const
+{
+    return float3(scalar / x, scalar / y, scalar / z);
 }
 
 float3 &float3::operator /=(float scalar)
