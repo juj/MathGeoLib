@@ -72,7 +72,7 @@ const float *float4::ptr() const
     return &x;
 } 
 
-CONST_WIN32 float float4::operator [](int index) const
+CONST_WIN32 float float4::At(int index) const
 { 
     assume(index >= 0);
     assume(index < Size);
@@ -83,7 +83,7 @@ CONST_WIN32 float float4::operator [](int index) const
     return ptr()[index];
 }
 
-float &float4::operator [](int index)
+float &float4::At(int index)
 { 
     assume(index >= 0);
     assume(index < Size);
@@ -97,6 +97,21 @@ float &float4::operator [](int index)
 float3 float4::xyz() const
 {
     return float3(x, y, z);
+}
+
+float2 float4::Swizzled(int i, int j) const
+{
+    return float2(At(i), At(j));
+}
+
+float3 float4::Swizzled(int i, int j, int k) const
+{
+    return float3(At(i), At(j), At(k));
+}
+
+float4 float4::Swizzled(int i, int j, int k, int l) const
+{
+    return float4(At(i), At(j), At(k), At(l));
 }
 
 float float4::LengthSq3() const
@@ -174,14 +189,17 @@ float4 float4::Normalized4() const
 
 bool float4::NormalizeW()
 {
-    assume(fabs(w) > 1e-6f);
-
-    float invW = 1.f / w;
-    x *= invW;
-    y *= invW;
-    z *= invW;
-    w = 1.f;
-    return true;
+    if (fabs(w) > 1e-6f)
+    {
+        float invW = 1.f / w;
+        x *= invW;
+        y *= invW;
+        z *= invW;
+        w = 1.f;
+        return true;
+    }
+    else
+        return false;
 }
 
 bool float4::IsWZeroOrOne(float epsilon) const

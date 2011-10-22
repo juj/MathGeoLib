@@ -22,6 +22,8 @@
 #endif
 #include <stdlib.h>
 #include "Math/float2.h"
+#include "Math/float3.h"
+#include "Math/float4.h"
 #include "Math/MathFunc.h"
 #include "Algorithm/Random/LCG.h"
 #include "assume.h"
@@ -61,7 +63,7 @@ const float *float2::ptr() const
     return &x;
 } 
 
-CONST_WIN32 float float2::operator [](int index) const
+CONST_WIN32 float float2::At(int index) const
 { 
     assume(index >= 0);
     assume(index < Size);
@@ -72,7 +74,7 @@ CONST_WIN32 float float2::operator [](int index) const
     return ptr()[index];
 }
 
-float &float2::operator [](int index)
+float &float2::At(int index)
 { 
     assume(index >= 0);
     assume(index < Size);
@@ -81,6 +83,21 @@ float &float2::operator [](int index)
         return ptr()[0];
 #endif
     return ptr()[index];
+}
+
+float2 float2::Swizzled(int i, int j) const
+{
+    return float2(At(i), At(j));
+}
+
+float3 float2::Swizzled(int i, int j, int k) const
+{
+    return float3(At(i), At(j), At(k));
+}
+
+float4 float2::Swizzled(int i, int j, int k, int l) const
+{
+    return float4(At(i), At(j), At(k), At(l));
 }
 
 float float2::LengthSq() const

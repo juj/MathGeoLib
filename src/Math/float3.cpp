@@ -77,7 +77,7 @@ const float *float3::ptr() const
     return &x;
 } 
 
-CONST_WIN32 float float3::operator [](int index) const
+CONST_WIN32 float float3::At(int index) const
 { 
     assume(index >= 0);
     assume(index < Size);
@@ -88,7 +88,7 @@ CONST_WIN32 float float3::operator [](int index) const
     return ptr()[index];
 }
 
-float &float3::operator [](int index)
+float &float3::At(int index)
 { 
     assume(index >= 0);
     assume(index < Size);
@@ -108,6 +108,21 @@ float2 float3::yz() const { return float2(y,z); }
 float2 float3::zx() const { return float2(z,x); }
 float2 float3::zy() const { return float2(z,y); }
 float2 float3::zz() const { return float2(z,z); }
+
+float2 float3::Swizzled(int i, int j) const
+{
+    return float2(At(i), At(j));
+}
+
+float3 float3::Swizzled(int i, int j, int k) const
+{
+    return float3(At(i), At(j), At(k));
+}
+
+float4 float3::Swizzled(int i, int j, int k, int l) const
+{
+    return float4(At(i), At(j), At(k), At(l));
+}
 
 float float3::LengthSq() const
 { 

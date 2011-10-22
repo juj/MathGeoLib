@@ -45,7 +45,11 @@ MATH_BEGIN_NAMESPACE
 class float3
 {
 public:
-    enum { Size = 3 };
+    enum
+    {
+        /// Specifies the number of elements in this vector.
+        Size = 3
+    };
     /// The x component.
     /** A float3 is 12 bytes in size. This element lies in the memory offsets 0-3 of this class. */
     float x;
@@ -89,19 +93,28 @@ public:
         @note Since the returned pointer points to this class, do not dereference the pointer after this
             float3 has been deleted. You should never store a copy of the returned pointer.
         @note This function is provided for compatibility with other APIs which require raw C pointer access
-            to vectors. Avoid using this function in general, and instead always use the operator [] of this 
-            class to access the elements of this vector by index.
+            to vectors. Avoid using this function in general, and instead always use the operator [] or
+            the At() function to access the elements of this vector by index.
         @return A pointer to the first float element of this class. The data is contiguous in memory.
-        @see operator [](). */
+        @see operator [](), At(). */
     float *ptr();
     const float *ptr() const;
 
     /// Accesses an element of this vector using array notation.
     /** @param index The element to get. Pass in 0 for x, 1 for y and 2 for z. 
         @note If you have a non-const instance of this class, you can use this notation to set the elements of 
-            this vector as well, e.g. vec[1] = 10.f; would set the y-component of this vector. */
-    float &operator [](int index);
-    CONST_WIN32 float operator [](int index) const;
+            this vector as well, e.g. vec[1] = 10.f; would set the y-component of this vector.
+        @see ptr(), At(). */
+    float &operator [](int index) { return At(index); }
+    CONST_WIN32 float operator [](int index) const { return At(index); }
+
+    /// Accesses an element of this vector.
+    /** @param index The element to get. Pass in 0 for x, 1 for y, and 2 for z.
+        @note If you have a non-const instance of this class, you can use this notation to set the elements of 
+            this vector as well, e.g. vec.At(1) = 10.f; would set the y-component of this vector.
+        @see ptr(), operator [](). */
+    float &At(int index);
+    CONST_WIN32 float At(int index) const;
 
     /// Adds two vectors. [indexTitle: operators +,-,*,/]
     /** This function is identical to the member function Add().
@@ -242,6 +255,16 @@ public:
     float3 zzy() const { return float3(z,z,y); } ///< [similarOverload: xxx] [hideIndex]
     float3 zzz() const { return float3(z,z,z); } ///< [similarOverload: xxx] [hideIndex]
 
+    /// Performs a swizzled access to this vector.
+    /** For example, Swizzled(2,1,0) return float3(z,y,x). Swizzled(2,2,2,2) returns float4(z,z,z,z).
+        @param i Chooses the element of this vector to pick for the x value of the returned vector, in the range [0, 2].
+        @param j Chooses the element of this vector to pick for the y value of the returned vector, in the range [0, 2].
+        @param k Chooses the element of this vector to pick for the z value of the returned vector, in the range [0, 2].
+        @param l Chooses the element of this vector to pick for the w value of the returned vector, in the range [0, 2]. */        
+    float2 Swizzled(int i, int j) const;
+    float3 Swizzled(int i, int j, int k) const;
+    float4 Swizzled(int i, int j, int k, int l) const;
+
     /// Generates a new float3 by filling its entries by the given scalar.
     /** @see float3::float3(float scalar), SetFromScalar(). */
     static float3 FromScalar(float scalar);
@@ -251,7 +274,7 @@ public:
     void SetFromScalar(float scalar);
 
     /// Sets all elements of this vector.
-    /** @see x, y, z. */
+    /** @see x, y, z, At(). */
     void Set(float x, float y, float z);
 
     /// @return float4(x,y,z,1).
