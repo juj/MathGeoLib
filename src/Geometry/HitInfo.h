@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file HitInfo.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief */
 #pragma once
 
@@ -21,25 +21,25 @@ MATH_BEGIN_NAMESPACE
 
 struct HitInfo
 {
-    enum HitResult
-    {
-        NoHit,
-        Intersect,
-        AInsideB,
-        BInsideA
-    };
+	enum HitResult
+	{
+		NoHit,
+		Intersect,
+		AInsideB,
+		BInsideA
+	};
 
-    /// Specifies the result of the intersection test.
-    HitResult result;
+	/// Specifies the result of the intersection test.
+	HitResult result;
 
-    /// Stores the point of intersection.
-    float3 point;
+	/// Stores the point of intersection.
+	float3 point;
 
-    /// Specifies the surface normal of the 'this' object at the point of intersection.
-    float3 normalA;
+	/// Specifies the surface normal of the 'this' object at the point of intersection.
+	float3 normalA;
 
-    /// Specifies the surface normal of the other object at the point of intersection.
-    float3 normalB;
+	/// Specifies the surface normal of the other object at the point of intersection.
+	float3 normalB;
 };
 
 MATH_END_NAMESPACE

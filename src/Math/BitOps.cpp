@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file BitOps.cpp
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief */
 #include <string.h>
 
@@ -23,12 +23,12 @@ MATH_BEGIN_NAMESPACE
 
 u32 BinaryStringToValue(const char *str)
 {
-    u32 val = 0;
-    int strl = (int)strlen(str);
-    for(int i = 0; i < strl && i < 32; ++i)
-        if (str[strl-i-1] != '0')
-            val |= 1 << i;
-    return val;
+	u32 val = 0;
+	int strl = (int)strlen(str);
+	for(int i = 0; i < strl && i < 32; ++i)
+		if (str[strl-i-1] != '0')
+			val |= 1 << i;
+	return val;
 }
 
 MATH_END_NAMESPACE

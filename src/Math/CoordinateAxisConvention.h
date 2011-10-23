@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file CoordinateAxisConvention.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief */
 #pragma once
 
@@ -24,44 +24,44 @@
 /*
 struct PositiveX
 { 
-    static float3 Pick(const float3x3 &m) { return m.Column(0); }
-    static float3 Pick(const float3x4 &m) { return m.Column(0); }
-    static float3 Pick(const float4x4 &m) { return m.Column3(0); }
+	static float3 Pick(const float3x3 &m) { return m.Column(0); }
+	static float3 Pick(const float3x4 &m) { return m.Column(0); }
+	static float3 Pick(const float4x4 &m) { return m.Column3(0); }
 };
 
 struct NegativeX
 { 
-    static float3 Pick(const float3x3 &m) { return -m.Column(0); }
-    static float3 Pick(const float3x4 &m) { return -m.Column(0); }
-    static float3 Pick(const float4x4 &m) { return -m.Column3(0); }
+	static float3 Pick(const float3x3 &m) { return -m.Column(0); }
+	static float3 Pick(const float3x4 &m) { return -m.Column(0); }
+	static float3 Pick(const float4x4 &m) { return -m.Column3(0); }
 };
 
 struct PositiveY
 { 
-    static float3 Pick(const float3x3 &m) { return m.Column(1); }
-    static float3 Pick(const float3x4 &m) { return m.Column(1); }
-    static float3 Pick(const float4x4 &m) { return m.Column3(1); }
+	static float3 Pick(const float3x3 &m) { return m.Column(1); }
+	static float3 Pick(const float3x4 &m) { return m.Column(1); }
+	static float3 Pick(const float4x4 &m) { return m.Column3(1); }
 };
 
 struct NegativeY
 { 
-    static float3 Pick(const float3x3 &m) { return -m.Column(1); }
-    static float3 Pick(const float3x4 &m) { return -m.Column(1); }
-    static float3 Pick(const float4x4 &m) { return -m.Column3(1); }
+	static float3 Pick(const float3x3 &m) { return -m.Column(1); }
+	static float3 Pick(const float3x4 &m) { return -m.Column(1); }
+	static float3 Pick(const float4x4 &m) { return -m.Column3(1); }
 };
 
 struct PositiveZ
 {
-    static float3 Pick(const float3x3 &m) { return m.Column(2); }
-    static float3 Pick(const float3x4 &m) { return m.Column(2); }
-    static float3 Pick(const float4x4 &m) { return m.Column3(2); }
+	static float3 Pick(const float3x3 &m) { return m.Column(2); }
+	static float3 Pick(const float3x4 &m) { return m.Column(2); }
+	static float3 Pick(const float4x4 &m) { return m.Column3(2); }
 };
 
 struct NegativeZ
 { 
-    static float3 Pick(const float3x3 &m) { return -m.Column(2); }
-    static float3 Pick(const float3x4 &m) { return -m.Column(2); }
-    static float3 Pick(const float4x4 &m) { return -m.Column3(2); }
+	static float3 Pick(const float3x3 &m) { return -m.Column(2); }
+	static float3 Pick(const float3x4 &m) { return -m.Column(2); }
+	static float3 Pick(const float4x4 &m) { return -m.Column3(2); }
 };
 
 /// For more information about coordinate axis conventions, and handedness,
@@ -69,9 +69,9 @@ struct NegativeZ
 template<typename ForwardAxis, typename RightAxis, typename UpAxis>
 struct CoordinateAxisConvention
 {
-    template<typename Matrix> static float3 Right(const Matrix &m) { return RightAxis::Pick(m); }
-    template<typename Matrix> static float3 Up(const Matrix &m) { return UpAxis::Pick(m); }
-    template<typename Matrix> static float3 Forward(const Matrix &m) { return ForwardAxis::Pick(m); }
+	template<typename Matrix> static float3 Right(const Matrix &m) { return RightAxis::Pick(m); }
+	template<typename Matrix> static float3 Up(const Matrix &m) { return UpAxis::Pick(m); }
+	template<typename Matrix> static float3 Forward(const Matrix &m) { return ForwardAxis::Pick(m); }
 };
 
 /// This is the default coordinate axis convention used by the math classes. This convention

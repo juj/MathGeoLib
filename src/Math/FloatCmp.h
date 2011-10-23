@@ -13,8 +13,8 @@
    limitations under the License. */
 
 /** @file FloatCmp.h
-    @author Jukka Jylänki
-    @brief */
+	@author Jukka Jylänki
+	@brief */
 #pragma once
 
 #ifdef MATH_ENABLE_STL_SUPPORT

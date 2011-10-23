@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file BitOps.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief */
 #pragma once
 
@@ -31,40 +31,40 @@ u32 BinaryStringToValue(const char *str);
 /// Returns the number of 1's set in the given value.
 inline int CountBitsSet(u32 value)
 {
-    int bits = 0;
-    while(value)
-    {
-        value &= value - 1;
-        ++bits;
-    }
-    return bits;
+	int bits = 0;
+	while(value)
+	{
+		value &= value - 1;
+		++bits;
+	}
+	return bits;
 }
 
 // Clears the LSB bit and returns the zero-based index of where the bit was set.
 inline int ExtractLSB(unsigned long *value)
 {
-    for(int i = 0; i < 32; ++i)
-        if ((*value & (1 << i)) != 0)
-        {
-            *value &= ~(1 << i);
-            return i;
-        }
-    return -1;
+	for(int i = 0; i < 32; ++i)
+		if ((*value & (1 << i)) != 0)
+		{
+			*value &= ~(1 << i);
+			return i;
+		}
+	return -1;
 }
 
 /** @brief Template-evaluated enum that gives a mask with the Bits LSB bits set.
 
-    For example,
-        LSBT<0>::val = 0,
-        LSBT<1>::val = 1,
-        LSBT<2>::val = 11,
-        LSBT<24>::val = 11111111 11111111 11111111. 
-    LSBT<33> and greater are undefined. */
+	For example,
+		LSBT<0>::val = 0,
+		LSBT<1>::val = 1,
+		LSBT<2>::val = 11,
+		LSBT<24>::val = 11111111 11111111 11111111. 
+	LSBT<33> and greater are undefined. */
 template<int Bits>
 class LSBT
 {
 public:
-    enum { val = (1 << Bits) - 1 };
+	enum { val = (1 << Bits) - 1 };
 };
 
 /// @cond FULL
@@ -73,95 +73,95 @@ template<>
 class LSBT<32>
 {
 public:
-    enum { val = 0xFFFFFFFF };
+	enum { val = 0xFFFFFFFF };
 };
 
 template<>
 class LSBT<31>
 {
 public:
-    enum { val = 0x7FFFFFFF };
+	enum { val = 0x7FFFFFFF };
 };
 
 /// @endcond
 
 /** @return A mask with the given amount of LSB bits set. This is the runtime-equivalent of LSBT.
-    LSB(0)==0, LSB(1)==1, LSB(8)=11111111, etc.
-    LSB(32) and above are undefined. */
+	LSB(0)==0, LSB(1)==1, LSB(8)=11111111, etc.
+	LSB(32) and above are undefined. */
 inline u32 LSB(u32 bits)
 {
-    assert(bits <= 32);
-    if (bits >= 32)
-        return 0xFFFFFFFF;
-    return (1 << bits) - 1;
+	assert(bits <= 32);
+	if (bits >= 32)
+		return 0xFFFFFFFF;
+	return (1 << bits) - 1;
 }
 
 /** @brief A template-computed enum to create a mask of given amount of bits at given position of a u32 variable. 
 
-    For example, 
-    BitMaskT<0,0>::val == 0,
-    BitMaskT<0,8>::val == 11111111,
-    BitMaskT<4, 12>::val == 11111111 11110000, etc.
-    If Pos+Bits > 32, the result is undefined. */
+	For example, 
+	BitMaskT<0,0>::val == 0,
+	BitMaskT<0,8>::val == 11111111,
+	BitMaskT<4, 12>::val == 11111111 11110000, etc.
+	If Pos+Bits > 32, the result is undefined. */
 template<int Pos, int Bits>
 class BitMaskT
 {
 public:
-//    enum { val = (Pow<2, Bits>::val - 1) << Pos };        // Alternate way to calculate this value.
-    enum { val = LSBT<Pos+Bits>::val & ~LSBT<Pos>::val }; // But this is nicer.
+//	enum { val = (Pow<2, Bits>::val - 1) << Pos };		// Alternate way to calculate this value.
+	enum { val = LSBT<Pos+Bits>::val & ~LSBT<Pos>::val }; // But this is nicer.
 };
 
 /** @return A mask with the given number of bits set at the given position of a u32 variable. This is 
-    the runtime-equivalent of BitMaskT.
-    For example, BitMask(4,4)==11110000. */
+	the runtime-equivalent of BitMaskT.
+	For example, BitMask(4,4)==11110000. */
 inline u32 BitMask(u32 pos, u32 bits)
 {
-    return LSB(pos + bits) & ~LSB(pos);
+	return LSB(pos + bits) & ~LSB(pos);
 }
 
 /** @return The given 4 bit fields packed into a single larger bitfield.
-    Aggressively templatized version. */
+	Aggressively templatized version. */
 template<typename ResultType, typename InputType,
-            int APos, int ABits, int RPos, int RBits,
-         int GPos, int GBits, int BPos, int BBits>
+			int APos, int ABits, int RPos, int RBits,
+		 int GPos, int GBits, int BPos, int BBits>
 ResultType PackBits(InputType a, InputType r, InputType g, InputType b)
 {
-    return (ResultType)(
-        (ResultType)a << APos & BitMaskT<APos, ABits>::val | 
-        (ResultType)r << RPos & BitMaskT<RPos, RBits>::val |
-        (ResultType)g << GPos & BitMaskT<GPos, GBits>::val |
-        (ResultType)b << BPos & BitMaskT<BPos, BBits>::val);
+	return (ResultType)(
+		(ResultType)a << APos & BitMaskT<APos, ABits>::val | 
+		(ResultType)r << RPos & BitMaskT<RPos, RBits>::val |
+		(ResultType)g << GPos & BitMaskT<GPos, GBits>::val |
+		(ResultType)b << BPos & BitMaskT<BPos, BBits>::val);
 }
 
 /** @return The given 4 bit fields packed into a single larger bitfield. */
 template<typename ResultType, typename InputType>
 ResultType PackBits(int APos, int ABits, int RPos, int RBits, 
-                                      int GPos, int GBits, int BPos, int BBits, 
-                                      InputType a, InputType r, InputType g, InputType b)
+									  int GPos, int GBits, int BPos, int BBits, 
+									  InputType a, InputType r, InputType g, InputType b)
 {
-    return (ResultType)(
-        (ResultType)a << APos & BitMask(APos, ABits) | 
-        (ResultType)r << RPos & BitMask(RPos, RBits) |
-        (ResultType)g << GPos & BitMask(GPos, GBits) |
-        (ResultType)b << BPos & BitMask(BPos, BBits));
+	return (ResultType)(
+		(ResultType)a << APos & BitMask(APos, ABits) | 
+		(ResultType)r << RPos & BitMask(RPos, RBits) |
+		(ResultType)g << GPos & BitMask(GPos, GBits) |
+		(ResultType)b << BPos & BitMask(BPos, BBits));
 }
 
 /** Extracts the given adjacent bits from a larger bitfield. Aggressively templatized version.
-    For example, ExtractBits<u8, u8, 4, 2> gets the bits 00110000 from a byte,
-    shifts them right 4 places and returns the two bits. */
+	For example, ExtractBits<u8, u8, 4, 2> gets the bits 00110000 from a byte,
+	shifts them right 4 places and returns the two bits. */
 template<typename ResultType, typename InputType, int Pos, int Bits>
 void ExtractBits(ResultType &out, const InputType &in)
 {
-    out = (ResultType)(in >> Pos & BitMaskT<0, Bits>::val);
+	out = (ResultType)(in >> Pos & BitMaskT<0, Bits>::val);
 }
 
 /** Extracts the given adjacent bits from a larger bitfield.
-    For example, ExtractBits<u8, u8>(3, 4) gets the bits 01111000 from a byte,
-    shifts them right 3 places and returns the four bits. */
+	For example, ExtractBits<u8, u8>(3, 4) gets the bits 01111000 from a byte,
+	shifts them right 3 places and returns the four bits. */
 template<typename ResultType, typename InputType>
 void ExtractBits(int pos, int bits, ResultType &out, const InputType &in)
 {
-    out = (ResultType)(in >> pos & BitMask(0, bits));
+	out = (ResultType)(in >> pos & BitMask(0, bits));
 }
 
 MATH_END_NAMESPACE

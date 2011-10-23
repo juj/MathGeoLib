@@ -13,8 +13,8 @@
    limitations under the License. */
 
 /** @file MathFunc.h
-    @author Jukka Jylänki
-    @brief Common mathematical functions. */
+	@author Jukka Jylänki
+	@brief Common mathematical functions. */
 #pragma once
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -67,7 +67,7 @@ MATH_BEGIN_NAMESPACE
 /// Computes the dot product of two 3D vectors, but with the elements of the second vector being scattered noncontiguous in memory.
 /// @param v1 The first vector in the dot product. This can either be a C array or a float3.
 /// @param v2 The second vector in the dot product. As opposed to the DOT3() macro, which accesses the elements of this vector
-///     as v2[0], v2[1], v2[2], this function accesses the elements as v2[0], v2[stride], v2[2*stride].
+///	 as v2[0], v2[1], v2[2], this function accesses the elements as v2[0], v2[stride], v2[2*stride].
 /// @param stride The distance between between the subsequent vector elements in the array v2. 
 /// @see DOT3(), ABSDOT3(), DOT3_xyz(), DOT4STRIDED().
 #define DOT3STRIDED(v1, v2, stride) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[stride] + (v1)[2] * (v2)[2*stride])
@@ -81,7 +81,7 @@ MATH_BEGIN_NAMESPACE
 /// Computes the dot product of two 4D vectors, but with the elements of the second vector being scattered noncontiguous in memory.
 /// @param v1 The first vector in the dot product. This can either be a C array or a float4.
 /// @param v2 The second vector in the dot product. As opposed to the DOT4() macro, which accesses the elements of this vector
-///     as v2[0], v2[1], v2[2], v2[3], this function accesses the elements as v2[0], v2[stride], v2[2*stride], v2[3*stride].
+///	 as v2[0], v2[1], v2[2], v2[3], this function accesses the elements as v2[0], v2[stride], v2[2*stride], v2[3*stride].
 /// @param stride The distance between between the subsequent vector elements in the array v2. 
 /// @see DOT4(), DOT4POS(), DOT4POS_xyz(), DOT4DIR(), DOT4DIR_xyz().
 #define DOT4STRIDED(v1, v2, stride) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[stride] + (v1)[2] * (v2)[2*stride] + (v1)[3] * (v2)[3*stride])
@@ -213,13 +213,13 @@ float SignOrZero(float f, float epsilon = 1e-8f);
 
 /// Linearly interpolates between a and b.
 /** @param t A value between [0,1]. 
-    @return This function computes a + t*(b-a). That is, if t==0, this function returns a. If t==1, this function returns b.
-        Otherwise, the returned value linearly moves from a to b as t ranges from 0 to 1.
-    @see LerpMod(), InvLerp(), Step(), SmoothStep(), PingPongMod(), Mod(), ModPos(), Frac(). */
+	@return This function computes a + t*(b-a). That is, if t==0, this function returns a. If t==1, this function returns b.
+		Otherwise, the returned value linearly moves from a to b as t ranges from 0 to 1.
+	@see LerpMod(), InvLerp(), Step(), SmoothStep(), PingPongMod(), Mod(), ModPos(), Frac(). */
 float Lerp(float a, float b, float t);
 /// Linearly interpolates from a to b, under the modulus mod.
 /** This function takes evaluates a and b in the range [0, mod] and takes the shorter path to reach from a to b.
-    @see Lerp(), InvLerp(), Step(), SmoothStep(), PingPongMod(), Mod(), ModPos(), Frac(). */
+	@see Lerp(), InvLerp(), Step(), SmoothStep(), PingPongMod(), Mod(), ModPos(), Frac(). */
 float LerpMod(float a, float b, float mod, float t);
 /// Computes the lerp factor a and b have to be Lerp()ed to get x.
 /** @see Lerp(), LerpMod(), Step(), SmoothStep(), PingPongMod(), Mod(), ModPos(), Frac(). */
@@ -270,8 +270,8 @@ int CombinatorialTab(int n, int k);
 template<typename T>
 inline T Clamp(const T &val, const T &floor, const T &ceil)
 {
-    assume(floor <= ceil);
-    return val <= ceil ? (val >= floor ? val : floor) : ceil;
+	assume(floor <= ceil);
+	return val <= ceil ? (val >= floor ? val : floor) : ceil;
 }
 
 /// Clamps the given input value to the range [0, 1].
@@ -284,7 +284,7 @@ inline T Clamp01(const T &val) { return Clamp(val, T(0), T(1)); }
 template<typename T>
 const T Min(const T &a, const T &b)
 {
-    return a < b ? a : b;
+	return a < b ? a : b;
 }
 
 /// Computes the larger of two values.
@@ -292,7 +292,7 @@ const T Min(const T &a, const T &b)
 template<typename T>
 const T Max(const T &a, const T &b)
 {
-    return a >= b ? a : b;
+	return a >= b ? a : b;
 }
 
 /// Computes the smallest of three values.
@@ -340,28 +340,28 @@ void Swap(T &a, T &b)
 template<typename T>
 bool GreaterThan(const T &a, const T &b)
 {
-    return a > b;
+	return a > b;
 }
 
 /** @return True if a < b. */
 template<typename T>
 bool LessThan(const T &a, const T &b)
 {
-    return a < b;
+	return a < b;
 }
 
 /** @return The absolute value of a. */
 template<typename T>
 const T Abs(const T &a)
 {
-    return a >= 0 ? a : -a;
+	return a >= 0 ? a : -a;
 }
 
 /// @return True if a and b are equal, using operator ==().
 template<typename T>
 bool Equal(const T &a, const T &b)
 {
-    return a == b;
+	return a == b;
 }
 
 /** Compares the two values for equality up to a small epsilon. */
@@ -373,12 +373,12 @@ template<> bool inline Equal(const long double &a, const long double &b) { retur
 bool EqualAbs(float a, float b, float epsilon = 1e-6f);
 
 /** Compares the two values for equality, allowing the given amount of relative error. 
-    Beware that for values very near 0, the relative error is significant. */
+	Beware that for values very near 0, the relative error is significant. */
 bool EqualRel(float a, float b, float maxRelError = 1e-5f);
 
 /** Compares two floats interpreted as integers, see 
-    http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm 
-    Warning: This comparison is not safe with NANs or INFs. */
+	http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm 
+	Warning: This comparison is not safe with NANs or INFs. */
 bool EqualUlps(float a, float b, int maxUlps = 10000);
 
 #ifndef isfinite

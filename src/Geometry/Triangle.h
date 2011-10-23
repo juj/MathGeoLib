@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Triangle.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief The Triangle geometry object. */
 #pragma once
 
@@ -27,304 +27,304 @@ MATH_BEGIN_NAMESPACE
 class Triangle
 {
 public:
-    /// The first triangle endpoint.
-    float3 a;
-    /// The second triangle endpoint.
-    /** [similarOverload: a] */
-    float3 b;
-    /// The third triangle endpoint.
-    /** [similarOverload: a]
-        @note The order in which the vertices are stored in this data structure is important. The triangles
-            (a,b,c) and (a,c,b) are otherwise equivalent, but their plane normals point to the opposite directions.
-        @see PlaneCCW(), PlaneCW(). */
-    float3 c;
+	/// The first triangle endpoint.
+	float3 a;
+	/// The second triangle endpoint.
+	/** [similarOverload: a] */
+	float3 b;
+	/// The third triangle endpoint.
+	/** [similarOverload: a]
+		@note The order in which the vertices are stored in this data structure is important. The triangles
+			(a,b,c) and (a,c,b) are otherwise equivalent, but their plane normals point to the opposite directions.
+		@see PlaneCCW(), PlaneCW(). */
+	float3 c;
 
-    /// The default constructor does not initialize any members of this class.
-    /** This means that the values of the members a, b and c are undefined after creating a new Triangle using this
-        default constructor. Remember to assign to them before use.
-        @see a, b, c. */
-    Triangle() {}
-    /// Constructs a triangle from three given endpoints.
-    /** The normal of the plane will be constructed to point towards the halfspace where
-        the vertices a, b and c wind in counter-clockwise order.
-        @see a, b, c. */
-    Triangle(const float3 &a, const float3 &b, const float3 &c);
+	/// The default constructor does not initialize any members of this class.
+	/** This means that the values of the members a, b and c are undefined after creating a new Triangle using this
+		default constructor. Remember to assign to them before use.
+		@see a, b, c. */
+	Triangle() {}
+	/// Constructs a triangle from three given endpoints.
+	/** The normal of the plane will be constructed to point towards the halfspace where
+		the vertices a, b and c wind in counter-clockwise order.
+		@see a, b, c. */
+	Triangle(const float3 &a, const float3 &b, const float3 &c);
 
-    /// Expresses the given point in barycentric (u,v,w) coordinates.
-    /** @note There are two different conventions for representing barycentric coordinates. One uses
-            a (u,v,w) triplet with the equation pt == u*a + v*b + w*c, and the other uses a (u,v) pair
-            with the equation pt == a + u*(b-a) + v*(c-a). These two are equivalent. Use the mappings 
-            (u,v) -> (1-u-v, u, v) and (u,v,w)->(v,w) to convert between these two representations.
-        @param point The point of the vector space to express in barycentric coordinates. This point should 
-                     lie in the plane formed by this triangle.
-        @return The factors (u,v,w) that satisfy the weighted sum equation point == u*a + v*b + w*c.
-        @see BarycentricUV(), BarycentricInsideTriangle(), Point(), http://mathworld.wolfram.com/BarycentricCoordinates.html */
-    float3 BarycentricUVW(const float3 &point) const;
+	/// Expresses the given point in barycentric (u,v,w) coordinates.
+	/** @note There are two different conventions for representing barycentric coordinates. One uses
+			a (u,v,w) triplet with the equation pt == u*a + v*b + w*c, and the other uses a (u,v) pair
+			with the equation pt == a + u*(b-a) + v*(c-a). These two are equivalent. Use the mappings 
+			(u,v) -> (1-u-v, u, v) and (u,v,w)->(v,w) to convert between these two representations.
+		@param point The point of the vector space to express in barycentric coordinates. This point should 
+			lie in the plane formed by this triangle.
+		@return The factors (u,v,w) that satisfy the weighted sum equation point == u*a + v*b + w*c.
+		@see BarycentricUV(), BarycentricInsideTriangle(), Point(), http://mathworld.wolfram.com/BarycentricCoordinates.html */
+	float3 BarycentricUVW(const float3 &point) const;
 
-    /// Expresses the given point in barycentric (u,v) coordinates.
-    /** @note There are two different conventions for representing barycentric coordinates. One uses
-            a (u,v,w) triplet with the equation pt == u*a + v*b + w*c, and the other uses a (u,v) pair
-            with the equation pt == a + u*(b-a) + v*(c-a). These two are equivalent. Use the mappings 
-            (u,v) -> (1-u-v, u, v) and (u,v,w)->(v,w) to convert between these two representations.
-        @param point The point to express in barycentric coordinates. This point should lie in the plane
-                     formed by this triangle.
-        @return The factors (u,v) that satisfy the weighted sum equation point == a + u*(b-a) + v*(c-a).
-        @see BarycentricUVW(), BarycentricInsideTriangle(), Point(). */
-    float2 BarycentricUV(const float3 &point) const;
+	/// Expresses the given point in barycentric (u,v) coordinates.
+	/** @note There are two different conventions for representing barycentric coordinates. One uses
+			a (u,v,w) triplet with the equation pt == u*a + v*b + w*c, and the other uses a (u,v) pair
+			with the equation pt == a + u*(b-a) + v*(c-a). These two are equivalent. Use the mappings 
+			(u,v) -> (1-u-v, u, v) and (u,v,w)->(v,w) to convert between these two representations.
+		@param point The point to express in barycentric coordinates. This point should lie in the plane
+			formed by this triangle.
+		@return The factors (u,v) that satisfy the weighted sum equation point == a + u*(b-a) + v*(c-a).
+		@see BarycentricUVW(), BarycentricInsideTriangle(), Point(). */
+	float2 BarycentricUV(const float3 &point) const;
 
-    /// Tests if the given barycentric UVW coordinates lie inside a triangle.
-    /** A barycentric UVW coordinate represents a point inside a triangle if
-          a) 0 <= u,v,w <= 1 and
-          b) u+v+w == 1.
-        @param barycentric The vector containing the barycentric (u,v,w) coordinates.
-        @return True if the given coordinates lie inside a triangle.
-        @see BarycentricUV(), BarycentricUVW(), Point(). */
-    static bool BarycentricInsideTriangle(const float3 &uvw);
+	/// Tests if the given barycentric UVW coordinates lie inside a triangle.
+	/** A barycentric UVW coordinate represents a point inside a triangle if
+		  a) 0 <= u,v,w <= 1 and
+		  b) u+v+w == 1.
+		@param barycentric The vector containing the barycentric (u,v,w) coordinates.
+		@return True if the given coordinates lie inside a triangle.
+		@see BarycentricUV(), BarycentricUVW(), Point(). */
+	static bool BarycentricInsideTriangle(const float3 &uvw);
 
-    /// Returns the point at the given barycentric coordinates.
-    /** This function computes the vector space point at the given barycentric coordinates.
-        @param uvw The barycentric UVW coordinate triplet. The condition u+v+w == 1 should hold for the input coordinate.
-                   If 0 <= u,v,w <= 1, the returned point lies inside this triangle.
-        @return u*a + v*b + w*c. */
-    float3 Point(float u, float v, float w) const;
-    float3 Point(const float3 &uvw) const;
-    /** These functions are an alternate form of Point(u,v,w) for the case when the barycentric coordinates are
-        represented as a (u,v) pair and not as a (u,v,w) triplet. This function is provided for convenience 
-        and effectively just computes Point(1-u-v, u, v).
-        @param uv The barycentric UV coordinates. If 0 <= u,v <= 1 and u+v <= 1, then the returned point lies inside
-                  this triangle.
-        @return a + (b-a)*u + (c-a)*v.
-        @see BarycentricUV(), BarycentricUVW(), BarycentricInsideTriangle(). */
-    float3 Point(float u, float v) const { return a + (b-a) * u + (c-a) * v; }
-    float3 Point(const float2 &uv) const;
+	/// Returns the point at the given barycentric coordinates.
+	/** This function computes the vector space point at the given barycentric coordinates.
+		@param uvw The barycentric UVW coordinate triplet. The condition u+v+w == 1 should hold for the input coordinate.
+			If 0 <= u,v,w <= 1, the returned point lies inside this triangle.
+		@return u*a + v*b + w*c. */
+	float3 Point(float u, float v, float w) const;
+	float3 Point(const float3 &uvw) const;
+	/** These functions are an alternate form of Point(u,v,w) for the case when the barycentric coordinates are
+		represented as a (u,v) pair and not as a (u,v,w) triplet. This function is provided for convenience 
+		and effectively just computes Point(1-u-v, u, v).
+		@param uv The barycentric UV coordinates. If 0 <= u,v <= 1 and u+v <= 1, then the returned point lies inside
+			this triangle.
+		@return a + (b-a)*u + (c-a)*v.
+		@see BarycentricUV(), BarycentricUVW(), BarycentricInsideTriangle(). */
+	float3 Point(float u, float v) const { return a + (b-a) * u + (c-a) * v; }
+	float3 Point(const float2 &uv) const;
 
-    /// Computes the center of mass of this triangle.
-    /// @return The point (a+b+c)/3.
-    float3 Centroid() const;
+	/// Computes the center of mass of this triangle.
+	/** @return The point (a+b+c)/3. */
+	float3 Centroid() const;
 
-    /// Computes the surface area of this triangle.
-    /// @return The surface area of this triangle.
-    /// @see Perimeter(), Area2D(), SignedArea().
-    float Area() const;
+	/// Computes the surface area of this triangle.
+	/** @return The surface area of this triangle.
+		@see Perimeter(), Area2D(), SignedArea(). */
+	float Area() const;
 
-    /// Computes the total edge length of this triangle.
-    /// @return |a-b| + |b-c| + |c-a|.
-    /// @see Area(), Edge().
-    float Perimeter() const;
+	/// Computes the total edge length of this triangle.
+	/** @return |a-b| + |b-c| + |c-a|.
+		@see Area(), Edge(). */
+	float Perimeter() const;
 
-    /// Returns an edge of this triangle.
-    /// @param i The index of the edge to generate: 0, 1 or 2.
-    /// @return A LineSegment representing the given edge of this triangle. Edge(0) returns LineSegment(a,b), Edge(1) 
-    ///         returns LineSegment(b,c) and Edge(2) returns LineSegment(c,a).
-    /// @note If an index outside [0, 2] is passed, an assume() failure occurs and LineSegment(NaN, NaN) is returned.
-    /// @see Vertex().
-    LineSegment Edge(int i) const;
+	/// Returns an edge of this triangle.
+	/** @param i The index of the edge to generate: 0, 1 or 2.
+		@return A LineSegment representing the given edge of this triangle. Edge(0) returns LineSegment(a,b), Edge(1) 
+			returns LineSegment(b,c) and Edge(2) returns LineSegment(c,a).
+		@note If an index outside [0, 2] is passed, an assume() failure occurs and LineSegment(NaN, NaN) is returned.
+		@see Vertex(). */
+	LineSegment Edge(int i) const;
 
-    /// Returns a vertex of this triangle.
-    /// @param i The vertex of this triangle to get: 0, 1 or 2.
-    /// @return Vertex(0) returns the point a, Vertex(1) returns the point b, and Vertex(2) returns the point c.
-    /// @note If an index outside [0, 2] is passed, an assume() failure occurs and float3(NaN) is returned.
-    /// @see Edge().
-    float3 Vertex(int i) const;
+	/// Returns a vertex of this triangle.
+	/** @param i The vertex of this triangle to get: 0, 1 or 2.
+		@return Vertex(0) returns the point a, Vertex(1) returns the point b, and Vertex(2) returns the point c.
+		@note If an index outside [0, 2] is passed, an assume() failure occurs and float3(NaN) is returned.
+		@see Edge(). */
+	float3 Vertex(int i) const;
 
-    /// Returns the counterclockwise-oriented plane this triangle lies on.
-    /** The normal of the returned plane points towards the halfspace in which the vertices of this triangle are winded
-        in <b>counter-clockwise</b> direction. */
-    Plane PlaneCCW() const;
+	/// Returns the counterclockwise-oriented plane this triangle lies on.
+	/** The normal of the returned plane points towards the halfspace in which the vertices of this triangle are winded
+		in <b>counter-clockwise</b> direction. */
+	Plane PlaneCCW() const;
 
-    /// Returns the clockwise-oriented plane this triangle lies on. 
-    /** The normal of the returned plane points towards the halfspace in which the vertices of this triangle are winded
-        in <b>clockwise</b> direction. [similarOverload: PlaneCCW]
-        @see NormalCCW(), NormalCW(), UnnormalizedNormalCCW(), UnnormalizedNormalCW(). */
-    Plane PlaneCW() const;
+	/// Returns the clockwise-oriented plane this triangle lies on. 
+	/** The normal of the returned plane points towards the halfspace in which the vertices of this triangle are winded
+		in <b>clockwise</b> direction. [similarOverload: PlaneCCW]
+		@see NormalCCW(), NormalCW(), UnnormalizedNormalCCW(), UnnormalizedNormalCW(). */
+	Plane PlaneCW() const;
 
-    /// Returns the normalized triangle normal pointing to the counter-clockwise direction of this triangle.
-    /** This function computes the normalized triangle normal vector that points towards the halfspace, 
-        from which observed, the vertices of this triangle wind in <b>counter-clockwise</b> (CCW) order.
-        @see PlaneCCW(), PlaneCW(), UnnormalizedNormalCCW(), UnnormalizedNormalCW(). */
-    float3 NormalCCW() const;
+	/// Returns the normalized triangle normal pointing to the counter-clockwise direction of this triangle.
+	/** This function computes the normalized triangle normal vector that points towards the halfspace, 
+		from which observed, the vertices of this triangle wind in <b>counter-clockwise</b> (CCW) order.
+		@see PlaneCCW(), PlaneCW(), UnnormalizedNormalCCW(), UnnormalizedNormalCW(). */
+	float3 NormalCCW() const;
 
-    /// Returns the normalized triangle normal pointing to the clockwise direction of this triangle.
-    /** This function computes the normalized triangle normal vector that points towards the halfspace, 
-        from which observed, the vertices of this triangle wind in <b>clockwise</b> (CW) order. [similarOverload: NormalCCW]
-        @see PlaneCCW(), PlaneCW(), UnnormalizedNormalCCW(), UnnormalizedNormalCW(). */
+	/// Returns the normalized triangle normal pointing to the clockwise direction of this triangle.
+	/** This function computes the normalized triangle normal vector that points towards the halfspace, 
+		from which observed, the vertices of this triangle wind in <b>clockwise</b> (CW) order. [similarOverload: NormalCCW]
+		@see PlaneCCW(), PlaneCW(), UnnormalizedNormalCCW(), UnnormalizedNormalCW(). */
 	float3 NormalCW() const;
 
-    /// Computes an unnormalized counter-clockwise oriented triangle normal vector.
-    float3 UnnormalizedNormalCCW() const;
-    /// Computes an unnormalized clockwise-oriented triangle normal vector.
-    /** These functions are equivalent to NormalCCW() and NormalCW(), except these functions do not produce 
-        a unit-length triangle normal vectors. Use these functions instead of NormalCCW/CW() to obtain a small 
-        speed benefit in cases where the normalization step is not required. [similarOverload: UnnormalizedNormalCCW]
-        @see PlaneCCW(), PlaneCW(), NormalCCW(), NormalCW(). */
-    float3 UnnormalizedNormalCW() const;
+	/// Computes an unnormalized counter-clockwise oriented triangle normal vector.
+	float3 UnnormalizedNormalCCW() const;
+	/// Computes an unnormalized clockwise-oriented triangle normal vector.
+	/** These functions are equivalent to NormalCCW() and NormalCW(), except these functions do not produce 
+		a unit-length triangle normal vectors. Use these functions instead of NormalCCW/CW() to obtain a small 
+		speed benefit in cases where the normalization step is not required. [similarOverload: UnnormalizedNormalCCW]
+		@see PlaneCCW(), PlaneCW(), NormalCCW(), NormalCW(). */
+	float3 UnnormalizedNormalCW() const;
 
-    /// Returns a Polygon representation of this Triangle.
-    /** The returned polygon is identical to this Triangle. It has three vertices a, b and c which wind in the same
-        direction than in this triangle.
-    @see class Polygon, ToPolyhedron(). */
-    Polygon ToPolygon() const;
+	/// Returns a Polygon representation of this Triangle.
+	/** The returned polygon is identical to this Triangle. It has three vertices a, b and c which wind in the same
+		direction than in this triangle.
+	@see class Polygon, ToPolyhedron(). */
+	Polygon ToPolygon() const;
 
-    /// Returns a Polyhedron representation of this Triangle.
-    /** The generated polyhedron will be closed and has two triangular faces, and three vertices (a, b and c). 
-        The two faces share the same vertices, but in opposite winding orders. This creates a polyhedron with zero
-        volume and the surface area twice of this Triangle.
-        @see class Polyhedron, ToPolygon(). */
-    Polyhedron ToPolyhedron() const;
+	/// Returns a Polyhedron representation of this Triangle.
+	/** The generated polyhedron will be closed and has two triangular faces, and three vertices (a, b and c). 
+		The two faces share the same vertices, but in opposite winding orders. This creates a polyhedron with zero
+		volume and the surface area twice of this Triangle.
+		@see class Polyhedron, ToPolygon(). */
+	Polyhedron ToPolyhedron() const;
 
-    /// Computes the surface area of the given 2D triangle.
-    /** This math library does not have a separate class for 2D triangles. To compute the area of a 2D triangle,
-        use this Triangle class and set z=0 for each coordinate, or use this helper function.
-        @see Area(), SignedArea(). */
-    static float Area2D(const float2 &p1, const float2 &p2, const float2 &p3);
+	/// Computes the surface area of the given 2D triangle.
+	/** This math library does not have a separate class for 2D triangles. To compute the area of a 2D triangle,
+		use this Triangle class and set z=0 for each coordinate, or use this helper function.
+		@see Area(), SignedArea(). */
+	static float Area2D(const float2 &p1, const float2 &p2, const float2 &p3);
 
-    /// Relates the barycentric coordinate of the given point to the surface area of triangle abc.
-    /** This function computes the ratio of the signed area of the triangle (point, b, c) to the signed area of
-        the triangle (a, b, c). This is the same as computing the barycentric u-coordinate of the given point
-        on the triangle (a, b, c).
-        @see Area(), Area2D(), BarycentricUVW(). */
-    static float SignedArea(const float3 &point, const float3 &a, const float3 &b, const float3 &c);
+	/// Relates the barycentric coordinate of the given point to the surface area of triangle abc.
+	/** This function computes the ratio of the signed area of the triangle (point, b, c) to the signed area of
+		the triangle (a, b, c). This is the same as computing the barycentric u-coordinate of the given point
+		on the triangle (a, b, c).
+		@see Area(), Area2D(), BarycentricUVW(). */
+	static float SignedArea(const float3 &point, const float3 &a, const float3 &b, const float3 &c);
 
-    /// Tests if this Triangle is finite.
-    /** A triangle is <b><i>finite</i></b> if its vertices a, b and c do not contain floating-point NaNs or +/-infs
-        in them.
-        @return True if each coordinate of each vertex of this triangle has a finite floating-point value.
-        @see a, b, c, IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), isfinite(), inf, negInf, nan, float3::nan, float3::inf. */
-    bool IsFinite() const;
+	/// Tests if this Triangle is finite.
+	/** A triangle is <b><i>finite</i></b> if its vertices a, b and c do not contain floating-point NaNs or +/-infs
+		in them.
+		@return True if each coordinate of each vertex of this triangle has a finite floating-point value.
+		@see a, b, c, IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), isfinite(), inf, negInf, nan, float3::nan, float3::inf. */
+	bool IsFinite() const;
 
-    /// Returns true if this triangle is degenerate.
-    /** A triangle is <b><i>degenerate</i></b> if it is not finite, or if the surface area of the triangle is 
-        close to zero.
-        @param epsilon The threshold to test against. If two vertices of this triangle are closer than this, the 
-        triangle is considered degenerate.
-        @see a, b, c, IsFinite(). */
-    bool IsDegenerate(float epsilon = 1e-3f) const;
+	/// Returns true if this triangle is degenerate.
+	/** A triangle is <b><i>degenerate</i></b> if it is not finite, or if the surface area of the triangle is 
+		close to zero.
+		@param epsilon The threshold to test against. If two vertices of this triangle are closer than this, the 
+		triangle is considered degenerate.
+		@see a, b, c, IsFinite(). */
+	bool IsDegenerate(float epsilon = 1e-3f) const;
 
-    /// Returns true if the triangle defined by the three given points is degenerate.
-    static bool IsDegenerate(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon = 1e-3f);
+	/// Returns true if the triangle defined by the three given points is degenerate.
+	static bool IsDegenerate(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon = 1e-3f);
 
-    /// Tests if the given object is fully contained inside this triangle.
-    /** @param triangleThickness An epsilon threshold value to use for this test. 
-        This specifies the maximum distance the given object can lie from the plane defined by this triangle.
-        @see Distance(), Intersects(), ClosestPoint().
-        \todo Add Triangle::Contains(Circle) and Triangle::Contains(Disc). */
-    bool Contains(const float3 &point, float triangleThickness = 1e-3f) const;
-    bool Contains(const LineSegment &lineSegment, float triangleThickness = 1e-3f) const;
-    bool Contains(const Triangle &triangle, float triangleThickness = 1e-3f) const;
+	/// Tests if the given object is fully contained inside this triangle.
+	/** @param triangleThickness An epsilon threshold value to use for this test. 
+			This specifies the maximum distance the given object can lie from the plane defined by this triangle.
+		@see Distance(), Intersects(), ClosestPoint().
+		@todo Add Triangle::Contains(Circle) and Triangle::Contains(Disc). */
+	bool Contains(const float3 &point, float triangleThickness = 1e-3f) const;
+	bool Contains(const LineSegment &lineSegment, float triangleThickness = 1e-3f) const;
+	bool Contains(const Triangle &triangle, float triangleThickness = 1e-3f) const;
 
-    /// Computes the distance between this triangle and the given object.
-    /** This function finds the nearest pair of points on this and the given object, and computes their distance.
-        If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-        @todo Add Triangle::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron). 
-        @see Contains(), Intersects(), ClosestPoint(). */
-    float Distance(const float3 &point) const;
-    float Distance(const Sphere &sphere) const;
+	/// Computes the distance between this triangle and the given object.
+	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
+		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
+		@todo Add Triangle::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron). 
+		@see Contains(), Intersects(), ClosestPoint(). */
+	float Distance(const float3 &point) const;
+	float Distance(const Sphere &sphere) const;
 
-    /// Tests whether this triangle and the given object intersect.       
-    /** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-        another, this function still returns true. (e.g. in case a line segment is contained inside this triangle, 
-        or this triangle is contained inside a sphere, etc.)
-        @param d [out] If specified, this parameter will receive the parametric distance of 
-            the intersection point along the line object. Use the GetPoint(d) function of the line class
-            to get the actual point of intersection. This pointer may be null.
-        @param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer
-            may be null.
-	    @return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
-        @see Contains(), Distance(), ClosestPoint(), LineSegment::GetPoint(). */
-    bool Intersects(const LineSegment &lineSegment, float *d, float3 *intersectionPoint) const;
-    bool Intersects(const Line &line, float *d, float3 *intersectionPoint) const;
-    bool Intersects(const Ray &ray, float *d, float3 *intersectionPoint) const;
-    bool Intersects(const Plane &plane) const;
-    /** @param closestPointOnTriangle [out] If specified, receives the point of intersection between the Sphere
-            and this Triangle. Even if no intersection occurred, this parameter will receive the closest point on
-            the Triangle to the Sphere. This pointer may be null. */
-    bool Intersects(const Sphere &sphere, float3 *closestPointOnTriangle) const;
-    bool Intersects(const Sphere &sphere) const;
-    /** @param outLine [out] If specified, receives the line segment of the common points shared by the two
-            intersecting triangles. If the two triangles do not intersect, this pointer is not written to.
-            This pointer may be null. */
-    bool Intersects(const Triangle &triangle, LineSegment *outLine) const;
-    bool Intersects(const AABB &aabb) const;
-    bool Intersects(const OBB &obb) const;
-    bool Intersects(const Polygon &polygon) const;
-    bool Intersects(const Frustum &frustum) const;
-    bool Intersects(const Polyhedron &polyhedron) const;
-    bool Intersects(const Capsule &capsule) const;
+	/// Tests whether this triangle and the given object intersect.	   
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+		another, this function still returns true. (e.g. in case a line segment is contained inside this triangle, 
+		or this triangle is contained inside a sphere, etc.)
+		@param d [out] If specified, this parameter will receive the parametric distance of 
+			the intersection point along the line object. Use the GetPoint(d) function of the line class
+			to get the actual point of intersection. This pointer may be null.
+		@param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer
+			may be null.
+		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
+		@see Contains(), Distance(), ClosestPoint(), LineSegment::GetPoint(). */
+	bool Intersects(const LineSegment &lineSegment, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const Line &line, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const Ray &ray, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const Plane &plane) const;
+	/** @param closestPointOnTriangle [out] If specified, receives the point of intersection between the Sphere
+			and this Triangle. Even if no intersection occurred, this parameter will receive the closest point on
+			the Triangle to the Sphere. This pointer may be null. */
+	bool Intersects(const Sphere &sphere, float3 *closestPointOnTriangle) const;
+	bool Intersects(const Sphere &sphere) const;
+	/** @param outLine [out] If specified, receives the line segment of the common points shared by the two
+			intersecting triangles. If the two triangles do not intersect, this pointer is not written to.
+			This pointer may be null. */
+	bool Intersects(const Triangle &triangle, LineSegment *outLine) const;
+	bool Intersects(const AABB &aabb) const;
+	bool Intersects(const OBB &obb) const;
+	bool Intersects(const Polygon &polygon) const;
+	bool Intersects(const Frustum &frustum) const;
+	bool Intersects(const Polyhedron &polyhedron) const;
+	bool Intersects(const Capsule &capsule) const;
 
-    /// A helper function used in line-triangle tests.
-    static bool Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
+	/// A helper function used in line-triangle tests.
+	static bool Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 		const float3 &v0, const float3 &v1, const float3 &v2,
 		float &u, float &v, float &t);
 
-    /// Projects this Triangle onto the given axis.
-    /** This function is used in SAT tests (separate axis theorem) to check the interval this triangle
-        lies in on an 1D line.
-        @param axis The axis to project onto. This vector can be unnormalized.
-        @param dMin [out] Returns the minimum extent of this triangle on the given axis.
-        @param dMax [out] Returns the maximum extent of this triangle on the given axis. */
-    void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
+	/// Projects this Triangle onto the given axis.
+	/** This function is used in SAT tests (separate axis theorem) to check the interval this triangle
+		lies in on an 1D line.
+		@param axis The axis to project onto. This vector can be unnormalized.
+		@param dMin [out] Returns the minimum extent of this triangle on the given axis.
+		@param dMax [out] Returns the maximum extent of this triangle on the given axis. */
+	void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
 
-    /// Computes the closest point on this triangle to the given object.
-    /** If the other object intersects this triangle, this function will return an arbitrary point inside
-        the region of intersection.
-        @see Contains(), Distance(), Intersects(), ClosestPointToTriangleEdge(). */
-    float3 ClosestPoint(const float3 &point) const;
-    /** @param otherPt [out] If specified, receives the closest point on the other object to this triangle.
-        This pointer may be null. */
-    float3 ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const;
-    /** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
-            This pointer may be null.
-        @param outV [out] If specified, receives the barycentric V coordinate of the returned point (in the UV convention).
-            This pointer may be null.
-        @param outD [out] If specified, receives the distance along the line of the closest point on the line to this triangle.
-        @return The closest point on this triangle to the given object.
-        @todo Add ClosestPoint(Ray/Plane/Polygon/Circle/Disk/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron).
-        @see Distance(), Contains(), Intersects(), ClosestPointToTriangleEdge(), Line::GetPoint. */
-    float3 ClosestPoint(const Line &line, float *outU, float *outV, float *outD) const;
-    float3 ClosestPoint(const Triangle &triangle, float3 *otherPt) const;
+	/// Computes the closest point on this triangle to the given object.
+	/** If the other object intersects this triangle, this function will return an arbitrary point inside
+		the region of intersection.
+		@see Contains(), Distance(), Intersects(), ClosestPointToTriangleEdge(). */
+	float3 ClosestPoint(const float3 &point) const;
+	/** @param otherPt [out] If specified, receives the closest point on the other object to this triangle.
+		This pointer may be null. */
+	float3 ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const;
+	/** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
+			This pointer may be null.
+		@param outV [out] If specified, receives the barycentric V coordinate of the returned point (in the UV convention).
+			This pointer may be null.
+		@param outD [out] If specified, receives the distance along the line of the closest point on the line to this triangle.
+		@return The closest point on this triangle to the given object.
+		@todo Add ClosestPoint(Ray/Plane/Polygon/Circle/Disk/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron).
+		@see Distance(), Contains(), Intersects(), ClosestPointToTriangleEdge(), Line::GetPoint. */
+	float3 ClosestPoint(const Line &line, float *outU, float *outV, float *outD) const;
+	float3 ClosestPoint(const Triangle &triangle, float3 *otherPt) const;
 
-    /// Computes the closest point on the edge of this triangle to the given object.
-    /** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
-            This pointer may be null.
-        @param outV [out] If specified, receives the barycentric V coordinate of the returned point (in the UV convention).
-            This pointer may be null.
-        @param outD [out] If specified, receives the distance along the line of the closest point on the line to the edge of this triangle.
-        @return The closest point on the edge of this triangle to the given object.
-        @todo Add ClosestPointToTriangleEdge(Point/Ray/Triangle/Plane/Polygon/Circle/Disk/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron).
-        @see Distance(), Contains(), Intersects(), ClosestPointToTriangleEdge(), Line::GetPoint. */
-    float3 ClosestPointToTriangleEdge(const Line &line, float *outU, float *outV, float *outD) const;
-    float3 ClosestPointToTriangleEdge(const LineSegment &lineSegment, float *outU, float *outV, float *outD) const;
+	/// Computes the closest point on the edge of this triangle to the given object.
+	/** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
+			This pointer may be null.
+		@param outV [out] If specified, receives the barycentric V coordinate of the returned point (in the UV convention).
+			This pointer may be null.
+		@param outD [out] If specified, receives the distance along the line of the closest point on the line to the edge of this triangle.
+		@return The closest point on the edge of this triangle to the given object.
+		@todo Add ClosestPointToTriangleEdge(Point/Ray/Triangle/Plane/Polygon/Circle/Disk/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron).
+		@see Distance(), Contains(), Intersects(), ClosestPointToTriangleEdge(), Line::GetPoint. */
+	float3 ClosestPointToTriangleEdge(const Line &line, float *outU, float *outV, float *outD) const;
+	float3 ClosestPointToTriangleEdge(const LineSegment &lineSegment, float *outU, float *outV, float *outD) const;
 
-    /// Generates a random point inside this Triangle.
-    /** The points are distributed uniformly.
-        The implementation of this function is based on Graphics Gems 1, p. 25: 
-        "1.5 Generating random points in triangles. Method 2." The Method 1 presented in the book
-        uses a sqrt() instead of the if().
-        @param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
-        @see class LCG, RandomPointOnEdge(), RandomVertex(), Point(). */
-    float3 RandomPointInside(LCG &rng) const;
+	/// Generates a random point inside this Triangle.
+	/** The points are distributed uniformly.
+		The implementation of this function is based on Graphics Gems 1, p. 25: 
+		"1.5 Generating random points in triangles. Method 2." The Method 1 presented in the book
+		uses a sqrt() instead of the if().
+		@param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
+		@see class LCG, RandomPointOnEdge(), RandomVertex(), Point(). */
+	float3 RandomPointInside(LCG &rng) const;
 
-    /// Chooses a corner vertex of this Triangle at random.
-    /** This function returns one of the vertices {a, b, c} at uniformly random.
-        @param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
-        @see class LCG, RandomPointInside(), RandomPointOnEdge(), Vertex(). */
-    float3 RandomVertex(LCG &rng) const;
+	/// Chooses a corner vertex of this Triangle at random.
+	/** This function returns one of the vertices {a, b, c} at uniformly random.
+		@param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
+		@see class LCG, RandomPointInside(), RandomPointOnEdge(), Vertex(). */
+	float3 RandomVertex(LCG &rng) const;
 
-    /// Generates a random point on the edge of this Triangle.
-    /** The points are distributed uniformly.
-        This function requires that this triangle is not degenerate. If it is, an assume() error will be printed,
-        and the return value will be undefined.
-        @param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
-        @see class LCG, RandomPointInside(), RandomVertex(), Edge(), class LineSegment, IsDegenerate(). */
-    float3 RandomPointOnEdge(LCG &rng) const;
+	/// Generates a random point on the edge of this Triangle.
+	/** The points are distributed uniformly.
+		This function requires that this triangle is not degenerate. If it is, an assume() error will be printed,
+		and the return value will be undefined.
+		@param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
+		@see class LCG, RandomPointInside(), RandomVertex(), Edge(), class LineSegment, IsDegenerate(). */
+	float3 RandomPointOnEdge(LCG &rng) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-    /// Returns a human-readable representation of this Line. Most useful for debugging purposes.
-    std::string ToString() const;
+	/// Returns a human-readable representation of this Line. Most useful for debugging purposes.
+	std::string ToString() const;
 #endif
 #ifdef MATH_QT_INTEROP
-    operator QString() const { return toString(); }
-    QString toString() const { return QString::fromStdString(ToString()); }
+	operator QString() const { return toString(); }
+	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
 

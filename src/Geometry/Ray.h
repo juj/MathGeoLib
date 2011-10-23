@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Ray.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief The Ray geometry object. */
 #pragma once
 
@@ -30,165 +30,165 @@ MATH_BEGIN_NAMESPACE
 class Ray
 {
 public:
-    /// Specifies the origin of this ray.
-    float3 pos;
+	/// Specifies the origin of this ray.
+	float3 pos;
 
-    /// The normalized direction vector of this ray. [similarOverload: pos]
-    /** @note For proper functionality, this direction vector needs to always be normalized. If you set to this
-        member manually, remember to make sure you only assign normalized direction vectors. */
-    float3 dir;
+	/// The normalized direction vector of this ray. [similarOverload: pos]
+	/** @note For proper functionality, this direction vector needs to always be normalized. If you set to this
+		member manually, remember to make sure you only assign normalized direction vectors. */
+	float3 dir;
 
-    /// The default constructor does not initialize any members of this class.
-    /** This means that the values of the members pos and dir are undefined after creating a new Ray using this
-        default constructor. Remember to assign to them before use.
-        @see pos, dir. */
-    Ray() {}
+	/// The default constructor does not initialize any members of this class.
+	/** This means that the values of the members pos and dir are undefined after creating a new Ray using this
+		default constructor. Remember to assign to them before use.
+		@see pos, dir. */
+	Ray() {}
 
-    /// Constructs a new ray by explicitly specifying the member variables.
-    /** @param pos The origin position of the ray.
-        @param dir The direction of the ray. This vector must be normalized, this function will not normalize
-            the vector for you (for performance reasons).
-        @see pos, dir. */
-    Ray(const float3 &pos, const float3 &dir);
+	/// Constructs a new ray by explicitly specifying the member variables.
+	/** @param pos The origin position of the ray.
+		@param dir The direction of the ray. This vector must be normalized, this function will not normalize
+			the vector for you (for performance reasons).
+		@see pos, dir. */
+	Ray(const float3 &pos, const float3 &dir);
 
-    /// Converts a Line to a Ray.
-    /** This conversion simply copies the members pos and dir over from the given Line to this Ray. 
-        This means that the new Ray starts at the same position, but only extends to one direction in space,
-        instead of two.
-        @see class Line, ToLine(). */
-    explicit Ray(const Line &line);
+	/// Converts a Line to a Ray.
+	/** This conversion simply copies the members pos and dir over from the given Line to this Ray. 
+		This means that the new Ray starts at the same position, but only extends to one direction in space,
+		instead of two.
+		@see class Line, ToLine(). */
+	explicit Ray(const Line &line);
 
-    /// Converts a LineSegment to a Ray.
-    /** This constructor sets pos = lineSegment.a, and dir = (lineSegment.b - lineSegment.a).Normalized().
-        @see class LineSegment, ToLineSegment(). */
-    explicit Ray(const LineSegment &lineSegment);
+	/// Converts a LineSegment to a Ray.
+	/** This constructor sets pos = lineSegment.a, and dir = (lineSegment.b - lineSegment.a).Normalized().
+		@see class LineSegment, ToLineSegment(). */
+	explicit Ray(const LineSegment &lineSegment);
 
-    /// Gets a point along the ray at the given distance.
-    /** Use this function to convert a 1D parametric point along the Ray to a 3D point in the linear space.
-        @param distance The point to compute. GetPoint(0) will return pos. GetPoint(t) will return a point
-            at distance |t| from pos. Passing in negative values is allowed, but in that case, the
-            returned point does not actually lie on this Ray.
-        @return pos + distance * dir.
-        @see pos, dir. */
-    float3 GetPoint(float distance) const;
+	/// Gets a point along the ray at the given distance.
+	/** Use this function to convert a 1D parametric point along the Ray to a 3D point in the linear space.
+		@param distance The point to compute. GetPoint(0) will return pos. GetPoint(t) will return a point
+			at distance |t| from pos. Passing in negative values is allowed, but in that case, the
+			returned point does not actually lie on this Ray.
+		@return pos + distance * dir.
+		@see pos, dir. */
+	float3 GetPoint(float distance) const;
 
-    /// Applies a transformation to this ray, in-place.
-    /** See classes float3x3, float3x4, float4x4, Quat. */
-    void Transform(const float3x3 &transform);
-    void Transform(const float3x4 &transform);
-    void Transform(const float4x4 &transform);
-    void Transform(const Quat &transform);
+	/// Applies a transformation to this ray, in-place.
+	/** See classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
 
-    /// Tests if the given object is fully contained on this ray.
-    /** @param distanceThreshold The magnitude of the epsilon test threshold to use. Since a Ray 
-        is a 1D object in a 3D space, an epsilon threshold is used to allow errors caused by floating-point 
-        inaccuracies.
-        @return True if this ray contains the given object, up to the given distance threshold.
-        @see class LineSegment, Distance(), ClosestPoint(), Intersects(). */
-    bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
-    bool Contains(const LineSegment &lineSegment, float distanceThreshold = 1e-3f) const;
+	/// Tests if the given object is fully contained on this ray.
+	/** @param distanceThreshold The magnitude of the epsilon test threshold to use. Since a Ray 
+		is a 1D object in a 3D space, an epsilon threshold is used to allow errors caused by floating-point 
+		inaccuracies.
+		@return True if this ray contains the given object, up to the given distance threshold.
+		@see class LineSegment, Distance(), ClosestPoint(), Intersects(). */
+	bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
+	bool Contains(const LineSegment &lineSegment, float distanceThreshold = 1e-3f) const;
 
-    /// Tests if two rays are equal.
-    /** @return True if this and the given Ray represent the same set of points, up to the given epsilon. */
-    bool Equals(const Ray &otherRay, float epsilon = 1e-3f) const;
+	/// Tests if two rays are equal.
+	/** @return True if this and the given Ray represent the same set of points, up to the given epsilon. */
+	bool Equals(const Ray &otherRay, float epsilon = 1e-3f) const;
 
-    /// Computes the distance between this ray and the given object.
-    /** This function finds the nearest pair of points on this and the given object, and computes their distance.
-        If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-        @param d [out] If specified, receives the parametric distance along this ray that 
-            specifies the closest point on this ray to the given object. The value returned here can be negative.
-            This pointer may be null.
-        @see Contains(), Intersects(), ClosestPoint(), GetPoint(). */
-    float Distance(const float3 &point, float *d) const;
-    float Distance(const float3 &point) const;
+	/// Computes the distance between this ray and the given object.
+	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
+		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
+		@param d [out] If specified, receives the parametric distance along this ray that 
+			specifies the closest point on this ray to the given object. The value returned here can be negative.
+			This pointer may be null.
+		@see Contains(), Intersects(), ClosestPoint(), GetPoint(). */
+	float Distance(const float3 &point, float *d) const;
+	float Distance(const float3 &point) const;
 
-    /** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
-        closest point on that line to this ray. The value returned here can be negative. This pointer may
-        be null. */
-    float Distance(const Ray &other, float *d, float *d2 = 0) const;
-    float Distance(const Ray &other) const;
-    float Distance(const Line &other, float *d, float *d2 = 0) const;
-    float Distance(const Line &other) const;
-    float Distance(const LineSegment &other, float *d, float *d2 = 0) const;
-    float Distance(const LineSegment &other) const;
-    float Distance(const Sphere &sphere) const;
-    float Distance(const Capsule &capsule) const;
+	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
+		closest point on that line to this ray. The value returned here can be negative. This pointer may
+		be null. */
+	float Distance(const Ray &other, float *d, float *d2 = 0) const;
+	float Distance(const Ray &other) const;
+	float Distance(const Line &other, float *d, float *d2 = 0) const;
+	float Distance(const Line &other) const;
+	float Distance(const LineSegment &other, float *d, float *d2 = 0) const;
+	float Distance(const LineSegment &other) const;
+	float Distance(const Sphere &sphere) const;
+	float Distance(const Capsule &capsule) const;
 
-    /// Computes the closest point on this ray to the given object.
-    /** If the other object intersects this ray, this function will return an arbitrary point inside
-        the region of intersection.
-        @param d [out] If specified, receives the parametric distance along this ray that 
-            specifies the closest point on this ray to the given object. The value returned here can be negative.
-            This pointer may be null.
-        @see Contains(), Distance(), Intersects(), GetPoint(). */
-    float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;
-    /** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
-        closest point on that line to this ray. The value returned here can be negative. This pointer may
-        be null. */
-    float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
-    float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
-    float3 ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+	/// Computes the closest point on this ray to the given object.
+	/** If the other object intersects this ray, this function will return an arbitrary point inside
+		the region of intersection.
+		@param d [out] If specified, receives the parametric distance along this ray that 
+			specifies the closest point on this ray to the given object. The value returned here can be negative.
+			This pointer may be null.
+		@see Contains(), Distance(), Intersects(), GetPoint(). */
+	float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;
+	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
+		closest point on that line to this ray. The value returned here can be negative. This pointer may
+		be null. */
+	float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
+	float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
+	float3 ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
 
-    /// Tests whether this ray and the given object intersect.       
-    /** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-        another, this function still returns true.
-        @param d [out] If specified, this parameter will receive the parametric distance of 
-            the intersection point along this object. Use the GetPoint(d) function
-            to get the actual point of intersection. This pointer may be null.
-        @param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer
-            may be null.
-	    @return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
-        @see Contains(), Distance(), ClosestPoint(), GetPoint(). */
-    bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
-    bool Intersects(const Triangle &triangle) const;
-    bool Intersects(const Plane &plane, float *d) const;
-    bool Intersects(const Plane &plane) const;
-    /** @param intersectionNormal [out] If specified, receives the surface normal of the other object at
-        the point of intersection. This pointer may be null. */
-    bool Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const;
-    bool Intersects(const Sphere &s) const;
-    /** @param dNear [out] If specified, receives the distance along this ray to where the ray enters
-        the bounding box. This pointer may be null.
-        @param dFar [out] If specified, receives the distance along this ray to where the ray exits
-        the bounding box. This pointer may be null. */
-    bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
-    bool Intersects(const AABB &aabb) const;
-    bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
-    bool Intersects(const OBB &obb) const;
-    bool Intersects(const Capsule &capsule) const;
-    bool Intersects(const Polygon &polygon) const;
-    bool Intersects(const Frustum &frustum) const;
-    bool Intersects(const Polyhedron &polyhedron) const;
-    /// Tests if this ray intersects the given disc.
-    /// @todo This signature will be moved to bool Intersects(const Disc &disc) const;
-    bool IntersectsDisc(const Circle &disc) const;
+	/// Tests whether this ray and the given object intersect.	   
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+		another, this function still returns true.
+		@param d [out] If specified, this parameter will receive the parametric distance of 
+			the intersection point along this object. Use the GetPoint(d) function
+			to get the actual point of intersection. This pointer may be null.
+		@param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer
+			may be null.
+		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
+		@see Contains(), Distance(), ClosestPoint(), GetPoint(). */
+	bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const Triangle &triangle) const;
+	bool Intersects(const Plane &plane, float *d) const;
+	bool Intersects(const Plane &plane) const;
+	/** @param intersectionNormal [out] If specified, receives the surface normal of the other object at
+		the point of intersection. This pointer may be null. */
+	bool Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const;
+	bool Intersects(const Sphere &s) const;
+	/** @param dNear [out] If specified, receives the distance along this ray to where the ray enters
+		the bounding box. This pointer may be null.
+		@param dFar [out] If specified, receives the distance along this ray to where the ray exits
+		the bounding box. This pointer may be null. */
+	bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
+	bool Intersects(const AABB &aabb) const;
+	bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
+	bool Intersects(const OBB &obb) const;
+	bool Intersects(const Capsule &capsule) const;
+	bool Intersects(const Polygon &polygon) const;
+	bool Intersects(const Frustum &frustum) const;
+	bool Intersects(const Polyhedron &polyhedron) const;
+	/// Tests if this ray intersects the given disc.
+	/// @todo This signature will be moved to bool Intersects(const Disc &disc) const;
+	bool IntersectsDisc(const Circle &disc) const;
 
-    /// Converts this Ray to a Line.
-    /** The pos and dir members of the returned Line will be equal to this Ray. The only difference is
-        that a Line extends to infinity in two directions, whereas the Ray spans only in the positive
-        direction.
-        @see dir, Ray::Ray, class Line, ToLineSegment(). */
-    Line ToLine() const;
-    /// Converts this Ray to a LineSegment.
-    /** @param d Specifies the position of the other endpoint along this Ray. This parameter may be negative,
-        in which case the returned LineSegment does not lie inside this Ray.
-        @return A LineSegment with point a at pos, and point b at pos + d * dir.
-        @see pos, dir, Ray::Ray, class LineSegment, ToLine(). */
-    LineSegment ToLineSegment(float d) const;
+	/// Converts this Ray to a Line.
+	/** The pos and dir members of the returned Line will be equal to this Ray. The only difference is
+		that a Line extends to infinity in two directions, whereas the Ray spans only in the positive
+		direction.
+		@see dir, Ray::Ray, class Line, ToLineSegment(). */
+	Line ToLine() const;
+	/// Converts this Ray to a LineSegment.
+	/** @param d Specifies the position of the other endpoint along this Ray. This parameter may be negative,
+		in which case the returned LineSegment does not lie inside this Ray.
+		@return A LineSegment with point a at pos, and point b at pos + d * dir.
+		@see pos, dir, Ray::Ray, class LineSegment, ToLine(). */
+	LineSegment ToLineSegment(float d) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-    /// Returns a human-readable representation of this Ray.
-    /** The returned string specifies the position and direction of this Ray. */
-    std::string ToString() const;
+	/// Returns a human-readable representation of this Ray.
+	/** The returned string specifies the position and direction of this Ray. */
+	std::string ToString() const;
 #endif
 #ifdef MATH_QT_INTEROP
-    operator QString() const { return toString(); }
-    QString toString() const { return QString::fromStdString(ToString()); }
+	operator QString() const { return toString(); }
+	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 
 #ifdef MATH_OGRE_INTEROP
-    Ray(const Ogre::Ray &other) { pos = other.getOrigin(); dir = other.getDirection(); }
-    operator Ogre::Ray() const { return Ogre::Ray(pos, dir); }
+	Ray(const Ogre::Ray &other) { pos = other.getOrigin(); dir = other.getDirection(); }
+	operator Ogre::Ray() const { return Ogre::Ray(pos, dir); }
 #endif
 
 };

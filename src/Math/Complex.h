@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Complex.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief */
 #pragma once
 
@@ -23,40 +23,40 @@ MATH_BEGIN_NAMESPACE
 class Complex
 {
 public:
-    /// The default ctor does not initialize the Circle to any value.
-    Complex() {}
-    Complex(float real, float imaginary);
+	/// The default ctor does not initialize the Circle to any value.
+	Complex() {}
+	Complex(float real, float imaginary);
 
-    float r;
-    float i;
+	float r;
+	float i;
 
-    Complex Conjugate() const;
-    void Normalize();
-    Complex Normalized() const;
-    float Length() const;
-    float LengthSq() const;
+	Complex Conjugate() const;
+	void Normalize();
+	Complex Normalized() const;
+	float Length() const;
+	float LengthSq() const;
 
-    Complex operator +(float real) const;
-    Complex operator +(const Complex &c) const;
-    Complex operator -(float real) const;
-    Complex operator -(const Complex &c) const;
-    Complex operator *(float real) const;
-    Complex operator *(const Complex &c) const;
-    Complex operator /(float real) const;
-    Complex operator /(const Complex &c) const;
+	Complex operator +(float real) const;
+	Complex operator +(const Complex &c) const;
+	Complex operator -(float real) const;
+	Complex operator -(const Complex &c) const;
+	Complex operator *(float real) const;
+	Complex operator *(const Complex &c) const;
+	Complex operator /(float real) const;
+	Complex operator /(const Complex &c) const;
 
-    Complex &operator +=(float real);
-    Complex &operator +=(const Complex &c);
-    Complex &operator -=(float real);
-    Complex &operator -=(const Complex &c);
-    Complex &operator *=(float real);
-    Complex &operator *=(const Complex &c);
-    Complex &operator /=(float real);
-    Complex &operator /=(const Complex &c);
+	Complex &operator +=(float real);
+	Complex &operator +=(const Complex &c);
+	Complex &operator -=(float real);
+	Complex &operator -=(const Complex &c);
+	Complex &operator *=(float real);
+	Complex &operator *=(const Complex &c);
+	Complex &operator /=(float real);
+	Complex &operator /=(const Complex &c);
 
-    static const Complex zero;
-    static const Complex unitOne;
-    static const Complex unitI;
+	static const Complex zero;
+	static const Complex unitOne;
+	static const Complex unitI;
 };
 
 MATH_END_NAMESPACE

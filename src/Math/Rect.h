@@ -13,8 +13,8 @@
    limitations under the License. */
 
 /** @file Rect.h
-    @author Jukka Jylänki
-    @brief 2D integral axis-aligned rectangle, equivalent to RECT in Windows API. */
+	@author Jukka Jylänki
+	@brief 2D integral axis-aligned rectangle, equivalent to RECT in Windows API. */
 #pragma once
 
 #ifdef WIN32
@@ -28,36 +28,36 @@ MATH_BEGIN_NAMESPACE
 class Rect
 {
 public:
-    Rect() { left = top = right = bottom = 0; }
-    Rect(int left_, int top_, int width, int height)
-        :left(left_), top(top_), right(left + width), bottom(top + height) {}
-//    ~Rect() {}
+	Rect() { left = top = right = bottom = 0; }
+	Rect(int left_, int top_, int width, int height)
+		:left(left_), top(top_), right(left + width), bottom(top + height) {}
+//	~Rect() {}
 
-    int Width() { return right - left; }
-    int Height() { return bottom - top; }
+	int Width() { return right - left; }
+	int Height() { return bottom - top; }
 
-    int left;
-    int top;
-    int right;
-    int bottom;
+	int left;
+	int top;
+	int right;
+	int bottom;
 
 #ifdef WIN32
-    operator RECT()
-    {
-        RECT r;
-        r.top = top;
-        r.left = left;
-        r.right = right;
-        r.bottom = bottom;
-        return r;
-    }
-    Rect(const RECT &r)
-    {
-        top = r.top;
-        left = r.left;
-        bottom = r.bottom;
-        right = r.right;
-    }
+	operator RECT()
+	{
+		RECT r;
+		r.top = top;
+		r.left = left;
+		r.right = right;
+		r.bottom = bottom;
+		return r;
+	}
+	Rect(const RECT &r)
+	{
+		top = r.top;
+		left = r.left;
+		bottom = r.bottom;
+		right = r.right;
+	}
 #endif
 };
 

@@ -13,8 +13,8 @@
    limitations under the License. */
 
 /** @file MathFwd.h
-    @author Jukka Jylänki
-    @brief */
+	@author Jukka Jylänki
+	@brief */
 #pragma once
 
 #include "Math/MathNamespace.h"

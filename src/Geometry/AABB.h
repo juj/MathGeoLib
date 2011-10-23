@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file AABB.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief The Axis-Aligned Bounding Box (AABB) geometry object. */
 #pragma once
 
@@ -28,465 +28,465 @@ MATH_BEGIN_NAMESPACE
 
 /// A 3D axis-aligned bounding box.
 /** This data structure can be used to represent coarse bounds of objects, in situations where detailed triangle-level
-    computations can be avoided. In physics systems, bounding boxes are used as an efficient early-out test for geometry
-    intersection queries. 
-    
-    The 'axis-aligned' part in the name means that the local axes of this bounding box are restricted to align with the 
-    axes of the world space coordinate system. This makes computations involving AABB's very fast, since AABB's cannot
-    be arbitrarily oriented in the space with respect to each other.
+	computations can be avoided. In physics systems, bounding boxes are used as an efficient early-out test for geometry
+	intersection queries. 
+	
+	The 'axis-aligned' part in the name means that the local axes of this bounding box are restricted to align with the 
+	axes of the world space coordinate system. This makes computations involving AABB's very fast, since AABB's cannot
+	be arbitrarily oriented in the space with respect to each other.
 
-    If you need to represent a box in 3D space with arbitrary orientation, see the class OBB. */
+	If you need to represent a box in 3D space with arbitrary orientation, see the class OBB. */
 class AABB
 {
 public:
-    /// Specifies the minimum extent of this AABB in the world space x, y and z axes.
-    float3 minPoint;
+	/// Specifies the minimum extent of this AABB in the world space x, y and z axes.
+	float3 minPoint;
 
-    /// Specifies the maximum extent of this AABB in the world space x, y and z axes. [similarOverload: minPoint]
-    float3 maxPoint;
+	/// Specifies the maximum extent of this AABB in the world space x, y and z axes. [similarOverload: minPoint]
+	float3 maxPoint;
 
-    /// The default constructor does not initialize any members of this class.
-    /** This means that the values of the members minPoint and maxPoint are undefined after creating a new AABB using this
-        default constructor. Remember to assign to them before use.
-        @see minPoint, maxPoint. */
-    AABB() {}
+	/// The default constructor does not initialize any members of this class.
+	/** This means that the values of the members minPoint and maxPoint are undefined after creating a new AABB using this
+		default constructor. Remember to assign to them before use.
+		@see minPoint, maxPoint. */
+	AABB() {}
 
-    /// Constructs this AABB by specifying the minimum and maximum extending corners of the box.
-    /** @see minPoint, maxPoint. */
-    AABB(const float3 &minPoint, const float3 &maxPoint);
+	/// Constructs this AABB by specifying the minimum and maximum extending corners of the box.
+	/** @see minPoint, maxPoint. */
+	AABB(const float3 &minPoint, const float3 &maxPoint);
 
-    /// Constructs this AABB to enclose the given OBB.
-    /** This constructor computes the optimal minimum volume AABB that encloses the given OBB.
-        @note Since an AABB cannot generally represent an OBB, this conversion is not exact, but the returned AABB
-            specifies a larger volume.            
-        @see class OBB. */
-    explicit AABB(const OBB &obb);
+	/// Constructs this AABB to enclose the given OBB.
+	/** This constructor computes the optimal minimum volume AABB that encloses the given OBB.
+		@note Since an AABB cannot generally represent an OBB, this conversion is not exact, but the returned AABB
+			specifies a larger volume.			
+		@see class OBB. */
+	explicit AABB(const OBB &obb);
 
-    /// Constructs this AABB to enclose the given Sphere.
-    /** @see class Sphere. */ 
-    explicit AABB(const Sphere &s);
+	/// Constructs this AABB to enclose the given Sphere.
+	/** @see class Sphere. */ 
+	explicit AABB(const Sphere &s);
 
-    /// Returns the minimum world-space coordinate along the given axis.
+	/// Returns the minimum world-space coordinate along the given axis.
 	float MinX() const { return minPoint.x; }
 	float MinY() const { return minPoint.y; } ///< [similarOverload: MinX]
 	float MinZ() const { return minPoint.z; } ///< [similarOverload: MinX]
-    /// Returns the maximum world-space coordinate along the given axis.
+	/// Returns the maximum world-space coordinate along the given axis.
 	float MaxX() const { return maxPoint.x; }
 	float MaxY() const { return maxPoint.y; } ///< [similarOverload: MaxX]
 	float MaxZ() const { return maxPoint.z; } ///< [similarOverload: MaxX]
 
-    /// Sets this structure to a degenerate AABB that does not have any volume.
-    /** This function is useful for initializing the AABB to "null" before a loop of calls to Enclose(),
-        which incrementally expands the bounds of this AABB to enclose the given objects.
-        @see Enclose(). */
-    void SetNegativeInfinity();
+	/// Sets this structure to a degenerate AABB that does not have any volume.
+	/** This function is useful for initializing the AABB to "null" before a loop of calls to Enclose(),
+		which incrementally expands the bounds of this AABB to enclose the given objects.
+		@see Enclose(). */
+	void SetNegativeInfinity();
 
-    /// Sets this AABB by specifying its center and size.
-    /** @param center The center point of this AABB.
-        @param size A vector that specifies the size of this AABB in x, y and z directions.
-        @see SetFrom(), FromCenterAndSize(). */
-    void SetFromCenterAndSize(const float3 &center, const float3 &size);
+	/// Sets this AABB by specifying its center and size.
+	/** @param center The center point of this AABB.
+		@param size A vector that specifies the size of this AABB in x, y and z directions.
+		@see SetFrom(), FromCenterAndSize(). */
+	void SetFromCenterAndSize(const float3 &center, const float3 &size);
 
-    /// Sets this AABB to enclose the given OBB.
-    /** This function computes the minimal axis-aligned bounding box for the given oriented bounding box. If the orientation
-        of the OBB is not aligned with the world axes, this conversion is not exact and loosens the volume of the bounding box.
-        @param SetCenter(), class OBB.
-        @todo Implement SetFrom(Polyhedron). */
-    void SetFrom(const OBB &obb);
+	/// Sets this AABB to enclose the given OBB.
+	/** This function computes the minimal axis-aligned bounding box for the given oriented bounding box. If the orientation
+		of the OBB is not aligned with the world axes, this conversion is not exact and loosens the volume of the bounding box.
+		@param SetCenter(), class OBB.
+		@todo Implement SetFrom(Polyhedron). */
+	void SetFrom(const OBB &obb);
 
-    // Computes the minimal enclosing AABB of the given polyhedron.        
-    /* This function computes the smallest AABB (in terms of volume) that contains the given polyhedron, and stores 
-        the result in this structure.
-        @note An AABB cannot generally exactly represent a polyhedron. Converting a polyhedron to an AABB loses some 
-        features of the polyhedron.
-        @return If the given polyhedron is closed, this function succeeds and returns true. If the polyhedron is uncapped 
-            (has infinite volume), this function does not modify this data structure, but returns false. */
-//    bool SetFrom(const Polyhedron &polyhedron);
+	// Computes the minimal enclosing AABB of the given polyhedron.		
+	/* This function computes the smallest AABB (in terms of volume) that contains the given polyhedron, and stores 
+		the result in this structure.
+		@note An AABB cannot generally exactly represent a polyhedron. Converting a polyhedron to an AABB loses some 
+		features of the polyhedron.
+		@return If the given polyhedron is closed, this function succeeds and returns true. If the polyhedron is uncapped 
+			(has infinite volume), this function does not modify this data structure, but returns false. */
+//	bool SetFrom(const Polyhedron &polyhedron);
 
-    /// Sets this AABB to enclose the given sphere.
-    /** This function computes the smallest possible AABB (in terms of volume) that contains the given sphere, and stores the result in this structure. */
-    void SetFrom(const Sphere &s);
+	/// Sets this AABB to enclose the given sphere.
+	/** This function computes the smallest possible AABB (in terms of volume) that contains the given sphere, and stores the result in this structure. */
+	void SetFrom(const Sphere &s);
 
-    /// Sets this AABB to enclose the given set of points.
-    /** @param pointArray A pointer to an array of points to enclose inside an AABB.
-        @param numPoints The number of elements in the pointArray list.
-        @see MinimalEnclosingAABB(). */
-    void SetFrom(const float3 *pointArray, int numPoints);
+	/// Sets this AABB to enclose the given set of points.
+	/** @param pointArray A pointer to an array of points to enclose inside an AABB.
+		@param numPoints The number of elements in the pointArray list.
+		@see MinimalEnclosingAABB(). */
+	void SetFrom(const float3 *pointArray, int numPoints);
 
-    /// Converts this AABB to a polyhedron.
-    /** This function returns a polyhedron representation of this AABB. This conversion is exact, meaning that the returned
-        polyhedron represents the same set of points than this AABB.
-        @see class Polyhedron. */
-    Polyhedron ToPolyhedron() const;
+	/// Converts this AABB to a polyhedron.
+	/** This function returns a polyhedron representation of this AABB. This conversion is exact, meaning that the returned
+		polyhedron represents the same set of points than this AABB.
+		@see class Polyhedron. */
+	Polyhedron ToPolyhedron() const;
 
-    /// Converts this AABB to an OBB.
-    /** This function returns an OBB representation of this AABB. This conversion is exact, meaning that the returned
-        OBB represents the same set of points than this AABB.
-        @see class OBB. */
-    OBB ToOBB() const;
+	/// Converts this AABB to an OBB.
+	/** This function returns an OBB representation of this AABB. This conversion is exact, meaning that the returned
+		OBB represents the same set of points than this AABB.
+		@see class OBB. */
+	OBB ToOBB() const;
 
-    /// Returns the smallest sphere that contains this AABB.
-    /** This function computes the minimal volume sphere that contains all the points inside this AABB.
-        @see MaximalContainedSphere(). */
-    Sphere MinimalEnclosingSphere() const;
+	/// Returns the smallest sphere that contains this AABB.
+	/** This function computes the minimal volume sphere that contains all the points inside this AABB.
+		@see MaximalContainedSphere(). */
+	Sphere MinimalEnclosingSphere() const;
 
-    /// Returns the largest sphere that can fit inside this AABB.
-    /** This function computes the largest sphere that can fit inside this AABB. This sphere is unique up to the center point 
-        of the sphere. The returned sphere will be positioned to the same center point as this AABB.
-        @see MinimalEnclosingSphere(). */
-    Sphere MaximalContainedSphere() const;
+	/// Returns the largest sphere that can fit inside this AABB.
+	/** This function computes the largest sphere that can fit inside this AABB. This sphere is unique up to the center point 
+		of the sphere. The returned sphere will be positioned to the same center point as this AABB.
+		@see MinimalEnclosingSphere(). */
+	Sphere MaximalContainedSphere() const;
 
-    /// Tests if this AABB is finite.
-    /** @return True if the member variables of this AABB are valid floats and do not contain NaNs or infs, and false otherwise.
-        @see IsDegenerate(), minPoint, maxPoint. */
-    bool IsFinite() const;
+	/// Tests if this AABB is finite.
+	/** @return True if the member variables of this AABB are valid floats and do not contain NaNs or infs, and false otherwise.
+		@see IsDegenerate(), minPoint, maxPoint. */
+	bool IsFinite() const;
 
-    /// Tests if this AABB is degenerate.
-    /** @return True if this AABB does not span a strictly positive volume.
-        @see IsFinite(), Volume(), minPoint, maxPoint. */
-    bool IsDegenerate() const;
+	/// Tests if this AABB is degenerate.
+	/** @return True if this AABB does not span a strictly positive volume.
+		@see IsFinite(), Volume(), minPoint, maxPoint. */
+	bool IsDegenerate() const;
 
-    /// @return The center point of this AABB.
-    float3 CenterPoint() const;
-    /// [similarOverload: CenterPoint]
-    float3 Centroid() const { return CenterPoint(); }
+	/// @return The center point of this AABB.
+	float3 CenterPoint() const;
+	/// [similarOverload: CenterPoint]
+	float3 Centroid() const { return CenterPoint(); }
 
-    /// Generates a point inside this AABB.
-    /** @param x A normalized value between [0,1]. This specifies the point position along the world x axis.
-        @param y A normalized value between [0,1]. This specifies the point position along the world y axis.
-        @param z A normalized value between [0,1]. This specifies the point position along the world z axis.
-        @return A point inside this AABB at point specified by given parameters.
-        @see Edge(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
-    float3 PointInside(float x, float y, float z) const;
+	/// Generates a point inside this AABB.
+	/** @param x A normalized value between [0,1]. This specifies the point position along the world x axis.
+		@param y A normalized value between [0,1]. This specifies the point position along the world y axis.
+		@param z A normalized value between [0,1]. This specifies the point position along the world z axis.
+		@return A point inside this AABB at point specified by given parameters.
+		@see Edge(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
+	float3 PointInside(float x, float y, float z) const;
 
-    /// Returns an edge of this AABB.
-    /** @param edgeIndex The index of the edge line segment to get, in the range [0, 11].
-        @todo Specify which index generates which edge.
-        @see PointInside(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
-    LineSegment Edge(int edgeIndex) const;
+	/// Returns an edge of this AABB.
+	/** @param edgeIndex The index of the edge line segment to get, in the range [0, 11].
+		@todo Specify which index generates which edge.
+		@see PointInside(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
+	LineSegment Edge(int edgeIndex) const;
 
-    /// Returns a corner point of this AABB.
-    /** This function generates one of the eight corner points of this AABB. 
-        @param cornerIndex The index of the corner point to generate, in the range [0, 7].
-            The points are returned in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++. (corresponding the XYZ axis directions).
-        @todo Draw which index generates which corner point.
-        @see PointInside(), Edge(), PointOnEdge(), FaceCenterPoint(), FacePoint(), GetCornerPoints(). */
-    float3 CornerPoint(int cornerIndex) const;
+	/// Returns a corner point of this AABB.
+	/** This function generates one of the eight corner points of this AABB. 
+		@param cornerIndex The index of the corner point to generate, in the range [0, 7].
+			The points are returned in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++. (corresponding the XYZ axis directions).
+		@todo Draw which index generates which corner point.
+		@see PointInside(), Edge(), PointOnEdge(), FaceCenterPoint(), FacePoint(), GetCornerPoints(). */
+	float3 CornerPoint(int cornerIndex) const;
 
-    /// Returns a point on an edge of this AABB.
-    /** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. \todo Document which index generates which one.
-        @param u A normalized value between [0,1]. This specifies the relative distance of the point along the edge.
-        @see PointInside(), CornerPoint(), CornerPoint(), FaceCenterPoint(), FacePoint(). */
-    float3 PointOnEdge(int edgeIndex, float u) const;
+	/// Returns a point on an edge of this AABB.
+	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.
+		@param u A normalized value between [0,1]. This specifies the relative distance of the point along the edge.
+		@see PointInside(), CornerPoint(), CornerPoint(), FaceCenterPoint(), FacePoint(). */
+	float3 PointOnEdge(int edgeIndex, float u) const;
 
-    /// Returns the point at the center of the given face of this AABB.
-    /** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
-            This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
-        @see PointInside(), CornerPoint(), PointOnEdge(), PointOnEdge(), FacePoint(). */
-    float3 FaceCenterPoint(int faceIndex) const;
+	/// Returns the point at the center of the given face of this AABB.
+	/** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
+			This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
+		@see PointInside(), CornerPoint(), PointOnEdge(), PointOnEdge(), FacePoint(). */
+	float3 FaceCenterPoint(int faceIndex) const;
 
-    /// Generates a point at the surface of the given face of this AABB.
-    /** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
-            This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
-        @param u A normalized value between [0, 1].
-        @param v A normalized value between [0, 1].
-        @see PointInside(), CornerPoint(), PointOnEdge(), PointOnEdge(), FaceCenterPoint(). */
-    float3 FacePoint(int faceIndex, float u, float v) const;
+	/// Generates a point at the surface of the given face of this AABB.
+	/** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
+			This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
+		@param u A normalized value between [0, 1].
+		@param v A normalized value between [0, 1].
+		@see PointInside(), CornerPoint(), PointOnEdge(), PointOnEdge(), FaceCenterPoint(). */
+	float3 FacePoint(int faceIndex, float u, float v) const;
 
-    /// Returns the surface normal direction vector the given face points towards.
-    /** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
-            This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
-        @see FacePoint(), FacePlane(). */
-    float3 FaceNormal(int faceIndex) const;
+	/// Returns the surface normal direction vector the given face points towards.
+	/** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
+			This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
+		@see FacePoint(), FacePlane(). */
+	float3 FaceNormal(int faceIndex) const;
 
-    /// Computes the plane equation of the given face of this AABB.
-    /** @param faceIndex The index of the AABB face. The valid range is [0, 5].
-            This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
-        @return The plane equation the specified face lies on. The normal of this plane points outwards from this AABB.
-        @see FacePoint(), FaceNormal(), GetFacePlanes(). */
-    Plane FacePlane(int faceIndex) const;
+	/// Computes the plane equation of the given face of this AABB.
+	/** @param faceIndex The index of the AABB face. The valid range is [0, 5].
+			This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
+		@return The plane equation the specified face lies on. The normal of this plane points outwards from this AABB.
+		@see FacePoint(), FaceNormal(), GetFacePlanes(). */
+	Plane FacePlane(int faceIndex) const;
 
-    /// Fills an array with all the eight corner points of this AABB.
-    /** @param outPointArray [out] The array to write the points to. Must have space for 8 elements.
-        @see CornerPoint(). */
-    void GetCornerPoints(float3 *outPointArray) const;
+	/// Fills an array with all the eight corner points of this AABB.
+	/** @param outPointArray [out] The array to write the points to. Must have space for 8 elements.
+		@see CornerPoint(). */
+	void GetCornerPoints(float3 *outPointArray) const;
 
-    /// Fills an array with all the six planes of this AABB.
-    /** @param outPlaneArray [out] The array to write the planes to. Must have space for 6 elements.
-        @see FacePlane(). */
-    void GetFacePlanes(Plane *outPlaneArray) const;
+	/// Fills an array with all the six planes of this AABB.
+	/** @param outPlaneArray [out] The array to write the planes to. Must have space for 6 elements.
+		@see FacePlane(). */
+	void GetFacePlanes(Plane *outPlaneArray) const;
 
-    /// Generates an AABB that encloses the given point set.
-    /** This function finds the smallest AABB that contains the given set of points.
-        @param pointArray A pointer to an array of points to enclose inside an AABB.
-        @param numPoints The number of elements in the pointArray list.
-        @see SetFrom(). */
-    static AABB MinimalEnclosingAABB(const float3 *pointArray, int numPoints);
+	/// Generates an AABB that encloses the given point set.
+	/** This function finds the smallest AABB that contains the given set of points.
+		@param pointArray A pointer to an array of points to enclose inside an AABB.
+		@param numPoints The number of elements in the pointArray list.
+		@see SetFrom(). */
+	static AABB MinimalEnclosingAABB(const float3 *pointArray, int numPoints);
 
-    /// Finds the most extremal points along the three world axes simultaneously.
-    /** @param pointArray A pointer to an array of points to process.
-        @param numPoints The number of elements in the pointArray list.
-        @param minx [out] Receives the point that has the smallest x coordinate.
-        @param maxx [out] Receives the point that has the largest x coordinate.
-        @param miny [out] Receives the point that has the smallest y coordinate.
-        @param maxy [out] Receives the point that has the largest y coordinate.
-        @param minz [out] Receives the point that has the smallest z coordinate.
-        @param maxz [out] Receives the point that has the largest z coordinate. */
-    static void ExtremePointsAlongAABB(const float3 *pointArray, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz);
+	/// Finds the most extremal points along the three world axes simultaneously.
+	/** @param pointArray A pointer to an array of points to process.
+		@param numPoints The number of elements in the pointArray list.
+		@param minx [out] Receives the point that has the smallest x coordinate.
+		@param maxx [out] Receives the point that has the largest x coordinate.
+		@param miny [out] Receives the point that has the smallest y coordinate.
+		@param maxy [out] Receives the point that has the largest y coordinate.
+		@param minz [out] Receives the point that has the smallest z coordinate.
+		@param maxz [out] Receives the point that has the largest z coordinate. */
+	static void ExtremePointsAlongAABB(const float3 *pointArray, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz);
 
-    /// Creates a new AABB given is center position and size along the X, Y and Z axes.
-    /** @see SetCenter(). */
-    static AABB FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize);
+	/// Creates a new AABB given is center position and size along the X, Y and Z axes.
+	/** @see SetCenter(). */
+	static AABB FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize);
 
-    /// Returns the side lengths of this AABB in x, y and z directions.
-    /** The returned vector is equal to the diagonal vector of this AABB, i.e. it spans from the
-        minimum corner of the AABB to the maximum corner of the AABB.
-        @see HalfSize(), Diagonal(). */
-    float3 Size() const;
+	/// Returns the side lengths of this AABB in x, y and z directions.
+	/** The returned vector is equal to the diagonal vector of this AABB, i.e. it spans from the
+		minimum corner of the AABB to the maximum corner of the AABB.
+		@see HalfSize(), Diagonal(). */
+	float3 Size() const;
 
-    /// [similarOverload: Size]
-    /** Returns Size()/2.
-        @see Size(), HalfDiagonal(). */
-    float3 HalfSize() const;
+	/// [similarOverload: Size]
+	/** Returns Size()/2.
+		@see Size(), HalfDiagonal(). */
+	float3 HalfSize() const;
 
-    /// Returns the diameter vector of this AABB. 
-    /** @note For AABB, Diagonal() and Size() are the same concept. These functions are provided for symmetry
-        with the OBB class.
-        @see Size(), HalfDiagonal(). */
-    float3 Diagonal() const { return Size(); }
+	/// Returns the diameter vector of this AABB. 
+	/** @note For AABB, Diagonal() and Size() are the same concept. These functions are provided for symmetry
+		with the OBB class.
+		@see Size(), HalfDiagonal(). */
+	float3 Diagonal() const { return Size(); }
 
-    /// [similarOverload: Diagonal]
-    /** Returns Diagonal()/2.
-        @see Diagonal(), HalfSize(). */
-    float3 HalfDiagonal() const { return HalfSize(); }
+	/// [similarOverload: Diagonal]
+	/** Returns Diagonal()/2.
+		@see Diagonal(), HalfSize(). */
+	float3 HalfDiagonal() const { return HalfSize(); }
 
-    /// Computes the volume of this AABB.
-    /** @see SurfaceArea(), IsDegenerate(). */
-    float Volume() const;
+	/// Computes the volume of this AABB.
+	/** @see SurfaceArea(), IsDegenerate(). */
+	float Volume() const;
 
-    /// Computes the surface area of the faces of this AABB.
-    /** @see Volume(). */
-    float SurfaceArea() const;
+	/// Computes the surface area of the faces of this AABB.
+	/** @see Volume(). */
+	float SurfaceArea() const;
 
-    /// Generates a random point inside this AABB.
-    /** The points are distributed uniformly.
-        @see RandomPointOnSurface(), RandomPointOnEdge(), RandomCornerPoint(). */
-    float3 RandomPointInside(LCG &rng) const;
+	/// Generates a random point inside this AABB.
+	/** The points are distributed uniformly.
+		@see RandomPointOnSurface(), RandomPointOnEdge(), RandomCornerPoint(). */
+	float3 RandomPointInside(LCG &rng) const;
 
-    /// Generates a random point on a random face of this AABB.
-    /** The points are distributed uniformly.
-        @see RandomPointInside(), RandomPointOnEdge(), RandomCornerPoint(). */
-    float3 RandomPointOnSurface(LCG &rng) const;
+	/// Generates a random point on a random face of this AABB.
+	/** The points are distributed uniformly.
+		@see RandomPointInside(), RandomPointOnEdge(), RandomCornerPoint(). */
+	float3 RandomPointOnSurface(LCG &rng) const;
 
-    /// Generates a random point on a random edge of this AABB.
-    /** The points are distributed uniformly. 
-        @see RandomPointInside(), RandomPointOnSurface(), RandomCornerPoint(). */
-    float3 RandomPointOnEdge(LCG &rng) const;
+	/// Generates a random point on a random edge of this AABB.
+	/** The points are distributed uniformly. 
+		@see RandomPointInside(), RandomPointOnSurface(), RandomCornerPoint(). */
+	float3 RandomPointOnEdge(LCG &rng) const;
 
-    /// Picks a random corner point of this AABB.
-    /** The points are distributed uniformly.
-        @see RandomPointInside(), RandomPointOnSurface(), RandomPointOnEdge(). */
-    float3 RandomCornerPoint(LCG &rng) const;
+	/// Picks a random corner point of this AABB.
+	/** The points are distributed uniformly.
+		@see RandomPointInside(), RandomPointOnSurface(), RandomPointOnEdge(). */
+	float3 RandomCornerPoint(LCG &rng) const;
 
-    /// Translates this AABB in world space.
-    /** @param offset The amount of displacement to apply to this AABB, in world space coordinates.
-        @see Scale(), Transform(). */
-    void Translate(const float3 &offset);
+	/// Translates this AABB in world space.
+	/** @param offset The amount of displacement to apply to this AABB, in world space coordinates.
+		@see Scale(), Transform(). */
+	void Translate(const float3 &offset);
 
-    /// Applies a uniform scale to this AABB.
-    /** This function scales this AABB structure in-place, using the given center point as the origin 
-        for the scaling operation.
-        @param centerPoint Specifies the center of the scaling operation, in world space.
-        @param scaleFactor The uniform scale factor to apply to each world space axis.
-        @see Translate(), Transform(). */
-    void Scale(const float3 &centerPoint, float scaleFactor);
+	/// Applies a uniform scale to this AABB.
+	/** This function scales this AABB structure in-place, using the given center point as the origin 
+		for the scaling operation.
+		@param centerPoint Specifies the center of the scaling operation, in world space.
+		@param scaleFactor The uniform scale factor to apply to each world space axis.
+		@see Translate(), Transform(). */
+	void Scale(const float3 &centerPoint, float scaleFactor);
 
-    /// Applies a non-uniform scale to this AABB.
-    /** This function scales this AABB structure in-place, using the given center point as the origin 
-        for the scaling operation.
-        @param centerPoint Specifies the center of the scaling operation, in world space.
-        @param scaleFactor The non-uniform scale factors to apply to each world space axis.
-        @see Translate(), Transform(). */
-    void Scale(const float3 &centerPoint, const float3 &scaleFactor);
+	/// Applies a non-uniform scale to this AABB.
+	/** This function scales this AABB structure in-place, using the given center point as the origin 
+		for the scaling operation.
+		@param centerPoint Specifies the center of the scaling operation, in world space.
+		@param scaleFactor The non-uniform scale factors to apply to each world space axis.
+		@see Translate(), Transform(). */
+	void Scale(const float3 &centerPoint, const float3 &scaleFactor);
 
-    /// Applies a transformation to this AABB.
-    /** This function transforms this AABB with the given transformation, and then recomputes this AABB
-        to enclose the resulting oriented bounding box. This transformation is not exact and in general, calling 
-        this function results in the loosening of the AABB bounds. 
-        @param transform The transformation to apply to this AABB. This function assumes that this
-            transformation does not contain shear, nonuniform scaling or perspective properties, i.e. that the fourth 
-            row of the float4x4 is [0 0 0 1].
-        @see Translate(), Scale(), Transform(), classes float3x3, float3x4, float4x4, Quat. */
-    void TransformAsAABB(const float3x3 &transform);
-    void TransformAsAABB(const float3x4 &transform);
-    void TransformAsAABB(const float4x4 &transform);
-    void TransformAsAABB(const Quat &transform);
+	/// Applies a transformation to this AABB.
+	/** This function transforms this AABB with the given transformation, and then recomputes this AABB
+		to enclose the resulting oriented bounding box. This transformation is not exact and in general, calling 
+		this function results in the loosening of the AABB bounds. 
+		@param transform The transformation to apply to this AABB. This function assumes that this
+			transformation does not contain shear, nonuniform scaling or perspective properties, i.e. that the fourth 
+			row of the float4x4 is [0 0 0 1].
+		@see Translate(), Scale(), Transform(), classes float3x3, float3x4, float4x4, Quat. */
+	void TransformAsAABB(const float3x3 &transform);
+	void TransformAsAABB(const float3x4 &transform);
+	void TransformAsAABB(const float4x4 &transform);
+	void TransformAsAABB(const Quat &transform);
 
-    /// Applies a transformation to this AABB and returns the resulting OBB.
-    /** Transforming an AABB produces an oriented bounding box. This set of functions does not apply the transformation
-        to this object itself, but instead returns the OBB that results in the transformation.
-        @param transform The transformation to apply to this AABB. This function assumes that this
-            transformation does not contain shear, nonuniform scaling or perspective properties, i.e. that the fourth 
-            row of the float4x4 is [0 0 0 1].
-        @see Translate(), Scale(), TransformAsAABB(), classes float3x3, float3x4, float4x4, Quat. */
-    OBB Transform(const float3x3 &transform) const;
-    OBB Transform(const float3x4 &transform) const;
-    OBB Transform(const float4x4 &transform) const;
-    OBB Transform(const Quat &transform) const;
+	/// Applies a transformation to this AABB and returns the resulting OBB.
+	/** Transforming an AABB produces an oriented bounding box. This set of functions does not apply the transformation
+		to this object itself, but instead returns the OBB that results in the transformation.
+		@param transform The transformation to apply to this AABB. This function assumes that this
+			transformation does not contain shear, nonuniform scaling or perspective properties, i.e. that the fourth 
+			row of the float4x4 is [0 0 0 1].
+		@see Translate(), Scale(), TransformAsAABB(), classes float3x3, float3x4, float4x4, Quat. */
+	OBB Transform(const float3x3 &transform) const;
+	OBB Transform(const float3x4 &transform) const;
+	OBB Transform(const float4x4 &transform) const;
+	OBB Transform(const Quat &transform) const;
 
-    /// Computes the closest point inside this AABB to the given point.
-    /** If the target point lies inside this AABB, then that point is returned.
-        @see Distance(), Contains(), Intersects().
-        @todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-    float3 ClosestPoint(const float3 &targetPoint) const;
+	/// Computes the closest point inside this AABB to the given point.
+	/** If the target point lies inside this AABB, then that point is returned.
+		@see Distance(), Contains(), Intersects().
+		@todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
+	float3 ClosestPoint(const float3 &targetPoint) const;
 
-    /// Computes the distance between this AABB and the given object.
-    /** This function finds the nearest pair of points on this and the given object, and computes their distance.
-        If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-        @todo Add AABB::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron). 
-        @see Contains(), Intersects(), ClosestPoint(). */
-    float Distance(const float3 &point) const;
-    float Distance(const Sphere &sphere) const;
+	/// Computes the distance between this AABB and the given object.
+	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
+		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
+		@todo Add AABB::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron). 
+		@see Contains(), Intersects(), ClosestPoint(). */
+	float Distance(const float3 &point) const;
+	float Distance(const Sphere &sphere) const;
 
-    /// Tests if the given object is fully contained inside this AABB.
-    /** This function returns true if the given object lies inside this AABB, and false otherwise.
-        @note The comparison is performed using less-or-equal, so the faces of this AABB count as being inside, but
-            due to float inaccuracies, this cannot generally be relied upon.
-        @todo Add Contains(Circle/Disc/Sphere/Capsule).
-        @see Distance(), Intersects(), ClosestPoint(). */
-    bool Contains(const float3 &point) const;
-    bool Contains(const LineSegment &lineSegment) const;
-    bool Contains(const AABB &aabb) const;
-    bool Contains(const OBB &obb) const;
-    bool Contains(const Sphere &sphere) const;
-    bool Contains(const Triangle &triangle) const;
-    bool Contains(const Polygon &polygon) const;
-    bool Contains(const Frustum &frustum) const;
-    bool Contains(const Polyhedron &polyhedron) const;
+	/// Tests if the given object is fully contained inside this AABB.
+	/** This function returns true if the given object lies inside this AABB, and false otherwise.
+		@note The comparison is performed using less-or-equal, so the faces of this AABB count as being inside, but
+			due to float inaccuracies, this cannot generally be relied upon.
+		@todo Add Contains(Circle/Disc/Sphere/Capsule).
+		@see Distance(), Intersects(), ClosestPoint(). */
+	bool Contains(const float3 &point) const;
+	bool Contains(const LineSegment &lineSegment) const;
+	bool Contains(const AABB &aabb) const;
+	bool Contains(const OBB &obb) const;
+	bool Contains(const Sphere &sphere) const;
+	bool Contains(const Triangle &triangle) const;
+	bool Contains(const Polygon &polygon) const;
+	bool Contains(const Frustum &frustum) const;
+	bool Contains(const Polyhedron &polyhedron) const;
 
-    /// Tests whether this AABB and the given object intersect.       
-    /** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-        another, this function still returns true. (e.g. in case a line segment is contained inside this AABB, 
-        or this AABB is contained inside a Sphere, etc.)
-        The first parameter of this function specifies the other object to test against.
-        @param dNear [out] If specified, receives the parametric distance along the line denoting where the line entered the
-            OBB. This pointer may be null.
-        @param dFar [out] If specified, receives the parametric distance along the line denoting where the line exited the
-            OBB. This pointer may be null.
-        @see Contains(), Distance(), ClosestPoint().
-        @todo Add Intersects(Circle/Disc). */
-    bool Intersects(const Ray &ray, float *dNear, float *dFar) const;
-    bool Intersects(const Line &line, float *dNear, float *dFar) const;
-    bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
-    bool Intersects(const Plane &plane) const;
-    bool Intersects(const AABB &aabb) const;
-    bool Intersects(const OBB &obb) const;
-    /** @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere. This pointer
-            may be null. */ 
-    bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const;
-    bool Intersects(const Capsule &capsule) const;
-    bool Intersects(const Triangle &triangle) const;
-    bool Intersects(const Polygon &polygon) const;
-    bool Intersects(const Frustum &frustum) const;
-    bool Intersects(const Polyhedron &polyhedron) const;
+	/// Tests whether this AABB and the given object intersect.	   
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+		another, this function still returns true. (e.g. in case a line segment is contained inside this AABB, 
+		or this AABB is contained inside a Sphere, etc.)
+		The first parameter of this function specifies the other object to test against.
+		@param dNear [out] If specified, receives the parametric distance along the line denoting where the line entered the
+			OBB. This pointer may be null.
+		@param dFar [out] If specified, receives the parametric distance along the line denoting where the line exited the
+			OBB. This pointer may be null.
+		@see Contains(), Distance(), ClosestPoint().
+		@todo Add Intersects(Circle/Disc). */
+	bool Intersects(const Ray &ray, float *dNear, float *dFar) const;
+	bool Intersects(const Line &line, float *dNear, float *dFar) const;
+	bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
+	bool Intersects(const Plane &plane) const;
+	bool Intersects(const AABB &aabb) const;
+	bool Intersects(const OBB &obb) const;
+	/** @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere. This pointer
+			may be null. */ 
+	bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const;
+	bool Intersects(const Capsule &capsule) const;
+	bool Intersects(const Triangle &triangle) const;
+	bool Intersects(const Polygon &polygon) const;
+	bool Intersects(const Frustum &frustum) const;
+	bool Intersects(const Polyhedron &polyhedron) const;
 
-    /// Projects this AABB onto the given axis.
-    /** @param axis The axis to project onto. This vector can be unnormalized.
-        @param dMin [out] Returns the minimum extent of this AABB on the given axis.
-        @param dMax [out] Returns the maximum extent of this AABB on the given axis. */
-    void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
+	/// Projects this AABB onto the given axis.
+	/** @param axis The axis to project onto. This vector can be unnormalized.
+		@param dMin [out] Returns the minimum extent of this AABB on the given axis.
+		@param dMax [out] Returns the maximum extent of this AABB on the given axis. */
+	void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
 
-    /// Expands this AABB to enclose the given object.
-    /** This function computes the AABB that encloses both this AABB and the specified object, and stores the resulting
-        AABB into this. */
-    void Enclose(const float3 &point);
-    void Enclose(const LineSegment &lineSegment);
-    void Enclose(const AABB &aabb);
-    void Enclose(const OBB &obb);
-    void Enclose(const Sphere &sphere);
-    void Enclose(const Triangle &triangle);
-    void Enclose(const Capsule &capsule);
-    void Enclose(const Frustum &frustum);
-    void Enclose(const Polygon &polygon);
-    void Enclose(const Polyhedron &polyhedron);
-    void Enclose(const float3 *pointArray, int numPoints);
+	/// Expands this AABB to enclose the given object.
+	/** This function computes the AABB that encloses both this AABB and the specified object, and stores the resulting
+		AABB into this. */
+	void Enclose(const float3 &point);
+	void Enclose(const LineSegment &lineSegment);
+	void Enclose(const AABB &aabb);
+	void Enclose(const OBB &obb);
+	void Enclose(const Sphere &sphere);
+	void Enclose(const Triangle &triangle);
+	void Enclose(const Capsule &capsule);
+	void Enclose(const Frustum &frustum);
+	void Enclose(const Polygon &polygon);
+	void Enclose(const Polyhedron &polyhedron);
+	void Enclose(const float3 *pointArray, int numPoints);
 
 	/// Generates an unindexed triangle mesh representation of this AABB.
-    /** @param x The number of faces to generate along the X axis. This value must be >= 1.
-        @param y The number of faces to generate along the Y axis. This value must be >= 1.
-        @param z The number of faces to generate along the Z axis. This value must be >= 1.
-	    @param outPos [out] An array of size numVertices which will receive a triangle list 
-            of vertex positions. Cannot be null.
-	    @param outNormal [out] An array of size numVertices which will receive vertex normals. 
-            If this parameter is null, vertex normals are not returned.
-	    @param outUV [out] An array of size numVertices which will receive vertex UV coordinates. 
-            If this parameter is null, a UV mapping is not generated.
-        The number of vertices that outPos, outNormal and outUV must be able to contain is
-        (x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call
-        NumVerticesInTriangulation to obtain this value.
-        @see ToPolyhedron(), ToEdgeList(), NumVerticesInTriangulation(). */
-    void Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const;
+	/** @param x The number of faces to generate along the X axis. This value must be >= 1.
+		@param y The number of faces to generate along the Y axis. This value must be >= 1.
+		@param z The number of faces to generate along the Z axis. This value must be >= 1.
+		@param outPos [out] An array of size numVertices which will receive a triangle list 
+			of vertex positions. Cannot be null.
+		@param outNormal [out] An array of size numVertices which will receive vertex normals. 
+			If this parameter is null, vertex normals are not returned.
+		@param outUV [out] An array of size numVertices which will receive vertex UV coordinates. 
+			If this parameter is null, a UV mapping is not generated.
+		The number of vertices that outPos, outNormal and outUV must be able to contain is
+		(x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call
+		NumVerticesInTriangulation to obtain this value.
+		@see ToPolyhedron(), ToEdgeList(), NumVerticesInTriangulation(). */
+	void Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const;
 
-    /// Returns the number of vertices that the Triangulate() function will output with the given subdivision parameters.
-    /** @see Triangulate(). */
-    static int NumVerticesInTriangulation(int numFacesX, int numFacesY, int numFacesZ)
-    {
-        return (numFacesX*numFacesY + numFacesX*numFacesZ + numFacesY*numFacesZ)*2*6;
-    }
-    
-    /// Generates an edge list representation of the edges of this AABB.
-    /** @param outPos [out] An array that contains space for at least 24 vertices (NumVerticesInEdgeList()).
-        @see Triangulate(), Edge(), NumVerticesInEdgeList(). */
-    void ToEdgeList(float3 *outPos) const;
+	/// Returns the number of vertices that the Triangulate() function will output with the given subdivision parameters.
+	/** @see Triangulate(). */
+	static int NumVerticesInTriangulation(int numFacesX, int numFacesY, int numFacesZ)
+	{
+		return (numFacesX*numFacesY + numFacesX*numFacesZ + numFacesY*numFacesZ)*2*6;
+	}
+	
+	/// Generates an edge list representation of the edges of this AABB.
+	/** @param outPos [out] An array that contains space for at least 24 vertices (NumVerticesInEdgeList()).
+		@see Triangulate(), Edge(), NumVerticesInEdgeList(). */
+	void ToEdgeList(float3 *outPos) const;
 
-    /// Returns the number of vertices that the ToEdgeList() function will output.
-    /** @see ToEdgeList(). */
-    static int NumVerticesInEdgeList()
-    {
-        return 4*3*2;
-    }
+	/// Returns the number of vertices that the ToEdgeList() function will output.
+	/** @see ToEdgeList(). */
+	static int NumVerticesInEdgeList()
+	{
+		return 4*3*2;
+	}
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-    /// Returns a human-readable representation of this AABB. Most useful for debugging purposes.
-    /** The returned string specifies the center point and the half-axes of this AABB. */
-    std::string ToString() const;
+	/// Returns a human-readable representation of this AABB. Most useful for debugging purposes.
+	/** The returned string specifies the center point and the half-axes of this AABB. */
+	std::string ToString() const;
 #endif
 #ifdef MATH_QT_INTEROP
-    operator QString() const { return toString(); }
-    QString toString() const { return QString::fromStdString(ToString()); }
+	operator QString() const { return toString(); }
+	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 
-    /// Finds the set intersection of this and the given AABB.
-    /** @return This function returns the AABB that is contained in both this and the given AABB.
-        @todo Add Intersection(OBB/Polyhedron). */
-    AABB Intersection(const AABB &aabb) const;
+	/// Finds the set intersection of this and the given AABB.
+	/** @return This function returns the AABB that is contained in both this and the given AABB.
+		@todo Add Intersection(OBB/Polyhedron). */
+	AABB Intersection(const AABB &aabb) const;
 
-    // Finds the set intersection of this AABB and the given OBB.
-    /* @return This function returns a Polyhedron that represents the set of points that are contained in this AABB
-        and the given OBB. */
-//    Polyhedron Intersection(const OBB &obb) const;
+	// Finds the set intersection of this AABB and the given OBB.
+	/* @return This function returns a Polyhedron that represents the set of points that are contained in this AABB
+		and the given OBB. */
+//	Polyhedron Intersection(const OBB &obb) const;
 
-    // Finds the set intersection of this AABB and the given Polyhedron.
-    /* @return This function returns a Polyhedron that represents the set of points that are contained in this AABB
-        and the given Polyhedron. */
-//    Polyhedron Intersection(const Polyhedron &polyhedron) const;
+	// Finds the set intersection of this AABB and the given Polyhedron.
+	/* @return This function returns a Polyhedron that represents the set of points that are contained in this AABB
+		and the given Polyhedron. */
+//	Polyhedron Intersection(const Polyhedron &polyhedron) const;
 
-    /// Computes the intersection of a ray and a AABB.
-    /** Based on "T. Kay, J. Kajiya. Ray Tracing Complex Scenes. SIGGRAPH 1986 vol 20, number 4. pp. 269-"
-	    http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
-	    @param r The ray to test. The ray direction vector must be normalized!
-	    @param tNear [out] If intersection occurs, the signed distance from ray origin to the ray entry point in aabb
-		    is returned here.
-	    @param tFar [out] If intersection occurs, the signed distance from ray origin to the ray exit point in aabb
-		    is returned here.
-	    @return True if an intersection occurs, false otherwise.
-        @note This is a low level utility function. You probably want to use the AABB::Intersects() function instead.
-        @see Intersects(). */
-    bool IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const;
+	/// Computes the intersection of a ray and a AABB.
+	/** Based on "T. Kay, J. Kajiya. Ray Tracing Complex Scenes. SIGGRAPH 1986 vol 20, number 4. pp. 269-"
+		http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
+		@param r The ray to test. The ray direction vector must be normalized!
+		@param tNear [out] If intersection occurs, the signed distance from ray origin to the ray entry point in aabb
+			is returned here.
+		@param tFar [out] If intersection occurs, the signed distance from ray origin to the ray exit point in aabb
+			is returned here.
+		@return True if an intersection occurs, false otherwise.
+		@note This is a low level utility function. You probably want to use the AABB::Intersects() function instead.
+		@see Intersects(). */
+	bool IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const;
 
 #ifdef MATH_OGRE_INTEROP
-    AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }
-    operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
+	AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }
+	operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
 #endif
 };
 

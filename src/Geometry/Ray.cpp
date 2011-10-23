@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Ray.cpp
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief Implementation for the Ray geometry object. */
 #include "Geometry/AABB.h"
 #include "Geometry/Line.h"
@@ -39,13 +39,13 @@ MATH_BEGIN_NAMESPACE
 Ray::Ray(const float3 &pos_, const float3 &dir_)
 :pos(pos_), dir(dir_)
 {
-    assume(dir.IsNormalized());
+	assume(dir.IsNormalized());
 }
 
 Ray::Ray(const Line &line)
 :pos(line.pos), dir(line.dir)
 {
-    assume(dir.IsNormalized());
+	assume(dir.IsNormalized());
 }
 
 Ray::Ray(const LineSegment &lineSegment)
@@ -55,245 +55,245 @@ Ray::Ray(const LineSegment &lineSegment)
 
 float3 Ray::GetPoint(float d) const
 {
-    assert(dir.IsNormalized());
-    return pos + d * dir;
+	assert(dir.IsNormalized());
+	return pos + d * dir;
 }
 
 void Ray::Transform(const float3x3 &transform)
 {
-    pos = transform.Transform(pos);
-    dir = transform.Transform(dir);
+	pos = transform.Transform(pos);
+	dir = transform.Transform(dir);
 }
 
 void Ray::Transform(const float3x4 &transform)
 {
-    pos = transform.TransformPos(pos);
-    dir = transform.TransformDir(dir);
+	pos = transform.TransformPos(pos);
+	dir = transform.TransformDir(dir);
 }
 
 void Ray::Transform(const float4x4 &transform)
 {
-    pos = transform.TransformPos(pos);
-    dir = transform.TransformDir(dir);
+	pos = transform.TransformPos(pos);
+	dir = transform.TransformDir(dir);
 }
 
 void Ray::Transform(const Quat &transform)
 {
-    pos = transform.Transform(pos);
-    dir = transform.Transform(dir);
+	pos = transform.Transform(pos);
+	dir = transform.Transform(dir);
 }
 
 bool Ray::Contains(const float3 &point, float distanceThreshold) const
 {
-    return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
+	return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
 }
 
 bool Ray::Contains(const LineSegment &lineSegment, float distanceThreshold) const
 {
-    return Contains(lineSegment.a, distanceThreshold) && Contains(lineSegment.b, distanceThreshold);
+	return Contains(lineSegment.a, distanceThreshold) && Contains(lineSegment.b, distanceThreshold);
 }
 
 bool Ray::Equals(const Ray &rhs, float epsilon) const
 {
-    return pos.Equals(rhs.pos, epsilon) && dir.Equals(rhs.dir, epsilon);
+	return pos.Equals(rhs.pos, epsilon) && dir.Equals(rhs.dir, epsilon);
 }
 
 float Ray::Distance(const float3 &point, float *d) const
 {
-    return ClosestPoint(point, d).Distance(point);
+	return ClosestPoint(point, d).Distance(point);
 }
 
 float Ray::Distance(const float3 &point) const
 {
-    return Distance(point, 0);
+	return Distance(point, 0);
 }
 
 float Ray::Distance(const Ray &other, float *d, float *d2) const
 {
-    float u2;
-    float3 c = ClosestPoint(other, d, &u2);
-    if (d2) *d2 = u2;
-    return c.Distance(other.GetPoint(u2));
+	float u2;
+	float3 c = ClosestPoint(other, d, &u2);
+	if (d2) *d2 = u2;
+	return c.Distance(other.GetPoint(u2));
 }
 
 float Ray::Distance(const Ray &ray) const
 {
-    return Distance(ray, 0, 0);
+	return Distance(ray, 0, 0);
 }
 
 float Ray::Distance(const Line &other, float *d, float *d2) const
 {
-    float u2;
-    float3 c = ClosestPoint(other, d, &u2);
-    if (d2) *d2 = u2;
-    return c.Distance(other.GetPoint(u2));
+	float u2;
+	float3 c = ClosestPoint(other, d, &u2);
+	if (d2) *d2 = u2;
+	return c.Distance(other.GetPoint(u2));
 }
 
 float Ray::Distance(const Line &line) const
 {
-    return Distance(line, 0, 0);
+	return Distance(line, 0, 0);
 }
 
 float Ray::Distance(const LineSegment &other, float *d, float *d2) const
 {
-    float u2;
-    float3 c = ClosestPoint(other, d, &u2);
-    if (d2) *d2 = u2;
-    return c.Distance(other.GetPoint(u2));
+	float u2;
+	float3 c = ClosestPoint(other, d, &u2);
+	if (d2) *d2 = u2;
+	return c.Distance(other.GetPoint(u2));
 }
 
 float Ray::Distance(const LineSegment &lineSegment) const
 {
-    return Distance(lineSegment, 0, 0);
+	return Distance(lineSegment, 0, 0);
 }
 
 float Ray::Distance(const Sphere &sphere) const
 {
-    return Max(0.f, Distance(sphere.pos) - sphere.r);
+	return Max(0.f, Distance(sphere.pos) - sphere.r);
 }
 
 float Ray::Distance(const Capsule &capsule) const
 {
-    return Max(0.f, Distance(capsule.l) - capsule.r);
+	return Max(0.f, Distance(capsule.l) - capsule.r);
 }
 
 float3 Ray::ClosestPoint(const float3 &targetPoint, float *d) const
 {
-    float u = Max(0.f, Dot(targetPoint - pos, dir));
-    if (d)
-        *d = u;
-    return GetPoint(u);
+	float u = Max(0.f, Dot(targetPoint - pos, dir));
+	if (d)
+		*d = u;
+	return GetPoint(u);
 }
 
 float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
-    ///\bug Properly cap d2.
-    return Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+	///\bug Properly cap d2.
+	return Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
 }
 
 float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 {
-    return Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+	return Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
 }
 
 float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
-    ///\bug Properly cap d2.
-    return Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
+	///\bug Properly cap d2.
+	return Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
 }
 
 bool Ray::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const
 {
-    return triangle.Intersects(*this, d, intersectionPoint);
+	return triangle.Intersects(*this, d, intersectionPoint);
 }
 
 bool Ray::Intersects(const Triangle &triangle) const
 {
-    return triangle.Intersects(*this, 0, 0);
+	return triangle.Intersects(*this, 0, 0);
 }
 
 bool Ray::Intersects(const Plane &plane, float *d) const
 {
-    return plane.Intersects(*this, d);
+	return plane.Intersects(*this, d);
 }
 
 bool Ray::Intersects(const Plane &plane) const
 {
-    return plane.Intersects(*this, 0);
+	return plane.Intersects(*this, 0);
 }
 
 bool Ray::Intersects(const Sphere &sphere, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
 {
-    return sphere.Intersects(*this, intersectionPoint, intersectionNormal, d);
+	return sphere.Intersects(*this, intersectionPoint, intersectionNormal, d);
 }
 
 bool Ray::Intersects(const Sphere &sphere) const
 {
-    return sphere.Intersects(*this, 0, 0, 0);
+	return sphere.Intersects(*this, 0, 0, 0);
 }
 
 bool Ray::Intersects(const AABB &aabb, float *dNear, float *dFar) const
 {
-    return aabb.Intersects(*this, dNear, dFar);
+	return aabb.Intersects(*this, dNear, dFar);
 }
 
 bool Ray::Intersects(const AABB &aabb) const
 {
-    return aabb.Intersects(*this, 0, 0);
+	return aabb.Intersects(*this, 0, 0);
 }
 
 bool Ray::Intersects(const OBB &obb, float *dNear, float *dFar) const
 {
-    return obb.Intersects(*this, dNear, dFar);
+	return obb.Intersects(*this, dNear, dFar);
 }
 
 bool Ray::Intersects(const OBB &obb) const
 {
-    return obb.Intersects(*this, 0, 0);
+	return obb.Intersects(*this, 0, 0);
 }
 
 bool Ray::Intersects(const Capsule &capsule) const
 {
-    return capsule.Intersects(*this);
+	return capsule.Intersects(*this);
 }
 
 bool Ray::Intersects(const Polygon &polygon) const
 {
-    return polygon.Intersects(*this);
+	return polygon.Intersects(*this);
 }
 
 bool Ray::Intersects(const Frustum &frustum) const
 {
-    return frustum.Intersects(*this);
+	return frustum.Intersects(*this);
 }
 
 bool Ray::Intersects(const Polyhedron &polyhedron) const
 {
-    return polyhedron.Intersects(*this);
+	return polyhedron.Intersects(*this);
 }
 
 bool Ray::IntersectsDisc(const Circle &disc) const
 {
-    return disc.IntersectsDisc(*this);
+	return disc.IntersectsDisc(*this);
 }
 
 Line Ray::ToLine() const
 {
-    return Line(pos, dir);
+	return Line(pos, dir);
 }
 
 LineSegment Ray::ToLineSegment(float d) const
 {
-    return LineSegment(pos, GetPoint(d));
+	return LineSegment(pos, GetPoint(d));
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Ray::ToString() const
 {
-    char str[256];
-    sprintf(str, "Ray(Pos:(%.2f, %.2f, %.2f) Dir:(%.2f, %.2f, %.2f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
-    return str;
+	char str[256];
+	sprintf(str, "Ray(Pos:(%.2f, %.2f, %.2f) Dir:(%.2f, %.2f, %.2f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	return str;
 }
 #endif
 
 Ray operator *(const float3x3 &transform, const Ray &ray)
 {
-    return Ray(transform * ray.pos, transform * ray.dir);
+	return Ray(transform * ray.pos, transform * ray.dir);
 }
 
 Ray operator *(const float3x4 &transform, const Ray &ray)
 {
-    return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir));
+	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir));
 }
 
 Ray operator *(const float4x4 &transform, const Ray &ray)
 {
-    return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir));
+	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir));
 }
 
 Ray operator *(const Quat &transform, const Ray &ray)
 {
-    return Ray(transform * ray.pos, transform * ray.dir);
+	return Ray(transform * ray.pos, transform * ray.dir);
 }
 
 MATH_END_NAMESPACE

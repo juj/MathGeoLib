@@ -13,8 +13,8 @@
    limitations under the License. */
 
 /** @file MatrixProxy.h
-    @author Jukka Jylänki
-    @brief */
+	@author Jukka Jylänki
+	@brief */
 #pragma once
 
 #include "Math/MathFwd.h"
@@ -26,23 +26,23 @@ template<int Cols>
 class MatrixProxy
 {
 private:
-    float v[Cols];
+	float v[Cols];
 
 public:
-    CONST_WIN32 float operator[](int col) const
-    {
-        assert(col >= 0);
-        assert(col < Cols);
+	CONST_WIN32 float operator[](int col) const
+	{
+		assert(col >= 0);
+		assert(col < Cols);
 
-        return v[col];
-    }
-    float &operator[](int col)
-    {
-        assert(col >= 0);
-        assert(col < Cols);
+		return v[col];
+	}
+	float &operator[](int col)
+	{
+		assert(col >= 0);
+		assert(col < Cols);
 
-        return v[col];
-    }
+		return v[col];
+	}
 };
 
 MATH_END_NAMESPACE

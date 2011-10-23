@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Capsule.h
-    @author Jukka Jylänki
+	@author Jukka Jylänki
 	@brief The Capsule geometry object. */
 #pragma once
 
@@ -26,232 +26,232 @@ MATH_BEGIN_NAMESPACE
 class Capsule
 {
 public:
-    /// Specifies the two inner points of this capsule.
-    LineSegment l;
+	/// Specifies the two inner points of this capsule.
+	LineSegment l;
 
-    /// Specifies the radius of this capsule. [similarOverload: l]
-    float r;
+	/// Specifies the radius of this capsule. [similarOverload: l]
+	float r;
 
-    /// The default constructor does not initialize any members of this class.
-    /** This means that the values of the members l and r are both undefined after creating a new capsule using 
-        this default constructor. Remember to assign to them before use.
-        @see l, r. */
-    Capsule() {}
+	/// The default constructor does not initialize any members of this class.
+	/** This means that the values of the members l and r are both undefined after creating a new capsule using 
+		this default constructor. Remember to assign to them before use.
+		@see l, r. */
+	Capsule() {}
 
-    /// Constructs a new capsule by explicitly specifying the member variables.
-    /** @param endPoints Specifies the line segment of the capsule.
-        @param radius Specifies the size of this capsule.
-        @see l, r. */
-    Capsule(const LineSegment &endPoints, float radius);
+	/// Constructs a new capsule by explicitly specifying the member variables.
+	/** @param endPoints Specifies the line segment of the capsule.
+		@param radius Specifies the size of this capsule.
+		@see l, r. */
+	Capsule(const LineSegment &endPoints, float radius);
 
-    /// Constructs a new capsule by explicitly specifying the member variables.
-    /** This constructor is equivalent to calling Capsule(LineSegment(bottomPoint, topPoint), radius), but provided
-        here for conveniency.
-        @see l, r. */
-    Capsule(const float3 &bottomPoint, const float3 &topPoint, float radius);
+	/// Constructs a new capsule by explicitly specifying the member variables.
+	/** This constructor is equivalent to calling Capsule(LineSegment(bottomPoint, topPoint), radius), but provided
+		here for conveniency.
+		@see l, r. */
+	Capsule(const float3 &bottomPoint, const float3 &topPoint, float radius);
 
-    /// Constructs a new capsule from a sphere.
-    /** This conversion results in a capsule which has its both endpoints at the exact same coordinates, and hence the
-        length of the inner line segment is set to 0. */
-    void SetFrom(const Sphere &s);
+	/// Constructs a new capsule from a sphere.
+	/** This conversion results in a capsule which has its both endpoints at the exact same coordinates, and hence the
+		length of the inner line segment is set to 0. */
+	void SetFrom(const Sphere &s);
 
-    /// Computes the distance of the two inner points of this capsule.
-    /** <img src="CapsuleFunctions.png" />
-        @see Height(). */
-    float LineLength() const;
+	/// Computes the distance of the two inner points of this capsule.
+	/** <img src="CapsuleFunctions.png" />
+		@see Height(). */
+	float LineLength() const;
 
-    /// Computes the total height of this capsule, i.e. LineLength() + Diameter().
-    /** <img src="CapsuleFunctions.png" />
-        @see LineLength(). */
-    float Height() const;
+	/// Computes the total height of this capsule, i.e. LineLength() + Diameter().
+	/** <img src="CapsuleFunctions.png" />
+		@see LineLength(). */
+	float Height() const;
 
-    /// Computes the diameter of this capsule.
-    /** <img src="CapsuleFunctions.png" />
-        @return 2*r.
-        @see r. */
-    float Diameter() const;
+	/// Computes the diameter of this capsule.
+	/** <img src="CapsuleFunctions.png" />
+		@return 2*r.
+		@see r. */
+	float Diameter() const;
 
-    /// Returns the bottom-most point of this Capsule.
-    /** <img src="CapsuleFunctions.png" />
-        @note The bottom-most point is only a naming convention, and does not correspond to the bottom-most point along any world axis. The returned
-            point is simply the point at the far end of this Capsule where the point l.a resides.
-        @note The bottom-most point of the capsule is different than the point l.a. The returned point is the point at the very far
-            edge of this capsule, and does not lie on the internal line. See the attached diagram.
-        @see Top(), l. */
-    float3 Bottom() const;
+	/// Returns the bottom-most point of this Capsule.
+	/** <img src="CapsuleFunctions.png" />
+		@note The bottom-most point is only a naming convention, and does not correspond to the bottom-most point along any world axis. The returned
+			point is simply the point at the far end of this Capsule where the point l.a resides.
+		@note The bottom-most point of the capsule is different than the point l.a. The returned point is the point at the very far
+			edge of this capsule, and does not lie on the internal line. See the attached diagram.
+		@see Top(), l. */
+	float3 Bottom() const;
 
-    /// Returns the center point of this Capsule.
-    /** <img src="CapsuleFunctions.png" />        
-        @return The point (l.a + l.b) / 2. This point is the center of mass for this capsule.
-        @see l, Bottom(), Top(). */
-    float3 Center() const;
-    float3 Centroid() const { return l.CenterPoint(); } ///< [similarOverload: Center]
+	/// Returns the center point of this Capsule.
+	/** <img src="CapsuleFunctions.png" />		
+		@return The point (l.a + l.b) / 2. This point is the center of mass for this capsule.
+		@see l, Bottom(), Top(). */
+	float3 Center() const;
+	float3 Centroid() const { return l.CenterPoint(); } ///< [similarOverload: Center]
 
-    /// Returns the topmost point of this Capsule.
-    /** <img src="CapsuleFunctions.png" />
-        @note The topmost point is only a naming convention, and does not correspond to the topmost point along any world axis. The returned
-            point is simply the point at the far end of this Capsule where the point l.b resides.
-        @note The topmost point of the capsule is different than the point l.b. The returned point is the point at the very far
-            edge of this capsule, and does not lie on the internal line. See the attached diagram.
-        @see Bottom(), l. */
-    float3 Top() const;
+	/// Returns the topmost point of this Capsule.
+	/** <img src="CapsuleFunctions.png" />
+		@note The topmost point is only a naming convention, and does not correspond to the topmost point along any world axis. The returned
+			point is simply the point at the far end of this Capsule where the point l.b resides.
+		@note The topmost point of the capsule is different than the point l.b. The returned point is the point at the very far
+			edge of this capsule, and does not lie on the internal line. See the attached diagram.
+		@see Bottom(), l. */
+	float3 Top() const;
 
-    /// Returns the direction from the bottommost point towards the topmost point of this Capsule.
-    /** <img src="CapsuleFunctions.png" />
-        @return The normalized direction vector from l.a to l.b.
-        @see l. */
-    float3 UpDirection() const;
+	/// Returns the direction from the bottommost point towards the topmost point of this Capsule.
+	/** <img src="CapsuleFunctions.png" />
+		@return The normalized direction vector from l.a to l.b.
+		@see l. */
+	float3 UpDirection() const;
 
-    /// Computes the volume of this Capsule.
-    /** @return pi * r^2 * |b-a| + 4 * pi * r^2 / 3.
-        @see SurfaceArea(). */
-    float Volume() const;
+	/// Computes the volume of this Capsule.
+	/** @return pi * r^2 * |b-a| + 4 * pi * r^2 / 3.
+		@see SurfaceArea(). */
+	float Volume() const;
 
-    /// Computes the surface area of this Capsule.
-    /** @return 2 * pi * r * |b-a| + 4 * pi * r^2.
-        @see Volume(). */
-    float SurfaceArea() const;
+	/// Computes the surface area of this Capsule.
+	/** @return 2 * pi * r * |b-a| + 4 * pi * r^2.
+		@see Volume(). */
+	float SurfaceArea() const;
 
-    /// Returns the cross-section circle at the given height of this Capsule.
-    /** <img src="CapsuleFunctions.png" />
-        @param l A normalized parameter between [0,1]. l == 0 returns a degenerate circle of radius 0 at the bottom of this Capsule, and l == 1
-                will return a degenerate circle of radius 0 at the top of this Capsule. */
-    Circle CrossSection(float l) const;
+	/// Returns the cross-section circle at the given height of this Capsule.
+	/** <img src="CapsuleFunctions.png" />
+		@param l A normalized parameter between [0,1]. l == 0 returns a degenerate circle of radius 0 at the bottom of this Capsule, and l == 1
+				will return a degenerate circle of radius 0 at the top of this Capsule. */
+	Circle CrossSection(float l) const;
 
-    /// Returns a line segment that spans the far axis of this capsule from bottom to tip.
-    /** <img src="CapsuleFunctions.png" />
-        @see Height(), LineLength(), l. */
-    LineSegment HeightLineSegment() const;
+	/// Returns a line segment that spans the far axis of this capsule from bottom to tip.
+	/** <img src="CapsuleFunctions.png" />
+		@see Height(), LineLength(), l. */
+	LineSegment HeightLineSegment() const;
 
-    /// Tests if this Capsule is finite.
-    /** A Capsule is <b><i>finite</i></b> if none of its member variables contain floating-point NaNs or +/-infs
-        in them.
-        @return True if each member variable has a finite floating-point value.
-        @see l, r.
-        @todo Implement IsDegenerate(). */
-    bool IsFinite() const;
+	/// Tests if this Capsule is finite.
+	/** A Capsule is <b><i>finite</i></b> if none of its member variables contain floating-point NaNs or +/-infs
+		in them.
+		@return True if each member variable has a finite floating-point value.
+		@see l, r.
+		@todo Implement IsDegenerate(). */
+	bool IsFinite() const;
 
-    /// Generates a point inside this capsule.
-    /** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
-        @param a A normalized value between [0,1]. This specifies the normalized directed angle of the point position around the capsule line segment.
-        @param d A normalized value between [0,1]. This specifies the normalized distance of the point position from the capsule line segment.
-        @note This function does not generate points inside this capsule uniformly, as (l,a,d) ranges uniformly over [0,1]^3.
-        @see UniformPointPerhapsInside(), RandomPointInside(). */
-    float3 PointInside(float l, float a, float d) const;
+	/// Generates a point inside this capsule.
+	/** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
+		@param a A normalized value between [0,1]. This specifies the normalized directed angle of the point position around the capsule line segment.
+		@param d A normalized value between [0,1]. This specifies the normalized distance of the point position from the capsule line segment.
+		@note This function does not generate points inside this capsule uniformly, as (l,a,d) ranges uniformly over [0,1]^3.
+		@see UniformPointPerhapsInside(), RandomPointInside(). */
+	float3 PointInside(float l, float a, float d) const;
 
-    /// Generates a point that perhaps lies inside this capsule.
-    /** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
-        @param x A normalized value between [0,1]. This specifies the x coordinate on the plane of the circle cross-section specified by l.
-        @param y A normalized value between [0,1]. This specifies the y coordinate on the plane of the circle cross-section specified by l.
-        @note This function will generate points uniformly, but they do not necessarily lie inside the capsule.
-        @see PointInside(). */
-    float3 UniformPointPerhapsInside(float l, float x, float y) const;
+	/// Generates a point that perhaps lies inside this capsule.
+	/** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
+		@param x A normalized value between [0,1]. This specifies the x coordinate on the plane of the circle cross-section specified by l.
+		@param y A normalized value between [0,1]. This specifies the y coordinate on the plane of the circle cross-section specified by l.
+		@note This function will generate points uniformly, but they do not necessarily lie inside the capsule.
+		@see PointInside(). */
+	float3 UniformPointPerhapsInside(float l, float x, float y) const;
 
-    /// Returns the smallest AABB that encloses this capsule.
-    /** @see MinimalEnclosingOBB(). */
-    AABB MinimalEnclosingAABB() const;
+	/// Returns the smallest AABB that encloses this capsule.
+	/** @see MinimalEnclosingOBB(). */
+	AABB MinimalEnclosingAABB() const;
 
-    /// Returns the smallest OBB that encloses this capsule.
-    /** @see MinimalEnclosingAABB(). */
-    OBB MinimalEnclosingOBB() const;
+	/// Returns the smallest OBB that encloses this capsule.
+	/** @see MinimalEnclosingAABB(). */
+	OBB MinimalEnclosingOBB() const;
 
-    /// Generates a random point inside this capsule.
-    /** The points are distributed uniformly.
-        @see RandomPointOnSurface(). */
-    float3 RandomPointInside(LCG &rng) const;
+	/// Generates a random point inside this capsule.
+	/** The points are distributed uniformly.
+		@see RandomPointOnSurface(). */
+	float3 RandomPointInside(LCG &rng) const;
 
-    /// Generates a random point on the surface of this Capsule.
-    /** @todo The points are NOT distributed uniformly. Convert this to using the rejection method and RandomPointInside()
-            to produce a uniform distribution.
-        @see RandomPointInside(). */
-    float3 RandomPointOnSurface(LCG &rng) const;
+	/// Generates a random point on the surface of this Capsule.
+	/** @todo The points are NOT distributed uniformly. Convert this to using the rejection method and RandomPointInside()
+			to produce a uniform distribution.
+		@see RandomPointInside(). */
+	float3 RandomPointOnSurface(LCG &rng) const;
 
-    /// Moves this capsule by the given offset vector.
-    /** @note This function operates in-place.
-        @param offset The world space offset to apply to the position of this capsule.
-        @see Transform(), Scale(). */
-    void Translate(const float3 &offset);
+	/// Moves this capsule by the given offset vector.
+	/** @note This function operates in-place.
+		@param offset The world space offset to apply to the position of this capsule.
+		@see Transform(), Scale(). */
+	void Translate(const float3 &offset);
 
-    /// Applies a uniform scale to this Capsule.
-    /** This function scales this capsule structure in-place, using the given center point as the origin 
-        for the scaling operation.
-        @param centerPoint Specifies the center of the scaling operation, in world space.
-        @param scaleFactor The uniform scale factor to apply to each world space axis.
-        @see Translate(), Transform(). */
-    void Scale(const float3 &centerPoint, float scaleFactor);
+	/// Applies a uniform scale to this Capsule.
+	/** This function scales this capsule structure in-place, using the given center point as the origin 
+		for the scaling operation.
+		@param centerPoint Specifies the center of the scaling operation, in world space.
+		@param scaleFactor The uniform scale factor to apply to each world space axis.
+		@see Translate(), Transform(). */
+	void Scale(const float3 &centerPoint, float scaleFactor);
 
-    /// Applies a transformation to this capsule.
-    /** @param transform The transformation to apply to this capsule. This transformation must be 
-        affine, and must contain an orthogonal set of column vectors (may not contain shear or projection).
-        The transformation can only contain uniform scale, and may not contain mirroring.
-        @see Translate(), Scale(), classes float3x3, float3x4, float4x4, Quat. */
-    void Transform(const float3x3 &transform);
-    void Transform(const float3x4 &transform);
-    void Transform(const float4x4 &transform);
-    void Transform(const Quat &transform);
+	/// Applies a transformation to this capsule.
+	/** @param transform The transformation to apply to this capsule. This transformation must be 
+		affine, and must contain an orthogonal set of column vectors (may not contain shear or projection).
+		The transformation can only contain uniform scale, and may not contain mirroring.
+		@see Translate(), Scale(), classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
 
-    /// Computes the closest point inside this capsule to the given point.
-    /** If the target point lies inside this capsule, then that point is returned.
-        @see Distance(), Contains(), Intersects().
-        @todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-    float3 ClosestPoint(const float3 &targetPoint) const;
+	/// Computes the closest point inside this capsule to the given point.
+	/** If the target point lies inside this capsule, then that point is returned.
+		@see Distance(), Contains(), Intersects().
+		@todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
+	float3 ClosestPoint(const float3 &targetPoint) const;
 
-    /// Computes the distance between this capsule and the given object.
-    /** This function finds the nearest pair of points on this and the given object, and computes their distance.
-        If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-        @todo Add Distance(Triangle/Polygon/Circle/Disc/Capsule). 
-        @see Contains(), Intersects(), ClosestPoint(). */
-    float Distance(const float3 &point) const;
-    float Distance(const Plane &plane) const;
-    float Distance(const Sphere &sphere) const;
-    float Distance(const Ray &ray) const;
-    float Distance(const Line &line) const;
-    float Distance(const LineSegment &lineSegment) const;
-    float Distance(const Capsule &capsule) const;
+	/// Computes the distance between this capsule and the given object.
+	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
+		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
+		@todo Add Distance(Triangle/Polygon/Circle/Disc/Capsule). 
+		@see Contains(), Intersects(), ClosestPoint(). */
+	float Distance(const float3 &point) const;
+	float Distance(const Plane &plane) const;
+	float Distance(const Sphere &sphere) const;
+	float Distance(const Ray &ray) const;
+	float Distance(const Line &line) const;
+	float Distance(const LineSegment &lineSegment) const;
+	float Distance(const Capsule &capsule) const;
 
-    /// Tests if the given object is fully contained inside this capsule.
-    /** This function returns true if the given object lies inside this capsule, and false otherwise.
-        @note The comparison is performed using less-or-equal, so the surface of this capsule count as being inside, but
-            due to float inaccuracies, this cannot generally be relied upon.
-        @todo Add Contains(Circle/Disc/Sphere/Capsule).
-        @see Distance(), Intersects(), ClosestPoint(). */
-    bool Contains(const float3 &point) const;
-    bool Contains(const LineSegment &lineSegment) const;
-    bool Contains(const Triangle &triangle) const;
-    bool Contains(const Polygon &polygon) const;
-    bool Contains(const AABB &aabb) const;
-    bool Contains(const OBB &obb) const;
-    bool Contains(const Frustum &frustum) const;
-    bool Contains(const Polyhedron &polyhedron) const;
+	/// Tests if the given object is fully contained inside this capsule.
+	/** This function returns true if the given object lies inside this capsule, and false otherwise.
+		@note The comparison is performed using less-or-equal, so the surface of this capsule count as being inside, but
+			due to float inaccuracies, this cannot generally be relied upon.
+		@todo Add Contains(Circle/Disc/Sphere/Capsule).
+		@see Distance(), Intersects(), ClosestPoint(). */
+	bool Contains(const float3 &point) const;
+	bool Contains(const LineSegment &lineSegment) const;
+	bool Contains(const Triangle &triangle) const;
+	bool Contains(const Polygon &polygon) const;
+	bool Contains(const AABB &aabb) const;
+	bool Contains(const OBB &obb) const;
+	bool Contains(const Frustum &frustum) const;
+	bool Contains(const Polyhedron &polyhedron) const;
 
-    /// Tests whether this capsule and the given object intersect.       
-    /** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-        another, this function still returns true. (e.g. in case a line segment is contained inside this capsule, 
-        or this capsule is contained inside a Sphere, etc.)
-        The first parameter of this function specifies the other object to test against.
-        @see Contains(), Distance(), ClosestPoint().
-        @todo Add Intersects(Circle/Disc). */
-    bool Intersects(const Ray &ray) const;
-    bool Intersects(const Line &line) const;
-    bool Intersects(const LineSegment &lineSegment) const;
-    bool Intersects(const Plane &plane) const;
-    bool Intersects(const Sphere &sphere) const;
-    bool Intersects(const Capsule &capsule) const;
-    bool Intersects(const AABB &aabb) const;
-    bool Intersects(const OBB &obb) const;
-    bool Intersects(const Triangle &triangle) const;
-    bool Intersects(const Polygon &polygon) const;
-    bool Intersects(const Frustum &frustum) const;
-    bool Intersects(const Polyhedron &polyhedron) const;
+	/// Tests whether this capsule and the given object intersect.	   
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+		another, this function still returns true. (e.g. in case a line segment is contained inside this capsule, 
+		or this capsule is contained inside a Sphere, etc.)
+		The first parameter of this function specifies the other object to test against.
+		@see Contains(), Distance(), ClosestPoint().
+		@todo Add Intersects(Circle/Disc). */
+	bool Intersects(const Ray &ray) const;
+	bool Intersects(const Line &line) const;
+	bool Intersects(const LineSegment &lineSegment) const;
+	bool Intersects(const Plane &plane) const;
+	bool Intersects(const Sphere &sphere) const;
+	bool Intersects(const Capsule &capsule) const;
+	bool Intersects(const AABB &aabb) const;
+	bool Intersects(const OBB &obb) const;
+	bool Intersects(const Triangle &triangle) const;
+	bool Intersects(const Polygon &polygon) const;
+	bool Intersects(const Frustum &frustum) const;
+	bool Intersects(const Polyhedron &polyhedron) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-    /// Returns a human-readable representation of this Capsule. Most useful for debugging purposes.
-    /** The returned string specifies the line segment and the radius of this Capsule. */
-    std::string ToString() const;
+	/// Returns a human-readable representation of this Capsule. Most useful for debugging purposes.
+	/** The returned string specifies the line segment and the radius of this Capsule. */
+	std::string ToString() const;
 #endif
 #ifdef MATH_QT_INTEROP
-    operator QString() const { return toString(); }
-    QString toString() const { return QString::fromStdString(ToString()); }
+	operator QString() const { return toString(); }
+	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
 
