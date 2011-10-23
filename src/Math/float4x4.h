@@ -67,18 +67,16 @@ class float4x4
 {
 public:
     /// Specifies the height of this matrix.
-    /** [Category: Data] */
     enum { Rows = 4 };
 
     /// Specifies the width of this matrix.
     enum { Cols = 4 };
 
     /// Stores the data in this matrix in row-major format.
-    /** [Category: Data] [noscript] */
+    /** [noscript] */
     float v[Rows][Cols];
 
     /// A constant matrix that has zeroes in all its entries.
-    /** [Category: Data] */
     static const float4x4 zero;
 
     /// A constant matrix that is the identity.
@@ -97,7 +95,7 @@ public:
     static const float4x4 nan;
 
     /// Creates a new float4x4 with uninitialized member values.
-    /** [Category: Create] [opaque-qtscript] */
+    /** [opaque-qtscript] */
     float4x4() {}
 
     /// The copy-ctor for float4x4 is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up this function for QtScript bindings.
@@ -138,7 +136,6 @@ public:
     float4x4(const Quat &orientation, const float3 &translation);
 
     /// Creates a new transformation matrix that translates by the given offset.
-    /** [Category: Create] */
     static TranslateOp Translate(float tx, float ty, float tz);
     static TranslateOp Translate(const float3 &offset);
 
@@ -277,8 +274,7 @@ public:
         @note MatrixProxy is a temporary helper class. Do not store references to it, but always
         directly dereference it with the [] operator.
         \example m[0][3] Returns the last element on the first row, which is the amount 
-        of translation in the x-direction.
-        [Category: Access] */
+        of translation in the x-direction. */
     MatrixProxy<Cols> &operator[](int row);
     const MatrixProxy<Cols> &operator[](int row) const;
 
@@ -377,8 +373,7 @@ public:
     const float *ptr() const;
 
     /// Sets the three first elements of the given row. The fourth element is left unchanged.
-    /** @param row The index of the row to set, in the range [0-3].
-        [Category: Set] */
+    /** @param row The index of the row to set, in the range [0-3]. */
     void SetRow3(int row, const float3 &rowVector);
     void SetRow3(int row, const float *data);
     void SetRow3(int row, float m_r0, float m_r1, float m_r2);
@@ -496,8 +491,7 @@ public:
         If the determinant is negative, this matrix performs reflection about some axis.
         From http://msdn.microsoft.com/en-us/library/bb204853(VS.85).aspx :
         "If the determinant is positive, the basis is said to be "positively" oriented (or right-handed). 
-        If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)."
-        [Category: Compute] */
+        If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)." */
     float Determinant4() const;
 
     /// Returns the 3x3 submatrix that results when the row i and column j is removed from this matrix.
@@ -608,7 +602,6 @@ public:
     void Pivot();
 
     /// Transforms the given point vector by this matrix M , i.e. returns M * (x, y, z, 1).
-    /** [Category: Transform] */
     float3 TransformPos(const float3 &pointVector) const;
     float3 TransformPos(float x, float y, float z) const;
 
@@ -666,8 +659,7 @@ public:
     float4x4 &operator -=(const float4x4 &rhs);
 
     /// Tests if this matrix does not contain any NaNs or infs.
-    /** @return Returns true if the entries of this float4x4 are all finite, and do not contain NaN or infs. 
-        [Category: Examine] */
+    /** @return Returns true if the entries of this float4x4 are all finite, and do not contain NaN or infs. */
     bool IsFinite() const;
 
     /// Tests if this is the identity matrix.
@@ -747,12 +739,11 @@ public:
     std::string ToString2() const;
 #endif
 
-    /// Extracts the rotation part of this matrix into Euler rotation angles (in radians).
+    /// Extracts the rotation part of this matrix into Euler rotation angles (in radians). [indexTitle: ToEuler***]
     /// @note It is better to thinkg about the returned float3 as an array of three floats, and
     /// not as a triple of xyz, because e.g. the .y component returned by ToEulerYXZ() does
     /// not return the amount of rotation about the y axis, but contains the amount of rotation
     /// in the second axis, in this case the x axis.
-    /// [Category: Extract] [indexTitle: ToEuler***]
     float3 ToEulerXYX() const;
     float3 ToEulerXZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
     float3 ToEulerYXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]

@@ -223,22 +223,29 @@ public:
     static Quat RandomRotation(LCG &lcg);
 
     /// Extracts the rotation part of this quaternion into Euler rotation angles (in radians).
-    /// @note It is better to thinkg about the returned float3 as an array of three floats, and
-    /// not as a triple of xyz, because e.g. the .y component returned by ToEulerYXZ() does
-    /// not return the amount of rotation about the y axis, but contains the amount of rotation
-    /// in the second axis, in this case the x axis.
+    /** @note It is better to think about the returned float3 as an array of three floats, and
+            not as a triple of xyz, because e.g. the .y component returned by ToEulerYXZ() does
+            not return the amount of rotation about the y axis, but contains the amount of rotation
+            in the second axis, in this case the x axis.
+        @return A float3 which specifies the rotation of this quaternion in radian Euler angles.
+            The function ToEulerABC returns a float3 where the first
+            element ([0], or x) specifies the rotation about the axis A (not necessarily the X axis!), 
+            [1] or y specifies the rotation about the B axis (not necessarily the Y axis!) and
+            [2] or z specifies the rotation about the C axis (not necessarily the Z axis!). The
+            order of rotations follows the M*v convention, meaning that ToEulerXYZ returns the Euler
+            angles for rotating a vector v in the order X * (Y * (Z * v))), i.e. right-to-left. */
     float3 ToEulerXYX() const;
-    float3 ToEulerXZX() const;
-    float3 ToEulerYXY() const;
-    float3 ToEulerYZY() const;
-    float3 ToEulerZXZ() const;
-    float3 ToEulerZYZ() const;
-    float3 ToEulerXYZ() const;
-    float3 ToEulerXZY() const;
-    float3 ToEulerYXZ() const;
-    float3 ToEulerYZX() const;
-    float3 ToEulerZXY() const;
-    float3 ToEulerZYX() const;
+    float3 ToEulerXZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerYXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerYZY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerZXZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerZYZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerXYZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerXZY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerYXZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerYZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerZXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+    float3 ToEulerZYX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
 
     float3x3 ToFloat3x3() const;
     float3x4 ToFloat3x4() const;

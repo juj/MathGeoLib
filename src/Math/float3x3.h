@@ -70,18 +70,15 @@ class float3x3
 {
 public:
     /// Specifies the height of this matrix.
-    /** [Category: Data] */
     enum { Rows = 3 };
 
     /// Specifies the width of this matrix.
     enum { Cols = 3 };
 
     /// Stores the data in this matrix in row-major format. [noscript]
-    /** [Category: Data] */
     float v[Rows][Cols];
 
     /// A constant matrix that has zeroes in all its entries.
-    /** [Category: Data] */
     static const float3x3 zero;
 
     /// A constant matrix that is the identity.
@@ -99,7 +96,7 @@ public:
     static const float3x3 nan;
 
     /// Creates a new float3x3 with uninitialized member values.
-    /** [Category: Create] [opaque-qtscript] */
+    /** [opaque-qtscript] */
     float3x3() {}
 
     /// The copy-ctor for float3x3 is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up this function for QtScript bindings.
@@ -231,8 +228,7 @@ public:
         @note You can use the index notation to set elements of the matrix, e.g. m[0][1] = 5.f;
         @note MatrixProxy is a temporary helper class. Do not store references to it, but always
         directly dereference it with the [] operator.
-        \example m[0][2] Returns the last element on the first row.
-        [Category: Access] */
+        \example m[0][2] Returns the last element on the first row. */
     MatrixProxy<Cols> &operator[](int row);
     const MatrixProxy<Cols> &operator[](int row) const;
 
@@ -303,8 +299,7 @@ public:
     const float *ptr() const;
 
     /// Sets the values of the given row.
-    /** @param row The index of the row to set, in the range [0-2].
-        [Category: Set] */
+    /** @param row The index of the row to set, in the range [0-2]. */
     void SetRow(int row, float x, float y, float z);
     void SetRow(int row, const float3 &rowVector);
     void SetRow(int row, const float *data);
@@ -363,8 +358,7 @@ public:
         If the determinant is negative, this matrix performs reflection about some axis.
         From http://msdn.microsoft.com/en-us/library/bb204853(VS.85).aspx :
         "If the determinant is positive, the basis is said to be "positively" oriented (or right-handed). 
-        If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)."
-        [Category: Compute] */
+        If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)." */
     float Determinant() const;
 
 //    float2x2 SubMatrix(int i, int j) const;
@@ -491,8 +485,7 @@ public:
     float3x3 &operator -=(const float3x3 &rhs);
 
     /// Tests if this matrix does not contain any NaNs or infs.
-    /** @return Returns true if the entries of this float3x3 are all finite, and do not contain NaN or infs. 
-        [Category: Examine] */
+    /** @return Returns true if the entries of this float3x3 are all finite, and do not contain NaN or infs. */
     bool IsFinite() const;
 
     /// Tests if this is the identity matrix.
@@ -563,12 +556,11 @@ public:
     std::string ToString2() const;
 #endif
 
-    /// Extracts the rotation part of this matrix into Euler rotation angles (in radians).
+    /// Extracts the rotation part of this matrix into Euler rotation angles (in radians). [indexTitle: ToEuler***]
     /// @note It is better to thinkg about the returned float3 as an array of three floats, and
     /// not as a triple of xyz, because e.g. the .y component returned by ToEulerYXZ() does
     /// not return the amount of rotation about the y axis, but contains the amount of rotation
     /// in the second axis, in this case the x axis.
-    /// [Category: Extract] [indexTitle: ToEuler***]
     float3 ToEulerXYX() const;
     float3 ToEulerXZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
     float3 ToEulerYXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
