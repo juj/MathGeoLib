@@ -290,6 +290,12 @@ Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
 	return s;
 }
 
+Sphere Sphere::OptimalEnclosingSphere(const float3 *pointArray, int numPoints)
+{
+	assume(false && "Not implemented!");
+	return Sphere();
+}
+
 /* This implementation was adapted from Christer Ericson's Real-time Collision Detection, pp. 99-100. */
 /*
 Sphere WelzlSphere(const float3 *pts, int numPoints, float3 *support, int numSupports)

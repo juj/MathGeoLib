@@ -701,6 +701,26 @@ float4 &float4::operator *=(float scalar)
 	return *this;
 }
 
+float4 float4::Add(float s) const
+{
+	return float4(x + s, y + s, z + s, w + s);
+}
+
+float4 float4::Sub(float s) const
+{
+	return float4(x - s, y - s, z - s, w - s);
+}
+
+float4 float4::SubLeft(float s) const
+{
+	return float4(s - x, s - y, s - z, s - w);
+}
+
+float4 float4::DivLeft(float s) const
+{
+	return float4(s / x, s / y, s / z, s / w);
+}
+
 float4 float4::Mul(const float4 &rhs) const
 {
 	return float4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);

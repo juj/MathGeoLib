@@ -396,6 +396,12 @@ void float2::Orthogonalize(const float2 &a, float2 &b)
 	b -= a.Dot(b) / a.Length() * a;
 }
 
+bool float2::AreOrthogonal(const float2 &a, const float2 &b, float epsilon)
+{
+	return a.IsPerpendicular(b, epsilon);
+}
+
+
 void float2::Orthonormalize(float2 &a, float2 &b)
 {
 	assume(!a.IsZero());
@@ -684,6 +690,26 @@ float2 &float2::operator *=(float scalar)
 	y *= scalar;
 
 	return *this;
+}
+
+float2 float2::Add(float s) const
+{
+	return float2(x + s, y + s);
+}
+
+float2 float2::Sub(float s) const
+{
+	return float2(x - s, y - s);
+}
+
+float2 float2::SubLeft(float s) const
+{
+	return float2(s - x, s - y);
+}
+
+float2 float2::DivLeft(float s) const
+{
+	return float2(s / x, s / y);
 }
 
 float2 float2::Mul(const float2 &rhs) const
