@@ -33,7 +33,7 @@ void Set3x3PartRotateX(Matrix &m, float angle)
 	 ³   1   0   0 ³
 	 ³   0  cz -sz ³
 	 ³   0  sz  cz ³
-   */
+	*/
 
 	const float cosz = Cos(angle);
 	const float sinz = Sin(angle);
@@ -54,7 +54,7 @@ void Set3x3PartRotateY(Matrix &m, float angle)
 	 ³  cz   0  sz ³
 	 ³   0   1   0 ³
 	 ³ -sz   0  cz ³
-   */
+	*/
 
 	const float cosz = Cos(angle);
 	const float sinz = Sin(angle);
@@ -75,7 +75,7 @@ void Set3x3PartRotateZ(Matrix &m, float angle)
 	 ³  cz -sz   0 ³
 	 ³  sz  cz   0 ³
 	 ³   0   0   1 ³
-   */
+	*/
 
 	const float cosz = Cos(angle);
 	const float sinz = Sin(angle);
@@ -85,20 +85,20 @@ void Set3x3PartRotateZ(Matrix &m, float angle)
 	m[2][0] =  0.f; m[2][1] =   0.f; m[2][2] = 1.f;
 }
 
-// The code below is adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerXYZ(Matrix &m, float x, float y, float z)
 {
 	float cx = cos(x); float cy = cos(y); float cz = cos(z);
 	float sx = sin(x); float sy = sin(y); float sz = sin(z);
 
-	m[0][0] = cy*cz;			 m[0][1] = -cy * sz;		 m[0][2] = sy;
-	m[1][0] = cz*sx*sy + cx*sz;  m[1][1] = cx*cz - sx*sy*sz; m[1][2] = -cy*sx;
-	m[2][0] = -cx*cz*sy + sx*sz; m[2][1] = cz*sx + cx*sy*sz; m[2][2] = cx*cy;
+	m[0][0] =             cy*cz; m[0][1] =         -cy * sz; m[0][2] =     sy;
+	m[1][0] =  cz*sx*sy + cx*sz; m[1][1] = cx*cz - sx*sy*sz; m[1][2] = -cy*sx;
+	m[2][0] = -cx*cz*sy + sx*sz; m[2][1] = cz*sx + cx*sy*sz; m[2][2] =  cx*cy;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerXYZ(Matrix &m, float &x, float &y, float &z)
 {
@@ -127,18 +127,20 @@ void ExtractEulerXYZ(Matrix &m, float &x, float &y, float &z)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerXZY(Matrix &m, float &x, float &z, float &y)
 {
 	float cx = cos(x); float cy = cos(y); float cz = cos(z);
 	float sx = sin(x); float sy = sin(y); float sz = sin(z);
 
-	m[0][0] = cy*cz;			 m[0][1] = -sz;   m[0][2] = cz*sy;
-	m[1][0] = sx*sy + cx*cy*sz;  m[1][1] = cx*cz; m[1][2] = -cy*sx + cx*sy*sz;
-	m[2][0] = -cx*sy + cy*sx*sz; m[2][1] = cz*sx; m[2][2] = cx*cy + sx*sy*sz;
+	m[0][0] =             cy*cz; m[0][1] =   -sz; m[0][2] =             cz*sy;
+	m[1][0] =  sx*sy + cx*cy*sz; m[1][1] = cx*cz; m[1][2] = -cy*sx + cx*sy*sz;
+	m[2][0] = -cx*sy + cy*sx*sz; m[2][1] = cz*sx; m[2][2] =  cx*cy + sx*sy*sz;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerXZY(Matrix &m, float &x, float &z, float &y)
 {
@@ -167,18 +169,20 @@ void ExtractEulerXZY(Matrix &m, float &x, float &z, float &y)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerYXZ(Matrix &m, float &y, float &x, float &z)
 {
 	float cx = cos(x); float cy = cos(y); float cz = cos(z);
 	float sx = sin(x); float sy = sin(y); float sz = sin(z);
 
-	m[0][0] = cy*cz + sx*sy*sz;  m[0][1] = cx*sx*sy - cy*sz; m[0][2] = cx*sy;
-	m[1][0] = cx*sz;			 m[1][1] = cx*cz;			m[1][2] = -sx;
+	m[0][0] =  cy*cz + sx*sy*sz; m[0][1] = cx*sx*sy - cy*sz; m[0][2] = cx*sy;
+	m[1][0] =             cx*sz; m[1][1] = cx*cz;            m[1][2] =   -sx;
 	m[2][0] = -cz*sy + cy*sx*sz; m[2][1] = cy*cz*sx + sy*sz; m[2][2] = cx*cy;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerYXZ(Matrix &m, float &y, float &x, float &z)
 {
@@ -207,18 +211,20 @@ void ExtractEulerYXZ(Matrix &m, float &y, float &x, float &z)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerYZX(Matrix &m, float &y, float &z, float &x)
 {
 	float cx = cos(x); float cy = cos(y); float cz = cos(z);
 	float sx = sin(x); float sy = sin(y); float sz = sin(z);
 
-	m[0][0] = cy*cz;  m[0][1] = sx*sy - cx*cy*sz; m[0][2] = cx*sy + cy*sx*sz;
-	m[1][0] = sz;	 m[1][1] = cx*cz;			m[1][2] = -cz*sx;
+	m[0][0] =  cy*cz; m[0][1] = sx*sy - cx*cy*sz; m[0][2] = cx*sy + cy*sx*sz;
+	m[1][0] =     sz; m[1][1] =            cx*cz; m[1][2] =           -cz*sx;
 	m[2][0] = -cx*sy; m[2][1] = cy*sx + cx*sy*sz; m[2][2] = cx*cy - sx*sy*sz;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 {
@@ -247,18 +253,20 @@ void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerZXY(Matrix &m, float &z, float &x, float &y)
 {
 	float cx = cos(x); float cy = cos(y); float cz = cos(z);
 	float sx = sin(x); float sy = sin(y); float sz = sin(z);
 
-	m[0][0] = cy*cz - sx*sy*sz; m[0][1] = -cx*sz; m[0][2] = cz*sy + cy*sx*sz;
-	m[1][0] = cz*sx*sy + cy*sz; m[1][1] = cx*cz;  m[1][2] = -cy*cz*sx + sy*sz;
-	m[2][0] = -cx*sy;		   m[2][1] = sx;	 m[2][2] = cx*cy;
+	m[0][0] = cy*cz - sx*sy*sz; m[0][1] = -cx*sz; m[0][2] =  cz*sy + cy*sx*sz;
+	m[1][0] = cz*sx*sy + cy*sz; m[1][1] =  cx*cz; m[1][2] = -cy*cz*sx + sy*sz;
+	m[2][0] =           -cx*sy; m[2][1] =     sx; m[2][2] =             cx*cy;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerZXY(Matrix &m, float &z, float &x, float &y)
 {
@@ -287,18 +295,20 @@ void ExtractEulerZXY(Matrix &m, float &z, float &x, float &y)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerZYX(Matrix &m, float &z, float &y, float &x)
 {
 	float cx = cos(x); float cy = cos(y); float cz = cos(z);
 	float sx = sin(x); float sy = sin(y); float sz = sin(z);
 
-	m[0][0] = cy*cz; m[0][1] = cz*sx*sy - cx*sz; m[0][2] = cx*cz*sy + sx*sz;
+	m[0][0] = cy*cz; m[0][1] = cz*sx*sy - cx*sz; m[0][2] =  cx*cz*sy + sx*sz;
 	m[1][0] = cy*sz; m[1][1] = cx*cz + sx*sy*sz; m[1][2] = -cz*sx + cx*sy*sz;
-	m[2][0] = -sy;   m[2][1] = cy*sx;			m[2][2] = cx*cy;
+	m[2][0] =   -sy; m[2][1] =            cy*sx; m[2][2] =             cx*cy;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerZYX(Matrix &m, float &z, float &y, float &x)
 {
@@ -327,18 +337,20 @@ void ExtractEulerZYX(Matrix &m, float &z, float &y, float &x)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 {
 	float cx2 = cos(x2); float cy = cos(y); float cx1 = cos(x1);
 	float sx2 = sin(x2); float sy = sin(y); float sx1 = sin(x1);
 
-	m[0][0] = cy;	  m[0][1] = sy*sx1;			   m[0][2] = sy*cx1;
-	m[1][0] = sy*sx2;  m[1][1] = cx2*cx1 - cy*sx2*sx1; m[1][2] = -cy*cx1*sx2 - cx2*sx1;
-	m[2][0] = -sy*cx2; m[2][1] = cx1*sx2 + cy*cx2*sx1; m[2][2] = cy*cx2*cx1 - sx2*sx1;
+	m[0][0] =      cy; m[0][1] =               sy*sx1; m[0][2] =                sy*cx1;
+	m[1][0] =  sy*sx2; m[1][1] = cx2*cx1 - cy*sx2*sx1; m[1][2] = -cy*cx1*sx2 - cx2*sx1;
+	m[2][0] = -sy*cx2; m[2][1] = cx1*sx2 + cy*cx2*sx1; m[2][2] =  cy*cx2*cx1 - sx2*sx1;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 {
@@ -367,18 +379,20 @@ void ExtractEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 {
 	float cx2 = cos(x2); float cz = cos(z); float cx1 = cos(x1);
 	float sx2 = sin(x2); float sz = sin(z); float sx1 = sin(x1);
 
-	m[0][0] = cz;	 m[0][1] = -sz*cx1;			  m[0][2] = sz*sx1;
+	m[0][0] =     cz; m[0][1] =              -sz*cx1; m[0][2] =                sz*sx1;
 	m[1][0] = sz*cx2; m[1][1] = cz*cx2*cx1 - sx2*sx1; m[1][2] = -cx1*sx2 - cz*cx2*sx1;
-	m[2][0] = sz*sx2; m[2][1] = cz*cx1*sx2 + cx2*sx1; m[2][2] = cx2*cx1 - cz*sx2*sx1;
+	m[2][0] = sz*sx2; m[2][1] = cz*cx1*sx2 + cx2*sx1; m[2][2] =  cx2*cx1 - cz*sx2*sx1;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 {
@@ -407,18 +421,20 @@ void ExtractEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 {
 	float cy2 = cos(y2); float cx = cos(x); float cy1 = cos(y1);
 	float sy2 = sin(y2); float sx = sin(x); float sy1 = sin(y1);
 
-	m[0][0] = cy2*cy1 - cx*sy2*sy1;  m[0][1] = sx*sy2; m[0][2] = cx*cy1*sy2 + cy2*sy1;
-	m[1][0] = sx*sy1;				m[1][1] = cx;	 m[1][2] = -sx*cy1;
+	m[0][0] =  cy2*cy1 - cx*sy2*sy1; m[0][1] = sx*sy2; m[0][2] = cx*cy1*sy2 + cy2*sy1;
+	m[1][0] =                sx*sy1; m[1][1] =     cx; m[1][2] =              -sx*cy1;
 	m[2][0] = -cy1*sy2 - cx*cy2*sy1; m[2][1] = sx*cy2; m[2][2] = cx*cy2*cy1 - sy2*sy1;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 {
@@ -447,18 +463,20 @@ void ExtractEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 {
 	float cy2 = cos(y2); float cz = cos(z); float cy1 = cos(y1);
 	float sy2 = sin(y2); float sz = sin(z); float sy1 = sin(y1);
 
-	m[0][0] = cz*cy2*cy1 - sy2*sy1;  m[0][1] = -sz*cy2; m[0][2] = cy1*sy2 + cz*cy2*sy1;
-	m[1][0] = sz*cy1;				m[1][1] = cz;	  m[1][2] = sz*sy1;
-	m[2][0] = -cz*cy1*sy2 - cy2*sy1; m[2][1] = sz*sy2;  m[2][2] = cy2*cy1 - cz*sy2*sy1;
+	m[0][0] =  cz*cy2*cy1 - sy2*sy1; m[0][1] = -sz*cy2; m[0][2] = cy1*sy2 + cz*cy2*sy1;
+	m[1][0] =                sz*cy1; m[1][1] =      cz; m[1][2] =               sz*sy1;
+	m[2][0] = -cz*cy1*sy2 - cy2*sy1; m[2][1] =  sz*sy2; m[2][2] = cy2*cy1 - cz*sy2*sy1;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 {
@@ -487,18 +505,20 @@ void ExtractEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 {
 	float cz2 = cos(z2); float cx = cos(x); float cz1 = cos(z1);
 	float sz2 = sin(z2); float sx = sin(x); float sz1 = sin(z1);
 
-	m[0][0] = cz2*cz1 - cx*sz2*sz1; m[0][1] = -cx*cz1*sz2 - cz2*sz1; m[0][2] = sx*sz2;
-	m[1][0] = cz1*sz2 + cx*cz2*sz1; m[1][1] = cx*cz2*cz1 - sz2*sz1;  m[1][2] = -sx*cz2;
-	m[2][0] = sx*sz1;			   m[2][1] = sx*cz1;				m[2][2] = cx;
+	m[0][0] = cz2*cz1 - cx*sz2*sz1; m[0][1] = -cx*cz1*sz2 - cz2*sz1; m[0][2] =  sx*sz2;
+	m[1][0] = cz1*sz2 + cx*cz2*sz1; m[1][1] =  cx*cz2*cz1 - sz2*sz1; m[1][2] = -sx*cz2;
+	m[2][0] =               sx*sz1; m[2][1] =                sx*cz1; m[2][2] =      cx;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 {
@@ -527,6 +547,7 @@ void ExtractEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 	}
 }
 
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
 template<typename Matrix>
 void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 {
@@ -534,11 +555,12 @@ void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 	float sz2 = sin(z2); float sy = sin(y); float sz1 = sin(z1);
 
 	m[0][0] = cy*cz2*cz1 - sz2*sz1; m[0][1] = -cz1*sz2 - cy*cz2*sz1; m[0][2] = sy*cz2;
-	m[1][0] = cy*cz1*sz2;		   m[1][1] = cz2*cz1 - cy*sz2*sz1;  m[1][2] = sy*sz2;
-	m[2][0] = -sy*cz1;			  m[2][1] = sy*sz1;				m[2][2] = cy;
+	m[1][0] =           cy*cz1*sz2; m[1][1] =  cz2*cz1 - cy*sz2*sz1; m[1][2] = sy*sz2;
+	m[2][0] =              -sy*cz1; m[2][1] =                sy*sz1; m[2][2] =     cy;
 }
 
-// The matrix m must be orthonormal.
+/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/// The matrix m must be orthonormal.
 template<typename Matrix>
 void ExtractEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 {
@@ -756,9 +778,9 @@ void SetMatrixRotatePart(Matrix &m, const Quat &q)
 
 	assume(q.IsNormalized());
 	const float x = q.x; const float y = q.y; const float z = q.z; const float w = q.w;
-	m[0][0] = 1 - 2*(y*y + z*z); m[0][1] =	 2*(x*y - z*w); m[0][2] =	 2*(x*z + y*w);
-	m[1][0] =	 2*(x*y + z*w); m[1][1] = 1 - 2*(x*x + z*z); m[1][2] =	 2*(y*z - x*w);
-	m[2][0] =	 2*(x*z - y*w); m[2][1] =	 2*(y*z + x*w); m[2][2] = 1 - 2*(x*x + y*y);
+	m[0][0] = 1 - 2*(y*y + z*z); m[0][1] =     2*(x*y - z*w); m[0][2] =     2*(x*z + y*w);
+	m[1][0] =     2*(x*y + z*w); m[1][1] = 1 - 2*(x*x + z*z); m[1][2] =     2*(y*z - x*w);
+	m[2][0] =     2*(x*z - y*w); m[2][1] =     2*(y*z + x*w); m[2][2] = 1 - 2*(x*x + y*y);
 }
 
 /// See e.g. http://en.wikipedia.org/wiki/Transformation_matrix#reflection
@@ -766,9 +788,9 @@ template<typename Matrix>
 void SetMatrix3x3LinearPlaneMirror(Matrix &m, float x, float y, float z)
 {
 	assume(float3(x,y,z).IsNormalized());
-	m[0][0] = 1.f - 2.f*x*x; m[0][1] =	  -2.f*y*x; m[0][2] =	  -2.f*z*x;
-	m[1][0] =	  -2.f*x*y; m[1][1] = 1.f - 2.f*y*y; m[1][2] =	  -2.f*y*z;
-	m[2][0] =	  -2.f*x*z; m[2][1] =	  -2.f*y*z; m[2][2] = 1.f - 2.f*z*z;
+	m[0][0] = 1.f - 2.f*x*x; m[0][1] =      -2.f*y*x; m[0][2] =      -2.f*z*x;
+	m[1][0] =      -2.f*x*y; m[1][1] = 1.f - 2.f*y*y; m[1][2] =      -2.f*y*z;
+	m[2][0] =      -2.f*x*z; m[2][1] =      -2.f*y*z; m[2][2] = 1.f - 2.f*z*z;
 }
 
 template<typename Matrix>
@@ -784,9 +806,9 @@ template<typename Matrix>
 void SetMatrix3x3LinearPlaneProject(Matrix &m, float x, float y, float z)
 {
 	assume(float3(x,y,z).IsNormalized());
-	m[0][0] = 1.f - x*x; m[0][1] =	  -y*x; m[0][2] =	  -z*x;
-	m[1][0] =	  -x*y; m[1][1] = 1.f - y*y; m[1][2] =	  -y*z;
-	m[2][0] =	  -x*z; m[2][1] =	  -y*z; m[2][2] = 1.f - z*z;
+	m[0][0] = 1.f - x*x; m[0][1] =      -y*x; m[0][2] =      -z*x;
+	m[1][0] =      -x*y; m[1][1] = 1.f - y*y; m[1][2] =      -y*z;
+	m[2][0] =      -x*z; m[2][1] =      -y*z; m[2][2] = 1.f - z*z;
 }
 
 template<typename Matrix>

@@ -317,9 +317,9 @@ template<typename M>
 void SetQuatFrom(Quat &q, const M &m)
 {
 	// The rotation matrix is of form: (Eric Lengyel's Mathematics for 3D Game Programming and Computer Graphics 2nd ed., p. 92)
-	// 1 - 2y^2 - 2z^2	 2xy - 2wz		 2xz + 2wy
-	//	2xy + 2wz	 1 - 2x^2 - 2z^2	  2yz - 2wx
-	//	2xz - 2wy		2yz + 2wx	  1 - 2x^2 - 2y^2
+	// 1 - 2y^2 - 2z^2        2xy - 2wz            2xz + 2wy
+	//    2xy + 2wz        1 - 2x^2 - 2z^2         2yz - 2wx
+	//    2xz - 2wy           2yz + 2wx         1 - 2x^2 - 2y^2
 
 	float r = m[0][0] + m[1][1] + m[2][2]; // The element w is easiest picked up as a sum of the diagonals.
 	// Above, r == 3 - 4(x^2+y^2+z^2) == 4(1-x^2-y^2-z^2) - 1 == 4*w^2 - 1. 
@@ -332,7 +332,7 @@ void SetQuatFrom(Quat &q, const M &m)
 		q.z = (m[1][0] - m[0][1]) * inv4w;
 	}
 	else if (m[0][0] > m[1][1] && m[0][0] > m[2][2]) // If |q.x| is larger than |q.y| and |q.z|, extract it first. This gives
-	{												// best stability, and we know below x can't be zero.
+	{                                                // best stability, and we know below x can't be zero.
 		q.x = sqrtf(1.f + m[0][0] - m[1][1] - m[2][2]) * 0.5f; // We have two choices for the sign of x, arbitrarily pick the positive.
 		const float x4 = 1.f / (4.f * q.x);
 		q.y = (m[0][1] + m[1][0]) * x4;
@@ -590,9 +590,9 @@ Quat Quat::operator /(float scalar) const
 Quat Quat::operator *(const Quat &r) const
 {
 	return Quat(w*r.x + x*r.w + y*r.z - z*r.y,
-				w*r.y - x*r.z + y*r.w + z*r.x,
-				w*r.z + x*r.y - y*r.x + z*r.w,
-				w*r.w - x*r.x - y*r.y - z*r.z);
+	            w*r.y - x*r.z + y*r.w + z*r.x,
+	            w*r.z + x*r.y - y*r.x + z*r.w,
+	            w*r.w - x*r.x - y*r.y - z*r.z);
 }
 
 Quat Quat::operator /(const Quat &rhs) const
