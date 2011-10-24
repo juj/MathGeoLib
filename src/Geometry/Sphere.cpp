@@ -17,9 +17,11 @@
 	@brief Implementation for the Sphere geometry object. */
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
+#include <vector>
+#else
+#include "Container/Array.h"
 #endif
 #include "Math/MathFunc.h"
-#include "Container/Array.h"
 #include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Capsule.h"
@@ -569,8 +571,11 @@ int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int nu
 #endif
 	assume(this->r > 0.f);
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+	std::vector<Triangle> temp;
+#else
 	Array<Triangle> temp;
-
+#endif
 	// Start subdividing from a tetrahedron.
 	float3 xp(r,0,0);
 	float3 xn(-r,0,0);
