@@ -461,12 +461,33 @@ public:
 	/// @note This function erases the previous top-left 3x3 part of this matrix (any previous rotation, scaling and shearing, etc.). Translation is unaffected.
 	void SetRotatePart(const float3x3 &rotation) { Set3x3Part(rotation); }
 
-	/// Produces a matrix that transforms one coordinate frame orientation to another.
-	/** This function generates a local->world transformation, which rotates the local forward direction to orient towards
-		the direction specified by targetDirection. Second, the local up axis is rotated to point as close towards the worldUp
-		axis as possible, while preserving an orthonormal coordinate frame.
-		@param rightHanded If true, the third basis vector will be equal to worldUp x targetDirection (right-handed). 
-						   Otherwise, the vector targetDirection x worldUp will be used (left-handed). */
+	/// Creates a LookAt matrix.
+	/** A LookAt matrix is a rotation matrix that orients an object to face towards a specified target direction.
+		@param localForward Specifies the forward direction in the local space of the object. This is the direction
+			the model is facing at in its own local/object space, often +X (1,0,0), +Y (0,1,0) or +Z (0,0,1). The
+			vector to pass in here depends on the conventions you or your modeling software is using, and it is best
+			pick one convention for all your objects, and be consistent.			
+			This input parameter must be a normalized vector.
+		@param targetDirection Specifies the desired world space direction the object should look at. This function
+			will compute a rotation matrix which will rotate the localForward vector to orient towards this targetDirection
+			vector. This input parameter must be a normalized vector.
+		@param localUp Specifies the up direction in the local space of the object. This is the up direction the model
+			was authored in, often +Y (0,1,0) or +Z (0,0,1). The vector to pass in here depends on the conventions you
+			or your modeling software is using, and it is best to pick one convention for all your objects, and be
+			consistent. This input parameter must be a normalized vector. This vector must be perpendicular to the
+			vector localForward, i.e. localForward.Dot(localUp) == 0.
+		@param worldUp Specifies the global up direction of the scene in world space. Simply rotating one vector to
+			coincide with another (localForward->targetDirection) would cause the up direction of the resulting
+			orientation to drift (e.g. the model could be looking at its target its head slanted sideways). To keep 
+			the up direction straight, this function orients the localUp direction of the model to point towards the 
+			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be 
+			collinear, but they do not need to be perpendicular either.
+		@return A matrix that maps the given local space forward direction vector to point towards the given target
+			direction, and the given local up direction towards the given target world up direction. The returned
+			matrix M is orthonormal with a determinant of +1. For the matrix M it holds that
+			M * localForward = targetDirection, and M * localUp lies in the plane spanned by the vectors targetDirection
+			and worldUp.
+		@see RotateFromTo(). */
 	static float4x4 LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
 	/// Sets this float4x4 to represent the same transformation as the given float3x3.

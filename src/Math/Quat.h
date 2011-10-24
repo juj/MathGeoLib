@@ -171,11 +171,32 @@ public:
 	///	   SetFromAxisAngle to define this Quat using a rotation axis and an angle.
 	void Set(float x, float y, float z, float w);
 
-	/// Creates a lookat quaternion.
-	/// Creates a rotation which orients the local (pre-transformed) axis specified by localForward 
-	/// towards targetDirection. Then tries to orient the localUp axis to point towards the
-	/// worldUp axis.
-	/// The given direction vectors are assumed to be normalized.
+	/// Creates a LookAt quaternion.
+	/** A LookAt quaternion is a quaternion that orients an object to face towards a specified target direction.
+		@param localForward Specifies the forward direction in the local space of the object. This is the direction
+			the model is facing at in its own local/object space, often +X (1,0,0), +Y (0,1,0) or +Z (0,0,1). The
+			vector to pass in here depends on the conventions you or your modeling software is using, and it is best
+			pick one convention for all your objects, and be consistent.			
+			This input parameter must be a normalized vector.
+		@param targetDirection Specifies the desired world space direction the object should look at. This function
+			will compute a quaternion which will rotate the localForward vector to orient towards this targetDirection
+			vector. This input parameter must be a normalized vector.
+		@param localUp Specifies the up direction in the local space of the object. This is the up direction the model
+			was authored in, often +Y (0,1,0) or +Z (0,0,1). The vector to pass in here depends on the conventions you
+			or your modeling software is using, and it is best to pick one convention for all your objects, and be
+			consistent. This input parameter must be a normalized vector. This vector must be perpendicular to the
+			vector localForward, i.e. localForward.Dot(localUp) == 0.
+		@param worldUp Specifies the global up direction of the scene in world space. Simply rotating one vector to
+			coincide with another (localForward->targetDirection) would cause the up direction of the resulting
+			orientation to drift (e.g. the model could be looking at its target its head slanted sideways). To keep 
+			the up direction straight, this function orients the localUp direction of the model to point towards the 
+			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be 
+			collinear, but they do not need to be perpendicular either.
+		@return A quaternion that maps the given local space forward direction vector to point towards the given target
+			direction, and the given local up direction towards the given target world up direction. For the returned 
+			quaternion Q it holds that M * localForward = targetDirection, and M * localUp lies in the plane spanned 
+			by the vectors targetDirection and worldUp.
+		@see RotateFromTo(). */
 	static Quat LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
 	/// Creates a new quaternion that rotates about the positive X axis by the given angle.

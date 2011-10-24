@@ -32,12 +32,12 @@
 MATH_BEGIN_NAMESPACE
 
 float3x3::float3x3(float _00, float _01, float _02,
-		 float _10, float _11, float _12,
-		 float _20, float _21, float _22)
+                   float _10, float _11, float _12,
+                   float _20, float _21, float _22)
 {
 	Set(_00, _01, _02,
-		_10, _11, _12,
-		_20, _21, _22);
+	    _10, _11, _12,
+	    _20, _21, _22);
 }
 
 float3x3::float3x3(const float3 &col0, const float3 &col1, const float3 &col2)
@@ -251,26 +251,26 @@ float3x3 float3x3::ShearX(float yFactor, float zFactor)
 	assume(isfinite(yFactor));
 	assume(isfinite(zFactor));
 	return float3x3(1.f, yFactor, zFactor,
-					0.f, 1.f, 0.f,
-					0.f, 0.f, 1.f);
+	                0.f,     1.f,     0.f,
+	                0.f,     0.f,     1.f);
 }
 
 float3x3 float3x3::ShearY(float xFactor, float zFactor)
 {
 	assume(isfinite(xFactor));
 	assume(isfinite(zFactor));
-	return float3x3(1.f, 0.f, 0.f,
-					xFactor, 1.f, zFactor,
-					0.f, 0.f, 1.f);
+	return float3x3(1.f,     0.f,     0.f,
+	                xFactor, 1.f, zFactor,
+	                0.f,     0.f,     1.f);
 }
 
 float3x3 float3x3::ShearZ(float xFactor, float yFactor)
 {
 	assume(isfinite(xFactor));
 	assume(isfinite(yFactor));
-	return float3x3(1.f, 0.f, 0.f,
-					0.f, 1.f, 0.f,
-					xFactor, yFactor, 1.f);
+	return float3x3(1.f,         0.f, 0.f,
+	                0.f,         1.f, 0.f,
+	                xFactor, yFactor, 1.f);
 }
 
 float3x3 float3x3::Mirror(const Plane &p)
@@ -513,8 +513,8 @@ void float3x3::SetCol(int column, const float *data)
 }
 
 void float3x3::Set(float _00, float _01, float _02,
-				   float _10, float _11, float _12,
-				   float _20, float _21, float _22)
+                   float _10, float _11, float _12,
+                   float _20, float _21, float _22)
 {
 	v[0][0] = _00; v[0][1] = _01; v[0][2] = _02;
 	v[1][0] = _10; v[1][1] = _11; v[1][2] = _12;
@@ -550,8 +550,8 @@ void float3x3::Set(int row, int col, float value)
 void float3x3::SetIdentity()
 {
 	Set(1,0,0,
-		0,1,0,
-		0,0,1);
+	    0,1,0,
+	    0,0,1);
 }
 
 void float3x3::SwapColumns(int col1, int col2)
@@ -609,25 +609,62 @@ void float3x3::SetRotatePart(const Quat &q)
 	SetMatrixRotatePart(*this, q);
 }
 
-float3x3 float3x3::LookAt(const float3 &localForwardDir, const float3 &targetForwardDir, const float3 &localUp, const float3 &worldUp)
+float3x3 float3x3::LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp)
 {
-	assume(localForwardDir.IsNormalized());
-	assume(targetForwardDir.IsNormalized());
+	// The user must have inputted proper normalized input direction vectors.
+	assume(localForward.IsNormalized());
+	assume(targetDirection.IsNormalized());
 	assume(localUp.IsNormalized());
 	assume(worldUp.IsNormalized());
-	assume(localForwardDir.IsPerpendicular(localUp));
 
-	float3 localRight = localUp.Cross(localForwardDir).Normalized();
+	// In the local space, the forward and up directions must be perpendicular to be well-formed.
+	assume(localForward.IsPerpendicular(localUp));
 
-	float3 worldRight = worldUp.Cross(targetForwardDir).Normalized();
-	float3 perpWorldUp = targetForwardDir.Cross(worldRight).Normalized();
+	// Generate the third basis vector in the local space.
+	float3 localRight = localUp.Cross(localForward).Normalized();
 
-	float3x3 m1(worldRight, perpWorldUp, targetForwardDir);
+	// A. Now we have an orthonormal linear basis { localRight, localUp, localForward } for the object local space.
+
+	// Generate the third basis vector for the world space.
+	float3 worldRight = worldUp.Cross(targetDirection).Normalized();
+	// Since the input worldUp vector is not necessarily perpendicular to the targetDirection vector, 
+	// we need to compute the real world space up vector that the "head" of the object will point 
+	// towards when the model is looking towards the desired target direction.
+	float3 perpWorldUp = targetDirection.Cross(worldRight).Normalized();
+	
+	// B. Now we have an orthonormal linear basis { worldRight, perpWorldUp, targetDirection } for the desired target orientation.
+
+	// We want to build a matrix M that performs the following mapping:
+	// 1. localRight must be mapped to worldRight.        (M * localRight = worldRight)
+	// 2. localUp must be mapped to perpWorldUp.          (M * localUp = perpWorldUp)
+	// 3. localForward must be mapped to targetDirection. (M * localForward = targetDirection)
+	// i.e. we want to map the basis A to basis B.
+
+	// This matrix M exists, and it is an orthonormal rotation matrix with a determinant of +1, because 
+	// the bases A and B are orthonormal with the same handedness.
+
+	// Below, use the notation that (a,b,c) is a 3x3 matrix with a as its first column, b second, and c third.
+	
+	// By algebraic manipulation, we can rewrite conditions 1, 2 and 3 in a matrix form:
+	//        M * (localRight, localUp, localForward) = (worldRight, perpWorldUp, targetDirection)
+	// or     M = (worldRight, perpWorldUp, targetDirection) * (localRight, localUp, localForward)^{-1}.
+	// or     M = m1 * m2, where
+
+	// m1 equals (worldRight, perpWorldUp, targetDirection):
+	float3x3 m1(worldRight, perpWorldUp, targetDirection);
+
+	// and m2 equals (localRight, localUp, localForward)^{-1}:
 	float3x3 m2;
 	m2.SetRow(0, localRight);
 	m2.SetRow(1, localUp);
-	m2.SetRow(2, localForwardDir);
+	m2.SetRow(2, localForward);
+	// Above we used the shortcut that for an orthonormal matrix M, M^{-1} = M^T. So set the rows
+	// and not the columns to directly produce the transpose, i.e. the inverse of (localRight, localUp, localForward).
+
+	// Compute final M.
 	m2 = m1 * m2;
+
+	// And fix any numeric stability issues by re-orthonormalizing the result.
 	m2.Orthonormalize(0, 1, 2);
 	return m2;
 }
@@ -670,7 +707,7 @@ float2x2 float3x3::SubMatrix(int i, int j) const
 	int c1 = SKIPNUM(1, j);
 
 	return float2x2(v[r0][c0], v[r0][c1],
-					v[r1][c0], v[r1][c1]);
+	                v[r1][c0], v[r1][c1]);
 }
 
 float float3x3::Minor(int i, int j) const
@@ -868,23 +905,23 @@ float3 float3x3::Transform(const float3 &vector) const
 float3 float3x3::TransformLeft(const float3 &vector) const
 {
 	return float3(DOT3STRIDED(vector, ptr(), 3),
-				  DOT3STRIDED(vector, ptr()+1, 3),
-				  DOT3STRIDED(vector, ptr()+2, 3));
+	              DOT3STRIDED(vector, ptr()+1, 3),
+	              DOT3STRIDED(vector, ptr()+2, 3));
 }
 
 float3 float3x3::Transform(float x, float y, float z) const
 {
 	return float3(DOT3_xyz(Row(0), x,y,z),
-				  DOT3_xyz(Row(1), x,y,z),
-				  DOT3_xyz(Row(2), x,y,z));
+	             DOT3_xyz(Row(1), x,y,z),
+	             DOT3_xyz(Row(2), x,y,z));
 }
 
 float4 float3x3::Transform(const float4 &vector) const
 {
 	return float4(DOT3(Row(0), vector),
-				  DOT3(Row(1), vector),
-				  DOT3(Row(2), vector),
-				  vector.w);
+	              DOT3(Row(1), vector),
+	              DOT3(Row(2), vector),
+	              vector.w);
 }
 
 void float3x3::BatchTransform(float3 *pointArray, int numPoints) const
@@ -972,16 +1009,16 @@ float3x3 float3x3::operator *(const Quat &rhs) const
 float3 float3x3::operator *(const float3 &rhs) const
 {
 	return float3(DOT3(v[0], rhs),
-				  DOT3(v[1], rhs),
-				  DOT3(v[2], rhs));
+	              DOT3(v[1], rhs),
+	              DOT3(v[2], rhs));
 }
 
 float4 float3x3::operator *(const float4 &rhs) const
 {
 	return float4(DOT3(v[0], rhs),
-				  DOT3(v[1], rhs),
-				  DOT3(v[2], rhs),
-				  rhs.w);
+	              DOT3(v[1], rhs),
+	              DOT3(v[2], rhs),
+	              rhs.w);
 }
 
 float3x3 float3x3::operator *(float scalar) const
@@ -1085,21 +1122,21 @@ bool float3x3::IsIdentity(float epsilon) const
 bool float3x3::IsLowerTriangular(float epsilon) const
 {
 	return EqualAbs(v[0][1], 0.f, epsilon)
-		&& EqualAbs(v[0][2], 0.f, epsilon)
-		&& EqualAbs(v[0][3], 0.f, epsilon)
-		&& EqualAbs(v[1][2], 0.f, epsilon)
-		&& EqualAbs(v[1][3], 0.f, epsilon)
-		&& EqualAbs(v[2][3], 0.f, epsilon);
+	    && EqualAbs(v[0][2], 0.f, epsilon)
+	    && EqualAbs(v[0][3], 0.f, epsilon)
+	    && EqualAbs(v[1][2], 0.f, epsilon)
+	    && EqualAbs(v[1][3], 0.f, epsilon)
+	    && EqualAbs(v[2][3], 0.f, epsilon);
 }
 
 bool float3x3::IsUpperTriangular(float epsilon) const
 {
 	return EqualAbs(v[1][0], 0.f, epsilon)
-		&& EqualAbs(v[2][0], 0.f, epsilon)
-		&& EqualAbs(v[3][0], 0.f, epsilon)
-		&& EqualAbs(v[2][1], 0.f, epsilon)
-		&& EqualAbs(v[3][1], 0.f, epsilon)
-		&& EqualAbs(v[3][2], 0.f, epsilon);
+	    && EqualAbs(v[2][0], 0.f, epsilon)
+	    && EqualAbs(v[3][0], 0.f, epsilon)
+	    && EqualAbs(v[2][1], 0.f, epsilon)
+	    && EqualAbs(v[3][1], 0.f, epsilon)
+	    && EqualAbs(v[3][2], 0.f, epsilon);
 }
 
 bool float3x3::IsInvertible(float epsilon) const
@@ -1147,15 +1184,15 @@ bool float3x3::HasUniformScale(float epsilon) const
 bool float3x3::IsRowOrthogonal(float epsilon) const
 {
 	return Row(0).IsPerpendicular(Row(1), epsilon)
-		&& Row(0).IsPerpendicular(Row(2), epsilon)
-		&& Row(1).IsPerpendicular(Row(2), epsilon);
+	    && Row(0).IsPerpendicular(Row(2), epsilon)
+	    && Row(1).IsPerpendicular(Row(2), epsilon);
 }
 
 bool float3x3::IsColOrthogonal(float epsilon) const
 {
 	return Col(0).IsPerpendicular(Col(1), epsilon)
-		&& Col(0).IsPerpendicular(Col(2), epsilon)
-		&& Col(1).IsPerpendicular(Col(2), epsilon);
+	    && Col(0).IsPerpendicular(Col(2), epsilon)
+	    && Col(1).IsPerpendicular(Col(2), epsilon);
 }
 
 bool float3x3::IsOrthonormal(float epsilon) const
