@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Algorithm\Random\LCG.cpp" />
+    <ClCompile Include="..\src\Geometry\AABB.cpp" />
+    <ClCompile Include="..\src\Geometry\Capsule.cpp" />
+    <ClCompile Include="..\src\Geometry\Circle.cpp" />
+    <ClCompile Include="..\src\Geometry\Frustum.cpp" />
+    <ClCompile Include="..\src\Geometry\Line.cpp" />
+    <ClCompile Include="..\src\Geometry\LineSegment.cpp" />
+    <ClCompile Include="..\src\Geometry\OBB.cpp" />
+    <ClCompile Include="..\src\Geometry\Plane.cpp" />
+    <ClCompile Include="..\src\Geometry\Polygon.cpp" />
+    <ClCompile Include="..\src\Geometry\Polyhedron.cpp" />
+    <ClCompile Include="..\src\Geometry\Ray.cpp" />
+    <ClCompile Include="..\src\Geometry\Sphere.cpp" />
+    <ClCompile Include="..\src\Geometry\Triangle.cpp" />
+    <ClCompile Include="..\src\Math\BitOps.cpp" />
+    <ClCompile Include="..\src\Math\float2.cpp" />
+    <ClCompile Include="..\src\Math\float3.cpp" />
+    <ClCompile Include="..\src\Math\float3x3.cpp" />
+    <ClCompile Include="..\src\Math\float3x4.cpp" />
+    <ClCompile Include="..\src\Math\float4.cpp" />
+    <ClCompile Include="..\src\Math\float4x4.cpp" />
+    <ClCompile Include="..\src\Math\MathFunc.cpp" />
+    <ClCompile Include="..\src\Math\MathOps.cpp" />
+    <ClCompile Include="..\src\Math\Polynomial.cpp" />
+    <ClCompile Include="..\src\Math\Quat.cpp" />
+    <ClCompile Include="..\src\Math\TransformOps.cpp" />
+    <ClCompile Include="..\src\Time\UnixClock.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\Time\W32Clock.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Algorithm\Random\LCG.h" />
+    <ClInclude Include="..\src\Geometry\AABB.h" />
+    <ClInclude Include="..\src\Geometry\Capsule.h" />
+    <ClInclude Include="..\src\Geometry\Circle.h" />
+    <ClInclude Include="..\src\Geometry\Frustum.h" />
+    <ClInclude Include="..\src\Geometry\HitInfo.h" />
+    <ClInclude Include="..\src\Geometry\Line.h" />
+    <ClInclude Include="..\src\Geometry\LineSegment.h" />
+    <ClInclude Include="..\src\Geometry\OBB.h" />
+    <ClInclude Include="..\src\Geometry\Plane.h" />
+    <ClInclude Include="..\src\Geometry\Polygon.h" />
+    <ClInclude Include="..\src\Geometry\Polyhedron.h" />
+    <ClInclude Include="..\src\Geometry\Ray.h" />
+    <ClInclude Include="..\src\Geometry\Sphere.h" />
+    <ClInclude Include="..\src\Geometry\Triangle.h" />
+    <ClInclude Include="..\src\Math\BitOps.h" />
+    <ClInclude Include="..\src\Math\Complex.h" />
+    <ClInclude Include="..\src\Math\CoordinateAxisConvention.h" />
+    <ClInclude Include="..\src\Math\FixedPoint.h" />
+    <ClInclude Include="..\src\Math\float2.h" />
+    <ClInclude Include="..\src\Math\float3.h" />
+    <ClInclude Include="..\src\Math\float3x3.h" />
+    <ClInclude Include="..\src\Math\float3x4.h" />
+    <ClInclude Include="..\src\Math\float4.h" />
+    <ClInclude Include="..\src\Math\float4x4.h" />
+    <ClInclude Include="..\src\Math\FloatCmp.h" />
+    <ClInclude Include="..\src\Math\MathConstants.h" />
+    <ClInclude Include="..\src\Math\MathFunc.h" />
+    <ClInclude Include="..\src\Math\MathFwd.h" />
+    <ClInclude Include="..\src\Math\MathNamespace.h" />
+    <ClInclude Include="..\src\Math\MatrixProxy.h" />
+    <ClInclude Include="..\src\Math\Polynomial.h" />
+    <ClInclude Include="..\src\Math\Quat.h" />
+    <ClInclude Include="..\src\Math\Rect.h" />
+    <ClInclude Include="..\src\Math\TransformOps.h" />
+    <ClInclude Include="..\src\Time\Clock.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\Math\Matrix.inl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5C786B4A-5F5D-4D7A-AA99-00875BBEFB13}</ProjectGuid>
+    <RootNamespace>MathGeoLib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;NDEBUG;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
