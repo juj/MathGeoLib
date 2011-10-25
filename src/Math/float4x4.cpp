@@ -1020,7 +1020,18 @@ void float4x4::SetRotatePart(const Quat &q)
 float4x4 float4x4::LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp)
 {
 	float4x4 m;
-	m.Float3x4Part() = float3x4::LookAt(localForward, targetDirection, localUp, worldUp);
+	m.SetRotatePart(float3x3::LookAt(localForward, targetDirection, localUp, worldUp));
+	m.SetTranslatePart(0,0,0);
+	m.SetRow(3, 0,0,0,1);
+	return m;
+}
+
+float4x4 float4x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward, 
+                          const float3 &localUp, const float3 &worldUp)
+{
+	float4x4 m;
+	m.SetRotatePart(float3x3::LookAt(localForward, (targetPos-eyePos).Normalized(), localUp, worldUp));
+	m.SetTranslatePart(eyePos);
 	m.SetRow(3, 0,0,0,1);
 	return m;
 }

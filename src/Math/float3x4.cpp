@@ -758,7 +758,16 @@ float3x4 float3x4::LookAt(const float3 &localForwardDir, const float3 &targetFor
 {
 	float3x4 m;
 	m.SetRotatePart(float3x3::LookAt(localForwardDir, targetForwardDir, localUp, worldUp));
-	m.SetCol(3, 0,0,1);
+	m.SetTranslatePart(0,0,0);
+	return m;
+	}
+
+float3x4 float3x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward, 
+                          const float3 &localUp, const float3 &worldUp)
+{
+	float3x4 m;
+	m.SetRotatePart(float3x3::LookAt(localForward, (targetPos-eyePos).Normalized(), localUp, worldUp));
+	m.SetTranslatePart(eyePos);
 	return m;
 }
 
