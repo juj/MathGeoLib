@@ -252,7 +252,7 @@ public:
 	bool Intersects(const Capsule &capsule) const;
 
 	/// A helper function used in line-triangle tests.
-	static bool Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
+	static bool IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 		const float3 &v0, const float3 &v1, const float3 &v2,
 		float &u, float &v, float &t);
 

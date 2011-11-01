@@ -39,6 +39,8 @@
 #define FLOAT_INF std::numeric_limits<float>::infinity()
 #define FLOAT_MAX std::numeric_limits<float>::max()
 #else
+#include <math.h>
+#include <float.h>
 #define FLOAT_MAX FLT_MAX
 #define FLOAT_NAN NAN
 #define FLOAT_INF INFINITY

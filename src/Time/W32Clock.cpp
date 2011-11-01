@@ -15,6 +15,8 @@
 /** @file W32Clock.cpp
 	@brief */
 
+#ifdef WIN32
+
 #include <cassert>
 
 #include "Time/Clock.h"
@@ -129,3 +131,5 @@ tick_t Clock::TicksPerSec()
 {
 	return ddwTimerFrequency.QuadPart;
 }
+
+#endif
