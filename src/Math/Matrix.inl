@@ -23,9 +23,10 @@
 MATH_BEGIN_NAMESPACE
 
 /** Sets the top-left 3x3 area of the matrix to the rotation matrix about the X-axis. Elements
-	outside the top-left 3x3 area are ignored.
+	outside the top-left 3x3 area are ignored. This matrix rotates counterclockwise if multiplied
+	in the order M*v, and clockwise if rotated in the order v*M.
 	@param m The matrix to store the result.
-	@param angle The rotation angle. */
+	@param angle The rotation angle in radians. */
 template<typename Matrix>
 void Set3x3PartRotateX(Matrix &m, float angle)
 {
@@ -44,9 +45,10 @@ void Set3x3PartRotateX(Matrix &m, float angle)
 }
 
 /** Sets the top-left 3x3 area of the matrix to the rotation matrix about the Y-axis. Elements
-	outside the top-left 3x3 area are ignored.
+	outside the top-left 3x3 area are ignored. This matrix rotates counterclockwise if multiplied
+	in the order M*v, and clockwise if rotated in the order v*M.
 	@param m The matrix to store the result.
-	@param angle The rotation angle. */
+	@param angle The rotation angle in radians. */
 template<typename Matrix>
 void Set3x3PartRotateY(Matrix &m, float angle)
 {
@@ -65,9 +67,10 @@ void Set3x3PartRotateY(Matrix &m, float angle)
 }
 
 /** Sets the top-left 3x3 area of the matrix to the rotation matrix about the Z-axis. Elements
-	outside the top-left 3x3 area are ignored.
+	outside the top-left 3x3 area are ignored. This matrix rotates counterclockwise if multiplied
+	in the order M*v, and clockwise if rotated in the order v*M.
 	@param m The matrix to store the result.
-	@param angle The rotation angle. */
+	@param angle The rotation angle in radians. */
 template<typename Matrix>
 void Set3x3PartRotateZ(Matrix &m, float angle)
 {
@@ -85,7 +88,10 @@ void Set3x3PartRotateZ(Matrix &m, float angle)
 	m[2][0] =  0.f; m[2][1] =   0.f; m[2][2] = 1.f;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_x * R_y * R_z, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x, y and z are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerXYZ(Matrix &m, float x, float y, float z)
 {
@@ -97,8 +103,11 @@ void Set3x3PartRotateEulerXYZ(Matrix &m, float x, float y, float z)
 	m[2][0] = -cx*cz*sy + sx*sz; m[2][1] = cz*sx + cx*sy*sz; m[2][2] =  cx*cy;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_x * R_y * R_z (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x, y and z, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerXYZ(Matrix &m, float &x, float &y, float &z)
 {
@@ -127,7 +136,10 @@ void ExtractEulerXYZ(Matrix &m, float &x, float &y, float &z)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_x * R_z * R_y, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x, y and z are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerXZY(Matrix &m, float &x, float &z, float &y)
 {
@@ -139,8 +151,11 @@ void Set3x3PartRotateEulerXZY(Matrix &m, float &x, float &z, float &y)
 	m[2][0] = -cx*sy + cy*sx*sz; m[2][1] = cz*sx; m[2][2] =  cx*cy + sx*sy*sz;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_x * R_z * R_y (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x, y and z, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerXZY(Matrix &m, float &x, float &z, float &y)
 {
@@ -169,7 +184,10 @@ void ExtractEulerXZY(Matrix &m, float &x, float &z, float &y)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_y * R_x * R_z, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x, y and z are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerYXZ(Matrix &m, float &y, float &x, float &z)
 {
@@ -181,8 +199,11 @@ void Set3x3PartRotateEulerYXZ(Matrix &m, float &y, float &x, float &z)
 	m[2][0] = -cz*sy + cy*sx*sz; m[2][1] = cy*cz*sx + sy*sz; m[2][2] = cx*cy;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_y * R_x * R_z (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x, y and z, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerYXZ(Matrix &m, float &y, float &x, float &z)
 {
@@ -211,7 +232,10 @@ void ExtractEulerYXZ(Matrix &m, float &y, float &x, float &z)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_y * R_z * R_x, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x, y and z are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerYZX(Matrix &m, float &y, float &z, float &x)
 {
@@ -223,8 +247,11 @@ void Set3x3PartRotateEulerYZX(Matrix &m, float &y, float &z, float &x)
 	m[2][0] = -cx*sy; m[2][1] = cy*sx + cx*sy*sz; m[2][2] = cx*cy - sx*sy*sz;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_y * R_z * R_x (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x, y and z, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 {
@@ -253,7 +280,10 @@ void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_z * R_x * R_y, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x, y and z are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerZXY(Matrix &m, float &z, float &x, float &y)
 {
@@ -265,10 +295,13 @@ void Set3x3PartRotateEulerZXY(Matrix &m, float &z, float &x, float &y)
 	m[2][0] =           -cx*sy; m[2][1] =     sx; m[2][2] =             cx*cy;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_z * R_x * R_y (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x, y and z, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
-void ExtractEulerZXY(Matrix &m, float &z, float &x, float &y)
+void ExtractEulerZXY(const Matrix &m, float &z, float &x, float &y)
 {
 	if (m[2][1] < 1.f)
 	{
@@ -295,7 +328,10 @@ void ExtractEulerZXY(Matrix &m, float &z, float &x, float &y)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_z * R_y * R_x, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x, y and z are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerZYX(Matrix &m, float &z, float &y, float &x)
 {
@@ -307,8 +343,11 @@ void Set3x3PartRotateEulerZYX(Matrix &m, float &z, float &y, float &x)
 	m[2][0] =   -sy; m[2][1] =            cy*sx; m[2][2] =             cx*cy;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_z * R_y * R_x (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x, y and z, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerZYX(Matrix &m, float &z, float &y, float &x)
 {
@@ -337,7 +376,10 @@ void ExtractEulerZYX(Matrix &m, float &z, float &y, float &x)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_x2 * R_y * R_x1, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x2, y and x1 are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 {
@@ -349,8 +391,11 @@ void Set3x3PartRotateEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 	m[2][0] = -sy*cx2; m[2][1] = cx1*sx2 + cy*cx2*sx1; m[2][2] =  cy*cx2*cx1 - sx2*sx1;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_x2 * R_y * R_x1 (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x2, y and x1, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 {
@@ -379,7 +424,10 @@ void ExtractEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_x2 * R_z * R_x1, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters x2, z and x1 are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 {
@@ -391,8 +439,11 @@ void Set3x3PartRotateEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 	m[2][0] = sz*sx2; m[2][1] = cz*cx1*sx2 + cx2*sx1; m[2][2] =  cx2*cx1 - cz*sx2*sx1;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_x2 * R_z * R_x1 (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters x2, z and x1, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 {
@@ -421,7 +472,10 @@ void ExtractEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_y2 * R_x * R_y1, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters y2, x and y1 are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 {
@@ -433,8 +487,11 @@ void Set3x3PartRotateEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 	m[2][0] = -cy1*sy2 - cx*cy2*sy1; m[2][1] = sx*cy2; m[2][2] = cx*cy2*cy1 - sy2*sy1;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_y2 * R_x * R_y1 (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters y2, x and y1, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 {
@@ -463,7 +520,10 @@ void ExtractEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_y2 * R_z * R_y1, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters y2, z and y1 are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 {
@@ -475,8 +535,11 @@ void Set3x3PartRotateEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 	m[2][0] = -cz*cy1*sy2 - cy2*sy1; m[2][1] =  sz*sy2; m[2][2] = cy2*cy1 - cz*sy2*sy1;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_y2 * R_z * R_y1 (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters y2, z and y1, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 {
@@ -505,7 +568,10 @@ void ExtractEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_z2 * R_x * R_z1, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters z2, x and z1 are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 {
@@ -517,8 +583,11 @@ void Set3x3PartRotateEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 	m[2][0] =               sx*sz1; m[2][1] =                sx*cz1; m[2][2] =      cx;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_z2 * R_x * R_z1 (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters z2, x and z1, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 {
@@ -547,7 +616,10 @@ void ExtractEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 	}
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+/** Computes the matrix M = R_z2 * R_y * R_z1, where R_d is the cardinal rotation matrix
+	about the axis +d, rotating counterclockwise.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
+	Parameters z2, y and z1 are the angles of rotation, in radians. */
 template<typename Matrix>
 void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 {
@@ -559,8 +631,11 @@ void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 	m[2][0] =              -sy*cz1; m[2][1] =                sy*sz1; m[2][2] =     cy;
 }
 
-/// This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf .
-/// The matrix m must be orthonormal.
+/** Decomposes the matrix M to form M = R_z2 * R_y * R_z1 (R_d being the cardinal rotation 
+	matrix about the axis +d, rotating counterclockwise), and outputs the angles of rotation in 
+	parameters z2, y and z1, in radians.
+	This function was adapted from http://www.geometrictools.com/Documentation/EulerAngles.pdf
+	The matrix m must be orthonormal. */
 template<typename Matrix>
 void ExtractEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 {
