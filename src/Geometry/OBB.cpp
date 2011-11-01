@@ -259,6 +259,15 @@ float3 OBB::CornerPoint(int cornerIndex) const
 	}
 }
 
+float3 OBB::ExtremePoint(const float3 &direction) const
+{
+	float3 pt = pos;
+	pt += axis[0] * (Dot(direction, axis[0]) >= 0.f ? r.x : -r.x);
+	pt += axis[1] * (Dot(direction, axis[1]) >= 0.f ? r.y : -r.y);
+	pt += axis[2] * (Dot(direction, axis[2]) >= 0.f ? r.z : -r.z);
+	return pt;
+}
+
 float3 OBB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);

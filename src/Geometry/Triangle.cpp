@@ -162,6 +162,23 @@ float3 Triangle::UnnormalizedNormalCW() const
 	return Cross(c-a, b-a);
 }
 
+float3 Triangle::ExtremePoint(const float3 &direction) const
+{
+	float3 mostExtreme;
+	float mostExtremeDist = -FLOAT_MAX;
+	for(int i = 0; i < 3; ++i)
+	{
+		float3 pt = Vertex(i);
+		float d = Dot(direction, pt);
+		if (d > mostExtremeDist)
+		{
+			mostExtremeDist = d;
+			mostExtreme = pt;
+		}
+	}
+	return mostExtreme;
+}
+
 Polygon Triangle::ToPolygon() const
 {
 	Polygon p;

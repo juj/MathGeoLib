@@ -51,6 +51,15 @@ float3 Circle::GetPoint(float angleRadians, float d) const
 	return pos + r * d * (cos(angleRadians) * BasisU() + sin(angleRadians) * BasisV());
 }
 
+float3 Circle::ExtremePoint(const float3 &direction) const
+{
+	float3 d = direction - direction.ProjectToNorm(normal);
+	if (d.IsZero())
+		return pos;
+	else
+		return pos + d.ScaledToLength(r);
+}
+
 Plane Circle::ContainingPlane() const
 {
 	return Plane(pos, normal);

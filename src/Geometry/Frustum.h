@@ -140,6 +140,16 @@ public:
 			of this Frustum. This pointer may not be null. */
 	void GetCornerPoints(float3 *outPointArray) const;
 
+	/// Computes an extreme point of this Frustum in the given direction.
+	/** An extreme point is a farthest point of this Frustum in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this Frustum in the given direction. The returned point is always a 
+			corner point of this Frustum.
+		@see CornerPoint(). */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Computes the matrix that transforms from the view space to the world (global) space of this Frustum.
 	/** @note The returned matrix is the inverse of the matrix returned by ViewMatrix().
 		@return An orthonormal affine matrix that performs the view->world transformation. The returned

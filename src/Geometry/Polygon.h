@@ -87,6 +87,16 @@ public:
 		@param edgeIndex The index of the edge line segment to construct, in the range [0, NumEdges()-1]. */
 	Plane EdgePlane(int edgeIndex) const;
 
+	/// Computes an extreme point of this Polygon in the given direction.
+	/** An extreme point is a farthest point of this Polygon in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this Polygon in the given direction. The returned point is always a 
+			vertex of this Polygon.
+		@see Vertex(). */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Tests if the given diagonal exists.
 	/** This function tests whether the diagonal that joins the two given vertices lies inside this polygon and is not intersected
 		by the edges of this polygon.

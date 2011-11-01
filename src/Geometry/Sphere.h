@@ -87,6 +87,14 @@ public:
 		@see pos */
 	float3 Centroid() const { return pos; }
 
+	/// Computes the extreme point of this Sphere in the given direction.
+	/** An extreme point is a farthest point of this Sphere in the given direction. For 
+		a Sphere, this point is unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return The extreme point of this Sphere in the given direction. */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Tests if this Sphere is finite.
 	/** A sphere is <b><i>finite</i></b> if its members pos and r do not contain floating-point NaNs or +/-infs
 		in them.

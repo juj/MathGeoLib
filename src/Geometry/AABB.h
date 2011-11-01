@@ -173,6 +173,16 @@ public:
 		@see PointInside(), Edge(), PointOnEdge(), FaceCenterPoint(), FacePoint(), GetCornerPoints(). */
 	float3 CornerPoint(int cornerIndex) const;
 
+	/// Computes an extreme point of this AABB in the given direction.
+	/** An extreme point is a farthest point of this AABB in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this AABB in the given direction. The returned point is always a 
+			corner point of this AABB.
+		@see CornerPoint(). */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Returns a point on an edge of this AABB.
 	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.
 		@param u A normalized value between [0,1]. This specifies the relative distance of the point along the edge.

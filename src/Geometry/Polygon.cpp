@@ -507,6 +507,23 @@ Plane Polygon::EdgePlane(int edgeIndex) const
 	return Plane(Edge(edgeIndex).a, EdgeNormal(edgeIndex));
 }
 
+float3 Polygon::ExtremePoint(const float3 &direction) const
+{
+	float3 mostExtreme;
+	float mostExtremeDist = -FLOAT_MAX;
+	for(int i = 0; i < NumVertices(); ++i)
+	{
+		float3 pt = Vertex(i);
+		float d = Dot(direction, pt);
+		if (d > mostExtremeDist)
+		{
+			mostExtremeDist = d;
+			mostExtreme = pt;
+		}
+	}
+	return mostExtreme;
+}
+
 /*
 /// Returns true if the edges of this polygon self-intersect.
 bool IsSelfIntersecting() const;

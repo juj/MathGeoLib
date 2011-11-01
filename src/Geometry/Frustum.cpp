@@ -419,6 +419,23 @@ float3 Frustum::CornerPoint(int cornerIndex) const
 	}
 }
 
+float3 Frustum::ExtremePoint(const float3 &direction) const
+{
+	float3 mostExtreme;
+	float mostExtremeDist = -FLOAT_MAX;
+	for(int i = 0; i < 8; ++i)
+	{
+		float3 pt = CornerPoint(i);
+		float d = Dot(direction, pt);
+		if (d > mostExtremeDist)
+		{
+			mostExtremeDist = d;
+			mostExtreme = pt;
+		}
+	}
+	return mostExtreme;
+}
+
 AABB Frustum::MinimalEnclosingAABB() const
 {
 	AABB aabb;

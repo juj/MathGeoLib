@@ -201,6 +201,15 @@ float3 AABB::CornerPoint(int cornerIndex) const
 	}
 }
 
+float3 AABB::ExtremePoint(const float3 &direction) const
+{
+	float3 pt;
+	pt.x = (direction.x >= 0.f ? maxPoint.x : minPoint.x);
+	pt.y = (direction.y >= 0.f ? maxPoint.y : minPoint.y);
+	pt.z = (direction.z >= 0.f ? maxPoint.z : minPoint.z);
+	return pt;
+}
+
 float3 AABB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);

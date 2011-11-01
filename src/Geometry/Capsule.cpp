@@ -75,6 +75,11 @@ float3 Capsule::Center() const
 	return l.CenterPoint();
 }
 
+float3 Capsule::ExtremePoint(const float3 &direction) const
+{
+	return (Dot(direction, l.b - l.a) >= 0.f ? l.b : l.a) + direction.ScaledToLength(r);
+}
+
 float3 Capsule::Top() const
 {
 	return l.b + UpDirection() * r;

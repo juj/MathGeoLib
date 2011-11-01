@@ -87,6 +87,14 @@ public:
 	float3 Center() const;
 	float3 Centroid() const { return l.CenterPoint(); } ///< [similarOverload: Center]
 
+	/// Computes the extreme point of this Capsule in the given direction.
+	/** An extreme point is a farthest point of this Capsule in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return The extreme point of this Capsule in the given direction. */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Returns the topmost point of this Capsule.
 	/** <img src="CapsuleFunctions.png" />
 		@note The topmost point is only a naming convention, and does not correspond to the topmost point along any world axis. The returned

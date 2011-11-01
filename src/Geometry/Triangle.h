@@ -159,6 +159,16 @@ public:
 		@see PlaneCCW(), PlaneCW(), NormalCCW(), NormalCW(). */
 	float3 UnnormalizedNormalCW() const;
 
+	/// Computes an extreme point of this Triangle in the given direction.
+	/** An extreme point is a farthest point of this Triangle in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this Triangle in the given direction. The returned point is always a 
+			vertex of this Triangle.
+		@see Vertex(). */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Returns a Polygon representation of this Triangle.
 	/** The returned polygon is identical to this Triangle. It has three vertices a, b and c which wind in the same
 		direction than in this triangle.

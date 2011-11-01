@@ -114,14 +114,24 @@ public:
 	Plane FacePlane(int faceIndex) const;
 
 	/// Returns the index of the vertex of this polyhedron that reaches farthest in the given direction.
-	/** @param dir The direction vector to query for. This vector can be unnormalized.
+	/** @param direction The direction vector to query for. This vector can be unnormalized.
 		@return The supporting point of this polyhedron that reaches farthest in the given direction.
 			The supporting point for a given direction is not necessarily unique, but this function
 			will always return one of the vertices of this polyhedron.
 		@see v, NumVertices(), Vertex(). */
-	int ExtremeVertex(const float3 &dir) const;
+	int ExtremeVertex(const float3 &direction) const;
 	// float3 SupportingPoint(const float3 &dir) const;
 	// bool IsSupportingPlane(const Plane &plane) const;
+
+	/// Computes an extreme point of this Polyhedron in the given direction.
+	/** An extreme point is a farthest point of this Polyhedron in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this Polyhedron in the given direction. The returned point is always a 
+			corner point of this Polyhedron.
+		@see CornerPoint(). */
+	float3 ExtremePoint(const float3 &direction) const;
 
 	/// Returns the arithmetic mean of all the corner vertices.
 	/** @bug This is not the proper centroid of the polyhedron! */

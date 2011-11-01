@@ -88,6 +88,15 @@ public:
 	float3 CenterPoint() const { return pos; }
 	float3 Centroid() const { return pos; } ///< [similarOverload: CenterPoint]
 
+	/// Computes an extreme point of this Circle/Disc in the given direction.
+	/** An extreme point is a farthest point of this Circle/Disc in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this Circle/Disc in the given direction. The returned point is always at 
+			the edge of this Circle. */
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Computes the plane this circle is contained in.
 	/** All the points of this circle lie inside this plane.
 		@see class Plane. */

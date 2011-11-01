@@ -167,6 +167,11 @@ float Sphere::SurfaceArea() const
 	return 4.f * pi * r*r;
 }
 
+float3 Sphere::ExtremePoint(const float3 &direction) const
+{
+	return pos + direction.ScaledToLength(r);
+}
+
 bool Sphere::IsFinite() const
 {
 	return pos.IsFinite() && isfinite(r);

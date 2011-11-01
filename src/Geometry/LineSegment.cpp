@@ -71,6 +71,11 @@ float3 LineSegment::Dir() const
 	return (b - a).Normalized();
 }
 
+float3 LineSegment::ExtremePoint(const float3 &direction) const
+{
+	return Dot(direction, b-a) >= 0.f ? b : a;
+}
+
 void LineSegment::Transform(const float3x3 &transform)
 {
 	a = transform * a;

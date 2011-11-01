@@ -117,13 +117,13 @@ Plane Polyhedron::FacePlane(int faceIndex) const
 	return FacePolygon(faceIndex).PlaneCCW();
 }
 
-int Polyhedron::ExtremeVertex(const float3 &dir) const
+int Polyhedron::ExtremeVertex(const float3 &direction) const
 {
 	int mostExtreme = -1;
 	float mostExtremeDist = -FLOAT_MAX;
 	for(int i = 0; i < NumVertices(); ++i)
 	{
-		float d = Dot(dir, Vertex(i));
+		float d = Dot(direction, Vertex(i));
 		if (d > mostExtremeDist)
 		{
 			mostExtremeDist = d;
@@ -131,6 +131,11 @@ int Polyhedron::ExtremeVertex(const float3 &dir) const
 		}
 	}
 	return mostExtreme;
+}
+
+float3 Polyhedron::ExtremePoint(const float3 &direction) const
+{
+	return Vertex(ExtremeVertex(direction));
 }
 
 float3 Polyhedron::Centroid() const

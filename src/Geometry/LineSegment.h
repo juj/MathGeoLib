@@ -80,6 +80,16 @@ public:
 		@see a, b. */
 	float3 Dir() const;
 
+	/// Computes an extreme point of this LineSegment in the given direction.
+	/** An extreme point is a farthest point along this LineSegment in the given direction. Given a direction,
+		this point is not necessarily unique.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@return An extreme point of this LineSegment in the given direction. The returned point is always
+			either a or b.
+		@see a, b.*/
+	float3 ExtremePoint(const float3 &direction) const;
+
 	/// Applies a transformation to this line.
 	/** This function operates in-place.
 		@see classes float3x3, float3x4, float4x4, Quat. */
