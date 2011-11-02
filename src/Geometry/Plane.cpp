@@ -107,12 +107,12 @@ float3 Plane::PointOnPlane() const
 
 float3 Plane::Point(float u, float v) const
 {
-    return PointOnPlane() + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
+	return PointOnPlane() + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
 }
 
 float3 Plane::Point(float u, float v, const float3 &referenceOrigin) const
 {
-    return Project(referenceOrigin) + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
+	return Project(referenceOrigin) + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
 }
 
 void Plane::Transform(const float3x3 &transform)
