@@ -90,8 +90,24 @@ public:
 
 	/// Returns a point on this plane.
 	/** @note This point has the special property that the line passing through the vector space origin (0,0,0) 
-			  and the returned point is perpendicular to this plane (directed towards the normal vector of this plane). */
+			and the returned point is perpendicular to this plane (directed towards the normal vector of this plane).
+		@see Point(). */
 	float3 PointOnPlane() const;
+
+	/// Returns a point on this plane, parameterized at the given coordinates.
+	/** The basis directions for U and V are arbitrarily (but consistently) defined.
+		Calling Point(0,0) is the same as calling PointOnPlane().
+		@see PointOnPlane(). */
+	float3 Point(float u, float v) const;
+
+	/// Returns a point on this plane, parameterized at the given coordinates.
+	/** The basis directions for U and V are arbitrarily (but consistently) defined.
+		@param referenceOrigin A point that defines an origin for the returned points. This point does not have to lie
+			on this plane.
+		Calling Point(0, 0, referenceOrigin) returns the point referenceOrigin projected onto this plane.
+		Calling Point(u, v) is the same as calling Point(u, v, PointOnPlane()).
+		@see PointOnPlane(). */
+	float3 Point(float u, float v, const float3 &referenceOrigin) const;
 
 	/// Applies a transformation to this plane.
 	/** This function operates in-place.

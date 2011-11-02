@@ -105,6 +105,16 @@ float3 Plane::PointOnPlane() const
 	return normal * d;
 }
 
+float3 Plane::Point(float u, float v) const
+{
+    return PointOnPlane() + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
+}
+
+float3 Plane::Point(float u, float v, const float3 &referenceOrigin) const
+{
+    return Project(referenceOrigin) + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
+}
+
 void Plane::Transform(const float3x3 &transform)
 {
 	float3x3 it = transform.InverseTransposed(); ///@todo Could optimize the inverse here by assuming orthogonality or orthonormality.
