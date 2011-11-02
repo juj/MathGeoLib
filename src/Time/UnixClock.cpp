@@ -15,6 +15,8 @@
 /** @file UnixClock.cpp
 	@brief */
 
+#ifdef UNIX
+
 #include <cassert>
 
 #include <time.h>
@@ -132,3 +134,5 @@ tick_t Clock::TicksPerSec()
 }
 
 } // ~kNet
+
+#endif
