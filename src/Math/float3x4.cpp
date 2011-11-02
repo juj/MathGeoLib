@@ -760,7 +760,7 @@ float3x4 float3x4::LookAt(const float3 &localForwardDir, const float3 &targetFor
 	m.SetRotatePart(float3x3::LookAt(localForwardDir, targetForwardDir, localUp, worldUp));
 	m.SetTranslatePart(0,0,0);
 	return m;
-	}
+}
 
 float3x4 float3x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward, 
                           const float3 &localUp, const float3 &worldUp)

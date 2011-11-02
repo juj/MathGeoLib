@@ -33,7 +33,8 @@ enum FrustumType
 class Frustum
 {
 public:
-	/// Specifies whether this frustum is a perspective or an orthographic frustum.
+	/// Specifies whether this frustum is a perspective or an orthographic frustum. 
+	/** [noscript] @todo Remove the noscript attribute. */
 	FrustumType type;
 	/// The eye point of this frustum.
 	/** Specifies the position of the camera (the eye point) for this frustum in world (global) space. [similarOverload: type] */
@@ -83,7 +84,7 @@ public:
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members type, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov/orthographicWidth and
 		verticalFov/orthographicHeight are all undefined after creating a new Frustum using this
-		default constructor. Remember to assign to them before use.
+		default constructor. Remember to assign to them before use. [opaque-qtscript] @todo remove the opaque-qtscript attribute.
 		@see type, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov, orthographicWidth, orthographicHeight. */
 	Frustum() {}
 
