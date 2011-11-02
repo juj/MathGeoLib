@@ -173,6 +173,8 @@ public:
 		@see Intersects(), IntersectsDisc(). */
 	std::vector<float3> IntersectsFaces(const OBB &obb) const;
 
+	std::vector<float3> IntersectsFaces(const AABB &aabb) const;
+
     /// Returns a human-readable representation of this circle. Most useful for debugging purposes.
 	/** The returned string specifies the center position, normal direction and the radius of this circle. */
 	std::string ToString() const;
