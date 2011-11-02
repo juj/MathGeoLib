@@ -281,4 +281,9 @@ public:
 	bool IntersectsConvex(const LineSegment &lineSegment) const;
 };
 
+#ifdef MATH_QT_INTEROP
+Q_DECLARE_METATYPE(Polyhedron)
+Q_DECLARE_METATYPE(Polyhedron*)
+#endif
+
 MATH_END_NAMESPACE
