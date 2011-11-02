@@ -646,9 +646,9 @@ inline float4 Clamp(const float4 &a, const float4 &floor, const float4 &ceil) { 
 inline float4 Clamp01(const float4 &a) { return a.Clamp01(); }
 inline float4 Lerp(const float4 &a, const float4 &b, float t) { return a.Lerp(b, t); }
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float4)
 Q_DECLARE_METATYPE(float4*)
 #endif
+
+MATH_END_NAMESPACE

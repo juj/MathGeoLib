@@ -197,9 +197,9 @@ Line operator *(const float3x4 &transform, const Line &line);
 Line operator *(const float4x4 &transform, const Line &line);
 Line operator *(const Quat &transform, const Line &line);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Line)
 Q_DECLARE_METATYPE(Line*)
 #endif
+
+MATH_END_NAMESPACE

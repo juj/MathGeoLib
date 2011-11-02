@@ -667,9 +667,9 @@ float3 operator *(const float3 &lhs, const float3x3 &rhs);
 /// This function ignores the w component of the given input vector. This component is assumed to be either 0 or 1.
 float4 operator *(const float4 &lhs, const float3x3 &rhs);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float3x3)
 Q_DECLARE_METATYPE(float3x3*)
 #endif
+
+MATH_END_NAMESPACE

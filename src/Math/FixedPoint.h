@@ -299,9 +299,9 @@ std::ostream &operator<<(std::ostream &out, const FixedPoint<T, F> &f)
 }
 #endif
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(FixedPoint)
 Q_DECLARE_METATYPE(FixedPoint*)
 #endif
+
+MATH_END_NAMESPACE

@@ -59,9 +59,9 @@ public:
 	static const Complex unitI;
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Complex)
 Q_DECLARE_METATYPE(Complex*)
 #endif
+
+MATH_END_NAMESPACE

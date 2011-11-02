@@ -198,9 +198,9 @@ Ray operator *(const float3x4 &transform, const Ray &ray);
 Ray operator *(const float4x4 &transform, const Ray &ray);
 Ray operator *(const Quat &transform, const Ray &ray);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Ray)
 Q_DECLARE_METATYPE(Ray*)
 #endif
+
+MATH_END_NAMESPACE

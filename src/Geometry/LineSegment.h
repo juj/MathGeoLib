@@ -215,9 +215,9 @@ LineSegment operator *(const float3x4 &transform, const LineSegment &line);
 LineSegment operator *(const float4x4 &transform, const LineSegment &line);
 LineSegment operator *(const Quat &transform, const LineSegment &line);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(LineSegment)
 Q_DECLARE_METATYPE(LineSegment*)
 #endif
+
+MATH_END_NAMESPACE

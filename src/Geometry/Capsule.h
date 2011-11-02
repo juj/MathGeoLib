@@ -263,9 +263,9 @@ public:
 #endif
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Capsule)
 Q_DECLARE_METATYPE(Capsule*)
 #endif
+
+MATH_END_NAMESPACE

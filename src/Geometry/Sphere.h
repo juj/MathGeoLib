@@ -247,9 +247,9 @@ public:
 #endif
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Sphere)
 Q_DECLARE_METATYPE(Sphere*)
 #endif
+
+MATH_END_NAMESPACE

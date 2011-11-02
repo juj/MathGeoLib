@@ -334,9 +334,9 @@ public:
 //	static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Polygon)
 Q_DECLARE_METATYPE(Polygon*)
 #endif
+
+MATH_END_NAMESPACE

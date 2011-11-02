@@ -338,9 +338,9 @@ Plane operator *(const float3x4 &transform, const Plane &plane);
 Plane operator *(const float4x4 &transform, const Plane &plane);
 Plane operator *(const Quat &transform, const Plane &plane);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Plane)
 Q_DECLARE_METATYPE(Plane*)
 #endif
+
+MATH_END_NAMESPACE

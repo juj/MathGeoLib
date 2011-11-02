@@ -171,9 +171,9 @@ public:
 #endif
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Circle)
 Q_DECLARE_METATYPE(Circle*)
 #endif
+
+MATH_END_NAMESPACE

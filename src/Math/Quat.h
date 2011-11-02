@@ -377,9 +377,9 @@ std::ostream &operator <<(std::ostream &out, const Quat &rhs);
 Quat Lerp(const Quat &a, const Quat &b, float t);
 Quat Slerp(const Quat &a, const Quat &b, float t);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Quat)
 Q_DECLARE_METATYPE(Quat*)
 #endif
+
+MATH_END_NAMESPACE

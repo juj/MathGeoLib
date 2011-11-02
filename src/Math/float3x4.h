@@ -767,9 +767,9 @@ float3x4 operator *(const float3x3 &lhs, const float3x4 &rhs);
 /// (Remember that M * v != v * M in general).
 float4 operator *(const float4 &lhs, const float3x4 &rhs);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float3x4)
 Q_DECLARE_METATYPE(float3x4*)
 #endif
+
+MATH_END_NAMESPACE

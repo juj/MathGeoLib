@@ -354,9 +354,9 @@ public:
 #endif
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Frustum)
 Q_DECLARE_METATYPE(Frustum*)
 #endif
+
+MATH_END_NAMESPACE

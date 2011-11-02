@@ -343,9 +343,9 @@ Triangle operator *(const float3x4 &transform, const Triangle &t);
 Triangle operator *(const float4x4 &transform, const Triangle &t);
 Triangle operator *(const Quat &transform, const Triangle &t);
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Triangle)
 Q_DECLARE_METATYPE(Triangle*)
 #endif
+
+MATH_END_NAMESPACE

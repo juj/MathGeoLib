@@ -455,9 +455,9 @@ public:
 //	Polyhedron Intersection(const Polyhedron &polyhedron) const;
 };
 
-MATH_END_NAMESPACE
-
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(OBB)
 Q_DECLARE_METATYPE(OBB*)
 #endif
+
+MATH_END_NAMESPACE
