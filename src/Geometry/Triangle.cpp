@@ -841,6 +841,7 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 		float m01 = -m[2][1];
 		float m10 = -m[1][2];
 		float m11 = m[1][1];
+        /// @bug This variable should be used somewhere below? Review the code, and test!
 		float det = m00*m11 - m01*m10;
 
 		// 2x2 * 2 matrix*vec mul.
