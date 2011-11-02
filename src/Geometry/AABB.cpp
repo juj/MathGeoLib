@@ -796,9 +796,6 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
 	if (!outPos)
 		return;
 
-	// A single quad comprises of two triangles, so therefore requires six vertices.
-	int numFaces = numFacesX * numFacesY * numFacesZ;
-
 	// Generate both X-Y planes.
 	int i = 0;
 	for(int face = 0; face < 6; ++face) // Faces run in the order -X, +X, -Y, +Y, -Z, +Z.
