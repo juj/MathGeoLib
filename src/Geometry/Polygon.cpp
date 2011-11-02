@@ -50,9 +50,9 @@ int Polygon::NumEdges() const
 float3 Polygon::Vertex(int vertexIndex) const
 {
 	assume(vertexIndex >= 0);
-	assume(vertexIndex < p.size());
+	assume(vertexIndex < (int)p.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (vertexIndex < 0 || vertexIndex >= p.size())
+	if (vertexIndex < 0 || vertexIndex >= (int)p.size())
 		return float3::nan;
 #endif
 	return p[vertexIndex];
@@ -81,10 +81,10 @@ bool Polygon::DiagonalExists(int i, int j) const
 	assume(p.size() >= 3);
 	assume(i >= 0);
 	assume(j >= 0);
-	assume(i < p.size());
-	assume(j < p.size());
+	assume(i < (int)p.size());
+	assume(j < (int)p.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (p.size() < 3 || i < 0 || j < 0 || i >= p.size() || j >= p.size())
+	if (p.size() < 3 || i < 0 || j < 0 || i >= (int)p.size() || j >= (int)p.size())
 		return false;
 #endif
 	assume(IsPlanar());
@@ -101,7 +101,7 @@ bool Polygon::DiagonalExists(int i, int j) const
 	LineSegment diagonal = polygonPlane.Project(LineSegment(p[i], p[j]));
 
 	// First check that this diagonal line is not intersected by an edge of this polygon.
-	for(size_t k = 0; k < p.size(); ++k)
+	for(int k = 0; k < (int)p.size(); ++k)
 		if (!(k == i || k+1 == i || k == j))
 			if (polygonPlane.Project(LineSegment(p[k], p[k+1])).Intersects(diagonal))
 				return false;
@@ -129,10 +129,10 @@ LineSegment Polygon::Diagonal(int i, int j) const
 {
 	assume(i >= 0);
 	assume(j >= 0);
-	assume(i < p.size());
-	assume(j < p.size());
+	assume(i < (int)p.size());
+	assume(j < (int)p.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (i < 0 || j < 0 || i >= p.size() || j >= p.size())
+	if (i < 0 || j < 0 || i >= (int)p.size() || j >= (int)p.size())
 		return LineSegment(float3::nan, float3::nan);
 #endif
 	return LineSegment(p[i], p[j]);
@@ -166,9 +166,9 @@ bool Polygon::IsConvex() const
 float2 Polygon::MapTo2D(int i) const
 {
 	assume(i >= 0);
-	assume(i < p.size());
+	assume(i < (int)p.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (i < 0 || i >= p.size())
+	if (i < 0 || i >= (int)p.size())
 		return float2::nan;
 #endif
 	return MapTo2D(p[i]);

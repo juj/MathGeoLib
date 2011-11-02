@@ -42,9 +42,9 @@ int Polyhedron::NumEdges() const
 float3 Polyhedron::Vertex(int vertexIndex) const
 {
 	assume(vertexIndex >= 0);
-	assume(vertexIndex < v.size());
+	assume(vertexIndex < (int)v.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (vertexIndex < 0 || vertexIndex >= v.size())
+	if (vertexIndex < 0 || vertexIndex >= (int)v.size())
 		return float3::nan;
 #endif
 	
@@ -55,9 +55,9 @@ LineSegment Polyhedron::Edge(int edgeIndex) const
 {
 	assume(edgeIndex >= 0);
 	std::vector<LineSegment> edges = Edges();
-	assume(edgeIndex < edges.size());
+	assume(edgeIndex < (int)edges.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (edgeIndex < 0 || edgeIndex >= edges.size())
+	if (edgeIndex < 0 || edgeIndex >= (int)edges.size())
 		return LineSegment(float3::nan, float3::nan);
 #endif
 	return edges[edgeIndex];
@@ -100,9 +100,9 @@ Polygon Polyhedron::FacePolygon(int faceIndex) const
 {
 	Polygon p;
 	assume(faceIndex >= 0);
-	assume(faceIndex < f.size());
+	assume(faceIndex < (int)f.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (faceIndex < 0 || faceIndex >= f.size())
+	if (faceIndex < 0 || faceIndex >= (int)f.size())
 		return Polygon();
 #endif
 
@@ -178,19 +178,19 @@ AABB Polyhedron::MinimalEnclosingAABB() const
 bool Polyhedron::FaceIndicesValid() const
 {
 	// Test condition 1: Face indices in proper range.
-	for(size_t i = 0; i < NumFaces(); ++i)
-		for(size_t j = 0; j < f[i].v.size(); ++j)
-			if (f[i].v[j] < 0 || f[i].v[j] >= v.size())
+	for(int i = 0; i < NumFaces(); ++i)
+		for(int j = 0; j < (int)f[i].v.size(); ++j)
+			if (f[i].v[j] < 0 || f[i].v[j] >= (int)v.size())
 				return false;
 
 	// Test condition 2: Each face has at least three vertices.
-	for(size_t i = 0; i < NumFaces(); ++i)
+	for(int i = 0; i < NumFaces(); ++i)
 		if (f[i].v.size() < 3)
 			return false;
 
 	// Test condition 3: Each face may refer to a vertex at most once. (Complexity O(n^2)).
-	for(size_t i = 0; i < NumFaces(); ++i)
-		for(size_t j = 0; j < f[i].v.size(); ++j)
+	for(int i = 0; i < NumFaces(); ++i)
+		for(int j = 0; j < (int)f[i].v.size(); ++j)
 			for(size_t k = j+1; k < f[i].v.size(); ++k)
 				if (f[i].v[j] == f[i].v[k])
 					return false;
