@@ -16,6 +16,10 @@
 /** @file Types.h
 	@brief Provides platform-independent fixed size types. */
 
+#ifdef MATH_TUNDRA_INTEROP
+#include "CoreTypes.h"
+#else
+
 #ifndef KNET_NO_FIXEDWIDTH_TYPES
 
 // As a reminder: http://predef.sourceforge.net/prestd.html
@@ -76,3 +80,5 @@ typedef signed long long s64; ///< 8 bytes signed. 9,223,372,036,854,775,807 ~ 9
 #endif
 
 #endif // ~KNET_NO_FIXEDWIDTH_TYPES
+
+#endif
