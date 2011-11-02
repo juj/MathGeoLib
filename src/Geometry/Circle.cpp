@@ -19,6 +19,7 @@
 #include "Geometry/Plane.h"
 #include "Math/MathFunc.h"
 #include "Geometry/Ray.h"
+#include "Geometry/OBB.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
 
@@ -174,6 +175,22 @@ bool Circle::IntersectsDisc(const Ray &ray) const
 	if (intersectsPlane)
 		return false;
 	return ray.GetPoint(d).DistanceSq(pos) <= r*r;
+}
+
+std::vector<float3> Circle::IntersectsFaces(const OBB &obb) const
+{
+	std::vector<float3> intersectionPoints;
+	for(int i = 0; i < 6; ++i)
+	{
+		Plane p = obb.FacePlane(i);
+		float3 pt1, pt2;
+		int numIntersections = Intersects(p, &pt1, &pt2);
+		if (numIntersections >= 1 && obb.Contains(pt1))
+			intersectionPoints.push_back(pt1);
+		if (numIntersections >= 2 && obb.Contains(pt2))
+			intersectionPoints.push_back(pt2);
+	}
+	return intersectionPoints;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT

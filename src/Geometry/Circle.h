@@ -20,6 +20,10 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <vector>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A two-dimensional circle in 3D space.
@@ -161,10 +165,19 @@ public:
 	bool IntersectsDisc(const Ray &ray) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-	/// Returns a human-readable representation of this circle. Most useful for debugging purposes.
+	/// Tests if this circle intersects the faces of the given OBB.
+	/** @param obb The bounding box to test against. This box is treated as "hollow", i.e. only the faces of the OBB are considered to be
+			a part of the OBB.
+		@return A vector that contains all the detected points of intersection for this circle and the given OBB. If the circle is fully
+			contained inside the OBB, or is fully outside the OBB, no intersection occurs, and the returned vector has zero elements.
+		@see Intersects(), IntersectsDisc(). */
+	std::vector<float3> IntersectsFaces(const OBB &obb) const;
+
+    /// Returns a human-readable representation of this circle. Most useful for debugging purposes.
 	/** The returned string specifies the center position, normal direction and the radius of this circle. */
 	std::string ToString() const;
 #endif
+
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
