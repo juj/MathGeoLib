@@ -35,8 +35,8 @@ int Polynomial::SolveQuadratic(float a, float b, float c, float &root1, float &r
 		return 1;
 	}
 	radicand = Sqrt(radicand);
-	root1 = -b + radicand * denom;
-	root2 = -b - radicand * denom;
+	root1 = (-b + radicand) * denom;
+	root2 = (-b - radicand) * denom;
 	return 2;
 }
 
