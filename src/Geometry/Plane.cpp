@@ -78,10 +78,10 @@ void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
 	normal.Normalize();
 	d = Dot(v1, normal);
 
-	assume(EqualAbs(SignedDistance(v1), 0.f));
-	assume(EqualAbs(SignedDistance(v2), 0.f));
-	assume(EqualAbs(SignedDistance(v3), 0.f));
-	assume(EqualAbs(SignedDistance(v3 + normal), 1.f));
+	mathassert(EqualAbs(SignedDistance(v1), 0.f));
+	mathassert(EqualAbs(SignedDistance(v2), 0.f));
+	mathassert(EqualAbs(SignedDistance(v3), 0.f));
+	mathassert(EqualAbs(SignedDistance(v3 + normal), 1.f));
 }
 
 void Plane::Set(const float3 &point, const float3 &normal_)
@@ -90,8 +90,8 @@ void Plane::Set(const float3 &point, const float3 &normal_)
 	assume(normal.IsNormalized());
 	d = Dot(point, normal);
 
-	assume(EqualAbs(SignedDistance(point), 0.f));
-	assume(EqualAbs(SignedDistance(point + normal_), 1.f));
+	mathassert(EqualAbs(SignedDistance(point), 0.f));
+	mathassert(EqualAbs(SignedDistance(point + normal_), 1.f));
 }
 
 void Plane::ReverseNormal()
@@ -217,7 +217,7 @@ float3 Plane::Mirror(const float3 &point) const
 {
 	assume(normal.IsNormalized());
 	float3 reflected = point - 2.f * (Dot(point, normal) + d) * normal;
-	assume(reflected.Equals(MirrorMatrix().MulPos(point)));
+	mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));
 	return reflected;
 }
 
@@ -229,7 +229,7 @@ float3 Plane::Refract(const float3 &vec, float negativeSideRefractionIndex, floa
 float3 Plane::Project(const float3 &point) const
 {
 	float3 projected = point - (Dot(normal, point) - d) * normal;
-	assume(projected.Equals(OrthoProjection().MulPos(point)));
+	mathassert(projected.Equals(OrthoProjection().MulPos(point)));
 	return projected;
 }
 
@@ -690,14 +690,12 @@ bool Plane::PassesThroughOrigin(float epsilon) const
 
 float Plane::DihedralAngle(const Plane &plane) const
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
-	return false;
+	return Dot(normal, plane.normal);
 }
 
 Circle Plane::GenerateCircle(const float3 &circleCenter, float radius) const
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
-	return Circle();
+	return Circle(Project(circleCenter), normal, radius);
 }
 
 Plane operator *(const float3x3 &transform, const Plane &plane)
