@@ -406,74 +406,141 @@ bool Sphere::Intersects(const Capsule &capsule) const
 	return capsule.Intersects(*this);
 }
 
-bool IntersectLineSphere(const float3 &lPos, const float3 &lDir, const Sphere &s, float &t)
+int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter, 
+                          float sphereRadius, float &t1, float &t2)
 {
-	assume(lDir.IsNormalized());
+	assume(lineDir.IsNormalized());
+	assume(sphereRadius >= 0.f);
 
-	const float3 dist = lPos - s.pos;
-	const float distSq = dist.LengthSq();
-	const float radSq = s.r*s.r;
+	/* A line is represented explicitly by the set { linePos + t * lineDir }, where t is an arbitrary float.
+	  A sphere is represented implictly by the set of vectors that satisfy ||v - sphereCenter|| == sphereRadius.
+	  To solve which points on the line are also points on the sphere, substitute v <- linePos + t * lineDir
+	  to obtain:
 
-	const float b = 2.f * Dot(lDir, dist);
-	const float c = distSq - radSq;
-	const float D = b*b - 4.f*c;
-	if (D <= 0.f)
-		return false;  // The ray doesn't even come near.
+	    || linePos + t * lineDir - sphereCenter || == sphereRadius, and squaring both sides we get
+	    || linePos + t * lineDir - sphereCenter ||^2 == sphereRadius^2, or rearranging:
+	    || (linePos - sphereCenter) + t * lineDir ||^2 == sphereRadius^2. */
 
-	t = (-b - sqrtf(D)) * 0.5f;
-	return true;
+	// This equation represents the set of points which lie both on the line and the sphere. There is only one
+	// unknown variable, t, for which we solve to get the actual points of intersection.
+
+	// Compute variables from the above equation:
+	const float3 a = linePos - sphereCenter;
+	const float radSq = sphereRadius * sphereRadius;
+
+	/* so now the equation looks like 
+
+	    || a + t * lineDir ||^2 == radSq.
+
+	  Since ||x||^2 == <x,x> (i.e. the square of a vector norm equals the dot product with itself), we get
+	
+	    <a + t * lineDir, a + t * lineDir> == radSq, 
+	
+	  and using the identity <a+b, a+b> == <a,a> + 2*<a,b> + <b,b> (which holds for dot product when a and b are reals),
+	  we have
+
+	    <a,a> + 2 * <a, t * lineDir> + <t * lineDir, t * lineDir> == radSq, or		
+	    <a,a> - radSq + 2 * <a, lineDir> * t + <lineDir, lineDir> * t^2 == 0, or
+
+	    A + Bt + Ct^2 == 0, where
+
+	    A = <a,a> - radSq,
+	    B = 2 * <a, lineDir>, and
+	    C = <lineDir, lineDir> == 1, since we assumed lineDir is normalized. */
+
+	const float A = Dot(a,a) - radSq;
+	const float B = 2.f * Dot(a, lineDir);
+
+	/* The equation A + Bt + Ct^2 == 0 is a second degree equation on t, which is easily solvable using the 
+	  known formula, and we obtain
+
+	    t = [-B +/- Sqrt(B^2 - 4AC)] / 2A. */
+
+	float D = B*B - 4.f * A; // D = B^2 - 4AC.
+	if (D < 0.f) // There is no solution to the square root, so the ray doesn't intersect the sphere.
+		return 0;
+
+	if (D < 1e-4f) // The expression inside Sqrt is ~ 0. The line is tangent to the sphere, and we have one solution.
+	{
+		t1 = t2 = -B / (2.f * A);
+		return 1;
+	}
+
+	// The Sqrt expression is strictly positive, so we get two different solutions for t.
+	D = Sqrt(D);
+	t1 = (-B - D) / (2.f * A);
+	t2 = (-B + D) / (2.f * A);
+	return 2;
 }
 
-bool Sphere::Intersects(const Ray &r, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
+int Sphere::Intersects(const Ray &ray, float3 *intersectionPoint, float3 *intersectionNormal, float *d, float *d2) const
 {
-	float t;
-	IntersectLineSphere(r.pos, r.dir, *this, t);
-	if (t < 0.f)
-		return false; // The intersection position is on the negative direction of the ray.
+	float t1, t2;
+	int numIntersections = IntersectLine(ray.pos, ray.dir, pos, r, t1, t2);
 
-	float3 hitPoint = r.pos + t * r.dir;
+	// If the line of this ray intersected in two places, but the first intersection was "behind" this ray,
+	// handle the second point of intersection instead. This case occurs when the origin of the ray is inside
+	// the Sphere.
+	if (t1 < 0.f && numIntersections == 2)
+		t1 = t2;
+
+	if (t1 < 0.f)
+		return 0; // The intersection position is on the negative direction of the ray.
+
+	float3 hitPoint = ray.pos + t1 * ray.dir;
 	if (intersectionPoint)
 		*intersectionPoint = hitPoint;
 	if (intersectionNormal)
 		*intersectionNormal = (hitPoint - pos).Normalized();
 	if (d)
-		*d = t;
-//	return (distSq <= radSq) ? IntersectBackface : IntersectFrontface;
-	return true;
+		*d = t1;
+	if (d2)
+		*d2 = t2;
+
+	return numIntersections;
 }
 
-bool Sphere::Intersects(const Line &l, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
+int Sphere::Intersects(const Line &line, float3 *intersectionPoint, float3 *intersectionNormal, float *d, float *d2) const
 {
-	float t;
-	IntersectLineSphere(l.pos, l.dir, *this, t);
+	float t1, t2;
+	int numIntersections = IntersectLine(line.pos, line.dir, pos, r, t1, t2);
+	if (numIntersections == 0)
+		return 0;
 
-	float3 hitPoint = l.pos + t * l.dir;
+	float3 hitPoint = line.pos + t1 * line.dir;
 	if (intersectionPoint)
 		*intersectionPoint = hitPoint;
 	if (intersectionNormal)
 		*intersectionNormal = (hitPoint - pos).Normalized();
 	if (d)
-		*d = t;
-//	return (distSq <= radSq) ? IntersectBackface : IntersectFrontface;
-	return true;
+		*d = t1;
+	if (d2)
+		*d2 = t2;
+
+	return numIntersections;
 }
 
-bool Sphere::Intersects(const LineSegment &l, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
+int Sphere::Intersects(const LineSegment &l, float3 *intersectionPoint, float3 *intersectionNormal, float *d, float *d2) const
 {
-	float t;
-	IntersectLineSphere(l.a, l.Dir(), *this, t);
+	float t1, t2;
+	int numIntersections = IntersectLine(l.a, l.Dir(), pos, r, t1, t2);
+
+	if (numIntersections == 0)
+		return 0;
 
 	float lineLength = l.Length();
-	if (t < 0.f || t > lineLength)
-		return false;
-	float3 hitPoint = l.GetPoint(t / lineLength);
+	if (t2 < 0.f || t1 > lineLength)
+		return 0;
+	float3 hitPoint = l.GetPoint(t1 / lineLength);
 	if (intersectionPoint)
 		*intersectionPoint = hitPoint;
 	if (intersectionNormal)
 		*intersectionNormal = (hitPoint - pos).Normalized();
 	if (d)
-		*d = t;
-//	return (distSq <= radSq) ? IntersectBackface : IntersectFrontface;
+		*d = t1 / lineLength;
+	if (d2)
+		*d2 = t2 / lineLength;
+
 	return true;
 }
 

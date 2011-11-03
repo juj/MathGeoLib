@@ -175,11 +175,12 @@ public:
 		@param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer may be null.
 		@param intersectionNormal [out] If specified, receives the sphere normal at the point of intersection. This pointer may be null.
 		@param d [out] If specified, receives the distance along the Line/LineSegment/Ray to the intersection. This pointer may be null.
-		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
+		@return In the case of Ray/Line/LineSegment intersection tests, the number of intersections is returned (0, 1 or 2).
+			For other functions, true is returned if an intersection occurs or one of the objects is contained inside the other, and false otherwise.
 		@see Contains(), Distance(), ClosestPoint(), LineSegment::GetPoint(). */
-	bool Intersects(const LineSegment &lineSegment, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
-	bool Intersects(const Line &line, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
-	bool Intersects(const Ray &ray, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
+	int Intersects(const LineSegment &lineSegment, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
+	int Intersects(const Line &line, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
+	int Intersects(const Ray &ray, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
 	bool Intersects(const Plane &plane) const;
 	bool Intersects(const AABB &aabb, float3 *closestPointOnAABB) const;
 	bool Intersects(const OBB &obb, float3 *closestPointOnOBB) const;
@@ -236,6 +237,31 @@ public:
 						  To generate a perfect geosphere, pass in a number of form 3 * 4 * 3^k for some k >= 0.
 		@return The actual number of vertices generated (== the number of elements written to outPos and outNormal). */
 	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices);
+
+	/// Computes the intersection of a line and a sphere.
+	/** This function solves the points of intersection between a line and a sphere.
+		A line intersects sphere at 0, 1 or 2 points. When only one point of intersection is reported,
+		the given line is tangent to the sphere.
+		@param linePos The source position of the line.
+		@param lineDir The direction of the line. This vector must be normalized in advance.
+		@param sphereCenter The center position of the sphere to test.
+		@param sphereRadius The radius of the sphere, which must be >= 0.
+		@param t1 [out] This parameter receives the parametric distance along the line to the first point of intersection. 
+			If the sphere and the line do not intersect, this variable is not written to. To receive the actual 
+			world space point corresponding to this point of intersection, compute the vector 'linePos + t1 * lineDir'.
+		@param t2 [out] This parameter receives the parametric distance along the line to the second point of intersection. 
+			If the sphere and the line do not intersect, this variable is not written to. If the line is tangent to this 
+			sphere (one point of intersection), this variable will be set equal to t1, so that the line segment
+			[t1, t2] always forms a line segment completely enclosed inside the sphere. To receive the actual world space
+			point corresponding to this point of intersection, compute the vector 'linePos + t2 * lineDir'.
+		@return The number of intersection points: 0, 1 or 2. In case of 0, the line and sphere do not intersect. In
+			case of 1, the line is tangent to the sphere. If the value of 2 is returned, the line properly intersects the
+			sphere.
+		@note The outputted variables t1 and t2 always satisfy t1 < t2. This allows distinguishing between the "enter"
+			and "exit" positions of the line, if the line is interpreted more like a ray starting at linePos, and extending
+			towards lineDir. */
+	static int IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter, 
+	                         float sphereRadius, float &t1, float &t2);
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Sphere. Most useful for debugging purposes.
