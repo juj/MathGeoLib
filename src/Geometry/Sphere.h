@@ -50,7 +50,8 @@ public:
 	Sphere(const float3 &pointA, const float3 &pointB);
 
 	/// Constructs a sphere that passes through the given three points.
-	/** @note The resulting sphere may not be the minimal enclosing sphere for the three points! */
+	/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 .
+		@note The resulting sphere may not be the minimal enclosing sphere for the three points! */
 	Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC);
 
 	/// Constructs a sphere that passes through the given four points.

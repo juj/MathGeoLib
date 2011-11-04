@@ -49,70 +49,94 @@ Sphere::Sphere(const float3 &center, float radius)
 {
 }
 
-Sphere::Sphere(const float3 &pointA, const float3 &pointB)
+Sphere::Sphere(const float3 &a, const float3 &b)
 {
-	pos = (pointA + pointB) / 2.f;
-	r = (pointB - pos).Length();
+	pos = (a + b) / 2.f;
+	r = (b - pos).Length();
 	assume(pos.IsFinite());
 	assume(r >= 0.f);
 }
 
-Sphere::Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC)
+Sphere::Sphere(const float3 &a, const float3 &b, const float3 &c)
 {
-	// See e.g. http://en.wikipedia.org/wiki/Circumcenter .
+	/* The task is to compute the minimal radius sphere through the three points
+	   a, b and c. (Note that this is not necessarily the minimal radius sphere enclosing
+	   the points a, b and c!)
 
-	float3 b = pointB - pointA;
-	float3 c = pointC - pointA;
-	float3 normal = Cross(b, c);
-	float denom = 2.f * normal.LengthSq();
+	   Denote by p the sphere center position, and r the sphere radius. If the sphere
+	   is to run through the points a, b and c, then the center point of the sphere
+	   must be equidistant of these points, i.e. 
+
+	      || p - a || == || p - b || == || p - c ||,
+
+	   or
+
+	      a^2 - 2ap + p^2 == b^2 - 2bp + p^2 == c^2 - 2cp + p^2.
+
+	   Subtracting pairwise, we get
+
+	      (b-a)p == (b^2 - a^2)/2 and       (1)
+	      (c-a)p == (c^2 - a^2)/2.          (2)
+
+	   Additionally, the center point of the sphere must lie on the same plane as the triangle
+	   defined by the points a, b and c. Therefore, the point p can be represented as a 2D
+	   barycentric coordinates (s,t) as follows:
+
+	      p == a + s*(b-a) + t*(c-a).        (3)
+
+	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
+	   of the coordinate system to be centered at the point a), and we have:
+
+	      BP == B^2/2,            (1')
+	      CP == C^2/2 and         (2')
+	       P == s*B + t*C.        (3') */
+
+	float3 B = b - a;
+	float3 C = c - a;
+
+	const float BB = Dot(B,B);
+	const float CC = Dot(C,C);
+	const float BC = Dot(B,C);
+
+	/* Substitute (3') into (1') and (2'), to obtain a matrix equation
+
+	   ( B^2  BC  ) * (s) = (B^2 / 2)
+	   ( BC   C^2 )   (t)   (C^2 / 2)
+
+	   which equals
+	   
+	   (s) = ( B^2  BC  )^-1  *  (B^2 / 2)
+	   (t)   ( BC   C^2 )        (C^2 / 2)
+
+	   	Use the formula for inverting a 2x2 matrix, and we have
+
+	   (s) = 1 / (2 * B^2 * C^2 - (BC)^2) * ( C^2   -BC ) *  (B^2)
+	   (t)                                  ( -BC   B^2 )    (C^2)
+	*/
+
+	float denom = BB*CC - BC*BC;
+
 	if (EqualAbs(denom, 0.f))
 	{
-		SetNegativeInfinity();
+		assume(false && "Sphere::Sphere through three points failed! The three points lie on the same line!");
+		pos = float3::nan;
+		r = -FLOAT_INF;
 		return;
 	}
 
-#if 0
-	{
-		// The three points are collinear. Construct a line through two most extremal points.
-		float dC = Dot(b,c);
+	denom = 0.5f / denom; // == 1 / (2 * B^2 * C^2 - (BC)^2)
 
-		if (dC < 0.f)
-			*this = Sphere(pointB, pointC);
-		else
-		{
-			float dB = Dot(b, b);
-			if (dC > dB)
-				*this = Sphere(pointA, pointC);
-			else
-				*this = sphere(pointA, pointB);
-		}
-		return;
-	}
-#endif
+	const float s = (CC * BB - BC * CC) * denom;
+	const float t = (CC * BB - BC * BB) * denom;
 
-	pos = (c.LengthSq() * Cross(normal, c) + b.LengthSq() * Cross(b, normal)) / denom;
-	r = pos.Length();
-	pos += pointA;
+	const float3 p = s*B + t*C;
 
-/* // An alternate formulation that is probably correct, but the above contains fewer operations.
-   // This one contains a matrix inverse operation.
-	float3x3 m;
-	m.SetRow(0, pointB - pointA);
-	m.SetRow(1, pointC - pointA);
-	m.SetRow(2, Cross(m.Row(0), m.Row(1)));
-	float3 lengths = float3(m.Row(0).LengthSq(), m.Row(1).LengthSq(), 0.f) * 0.5f;
+	// In our translated coordinate space, the origin lies on the sphere, so the distance of p from origin 
+	// gives the radius of the sphere.
+	r = p.Length(); 
 
-	bool success = m.Inverse();
-	if (!success)
-	{
-		SetNegativeInfinity();
-		return;
-	}
-
-	pos = m * lengths;
-	r = pos.Length();
-	pos += pointA;
-*/
+	// Translate back to original coordinate space.
+	pos = a + p;
 }
 
 Sphere::Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD)
