@@ -21,6 +21,8 @@
 #else
 #include "Container/Array.h"
 #endif
+
+#include "Log.h"
 #include "Math/MathFunc.h"
 #include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
@@ -51,112 +53,17 @@ Sphere::Sphere(const float3 &center, float radius)
 
 Sphere::Sphere(const float3 &a, const float3 &b)
 {
-	pos = (a + b) / 2.f;
-	r = (b - pos).Length();
-	assume(pos.IsFinite());
-	assume(r >= 0.f);
+	*this = FitThroughPoints(a, b);
 }
 
 Sphere::Sphere(const float3 &a, const float3 &b, const float3 &c)
 {
-	/* The task is to compute the minimal radius sphere through the three points
-	   a, b and c. (Note that this is not necessarily the minimal radius sphere enclosing
-	   the points a, b and c!)
-
-	   Denote by p the sphere center position, and r the sphere radius. If the sphere
-	   is to run through the points a, b and c, then the center point of the sphere
-	   must be equidistant of these points, i.e. 
-
-	      || p - a || == || p - b || == || p - c ||,
-
-	   or
-
-	      a^2 - 2ap + p^2 == b^2 - 2bp + p^2 == c^2 - 2cp + p^2.
-
-	   Subtracting pairwise, we get
-
-	      (b-a)p == (b^2 - a^2)/2 and       (1)
-	      (c-a)p == (c^2 - a^2)/2.          (2)
-
-	   Additionally, the center point of the sphere must lie on the same plane as the triangle
-	   defined by the points a, b and c. Therefore, the point p can be represented as a 2D
-	   barycentric coordinates (s,t) as follows:
-
-	      p == a + s*(b-a) + t*(c-a).        (3)
-
-	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
-	   of the coordinate system to be centered at the point a), and we have:
-
-	      BP == B^2/2,            (1')
-	      CP == C^2/2 and         (2')
-	       P == s*B + t*C.        (3') */
-
-	float3 B = b - a;
-	float3 C = c - a;
-
-	const float BB = Dot(B,B);
-	const float CC = Dot(C,C);
-	const float BC = Dot(B,C);
-
-	/* Substitute (3') into (1') and (2'), to obtain a matrix equation
-
-	   ( B^2  BC  ) * (s) = (B^2 / 2)
-	   ( BC   C^2 )   (t)   (C^2 / 2)
-
-	   which equals
-	   
-	   (s) = ( B^2  BC  )^-1  *  (B^2 / 2)
-	   (t)   ( BC   C^2 )        (C^2 / 2)
-
-	   	Use the formula for inverting a 2x2 matrix, and we have
-
-	   (s) = 1 / (2 * B^2 * C^2 - (BC)^2) * ( C^2   -BC ) *  (B^2)
-	   (t)                                  ( -BC   B^2 )    (C^2)
-	*/
-
-	float denom = BB*CC - BC*BC;
-
-	if (EqualAbs(denom, 0.f))
-	{
-		assume(false && "Sphere::Sphere through three points failed! The three points lie on the same line!");
-		pos = float3::nan;
-		r = -FLOAT_INF;
-		return;
-	}
-
-	denom = 0.5f / denom; // == 1 / (2 * B^2 * C^2 - (BC)^2)
-
-	const float s = (CC * BB - BC * CC) * denom;
-	const float t = (CC * BB - BC * BB) * denom;
-
-	const float3 p = s*B + t*C;
-
-	// In our translated coordinate space, the origin lies on the sphere, so the distance of p from origin 
-	// gives the radius of the sphere.
-	r = p.Length(); 
-
-	// Translate back to original coordinate space.
-	pos = a + p;
+	*this = FitThroughPoints(a, b, c);
 }
 
-Sphere::Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD)
+Sphere::Sphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
 {
-	float3x3 m;
-	m.SetRow(0, pointB - pointA);
-	m.SetRow(1, pointC - pointA);
-	m.SetRow(2, pointD - pointA);
-	float3 lengths = float3(m.Row(0).LengthSq(), m.Row(1).LengthSq(), m.Row(2).LengthSq()) * 0.5f;
-
-	bool success = m.Inverse();
-	if (!success)
-	{
-		SetNegativeInfinity();
-		return;
-	}
-
-	pos = m * lengths;
-	r = pos.Length();
-	pos += pointA;
+	*this = FitThroughPoints(a, b, c, d);
 }
 
 AABB Sphere::MinimalEnclosingAABB() const
@@ -204,6 +111,12 @@ bool Sphere::IsFinite() const
 bool Sphere::IsDegenerate() const
 {
 	return r < 0.f;
+}
+
+void Sphere::SetDegenerate()
+{
+	pos = float3::nan;
+	r = FLOAT_NAN;
 }
 
 bool Sphere::Contains(const float3 &point) const
@@ -776,6 +689,198 @@ float3 Sphere::RandomPointInside(LCG &lcg, const float3 &center, float radius)
 float3 Sphere::RandomPointOnSurface(LCG &lcg, const float3 &center, float radius)
 {
 	return Sphere(center, radius).RandomPointOnSurface(lcg);
+}
+
+Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b)
+{
+	Sphere s;
+	s.pos = (a + b) / 2.f;
+	s.r = (b - s.pos).Length();
+	assume(s.pos.IsFinite());
+	assume(s.r >= 0.f);
+
+	return s;
+}
+
+/** Computes the (s,t) barycentric coordinates of the smallest sphere that passes through three points (0,0,0), ab and ac.
+	@param ab The first point to fit the sphere through.
+	@param ac The second point to fit the sphere through. The third point is hardcoded to (0,0,0). When fitting a sphere
+		through three points a, b and c. Pass in b-a as the parameter ab, and c-a as the parameter ac (i.e. translate
+		the coordinate system center to lie at a).
+	@param s [out] Outputs the barycentric u-coordinate of the sphere center (in the 2D barycentric UV convention)
+	@param t [out] Outputs the barycentric v-coordinate of the sphere center (in the 2D barycentric UV convention) To
+		compute the actual point, calculate the expression origin + s*ab + t*ac.
+	@note The returned sphere is one that passes through the three points (0,0,0), ab and ac. It is NOT the smallest sphere
+		that encloses these three points!
+	@return True if the function succeeded. False on failure. This function fails if the points (0,0,0), ab and ac
+		are collinear, in which case there does not exist a sphere that passes through the three given points. */
+bool FitSphereBarycentricThroughPoints(const float3 &ab, const float3 &ac, float &s, float &t)
+{
+	/* The task is to compute the minimal radius sphere through the three points
+	   a, b and c. (Note that this is not necessarily the minimal radius sphere enclosing
+	   the points a, b and c!)
+
+	   Denote by p the sphere center position, and r the sphere radius. If the sphere
+	   is to run through the points a, b and c, then the center point of the sphere
+	   must be equidistant of these points, i.e. 
+
+	      || p - a || == || p - b || == || p - c ||,
+
+	   or
+
+	      a^2 - 2ap + p^2 == b^2 - 2bp + p^2 == c^2 - 2cp + p^2.
+
+	   Subtracting pairwise, we get
+
+	      (b-a)p == (b^2 - a^2)/2 and       (1)
+	      (c-a)p == (c^2 - a^2)/2.          (2)
+
+	   Additionally, the center point of the sphere must lie on the same plane as the triangle
+	   defined by the points a, b and c. Therefore, the point p can be represented as a 2D
+	   barycentric coordinates (s,t) as follows:
+
+	      p == a + s*(b-a) + t*(c-a).        (3)
+
+	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
+	   of the coordinate system to be centered at the point a), and we have:
+
+	      BP == B^2/2,            (1')
+	      CP == C^2/2 and         (2')
+	       P == s*B + t*C.        (3') */
+
+	const float BB = Dot(ab,ab);
+	const float CC = Dot(ac,ac);
+	const float BC = Dot(ab,ac);
+
+	/* Substitute (3') into (1') and (2'), to obtain a matrix equation
+
+	   ( B^2  BC  ) * (s) = (B^2 / 2)
+	   ( BC   C^2 )   (t)   (C^2 / 2)
+
+	   which equals
+	   
+	   (s) = ( B^2  BC  )^-1  *  (B^2 / 2)
+	   (t)   ( BC   C^2 )        (C^2 / 2)
+
+	   	Use the formula for inverting a 2x2 matrix, and we have
+
+	   (s) = 1 / (2 * B^2 * C^2 - (BC)^2) * ( C^2   -BC ) *  (B^2)
+	   (t)                                  ( -BC   B^2 )    (C^2)
+	*/
+
+	float denom = BB*CC - BC*BC;
+
+	if (EqualAbs(denom, 0.f))
+		return false;
+
+	denom = 0.5f / denom; // == 1 / (2 * B^2 * C^2 - (BC)^2)
+
+	s = (CC * BB - BC * CC) * denom;
+	t = (CC * BB - BC * BB) * denom;
+
+	return true;
+}
+
+Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c)
+{
+	Sphere sphere;
+
+	float3 ab = b-a;
+	float3 ac = c-a;
+
+	float s, t;
+	bool success = FitSphereBarycentricThroughPoints(ab, ac, s, t);
+	if (!success)
+	{
+		float3 minPt = Min(a, b, c);
+		float3 maxPt = Max(a, b, c);
+		sphere.pos = (minPt + maxPt) * 0.5f;
+		sphere.r = sphere.pos.Distance(minPt);
+	}
+
+	if (s < 0.f)
+	{
+		sphere.pos = (a + c) * 0.5f;
+		sphere.r = a.Distance(c) * 0.5f;
+	}
+	else if (t < 0.f)
+	{
+		sphere.pos = (a + b) * 0.5f;
+		sphere.r = a.Distance(b) * 0.5f;
+	}
+	else if (s+t > 1.f)
+	{
+		sphere.pos = (b + c) * 0.5f;
+		sphere.r = b.Distance(c);
+	}
+	else
+	{
+		const float3 c = s*ab + t*ac;
+		sphere.pos = a + c;
+		sphere.r = c.Length();
+	}
+	return sphere;
+}
+
+Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
+{
+	///\todo Implement.
+	assume(false && "Not implemented!");
+	return Sphere();
+}
+
+/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
+Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &c)
+{
+	Sphere sphere;
+
+	float3 ab = b-a;
+	float3 ac = c-a;
+
+	float s, t;
+	bool success = FitSphereBarycentricThroughPoints(ab, ac, s, t);
+	if (!success)
+	{
+		LOGW("Sphere::FitThroughPoints(a,b,c) failed! The three input points are collinear!");
+		sphere.SetDegenerate();
+		return sphere;
+	}
+
+	const float3 p = s*ab + t*ac;
+
+	// In our translated coordinate space, the origin lies on the sphere, so the distance of p from origin 
+	// gives the radius of the sphere.
+	sphere.r = p.Length(); 
+
+	// Translate back to original coordinate space.
+	sphere.pos = a + p;
+
+	return sphere;
+}
+
+Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
+{
+	float3x3 m;
+	m.SetRow(0, b - a);
+	m.SetRow(1, c - a);
+	m.SetRow(2, d - a);
+	float3 lengths = float3(m.Row(0).LengthSq(), m.Row(1).LengthSq(), m.Row(2).LengthSq()) * 0.5f;
+
+	Sphere s;
+
+	bool success = m.Inverse();
+	if (!success)
+	{
+		assume(false && "Sphere::FitThroughPoints through four points failed! The points lie on the same plane!");
+		s.SetDegenerate();
+		return s;
+	}
+
+	s.pos = m * lengths;
+	s.r = s.pos.Length();
+	s.pos += a;
+
+	return s;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT

@@ -50,8 +50,7 @@ public:
 	Sphere(const float3 &pointA, const float3 &pointB);
 
 	/// Constructs a sphere that passes through the given three points.
-	/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 .
-		@note The resulting sphere may not be the minimal enclosing sphere for the three points! */
+	/** @note The resulting sphere may not be the minimal enclosing sphere for the three points! */
 	Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC);
 
 	/// Constructs a sphere that passes through the given four points.
@@ -108,6 +107,10 @@ public:
 		@see pos, r, IsFinite(), SetNegativeInfinity(). */
 	bool IsDegenerate() const;
 
+	/// Resets the members of this Sphere to NaN values.
+	/** After calling this function, pos = NaN and r = NaN for this sphere. */
+	void SetDegenerate();
+
 	/// Tests if the given object is fully contained inside this sphere.
 	/** @see Distance(), Intersects(), ClosestPoint().
 		@todo Add Sphere::Contains(Circle/Disc). */
@@ -132,7 +135,7 @@ public:
 		@see OptimalEnclosingSphere(). */
 	static Sphere FastEnclosingSphere(const float3 *pointArray, int numPoints);
 
-	/// Returns a Sphere that bounds the given point array.
+	/// Computes the minimal bounding sphere for the given point array.
 	/** This function implements Emo Welzl's optimal enclosing sphere algorithm.
 		See "Smallest enclosing disks (balls and ellipsoids)", Lecture Notes in Computer Science 555 (1991) pp. 359-370.
 		The running time is expected linear time, but compared to Ritter's algorithm (the FastEnclosingSphere() function),
@@ -141,6 +144,48 @@ public:
 		@param numPoints The number of elements in the input array pointArray.
 		@see FastEnclosingSphere(). */
 	static Sphere OptimalEnclosingSphere(const float3 *pointArray, int numPoints);
+
+	/// Computes the minimal bounding sphere for two points.
+	/** This function computes the smallest volume sphere that contains the given two points. For two points,
+		the OptimalEnclosingSphere(a, b) is the same as calling FitThroughPoints(a, b).
+		@see FitThroughPoints(). */
+	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b);
+
+	/// Computes the minimal bounding sphere for three points.
+	/** This function computes the smallest volume sphere that contains the given three points. The smallest
+		enclosing sphere may not pass through all the three points that are specified. */
+	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c);
+
+	/// Computes the minimal bounding sphere for four points.
+	/** This function computes the smallest volume sphere that contains the given four points. The smallest
+		enclosing sphere may not pass through all the four points that are specified. */
+	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d);
+
+	/// Fits a sphere through the given two points.
+	/** Two points do not uniquely define a sphere in 3D space. This function computes the minimal enclosing
+		sphere for the given two points, which is uniquely defined. This function is identical to 
+		OptimalEnclosingSphere(a, b) and is simply an alias for that function.
+		@see OptimalEnclosingSphere(). */
+	static Sphere FitThroughPoints(const float3 &a, const float3 &b) { return OptimalEnclosingSphere(a, b); }
+
+	/// Fits a sphere through the given three points.
+	/** Three points do not uniquely define a sphere in 3D space. This function computes the sphere that goes
+		through these three points and has the minimal volume. Note that this is not the same than the smallest
+		sphere that encloses three given points, since the smallest enclosing sphere does not necessarily pass
+		through all the three points.
+		@note The three points that are passed in must not be collinear, because in that case a sphere cannot
+			be fitted through these points. 
+		@see OptimalEnclosingSphere(). */
+	static Sphere FitThroughPoints(const float3 &a, const float3 &b, const float3 &c);
+
+	/// Fits a sphere through the given four points.
+	/** Four points uniquely define a sphere in 3D space. This function computes the sphere that passes through
+		these four points. Note that this is not the same than the smallest enclosing sphere for the four points,
+		since the smallest enclosing sphere does not necessarily need to pass through all of these four points.
+		@note The four points that are passed in must not be coplanar, because in that case a sphere cannot
+			be fitted through these points.
+		@see OptimalEnclosingSphere(). */
+	static Sphere FitThroughPoints(const float3 &a, const float3 &b, const float3 &c, const float3 &d);
 
 /*
 	static Sphere ApproximateEnclosingSphere(const float3 *pointArray, int numPoints);
