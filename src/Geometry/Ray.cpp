@@ -204,12 +204,12 @@ bool Ray::Intersects(const Plane &plane) const
 
 bool Ray::Intersects(const Sphere &sphere, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
 {
-	return sphere.Intersects(*this, intersectionPoint, intersectionNormal, d);
+	return sphere.Intersects(*this, intersectionPoint, intersectionNormal, d) > 0;
 }
 
 bool Ray::Intersects(const Sphere &sphere) const
 {
-	return sphere.Intersects(*this, 0, 0, 0);
+	return sphere.Intersects(*this, 0, 0, 0) > 0;
 }
 
 bool Ray::Intersects(const AABB &aabb, float *dNear, float *dFar) const
