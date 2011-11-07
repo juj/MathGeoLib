@@ -468,13 +468,27 @@ public:
 
 	/// Computes the squared distance between the (x, y, z) parts of this and the given float4. 
 	/** @note This function ignores the w component of this and rhs vector (assumes w=0 or w=1 are the same for both vectors).
-		@see Distance3(), Length3Sq(), Length3(). */
+		@see Distance3(), Length3Sq(), Length3().
+		@return (x-rhs.x)^2 + (y-rhs.y)^2 + (z-rhs.z)^2. */
 	float Distance3Sq(const float4 &rhs) const;
 
 	/// Computes the distance between the (x, y, z) parts of this and the given float4. 
 	/** @note This function ignores the w component of this and rhs vector (assumes w=0 or w=1 are the same for both vectors).
-		@see Distance3Sq(), Length3Sq(), Length3(). */
+		@see Distance3Sq(), Length3Sq(), Length3().
+		@return Sqrt((x-rhs.x)^2 + (y-rhs.y)^2 + (z-rhs.z)^2). */
 	float Distance3(const float4 &rhs) const;
+
+	/// Computes the squared distance between this and the given float4.
+	/** @note This function computes the square of the Euclidean distance of the two vectors in 4D space (taking into account the w component).
+		@see Distance4Sq(), Distance3(), Distance3Sq(), Length3Sq(), Length3().
+		@return (x-rhs.x)^2 + (y-rhs.y)^2 + (z-rhs.z)^2 + (w-rhs.w)^2. */
+	float Distance4Sq(const float4 &rhs) const;
+
+	/// Computes the distance between this and the given float4.
+	/** @note This function computes the Euclidean distance of the two vectors in 4D space (taking into account the w component).
+		@see Distance4Sq(), Distance3(), Distance3Sq(), Length3Sq(), Length3().
+		@return Sqrt((x-rhs.x)^2 + (y-rhs.y)^2 + (z-rhs.z)^2 + (w-rhs.w)^2). */
+	float Distance4(const float4 &rhs) const;
 
 	/// Computes the dot product of the (x, y, z) parts of this and the given float4.
 	/** @note This function ignores the w component of this vector (assumes w=0).
@@ -639,6 +653,10 @@ inline float Dot3(const float4 &a, const float4 &b) { return a.Dot3(b); }
 inline float Dot4(const float4 &a, const float4 &b) { return a.Dot4(b); }
 inline float4 Cross3(const float4 &a, const float4 &b) { return a.Cross3(b); }
 inline float4 Abs(const float4 &a) { return a.Abs(); }
+inline float Length3(const float4 &a) { return a.Length3(); }
+inline float Length4(const float4 &a) { return a.Length4(); }
+inline float Distance3(const float4 &a, const float4 &b) { return a.Distance3(b); }
+inline float Distance4(const float4 &a, const float4 &b) { return a.Distance4(b); }
 inline float4 Min(const float4 &a, const float4 &b) { return a.Min(b); }
 inline float4 Max(const float4 &a, const float4 &b) { return a.Max(b); }
 inline float4 Clamp(const float4 &a, float floor, float ceil) { return a.Clamp(floor, ceil); }

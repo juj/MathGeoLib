@@ -447,6 +447,20 @@ float float4::Distance3(const float4 &rhs) const
 	return sqrtf(Distance3Sq(rhs));
 }
 
+float float4::Distance4Sq(const float4 &rhs) const
+{
+	float dx = x - rhs.x;
+	float dy = y - rhs.y;
+	float dz = z - rhs.z;
+	float dw = w - rhs.w;
+	return dx*dx + dy*dy + dz*dz + dw*dw;
+}
+
+float float4::Distance4(const float4 &rhs) const
+{
+	return sqrtf(Distance4Sq(rhs));
+}
+
 float float4::Dot3(const float3 &rhs) const
 {
 	return x * rhs.x + y * rhs.y + z * rhs.z;
