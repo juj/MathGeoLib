@@ -45,6 +45,10 @@ public:
 	/// Stores the fixed-point value.
 	BaseT value;
 
+	FixedPoint()
+	{
+	}
+
 	/** Converts an integer value to fixed-point value. */
 	FixedPoint(const BaseT &v)
 	:value(v << FracBits)
@@ -68,6 +72,11 @@ public:
 	operator double() const
 	{
 		return value/(double)One;
+	}
+
+	operator float() const
+	{
+		return value/(float)One;
 	}
 
 	/// Returns the truncated integer part.
