@@ -68,7 +68,6 @@ class Polyhedron;
 class Polynomial;
 class Quat;
 class Ray;
-class Rect;
 class Sphere;
 class TranslateOp;
 class Torus;
