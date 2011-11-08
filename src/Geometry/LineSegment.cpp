@@ -261,7 +261,7 @@ bool LineSegment::Intersects(const Triangle &triangle, float *d, float3 *interse
 
 bool LineSegment::Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
 {
-	return s.Intersects(*this, intersectionPoint, intersectionNormal, d);
+	return s.Intersects(*this, intersectionPoint, intersectionNormal, d) > 0;
 }
 
 bool LineSegment::Intersects(const AABB &aabb, float *dNear, float *dFar) const

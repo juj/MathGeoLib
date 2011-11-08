@@ -210,7 +210,7 @@ bool Line::Intersects(const Plane &plane, float *d) const
 
 bool Line::Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
 {
-	return s.Intersects(*this, intersectionPoint, intersectionNormal, d);
+	return s.Intersects(*this, intersectionPoint, intersectionNormal, d) > 0;
 }
 
 bool Line::Intersects(const AABB &aabb, float *dNear, float *dFar) const
