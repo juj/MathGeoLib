@@ -383,8 +383,15 @@ public:
 		If the determinant is negative, this matrix performs reflection about some axis.
 		From http://msdn.microsoft.com/en-us/library/bb204853(VS.85).aspx :
 		"If the determinant is positive, the basis is said to be "positively" oriented (or right-handed). 
-		If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)." */
+		If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)."
+		@note This function computes 9 LOADs, 9 MULs and 5 ADDs. */
 	float Determinant() const;
+
+	/// Computes the determinant of a symmetric matrix.
+	/** This function can be used to compute the determinant of a matrix in the case the matrix is known beforehand
+		to be symmetric. This function is slightly faster than Determinant().
+		@note This function computes 6 LOADs, 9 MULs and 4 ADDs. */
+	float DeterminantSymmetric() const;
 
 //	float2x2 SubMatrix(int i, int j) const;
 
@@ -429,6 +436,14 @@ public:
 	/// generic Inverse().
 	/// This function may not be called if this matrix contains any scaling or shearing, but it may contain mirroring.
 	void InverseOrthonormal();
+
+	/// Inverts a symmetric matrix.
+	/** This function is faster than directly calling Inverse().
+		This function computes 6 LOADs, 9 STOREs, 21 MULs, 1 DIV, 1 CMP and 8 ADDs.
+		@return True if computing the inverse succeeded, false otherwise (determinant was zero). If this function fails,
+			the original matrix is not modified.
+		@note This function operates in-place. */
+	bool InverseSymmetric();
 
 	/// Transposes this matrix.
 	/// This operation swaps all elements with respect to the diagonal.

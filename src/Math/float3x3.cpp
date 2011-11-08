@@ -694,7 +694,37 @@ float float3x3::Determinant() const
 	const float h = v[2][1];
 	const float i = v[2][2];
 
+	/* a b c
+	   d e f
+	   g h i */
+
+	// Perform a direct cofactor expansion:
 	return a*(e*i - f*h) + b*(f*g - d*i) + c*(d*h - e*g);
+}
+
+float float3x3::DeterminantSymmetric() const
+{
+	assume(IsSymmetric());
+	const float a = v[0][0];
+	const float b = v[0][1];
+	const float c = v[0][2];
+	const float d = v[1][1];
+	const float e = v[1][2];
+	const float f = v[2][2];
+
+	/* If the matrix is symmetric, it is of form
+	   a b c
+	   b d e
+	   c e f
+	*/
+
+	// A direct cofactor expansion gives
+	// det = a * (df - ee) -b * (bf - ce) + c * (be-dc)
+	//     = adf - aee - bbf + bce + bce - ccd
+	//     = adf - aee - bbf - ccd + 2*bce
+	//     = a(df-ee) + b(2*ce - bf) - ccd
+
+	return a * (d*f - e*e) + b * (2.f * c * e - b * f) - c*c*d;
 }
 
 #define SKIPNUM(val, skip) (val < skip ? val : skip + 1)
@@ -834,6 +864,46 @@ void float3x3::InverseOrthonormal()
 	assume(IsOrthonormal());
 	Transpose();
 	mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
+}
+
+bool float3x3::InverseSymmetric()
+{
+	assume(IsSymmetric());
+	const float a = v[0][0];
+	const float b = v[0][1];
+	const float c = v[0][2];
+	const float d = v[1][1];
+	const float e = v[1][2];
+	const float f = v[2][2];
+
+	/* If the matrix is symmetric, it is of form
+	   a b c
+	   b d e
+	   c e f
+	*/
+
+	// A direct cofactor expansion gives
+	// det = a * (df - ee) + b * (ce - bf) + c * (be-dc)
+
+	const float df_ee = d*f - e*e;
+	const float ce_bf = c*e - b*f;
+	const float be_dc = b*e - d*c;
+
+	float det = a * df_ee + b * ce_bf + c * be_dc; // = DeterminantSymmetric();
+	if (EqualAbs(det, 0.f))
+		return false;
+	det = 1.f / det;
+	
+	// The inverse of a symmetric matrix will also be symmetric, so can avoid some computations altogether.
+
+	v[0][0] = det * df_ee;
+	v[1][0] = v[0][1] = det * ce_bf;
+	v[0][2] = v[2][0] = det * be_dc;
+	v[1][1] = det * (a*f - c*c);
+	v[1][2] = v[2][1] = det * (c*b - a*e);
+	v[2][2] = det * (a*d - b*b);
+
+	return true;
 }
 
 void float3x3::Transpose()
