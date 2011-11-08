@@ -571,7 +571,7 @@ void Sphere::Enclose(const float3 *pointArray, int numPoints)
 		Enclose(pointArray[i]);
 }
 
-int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices)
+int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices) const
 {
 	assume(outPos);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS

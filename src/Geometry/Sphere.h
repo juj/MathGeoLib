@@ -282,7 +282,7 @@ public:
 		@param numVertices The size of the input arrays outPos and outNormal. This value should be of form 12 + 6*n for some n >= 0.
 						  To generate a perfect geosphere, pass in a number of form 3 * 4 * 3^k for some k >= 0.
 		@return The actual number of vertices generated (== the number of elements written to outPos and outNormal). */
-	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices);
+	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices) const;
 
 	/// Computes the intersection of a line and a sphere.
 	/** This function solves the points of intersection between a line and a sphere.
