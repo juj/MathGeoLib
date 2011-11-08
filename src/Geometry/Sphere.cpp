@@ -702,19 +702,19 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b)
 	return s;
 }
 
-/** Computes the (s,t) barycentric coordinates of the smallest sphere that passes through three points (0,0,0), ab and ac.
+/** Computes the (s,t) coordinates of the smallest sphere that passes through three points (0,0,0), ab and ac.
 	@param ab The first point to fit the sphere through.
 	@param ac The second point to fit the sphere through. The third point is hardcoded to (0,0,0). When fitting a sphere
-		through three points a, b and c. Pass in b-a as the parameter ab, and c-a as the parameter ac (i.e. translate
+		through three points a, b and c, pass in b-a as the parameter ab, and c-a as the parameter ac (i.e. translate
 		the coordinate system center to lie at a).
-	@param s [out] Outputs the barycentric u-coordinate of the sphere center (in the 2D barycentric UV convention)
-	@param t [out] Outputs the barycentric v-coordinate of the sphere center (in the 2D barycentric UV convention) To
+	@param s [out] Outputs the s-coordinate of the sphere center (in the 2D barycentric UV convention)
+	@param t [out] Outputs the t-coordinate of the sphere center (in the 2D barycentric UV convention) To
 		compute the actual point, calculate the expression origin + s*ab + t*ac.
-	@note The returned sphere is one that passes through the three points (0,0,0), ab and ac. It is NOT the smallest sphere
-		that encloses these three points!
+	@note The returned sphere is one that passes through the three points (0,0,0), ab and ac. It is NOT necessarily the 
+		smallest sphere that encloses these three points!
 	@return True if the function succeeded. False on failure. This function fails if the points (0,0,0), ab and ac
 		are collinear, in which case there does not exist a sphere that passes through the three given points. */
-bool FitSphereBarycentricThroughPoints(const float3 &ab, const float3 &ac, float &s, float &t)
+bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, float &s, float &t)
 {
 	/* The task is to compute the minimal radius sphere through the three points
 	   a, b and c. (Note that this is not necessarily the minimal radius sphere enclosing
@@ -722,7 +722,7 @@ bool FitSphereBarycentricThroughPoints(const float3 &ab, const float3 &ac, float
 
 	   Denote by p the sphere center position, and r the sphere radius. If the sphere
 	   is to run through the points a, b and c, then the center point of the sphere
-	   must be equidistant of these points, i.e. 
+	   must be equidistant to these points, i.e. 
 
 	      || p - a || == || p - b || == || p - c ||,
 
@@ -742,7 +742,8 @@ bool FitSphereBarycentricThroughPoints(const float3 &ab, const float3 &ac, float
 	      p == a + s*(b-a) + t*(c-a).        (3)
 
 	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
-	   of the coordinate system to be centered at the point a), and we have:
+	   of the coordinate system to be centered at the point a), i.e. make the substitutions
+	   A = (0,0,0), B = b-a, C = c-a, and we have:and we have:
 
 	      BP == B^2/2,            (1')
 	      CP == C^2/2 and         (2')
@@ -781,6 +782,92 @@ bool FitSphereBarycentricThroughPoints(const float3 &ab, const float3 &ac, float
 	return true;
 }
 
+/** Computes the center point coordinates of the sphere that passes through four points (0,0,0), ab, ac and ad.
+	@param ab The first point to fit the sphere through.
+	@param ac The second point to fit the sphere through.
+	@param ad The third point to fit the sphere through. The fourth point is hardcoded to (0,0,0). When fitting a sphere
+		through four points a, b c and d, pass in b-a as the parameter ab, and c-a as the parameter ac and d-a as
+		the parameter ad (i.e. translate
+		the coordinate system center to lie at a).
+	@param s [out] Outputs the s-coordinate of the sphere center.
+	@param t [out] Outputs the t-coordinate of the sphere center.
+	@param u [out] Outputs the u-coordinate of the sphere center. To
+		compute the actual point, calculate the expression a + s*ab + t*ac + u*ad.
+	@note The returned sphere is one that passes through the four points (0,0,0), ab, ac and ad. It is NOT necessarily
+		the smallest sphere that encloses these four points!
+	@return True if the function succeeded. False on failure. This function fails if the points (0,0,0), ab, ac and ad
+		are coplanar, in which case there does not exist a sphere that passes through the four given points. */
+bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad, float &s, float &t, float &u)
+{
+	/* The task is to compute the (unique) sphere through the four points
+	   a, b c and d. (Note that this is not necessarily the minimal radius sphere enclosing
+	   the points a, b, c and d!)
+
+	   Denote by p the sphere center position, and r the sphere radius. If the sphere
+	   is to run through the points a, b, c and d, then the center point of the sphere
+	   must be equidistant to these points, i.e. 
+
+	      || p - a || == || p - b || == || p - c || == || p - d ||,
+
+	   or
+
+	      a^2 - 2ap + p^2 == b^2 - 2bp + p^2 == c^2 - 2cp + p^2 == d^2 - 2dp + p ^2.
+
+	   Subtracting pairwise, we get
+
+	      (b-a)p == (b^2 - a^2)/2,          (1)
+	      (c-a)p == (c^2 - a^2)/2 and       (2)
+	      (d-a)p == (d^2 - a^2)/2.          (3)
+
+	   Additionally, the center point of the sphere can be represented as a linear combination
+	   of the four points a, b, c and d, as follows:
+
+	      p == a + s*(b-a) + t*(c-a) + u*(d-a).        (4)
+
+	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
+	   of the coordinate system to be centered at the point a, i.e. make the substitutions
+	   A = (0,0,0), B = b-a, C = c-a, D = d-a, and we have:
+
+	      BP == B^2/2,            (1')
+	      CP == C^2/2 and         (2')
+	      DP == D^2/2 and         (3')
+	       P == s*B + t*C + u*D.  (4')
+
+	   Substitute (4') into (1'), (2') and (3'), to obtain a matrix equation
+
+	      ( B^2  BC  BD )   (s)   (B^2 / 2)
+	      ( BC   C^2 CD ) * (t) = (C^2 / 2)
+	      ( BD   CD  D^2)   (u)   (D^2 / 2)
+
+	   which equals
+	   
+	      (s)   ( B^2  BC  BD )^-1   (B^2 / 2)
+	      (t) = ( BC   C^2 CD )    * (C^2 / 2)
+	      (u)   ( BD   CD  D^2)      (D^2 / 2)
+
+	   	Then we simply invert the 3x3 matrix and compute the vector (s, t, u). */
+
+	const float BB = Dot(ab, ab);
+	const float BC = Dot(ab, ac);
+	const float BD = Dot(ab, ad);
+	const float CC = Dot(ac, ac);
+	const float CD = Dot(ac, ad);
+	const float DD = Dot(ad, ad);
+
+	float3x3 m;
+	m[0][0] = BB; m[0][1] = BC; m[0][2] = BD;
+	m[1][0] = BC; m[1][1] = CC; m[1][2] = CD;
+	m[2][0] = BD; m[2][1] = CD; m[2][2] = DD;
+	m.InverseSymmetric();
+	float3 v = m * float3(BB * 0.5f, CC * 0.5f, DD * 0.5f);
+	s = v.x;
+	t = v.y;
+	u = v.z;
+
+	return true;
+}
+
+/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c)
 {
 	Sphere sphere;
@@ -789,7 +876,7 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	float3 ac = c-a;
 
 	float s, t;
-	bool success = FitSphereBarycentricThroughPoints(ab, ac, s, t);
+	bool success = FitSphereThroughPoints(ab, ac, s, t);
 	if (!success)
 	{
 		float3 minPt = Min(a, b, c);
@@ -822,11 +909,66 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	return sphere;
 }
 
+/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
 {
-	///\todo Implement.
-	assume(false && "Not implemented!");
-	return Sphere();
+	Sphere sphere;
+
+	float s,t,u;
+	const float3 ab = b-a;
+	const float3 ac = c-a;
+	const float3 ad = d-a;
+	bool success = FitSphereThroughPoints(ab, ac, ad, s, t, u);
+	if (!success)
+	{
+		// The points are coplanar. It is not possible to fit a point through these four points.
+		// Try each triplet in turn, and see which one also encloses the fourth point.
+		/// @todo This logic can probably be optimized in some way.
+		sphere = OptimalEnclosingSphere(a,b,c);
+		if (sphere.Contains(d))
+			return sphere;
+
+		sphere = OptimalEnclosingSphere(a,b,d);
+		if (sphere.Contains(c))
+			return sphere;
+
+		sphere = OptimalEnclosingSphere(a,c,d);
+		if (sphere.Contains(b))
+			return sphere;
+
+		sphere = OptimalEnclosingSphere(b,c,d);
+		assume(sphere.Contains(a));
+		return sphere;
+	}
+
+	if (s < 0.f)
+	{
+		sphere = OptimalEnclosingSphere(a, c, d);
+		mathassert(sphere.Contains(b));
+	}
+	else if (t < 0.f)
+	{
+		sphere = OptimalEnclosingSphere(a, b, d);
+		mathassert(sphere.Contains(c));
+	}
+	else if (u < 0.f)
+	{
+		sphere = OptimalEnclosingSphere(a, b, c);
+		mathassert(sphere.Contains(d));
+	}
+	else if (s + t + u > 1.f)
+	{
+		sphere = OptimalEnclosingSphere(b, c, d);
+		mathassert(sphere.Contains(a));
+	}
+	else
+	{
+		const float3 center = s*ab + t*ac + u*ad;
+		sphere.r = center.Length();
+		sphere.pos = a + center;
+	}
+
+	return sphere;
 }
 
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
@@ -838,7 +980,7 @@ Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &
 	float3 ac = c-a;
 
 	float s, t;
-	bool success = FitSphereBarycentricThroughPoints(ab, ac, s, t);
+	bool success = FitSphereThroughPoints(ab, ac, s, t);
 	if (!success)
 	{
 		LOGW("Sphere::FitThroughPoints(a,b,c) failed! The three input points are collinear!");
@@ -858,29 +1000,29 @@ Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &
 	return sphere;
 }
 
+/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
 {
-	float3x3 m;
-	m.SetRow(0, b - a);
-	m.SetRow(1, c - a);
-	m.SetRow(2, d - a);
-	float3 lengths = float3(m.Row(0).LengthSq(), m.Row(1).LengthSq(), m.Row(2).LengthSq()) * 0.5f;
+	Sphere sphere;
 
-	Sphere s;
-
-	bool success = m.Inverse();
-	if (!success)
+	float s,t,u;
+	const float3 ab = b-a;
+	const float3 ac = c-a;
+	const float3 ad = d-a;
+	bool success = FitSphereThroughPoints(ab, ac, ad, s, t, u);
+	if (success)
 	{
-		assume(false && "Sphere::FitThroughPoints through four points failed! The points lie on the same plane!");
-		s.SetDegenerate();
-		return s;
+		const float3 center = s*ab + t*ac + u*ad;
+		sphere.r = center.Length();
+		sphere.pos = a + center;
+	}
+	else
+	{
+		LOGW("Sphere::FitThroughPoints through four points failed! The points lie on the same plane!");
+		sphere.SetDegenerate();
 	}
 
-	s.pos = m * lengths;
-	s.r = s.pos.Length();
-	s.pos += a;
-
-	return s;
+	return sphere;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
