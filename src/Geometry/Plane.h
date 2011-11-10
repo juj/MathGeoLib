@@ -334,6 +334,18 @@ public:
 //	float3 RandomPointInsideCircle(const float3 &circleCenter, float radius) const;
 //	float3 RandomPointOnCircleEdge(const float3 &circleCenter, float radius) const;
 
+	/// Computes the intersection of a line and a plane.
+	/** @param ptOnPlane An arbitrary point on the plane.
+		@param planeNormal The plane normal direction vector. This vector can be unnormalized.
+		@param lineStart The starting point of the line.
+		@param lineDir The line direction vector. This vector does not need to be normalized.
+		@param t [out] If this function returns true, this parameter will receive the distance along the line where intersection occurs.
+					That is, the point lineStart + t * lineDir will be the intersection point. Note that if |lineDir| != 1,
+					then t will not contain the real distance, but one scaled to the units of lineDir.
+		@return If an intersection occurs, this function returns true. */
+	static bool IntersectLinePlane(const float3 &ptOnPlane, const float3 &planeNormal, 
+	                               const float3 &lineStart, const float3 &lineDir, float &t);
+
 #ifdef MATH_OGRE_INTEROP
 	Plane(const Ogre::Plane &other) { normal = other.normal; d = other.d; }
 	operator Ogre::Plane() const { return Ogre::Plane(normal, d); }

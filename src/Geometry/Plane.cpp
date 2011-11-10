@@ -435,28 +435,44 @@ bool Plane::Intersects(const Polygon &polygon) const
 	return polygon.Intersects(*this);
 }
 
-/// Computes the intersection of a line and a plane.
-/// @param ptOnPlane An arbitrary point on the plane.
-/// @param planeNormal The plane normal direction vector, which must be normalized.
-/// @param lineStart The starting point of the line.
-/// @param lineDir The line direction vector. This vector does not need to be normalized.
-/// @param t [out] If this function returns true, this parameter will receive the distance along the line where intersection occurs.
-///				That is, the point lineStart + t * lineDir will be the intersection point.
-/// @return If an intersection occurs, this function returns true.
-bool IntersectLinePlane(const float3 &ptOnPlane, const float3 &planeNormal, const float3 &lineStart, const float3 &lineDir, float *t)
+bool Plane::IntersectLinePlane(const float3 &p, const float3 &n, const float3 &a, const float3 &d, float &t)
 {
-	float denom = Dot(lineDir, planeNormal);
+	/* The set of points x lying on a plane is defined by the equation
+
+		(x - p)*n == 0, where p is a point on the plane, and n is the plane normal.
+
+	The set of points x on a line is constructed explicitly by a single parameter t by
+
+		x = a + t*d, where a is a point on the line, and d is the direction vector of the line.
+
+	To solve the intersection of these two objects, substitute the second equation to the first above,
+	and we get
+
+		  (a + t*d - p)*n == 0, or
+		t*(d*n) + (a-p)*n == 0, or
+	                    t == (p-a)*n / (d*n), assuming that d*n != 0.
+
+	If d*n == 0, then the line is parallel to the plane, and either no intersection occurs, or the whole line
+	is embedded on the plane, and infinitely many intersections occur. */
+
+	float denom = Dot(d, n);
 	if (EqualAbs(denom, 0.f))
-		return false; // Either we have no intersection, or the whole line is on the plane. @todo distinguish these cases.
-	if (t)
-		*t = Dot(ptOnPlane - lineStart, planeNormal);
-	return true;
+	{
+		t = 0.f;
+		return EqualAbs(Dot(a-p, n), 0.f); // If (a-p)*n == 0, then then above equation holds for all t, and return true.
+	}
+	else
+	{
+		// Compute the distance from the line starting point to the point of intersection.
+		t = Dot(p - a, n) / denom;
+		return true;
+	}
 }
 
 bool Plane::Intersects(const Ray &ray, float *d) const
 {
 	float t;
-	bool success = IntersectLinePlane(PointOnPlane(), normal, ray.pos, ray.dir, &t);
+	bool success = IntersectLinePlane(PointOnPlane(), normal, ray.pos, ray.dir, t);
 	if (d)
 		*d = t;
 	return success && t >= 0.f;
@@ -464,13 +480,16 @@ bool Plane::Intersects(const Ray &ray, float *d) const
 
 bool Plane::Intersects(const Line &line, float *d) const
 {
-	return IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, d);
+	float t;
+	return IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, t);
+	if (d)
+		*d = t;
 }
 
 bool Plane::Intersects(const LineSegment &lineSegment, float *d) const
 {
 	float t;
-	bool success = IntersectLinePlane(PointOnPlane(), normal, lineSegment.a, lineSegment.Dir(), &t);
+	bool success = IntersectLinePlane(PointOnPlane(), normal, lineSegment.a, lineSegment.Dir(), t);
 	const float lineSegmentLength = lineSegment.Length();
 	if (d)
 		*d = t / lineSegmentLength;
@@ -563,7 +582,7 @@ int Plane::Intersects(const Circle &circle) const
 bool Plane::Clip(float3 &a, float3 &b) const
 {
 	float t;
-	bool intersects = IntersectLinePlane(PointOnPlane(), normal, a, b-a, &t);
+	bool intersects = IntersectLinePlane(PointOnPlane(), normal, a, b-a, t);
 	if (!intersects || t <= 0.f || t >= 1.f)
 	{
 		if (SignedDistance(a) <= 0.f)
@@ -589,7 +608,7 @@ bool Plane::Clip(LineSegment &line) const
 int Plane::Clip(const Line &line, Ray &outRay) const
 {
 	float t;
-	bool intersects = IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, &t);
+	bool intersects = IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, t);
 	if (!intersects)
 	{
 		if (SignedDistance(line.pos) <= 0.f)
