@@ -1257,20 +1257,19 @@ bool float3x4::IsInvertible(float epsilon) const
 
 bool float3x4::IsSymmetric(float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = y+1; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], v[x][y], epsilon))
-				return false;
-	return true;
+	return EqualAbs(v[0][1], v[1][0], epsilon) &&
+		EqualAbs(v[0][2], v[2][0], epsilon) &&
+		EqualAbs(v[1][2], v[2][1], epsilon);
 }
 
 bool float3x4::IsSkewSymmetric(float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = y; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], -v[x][y], epsilon))
-				return false;
-	return true;
+	return EqualAbs(v[0][0], 0.f, epsilon) &&
+		EqualAbs(v[1][1], 0.f, epsilon) &&
+		EqualAbs(v[2][2], 0.f, epsilon) &&
+		EqualAbs(v[0][1], -v[1][0], epsilon) &&
+		EqualAbs(v[0][2], -v[2][0], epsilon) &&
+		EqualAbs(v[1][2], -v[2][1], epsilon);
 }
 
 bool float3x4::HasUnitaryScale(float epsilon) const
