@@ -476,13 +476,13 @@ float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegment
 	float closestDist = FLOAT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
-		float3 lineSegmentPt;
-		float3 pt = tris[i].ClosestPoint(lineSegment, &lineSegmentPt);
-		float d = pt.DistanceSq(closestLineSegmentPt);
+		float3 lineSegPt;
+		float3 pt = tris[i].ClosestPoint(lineSegment, &lineSegPt);
+		float d = pt.DistanceSq(lineSegPt);
 		if (d < closestDist)
 		{
 			closestPt = pt;
-			closestLineSegmentPt = lineSegmentPt;
+			closestLineSegmentPt = lineSegPt;
 			closestDist = d;
 		}
 	}

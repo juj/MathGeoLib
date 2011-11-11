@@ -402,14 +402,14 @@ float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegm
 	float3 closestLineSegmentPt;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
-		float3 lineSegmentPt;
-		float3 pt = FacePolygon(i).ClosestPoint(lineSegment, &lineSegmentPt);
-		float d = pt.DistanceSq(lineSegmentPt);
+		float3 lineSegPt;
+		float3 pt = FacePolygon(i).ClosestPoint(lineSegment, &lineSegPt);
+		float d = pt.DistanceSq(lineSegPt);
 		if (d < closestDistance)
 		{
 			closestDistance = d;
 			closestPt = pt;
-			closestLineSegmentPt = lineSegmentPt;
+			closestLineSegmentPt = lineSegPt;
 		}
 	}
 	if (lineSegmentPt)
