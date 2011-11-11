@@ -115,6 +115,7 @@ public:
 	/** @see Distance(), Intersects(), ClosestPoint().
 		@todo Add Sphere::Contains(Circle/Disc). */
 	bool Contains(const float3 &point) const;
+	bool Contains(const float3 &point, float epsilon) const;
 	bool Contains(const LineSegment &lineSegment) const;
 	bool Contains(const Triangle &triangle) const;
 	bool Contains(const Polygon &polygon) const;
@@ -140,6 +141,8 @@ public:
 		See "Smallest enclosing disks (balls and ellipsoids)", Lecture Notes in Computer Science 555 (1991) pp. 359-370.
 		The running time is expected linear time, but compared to Ritter's algorithm (the FastEnclosingSphere() function),
 		this algorithm is considerably slower.
+		The implementation of this function is based on the book Geometric Tools for Computer Graphics, pp. 807-813, by
+		Schneider and Eberly.
 		@param pointArray An array of points to compute an enclosing sphere for. This pointer must not be null.
 		@param numPoints The number of elements in the input array pointArray.
 		@see FastEnclosingSphere(). */
@@ -160,6 +163,17 @@ public:
 	/** This function computes the smallest volume sphere that contains the given four points. The smallest
 		enclosing sphere may not pass through all the four points that are specified. */
 	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d);
+
+	/// Computes the minimal bounding sphere for four points.
+	/** This function computes the smallest volume sphere that contains the given five points.
+		@param redundantPoint [out] Since a sphere is characterized by four points, one of the given points 
+			will necessarily be redundant and not part of the support set of the minimal enclosing sphere. This
+			parameter will receive the index [0, 4] of the five input points denoting which point became redundant.
+			(Note that there may be more than one point not lying on the support set of the sphere, but this function
+			only returns one)
+		@return The smallest volume sphere that encloses the given five points. */
+	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d, const float3 &e,
+	                                     int &redundantPoint);
 
 	/// Fits a sphere through the given two points.
 	/** Two points do not uniquely define a sphere in 3D space. This function computes the minimal enclosing
@@ -187,10 +201,6 @@ public:
 		@see OptimalEnclosingSphere(). */
 	static Sphere FitThroughPoints(const float3 &a, const float3 &b, const float3 &c, const float3 &d);
 
-/*
-	static Sphere ApproximateEnclosingSphere(const float3 *pointArray, int numPoints);
-
-*/
 	/// Returns the distance between this sphere and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
@@ -279,8 +289,7 @@ public:
 	/** @param outPos [out] An array of size numVertices which will receive a triangle list of vertex positions. Cannot be null.
 		@param outNormal [out] An array of size numVertices which will receive vertex normals. If this parameter is null, vertex normals are not generated.
 		@param outUV [out] An array of size numVertices which will receive UV coordinates. If this parameter is null, UV coordinates are not generated.
-		@param numVertices The size of the input arrays outPos and outNormal. This value should be of form 12 + 6*n for some n >= 0.
-						  To generate a perfect geosphere, pass in a number of form 3 * 4 * 3^k for some k >= 0.
+		@param numVertices The size of the input arrays outPos and outNormal. This value should be of form 24*4^n for some n >= 0.
 		@return The actual number of vertices generated (== the number of elements written to outPos and outNormal). */
 	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices) const;
 

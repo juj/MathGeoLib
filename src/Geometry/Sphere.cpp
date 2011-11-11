@@ -124,6 +124,11 @@ bool Sphere::Contains(const float3 &point) const
 	return pos.DistanceSq(point) <= r*r;
 }
 
+bool Sphere::Contains(const float3 &point, float epsilon) const
+{
+	return pos.DistanceSq(point) <= r*r + epsilon;
+}
+
 bool Sphere::Contains(const LineSegment &lineSegment) const
 {
 	return Contains(lineSegment.a) && Contains(lineSegment.b);
@@ -234,13 +239,8 @@ Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
 	return s;
 }
 
-Sphere Sphere::OptimalEnclosingSphere(const float3 *pointArray, int numPoints)
-{
-	assume(false && "Not implemented!");
-	return Sphere();
-}
-
-/* This implementation was adapted from Christer Ericson's Real-time Collision Detection, pp. 99-100. */
+/* This implementation was adapted from Christer Ericson's Real-time Collision Detection, pp. 99-100.
+	@bug This implementation is broken! */
 /*
 Sphere WelzlSphere(const float3 *pts, int numPoints, float3 *support, int numSupports)
 {
@@ -265,17 +265,66 @@ Sphere WelzlSphere(const float3 *pts, int numPoints, float3 *support, int numSup
 	return WelzlSphere(pts, numPoints - 1,  support, numSupports + 1);
 }
 */
-/*
 Sphere Sphere::OptimalEnclosingSphere(const float3 *pts, int numPoints)
 {
-	float3 support[4];
-	WelzlSphere(pts, numPoints, &support, 0);
-}
-*/
-/*
-Sphere Sphere::ApproximateEnclosingSphere(const float3 *pointArray, int numPoints)
+	// If we have only a small number of points, can solve with a specialized function.
+	switch(numPoints)
+	{
+	case 0: return Sphere();
+	case 1: return Sphere(pts[0], 0.f); // Sphere around a single point will be degenerate with r = 0.
+	case 2: return OptimalEnclosingSphere(pts[0], pts[1]);
+	case 3: return OptimalEnclosingSphere(pts[0], pts[1], pts[2]);
+	case 4: return OptimalEnclosingSphere(pts[0], pts[1], pts[2], pts[3]);
+	default: break;
+	}
 
-*/
+	// The set of supporting points for the minimal sphere. Even though the minimal enclosing
+	// sphere might have 2, 3 or 4 points in its support (sphere surface), always store here 
+	// indices to exactly four points.
+	int sp[4] = { 0, 1, 2, 3 };
+	// Due to numerical issues, it can happen that the minimal sphere for four points {a,b,c,d} does not 
+	// accommodate a fifth point e, but replacing any of the points a-d from the support with the point e
+	// does not accommodate the all the five points either.
+	// Therefore, keep a set of flags for each support point to avoid going in cycles, where the same
+	// set of points are again and again added and removed from the support, causing an infinite loop.
+	bool expendable[4] = { true, true, true, true };
+	// The so-far constructed minimal sphere.
+	Sphere s = OptimalEnclosingSphere(pts[sp[0]], pts[sp[1]], pts[sp[2]], pts[sp[3]]);
+	const float epsilon = 1e-5f;
+	float rSq = s.r * s.r + epsilon;
+	for(int i = 4; i < numPoints; ++i)
+	{
+		if (i == sp[0] || i == sp[1] || i == sp[2] || i == sp[3])
+			continue; // Take care not to add the same point twice to the support set.
+		// If the next point (pts[i]) does not fit inside the currently computed minimal sphere, compute
+		// a new minimal sphere that also contains pts[i].
+		if (pts[i].DistanceSq(s.pos) > rSq)
+		{
+			int redundant;
+			s = OptimalEnclosingSphere(pts[sp[0]], pts[sp[1]], pts[sp[2]], pts[sp[3]], pts[i], redundant);
+			rSq = s.r*s.r + epsilon;
+			// A sphere is uniquely defined by four points, so one of the five points passed in above is 
+			// now redundant, and can be removed from the support set. 
+			if (redundant != 4 && (sp[redundant] < i || expendable[redundant]))
+			{
+				sp[redundant] = i; // Replace the old point with the new one.
+				expendable[redundant] = false; // This new one cannot be evicted (until we proceed past it in the input list later)
+				// Mark all points in the array before this index "expendable", meaning that they can be removed from the support set.
+				if (sp[0] < i) expendable[0] = true;
+				if (sp[1] < i) expendable[1] = true;
+				if (sp[2] < i) expendable[2] = true;
+				if (sp[3] < i) expendable[3] = true;
+
+				// Have to start all over and make sure all old points also lie inside this new sphere, 
+				// since our guess for the minimal enclosing sphere changed.
+				i = 0; 
+			}
+		}
+	}
+
+	return s;
+}
+
 float Sphere::Distance(const float3 &point) const
 {
 	return Max(0.f, pos.Distance(point) - r);
@@ -585,7 +634,7 @@ int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int nu
 #else
 	Array<Triangle> temp;
 #endif
-	// Start subdividing from a tetrahedron.
+	// Start subdividing from a diamond shape.
 	float3 xp(r,0,0);
 	float3 xn(-r,0,0);
 	float3 yp(0,r,0);
@@ -741,7 +790,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, float &s, float 
 
 	      p == a + s*(b-a) + t*(c-a).        (3)
 
-	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
+	   Now, without loss of generality, assume that the point a lies at origin (translate the origin 
 	   of the coordinate system to be centered at the point a), i.e. make the substitutions
 	   A = (0,0,0), B = b-a, C = c-a, and we have:and we have:
 
@@ -824,7 +873,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 
 	      p == a + s*(b-a) + t*(c-a) + u*(d-a).        (4)
 
-	   Now, without loss of generality, assume that the point a liest at origin (translate the origin 
+	   Now, without loss of generality, assume that the point a lies at origin (translate the origin 
 	   of the coordinate system to be centered at the point a, i.e. make the substitutions
 	   A = (0,0,0), B = b-a, C = c-a, D = d-a, and we have:
 
@@ -858,7 +907,9 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 	m[0][0] = BB; m[0][1] = BC; m[0][2] = BD;
 	m[1][0] = BC; m[1][1] = CC; m[1][2] = CD;
 	m[2][0] = BD; m[2][1] = CD; m[2][2] = DD;
-	m.InverseSymmetric();
+	bool success = m.InverseSymmetric();
+	if (!success)
+		return false;
 	float3 v = m * float3(BB * 0.5f, CC * 0.5f, DD * 0.5f);
 	s = v.x;
 	t = v.y;
@@ -870,6 +921,8 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c)
 {
+	const float epsilon = 1e-5f;
+
 	Sphere sphere;
 
 	float3 ab = b-a;
@@ -898,7 +951,7 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	else if (s+t > 1.f)
 	{
 		sphere.pos = (b + c) * 0.5f;
-		sphere.r = b.Distance(c);
+		sphere.r = b.Distance(c) * 0.5f;
 	}
 	else
 	{
@@ -906,12 +959,18 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 		sphere.pos = a + c;
 		sphere.r = c.Length();
 	}
+
+	mathassert(sphere.Contains(a, epsilon));
+	mathassert(sphere.Contains(b, epsilon));
+	mathassert(sphere.Contains(c, epsilon));
 	return sphere;
 }
 
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
 {
+	const float epsilon = 1e-5f;
+
 	Sphere sphere;
 
 	float s,t,u;
@@ -919,56 +978,80 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	const float3 ac = c-a;
 	const float3 ad = d-a;
 	bool success = FitSphereThroughPoints(ab, ac, ad, s, t, u);
-	if (!success)
+	if (!success || s < 0.f || t < 0.f || u < 0.f || s+t+u > 1.f)
 	{
-		// The points are coplanar. It is not possible to fit a point through these four points.
-		// Try each triplet in turn, and see which one also encloses the fourth point.
-		/// @todo This logic can probably be optimized in some way.
+		const float epsilon = 1e-5f;
 		sphere = OptimalEnclosingSphere(a,b,c);
-		if (sphere.Contains(d))
-			return sphere;
-
-		sphere = OptimalEnclosingSphere(a,b,d);
-		if (sphere.Contains(c))
-			return sphere;
-
-		sphere = OptimalEnclosingSphere(a,c,d);
-		if (sphere.Contains(b))
-			return sphere;
-
-		sphere = OptimalEnclosingSphere(b,c,d);
-		assume(sphere.Contains(a));
-		return sphere;
+		if (!sphere.Contains(d, epsilon))
+		{
+			sphere = OptimalEnclosingSphere(a,b,d);
+			if (!sphere.Contains(c, epsilon))
+			{
+				sphere = OptimalEnclosingSphere(a,c,d);
+				if (!sphere.Contains(b, epsilon))
+				{
+					sphere = OptimalEnclosingSphere(b,c,d);
+					assume(sphere.Contains(a, epsilon));
+				}
+			}
+		}
 	}
-
+	/* // Note: Trying to approach the problem like this, like was in the triangle case, is flawed:
 	if (s < 0.f)
-	{
 		sphere = OptimalEnclosingSphere(a, c, d);
-		mathassert(sphere.Contains(b));
-	}
 	else if (t < 0.f)
-	{
 		sphere = OptimalEnclosingSphere(a, b, d);
-		mathassert(sphere.Contains(c));
-	}
 	else if (u < 0.f)
-	{
 		sphere = OptimalEnclosingSphere(a, b, c);
-		mathassert(sphere.Contains(d));
-	}
 	else if (s + t + u > 1.f)
-	{
-		sphere = OptimalEnclosingSphere(b, c, d);
-		mathassert(sphere.Contains(a));
-	}
-	else
+		sphere = OptimalEnclosingSphere(b, c, d); */
+	else // The fitted sphere is inside the convex hull of the vertices (a,b,c,d), so it must be optimal.
 	{
 		const float3 center = s*ab + t*ac + u*ad;
 		sphere.r = center.Length();
 		sphere.pos = a + center;
 	}
 
+	mathassert(sphere.Contains(a, epsilon));
+	mathassert(sphere.Contains(b, epsilon));
+	mathassert(sphere.Contains(c, epsilon));
+	mathassert(sphere.Contains(d, epsilon));
+
 	return sphere;
+}
+
+Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d, const float3 &e,
+                                      int &redundantPoint)
+{
+	const float epsilon = 1e-5f;
+	Sphere s = OptimalEnclosingSphere(b,c,d,e);
+	if (s.Contains(a, epsilon))
+	{
+		redundantPoint = 0;
+		return s;
+	}
+	s = OptimalEnclosingSphere(a,c,d,e);
+	if (s.Contains(b, epsilon))
+	{
+		redundantPoint = 1;
+		return s;
+	}
+	s = OptimalEnclosingSphere(a,b,d,e);
+	if (s.Contains(c, epsilon))
+	{
+		redundantPoint = 2;
+		return s;
+	}
+	s = OptimalEnclosingSphere(a,b,c,e);
+	if (s.Contains(d, epsilon))
+	{
+		redundantPoint = 3;
+		return s;
+	}
+	s = OptimalEnclosingSphere(a,b,c,d);
+	mathassert(s.Contains(e, epsilon));
+	redundantPoint = 4;
+	return s;
 }
 
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
