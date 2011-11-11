@@ -265,6 +265,10 @@ Sphere WelzlSphere(const float3 *pts, int numPoints, float3 *support, int numSup
 	return WelzlSphere(pts, numPoints - 1,  support, numSupports + 1);
 }
 */
+
+// The epsilon value used for enclosing sphere computations.
+static const float epsilon = 1e-4f;
+
 Sphere Sphere::OptimalEnclosingSphere(const float3 *pts, int numPoints)
 {
 	// If we have only a small number of points, can solve with a specialized function.
@@ -290,7 +294,6 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 *pts, int numPoints)
 	bool expendable[4] = { true, true, true, true };
 	// The so-far constructed minimal sphere.
 	Sphere s = OptimalEnclosingSphere(pts[sp[0]], pts[sp[1]], pts[sp[2]], pts[sp[3]]);
-	const float epsilon = 1e-5f;
 	float rSq = s.r * s.r + epsilon;
 	for(int i = 4; i < numPoints; ++i)
 	{
@@ -748,6 +751,12 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b)
 	assume(s.pos.IsFinite());
 	assume(s.r >= 0.f);
 
+	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
+	// really contain the points (note that the points must be sufficiently near enough to the origin)
+	s.r += epsilon;
+
+	mathassert(s.Contains(a));
+	mathassert(s.Contains(b));
 	return s;
 }
 
@@ -921,8 +930,6 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c)
 {
-	const float epsilon = 1e-5f;
-
 	Sphere sphere;
 
 	float3 ab = b-a;
@@ -955,22 +962,30 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	}
 	else
 	{
-		const float3 c = s*ab + t*ac;
-		sphere.pos = a + c;
-		sphere.r = c.Length();
+		const float3 center = s*ab + t*ac;
+		sphere.pos = a + center;
+		// Mathematically, the following would be correct, but it suffers from floating point inaccuracies,
+		// since it only tests distance against one point.
+		//sphere.r = center.Length();
+
+		// For robustness, take the radius to be the distance to the farthest point (though the distance are all
+		// equal).
+		sphere.r = Sqrt(Max(sphere.pos.DistanceSq(a), sphere.pos.DistanceSq(b), sphere.pos.DistanceSq(c)));
 	}
 
-	mathassert(sphere.Contains(a, epsilon));
-	mathassert(sphere.Contains(b, epsilon));
-	mathassert(sphere.Contains(c, epsilon));
+	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
+	// really contain the points (note that the points must be sufficiently near enough to the origin)
+	sphere.r += epsilon;
+
+	mathassert(sphere.Contains(a));
+	mathassert(sphere.Contains(b));
+	mathassert(sphere.Contains(c));
 	return sphere;
 }
 
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d)
 {
-	const float epsilon = 1e-5f;
-
 	Sphere sphere;
 
 	float s,t,u;
@@ -980,7 +995,6 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	bool success = FitSphereThroughPoints(ab, ac, ad, s, t, u);
 	if (!success || s < 0.f || t < 0.f || u < 0.f || s+t+u > 1.f)
 	{
-		const float epsilon = 1e-5f;
 		sphere = OptimalEnclosingSphere(a,b,c);
 		if (!sphere.Contains(d, epsilon))
 		{
@@ -1008,14 +1022,25 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	else // The fitted sphere is inside the convex hull of the vertices (a,b,c,d), so it must be optimal.
 	{
 		const float3 center = s*ab + t*ac + u*ad;
-		sphere.r = center.Length();
+
 		sphere.pos = a + center;
+		// Mathematically, the following would be correct, but it suffers from floating point inaccuracies,
+		// since it only tests distance against one point.
+		//sphere.r = center.Length();
+
+		// For robustness, take the radius to be the distance to the farthest point (though the distance are all
+		// equal).
+		sphere.r = Sqrt(Max(sphere.pos.DistanceSq(a), sphere.pos.DistanceSq(b), sphere.pos.DistanceSq(c), sphere.pos.DistanceSq(d)));
+
+		// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
+		// really contain the points (note that the points must be sufficiently near enough to the origin)
+		sphere.r += epsilon;
 	}
 
-	mathassert(sphere.Contains(a, epsilon));
-	mathassert(sphere.Contains(b, epsilon));
-	mathassert(sphere.Contains(c, epsilon));
-	mathassert(sphere.Contains(d, epsilon));
+	mathassert(sphere.Contains(a));
+	mathassert(sphere.Contains(b));
+	mathassert(sphere.Contains(c));
+	mathassert(sphere.Contains(d));
 
 	return sphere;
 }
@@ -1023,7 +1048,6 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d, const float3 &e,
                                       int &redundantPoint)
 {
-	const float epsilon = 1e-5f;
 	Sphere s = OptimalEnclosingSphere(b,c,d,e);
 	if (s.Contains(a, epsilon))
 	{
