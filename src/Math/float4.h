@@ -216,6 +216,9 @@ public:
 	/// @return (s/x, s/y, s/z, s/w).
 	float4 DivLeft(float s) const;
 
+	/// Returns the (x, y) part of this vector.
+	float2 xy() const;
+
 	/// Returns the (x, y, z) part of this vector.
 	float3 xyz() const;
 

@@ -94,6 +94,11 @@ float &float4::At(int index)
 	return ptr()[index];
 }
 
+float2 float4::xy() const
+{
+	return float2(x, y);
+}
+
 float3 float4::xyz() const
 {
 	return float3(x, y, z);
