@@ -44,6 +44,7 @@ public:
 		default constructor. Remember to assign to them before use.
 		@see a, b, c. */
 	Triangle() {}
+
 	/// Constructs a triangle from three given endpoints.
 	/** The normal of the plane will be constructed to point towards the halfspace where
 		the vertices a, b and c wind in counter-clockwise order.

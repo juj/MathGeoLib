@@ -6,7 +6,7 @@
 #include <assert.h>
 #endif
 
-//#define MATH_ASSERT_ON_ASSUME
+#define MATH_ASSERT_ON_ASSUME
 
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
 
