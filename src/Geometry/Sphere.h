@@ -333,4 +333,9 @@ Q_DECLARE_METATYPE(Sphere)
 Q_DECLARE_METATYPE(Sphere*)
 #endif
 
+Sphere operator *(const float3x3 &m, const Sphere &s);
+Sphere operator *(const float3x4 &m, const Sphere &s);
+Sphere operator *(const float4x4 &m, const Sphere &s);
+Sphere operator *(const Quat &q, const Sphere &s);
+
 MATH_END_NAMESPACE

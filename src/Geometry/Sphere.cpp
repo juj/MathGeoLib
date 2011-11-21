@@ -431,13 +431,13 @@ int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const fl
 	    <a,a> + 2 * <a, t * lineDir> + <t * lineDir, t * lineDir> == radSq, or		
 	    <a,a> - radSq + 2 * <a, lineDir> * t + <lineDir, lineDir> * t^2 == 0, or
 
-	    A + Bt + Ct^2 == 0, where
+	    C + Bt + At^2 == 0, where
 
-	    A = <a,a> - radSq,
+	    C = <a,a> - radSq,
 	    B = 2 * <a, lineDir>, and
-	    C = <lineDir, lineDir> == 1, since we assumed lineDir is normalized. */
+	    A = <lineDir, lineDir> == 1, since we assumed lineDir is normalized. */
 
-	const float A = Dot(a,a) - radSq;
+	const float C = Dot(a,a) - radSq;
 	const float B = 2.f * Dot(a, lineDir);
 
 	/* The equation A + Bt + Ct^2 == 0 is a second degree equation on t, which is easily solvable using the 
@@ -445,20 +445,20 @@ int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const fl
 
 	    t = [-B +/- Sqrt(B^2 - 4AC)] / 2A. */
 
-	float D = B*B - 4.f * A; // D = B^2 - 4AC.
+	float D = B*B - 4.f * C; // D = B^2 - 4AC.
 	if (D < 0.f) // There is no solution to the square root, so the ray doesn't intersect the sphere.
 		return 0;
 
 	if (D < 1e-4f) // The expression inside Sqrt is ~ 0. The line is tangent to the sphere, and we have one solution.
 	{
-		t1 = t2 = -B / (2.f * A);
+		t1 = t2 = -B * 0.5f;
 		return 1;
 	}
 
 	// The Sqrt expression is strictly positive, so we get two different solutions for t.
 	D = Sqrt(D);
-	t1 = (-B - D) / (2.f * A);
-	t2 = (-B + D) / (2.f * A);
+	t1 = (-B - D) * 0.5f;
+	t2 = (-B + D) * 0.5f;
 	return 2;
 }
 
@@ -1141,5 +1141,29 @@ std::string Sphere::ToString() const
 	return str;
 }
 #endif
+
+Sphere operator *(const float3x3 &m, const Sphere &s)
+{
+	assume(m.HasUniformScale());
+	return Sphere(m * s.pos, s.r * m.Col(0).Length());
+}
+
+Sphere operator *(const float3x4 &m, const Sphere &s)
+{
+	assume(m.HasUniformScale());
+	return Sphere(m.MulPos(s.pos), s.r * m.Col(0).Length());
+}
+
+Sphere operator *(const float4x4 &m, const Sphere &s)
+{
+	assume(m.HasUniformScale());
+	assume(!m.ContainsProjection());
+	return Sphere(m.MulPos(s.pos), s.r * m.Col3(0).Length());
+}
+
+Sphere operator *(const Quat &q, const Sphere &s)
+{
+	return q.ToFloat3x3() * s;
+}
 
 MATH_END_NAMESPACE
