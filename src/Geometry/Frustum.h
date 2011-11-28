@@ -20,6 +20,10 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+#ifdef MATH_TINYXML_INTEROP
+#include "Config/tinyxml/tinyxml.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 enum FrustumType
@@ -344,6 +348,10 @@ public:
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Frustum &frustum) const;
 	bool Intersects(const Polyhedron &polyhedron) const;
+
+#ifdef MATH_TINYXML_INTEROP
+	void DeserializeFromXml(TiXmlElement *e);
+#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.

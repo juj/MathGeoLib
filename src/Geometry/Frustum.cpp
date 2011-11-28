@@ -560,6 +560,22 @@ bool Frustum::Intersects(const Polyhedron &polyhedron) const
 	return this->ToPolyhedron().Intersects(polyhedron);
 }
 
+#ifdef MATH_TINYXML_INTEROP
+
+void Frustum::DeserializeFromXml(TiXmlElement *e)
+{
+	type = !_stricmp(e->Attribute("orthographic"), "true") ? OrthographicFrustum : PerspectiveFrustum;
+	pos = float3::FromString(e->Attribute("pos"));
+	front = float3::FromString(e->Attribute("front"));
+	up = float3::FromString(e->Attribute("up"));
+	e->QueryFloatAttribute("nearPlaneDistance", &nearPlaneDistance);
+	e->QueryFloatAttribute("farPlaneDistance", &farPlaneDistance);
+	e->QueryFloatAttribute("horizontalFov", &horizontalFov);
+	e->QueryFloatAttribute("verticalFov", &verticalFov);
+}
+
+#endif
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 
 std::string FrustumTypeToString(FrustumType t)

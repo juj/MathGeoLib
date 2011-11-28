@@ -84,6 +84,11 @@
   <ItemGroup>
     <None Include="..\src\Math\Matrix.inl" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CodeLib\msvc\CodeLib.vcxproj">
+      <Project>{709dc866-59d0-4e18-8028-788b4e534cdc}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5C786B4A-5F5D-4D7A-AA99-00875BBEFB13}</ProjectGuid>
     <RootNamespace>MathGeoLib</RootNamespace>
@@ -115,8 +120,8 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)../src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MATH_TINYXML_INTEROP;_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -128,8 +133,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)../src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;NDEBUG;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MATH_TINYXML_INTEROP;_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;NDEBUG;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
