@@ -34,6 +34,10 @@
 #include "Math/float4.h"
 #include "Math/Quat.h"
 
+#ifdef MATH_TINYXML_INTEROP
+#include "Container/UString.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 float Frustum::AspectRatio() const
@@ -564,7 +568,7 @@ bool Frustum::Intersects(const Polyhedron &polyhedron) const
 
 void Frustum::DeserializeFromXml(TiXmlElement *e)
 {
-	type = !_stricmp(e->Attribute("orthographic"), "true") ? OrthographicFrustum : PerspectiveFrustum;
+	type = StrCaseEq(e->Attribute("orthographic"), "true") ? OrthographicFrustum : PerspectiveFrustum;
 	pos = float3::FromString(e->Attribute("pos"));
 	front = float3::FromString(e->Attribute("front"));
 	up = float3::FromString(e->Attribute("up"));
