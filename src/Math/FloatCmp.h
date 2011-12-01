@@ -18,7 +18,7 @@
 #pragma once
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-#include <cassert>
+#include "myassert.h"
 #endif
 
 MATH_BEGIN_NAMESPACE

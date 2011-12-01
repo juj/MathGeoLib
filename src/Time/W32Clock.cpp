@@ -17,7 +17,7 @@
 
 #ifdef WIN32
 
-#include <cassert>
+#include "myassert.h"
 
 #include "Time/Clock.h"
 #include "Log.h"

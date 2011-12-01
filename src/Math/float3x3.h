@@ -19,7 +19,7 @@
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <ostream>
-#include <cassert>
+#include "myassert.h"
 #endif
 
 #include "Math/MathFwd.h"

@@ -3,10 +3,12 @@
 #include "Math/MathNamespace.h"
 #include <stdio.h>
 #ifdef WIN32
-#include <assert.h>
+#include "myassert.h"
 #endif
 
+#ifdef WIN32
 #define MATH_ASSERT_ON_ASSUME
+#endif
 
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
 

@@ -16,7 +16,7 @@
 	@author Jukka Jylänki
 	@brief Implementation for the Polygon geometry object. */
 #ifdef MATH_ENABLE_STL_SUPPORT
-#include <cassert>
+#include "myassert.h"
 #include <utility>
 #include <list>
 #endif

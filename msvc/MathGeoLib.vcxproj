@@ -160,6 +160,8 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>PERFORMANCEPROFILING;MATH_TINYXML_INTEROP;MATH_ENABLE_STL_SUPPORT;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OmitFramePointer>false</OmitFramePointer>
+      <UnswitchLoops>false</UnswitchLoops>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

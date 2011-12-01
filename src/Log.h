@@ -11,7 +11,8 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License. */
-#pragma once
+#ifndef LOG_H
+#define LOG_H
 
 /** @file Log.h
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
@@ -98,5 +99,7 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGE(...) ((void)0)
 #define LOGW(...) ((void)0)
 #define LOGI(...) ((void)0)
+
+#endif
 
 #endif

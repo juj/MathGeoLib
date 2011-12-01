@@ -17,7 +17,7 @@
 
 #ifdef UNIX
 
-#include <cassert>
+#include "myassert.h"
 
 #include <time.h>
 #include <errno.h>
