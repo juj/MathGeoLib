@@ -70,3 +70,15 @@ MATH_END_NAMESPACE
 #else
 #define mathassert(x)
 #endif
+
+// Kill both assume() and mathassert() macros in OPTIMIZED_RELEASE builds.
+#ifdef OPTIMIZED_RELEASE
+#ifdef assume
+#undef assume
+#endif
+#ifdef mathassert
+#undef mathassert
+#endif
+#define assume(x)
+#define mathassert(x)
+#endif
