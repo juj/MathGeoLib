@@ -179,7 +179,7 @@
       <PreprocessorDefinitions>PERFORMANCEPROFILING;MATH_TINYXML_INTEROP;_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;NDEBUG;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
