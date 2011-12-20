@@ -11,6 +11,7 @@
 #include "Math/MathFunc.h"
 #include "Algorithm/Random/LCG.h"
 #include "Time/Clock.h"
+#include "Types.h"
 
 LCG::LCG()
 {
@@ -58,17 +59,17 @@ u32 LCG::Int()
 	// Currently we cast everything to 64-bit to avoid overflow, which is quite dumb.
 
 	// Create the new random number
-#ifdef WIN32
-	unsigned __int64 newNum = ((unsigned __int64)lastNumber * (unsigned __int64)multiplier + (unsigned __int64)increment) % (unsigned __int64)modulus;
+//#ifdef WIN32
+	u64 newNum = ((u64)lastNumber * (u64)multiplier + (u64)increment) % (u64)modulus;
 //	u32 m = lastNumber * multiplier;
 //	u32 i = m + increment;
 //	u32 f = i & 0x7FFFFFFF;
 //	u32 m = (lastNumber * 214013 + 2531011) & 0x7FFFFFFF;
 //	unsigned __int64 newNum = (lastNumber * multiplier + increment) & 0x7FFFFFFF;
-#else
+//#else
 	// On console platform, we rely on using smaller sequences.
-	unsigned long newNum = ((unsigned long)lastNumber * (unsigned long)multiplier + (unsigned long)increment) % (unsigned long)modulus;
-#endif
+//	unsigned long newNum = ((unsigned long)lastNumber * (unsigned long)multiplier + (unsigned long)increment) % (unsigned long)modulus;
+//#endif
 	// Save the newly generated random number to use as seed for the next one.
 //	lastNumber = m;//(u32)newNum;
 	lastNumber = (u32)newNum;
