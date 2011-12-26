@@ -15,7 +15,7 @@
 /** @file UnixClock.cpp
 	@brief */
 
-#ifdef UNIX
+#if defined(UNIX) || defined(ANDROID)
 
 #include "myassert.h"
 
