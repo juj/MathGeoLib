@@ -66,7 +66,7 @@ void EnableMemoryLeakLoggingAtExit();
 
 #ifndef LOGGING_SUPPORT_DISABLED
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__APPLE__) || defined(UNIX)
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.
 //#define LOG(channel, msg, ...)  ( IsLogChannelActive(channel) && (TimeOutputDebugStringVariadic(channel, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
@@ -79,7 +79,7 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGW(msg, ...)  ( kNet::IsLogChannelActive(LogWarning) && (kNet::TimeOutputDebugStringVariadic(LogWarning, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 #define LOGI(msg, ...)  ( kNet::IsLogChannelActive(LogInfo) && (kNet::TimeOutputDebugStringVariadic(LogInfo, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 */
-#else
+#elif defined(ANDROID)
 
 #include <android/log.h>
 

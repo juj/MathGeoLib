@@ -178,6 +178,7 @@ bool Circle::IntersectsDisc(const Ray &ray) const
 	return ray.GetPoint(d).DistanceSq(pos) <= r*r;
 }
 
+#ifdef MATH_ENABLE_STL_SUPPORT
 std::vector<float3> Circle::IntersectsFaces(const AABB &aabb) const
 {
     return IntersectsFaces(aabb.ToOBB());
@@ -187,7 +188,7 @@ std::vector<float3> Circle::IntersectsFaces(const OBB &obb) const
 {
 	std::vector<float3> intersectionPoints;
 	for(int i = 0; i < 6; ++i)
-	{
+	{		
 		Plane p = obb.FacePlane(i);
 		float3 pt1, pt2;
 		int numIntersections = Intersects(p, &pt1, &pt2);
@@ -199,7 +200,6 @@ std::vector<float3> Circle::IntersectsFaces(const OBB &obb) const
 	return intersectionPoints;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
 std::string Circle::ToString() const
 {
 	char str[256];
