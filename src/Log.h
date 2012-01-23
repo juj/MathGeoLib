@@ -66,7 +66,7 @@ void EnableMemoryLeakLoggingAtExit();
 
 #ifndef LOGGING_SUPPORT_DISABLED
 
-#if defined(WIN32) || defined(__APPLE__) || defined(UNIX)
+#if defined(WIN32) || defined(__APPLE__) || defined(__GNUC__)
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.
 //#define LOG(channel, msg, ...)  ( IsLogChannelActive(channel) && (TimeOutputDebugStringVariadic(channel, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
