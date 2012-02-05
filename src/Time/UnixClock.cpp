@@ -24,11 +24,8 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "kNet/Clock.h"
-#include "kNet/NetworkLogging.h"
-
-namespace kNet
-{
+#include "Time/Clock.h"
+#include "Log.h"
 
 tick_t Clock::appStartTime = 0;
 
@@ -132,7 +129,5 @@ tick_t Clock::TicksPerSec()
     return 1;
 #endif
 }
-
-} // ~kNet
 
 #endif

@@ -887,9 +887,39 @@ void float3x4::InverseOrthonormal()
 #endif
 
 	assume(IsOrthonormal());
+
+	/* In this function, we seek to optimize the matrix inverse in the case this
+	   matrix is orthonormal, i.e. it can be written in the following form:
+
+	              [ R | T ]
+	          M = [---+---]
+	              [ 0 | 1 ]
+
+	   where R is a 3x3 orthonormal (orthogonal vectors, normalized columns) rotation
+	   matrix, and T is a 3x1 vector representing the translation performed by
+	   this matrix.
+
+	   In this form, the inverse of this matrix is simple to compute and will not
+	   require the calculation of determinants or expensive Gaussian elimination. The
+	   inverse is of form
+
+	                 [ R^t | R^t(-T) ]
+	          M^-1 = [-----+---------]
+	                 [  0  |    1    ]
+
+	   which can be seen by multiplying out M * M^(-1) in block form. Especially the top-
+	   right cell turns out to (remember that R^(-1) == R^t since R is orthonormal)
+
+	        R * R^t(-T) + T * 1 == (R * R^t)(-T) + T == -T + T == 0, as expected.
+
+	   Therefore the inversion requires only two steps: */
+
+	// a) Transpose the top-left 3x3 part in-place to produce R^t.
 	Swap(v[0][1], v[1][0]);
 	Swap(v[0][2], v[2][0]);
 	Swap(v[1][2], v[2][1]);
+
+	// b) Replace the top-right 3x1 part by computing R^t(-T).
 	SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 
 	mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
