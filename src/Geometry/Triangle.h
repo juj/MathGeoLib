@@ -263,9 +263,9 @@ public:
 	bool Intersects(const Capsule &capsule) const;
 
 	/// A helper function used in line-triangle tests.
-	static bool IntersectLineTri(const float3 &linePos, const float3 &lineDir,
+	static float IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 		const float3 &v0, const float3 &v1, const float3 &v2,
-		float &u, float &v, float &t);
+		float &u, float &v);
 
 	/// Projects this Triangle onto the given axis.
 	/** This function is used in SAT tests (separate axis theorem) to check the interval this triangle

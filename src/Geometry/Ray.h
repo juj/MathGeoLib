@@ -193,8 +193,14 @@ public:
 
 };
 
+/// @note Assumes that transform may contain scaling, and re-normalizes the ray direction
+///		after the transform.
 Ray operator *(const float3x3 &transform, const Ray &ray);
+/// @note Assumes that transform may contain scaling, and re-normalizes the ray direction
+///		after the transform.
 Ray operator *(const float3x4 &transform, const Ray &ray);
+/// @note Assumes that transform may contain scaling, and re-normalizes the ray direction
+///		after the transform.
 Ray operator *(const float4x4 &transform, const Ray &ray);
 Ray operator *(const Quat &transform, const Ray &ray);
 

@@ -189,7 +189,11 @@ bool Ray::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoi
 
 bool Ray::Intersects(const Triangle &triangle) const
 {
-	return triangle.Intersects(*this, 0, 0);
+	float u, v;
+	float t = Triangle::IntersectLineTri(pos, dir, triangle.a, triangle.b, triangle.c, u, v);
+	if (t < 0.f || t == FLOAT_INF)
+		return false;
+	return true;
 }
 
 bool Ray::Intersects(const Plane &plane, float *d) const
@@ -278,17 +282,20 @@ std::string Ray::ToString() const
 
 Ray operator *(const float3x3 &transform, const Ray &ray)
 {
-	return Ray(transform * ray.pos, transform * ray.dir);
+	assume(transform.IsInvertible());
+	return Ray(transform * ray.pos, (transform * ray.dir).Normalized());
 }
 
 Ray operator *(const float3x4 &transform, const Ray &ray)
 {
-	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir));
+	assume(transform.IsInvertible());
+	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir).Normalized());
 }
 
 Ray operator *(const float4x4 &transform, const Ray &ray)
 {
-	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir));
+	assume(transform.IsInvertible());
+	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir).Normalized());
 }
 
 Ray operator *(const Quat &transform, const Ray &ray)

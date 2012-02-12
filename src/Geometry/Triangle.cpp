@@ -270,10 +270,12 @@ float Triangle::Distance(const Sphere &sphere) const
 	@param u [out] The barycentric u coordinate is returned here if an intersection occurred.
 	@param v [out] The barycentric v coordinate is returned here if an intersection occurred.
 	@param t [out] The signed distance from ray origin to ray intersection position will be returned here. (if intersection occurred)
-	@return True if an intersection occurred. If no intersection, then u,v and t will contain undefined values. */
-bool Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
+	@return The distance along the ray to the point of intersection, or +inf if no intersection occurred. 
+		If no intersection, then u and v and t will contain undefined values.
+	@note This function will return a negative value (success) if the intersection occurred behind the ray origin. */
+float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 		const float3 &v0, const float3 &v1, const float3 &v2,
-		float &u, float &v, float &t)
+		float &u, float &v)
 {
 	float3 vE1, vE2;
 	float3 vT, vP, vQ;
@@ -285,37 +287,36 @@ bool Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 	vE2 = v2 - v0;
 
 	// begin calculating determinant - also used to calculate U parameter
-	vP = Cross(lineDir, vE2);
+	vP = lineDir.Cross(vE2);
 
 	// If det < 0, intersecting backfacing tri, > 0, intersecting frontfacing tri, 0, parallel to plane.
-	const float det = Dot(vE1, vP);
+	const float det = vE1.Dot(vP);
 
 	// If determinant is near zero, ray lies in plane of triangle.
 	if (fabs(det) <= epsilon)
-		return false;
+		return FLOAT_INF;
 	const float recipDet = 1.f / det;
 
 	// Calculate distance from v0 to ray origin
 	vT = linePos - v0;
 
 	// Output barycentric u
-	u = Dot(vT, vP) * recipDet;
+	u = vT.Dot(vP) * recipDet;
 	if (u < 0.f || u > 1.f)
-		return false; // Barycentric U is outside the triangle - early out.
+		return FLOAT_INF; // Barycentric U is outside the triangle - early out.
 
 	// Prepare to test V parameter
-	vQ = Cross(vT, vE1);
+	vQ = vT.Cross(vE1);
 
 	// Output barycentric v
-	v = Dot(lineDir, vQ) * recipDet;
+	v = lineDir.Dot(vQ) * recipDet;
 	if (v < 0.f || u + v > 1.f) // Barycentric V or the combination of U and V are outside the triangle - no intersection.
-		return false;
+		return FLOAT_INF;
 
 	// Barycentric u and v are in limits, the ray intersects the triangle. 
 	
 	// Output signed distance from ray to triangle.
-	t = Dot(vE2, vQ) * recipDet;
-	return true;
+	return vE2.Dot(vQ) * recipDet;
 //	return (det < 0.f) ? IntersectBackface : IntersectFrontface;
 }
 
@@ -325,8 +326,9 @@ bool Triangle::Intersects(const LineSegment &l, float *d, float3 *intersectionPo
 	/** The Triangle-Line/LineSegment/Ray intersection tests are based on M&ouml;ller-Trumbore method:
 		"T. M&ouml;ller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
 		http://jgt.akpeters.com/papers/MollerTrumbore97/. */
-	float u, v, t;
-	bool success = IntersectLineTri(l.a, l.Dir(), a, b, c, u, v, t);
+	float u, v;
+	float t = IntersectLineTri(l.a, l.Dir(), a, b, c, u, v);
+	bool success = (t >= 0 && t != FLOAT_INF);
 	if (!success)
 		return false;
 	float length = l.LengthSq();
@@ -347,8 +349,9 @@ bool Triangle::Intersects(const LineSegment &l, float *d, float3 *intersectionPo
 
 bool Triangle::Intersects(const Line &l, float *d, float3 *intersectionPoint) const
 {
-	float u, v, t;
-	bool success = IntersectLineTri(l.pos, l.dir, a, b, c, u, v, t);
+	float u, v;
+	float t = IntersectLineTri(l.pos, l.dir, a, b, c, u, v);
+	bool success = (t != FLOAT_INF);
 	if (!success)
 		return false;
 	if (d)
@@ -360,9 +363,10 @@ bool Triangle::Intersects(const Line &l, float *d, float3 *intersectionPoint) co
 
 bool Triangle::Intersects(const Ray &r, float *d, float3 *intersectionPoint) const
 {
-	float u, v, t;
-	bool success = IntersectLineTri(r.pos, r.dir, a, b, c, u, v, t);
-	if (!success || t <= 0.f)
+	float u, v;
+	float t = IntersectLineTri(r.pos, r.dir, a, b, c, u, v);
+	bool success = (t >= 0 && t != FLOAT_INF);
+	if (!success)
 		return false;
 	if (d)
 		*d = t;
