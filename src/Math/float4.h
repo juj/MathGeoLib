@@ -31,6 +31,8 @@
 #include <OgreVector4.h>
 #endif
 
+#define MATH_SSE
+
 #ifdef MATH_SSE
 #include <xmmintrin.h>
 #endif

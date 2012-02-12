@@ -29,6 +29,7 @@
 #include "Algorithm/Random/LCG.h"
 #include "Math/float4x4.h"
 #include "Math/MathFunc.h"
+#include "SSEMath.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -123,84 +124,7 @@ float4 float4::Swizzled(int i, int j, int k, int l) const
 #endif
 }
 
-static const u32 andMaskOne = 0xFFFFFFFF;
-static const float andMaskOneF = *(float*)&andMaskOne;
-
 #ifdef MATH_SSE
-
-/// Returns a SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
-/// Warning: _mm_setr_ps is slow!
-inline __m128 SSEMaskXYZ()
-{
-	return _mm_setr_ps(andMaskOneF,andMaskOneF,andMaskOneF,0.f);
-}
-
-inline __m128 _mm_sum_xyz_ps(__m128 m)
-{
-#ifdef MATH_SSE3 // If we have SSE 3, we can use the haddps (horizontal add) instruction, _mm_hadd_ps intrinsic.
-	m = _mm_and_ps(m, SSEMaskXYZ()); // Clear w to zero.
-	m = _mm_hadd_ps(m, m); // m = (x+y, z+w, x+y, z+w).
-	m = _mm_hadd_ps(m, m); // m = (x+y+z+w, x+y+z+w, x+y+z+w, x+y+z+w).
-	return m; // Each index of the output will contain the sum x+y+z.
-#else // We only have SSE 1, and must individually shuffle.
-	__m128 Y = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,1,1,1)); // Load Y to lowest index. (others don't matter)
-	__m128 Z = _mm_shuffle_ps(m, m, _MM_SHUFFLE(2,2,2,2)); // Load Z to lowest index. (others don't matter)
-	__m128 XYZ = _mm_add_ss(m, _mm_add_ss(Y, Z));
-	return XYZ; // Only the lowest index of the output will contain x+y+z.
-#endif
-}
-
-inline __m128 _mm_sum_xyzw_ps(__m128 m)
-{
-#ifdef MATH_SSE3 // If we have SSE 3, we can use the haddps (horizontal add) instruction, _mm_hadd_ps intrinsic.
-	m = _mm_hadd_ps(m, m); // m = (x+y, z+w, x+y, z+w).
-	m = _mm_hadd_ps(m, m); // m = (x+y+z+w, x+y+z+w, x+y+z+w, x+y+z+w).
-	return m; // Each index of the output will contain the sum x+y+z+w.
-#else // We only have SSE 1, and must individually shuffle.
-	__m128 Y = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,1,1,1)); // Load Y to lowest index. (others don't matter)
-	__m128 Z = _mm_shuffle_ps(m, m, _MM_SHUFFLE(2,2,2,2)); // Load Z to lowest index. (others don't matter)
-	__m128 W = _mm_shuffle_ps(m, m, _MM_SHUFFLE(3,3,3,3)); // Load W to lowest index. (others don't matter)
-	__m128 XYZW = _mm_add_ss(_mm_add_ss(m, Y), _mm_add_ss(Z, W));
-	return XYZW; // Only the lowest index of the output will contain x+y+z+w.
-#endif
-}
-
-inline __m128 _mm_mul_xyzw_ps(__m128 v)
-{
-	__m128 v2 = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 0, 3, 2)); // v2 = [y, x, w, z]
-	v2 = _mm_mul_ps(v, v2); // v2 = [w*y, z*x, y*w, x*z]
-	__m128 v3 = _mm_shuffle_ps(v2, v2, _MM_SHUFFLE(2, 1, 0, 3)); // v3 = [z*x, y*w, x*z, w*y]
-	return _mm_mul_ps(v2, v3); // v3 = [w*y*z*x, z*x*y*w, y*w*x*z, x*z*w*y]
-}
-
-const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
-
-inline __m128 _mm_abs_ps(__m128 x)
-{
-    return _mm_andnot_ps(sign_mask, x);
-}
-
-inline __m128 _mm_dot3_ps(__m128 a, __m128 b)
-{
-#ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
-	__m128 v2 = _mm_dp_ps(a, b, 0x70 | 0x0F); // Choose to multiply x, y and z (0x70 = 0111 0000), and store the output to all indices (0x0F == 0000 1111).
-	return v2;
-#else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
-	__m128 v2 = _mm_mul_ps(a, b);
-	return _mm_sum_xyz_ps(v2);
-#endif
-}
-
-inline __m128 _mm_dot4_ps(__m128 a, __m128 b)
-{
-#ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
-	__m128 v2 = _mm_dp_ps(a, b, 0xF0 | 0x0F); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
-	return v2;
-#else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
-	__m128 v2 = _mm_mul_ps(a, b);
-	return _mm_sum_xyzw_ps(v2);
-#endif
-}
 
 __m128 float4::Swizzled_SSE(int i, int j, int k, int l) const
 {
@@ -238,27 +162,6 @@ __m128 float4::LengthSq4_SSE() const
 __m128 float4::Length4_SSE() const
 {
 	return _mm_sqrt_ss(_mm_dot4_ps(v, v));
-}
-
-inline float M128_TO_FLOAT(__m128 sse)
-{
-	float ret;
-	_mm_store_ss(&ret, sse);
-	return ret;
-}
-
-const __m128 epsilonFloat = _mm_set1_ps(1e-4f);
-
-// If mask[i] == 0, then output index i from a, otherwise mask[i] must be 0xFFFFFFFF, and output index i from b.
-__m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
-{
-#ifdef MATH_SSE41 // SSE 4.1 offers conditional copying between registers with the blendvps instruction.
-	return _mm_blendv_ps(a, b, mask);
-#else // If not on SSE 4.1, use conditional masking.
-	b = _mm_and_ps(b, mask); // Where mask is 1, output b.
-	a = _mm_andnot_ps(a, mask); // Where mask is 0, output a.
-	return _mm_or_ps(a, b);
-#endif
 }
 
 __m128 float4::Normalize3_SSE()

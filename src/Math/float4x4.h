@@ -32,6 +32,12 @@
 #include <QMatrix4x4>
 #endif
 
+#define MATH_SSE
+
+#ifdef MATH_SSE
+#include <xmmintrin.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A 4-by-4 matrix for affine transformations and perspective projections of 3D geometry.
@@ -74,7 +80,13 @@ public:
 
 	/// Stores the data in this matrix in row-major format.
 	/** [noscript] */
-	float v[Rows][Cols];
+	union
+	{
+		float v[Rows][Cols];
+#ifdef MATH_SSE
+		__m128 row[4];
+#endif
+	};
 
 	/// A constant matrix that has zeroes in all its entries.
 	static const float4x4 zero;

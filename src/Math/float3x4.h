@@ -25,6 +25,12 @@
 #include "MatrixProxy.h"
 #include "CoordinateAxisConvention.h"
 
+#define MATH_SSE
+
+#ifdef MATH_SSE
+#include <xmmintrin.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A 3-by-4 matrix for affine transformations of 3D geometry.
@@ -67,7 +73,13 @@ public:
 
 	/// Stores the data in this matrix in row-major format.
 	/** [noscript] */
-	float v[Rows][Cols];
+	union
+	{
+		float v[Rows][Cols];
+#ifdef MATH_SSE
+		__m128 row[3];
+#endif
+	};
 
 	/// A constant matrix that has zeroes in all its entries.
 	static const float3x4 zero;
