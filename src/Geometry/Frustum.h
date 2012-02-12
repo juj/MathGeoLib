@@ -192,15 +192,14 @@ public:
 	/** The (x,y) coordinate specifies the normalized viewport coordinate through which the ray passes.
 		Both x and y must be in the range [-1,1].
 		Specifying (-1, -1) returns the bottom-left corner of the near plane.
-		The point (1, 1) corresponds to the top-right corner of the near plane.
-		@todo This function will be renamed and replaced with Unproject(float x, float y) and Unproject(const float3 &p); */
-	Ray LookAt(float x, float y) const;
+		The point (1, 1) corresponds to the top-right corner of the near plane. */
+	Ray UnProject(float x, float y) const;
 
+	///\todo Add float3 UnProject(const float3 &point) const;
 	/** Like LookAt, but if the frustum type is PerspectiveFrustum, the ray originates at the near plane, 
 		and not at the camera eye point. For orthographic frustum, LookAt and LookAtFromNearPlane are identical
-		(always originates at near plane).
-		@todo This function will be renamed and replaced with Unproject(float x, float y) and Unproject(const float3 &p); */
-	Ray LookAtFromNearPlane(float x, float y) const;
+		(always originates at near plane). */
+	Ray UnProjectFromNearPlane(float x, float y) const;
 
 	/// Projects the given point onto the near plane of this frustum.
 	/** The (x,y) component of the returned float3 gives the normalized viewport coordinates of the point on the

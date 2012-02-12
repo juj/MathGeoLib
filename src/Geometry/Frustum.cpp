@@ -119,14 +119,10 @@ float4x4 Frustum::ProjectionMatrix() const
 	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
 	if (type == PerspectiveFrustum)
 	{
-		assume(false && "Not implemented!"); /// @todo Implement.
-		return float4x4();
+		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
 	}
 	else
 	{
-		assume(front.Equals(float3(0,0,1)));
-		assume(up.Equals(float3(0,1,0)));
-		// pos assumed to be in center. ///@todo Remove these assumptions.
 		return float4x4::D3DOrthoProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
 	}
 }
@@ -205,7 +201,7 @@ float2 Frustum::ScreenToViewportSpace(const float2 &point, int screenWidth, int 
 	return ScreenToViewportSpace(point.x, point.y, screenWidth, screenHeight);
 }
 
-Ray Frustum::LookAt(float x, float y) const
+Ray Frustum::UnProject(float x, float y) const
 {
 	if (type == PerspectiveFrustum)
 	{
@@ -213,10 +209,10 @@ Ray Frustum::LookAt(float x, float y) const
 		return Ray(pos, (nearPlanePos - pos).Normalized());
 	}
 	else
-		return LookAtFromNearPlane(x, y);
+		return UnProjectFromNearPlane(x, y);
 }
 
-Ray Frustum::LookAtFromNearPlane(float x, float y) const
+Ray Frustum::UnProjectFromNearPlane(float x, float y) const
 {
 	float3 nearPlanePos = NearPlanePos(x, y);
 	float3 farPlanePos = FarPlanePos(x, y);
