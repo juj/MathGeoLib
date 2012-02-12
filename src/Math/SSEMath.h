@@ -46,6 +46,7 @@ inline __m128 _mm_sum_xyz_ps(__m128 m)
 #endif
 }
 
+/// The returned SP FP contains x+y+z+w in all channels of the vector.
 inline __m128 _mm_sum_xyzw_ps(__m128 m)
 {
 #ifdef MATH_SSE3 // If we have SSE 3, we can use the haddps (horizontal add) instruction, _mm_hadd_ps intrinsic.
@@ -53,11 +54,10 @@ inline __m128 _mm_sum_xyzw_ps(__m128 m)
 	m = _mm_hadd_ps(m, m); // m = (x+y+z+w, x+y+z+w, x+y+z+w, x+y+z+w).
 	return m; // Each index of the output will contain the sum x+y+z+w.
 #else // We only have SSE 1, and must individually shuffle.
-	__m128 Y = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,1,1,1)); // Load Y to lowest index. (others don't matter)
-	__m128 Z = _mm_shuffle_ps(m, m, _MM_SHUFFLE(2,2,2,2)); // Load Z to lowest index. (others don't matter)
-	__m128 W = _mm_shuffle_ps(m, m, _MM_SHUFFLE(3,3,3,3)); // Load W to lowest index. (others don't matter)
-	__m128 XYZW = _mm_add_ss(_mm_add_ss(m, Y), _mm_add_ss(Z, W));
-	return XYZW; // Only the lowest index of the output will contain x+y+z+w.
+	__m128 v2 = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,0,3,2)); // = [y, x, w, z]
+	v2 = _mm_add_ps(v2, m); // = [w+y, z+x, y+w, x+z]
+	__m128 v3 = _mm_shuffle_ps(m, m, _MM_SHUFFLE(0,3,2,1)); // = [x+z, w+y, z+x, y+w]
+	return _mm_add_ps(v2, v3); // = [w+y+x+z, z+x+w+y, y+w+z+x, x+z+y+w]
 #endif
 }
 
@@ -87,6 +87,7 @@ inline __m128 _mm_dot3_ps(__m128 a, __m128 b)
 #endif
 }
 
+/// The dot product is stored in each channel of the returned vector.
 inline __m128 _mm_dot4_ps(__m128 a, __m128 b)
 {
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
