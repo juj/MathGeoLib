@@ -31,6 +31,10 @@
 #include <OgreVector4.h>
 #endif
 
+#ifdef MATH_SSE
+#include <xmmintrin.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A 3D vector of form (x,y,z,w) in a 4D homogeneous coordinate space.
@@ -46,18 +50,27 @@ public:
 		Size = 4
 	};
 
-	/// The x component.
-	/** A float4 is 16 bytes in size. This element lies in the memory offsets 0-3 of this class. */
-	float x;
-	/// The y component. [similarOverload: x]
-	/** This element is packed to the memory offsets 4-7 of this class. */
-	float y;
-	/// The z component. [similarOverload: x]
-	/** This element is packed to the memory offsets 8-11 of this class. */
-	float z;
-	/// The w component. [similarOverload: x]
-	/** This element is packed to the memory offsets 12-15 of this class. */
-	float w;
+	union
+	{
+		struct
+		{
+			/// The x component.
+			/** A float4 is 16 bytes in size. This element lies in the memory offsets 0-3 of this class. */
+			float x;
+			/// The y component. [similarOverload: x]
+			/** This element is packed to the memory offsets 4-7 of this class. */
+			float y;
+			/// The z component. [similarOverload: x]
+			/** This element is packed to the memory offsets 8-11 of this class. */
+			float z;
+			/// The w component. [similarOverload: x]
+			/** This element is packed to the memory offsets 12-15 of this class. */
+			float w;
+		};
+#ifdef MATH_SSE
+		__m128 v;
+#endif
+	};
 
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members x, y, z and w are all undefined after creating a new float4 using 
@@ -65,10 +78,12 @@ public:
 		@see x, y, z, w. */
 	float4() {}
 
+#ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float4 copy constructor.
 	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up 
 		this function for script bindings. */
 	float4(const float4 &rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
+#endif
 
 	/// Constructs a new float4 with the value (x, y, z, w).
 	/** @see x, y, z, w. */
@@ -85,6 +100,10 @@ public:
 	/// Constructs this float4 from a C array, to the value (data[0], data[1], data[2], data[3]).
 	/** @param data An array containing four elements for x, y, z and w. This pointer may not be null. */
 	explicit float4(const float *data);
+
+#ifdef MATH_SSE
+	float4(__m128 vec):v(vec) {}
+#endif
 
 	/// Casts this float4 to a C array. 
 	/** This function does not allocate new memory or make a copy of this float4. This function simply
@@ -281,6 +300,19 @@ public:
 		@see LengthSq3(), Length3(), LengthSq4(), Normalize3(), Normalize4(). */
 	float Length4() const;
 
+#ifdef MATH_SSE
+	__m128 Swizzled_SSE(int i, int j, int k, int l) const;
+	__m128 LengthSq3_SSE() const;
+	__m128 Length3_SSE() const;
+	__m128 LengthSq4_SSE() const;
+	__m128 Length4_SSE() const;
+	__m128 Normalize3_SSE();
+	__m128 Normalize4_SSE();
+	void Normalize3_Fast_SSE();
+	void Normalize4_Fast_SSE();
+	void NormalizeW_SSE();
+	__m128 SumOfElements_SSE() const;
+#endif
 	/// Normalizes the (x, y, z) part of this vector.
 	/** @note This function ignores the w component of this vector, retaining whatever value was set there.
 		@note This function fails silently. If you expect to receive an error message in case the normalization
