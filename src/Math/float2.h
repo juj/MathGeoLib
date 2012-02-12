@@ -56,10 +56,12 @@ public:
 		@see x, y. */
 	float2() {}
 
+#ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float2 copy constructor.
 	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up 
 		this function for script bindings. */
 	float2(const float2 &rhs) { x = rhs.x; y = rhs.y; }
+#endif
 
 	/// Constructs a new float2 with the value (x, y).
 	/** @see x, y. */

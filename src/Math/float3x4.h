@@ -90,8 +90,11 @@ public:
 	/** [opaque-qtscript] */
 	float3x4() {}
 
-	/// The copy-ctor for float3x4 is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up this function for QtScript bindings.
+#ifdef MATH_EXPLICIT_COPYCTORS
+	/// The copy-ctor for float3x4 is the trivial copy-ctor, but it is explicitly written to be able to automatically 
+	/// pick up this function for QtScript bindings.
 	float3x4(const float3x4 &rhs) { Set(rhs); }
+#endif
 
 	/// Constructs a new float3x4 by explicitly specifying all the matrix elements.
 	/// The elements are specified in row-major format, i.e. the first row first followed by the second and third row.

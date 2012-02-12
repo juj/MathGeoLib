@@ -48,8 +48,11 @@ public:
 	/// @note The default ctor does not initialize any member values.
 	Quat() {}
 
-	/// The copy-ctor for Quat is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up this function for QtScript bindings.
+#ifdef MATH_EXPLICIT_COPYCTORS
+	/// The copy-ctor for Quat is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up 
+	/// this function for QtScript bindings.
 	Quat(const Quat &rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
+#endif
 
 	/// Constructs a quaternion from the given data buffer.
 	/// @param data An array of four floats to use for the quaternion, in the order 'x, y, z, w'. (== 'i, j, k, r')

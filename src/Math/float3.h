@@ -66,10 +66,12 @@ public:
 		@see x, y, z. */
 	float3() {}
 
+#ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float3 copy constructor.
 	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up 
 		this function for script bindings. */
 	float3(const float3 &rhs) { x = rhs.x; y = rhs.y; z = rhs.z; }
+#endif
 
 	/// Constructs a new float3 with the value (x, y, z).
 	/** @see x, y, z. */
