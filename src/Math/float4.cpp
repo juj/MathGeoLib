@@ -138,16 +138,19 @@ __m128 float4::Swizzled_SSE(int i, int j, int k, int l) const
 #endif
 }
 
+/// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.
 __m128 float4::LengthSq3_SSE() const
 {
 	return _mm_dot3_ps(v, v);
 }
 
+/// The returned vector contains the length of the float3 part in the lowest channel of the vector.
 __m128 float4::Length3_SSE() const
 {
 	return _mm_sqrt_ss(_mm_dot3_ps(v, v));
 }
 
+/// The returned vector contains the squared length of the float4 in each channel of the vector.
 __m128 float4::LengthSq4_SSE() const
 {
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
@@ -159,6 +162,7 @@ __m128 float4::LengthSq4_SSE() const
 #endif
 }
 
+/// The returned vector contains the length of the float4 in the lowest channel of the vector.
 __m128 float4::Length4_SSE() const
 {
 	return _mm_sqrt_ss(_mm_dot4_ps(v, v));
@@ -167,10 +171,8 @@ __m128 float4::Length4_SSE() const
 __m128 float4::Normalize3_SSE()
 {
 	__m128 len = Length3_SSE();
-#ifndef MATH_SSE3
-	// If the length was not computed with SSE 3 or newer, broadcast the length from the lowest index to all indices.
+	// Broadcast the length from the lowest index to all indices.
 	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
-#endif
 	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero? 
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	normalized = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
@@ -181,10 +183,8 @@ __m128 float4::Normalize3_SSE()
 void float4::Normalize3_Fast_SSE()
 {
 	__m128 len = Length3_SSE();
-#ifndef MATH_SSE3
-	// If the length was not computed with SSE 3 or newer, broadcast the length from the lowest index to all indices.
+	// Broadcast the length from the lowest index to all indices.
 	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
-#endif
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(v, normalized, SSEMaskXYZ()); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
@@ -192,10 +192,8 @@ void float4::Normalize3_Fast_SSE()
 __m128 float4::Normalize4_SSE()
 {
 	__m128 len = Length4_SSE();
-#ifndef MATH_SSE3
-	// If the length was not computed with SSE 3 or newer, broadcast the length from the lowest index to all indices.
+	// Broadcast the length from the lowest index to all indices.
 	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
-#endif
 	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero? 
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
@@ -205,10 +203,8 @@ __m128 float4::Normalize4_SSE()
 void float4::Normalize4_Fast_SSE()
 {
 	__m128 len = Length4_SSE();
-#ifndef MATH_SSE3
-	// If the length was not computed with SSE 3 or newer, broadcast the length from the lowest index to all indices.
+	// Broadcast the length from the lowest index to all indices.
 	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
-#endif
 	v = _mm_div_ps(v, len); // Normalize.
 }
 
