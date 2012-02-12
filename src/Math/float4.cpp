@@ -643,8 +643,8 @@ float4 float4::Clamp(float floor, float ceil) const
 float float4::Distance3Sq(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	__m128 v = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v).LengthSq3_SSE());
+	__m128 v2 = _mm_sub_ps(v, rhs.v);
+	return M128_TO_FLOAT(float4(v2).LengthSq3_SSE());
 #else
 	float dx = x - rhs.x;
 	float dy = y - rhs.y;
@@ -656,8 +656,8 @@ float float4::Distance3Sq(const float4 &rhs) const
 float float4::Distance3(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	__m128 v = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v).Length3_SSE());
+	__m128 v2 = _mm_sub_ps(v, rhs.v);
+	return M128_TO_FLOAT(float4(v2).Length3_SSE());
 #else
 	return sqrtf(Distance3Sq(rhs));
 #endif
@@ -666,8 +666,8 @@ float float4::Distance3(const float4 &rhs) const
 float float4::Distance4Sq(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	__m128 v = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v).LengthSq4_SSE());
+	__m128 v2 = _mm_sub_ps(v, rhs.v);
+	return M128_TO_FLOAT(float4(v2).LengthSq4_SSE());
 #else
 	float dx = x - rhs.x;
 	float dy = y - rhs.y;
@@ -680,8 +680,8 @@ float float4::Distance4Sq(const float4 &rhs) const
 float float4::Distance4(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	__m128 v = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v).Length4_SSE());
+	__m128 v2 = _mm_sub_ps(v, rhs.v);
+	return M128_TO_FLOAT(float4(v2).Length4_SSE());
 #else
 	return sqrtf(Distance4Sq(rhs));
 #endif
@@ -882,7 +882,7 @@ void float4::SetFromScalar(float scalar)
 void float4::Set(float x_, float y_, float z_, float w_)
 {
 #ifdef MATH_SSE
-	v = _mm_set_ps(x_, y_, z_, w_);
+	v = _mm_set_ps(w_, z_, y_, x_);
 #else
 	x = x_;
 	y = y_;
@@ -894,7 +894,7 @@ void float4::Set(float x_, float y_, float z_, float w_)
 void float4::SetFromScalar(float scalar, float w_)
 {
 #ifdef MATH_SSE
-	v = _mm_set_ps(scalar, scalar, scalar, w_);
+	v = _mm_set_ps(w_, scalar, scalar, scalar);
 #else
 	x = scalar;
 	y = scalar;

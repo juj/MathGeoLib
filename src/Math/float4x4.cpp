@@ -46,10 +46,10 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
 float4x4::float4x4(const float3x3 &other)
 {
 #ifdef MATH_SSE
-	row[0] = _mm_set_ps(other.v[0][0], other.v[0][1], other.v[0][2], 0.f);
-	row[1] = _mm_set_ps(other.v[1][0], other.v[1][1], other.v[1][2], 0.f);
-	row[2] = _mm_set_ps(other.v[2][0], other.v[2][1], other.v[2][2], 0.f);
-	row[3] = _mm_set_ps(0.f, 0.f, 0.f, 1.f);
+	row[0] = _mm_set_ps(0.f, other.v[0][2], other.v[0][1], other.v[0][0]);
+	row[1] = _mm_set_ps(0.f, other.v[1][2], other.v[1][1], other.v[1][0]);
+	row[2] = _mm_set_ps(0.f, other.v[2][2], other.v[2][1], other.v[2][0]);
+	row[3] = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
 #else
 	SetRow3(0, other.Row(0));
 	SetRow3(1, other.Row(1));
@@ -65,7 +65,7 @@ float4x4::float4x4(const float3x4 &other)
 	row[0] = other.row[0];
 	row[1] = other.row[1];
 	row[2] = other.row[2];
-	row[3] = _mm_set_ps(0.f, 0.f, 0.f, 1.f);
+	row[3] = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
 #else
 	SetRow(0, other.Row(0));
 	SetRow(1, other.Row(1));
@@ -787,7 +787,7 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 #endif
 
 #ifdef MATH_SSE
-	this->row[row] = _mm_set_ps(m_r0, m_r1, m_r2, m_r3);
+	this->row[row] = _mm_set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
 	v[row][0] = m_r0;
 	v[row][1] = m_r1;
@@ -871,10 +871,10 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 				   float _30, float _31, float _32, float _33)
 {
 #ifdef MATH_SSE
-	row[0] = _mm_set_ps(_00, _01, _02, _03);
-	row[1] = _mm_set_ps(_10, _11, _12, _13);
-	row[2] = _mm_set_ps(_20, _21, _22, _23);
-	row[3] = _mm_set_ps(_30, _31, _32, _33);
+	row[0] = _mm_set_ps(_03, _02, _01, _00);
+	row[1] = _mm_set_ps(_13, _12, _11, _10);
+	row[2] = _mm_set_ps(_23, _22, _21, _20);
+	row[3] = _mm_set_ps(_33, _32, _31, _30);
 #else
 	v[0][0] = _00; v[0][1] = _01; v[0][2] = _02; v[0][3] = _03;
 	v[1][0] = _10; v[1][1] = _11; v[1][2] = _12; v[1][3] = _13;
@@ -1094,7 +1094,7 @@ float4x4 &float4x4::operator =(const float3x4 &rhs)
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
-	row[3] = _mm_set_ps(0.f, 0.f, 0.f, 1.f);
+	row[3] = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
 #else
 	Float3x4Part() = rhs;
 	SetRow(3, 0,0,0,1);
@@ -1365,7 +1365,7 @@ float3 float4x4::TransformPos(const float3 &pointVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(pointVector.x, pointVector.y, pointVector.z, 1.f));
+	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
 #else
 	return TransformPos(pointVector.x, pointVector.y, pointVector.z);
 #endif
@@ -1375,7 +1375,7 @@ float3 float4x4::TransformPos(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(x, y, z, 1.f));
+	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, z, y, x));
 #else
 	return float3(DOT4POS_xyz(Row(0), x,y,z),
 				  DOT4POS_xyz(Row(1), x,y,z),
@@ -1387,7 +1387,7 @@ float3 float4x4::TransformDir(const float3 &directionVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(directionVector.x, directionVector.y, directionVector.z, 0.f));
+	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
 #else
 	return TransformDir(directionVector.x, directionVector.y, directionVector.z);
 #endif
@@ -1397,7 +1397,7 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(x, y, z, 0.f));
+	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, z, y, x));
 #else
 	return float3(DOT4DIR_xyz(Row(0), x,y,z),
 				  DOT4DIR_xyz(Row(1), x,y,z),

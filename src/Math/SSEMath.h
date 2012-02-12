@@ -132,6 +132,19 @@ inline __m128 _mm_mat4x4_mul_ps(const __m128 *matrix, __m128 vector)
 	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 }
 
+/// Compute the product M*v, where M is a 3x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
+inline __m128 _mm_mat3x4_mul_ps(const __m128 *matrix, __m128 vector)
+{
+	__m128 x = _mm_dot4_ps(matrix[0], vector);
+	__m128 y = _mm_dot4_ps(matrix[1], vector);
+	__m128 z = _mm_dot4_ps(matrix[2], vector);
+	__m128 w = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(3,3,3,3)); // Take the 'w' component of the vector unmodified.
+
+	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]
+	__m128 zw = _mm_movelh_ps(z, w); // zw = [ _, w, _, z]
+	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
+}
+
 inline float3 _mm_mat3x4_mul_ps_float3(const __m128 *matrix, __m128 vector)
 {
 	__m128 x = _mm_dot4_ps(matrix[0], vector);
@@ -152,19 +165,19 @@ inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
 inline void _mm_mat4x4_mul_ps(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
 	// Transpose m2:
-	// m2[0] = [ 03, 02, 01, 00 ]     [ 03, 13, 23, 33 ]
-	// m2[1] = [ 13, 12, 11, 10 ] --> [ 02, 12, 22, 32 ]
-	// m2[2] = [ 23, 22, 21, 20 ] --> [ 01, 11, 21, 31 ]
-	// m2[3] = [ 33, 32, 31, 30 ]     [ 00, 10, 20, 30 ]
+	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
+	// m2[1] = [ 13, 12, 11, 10 ] --> [ 31, 21, 11, 01 ]
+	// m2[2] = [ 23, 22, 21, 20 ] --> [ 32, 22, 12, 02 ]
+	//         [ 33, 32, 31, 30 ]     [ 33, 23, 13, 03 ]
 	__m128 low1 = _mm_movelh_ps(m2[0], m2[1]); // = [ 11, 10, 01, 00 ]
 	__m128 low2 = _mm_movelh_ps(m2[2], m2[3]); // = [ 31, 30, 21, 20 ]
-	__m128 hi1 = _mm_movehl_ps(m2[0], m2[1]);  // = [ 13, 12, 03, 02 ]
-	__m128 hi2 = _mm_movehl_ps(m2[2], m2[3]);  // = [ 33, 32, 23, 22 ]
+	__m128 hi1 = _mm_movehl_ps(m2[1], m2[0]);  // = [ 13, 12, 03, 02 ]
+	__m128 hi2 = _mm_movehl_ps(m2[3], m2[2]);  // = [ 33, 32, 23, 22 ]
 
-	__m128 row1 = _mm_shuffle_ps(hi2, hi1, _MM_SHUFFLE(1, 3, 1, 3));   // = [03, 13, 23, 33]
-	__m128 row2 = _mm_shuffle_ps(hi2, hi1, _MM_SHUFFLE(0, 2, 0, 2));   // = [02, 12, 22, 32]
-	__m128 row3 = _mm_shuffle_ps(low2, low1, _MM_SHUFFLE(1, 3, 1, 3)); // = [01, 11, 21, 31]
-	__m128 row4 = _mm_shuffle_ps(low2, low1, _MM_SHUFFLE(0, 2, 0, 2)); // = [00, 10, 20, 30]
+	__m128 row1 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(2, 0, 2, 0)); // = [30, 20, 10, 00]
+	__m128 row2 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(3, 1, 3, 1)); // = [31, 21, 11, 01]
+	__m128 row3 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(2, 0, 2, 0));   // = [32, 22, 12, 02]
+	__m128 row4 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(3, 1, 3, 1));   // = [33, 23, 13, 03]
 
 	__m128 _00 = _mm_dot4_ps(m1[0], row1);
 	__m128 _01 = _mm_dot4_ps(m1[0], row2);
@@ -189,6 +202,43 @@ inline void _mm_mat4x4_mul_ps(__m128 *out, const __m128 *m1, const __m128 *m2)
 	__m128 _32 = _mm_dot4_ps(m1[3], row3);
 	__m128 _33 = _mm_dot4_ps(m1[3], row4);
 	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
+}
+
+inline void _mm_mat3x4_mul_ps(__m128 *out, const __m128 *m1, const __m128 *m2)
+{
+	// Transpose m2:
+	// m2[0] = [ 03, 02, 01, 00 ]     [  0, 20, 10, 00 ]
+	// m2[1] = [ 13, 12, 11, 10 ] --> [  0, 21, 11, 01 ]
+	// m2[2] = [ 23, 22, 21, 20 ] --> [  0, 22, 12, 02 ]
+	//         [  0,  0,  0,  1 ]     [  1, 23, 13, 03 ]
+	const __m128 m2_3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+	__m128 low1 = _mm_movelh_ps(m2[0], m2[1]); // = [ 11, 10, 01, 00 ]
+	__m128 low2 = _mm_movelh_ps(m2[2], m2_3);  // = [ 31, 30, 21, 20 ]
+	__m128 hi1 = _mm_movehl_ps(m2[1], m2[0]);  // = [ 13, 12, 03, 02 ]
+	__m128 hi2 = _mm_movehl_ps(m2_3, m2[2]);   // = [ 33, 32, 23, 22 ]
+
+	__m128 row1 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(2, 0, 2, 0)); // = [30, 20, 10, 00]
+	__m128 row2 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(3, 1, 3, 1)); // = [31, 21, 11, 01]
+	__m128 row3 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(2, 0, 2, 0));   // = [32, 22, 12, 02]
+	__m128 row4 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(3, 1, 3, 1));   // = [33, 23, 13, 03]
+
+	__m128 _00 = _mm_dot4_ps(m1[0], row1);
+	__m128 _01 = _mm_dot4_ps(m1[0], row2);
+	__m128 _02 = _mm_dot4_ps(m1[0], row3);
+	__m128 _03 = _mm_dot4_ps(m1[0], row4);
+	out[0] = _mm_pack_4ss_to_ps(_00, _01, _02, _03);
+
+	__m128 _10 = _mm_dot4_ps(m1[1], row1);
+	__m128 _11 = _mm_dot4_ps(m1[1], row2);
+	__m128 _12 = _mm_dot4_ps(m1[1], row3);
+	__m128 _13 = _mm_dot4_ps(m1[1], row4);
+	out[1] = _mm_pack_4ss_to_ps(_10, _11, _12, _13);
+
+	__m128 _20 = _mm_dot4_ps(m1[2], row1);
+	__m128 _21 = _mm_dot4_ps(m1[2], row2);
+	__m128 _22 = _mm_dot4_ps(m1[2], row3);
+	__m128 _23 = _mm_dot4_ps(m1[2], row4);
+	out[2] = _mm_pack_4ss_to_ps(_20, _21, _22, _23);
 }
 
 MATH_END_NAMESPACE
