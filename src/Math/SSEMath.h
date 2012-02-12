@@ -56,7 +56,7 @@ inline __m128 _mm_sum_xyzw_ps(__m128 m)
 #else // We only have SSE 1, and must individually shuffle.
 	__m128 v2 = _mm_shuffle_ps(m, m, _MM_SHUFFLE(1,0,3,2)); // = [y, x, w, z]
 	v2 = _mm_add_ps(v2, m); // = [w+y, z+x, y+w, x+z]
-	__m128 v3 = _mm_shuffle_ps(m, m, _MM_SHUFFLE(0,3,2,1)); // = [x+z, w+y, z+x, y+w]
+	__m128 v3 = _mm_shuffle_ps(v2, v2, _MM_SHUFFLE(0,3,2,1)); // = [x+z, w+y, z+x, y+w]
 	return _mm_add_ps(v2, v3); // = [w+y+x+z, z+x+w+y, y+w+z+x, x+z+y+w]
 #endif
 }
