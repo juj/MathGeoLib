@@ -114,8 +114,8 @@ inline __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
 #ifdef MATH_SSE41 // SSE 4.1 offers conditional copying between registers with the blendvps instruction.
 	return _mm_blendv_ps(a, b, mask);
 #else // If not on SSE 4.1, use conditional masking.
-	b = _mm_and_ps(b, mask); // Where mask is 1, output b.
-	a = _mm_andnot_ps(a, mask); // Where mask is 0, output a.
+	b = _mm_and_ps(mask, b); // Where mask is 1, output b.
+	a = _mm_andnot_ps(mask, a); // Where mask is 0, output a.
 	return _mm_or_ps(a, b);
 #endif
 }
