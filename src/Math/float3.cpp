@@ -380,11 +380,9 @@ i x j == -(j x i) == k,
 (k x i) == -(i x k) == j. */
 float3 float3::Cross(const float3 &rhs) const
 {
-	float3 dst;
-	dst.x = y * rhs.z - z * rhs.y;
-	dst.y = z * rhs.x - x * rhs.z;
-	dst.z = x * rhs.y - y * rhs.x;
-	return dst;
+	return float3(y * rhs.z - z * rhs.y,
+	              z * rhs.x - x * rhs.z,
+	              x * rhs.y - y * rhs.x);
 }
 
 float3x3 float3::OuterProduct(const float3 &rhs) const
