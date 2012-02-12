@@ -3,3 +3,8 @@ Debug/
 Release/
 *.filters
 *.user
+CMakeFiles/
+CMakeCache.txt
+*.smproj
+Makefile
+doc/
