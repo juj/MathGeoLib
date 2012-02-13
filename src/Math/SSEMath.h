@@ -139,11 +139,11 @@ inline __m128 _mm_mat3x4_mul_ps(const __m128 *matrix, __m128 vector)
 	__m128 x = _mm_dot4_ps(matrix[0], vector);
 	__m128 y = _mm_dot4_ps(matrix[1], vector);
 	__m128 z = _mm_dot4_ps(matrix[2], vector);
-	__m128 w = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(3,3,3,3)); // Take the 'w' component of the vector unmodified.
 
+	// Take the 'w' component of the vector unmodified.
 	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]
-	__m128 zw = _mm_movelh_ps(z, w); // zw = [ _, w, _, z]
-	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
+	__m128 zw = _mm_movehl_ps(vector, z); // zw = [ w, _, z, _]
+	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(3, 1, 2, 0)); // ret = [w, z, y, x]
 }
 
 inline float3 _mm_mat3x4_mul_ps_float3(const __m128 *matrix, __m128 vector)
