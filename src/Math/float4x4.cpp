@@ -1364,7 +1364,7 @@ void float4x4::Pivot()
 float3 float4x4::TransformPos(const float3 &pointVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
 #else
 	return TransformPos(pointVector.x, pointVector.y, pointVector.z);
@@ -1374,7 +1374,7 @@ float3 float4x4::TransformPos(const float3 &pointVector) const
 float3 float4x4::TransformPos(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, z, y, x));
 #else
 	return float3(DOT4POS_xyz(Row(0), x,y,z),
@@ -1386,7 +1386,7 @@ float3 float4x4::TransformPos(float x, float y, float z) const
 float3 float4x4::TransformDir(const float3 &directionVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
 #else
 	return TransformDir(directionVector.x, directionVector.y, directionVector.z);
@@ -1396,7 +1396,7 @@ float3 float4x4::TransformDir(const float3 &directionVector) const
 float3 float4x4::TransformDir(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, z, y, x));
 #else
 	return float3(DOT4DIR_xyz(Row(0), x,y,z),
@@ -1407,7 +1407,7 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 
 float4 float4x4::Transform(const float4 &vector) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(_mm_mat4x4_mul_ps(row, vector.v));
 #else
 	return float4(DOT4(Row(0), vector),
@@ -1562,7 +1562,7 @@ float4x4 float4x4::operator *(const float3x4 &rhs) const
 float4x4 float4x4::operator *(const float4x4 &rhs) const
 {
 	float4x4 r;
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	_mm_mat4x4_mul_ps(r.row, this->row, rhs.row);
 #else
 	const float *c0 = rhs.ptr();
@@ -1606,7 +1606,7 @@ float4 float4x4::operator *(const float4 &rhs) const
 
 float4x4 float4x4::operator *(float scalar) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
 	__m128 s = _mm_set1_ps(scalar);
 	r.row[0] = _mm_mul_ps(row[0], s);
@@ -1625,7 +1625,7 @@ float4x4 float4x4::operator /(float scalar) const
 {
 	assume(!EqualAbs(scalar, 0));
 
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
 	__m128 s = _mm_set1_ps(scalar);
 	__m128 one = _mm_set1_ps(1.f);
@@ -1644,7 +1644,7 @@ float4x4 float4x4::operator /(float scalar) const
 
 float4x4 float4x4::operator +(const float4x4 &rhs) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
 	r.row[0] = _mm_add_ps(row[0], rhs.row[0]);
 	r.row[1] = _mm_add_ps(row[1], rhs.row[1]);
@@ -1660,7 +1660,7 @@ float4x4 float4x4::operator +(const float4x4 &rhs) const
 
 float4x4 float4x4::operator -(const float4x4 &rhs) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
 	r.row[0] = _mm_sub_ps(row[0], rhs.row[0]);
 	r.row[1] = _mm_sub_ps(row[1], rhs.row[1]);
@@ -1678,7 +1678,7 @@ float4x4 float4x4::operator -() const
 {
 	float4x4 r;
 
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 zero = _mm_setzero_ps();
 	r.row[0] = _mm_sub_ps(zero, row[0]);
 	r.row[1] = _mm_sub_ps(zero, row[1]);
@@ -1695,7 +1695,7 @@ float4x4 float4x4::operator -() const
 
 float4x4 &float4x4::operator *=(float scalar)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 s = _mm_set1_ps(scalar);
 	row[0] = _mm_mul_ps(row[0], s);
 	row[1] = _mm_mul_ps(row[1], s);
@@ -1714,7 +1714,7 @@ float4x4 &float4x4::operator /=(float scalar)
 {
 	assume(!EqualAbs(scalar, 0));
 
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 s = _mm_set1_ps(scalar);
 	__m128 one = _mm_set1_ps(1.f);
 	s = _mm_div_ps(one, s);
@@ -1734,7 +1734,7 @@ float4x4 &float4x4::operator /=(float scalar)
 
 float4x4 &float4x4::operator +=(const float4x4 &rhs)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	row[0] = _mm_add_ps(row[0], rhs.row[0]);
 	row[1] = _mm_add_ps(row[1], rhs.row[1]);
 	row[2] = _mm_add_ps(row[2], rhs.row[2]);
@@ -1750,7 +1750,7 @@ float4x4 &float4x4::operator +=(const float4x4 &rhs)
 
 float4x4 &float4x4::operator -=(const float4x4 &rhs)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	row[0] = _mm_sub_ps(row[0], rhs.row[0]);
 	row[1] = _mm_sub_ps(row[1], rhs.row[1]);
 	row[2] = _mm_sub_ps(row[2], rhs.row[2]);
@@ -2072,6 +2072,72 @@ float4x4 float4x4::Mul(const Quat &rhs) const { return *this * rhs; }
 float3 float4x4::MulPos(const float3 &pointVector) const { return this->TransformPos(pointVector); }
 float3 float4x4::MulDir(const float3 &directionVector) const { return this->TransformDir(directionVector); }
 float4 float4x4::Mul(const float4 &vector) const { return *this * vector; }
+
+#ifdef MATH_SSE41
+float4 float4x4::Mul_SSE41(const float4 &rhs) const
+{
+	return float4(_mm_mat4x4_mul_ps_sse41(row, rhs.v));
+}
+#endif
+
+#ifdef MATH_SSE3
+float4 float4x4::Mul_SSE3(const float4 &rhs) const
+{
+	return float4(_mm_mat4x4_mul_ps_sse3(row, rhs.v));
+}
+#endif
+
+#ifdef MATH_SSE
+float4 float4x4::Mul_SSE1(const float4 &rhs) const
+{
+	return float4(_mm_mat4x4_mul_ps_sse1(row, rhs.v));
+}
+
+float4 float4x4::Mul_SSE(const float4 &rhs) const
+{
+	return float4(_mm_mat4x4_mul_ps(row, rhs.v));
+}
+
+float4 float4x4::Mul_ColMajor_SSE(const float4 &rhs) const
+{
+	return float4(_mm_colmajor_mat4x4_mul_ps_sse1(row, rhs.v));
+}
+
+float4 float4x4::Mul_ColMajor_SSE_2(const float4 &rhs) const
+{
+	return float4(_mm_colmajor_mat4x4_mul_ps_sse1_2(row, rhs.v));
+}
+
+float4x4 float4x4::Mul_SSE(const float4x4 &rhs) const
+{
+	float4x4 r;
+	_mm_mat4x4_mul_ps(r.row, row, rhs.row);
+	return r;
+}
+
+/* Temporary alternative implementations: Profiled the Mul_SSE version above to be the fastest.
+float4x4 float4x4::Mul_SSE1_2(const float4x4 &rhs) const
+{
+	float4x4 r;
+	_mm_mat4x4_mul_ps_2(r.row, row, rhs.row);
+	return r;
+}
+
+float4x4 float4x4::Mul_SSE1_dpps(const float4x4 &rhs) const
+{
+	float4x4 r;
+	_mm_mat4x4_mul_ps_dpps(r.row, row, rhs.row);
+	return r;
+}
+
+float4x4 float4x4::Mul_SSE1_dpps_2(const float4x4 &rhs) const
+{
+	float4x4 r;
+	_mm_mat4x4_mul_ps_dpps_2(r.row, row, rhs.row);
+	return r;
+}
+*/
+#endif
 
 const float4x4 float4x4::zero	 = float4x4(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0);
 const float4x4 float4x4::identity = float4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);

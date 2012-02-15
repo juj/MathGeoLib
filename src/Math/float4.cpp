@@ -172,7 +172,7 @@ __m128 float4::Normalize3_SSE()
 {
 	__m128 len = Length3_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
 	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero? 
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	normalized = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
@@ -184,7 +184,7 @@ void float4::Normalize3_Fast_SSE()
 {
 	__m128 len = Length3_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(v, normalized, SSEMaskXYZ()); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
@@ -193,7 +193,7 @@ __m128 float4::Normalize4_SSE()
 {
 	__m128 len = Length4_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
 	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero? 
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
@@ -204,13 +204,13 @@ void float4::Normalize4_Fast_SSE()
 {
 	__m128 len = Length4_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle_ps(len, len, _MM_SHUFFLE(0,0,0,0)); 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
 	v = _mm_div_ps(v, len); // Normalize.
 }
 
 void float4::NormalizeW_SSE()
 {
-	__m128 div = _mm_shuffle_ps(v, v, _MM_SHUFFLE(3,3,3,3));
+	__m128 div = _mm_shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
 	v = _mm_div_ps(v, div);
 }
 
@@ -366,7 +366,7 @@ void float4::Scale3(float scalar)
 	__m128 scale = _mm_load_ss(&scalar);
 	__m128 one = _mm_set_ss(1.f);
 	scale = _mm_shuffle_ps(scale, one, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
-	scale = _mm_shuffle_ps(scale, scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
+	scale = _mm_shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
 	v = _mm_mul_ps(v, scale);
 #else
 	x *= scalar;
@@ -712,11 +712,11 @@ float float4::Dot4(const float4 &rhs) const
 
 __m128 _mm_cross_ps(__m128 a, __m128 b)
 {
-	__m128 a_yzx = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 1, 2, 0)); // a_yzx = [w, y, z, x]
-	__m128 a_zxy = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 2, 0, 1)); // a_zxy = [w, z, x, y]
+	__m128 a_yzx = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 1, 2, 0)); // a_yzx = [w, y, z, x]
+	__m128 a_zxy = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 2, 0, 1)); // a_zxy = [w, z, x, y]
 
-	__m128 b_yzx = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 1, 2, 0)); // b_yzx = [w, y, z, x]
-	__m128 b_zxy = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 2, 0, 1)); // b_zxy = [w, z, x, y]
+	__m128 b_yzx = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 1, 2, 0)); // b_yzx = [w, y, z, x]
+	__m128 b_zxy = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 2, 0, 1)); // b_zxy = [w, z, x, y]
 
 	// The content of highest index (.w) in the returned vector is undefined.
 	return _mm_sub_ps(_mm_mul_ps(a_yzx, b_zxy), _mm_mul_ps(a_zxy, b_yzx));
