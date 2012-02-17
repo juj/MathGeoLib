@@ -45,12 +45,12 @@ float3 Circle::BasisV() const
 
 float3 Circle::GetPoint(float angleRadians) const
 {
-	return pos + r * (cos(angleRadians) * BasisU() + sin(angleRadians) * BasisV());
+	return pos + r * (Cos(angleRadians) * BasisU() + Sin(angleRadians) * BasisV());
 }
 
 float3 Circle::GetPoint(float angleRadians, float d) const
 {
-	return pos + r * d * (cos(angleRadians) * BasisU() + sin(angleRadians) * BasisV());
+	return pos + r * d * (Cos(angleRadians) * BasisU() + Sin(angleRadians) * BasisV());
 }
 
 float3 Circle::ExtremePoint(const float3 &direction) const

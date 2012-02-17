@@ -477,7 +477,7 @@ Quat Quat::RandomRotation(LCG &lcg)
 		float w = lcg.Float(-1, 1);
 		float lenSq = x*x + y*y + z*z + w*w;
 		if (lenSq >= 1e-6f && lenSq <= 1.f)
-			return Quat(x, y, z, w) / sqrt(lenSq);
+			return Quat(x, y, z, w) / Sqrt(lenSq);
 	}
 	assume(false && "Quat::RandomRotation failed!");
 	return Quat::identity;

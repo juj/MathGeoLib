@@ -40,57 +40,57 @@ bool MathBreakOnAssume()
 
 float Sin(float angleRadians)
 {
-	return sin(angleRadians);
+	return sinf(angleRadians);
 }
 
 float Cos(float angleRadians)
 {
-	return cos(angleRadians);
+	return cosf(angleRadians);
 }
 
 float Tan(float angleRadians)
 {
-	return tan(angleRadians);
+	return tanf(angleRadians);
 }
 
 float2 SinCos(float angleRadians)
 {
-	return float2(sin(angleRadians), cos(angleRadians));
+	return float2(sinf(angleRadians), cosf(angleRadians));
 }
 
 float Asin(float x)
 {
-	return asin(x);
+	return asinf(x);
 }
 
 float Acos(float x)
 {
-	return acos(x);
+	return acosf(x);
 }
 
 float Atan(float x)
 {
-	return atan(x);
+	return atanf(x);
 }
 
 float Atan2(float y, float x)
 {
-	return atan2(y, x);
+	return atan2f(y, x);
 }
 
 float Sinh(float x)
 {
-	return sinh(x);
+	return sinhf(x);
 }
 
 float Cosh(float x)
 {
-	return cosh(x);
+	return coshf(x);
 }
 
 float Tanh(float x)
 {
-	return tanh(x);
+	return tanhf(x);
 }
 
 bool IsPow2(unsigned int number)

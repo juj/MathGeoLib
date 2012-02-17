@@ -58,7 +58,7 @@ Plane Frustum::FarPlane() const
 Plane Frustum::LeftPlane() const
 {
 	float3 left = Cross(up, front);
-	left.ScaleToLength(tan(horizontalFov*0.5f));
+	left.ScaleToLength(Tan(horizontalFov*0.5f));
 	float3 leftSide = front + left;
 	float3 leftSideNormal = Cross(up, leftSide).Normalized();
 	return Plane(pos, leftSideNormal);
@@ -67,7 +67,7 @@ Plane Frustum::LeftPlane() const
 Plane Frustum::RightPlane() const
 {
 	float3 right = Cross(front, up);
-	right.ScaleToLength(tan(horizontalFov*0.5f));
+	right.ScaleToLength(Tan(horizontalFov*0.5f));
 	float3 rightSide = front + right;
 	float3 rightSideNormal = Cross(rightSide, up).Normalized();
 	return Plane(pos, rightSideNormal);
@@ -75,7 +75,7 @@ Plane Frustum::RightPlane() const
 
 Plane Frustum::TopPlane() const
 {
-	float3 topSide = front + tan(verticalFov * 0.5f) * up;
+	float3 topSide = front + Tan(verticalFov * 0.5f) * up;
 	float3 right = Cross(front, up);
 	float3 topSideNormal = Cross(right, topSide).Normalized();
 	return Plane(pos, topSideNormal);
@@ -83,7 +83,7 @@ Plane Frustum::TopPlane() const
 
 Plane Frustum::BottomPlane() const
 {
-	float3 bottomSide = front - tan(verticalFov * 0.5f) * up;
+	float3 bottomSide = front - Tan(verticalFov * 0.5f) * up;
 	float3 left = Cross(up, front);
 	float3 bottomSideNormal = Cross(left, bottomSide).Normalized();
 	return Plane(pos, bottomSideNormal);
@@ -133,8 +133,8 @@ float3 Frustum::NearPlanePos(float x, float y) const
 
 	if (type == PerspectiveFrustum)
 	{
-		float frontPlaneHalfWidth = tan(horizontalFov*0.5f)*nearPlaneDistance;
-		float frontPlaneHalfHeight = tan(verticalFov*0.5f)*nearPlaneDistance;
+		float frontPlaneHalfWidth = Tan(horizontalFov*0.5f)*nearPlaneDistance;
+		float frontPlaneHalfHeight = Tan(verticalFov*0.5f)*nearPlaneDistance;
 		x = x * frontPlaneHalfWidth; // Map [-1,1] to [-width/2, width/2].
 		y = y * frontPlaneHalfHeight;  // Map [-1,1] to [-height/2, height/2].
 		float3 right = Cross(up, front).Normalized();
@@ -160,8 +160,8 @@ float3 Frustum::FarPlanePos(float x, float y) const
 
 	if (type == PerspectiveFrustum)
 	{
-		float farPlaneHalfWidth = tan(horizontalFov*0.5f)*farPlaneDistance;
-		float farPlaneHalfHeight = tan(verticalFov*0.5f)*farPlaneDistance;
+		float farPlaneHalfWidth = Tan(horizontalFov*0.5f)*farPlaneDistance;
+		float farPlaneHalfHeight = Tan(verticalFov*0.5f)*farPlaneDistance;
 		x = x * farPlaneHalfWidth;
 		y = y * farPlaneHalfHeight;
 		float3 right = Cross(up, front).Normalized();

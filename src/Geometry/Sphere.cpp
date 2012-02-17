@@ -574,7 +574,7 @@ void Sphere::Enclose(const float3 &point)
 	float dist2 = d.LengthSq();
 	if (dist2 > r*r)
 	{
-		float dist = sqrt(dist2);
+		float dist = Sqrt(dist2);
 		float newRadius = (r + dist) / 2.f;
 		pos += d * (newRadius - r) / dist;
 		r = newRadius;
@@ -725,7 +725,7 @@ float3 Sphere::RandomPointOnSurface(LCG &lcg)
 		float z = lcg.Float(-r, r);
 		float lenSq = x*x + y*y + z*z;
 		if (lenSq >= 1e-6f && lenSq <= r*r)
-			return pos + r / sqrt(lenSq) * float3(x,y,z);
+			return pos + r / Sqrt(lenSq) * float3(x,y,z);
 	}
 	assume(false && "Sphere::RandomPointOnSurface failed!");
 
