@@ -626,11 +626,17 @@ void Sphere::Enclose(const float3 *pointArray, int numPoints)
 int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices) const
 {
 	assume(outPos);
+	assume(numVertices >= 24 && "At minimum, sphere triangulation will contain at least 8 triangles, which is 24 vertices, but fewer were specified!");
+	assume(numVertices % 3 == 0 && "Warning:: The size of output should be divisible by 3 (each triangle takes up 3 vertices!)");
+
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!outPos)
 		return 0;
 #endif
 	assume(this->r > 0.f);
+
+	if (numVertices < 24)
+		return 0;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	std::vector<Triangle> temp;
