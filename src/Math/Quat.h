@@ -159,6 +159,8 @@ public:
 	float3 AxisFromTo(const Quat &target) const;
 
 	/// Returns the rotation axis and angle of this quaternion.
+	/// @param rotationAxis [out] Received the normalized axis of the rotation.
+	/// @param rotationAngleRadians [out] Receives the angle of rotation around the given axis. This parameter is returned in the range [0, 2pi].
 	void ToAxisAngle(float3 &rotationAxis, float &rotationAngleRadians) const;
 	/// Sets this quaternion by specifying the axis about which the rotation is performed, and the angle of rotation.
 	/// @param rotationAxis The axis of rotation. This vector must be normalized to call this function.
