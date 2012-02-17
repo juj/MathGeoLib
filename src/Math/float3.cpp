@@ -626,15 +626,15 @@ float2 float3::ToSphericalCoordinatesNormalized() const
 bool float3::Equals(const float3 &other, float epsilon) const
 {
 	return fabs(x - other.x) < epsilon &&
-		   fabs(y - other.y) < epsilon &&
-		   fabs(z - other.z) < epsilon;
+	       fabs(y - other.y) < epsilon &&
+	       fabs(z - other.z) < epsilon;
 }
 
 bool float3::Equals(float x_, float y_, float z_, float epsilon) const
 {
 	return fabs(x - x_) < epsilon &&
-		   fabs(y - y_) < epsilon &&
-		   fabs(z - z_) < epsilon;
+	       fabs(y - y_) < epsilon &&
+	       fabs(z - z_) < epsilon;
 }
 
 float4 float3::ToPos4() const

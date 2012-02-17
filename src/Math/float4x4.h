@@ -892,7 +892,6 @@ public:
 	float4x4 float4x4::Mul_SSE1_dpps(const float4x4 &rhs) const;
 	float4x4 float4x4::Mul_SSE1_dpps_2(const float4x4 &rhs) const;
 	*/
-
 #endif
 };
 
