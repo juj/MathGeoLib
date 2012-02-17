@@ -279,6 +279,21 @@ public:
 	/** @see x, y, z, At(). */
 	void Set(float x, float y, float z);
 
+	/// Converts the given vector represented in spherical coordinates to an euclidean float3 (x,y,z) triplet.
+	/** @param azimuth The direction, or yaw, of the vector. This function uses the convention that the X-Z plane is
+			the 2D horizontal "map" plane, with the vector (0,0,radius) corresponding to the vector in the direction azimuth=0 and inclination=0.
+			This value is typically in the range [-pi, pi] (, or [0, 2pi]).
+		@param inclination The elevation, or pitch, of the vector. This function uses the convention that the +Y axis
+			points towards up, i.e. +Y is the "Zenith direction". This value is typically in the range [-pi/2, pi/2].
+		@param radius The magnitude of the vector. This is usually >= 0, although */
+	void SetFromSphericalCoordinates(float azimuth, float inclination, float radius);
+	static float3 FromSphericalCoordinates(float azimuth, float inclination, float radius);
+
+	/// Identical to SetFromSphericalCoordinates(azimuth, inclination, radius), except this function sets radius == 1 to generate a normalized 
+	/// vector on the unit sphere.
+	void SetFromSphericalCoordinates(float azimuth, float inclination);
+	static float3 FromSphericalCoordinates(float azimuth, float inclination);
+
 	/// @return float4(x,y,z,1).
 	/** @see x, y, z, class float4, ToDir4(). */
 	float4 ToPos4() const;
@@ -286,6 +301,19 @@ public:
 	/// @return float4(x,y,z,0). [similarOverload: ToPos4]
 	/** @see x, y, z, class float4, ToPos4(). */
 	float4 ToDir4() const;
+
+	/// Converts this euclidean (x,y,z) float3 to spherical coordinates representation in the form (azimuth, inclination, radius).
+	/** @note This corresponsds to the matrix operation R_y * R_x * (0,0,radius), where R_y is a rotation about the y-axis by azimuth,
+			and R_x is a rotation about the x-axis by inclination.
+		@see SetFromSphericalCoordinates. */
+	float3 ToSphericalCoordinates() const;
+
+	/// Converts this normalized euclidean (x,y,z) float3 to spherical coordinates representation in the form (azimuth, inclination)
+	/** @note This function requires that this float3 is normalized.
+		@note This corresponsds to the matrix operation R_y * R_x * (0,0,radius), where R_y is a rotation about the y-axis by azimuth,
+			and R_x is a rotation about the x-axis by inclination.
+		@see SetFromSphericalCoordinates. */
+	float2 ToSphericalCoordinatesNormalized() const;
 
 	/// Computes the length of this vector.
 	/** @return Sqrt(x*x + y*y + z*z).
