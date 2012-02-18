@@ -183,6 +183,9 @@ public:
 		@see class Polyhedron, ToPolygon(). */
 	Polyhedron ToPolyhedron() const;
 
+	/// Returns the tight AABB that encloses this Triangle.
+	AABB BoundingAABB() const;
+
 	/// Computes the surface area of the given 2D triangle.
 	/** This math library does not have a separate class for 2D triangles. To compute the area of a 2D triangle,
 		use this Triangle class and set z=0 for each coordinate, or use this helper function.

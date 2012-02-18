@@ -193,6 +193,16 @@ Polyhedron Triangle::ToPolyhedron() const
 	return ToPolygon().ToPolyhedron();
 }
 
+AABB Triangle::BoundingAABB() const
+{
+	AABB aabb;
+	aabb.SetNegativeInfinity();
+	aabb.Enclose(a);
+	aabb.Enclose(b);
+	aabb.Enclose(c);
+	return aabb;
+}
+
 float Triangle::Area2D(const float2 &p1, const float2 &p2, const float2 &p3)
 {
 	return (p1.x - p2.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p2.y);
