@@ -99,10 +99,6 @@ public:
 	/** @param data An array containing four elements for x, y, z and w. This pointer may not be null. */
 	explicit float4(const float *data);
 
-#ifdef MATH_SSE
-	float4(__m128 vec):v(vec) {}
-#endif
-
 	/// Casts this float4 to a C array. 
 	/** This function does not allocate new memory or make a copy of this float4. This function simply
 		returns a C pointer view to this data structure. Use ptr()[0] to access the x component of this float4,
@@ -298,19 +294,6 @@ public:
 		@see LengthSq3(), Length3(), LengthSq4(), Normalize3(), Normalize4(). */
 	float Length4() const;
 
-#ifdef MATH_SSE
-	__m128 Swizzled_SSE(int i, int j, int k, int l) const;
-	__m128 LengthSq3_SSE() const;
-	__m128 Length3_SSE() const;
-	__m128 LengthSq4_SSE() const;
-	__m128 Length4_SSE() const;
-	__m128 Normalize3_SSE();
-	__m128 Normalize4_SSE();
-	void Normalize3_Fast_SSE();
-	void Normalize4_Fast_SSE();
-	void NormalizeW_SSE();
-	__m128 SumOfElements_SSE() const;
-#endif
 	/// Normalizes the (x, y, z) part of this vector.
 	/** @note This function ignores the w component of this vector, retaining whatever value was set there.
 		@note This function fails silently. If you expect to receive an error message in case the normalization
@@ -666,6 +649,26 @@ public:
 	// Bullet uses the same btVector3 class for both 3- and 4 -tuples (due to SSE).
 	float4(const btVector3 &other) { x = other.x(); y = other.y(); z = other.z(); w = other.w(); }
 	operator btVector3() const { btVector3 v(x, y, z); v.setW(w); return v; }
+#endif
+
+#ifdef MATH_SSE
+	float4(__m128 vec):v(vec) {}
+
+	__m128 Swizzled_SSE(int i, int j, int k, int l) const;
+	__m128 LengthSq3_SSE() const;
+	__m128 Length3_SSE() const;
+	__m128 LengthSq4_SSE() const;
+	__m128 Length4_SSE() const;
+	__m128 Normalize3_SSE();
+	__m128 Normalize4_SSE();
+	void Normalize3_Fast_SSE();
+	void Normalize4_Fast_SSE();
+	void NormalizeW_SSE();
+	__m128 SumOfElements_SSE() const;
+
+	inline float4 &operator =(const __m128 vec) { v = vec; return *this; }
+
+	inline operator __m128() const { return v; }
 #endif
 };
 
