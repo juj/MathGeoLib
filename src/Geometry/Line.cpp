@@ -298,6 +298,11 @@ LineSegment Line::ToLineSegment(float d) const
 	return LineSegment(pos, GetPoint(d));
 }
 
+LineSegment Line::ToLineSegment(float dStart, float dEnd) const
+{
+	return LineSegment(GetPoint(dStart), GetPoint(dEnd));
+}
+
 Line operator *(const float3x3 &transform, const Line &l)
 {
 	return Line(transform * l.pos, transform * l.dir);

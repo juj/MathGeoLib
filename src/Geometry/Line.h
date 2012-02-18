@@ -174,6 +174,14 @@ public:
 		@see pos, dir, Line::Line, class LineSegment, ToRay(). */
 	LineSegment ToLineSegment(float d) const;
 
+	/// Converts this Line to a LineSegment.
+	/** @param dStart Specifies the position of the first endpoint along this Line. This parameter may be negative,
+		in which case the starting point lies to the opposite direction of the Line.
+		@param dEnd Specifies the position of the second endpoint along this Line. This parameter may also be negative.
+		@return A LineSegment with point a at pos + dStart * dir, and point b at pos + dEnd * dir.
+		@see pos, dir, Line::Line, class LineSegment, ToLine(). */
+	LineSegment ToLineSegment(float dStart, float dEnd) const;
+
 	/// Tests if the given three points are collinear.
 	/** This function tests whether the given three functions all lie on the same line.
 		@param epsilon The comparison threshold to use to account for floating-point inaccuracies. */

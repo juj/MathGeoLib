@@ -271,6 +271,11 @@ LineSegment Ray::ToLineSegment(float d) const
 	return LineSegment(pos, GetPoint(d));
 }
 
+LineSegment Ray::ToLineSegment(float dStart, float dEnd) const
+{
+	return LineSegment(GetPoint(dStart), GetPoint(dEnd));
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Ray::ToString() const
 {

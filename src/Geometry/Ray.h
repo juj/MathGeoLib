@@ -176,6 +176,14 @@ public:
 		@see pos, dir, Ray::Ray, class LineSegment, ToLine(). */
 	LineSegment ToLineSegment(float d) const;
 
+	/// Converts this Ray to a LineSegment.
+	/** @param dStart Specifies the position of the first endpoint along this Ray. This parameter may be negative,
+		in which case the starting point lies outside this Ray to the opposite direction of the Ray.
+		@param dEnd Specifies the position of the second endpoint along this Ray. This parameter may also be negative.
+		@return A LineSegment with point a at pos + dStart * dir, and point b at pos + dEnd * dir.
+		@see pos, dir, Ray::Ray, class LineSegment, ToLine(). */
+	LineSegment ToLineSegment(float dStart, float dEnd) const;
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Ray.
 	/** The returned string specifies the position and direction of this Ray. */
