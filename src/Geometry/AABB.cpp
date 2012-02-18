@@ -134,8 +134,8 @@ Sphere AABB::MinimalEnclosingSphere() const
 
 Sphere AABB::MaximalContainedSphere() const
 {
-	float3 size = Size();
-	return Sphere(CenterPoint(), Min(Min(size.x, size.y), size.z));
+	float3 halfSize = HalfSize();
+	return Sphere(CenterPoint(), Min(halfSize.x, halfSize.y, halfSize.z));
 }
 
 bool AABB::IsFinite() const
