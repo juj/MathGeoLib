@@ -268,4 +268,8 @@ Q_DECLARE_METATYPE(Capsule)
 Q_DECLARE_METATYPE(Capsule*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Capsule &capsule);
+#endif
+
 MATH_END_NAMESPACE

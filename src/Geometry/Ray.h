@@ -217,4 +217,8 @@ Q_DECLARE_METATYPE(Ray)
 Q_DECLARE_METATYPE(Ray*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Ray &ray);
+#endif
+
 MATH_END_NAMESPACE

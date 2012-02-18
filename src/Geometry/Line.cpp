@@ -331,6 +331,13 @@ std::string Line::ToString() const
 		pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Line &line)
+{
+	o << line.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE

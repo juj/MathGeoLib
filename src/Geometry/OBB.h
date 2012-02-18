@@ -460,4 +460,8 @@ Q_DECLARE_METATYPE(OBB)
 Q_DECLARE_METATYPE(OBB*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const OBB &obb);
+#endif
+
 MATH_END_NAMESPACE

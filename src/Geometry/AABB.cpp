@@ -877,6 +877,13 @@ std::string AABB::ToString() const
 	sprintf(str, "AABB(Min:(%.2f, %.2f, %.2f) Max:(%.2f, %.2f, %.2f))", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const AABB &aabb)
+{
+	o << aabb.ToString();
+	return o;
+}
+
 #endif
 
 AABB AABB::Intersection(const AABB &aabb) const

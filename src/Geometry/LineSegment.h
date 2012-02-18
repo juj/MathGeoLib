@@ -220,4 +220,8 @@ Q_DECLARE_METATYPE(LineSegment)
 Q_DECLARE_METATYPE(LineSegment*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment);
+#endif
+
 MATH_END_NAMESPACE

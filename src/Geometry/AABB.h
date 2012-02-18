@@ -505,4 +505,8 @@ Q_DECLARE_METATYPE(AABB)
 Q_DECLARE_METATYPE(AABB*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const AABB &aabb);
+#endif
+
 MATH_END_NAMESPACE

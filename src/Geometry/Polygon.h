@@ -339,4 +339,9 @@ Q_DECLARE_METATYPE(Polygon)
 Q_DECLARE_METATYPE(Polygon*)
 #endif
 
+// @todo Add this.
+//#ifdef MATH_ENABLE_STL_SUPPORT
+//std::ostream &operator <<(std::ostream &o, const Polygon &polygon);
+//#endif
+
 MATH_END_NAMESPACE

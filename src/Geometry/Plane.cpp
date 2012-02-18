@@ -752,6 +752,13 @@ std::string Plane::ToString() const
 	sprintf(str, "Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Plane &plane)
+{
+	o << plane.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE

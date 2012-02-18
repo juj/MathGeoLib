@@ -1081,6 +1081,13 @@ std::string Triangle::ToString() const
 		a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Triangle &triangle)
+{
+	o << triangle.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE

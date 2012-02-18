@@ -210,4 +210,8 @@ Q_DECLARE_METATYPE(Line)
 Q_DECLARE_METATYPE(Line*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Line &line);
+#endif
+
 MATH_END_NAMESPACE

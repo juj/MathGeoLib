@@ -286,4 +286,9 @@ Q_DECLARE_METATYPE(Polyhedron)
 Q_DECLARE_METATYPE(Polyhedron*)
 #endif
 
+// @todo Add this
+//#ifdef MATH_ENABLE_STL_SUPPORT
+//std::ostream &operator <<(std::ostream &o, const Polyhedron &polyhedron);
+//#endif
+
 MATH_END_NAMESPACE

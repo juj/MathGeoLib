@@ -283,6 +283,13 @@ std::string Ray::ToString() const
 	sprintf(str, "Ray(Pos:(%.2f, %.2f, %.2f) Dir:(%.2f, %.2f, %.2f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Ray &ray)
+{
+	o << ray.ToString();
+	return o;
+}
+
 #endif
 
 Ray operator *(const float3x3 &transform, const Ray &ray)

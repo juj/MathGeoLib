@@ -337,6 +337,13 @@ std::string LineSegment::ToString() const
 		a.x, a.y, a.z, b.x, b.y, b.z);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment)
+{
+	o << lineSegment.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE

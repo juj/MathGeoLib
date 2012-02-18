@@ -367,4 +367,8 @@ Q_DECLARE_METATYPE(Frustum)
 Q_DECLARE_METATYPE(Frustum*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Frustum &frustum);
+#endif
+
 MATH_END_NAMESPACE

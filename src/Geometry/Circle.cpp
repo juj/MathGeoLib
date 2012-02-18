@@ -207,6 +207,13 @@ std::string Circle::ToString() const
 		pos.x, pos.y, pos.z, normal.x, normal.y, normal.z, r);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Circle &circle)
+{
+	o << circle.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE

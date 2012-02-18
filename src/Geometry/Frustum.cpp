@@ -598,6 +598,13 @@ std::string Frustum::ToString() const
 		verticalFov);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Frustum &frustum)
+{
+	o << frustum.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE

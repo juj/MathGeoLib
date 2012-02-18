@@ -1146,6 +1146,13 @@ std::string Sphere::ToString() const
 		pos.x, pos.y, pos.z, r);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
+{
+	o << sphere.ToString();
+	return o;
+}
+
 #endif
 
 Sphere operator *(const float3x3 &m, const Sphere &s)

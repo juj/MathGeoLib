@@ -338,4 +338,8 @@ Sphere operator *(const float3x4 &m, const Sphere &s);
 Sphere operator *(const float4x4 &m, const Sphere &s);
 Sphere operator *(const Quat &q, const Sphere &s);
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Sphere &sphere);
+#endif
+
 MATH_END_NAMESPACE

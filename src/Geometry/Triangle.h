@@ -352,4 +352,8 @@ Q_DECLARE_METATYPE(Triangle)
 Q_DECLARE_METATYPE(Triangle*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Triangle &triangle);
+#endif
+
 MATH_END_NAMESPACE

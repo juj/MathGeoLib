@@ -371,4 +371,8 @@ Q_DECLARE_METATYPE(Plane)
 Q_DECLARE_METATYPE(Plane*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Plane &plane);
+#endif
+
 MATH_END_NAMESPACE

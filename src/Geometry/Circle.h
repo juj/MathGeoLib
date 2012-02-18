@@ -191,4 +191,8 @@ Q_DECLARE_METATYPE(Circle)
 Q_DECLARE_METATYPE(Circle*)
 #endif
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::ostream &operator <<(std::ostream &o, const Circle &circle);
+#endif
+
 MATH_END_NAMESPACE

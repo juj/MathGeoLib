@@ -865,6 +865,13 @@ std::string OBB::ToString() const
 		pos.x, pos.y, pos.z, r.x*2.f, r.y*2.f, r.z*2.f, axis[0].x, axis[0].y, axis[0].z, axis[1].x, axis[1].y, axis[1].z, axis[2].x, axis[2].y, axis[2].z);
 	return str;
 }
+
+std::ostream &operator <<(std::ostream &o, const OBB &obb)
+{
+	o << obb.ToString();
+	return o;
+}
+
 #endif
 
 MATH_END_NAMESPACE
