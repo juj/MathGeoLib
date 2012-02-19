@@ -77,11 +77,6 @@ void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
 	assume(!normal.IsZero());
 	normal.Normalize();
 	d = Dot(v1, normal);
-
-	mathassert(EqualAbs(SignedDistance(v1), 0.f));
-	mathassert(EqualAbs(SignedDistance(v2), 0.f));
-	mathassert(EqualAbs(SignedDistance(v3), 0.f));
-	mathassert(EqualAbs(SignedDistance(v3 + normal), 1.f));
 }
 
 void Plane::Set(const float3 &point, const float3 &normal_)

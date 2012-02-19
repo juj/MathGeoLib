@@ -771,7 +771,7 @@ bool float3x3::Inverse()
 	// return InverseMatrix(*this);
 	// Instead, compute the inverse directly using Cramer's rule.
 	float d = Determinant();
-	if (EqualAbs(d, 0.f))
+	if (EqualAbs(d, 0.f, 1e-3f))
 		return false;
 
 	d = 1.f / d;
