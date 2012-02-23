@@ -422,9 +422,9 @@ public:
 	void Enclose(const float3 *pointArray, int numPoints);
 
 	/// Generates an unindexed triangle mesh representation of this AABB.
-	/** @param x The number of faces to generate along the X axis. This value must be >= 1.
-		@param y The number of faces to generate along the Y axis. This value must be >= 1.
-		@param z The number of faces to generate along the Z axis. This value must be >= 1.
+	/** @param numFacesX The number of faces to generate along the X axis. This value must be >= 1.
+		@param numFacesY The number of faces to generate along the Y axis. This value must be >= 1.
+		@param numFacesZ The number of faces to generate along the Z axis. This value must be >= 1.
 		@param outPos [out] An array of size numVertices which will receive a triangle list 
 			of vertex positions. Cannot be null.
 		@param outNormal [out] An array of size numVertices which will receive vertex normals. 
@@ -435,7 +435,7 @@ public:
 		(x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call
 		NumVerticesInTriangulation to obtain this value.
 		@see ToPolyhedron(), ToEdgeList(), NumVerticesInTriangulation(). */
-	void Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const;
+	void Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outPos, float3 *outNormal, float2 *outUV) const;
 
 	/// Returns the number of vertices that the Triangulate() function will output with the given subdivision parameters.
 	/** @see Triangulate(). */
