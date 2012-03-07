@@ -17,6 +17,7 @@
 	@brief */
 #pragma once
 
+#include "myassert.h"
 #include "Math/MathFwd.h"
 
 MATH_BEGIN_NAMESPACE

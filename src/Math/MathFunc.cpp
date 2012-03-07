@@ -20,6 +20,7 @@
 #include <algorithm>
 #endif
 
+#include "myassert.h"
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 

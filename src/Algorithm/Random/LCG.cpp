@@ -12,6 +12,7 @@
 #include "Algorithm/Random/LCG.h"
 #include "Time/Clock.h"
 #include "Types.h"
+#include "myassert.h"
 
 LCG::LCG()
 {

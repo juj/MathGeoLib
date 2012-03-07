@@ -710,6 +710,7 @@ float float4::Dot4(const float4 &rhs) const
 #endif
 }
 
+#ifdef MATH_SSE
 __m128 _mm_cross_ps(__m128 a, __m128 b)
 {
 	__m128 a_yzx = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 1, 2, 0)); // a_yzx = [w, y, z, x]
@@ -721,6 +722,7 @@ __m128 _mm_cross_ps(__m128 a, __m128 b)
 	// The content of highest index (.w) in the returned vector is undefined.
 	return _mm_sub_ps(_mm_mul_ps(a_yzx, b_zxy), _mm_mul_ps(a_zxy, b_yzx));
 }
+#endif
 
 /** dst = A x B - The standard cross product:
 \code

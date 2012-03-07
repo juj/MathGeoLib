@@ -15,11 +15,6 @@
 /** @file float2.cpp
 	@author Jukka Jylänki
 	@brief */
-#ifdef MATH_ENABLE_STL_SUPPORT
-#include "myassert.h"
-#include <utility>
-#include <algorithm>
-#endif
 #include <stdlib.h>
 #include "Math/float2.h"
 #include "Math/float3.h"
@@ -27,6 +22,12 @@
 #include "Math/MathFunc.h"
 #include "Algorithm/Random/LCG.h"
 #include "assume.h"
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include "myassert.h"
+#include <utility>
+#include <algorithm>
+#endif
 
 MATH_BEGIN_NAMESPACE
 

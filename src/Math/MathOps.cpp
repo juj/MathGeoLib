@@ -16,6 +16,7 @@
 	@author Jukka Jylänki
 	@brief */
 #include "Math/MathFunc.h"
+#include "myassert.h"
 
 MATH_BEGIN_NAMESPACE
 

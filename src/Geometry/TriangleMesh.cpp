@@ -1,3 +1,5 @@
+#ifdef WIN32
+
 #include <malloc.h>
 #include <string.h>
 #include "Math/float3.h"
@@ -7,10 +9,13 @@
 #include "Math/MathConstants.h"
 #include "TriangleMesh.h"
 #include <cassert>
+
+#ifdef MATH_SSE
 #include <intrin.h>
 #include <emmintrin.h>
 #include <smmintrin.h>
 #include <xmmintrin.h>
+#endif
 
 // If defined, we preprocess our TriangleMesh data structure to contain (v0, v1-v0, v2-v0)
 // instead of (v0, v1, v2) triplets for faster ray-triangle mesh intersection.
@@ -334,3 +339,5 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 #include "TriangleMesh_IntersectRay_AVX.inl"
 
 MATH_END_NAMESPACE
+
+#endif
