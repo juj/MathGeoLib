@@ -38,6 +38,10 @@
 #include "Geometry/Ray.h"
 #include "Geometry/Triangle.h"
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+#include "VertexBuffer.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 OBB::OBB(const AABB &aabb)
@@ -659,10 +663,10 @@ void OBB::Enclose(const float3 &point)
 	assume(Distance(point) <= 1e-3f);
 }
 
-void OBB::Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV) const
+void OBB::Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV, bool ccwIsFrontFacing) const
 {
 	AABB aabb(float3(0,0,0), float3(r.x*2.f,r.y*2.f,r.z*2.f));
-	aabb.Triangulate(x, y, z, outPos, outNormal, outUV);
+	aabb.Triangulate(x, y, z, outPos, outNormal, outUV, ccwIsFrontFacing);
 	float3x4 localToWorld = LocalToWorld();
 	assume(localToWorld.HasUnitaryScale()); // Transforming of normals will fail otherwise.
 	localToWorld.BatchTransformPos(outPos, NumVerticesInTriangulation(x,y,z), sizeof(float3));
@@ -872,6 +876,30 @@ std::ostream &operator <<(std::ostream &o, const OBB &obb)
 	return o;
 }
 
+#endif
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+void OBB::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
+{
+    int x = 1;
+    int y = 1;
+    int z = 1;
+    Array<float3> pos;
+    Array<float3> normal;
+    Array<float2> uv;
+    int numVertices = (x*y+y*z+x*z)*2*6;
+    pos.Resize_pod(numVertices);
+    normal.Resize_pod(numVertices);
+    uv.Resize_pod(numVertices);
+    Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
+    int startIndex = vb.AppendVertices(numVertices);
+    for(size_t i = 0; i < pos.size(); ++i)
+    {
+        vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+        vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+        vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
+    }
+}
 #endif
 
 MATH_END_NAMESPACE

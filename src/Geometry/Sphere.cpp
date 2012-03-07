@@ -44,6 +44,10 @@
 #include "Math/Quat.h"
 #include "Geometry/Triangle.h"
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+#include "VertexBuffer.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Sphere::Sphere(const float3 &center, float radius)
@@ -623,7 +627,7 @@ void Sphere::Enclose(const float3 *pointArray, int numPoints)
 		Enclose(pointArray[i]);
 }
 
-int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices) const
+int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const
 {
 	assume(outPos);
 	assume(numVertices >= 24 && "At minimum, sphere triangulation will contain at least 8 triangles, which is 24 vertices, but fewer were specified!");
@@ -651,14 +655,28 @@ int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int nu
 	float3 zp(0,0,r);
 	float3 zn(0,0,-r);
 
-	temp.push_back(Triangle(yp,xp,zp));
-	temp.push_back(Triangle(xp,yp,zn));
-	temp.push_back(Triangle(yn,zp,xp));
-	temp.push_back(Triangle(yn,xp,zn));
-	temp.push_back(Triangle(zp,xn,yp));
-	temp.push_back(Triangle(yp,xn,zn));
-	temp.push_back(Triangle(yn,xn,zp));
-	temp.push_back(Triangle(xn,yn,zn));
+	if (ccwIsFrontFacing)
+	{
+		temp.push_back(Triangle(yp,xp,zp));
+		temp.push_back(Triangle(xp,yp,zn));
+		temp.push_back(Triangle(yn,zp,xp));
+		temp.push_back(Triangle(yn,xp,zn));
+		temp.push_back(Triangle(zp,xn,yp));
+		temp.push_back(Triangle(yp,xn,zn));
+		temp.push_back(Triangle(yn,xn,zp));
+		temp.push_back(Triangle(xn,yn,zn));
+	}
+	else
+	{
+		temp.push_back(Triangle(yp,zp,xp));
+		temp.push_back(Triangle(xp,zn,yp));
+		temp.push_back(Triangle(yn,xp,zp));
+		temp.push_back(Triangle(yn,zn,xp));
+		temp.push_back(Triangle(zp,yp,xn));
+		temp.push_back(Triangle(yp,zn,xn));
+		temp.push_back(Triangle(yn,zp,xn));
+		temp.push_back(Triangle(xn,zn,yn));
+	}
 
 	int oldEnd = 0;
 	while(((int)temp.size()-oldEnd+3)*3 <= numVertices)
@@ -1178,5 +1196,28 @@ Sphere operator *(const Quat &q, const Sphere &s)
 {
 	return q.ToFloat3x3() * s;
 }
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+void Sphere::Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacing) const
+{
+	int x = 1;
+	int y = 1;
+	int z = 1;
+	Array<float3> pos;
+	Array<float3> normal;
+	Array<float2> uv;
+	pos.Resize_pod(numVertices);
+	normal.Resize_pod(numVertices);
+	uv.Resize_pod(numVertices);
+	Triangulate(pos.beginptr(), normal.beginptr(), uv.beginptr(), numVertices, ccwIsFrontFacing);
+	int startIndex = vb.AppendVertices(numVertices);
+	for(size_t i = 0; i < pos.size(); ++i)
+	{
+		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+		vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+		vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
+	}
+}
+#endif
 
 MATH_END_NAMESPACE

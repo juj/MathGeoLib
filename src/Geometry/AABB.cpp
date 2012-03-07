@@ -39,6 +39,10 @@
 #include "Geometry/Triangle.h"
 #include "Geometry/Capsule.h"
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+#include "VertexBuffer.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 AABB::AABB(const float3 &minPoint_, const float3 &maxPoint_)
@@ -786,7 +790,9 @@ void AABB::Enclose(const float3 *pointArray, int numPoints)
 		Enclose(pointArray[i]);
 }
 
-void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outPos, float3 *outNormal, float2 *outUV) const
+void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
+                       float3 *outPos, float3 *outNormal, float2 *outUV,
+                       bool ccwIsFrontFacing) const
 {
 	assume(numFacesX >= 1);
 	assume(numFacesY >= 1);
@@ -803,6 +809,8 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outP
 		int numFacesU;
 		int numFacesV;
 		bool flip = (face == 1 || face == 2 || face == 5);
+		if (ccwIsFrontFacing)
+			flip = !flip;
 		if (face == 0 || face == 1)
 		{
 			numFacesU = numFacesY;
@@ -890,5 +898,29 @@ AABB AABB::Intersection(const AABB &aabb) const
 {
 	return AABB(Max(minPoint, aabb.minPoint), Min(maxPoint, aabb.maxPoint));
 }
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+void AABB::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
+{
+    int x = 1;
+    int y = 1;
+    int z = 1;
+    Array<float3> pos;
+    Array<float3> normal;
+    Array<float2> uv;
+    int numVertices = (x*y+y*z+x*z)*2*6;
+    pos.Resize_pod(numVertices);
+    normal.Resize_pod(numVertices);
+    uv.Resize_pod(numVertices);
+    Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
+    int startIndex = vb.AppendVertices(numVertices);
+    for(size_t i = 0; i < pos.size(); ++i)
+    {
+        vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+        vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+        vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
+    }
+}
+#endif
 
 MATH_END_NAMESPACE

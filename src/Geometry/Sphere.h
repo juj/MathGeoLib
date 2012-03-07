@@ -289,9 +289,9 @@ public:
 	/** @param outPos [out] An array of size numVertices which will receive a triangle list of vertex positions. Cannot be null.
 		@param outNormal [out] An array of size numVertices which will receive vertex normals. If this parameter is null, vertex normals are not generated.
 		@param outUV [out] An array of size numVertices which will receive UV coordinates. If this parameter is null, UV coordinates are not generated.
-		@param numVertices The size of the input arrays outPos and outNormal. This value should be of form 24*4^n for some n >= 0.
+		@param numVertices The size of the input arrays outPos and outNormal. This value should be of form 24*4^n for some n >= 0. (24, 96, 384, 1536, 6144, 24576, ...)
 		@return The actual number of vertices generated (== the number of elements written to outPos and outNormal). */
-	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices) const;
+	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const;
 
 	/// Computes the intersection of a line and a sphere.
 	/** This function solves the points of intersection between a line and a sphere.
@@ -325,6 +325,10 @@ public:
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
+#endif
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+	void Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacing) const;
 #endif
 };
 

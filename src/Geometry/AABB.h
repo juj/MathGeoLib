@@ -435,7 +435,9 @@ public:
 		(x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call
 		NumVerticesInTriangulation to obtain this value.
 		@see ToPolyhedron(), ToEdgeList(), NumVerticesInTriangulation(). */
-	void Triangulate(int numFacesX, int numFacesY, int numFacesZ, float3 *outPos, float3 *outNormal, float2 *outUV) const;
+	void Triangulate(int numFacesX, int numFacesY, int numFacesZ, 
+	                 float3 *outPos, float3 *outNormal, float2 *outUV,
+	                 bool ccwIsFrontFacing) const;
 
 	/// Returns the number of vertices that the Triangulate() function will output with the given subdivision parameters.
 	/** @see Triangulate(). */
@@ -497,6 +499,10 @@ public:
 #ifdef MATH_OGRE_INTEROP
 	AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }
 	operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
+#endif
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const;
 #endif
 };
 
