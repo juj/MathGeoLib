@@ -17,6 +17,8 @@
 	@brief A 2D (x,y) ordered pair. */
 #pragma once
 
+#include "MathBuildConfig.h"
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #include <vector>

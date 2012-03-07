@@ -17,6 +17,8 @@
 	@brief Quaternions represent rotations and orientations of 3D objects. */
 #pragma once
 
+#include "MathBuildConfig.h"
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #endif

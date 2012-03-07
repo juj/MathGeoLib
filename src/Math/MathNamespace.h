@@ -33,3 +33,5 @@ MATH_END_NAMESPACE
 // the math namespace only exists to allow shadowing all symbols outside the math libraries.
 // This enables hiding the unwanted stuff from the math libraries (e.g. Windows GDI Polygon function).
 USE_MATH_NAMESPACE
+
+#include "MathBuildConfig.h"
