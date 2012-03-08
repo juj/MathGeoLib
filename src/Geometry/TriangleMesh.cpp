@@ -26,7 +26,7 @@ MATH_BEGIN_NAMESPACE
 enum SIMDCapability
 {
 	SIMD_NONE,
-//	SIMD_SSE,
+	SIMD_SSE,
 	SIMD_SSE2,
 //	SIMD_SSE3,
 //	SIMD_SSSE3,
@@ -38,6 +38,7 @@ enum SIMDCapability
 
 SIMDCapability DetectSIMDCapability()
 {
+#ifdef MATH_SSE
 	int CPUInfo[4] = {-1};
 
 	unsigned    nIds, nExIds, i;
@@ -118,12 +119,24 @@ SIMDCapability DetectSIMDCapability()
         }
     }
 
+#ifdef MATH_AVX
 	if (hasAVX)
 		return SIMD_AVX;
+#endif
+#ifdef MATH_SSE41
 	if (bSSE41Extensions)
 		return SIMD_SSE41;
+#endif
+#ifdef MATH_SSE2
 	if (hasSSE2)
 		return SIMD_SSE2;
+#endif
+#ifdef MATH_SSE
+	if (hasSSE)
+		return SIMD_SSE;
+#endif
+
+#endif // ~ MATH_SSE not defined.
 	return SIMD_NONE;
 }
 
@@ -302,6 +315,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 	return nearestD;
 }
 
+#ifdef MATH_SSE2
 #define MATH_GEN_SSE2
 #include "TriangleMesh_IntersectRay_SSE.inl"
 
@@ -313,7 +327,9 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 #define MATH_GEN_TRIANGLEINDEX
 #define MATH_GEN_UV
 #include "TriangleMesh_IntersectRay_SSE.inl"
+#endif
 
+#ifdef MATH_SSE41
 #define MATH_GEN_SSE41
 #include "TriangleMesh_IntersectRay_SSE.inl"
 
@@ -325,7 +341,9 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 #define MATH_GEN_TRIANGLEINDEX
 #define MATH_GEN_UV
 #include "TriangleMesh_IntersectRay_SSE.inl"
+#endif
 
+#ifdef MATH_AVX
 #define MATH_GEN_AVX
 #include "TriangleMesh_IntersectRay_AVX.inl"
 
@@ -337,6 +355,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 #define MATH_GEN_TRIANGLEINDEX
 #define MATH_GEN_UV
 #include "TriangleMesh_IntersectRay_AVX.inl"
+#endif
 
 MATH_END_NAMESPACE
 
