@@ -17,8 +17,22 @@
 	@brief Specifies all build flags for the library. */
 #pragma once
 
+/// Adjust this #define to choose the name of the namespace math is given to.
+#define MATH_NAMESPACE_NAME math
+
+#define MATH_ENABLE_NAMESPACE
+
+#ifdef WIN32
+//#define MATH_ASSERT_ON_ASSUME
+#endif
+
+//#define MATH_ASSERT_CORRECTNESS
+
+#define MATH_SILENT_ASSUME
+
 #define MATH_ENABLE_STL_SUPPORT
 #define MATH_TINYXML_INTEROP
+//#define MATH_GRAPHICSENGINE_INTEROP
 #define KNET_LOGGING_SUPPORT_ENABLED
 
 //#define MATH_AVX

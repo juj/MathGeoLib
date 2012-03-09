@@ -32,7 +32,7 @@
 #include <QMatrix4x4>
 #endif
 
-#include "SSEMathConfig.h"
+#include "MathBuildConfig.h"
 #include "SSEMath.h"
 
 MATH_BEGIN_NAMESPACE

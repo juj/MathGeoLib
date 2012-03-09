@@ -24,7 +24,7 @@
 #include "Math/MathFwd.h"
 #include "MatrixProxy.h"
 #include "CoordinateAxisConvention.h"
-#include "SSEMathConfig.h"
+#include "MathBuildConfig.h"
 
 MATH_BEGIN_NAMESPACE
 

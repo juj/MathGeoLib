@@ -17,6 +17,7 @@
 	@brief */
 #pragma once
 
+#include "Math/MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 
 // The CONST_WIN32 is a #define which resolves to 'const' on Windows, and null on other
@@ -77,3 +78,7 @@ class Triangle;
 MATH_END_NAMESPACE
 
 class LCG;
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+class VertexBuffer;
+#endif

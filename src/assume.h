@@ -1,13 +1,10 @@
 #pragma once
 
+#include "Math/MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 #include <stdio.h>
 #ifdef WIN32
 #include "myassert.h"
-#endif
-
-#ifdef WIN32
-#define MATH_ASSERT_ON_ASSUME
 #endif
 
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
@@ -60,7 +57,7 @@ MATH_END_NAMESPACE
 #define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
 #endif
 #else
-#define assume(x) 
+#define assume(x) do { } while(0)
 #endif
 
 // If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test

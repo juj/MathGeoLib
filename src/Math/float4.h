@@ -31,7 +31,7 @@
 #include <OgreVector4.h>
 #endif
 
-#include "SSEMathConfig.h"
+#include "MathBuildConfig.h"
 
 MATH_BEGIN_NAMESPACE
 

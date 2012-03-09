@@ -1,9 +1,6 @@
 #pragma once
 
-/// Adjust this #define to choose the name of the namespace math is given to.
-#define MATH_NAMESPACE_NAME math
-
-#define MATH_ENABLE_NAMESPACE
+#include "MathBuildConfig.h"
 
 #ifdef MATH_ENABLE_NAMESPACE
 
@@ -33,5 +30,3 @@ MATH_END_NAMESPACE
 // the math namespace only exists to allow shadowing all symbols outside the math libraries.
 // This enables hiding the unwanted stuff from the math libraries (e.g. Windows GDI Polygon function).
 USE_MATH_NAMESPACE
-
-#include "MathBuildConfig.h"
