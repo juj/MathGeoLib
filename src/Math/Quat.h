@@ -155,6 +155,25 @@ public:
 	Quat Slerp(const Quat &target, float t) const;
 	static Quat Slerp(const Quat &source, const Quat &target, float t);
 
+	/// Returns the 'from' vector rotated towards the 'to' vector by the given normalized time parameter.
+	/** This function slerps the given 'from' vector towards the 'to' vector.
+		@param from A normalized direction vector specifying the direction of rotation at t=0.
+		@param to A normalized direction vector specifying the direction of rotation at t=1.
+		@param t The interpolation time parameter, in the range [0,1]. Input values outside this range are 
+			silently clamped to the [0, 1] interval.
+		@return A spherical linear interpolation of the vector 'from' towards the vector 'to'. */
+	static float3 SlerpVector(const float3 &from, const float3 &to, float t);
+
+	/// Returns the 'from' vector rotated towards the 'to' vector by the given absolute angle, in radians.
+	/** This function slerps the given 'from' vector towards the 'to' vector.
+		@param from A normalized direction vector specifying the direction of rotation at angleRadians=0.
+		@param to A normalized direction vector specifying the target direction to rotate towards.
+		@param angleRadians The maximum angle to rotate the 'from' vector by, in the range [0, pi]. If the
+			angle between 'from' and 'to' is smaller than this angle, then the vector 'to' is returned.
+			Input values outside this range are silently clamped to the [0, pi] interval.
+		@return A spherical linear interpolation of the vector 'from' towards the vector 'to'. */
+	static float3 SlerpVectorAbs(const float3 &from, const float3 &to, float angleRadians);
+
 	/// Returns the angle between this and the target orientation (the shortest route) in radians.
 	float AngleBetween(const Quat &target) const;
 	/// Returns the axis of rotation to get from this orientation to target orientation (the shortest route).

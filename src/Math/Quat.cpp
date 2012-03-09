@@ -268,6 +268,31 @@ Quat Slerp(const Quat &a, const Quat &b, float t)
 	return a.Slerp(b, t);
 }
 
+float3 Quat::SlerpVector(const float3 &from, const float3 &to, float t)
+{
+	if (t <= 0.f)
+		return from;
+	if (t >= 1.f)
+		return to;
+	///\todo The following chain can be greatly optimized.
+	Quat q = Quat::RotateFromTo(from, to);
+	q = Slerp(Quat::identity, q, t);
+	return q.Transform(from);
+}
+
+float3 Quat::SlerpVectorAbs(const float3 &from, const float3 &to, float angleRadians)
+{
+	if (angleRadians <= 0.f)
+		return from;
+	Quat q = Quat::RotateFromTo(from, to);
+	float a = q.Angle();
+	if (a <= angleRadians)
+		return to;
+	float t = angleRadians / a;
+	q = Slerp(Quat::identity, q, t);
+	return q.Transform(from);
+}
+
 float Quat::AngleBetween(const Quat &target) const
 {
 	assume(this->IsInvertible());
