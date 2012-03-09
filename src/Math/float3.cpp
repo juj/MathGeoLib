@@ -330,6 +330,26 @@ float3 float3::Clamp(float floor, float ceil) const
 	return Min(ceil).Max(floor);
 }
 
+float3 float3::ClampLength(float maxLength) const
+{
+	float lenSq = LengthSq();
+	if (lenSq > maxLength*maxLength)
+		return *this * (maxLength / Sqrt(lenSq));
+	else
+		return *this;
+}
+
+float3 float3::ClampLength(float minLength, float maxLength) const
+{
+	float lenSq = LengthSq();
+	if (lenSq > maxLength*maxLength)
+		return *this * (maxLength / Sqrt(lenSq));
+	else if (lenSq < minLength*minLength)
+		return *this * (minLength / Sqrt(lenSq));
+	else
+		return *this;
+}
+
 float float3::DistanceSq(const float3 &rhs) const
 {
 	float dx = x - rhs.x;

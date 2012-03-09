@@ -449,12 +449,19 @@ public:
 	/// Returns a vector that has floor <= this[i] <= ceil for each element.
 	float3 Clamp(float floor, float ceil) const;
 	/// Limits each element of this vector between the corresponding elements in floor and ceil.
-	/** @see Min(), Max(), Clamp01(). */
+	/** @see Min(), Max(), Clamp01(), ClampLength(). */
 	float3 Clamp(const float3 &floor, const float3 &ceil) const;
 	/// Limits each element of this vector in the range [0, 1].
-	/** @see Min(), Max(), Clamp(). */
+	/** @see Min(), Max(), Clamp(), ClampLength(). */
 	float3 Clamp01() const;
 
+	/// Returns a copy of this vector, with its length scaled down to maxLength.
+	/** @see Clamp(). */
+	float3 ClampLength(float maxLength) const;
+	/// Returns a copy of this vector, with its length scaled between minLength and maxLength.
+	/** @see Clamp(). */
+	float3 ClampLength(float minLength, float maxLength) const;
+				
 	/// Computes the distance between this point and the given object.
 	/** This function finds the nearest point to this point on the given object, and computes its distance
 		to this point.
