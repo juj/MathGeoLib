@@ -309,11 +309,11 @@ inline void QuadTree<T>::AABBQuery(const AABB2D &aabb, Func &callback)
 	}
 }
 
-template<typename T>
+template<typename T, typename Func>
 class FindCollidingPairs
 {
 public:
-	void (*collisionCallback)(T &a, T &b);
+	Func *collisionCallback;
 
 	bool operator ()(QuadTree<T> &tree, const AABB2D queryAABB, typename QuadTree<T>::Node &node, const AABB2D &nodeAABB)
 	{
@@ -324,7 +324,7 @@ public:
 			{
 				AABB2D aabbJ = GetAABB2D(node.objects[j]);
 				if (aabbI.Intersects(aabbJ))
-					collisionCallback(node.objects[i], node.objects[j]);
+					(*collisionCallback)(node.objects[i], node.objects[j]);
 			}
 
 			typename QuadTree<T>::Node *n = node.parent;
@@ -334,7 +334,7 @@ public:
 				{
 					AABB2D aabbJ = GetAABB2D(n->objects[j]);
 					if (aabbI.Intersects(aabbJ))
-						collisionCallback(node.objects[i], n->objects[j]);
+						(*collisionCallback)(node.objects[i], n->objects[j]);
 				}
 				n = n->parent;
 			}
@@ -347,8 +347,8 @@ template<typename T>
 template<typename Func>
 inline void QuadTree<T>::CollidingPairsQuery(const AABB2D &aabb, Func &callback)
 {
-	FindCollidingPairs<T> func;
-	func.collisionCallback = callback;
+	FindCollidingPairs<T, Func> func;
+	func.collisionCallback = &callback;
 	AABBQuery(aabb, func);
 }
 
