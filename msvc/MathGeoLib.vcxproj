@@ -273,7 +273,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MATH_TINYXML_INTEROP;PERFORMANCEPROFILING;_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;NDEBUG;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PERFORMANCEPROFILING;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
