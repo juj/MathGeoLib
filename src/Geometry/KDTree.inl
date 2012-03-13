@@ -158,7 +158,7 @@ const T &KdTree<T>::Object(int objectIndex) const
 template<typename T>
 int KdTree<T>::NumNodes() const
 {
-	return nodes.size() -1;
+	return nodes.size() - 1;
 }
 
 /// Returns the total number of leaf nodes in the tree.

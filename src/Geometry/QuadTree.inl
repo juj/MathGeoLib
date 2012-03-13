@@ -3,15 +3,13 @@
 template<typename T>
 void QuadTree<T>::Clear(const float2 &minXY, const float2 &maxXY)
 {
-//	FreeBuckets();
 	nodes.clear();
 
 	boundingAABB.minPoint = minXY;
 	boundingAABB.maxPoint = maxXY;
 
-	int rootNodeGroup = AllocateNodeGroup(0);
-	Node *root = Root();
-	assert(root);
+	rootNodeIndex = AllocateNodeGroup(0);
+	assert(Root());
 }
 
 template<typename T>
@@ -20,13 +18,60 @@ void QuadTree<T>::Add(const T &object)
 	Node *n = Root();
 	assert(n);
 
-	AABB2D aabb = boundingAABB;
-	assert(Contains(aabb, object));
+	assert(boundingAABB.IsFinite());
 
-//	u32 objectId = (u32)objects.size();
-//	objects.push_back(object);
+	AABB2D objectAABB = GetAABB2D(object);
+	assert(objectAABB.IsFinite());
+	
+	if (objectAABB.minPoint.x >= boundingAABB.minPoint.x)
+	{
+		// Object fits left.
 
-	Add(object, n, aabb);
+		if (objectAABB.maxPoint.x <= boundingAABB.maxPoint.x)
+		{
+			// Object fits left and right.
+
+			if (objectAABB.minPoint.y >= boundingAABB.minPoint.y)
+			{
+				// Object fits left, right and top.
+				if (objectAABB.maxPoint.y <= boundingAABB.maxPoint.y)
+				{
+					// Object fits the whole root AABB. Can safely add into the existing tree size.
+					Add(object, n, boundingAABB);
+					return;
+				}
+				else
+				{
+					// Object fits left, right and top, but not bottom.
+					GrowRootBottomRight(); // Could grow bottom-left as well, wouldn't matter here.
+				}
+			}
+			else
+			{
+				// Object fits left and right, but not to top.
+				GrowRootTopRight(); // Could grow top-left as well, wouldn't matter here.
+			}
+		}
+		else
+		{
+			// Object fits left, but not to right. We must grow right. Check whether to grow top or bottom.
+			if (objectAABB.minPoint.y < boundingAABB.minPoint.y)
+				GrowRootTopRight();
+			else
+				GrowRootBottomRight();
+		}
+	}
+	else
+	{
+		// We must grow left. Check whether to grow top or bottom.
+		if (objectAABB.minPoint.y < boundingAABB.minPoint.y)
+			GrowRootTopLeft();
+		else
+			GrowRootBottomLeft();
+	}
+
+	// Now that we have grown the tree root node, try adding again.
+	Add(object);
 }
 
 template<typename T>
@@ -73,11 +118,13 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 			if (top)
 			{
 				aabb.maxPoint.y = halfY;
+				assert(nodes[n->TopLeftChildIndex()].parent == n);
 				n = &nodes[n->TopLeftChildIndex()];
 			}
 			else
 			{
 				aabb.minPoint.y = halfY;
+				assert(nodes[n->BottomLeftChildIndex()].parent == n);
 				n = &nodes[n->BottomLeftChildIndex()];
 			}
 		}
@@ -87,82 +134,56 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 			if (top)
 			{
 				aabb.maxPoint.y = halfY;
+				assert(nodes[n->TopRightChildIndex()].parent == n);
 				n = &nodes[n->TopRightChildIndex()];
 			}
 			else
 			{
 				aabb.minPoint.y = halfY;
+				assert(nodes[n->BottomRightChildIndex()].parent == n);
 				n = &nodes[n->BottomRightChildIndex()];
 			}
 		}
 	}
 }
 
-/*
-template<typename T>
-u32 *QuadTree<T>::Bucket(int bucketIndex)
-{
-	return buckets[bucketIndex];
-}
-
-template<typename T>
-const u32 *QuadTree<T>::Bucket(int bucketIndex) const
-{
-	return buckets[bucketIndex];
-}
-
-template<typename T>
-T &QuadTree<T>::Object(int objectIndex)
-{
-	return objects[objectIndex];
-}
-
-template<typename T>
-const T &QuadTree<T>::Object(int objectIndex) const
-{
-	return objects[objectIndex];
-}
-*/
 template<typename T>
 typename QuadTree<T>::Node *QuadTree<T>::Root()
 {
-	return nodes.size() > 0 ? &nodes[1] : 0;
+	return nodes.size() > 0 ? &nodes[rootNodeIndex] : 0;
 }
 
 template<typename T>
 const typename QuadTree<T>::Node *QuadTree<T>::Root() const
 {
-	return nodes.size() > 0 ? &nodes[1] : 0;
+	return nodes.size() > 0 ? &nodes[rootNodeIndex] : 0;
 }
 
 template<typename T>
 int QuadTree<T>::AllocateNodeGroup(Node *parent)
 {
+#ifdef _DEBUG
+	int oldCap = nodes.capacity();
+#endif
 	int index = nodes.size();
 	Node n;
 	n.parent = parent;
-	n.childIndex = 0;
+	n.childIndex = 0xFFFFFFFF;
 	nodes.push_back(n);
 	nodes.push_back(n);
 	nodes.push_back(n);
 	nodes.push_back(n);
+#ifdef _DEBUG
+	assert(nodes.capacity() == oldCap); // Limitation: Cannot resize the nodes vector!
+#endif
 	return index;
 }
-/*
-template<typename T>
-void QuadTree<T>::FreeBuckets()
-{
-	for(size_t i = 0; i < buckets.size(); ++i)
-		delete[] buckets[i];
-	buckets.clear();
-}
-*/
 
 template<typename T>
 void QuadTree<T>::SplitLeaf(Node *leaf, const AABB2D &leafAABB)
 {
 	assert(leaf->IsLeaf());
-	assert(leaf->childIndex == 0);
+	assert(leaf->childIndex == 0xFFFFFFFF);
 
 	leaf->childIndex = AllocateNodeGroup(leaf);
 
@@ -172,7 +193,6 @@ void QuadTree<T>::SplitLeaf(Node *leaf, const AABB2D &leafAABB)
 	size_t i = 0;
 	while(i < leaf->objects.size())
 	{
-//		u32 objectId = leaf->bucket[i];
 		const T &object = leaf->objects[i];
 
 		// Traverse the QuadTree to decide which quad to place this object into.
@@ -336,6 +356,7 @@ public:
 					if (aabbI.Intersects(aabbJ))
 						(*collisionCallback)(node.objects[i], n->objects[j]);
 				}
+				assert(n != n->parent);
 				n = n->parent;
 			}
 		}
@@ -424,3 +445,231 @@ inline void QuadTree<T>::NearestObjects(const float2 &point, Func &leafCallback)
 	}
 }
 #endif
+
+template<typename T>
+void QuadTree<T>::GrowRootTopLeft()
+{
+	boundingAABB.minPoint.x -= boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
+	boundingAABB.minPoint.y -= boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
+
+	// rootNodeIndex always points to the first index of the four quadrants.
+	// The old root will become the bottom-right child of the new root, at index 3. Swap the root node to its proper place.
+	Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+3]);
+	Node *oldRoot = &nodes[rootNodeIndex+3];
+
+	// Fix up the refs to the swapped old root node.
+	if (!oldRoot->IsLeaf())
+	{
+		nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
+		nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
+		nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
+		nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
+	}
+
+	// Fix up object->node associations to the swapped old root node.
+	for(size_t i = 0; i < oldRoot->objects.size(); ++i)
+		AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
+
+	int oldRootNodeIndex = rootNodeIndex;
+	rootNodeIndex = AllocateNodeGroup(0);
+	Node *newRoot = &nodes[rootNodeIndex];
+	newRoot->childIndex = oldRootNodeIndex;
+	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
+
+	LOGI("TopLeft: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
+		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
+	DebugSanityCheckNode(Root());
+}
+
+template<typename T>
+void QuadTree<T>::GrowRootTopRight()
+{
+	boundingAABB.maxPoint.x += boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
+	boundingAABB.minPoint.y -= boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
+
+	// rootNodeIndex always points to the first index of the four quadrants.
+	// The old root will become the bottom-left child of the new root, at index 2. Swap the root node to its proper place.
+	Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+2]);
+	Node *oldRoot = &nodes[rootNodeIndex+2];
+
+	// Fix up the refs to the swapped old root node.
+	if (!oldRoot->IsLeaf())
+	{
+		nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
+		nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
+		nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
+		nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
+	}
+
+	// Fix up object->node associations to the swapped old root node.
+	for(size_t i = 0; i < oldRoot->objects.size(); ++i)
+		AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
+
+	int oldRootNodeIndex = rootNodeIndex;
+	rootNodeIndex = AllocateNodeGroup(0);
+	Node *newRoot = &nodes[rootNodeIndex];
+	newRoot->childIndex = oldRootNodeIndex;
+	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
+
+	LOGI("TopRight: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
+		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
+	DebugSanityCheckNode(Root());
+}
+
+template<typename T>
+void QuadTree<T>::GrowRootBottomLeft()
+{
+	boundingAABB.minPoint.x -= boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
+	boundingAABB.maxPoint.y += boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
+
+	// rootNodeIndex always points to the first index of the four quadrants.
+	// The old root will become the top-right child of the new root, at index 1. Swap the root node to its proper place.
+	Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+1]);
+	Node *oldRoot = &nodes[rootNodeIndex+1];
+
+	// Fix up the refs to the swapped old root node.
+	if (!oldRoot->IsLeaf())
+	{
+		nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
+		nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
+		nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
+		nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
+	}
+
+	// Fix up object->node associations to the swapped old root node.
+	for(size_t i = 0; i < oldRoot->objects.size(); ++i)
+		AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
+
+	int oldRootNodeIndex = rootNodeIndex;
+	rootNodeIndex = AllocateNodeGroup(0);
+	Node *newRoot = &nodes[rootNodeIndex];
+	newRoot->childIndex = oldRootNodeIndex;
+	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
+
+	LOGI("BottomLeft: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
+		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
+	DebugSanityCheckNode(Root());
+}
+
+template<typename T>
+void QuadTree<T>::GrowRootBottomRight()
+{
+	boundingAABB.maxPoint.x += boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
+	boundingAABB.maxPoint.y += boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
+
+	// rootNodeIndex always points to the first index of the four quadrants.
+	// The old root will become the top-left child of the new root, at index 0, so no swapping is necessary.
+
+	int oldRootNodeIndex = rootNodeIndex;
+	rootNodeIndex = AllocateNodeGroup(0);
+	Node *newRoot = &nodes[rootNodeIndex];
+	newRoot->childIndex = oldRootNodeIndex;
+	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
+	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
+
+	LOGI("BottomRight: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
+		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
+	DebugSanityCheckNode(Root());
+}
+
+/// Returns the total number of nodes (all nodes, i.e. inner nodes + leaves) in the tree.
+template<typename T>
+int QuadTree<T>::NumNodes() const
+{
+	return std::max<int>(0, nodes.size() - 3); // The nodes rootNodeIndex+1, rootNodeIndex+2 and rootNodeIndex+3 are dummy unused, since the root node is not a quadrant.
+}
+
+/// Returns the total number of leaf nodes in the tree.
+template<typename T>
+int QuadTree<T>::NumLeaves() const
+{
+	int numLeaves = 0;
+	for(size_t i = 0; i < nodes.size(); ++i)
+		if (i <= rootNodeIndex || i >= rootNodeIndex + 4) // The nodes rootNodeIndex+1, rootNodeIndex+2 and rootNodeIndex+3 are dummy unused, since the root node is not a quadrant.
+			if (nodes[i].IsLeaf())
+				++numLeaves;
+
+	return numLeaves;
+}
+
+/// Returns the total number of inner nodes in the tree.
+template<typename T>
+int QuadTree<T>::NumInnerNodes() const
+{
+	int numInnerNodes = 0;
+	for(size_t i = 0; i < nodes.size(); ++i)
+		if (i <= rootNodeIndex || i >= rootNodeIndex + 4) // The nodes rootNodeIndex+1, rootNodeIndex+2 and rootNodeIndex+3 are dummy unused, since the root node is not a quadrant.
+			if (!nodes[i].IsLeaf())
+				++numInnerNodes;
+
+	return numInnerNodes;
+}
+
+template<typename T>
+int QuadTree<T>::TreeHeight(const Node *node) const
+{
+	if (node->IsLeaf())
+		return 1;
+	return 1 + Max(TreeHeight(&nodes[node->TopLeftChildIndex()]),
+	               TreeHeight(&nodes[node->TopRightChildIndex()]),
+	               TreeHeight(&nodes[node->BottomLeftChildIndex()]),
+	               TreeHeight(&nodes[node->BottomRightChildIndex()]));
+}
+
+template<typename T>
+int QuadTree<T>::TreeHeight() const
+{
+	if (!Root())
+		return 0;
+	return TreeHeight(Root());
+}
+
+template<typename T>
+void QuadTree<T>::DebugSanityCheckNode(Node *n)
+{
+#ifdef _DEBUG
+	assert(n);
+	assert(n->parent || n == Root()); // If no parent, must be root.
+	assert(n != Root() || !n->parent); // If not root, must have a parent.
+
+	// Must have a good AABB.
+	AABB2D aabb = ComputeAABB(n);
+	assert(aabb.IsFinite());
+	assert(aabb.minPoint.x <= aabb.maxPoint.x);
+	assert(aabb.minPoint.y <= aabb.maxPoint.y);
+
+	LOGI("Node AABB: %s.", aabb.ToString().c_str());
+	// Each object in this node must be contained in this node.
+	for(size_t i = 0; i < n->objects.size(); ++i)
+	{
+		LOGI("Object AABB: %s.", GetAABB2D(n->objects[i]).ToString().c_str());
+
+		assert(aabb.Contains(GetAABB2D(n->objects[i])));
+	}
+
+	// Parent <-> child links must be valid.
+	if (!n->IsLeaf())
+	{
+		assert(nodes[n->TopLeftChildIndex()].parent == n);
+		assert(nodes[n->TopRightChildIndex()].parent == n);
+		assert(nodes[n->BottomLeftChildIndex()].parent == n);
+		assert(nodes[n->BottomRightChildIndex()].parent == n);
+
+		DebugSanityCheckNode(&nodes[n->TopLeftChildIndex()]);
+		DebugSanityCheckNode(&nodes[n->TopRightChildIndex()]);
+		DebugSanityCheckNode(&nodes[n->BottomLeftChildIndex()]);
+		DebugSanityCheckNode(&nodes[n->BottomRightChildIndex()]);
+	}
+#endif
+}

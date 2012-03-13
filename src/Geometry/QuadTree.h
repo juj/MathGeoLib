@@ -9,7 +9,7 @@
 
 struct AABB2D
 {
-	AABB2D(){}
+	AABB2D() { }
 	AABB2D(const float2 &minPt, const float2 &maxPt)
 	:minPoint(minPt),
 	maxPoint(maxPt)
@@ -34,6 +34,17 @@ struct AABB2D
 		       maxPoint.y >= rhs.minPoint.y &&
 		       rhs.maxPoint.x >= minPoint.x &&
 		       rhs.maxPoint.y >= minPoint.y;
+	}
+
+	bool Contains(const AABB2D &rhs) const
+	{
+		return rhs.minPoint.x >= minPoint.x && rhs.minPoint.y >= minPoint.y
+			&& rhs.maxPoint.x <= maxPoint.x && rhs.maxPoint.y <= maxPoint.y;
+	}
+
+	bool IsFinite() const
+	{
+		return minPoint.IsFinite() && maxPoint.IsFinite();
 	}
 
 	AABB2D operator +(const float2 &pt) const
@@ -87,7 +98,7 @@ public:
 		u32 childIndex;
 		std::vector<T> objects;
 
-		bool IsLeaf() const { return childIndex == 0; }
+		bool IsLeaf() const { return childIndex == 0xFFFFFFFF; }
 
 		u32 TopLeftChildIndex() const { return childIndex; }
 		u32 TopRightChildIndex() const { return childIndex+1; }
@@ -114,7 +125,14 @@ public:
 		Node *node;
 	};
 
-	QuadTree() { nodes.reserve(200000); }
+	QuadTree()
+	:rootNodeIndex(-1),
+	boundingAABB(float2(0,0), float2(1,1))
+	{
+		///\todo Currently storing persistent raw pointers to this array outside the array.
+		/// Remove the requirement to never reallocate the vector!
+		nodes.reserve(200000);
+	}
 
 	void Clear(const float2 &minXY, const float2 &maxXY);
 
@@ -161,20 +179,22 @@ public:
 		}
 	}
 
-	/// Returns an object bucket by the given bucket index.
-	/// An object bucket is a contiguous C array of object indices, terminated with a sentinel value BUCKET_SENTINEL.
-	/// To fetch the actual object based on an object index, call the Object() method.
-//	u32 *Bucket(int bucketIndex);
-//	const u32 *Bucket(int bucketIndex) const;
-
-	/// Returns an object by the given object index.
-//	T &Object(int objectIndex);
-//	const T &Object(int objectIndex) const;
-
 	Node *Root();
 	const Node *Root() const;
 
-//	int NumObjects() const { return objects.size(); }
+	/// Returns the total number of nodes (all nodes, i.e. inner nodes + leaves) in the tree.
+	int NumNodes() const;
+
+	/// Returns the total number of leaf nodes in the tree.
+	int NumLeaves() const;
+
+	/// Returns the total number of inner nodes in the tree.
+	int NumInnerNodes() const;
+
+	/// Returns the maximum height of the tree (the path from the root to the farthest leaf node).
+	int TreeHeight() const;
+
+	int TreeHeight(const Node *node) const;
 
 	/// Performs an AABB intersection query in this Quadtreee, and calls the given callback function for each non-empty
 	/// node of the tree which intersects the given AABB.
@@ -202,6 +222,8 @@ public:
 	inline void NearestObjects(const float2 &point, Func &leafCallback);
 #endif
 
+	void DebugSanityCheckNode(Node *n);
+
 private:
 	void Add(const T &object, Node *n, AABB2D aabb);
 
@@ -209,12 +231,17 @@ private:
 	int AllocateNodeGroup(Node *parent);
 
 	void SplitLeaf(Node *leaf, const AABB2D &leafAABB);
-//	void FreeBuckets();
 
 	std::vector<Node> nodes;
-//	std::vector<T> objects;
 
+	/// Specifies the index to the root node, or -1 if there is no root (nodes.size() == 0).
+	int rootNodeIndex;
 	AABB2D boundingAABB;
+
+	void GrowRootTopLeft();
+	void GrowRootTopRight();
+	void GrowRootBottomLeft();
+	void GrowRootBottomRight();
 };
 
 #include "QuadTree.inl"
