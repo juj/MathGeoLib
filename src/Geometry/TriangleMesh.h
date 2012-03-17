@@ -40,16 +40,25 @@ public:
 	void SetSoA4(const float *vertexData, int numTriangles);
 	void SetSoA8(const float *vertexData, int numTriangles);
 
-	float IntersectRay_SSE2(const Ray &ray) const;
-	float IntersectRay_SSE41(const Ray &ray) const;
-	float IntersectRay_AVX(const Ray &ray) const;
-	float IntersectRay_TriangleIndex_SSE2(const Ray &ray, int &outTriangleIndex) const;
-	float IntersectRay_TriangleIndex_SSE41(const Ray &ray, int &outTriangleIndex) const;
-	float IntersectRay_TriangleIndex_AVX(const Ray &ray, int &outTriangleIndex) const;
 	float IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTriangleIndex, float &outU, float &outV) const;
+
+#ifdef MATH_SSE2
+	float IntersectRay_SSE2(const Ray &ray) const;
+	float IntersectRay_TriangleIndex_SSE2(const Ray &ray, int &outTriangleIndex) const;
 	float IntersectRay_TriangleIndex_UV_SSE2(const Ray &ray, int &outTriangleIndex, float &outU, float &outV) const;
+#endif
+
+#ifdef MATH_SSE41
+	float IntersectRay_SSE41(const Ray &ray) const;
+	float IntersectRay_TriangleIndex_SSE41(const Ray &ray, int &outTriangleIndex) const;
 	float IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &outTriangleIndex, float &outU, float &outV) const;
+#endif
+
+#ifdef MATH_AVX
+	float IntersectRay_AVX(const Ray &ray) const;
+	float IntersectRay_TriangleIndex_AVX(const Ray &ray, int &outTriangleIndex) const;
 	float IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTriangleIndex, float &outU, float &outV) const;
+#endif
 
 private:
 	float *data;

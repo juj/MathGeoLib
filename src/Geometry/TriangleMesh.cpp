@@ -153,45 +153,59 @@ void TriangleMesh::Set(const float *triangleMesh, int numTriangles)
 
 float TriangleMesh::IntersectRay(const Ray &ray) const
 {
+#ifdef MATH_AVX
 	if (simdCapability == SIMD_AVX)
 		return IntersectRay_AVX(ray);
+#endif
+#ifdef MATH_SSE41
 	if (simdCapability == SIMD_SSE41)
 		return IntersectRay_SSE41(ray);
+#endif
+#ifdef MATH_SSE2
 	if (simdCapability == SIMD_SSE2)
 		return IntersectRay_SSE2(ray);
-	else
-	{
-		int triangleIndex;
-		float u, v;
-		return IntersectRay_TriangleIndex_UV_CPP(ray, triangleIndex, u, v);
-	}
+#endif
+
+	int triangleIndex;
+	float u, v;
+	return IntersectRay_TriangleIndex_UV_CPP(ray, triangleIndex, u, v);
 }
 
 float TriangleMesh::IntersectRay_TriangleIndex(const Ray &ray, int &outTriangleIndex) const
 {
+#ifdef MATH_AVX
 	if (simdCapability == SIMD_AVX)
 		return IntersectRay_TriangleIndex_AVX(ray, outTriangleIndex);
+#endif
+#ifdef MATH_SSE41
 	if (simdCapability == SIMD_SSE41)
 		return IntersectRay_TriangleIndex_SSE41(ray, outTriangleIndex);
+#endif
+#ifdef MATH_SSE2
 	if (simdCapability == SIMD_SSE2)
 		return IntersectRay_TriangleIndex_SSE2(ray, outTriangleIndex);
-	else
-	{
-		float u, v;
-		return IntersectRay_TriangleIndex_UV_CPP(ray, outTriangleIndex, u, v);
-	}
+#endif
+
+	float u, v;
+	return IntersectRay_TriangleIndex_UV_CPP(ray, outTriangleIndex, u, v);
 }
 
 float TriangleMesh::IntersectRay_TriangleIndex_UV(const Ray &ray, int &outTriangleIndex, float &outU, float &outV) const
 {
+#ifdef MATH_AVX
 	if (simdCapability == SIMD_AVX)
 		return IntersectRay_TriangleIndex_UV_AVX(ray, outTriangleIndex, outU, outV);
+#endif
+#ifdef MATH_SSE41
 	if (simdCapability == SIMD_SSE41)
 		return IntersectRay_TriangleIndex_UV_SSE41(ray, outTriangleIndex, outU, outV);
+#endif
+#ifdef MATH_SSE2
 	if (simdCapability == SIMD_SSE2)
 		return IntersectRay_TriangleIndex_UV_SSE2(ray, outTriangleIndex, outU, outV);
-	else
-		return IntersectRay_TriangleIndex_UV_CPP(ray, outTriangleIndex, outU, outV);
+#endif
+
+	return IntersectRay_TriangleIndex_UV_CPP(ray, outTriangleIndex, outU, outV);
 }
 
 void TriangleMesh::ReallocVertexBuffer(int numTris)
