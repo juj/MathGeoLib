@@ -274,6 +274,22 @@ float RSqrt(float x)
 	return 1.f / sqrtf(x);
 }
 
+float Recip(float x)
+{
+	return 1.f / x;
+}
+
+float RecipFast(float x)
+{
+#ifdef MATH_SSE
+	__m128 r = _mm_rcp_ss(_mm_set_ss(x));
+	_mm_store_ss(&x, r);
+	return x;
+#else
+	return 1.f / x;
+#endif
+}
+
 /** Uses a recursive approach, not the fastest/brightest method.
 	Note that 13! = 6227020800 overflows already.
 	@return n! = n * (n-1) * (n-2) * ... * 1. */

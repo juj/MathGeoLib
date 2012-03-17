@@ -253,6 +253,10 @@ float Frac(float x);
 float Sqrt(float x);
 /// Returns 1/sqrt(x). (The reciprocal of the square root of x)
 float RSqrt(float x);
+/// Returns 1/x, the reciprocal of x.
+float Recip(float x);
+/// Returns 1/x, the reciprocal of x, using a fast approximation (SSE rcp instruction).
+float RecipFast(float x);
 
 /// Calculates n! at runtime. Use class FactorialT<N> to evaluate factorials at compile-time.
 int Factorial(int n); 
@@ -295,12 +299,38 @@ const T Max(const T &a, const T &b)
 	return a >= b ? a : b;
 }
 
+template<>
+inline const float Max(const float &a, const float &b)
+{
+#ifdef MATH_SSE
+	__m128 maxVal = _mm_max_ss(_mm_set_ss(a), _mm_set_ss(b));
+	float x;
+	_mm_store_ss(&x, maxVal);
+	return x;
+#else
+	return a >= b ? a : b;
+#endif
+}
+
 /// Computes the smallest of three values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
 const T Min(const T &a, const T &b, const T &c)
 {
 	return Min(Min(a, b), c);
+}
+
+template<>
+inline const float Min(const float &a, const float &b)
+{
+#ifdef MATH_SSE
+	__m128 minVal = _mm_min_ss(_mm_set_ss(a), _mm_set_ss(b));
+	float x;
+	_mm_store_ss(&x, minVal);
+	return x;
+#else
+	return a >= b ? a : b;
+#endif
 }
 
 /// Computes the largest of three values.
