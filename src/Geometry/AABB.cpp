@@ -554,6 +554,15 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
 
 bool AABB::IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
 {
+#ifdef MATH_SSE
+	return IntersectLineAABB_SSE(float4(linePos, 1.f), float4(lineDir, 0.f), tNear, tFar);
+#else
+	bool IntersectLineAABB_CPP(linePos, lineDir, tNear, tFar);
+#endif
+}
+
+bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
+{
 	assume(lineDir.IsNormalized());
 	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
 	// The user should have inputted values for tNear and tFar to specify the desired subrange [tNear, tFar] of the line
@@ -621,6 +630,105 @@ bool AABB::IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float
 
 	return tNear <= tFar;
 }
+
+#ifdef MATH_SSE
+bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, float &tNear, float &tFar) const
+{
+	/* For reference, this is the C++ form of the vectorized SSE code below.
+
+	float4 recipDir = rayDir.RecipFast4();
+	float4 t1 = (aabbMinPoint - rayPos).Mul(recipDir);
+	float4 t2 = (aabbMaxPoint - rayPos).Mul(recipDir);
+	float4 near = t1.Min(t2);
+	float4 far = t1.Max(t2);
+	float4 rayDirAbs = rayDir.Abs();
+
+	if (rayDirAbs.x > 1e-4f) // ray is parallel to plane in question
+	{
+		tNear = Max(near.x, tNear); // tNear tracks distance to intersect (enter) the AABB.
+		tFar = Min(far.x, tFar); // tFar tracks the distance to exit the AABB.
+	}
+	else if (rayPos.x < aabbMinPoint.x || rayPos.x > aabbMaxPoint.x) // early-out if the ray can't possibly enter the box.
+		return false;
+
+	if (rayDirAbs.y > 1e-4f) // ray is parallel to plane in question
+	{
+		tNear = Max(near.y, tNear); // tNear tracks distance to intersect (enter) the AABB.
+		tFar = Min(far.y, tFar); // tFar tracks the distance to exit the AABB.
+	}
+	else if (rayPos.y < aabbMinPoint.y || rayPos.y > aabbMaxPoint.y) // early-out if the ray can't possibly enter the box.
+		return false;
+
+	if (rayDirAbs.z > 1e-4f) // ray is parallel to plane in question
+	{
+		tNear = Max(near.z, tNear); // tNear tracks distance to intersect (enter) the AABB.
+		tFar = Min(far.z, tFar); // tFar tracks the distance to exit the AABB.
+	}
+	else if (rayPos.z < aabbMinPoint.z || rayPos.z > aabbMaxPoint.z) // early-out if the ray can't possibly enter the box.
+		return false;
+
+	return tNear < tFar;
+	*/
+
+	__m128 recipDir = _mm_rcp_ps(rayDir.v);
+	// Note: The above performs an approximate reciprocal (11 bits of precision).
+	// For a full precision reciprocal, perform a div:
+//	__m128 recipDir = _mm_div_ps(_mm_set1_ps(1.f), rayDir.v);
+
+	__m128 t1 = _mm_mul_ps(_mm_sub_ps(MinPoint_SSE(), rayPos.v), recipDir);
+	__m128 t2 = _mm_mul_ps(_mm_sub_ps(MaxPoint_SSE(), rayPos.v), recipDir);
+
+	__m128 nearD = _mm_min_ps(t1, t2); // [0 n3 n2 n1]
+	__m128 farD = _mm_max_ps(t1, t2);  // [0 f3 f2 f1]
+
+	// Check if the ray direction is parallel to any of the cardinal axes, and if so,
+	// mask those [near, far] ranges away from the hit test computations.
+	__m128 rayDirAbs = _mm_abs_ps(rayDir.v);
+
+	const __m128 epsilon = _mm_set1_ps(1e-4f);
+	// zeroDirections[i] will be nonzero for each axis i the ray is parallel to. 
+	__m128 zeroDirections = _mm_cmple_ps(rayDirAbs, epsilon);
+
+	const __m128 floatInf = _mm_set1_ps(FLOAT_INF);
+	const __m128 floatNegInf = _mm_set1_ps(-FLOAT_INF);
+
+	// If the ray is parallel to one of the axes, replace the slab range for that axis
+	// with [-inf, inf] range instead. (which is a no-op in the comparisons below)
+	nearD = _mm_cmov_ps(nearD, floatNegInf, zeroDirections);
+	farD = _mm_cmov_ps(farD , floatInf, zeroDirections);
+
+	// Next, we need to compute horizontally max(nearD[0], nearD[1], nearD[2]) and min(farD[0], farD[1], farD[2])
+	// to see if there is an overlap in the hit ranges.
+	__m128 v1 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(0, 0, 0, 0)); // [f1 f1 n1 n1]
+	__m128 v2 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(1, 1, 1, 1)); // [f2 f2 n2 n2]
+	__m128 v3 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(2, 2, 2, 2)); // [f3 f3 n3 n3]
+	nearD = _mm_max_ps(v1, _mm_max_ps(v2, v3));
+	farD = _mm_min_ps(v1, _mm_min_ps(v2, v3));
+	farD = _mm_shuffle_ps(farD, farD, _MM_SHUFFLE(3, 3, 3, 3)); // Unpack the result from high offset in the register.
+	nearD = _mm_max_ps(nearD, _mm_set_ss(tNear));
+	farD = _mm_min_ps(farD, _mm_set_ss(tFar));
+
+	// Finally, test if the ranges overlap.
+	__m128 rangeIntersects = _mm_cmple_ss(nearD, farD);
+
+	// To avoid false positives, need to have an additional rejection test for each cardinal axis the ray direction
+	// is parallel to.
+	__m128 out2 = _mm_cmplt_ps(rayPos.v, MinPoint_SSE());
+	__m128 out3 = _mm_cmpgt_ps(rayPos.v, MaxPoint_SSE());
+	out2 = _mm_or_ps(out2, out3);
+	zeroDirections = _mm_and_ps(zeroDirections, out2);
+
+	__m128 yOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(1,1,1,1));
+	__m128 zOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(2,2,2,2));
+
+	zeroDirections = _mm_or_ps(_mm_or_ps(zeroDirections, yOut), zOut);
+	// Intersection occurs if the slab ranges had positive overlap and if the test was not rejected by the ray being
+	// parallel to some cardinal axis.
+	__m128 intersects = _mm_andnot_ps(zeroDirections, rangeIntersects);
+	__m128 epsilonMasked = _mm_and_ps(epsilon, intersects);
+	return _mm_comieq_ss(epsilon, epsilonMasked) != 0;
+}
+#endif
 
 bool AABB::Intersects(const Ray &ray, float *dNear, float *dFar) const
 {

@@ -20,6 +20,10 @@
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
 
+#ifdef MATH_SSE
+#include "Math/SSEMath.h"
+#endif
+
 #ifdef MATH_OGRE_INTEROP
 #include <OgreAxisAlignedBox.h>
 #endif
@@ -39,11 +43,18 @@ MATH_BEGIN_NAMESPACE
 class AABB
 {
 public:
+
 	/// Specifies the minimum extent of this AABB in the world space x, y and z axes.
-	float3 minPoint;
+	ALIGN16 float3 minPoint;
+#ifdef MATH_SSE
+	float padding;
+#endif
 
 	/// Specifies the maximum extent of this AABB in the world space x, y and z axes. [similarOverload: minPoint]
-	float3 maxPoint;
+	ALIGN16	float3 maxPoint;
+#ifdef MATH_SSE
+	float padding2;
+#endif
 
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members minPoint and maxPoint are undefined after creating a new AABB using this
@@ -501,6 +512,16 @@ public:
 			functions instead.
 		@see Intersects(). */
 	bool IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const;
+
+	bool IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const;
+#ifdef MATH_SSE
+	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float &tNear, float &tFar) const;
+
+	__m128 &MinPoint_SSE() { return *(__m128*)minPoint.ptr(); }
+	__m128 &MaxPoint_SSE() { return *(__m128*)maxPoint.ptr(); }
+	const __m128 &MinPoint_SSE() const { return *(__m128*)minPoint.ptr(); }
+	const __m128 &MaxPoint_SSE() const { return *(__m128*)maxPoint.ptr(); }
+#endif
 
 #ifdef MATH_OGRE_INTEROP
 	AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }

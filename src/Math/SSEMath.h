@@ -21,6 +21,8 @@
 
 #ifdef MATH_SSE // If SSE is not enabled, this whole file will not be included.
 
+#define ALIGN16 __declspec(align(16))
+
 MATH_BEGIN_NAMESPACE
 
 #ifdef MATH_SSE2 // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
@@ -525,5 +527,9 @@ inline void _mm_mat3x4_mul_ps(__m128 *out, const __m128 *m1, const __m128 *m2)
 }
 
 MATH_END_NAMESPACE
+
+#else // ~MATH_SSE
+
+#define ALIGN16
 
 #endif // ~MATH_SSE
