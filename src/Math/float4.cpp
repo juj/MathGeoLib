@@ -558,6 +558,15 @@ float4 float4::Recip4() const
 #endif
 }
 
+float4 float4::RecipFast4() const
+{
+#ifdef MATH_SSE
+	return float4(_mm_rcp_ps(v));
+#else
+	return float4(1.f/x, 1.f/y, 1.f/z, 1.f/w);
+#endif
+}
+
 float4 float4::Min(float ceil) const
 {
 #ifdef MATH_SSE
@@ -590,7 +599,7 @@ float4 float4::Max(float floor) const
 float4 float4::Max(const float4 &floor) const
 {
 #ifdef MATH_SSE
-	return float4(_mm_min_ps(v, floor.v));
+	return float4(_mm_max_ps(v, floor.v));
 #else
 	return float4(MATH_NS::Max(x, floor.x), MATH_NS::Max(y, floor.y), MATH_NS::Max(z, floor.z), MATH_NS::Max(w, floor.w));
 #endif

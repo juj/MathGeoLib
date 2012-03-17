@@ -445,6 +445,12 @@ public:
 		@return float4(1/x, 1/y, 1/z, 1/w). */
 	float4 Recip4() const;
 
+	/// Computes the element-wise reciprocal of this vector using a fast approximation (SSE rcp instruction).
+	/** This function returns a new vector where each element x of the original vector is replaced by the value 1/x. 
+		This function operates on all four elements of this vector.
+		@return float4(1/x, 1/y, 1/z, 1/w). */
+	float4 RecipFast4() const;
+
 	/// Returns an element-wise minimum of this and the vector (ceil, ceil, ceil, ceil).
 	/** Each element that is larger than ceil is replaced by ceil. */
 	float4 Min(float ceil) const;
