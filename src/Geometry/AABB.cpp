@@ -552,9 +552,9 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
 	return Contains(polyhedron.MinimalEnclosingAABB());
 }
 
-bool AABB::IntersectLineAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const
+bool AABB::IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
 {
-	assume(rayDir.IsNormalized());
+	assume(lineDir.IsNormalized());
 	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
 	// The user should have inputted values for tNear and tFar to specify the desired subrange [tNear, tFar] of the line
 	// for this intersection test.
@@ -568,33 +568,58 @@ bool AABB::IntersectLineAABB(const float3 &rayPos, const float3 &rayDir, float &
 	//    tNear = 0.f;
 	//    tFar = LineSegment.Length();
 
-	for(int i = 0; i < 3; ++i) // loop for each AABB plane (X,Y,Z)
+	// Test each cardinal plane (X, Y and Z) in turn.
+	if (!EqualAbs(lineDir.x, 0.f))
 	{
-		if (EqualAbs(rayDir[i], 0.f)) // ray is parallel to plane in question
-			if (rayPos[i] < minPoint[i] || rayPos[i] > maxPoint[i]) // early-out if the ray can't possibly enter the box.
-				return false;
+		float recipDir = RecipFast(lineDir.x);
+		float t1 = (minPoint.x - linePos.x) * recipDir;
+		float t2 = (maxPoint.x - linePos.x) * recipDir;
 
-		// intersection distances to plane.
-		float recipDir = 1.f / rayDir[i];
-		float t1 = (minPoint[i] - rayPos[i]) * recipDir;
-		float t2 = (maxPoint[i] - rayPos[i]) * recipDir;
+		// tNear tracks distance to intersect (enter) the AABB.
+		// tFar tracks the distance to exit the AABB.
+		if (t1 < t2)
+			tNear = Max(t1, tNear), tFar = Min(t2, tFar); 
+		else // Swap t1 and t2.
+			tNear = Max(t2, tNear), tFar = Min(t1, tFar);
+
+		if (tNear > tFar)
+			return false; // Box is missed since we "exit" before entering it.
+	}
+	else if (linePos.x < minPoint.x || linePos.x > maxPoint.x)
+		return false; // The ray can't possibly enter the box, abort.
+
+	if (!EqualAbs(lineDir.y, 0.f))
+	{
+		float recipDir = RecipFast(lineDir.y);
+		float t1 = (minPoint.y - linePos.y) * recipDir;
+		float t2 = (maxPoint.y - linePos.y) * recipDir;
 
 		if (t1 < t2)
-		{
-			tNear = Max(t1, tNear); // tNear tracks distance to intersect (enter) the AABB.
-			tFar = Min(t2, tFar); // tFar tracks the distance to exit the AABB.
-		}
-		else
-		{
-			// Do the test in the opposite order of above. (swap t1 and t2 so that t1 < t2).
-			tNear = Max(t2, tNear);
-			tFar = Min(t1, tFar);
-		}
+			tNear = Max(t1, tNear), tFar = Min(t2, tFar); 
+		else // Swap t1 and t2.
+			tNear = Max(t2, tNear), tFar = Min(t1, tFar);
 
-		if (tNear > tFar) // Box is missed since we "exit" before entering it.
-			return false;
+		if (tNear > tFar)
+			return false; // Box is missed since we "exit" before entering it.
 	}
-	return true;
+	else if (linePos.y < minPoint.y || linePos.y > maxPoint.y)
+		return false; // The ray can't possibly enter the box, abort.
+
+	if (!EqualAbs(lineDir.z, 0.f)) // ray is parallel to plane in question
+	{
+		float recipDir = RecipFast(lineDir.z);
+		float t1 = (minPoint.z - linePos.z) * recipDir;
+		float t2 = (maxPoint.z - linePos.z) * recipDir;
+
+		if (t1 < t2)
+			tNear = Max(t1, tNear), tFar = Min(t2, tFar); 
+		else // Swap t1 and t2.
+			tNear = Max(t2, tNear), tFar = Min(t1, tFar);
+	}
+	else if (linePos.z < minPoint.z || linePos.z > maxPoint.z)
+		return false; // The ray can't possibly enter the box, abort.
+
+	return tNear <= tFar;
 }
 
 bool AABB::Intersects(const Ray &ray, float *dNear, float *dFar) const
