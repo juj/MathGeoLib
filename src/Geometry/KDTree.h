@@ -113,6 +113,7 @@ public:
 	template<typename Func>
 	inline void AABBQuery(const AABB &aabb, Func &leafCallback);
 
+#if 0 ///\bug Doesn't work properly. Fix up!
 	/// Performs an intersection query of this kD-tree against a given kD-tree, and calls the given 
 	/// leafCallback function for each leaf pair that intersect each other.
 	/// @param leafCallback A function or a function object of prototype
@@ -122,6 +123,7 @@ public:
 	///    returns afterwards. If the callback function returns false, the execution of the query continues.
 	template<typename Func>
 	inline void KdTreeQuery(KdTree<T> &tree2, const float3x4 &thisWorldTransform, const float3x4 &tree2WorldTransform, Func &leafCallback);
+#endif
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 	/// Performs a nearest neighbor search on this kD-tree.

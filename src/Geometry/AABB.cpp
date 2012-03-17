@@ -552,11 +552,21 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
 	return Contains(polyhedron.MinimalEnclosingAABB());
 }
 
-bool AABB::IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const
+bool AABB::IntersectLineAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const
 {
 	assume(rayDir.IsNormalized());
-	tNear = -FLOAT_INF;
-	tFar = FLOAT_INF;
+	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
+	// The user should have inputted values for tNear and tFar to specify the desired subrange [tNear, tFar] of the line
+	// for this intersection test.
+	// For a Line-AABB test, pass in
+	//    tNear = -FLOAT_INF;
+	//    tFar = FLOAT_INF;
+	// For a Ray-AABB test, pass in
+	//    tNear = 0.f;
+	//    tFar = FLOAT_INF;
+	// For a LineSegment-AABB test, pass in
+	//    tNear = 0.f;
+	//    tFar = LineSegment.Length();
 
 	for(int i = 0; i < 3; ++i) // loop for each AABB plane (X,Y,Z)
 	{
@@ -569,39 +579,18 @@ bool AABB::IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, float &t
 		float t1 = (minPoint[i] - rayPos[i]) * recipDir;
 		float t2 = (maxPoint[i] - rayPos[i]) * recipDir;
 
-		if (t1 > t2) Swap(t1, t2); // swap so that t1 is the distance to nearer of the two planes.
-		if (t1 > tNear) tNear = t1; // tNear tracks distance to intersect the AABB.
-		if (t2 < tFar)
-			tFar = t2; // tFar tracks the distance to exit the AABB.
-		if (tNear > tFar) // Box is missed since we "exit" before entering it.
-			return false;
-		if (tFar < 0) // Box is behind the ray.
-			return false;
-	}
-	return true;
-}
+		if (t1 < t2)
+		{
+			tNear = Max(t1, tNear); // tNear tracks distance to intersect (enter) the AABB.
+			tFar = Min(t2, tFar); // tFar tracks the distance to exit the AABB.
+		}
+		else
+		{
+			// Do the test in the opposite order of above. (swap t1 and t2 so that t1 < t2).
+			tNear = Max(t2, tNear);
+			tFar = Min(t1, tFar);
+		}
 
-/// Computes the intersection of a line and a AABB. For reference, see IntersectRayAABB.
-bool IntersectLineAABB(const float3 &linePos, const float3 &lineDir, const AABB &aabb, float &tNear, float &tFar)
-{
-	tNear = -FLOAT_INF;
-	tFar = FLOAT_INF;
-
-	for(int i = 0; i < 3; ++i) // loop for each AABB plane (X,Y,Z)
-	{
-		if (EqualAbs(lineDir[i], 0.f)) // ray is parallel to plane in question
-			if (linePos[i] < aabb.minPoint[i] || linePos[i] > aabb.maxPoint[i]) // early-out if the ray can't possibly enter the box.
-				return false;
-
-		// intersection distances to plane.
-		float recipDir = 1.f / lineDir[i];
-		float t1 = (aabb.minPoint[i] - linePos[i]) * recipDir;
-		float t2 = (aabb.maxPoint[i] - linePos[i]) * recipDir;
-
-		if (t1 > t2) Swap(t1, t2); // swap so that t1 is the distance to nearer of the two planes.
-		if (t1 > tNear) tNear = t1; // tNear tracks distance to intersect the AABB.
-		if (t2 < tFar)
-			tFar = t2; // tFar tracks the distance to exit the AABB.
 		if (tNear > tFar) // Box is missed since we "exit" before entering it.
 			return false;
 	}
@@ -610,36 +599,47 @@ bool IntersectLineAABB(const float3 &linePos, const float3 &lineDir, const AABB 
 
 bool AABB::Intersects(const Ray &ray, float *dNear, float *dFar) const
 {
-	float tNear, tFar;
-	bool success = IntersectRayAABB(ray.pos, ray.dir, tNear, tFar);
+	float tNear = 0.f, tFar = FLOAT_INF;
+	bool hit = IntersectLineAABB(ray.pos, ray.dir, tNear, tFar);
 	if (dNear)
 		*dNear = tNear;
 	if (dFar)
 		*dFar = tFar;
-	return success;
+	return hit;
 }
 
 bool AABB::Intersects(const Line &line, float *dNear, float *dFar) const
 {
-	float tNear, tFar;
-	bool success = IntersectLineAABB(line.pos, line.dir, *this, tNear, tFar);
+	float tNear = -FLOAT_INF, tFar = FLOAT_INF;
+	bool hit = IntersectLineAABB(line.pos, line.dir, tNear, tFar);
 	if (dNear)
 		*dNear = tNear;
 	if (dFar)
 		*dFar = tFar;
-	return success;
+	return hit;
 }
 
 bool AABB::Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const
 {
-	float tNear, tFar;
-	bool success = IntersectLineAABB(lineSegment.a, lineSegment.Dir(), *this, tNear, tFar);
-	success = (tNear >= 0.f && tNear*tNear <= lineSegment.LengthSq());
+	float3 dir = lineSegment.b - lineSegment.a;
+	float len = dir.Length();
+	if (len <= 1e-4f) // Degenerate line segment? Fall back to point-in-AABB test.
+	{
+		if (dNear)
+			*dNear = 0.f;
+		if (dFar)
+			*dFar = 1.f;
+		return Contains(lineSegment.a);
+	}
+	float invLen = 1.f / len;
+	dir *= invLen;
+	float tNear = 0.f, tFar = len;
+	bool hit = IntersectLineAABB(lineSegment.a, dir, tNear, tFar);
 	if (dNear)
-		*dNear = tNear / lineSegment.Length();
+		*dNear = tNear * invLen;
 	if (dFar)
-		*dFar = tFar / lineSegment.Length();
-	return success;
+		*dFar = tFar * invLen;
+	return hit;
 }
 
 bool AABB::Intersects(const Plane &plane) const

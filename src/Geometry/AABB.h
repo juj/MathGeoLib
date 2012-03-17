@@ -483,18 +483,24 @@ public:
 		and the given Polyhedron. */
 //	Polyhedron Intersection(const Polyhedron &polyhedron) const;
 
-	/// Computes the intersection of a ray and a AABB.
+	/// Computes the intersection of a line, ray or line segment and an AABB.
 	/** Based on "T. Kay, J. Kajiya. Ray Tracing Complex Scenes. SIGGRAPH 1986 vol 20, number 4. pp. 269-"
 		http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
-		@param r The ray to test. The ray direction vector must be normalized!
-		@param tNear [out] If intersection occurs, the signed distance from ray origin to the ray entry point in aabb
-			is returned here.
-		@param tFar [out] If intersection occurs, the signed distance from ray origin to the ray exit point in aabb
+		@param linePos The starting position of the line.
+		@param lineDir The direction of the line. This direction vector must be normalized!
+		@param tNear [in, out] For the test, the input line is treated as a line segment. Pass in the signed distance 
+			from the line origin to the start of the line. For a Line-AABB test, -FLOAT_INF is typically passed here.
+			For a Ray-AABB test, 0.0f should be inputted. If intersection occurs, the signed distance from line origin 
+			to the line entry point in the AABB is returned here.
+		@param tFar [in, out] Pass in the signed distance from the line origin to the end of the line. For Line-AABB and
+			Ray-AABB tests, pass in FLOAT_INF. For a LineSegment-AABB test, pass in the length of the line segment here.
+			If intersection occurs, the signed distance from line origin to the line exit point in the AABB
 			is returned here.
 		@return True if an intersection occurs, false otherwise.
-		@note This is a low level utility function. You probably want to use the AABB::Intersects() function instead.
+		@note This is a low level utility function. It may be more convenient to use one of the AABB::Intersects() 
+			functions instead.
 		@see Intersects(). */
-	bool IntersectRayAABB(const float3 &rayPos, const float3 &rayDir, float &tNear, float &tFar) const;
+	bool IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const;
 
 #ifdef MATH_OGRE_INTEROP
 	AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }

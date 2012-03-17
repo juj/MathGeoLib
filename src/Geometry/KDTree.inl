@@ -276,9 +276,9 @@ template<typename T>
 template<typename Func>
 inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 {
-	float tNear, tFar;
+	float tNear = 0.f, tFar = FLOAT_INF;
 
-	if (!rootAABB.Intersects(r, &tNear, &tFar))
+	if (!rootAABB.IntersectLineAABB(r.pos, r.dir, &tNear, &tFar))
 		return; // The ray doesn't intersect the root, therefore no collision.
 
 	static const CardinalAxis axes[] = { AxisX, AxisY, AxisZ, AxisX, AxisY };
