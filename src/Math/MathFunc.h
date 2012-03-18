@@ -329,7 +329,7 @@ inline const float Min(const float &a, const float &b)
 	_mm_store_ss(&x, minVal);
 	return x;
 #else
-	return a >= b ? a : b;
+	return a <= b ? a : b;
 #endif
 }
 
