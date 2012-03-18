@@ -148,11 +148,13 @@ public:
 		the point of intersection. This pointer may be null. */
 	bool Intersects(const Sphere &s, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
 	/** @param dNear [out] If specified, receives the distance along this line to where the line enters
-		the bounding box. This pointer may be null.
+		the bounding box.
 		@param dFar [out] If specified, receives the distance along this line to where the line exits
-		the bounding box. This pointer may be null. */
-	bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
-	bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
+		the bounding box. */
+	bool Intersects(const AABB &aabb, float &dNear, float &dFar) const;
+	bool Intersects(const AABB &aabb) const;
+	bool Intersects(const OBB &obb, float &dNear, float &dFar) const;
+	bool Intersects(const OBB &obb) const;
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Polygon &polygon) const;
 	bool Intersects(const Frustum &frustum) const;

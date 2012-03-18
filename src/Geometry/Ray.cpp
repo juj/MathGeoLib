@@ -216,24 +216,24 @@ bool Ray::Intersects(const Sphere &sphere) const
 	return sphere.Intersects(*this, 0, 0, 0) > 0;
 }
 
-bool Ray::Intersects(const AABB &aabb, float *dNear, float *dFar) const
+bool Ray::Intersects(const AABB &aabb) const
+{
+	return aabb.Intersects(*this);
+}
+
+bool Ray::Intersects(const AABB &aabb, float &dNear, float &dFar) const
 {
 	return aabb.Intersects(*this, dNear, dFar);
 }
 
-bool Ray::Intersects(const AABB &aabb) const
-{
-	return aabb.Intersects(*this, 0, 0);
-}
-
-bool Ray::Intersects(const OBB &obb, float *dNear, float *dFar) const
+bool Ray::Intersects(const OBB &obb, float &dNear, float &dFar) const
 {
 	return obb.Intersects(*this, dNear, dFar);
 }
 
 bool Ray::Intersects(const OBB &obb) const
 {
-	return obb.Intersects(*this, 0, 0);
+	return obb.Intersects(*this);
 }
 
 bool Ray::Intersects(const Capsule &capsule) const

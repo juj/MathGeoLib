@@ -213,12 +213,22 @@ bool Line::Intersects(const Sphere &s, float3 *intersectionPoint, float3 *inters
 	return s.Intersects(*this, intersectionPoint, intersectionNormal, d) > 0;
 }
 
-bool Line::Intersects(const AABB &aabb, float *dNear, float *dFar) const
+bool Line::Intersects(const AABB &aabb) const
+{
+	return aabb.Intersects(*this);
+}
+
+bool Line::Intersects(const AABB &aabb, float &dNear, float &dFar) const
 {
 	return aabb.Intersects(*this, dNear, dFar);
 }
 
-bool Line::Intersects(const OBB &obb, float *dNear, float *dFar) const
+bool Line::Intersects(const OBB &obb) const
+{
+	return obb.Intersects(*this);
+}
+
+bool Line::Intersects(const OBB &obb, float &dNear, float &dFar) const
 {
 	return obb.Intersects(*this, dNear, dFar);
 }

@@ -554,10 +554,50 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
 
 bool AABB::IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
 {
+	// Never call the SSE version here. The SSE version does not output tNear and tFar, because 
+	// the memory stores have been profiled to make it slower than the CPP version. Therefore the SSE
+	// version does not output tNear and tFar (profile shows it to be about 10x faster than the CPP version).
+	return IntersectLineAABB_CPP(linePos, lineDir, tNear, tFar);
+}
+
+bool AABB::Intersects(const Line &line) const
+{
+	float tNear = -FLOAT_INF;
+	float tFar = FLOAT_INF;
+
 #ifdef MATH_SSE
-	return IntersectLineAABB_SSE(float4(linePos, 1.f), float4(lineDir, 0.f), tNear, tFar);
+	return IntersectLineAABB_SSE(float4(line.pos, 1.f), float4(line.dir, 0.f), tNear, tFar);
 #else
-	bool IntersectLineAABB_CPP(linePos, lineDir, tNear, tFar);
+	return IntersectLineAABB_CPP(line.pos, line.dir, tNear, tFar);
+#endif
+}
+
+bool AABB::Intersects(const Ray &ray) const
+{
+	float tNear = 0;
+	float tFar = FLOAT_INF;
+
+#ifdef MATH_SSE
+	return IntersectLineAABB_SSE(float4(ray.pos, 1.f), float4(ray.dir, 0.f), tNear, tFar);
+#else
+	return IntersectLineAABB_CPP(ray.pos, ray.dir, tNear, tFar);
+#endif
+}
+
+bool AABB::Intersects(const LineSegment &lineSegment) const
+{
+	float3 dir = lineSegment.b - lineSegment.a;
+	float len = dir.Length();
+	if (len <= 1e-4f) // Degenerate line segment? Fall back to point-in-AABB test.
+		return Contains(lineSegment.a);
+
+	float invLen = 1.f / len;
+	dir *= invLen;
+	float tNear = 0.f, tFar = len;
+#ifdef MATH_SSE
+	return IntersectLineAABB_SSE(float4(lineSegment.a, 1.f), float4(dir, 0.f), tNear, tFar);
+#else
+	return IntersectLineAABB_CPP(lineSegment.a, dir, tNear, tFar);
 #endif
 }
 
@@ -632,8 +672,10 @@ bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, f
 }
 
 #ifdef MATH_SSE
-bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, float &tNear, float &tFar) const
+bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, float tNear, float tFar) const
 {
+	assume(lineDir.IsNormalized());
+	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
 	/* For reference, this is the C++ form of the vectorized SSE code below.
 
 	float4 recipDir = rayDir.RecipFast4();
@@ -711,6 +753,13 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	// Finally, test if the ranges overlap.
 	__m128 rangeIntersects = _mm_cmple_ss(nearD, farD);
 
+	// To store out out the interval of intersection, uncomment the following:
+	// These are disabled, since without these, the whole function runs without a single memory store,
+	// which has been profiled to be very fast! Uncommenting these causes an order-of-magnitude slowdown.
+	// For now, using the SSE version only where the tNear and tFar ranges are not interesting.
+//	_mm_store_ss(&tNear, nearD);
+//	_mm_store_ss(&tFar, farD);
+
 	// To avoid false positives, need to have an additional rejection test for each cardinal axis the ray direction
 	// is parallel to.
 	__m128 out2 = _mm_cmplt_ps(rayPos.v, MinPoint_SSE());
@@ -730,48 +779,37 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 }
 #endif
 
-bool AABB::Intersects(const Ray &ray, float *dNear, float *dFar) const
+bool AABB::Intersects(const Ray &ray, float &dNear, float &dFar) const
 {
-	float tNear = 0.f, tFar = FLOAT_INF;
-	bool hit = IntersectLineAABB(ray.pos, ray.dir, tNear, tFar);
-	if (dNear)
-		*dNear = tNear;
-	if (dFar)
-		*dFar = tFar;
-	return hit;
+	dNear = 0.f;
+	dFar = FLOAT_INF;
+	return IntersectLineAABB(ray.pos, ray.dir, dNear, dFar);
 }
 
-bool AABB::Intersects(const Line &line, float *dNear, float *dFar) const
+bool AABB::Intersects(const Line &line, float &dNear, float &dFar) const
 {
-	float tNear = -FLOAT_INF, tFar = FLOAT_INF;
-	bool hit = IntersectLineAABB(line.pos, line.dir, tNear, tFar);
-	if (dNear)
-		*dNear = tNear;
-	if (dFar)
-		*dFar = tFar;
-	return hit;
+	dNear = -FLOAT_INF;
+	dFar = FLOAT_INF;
+	return IntersectLineAABB(line.pos, line.dir, dNear, dFar);
 }
 
-bool AABB::Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const
+bool AABB::Intersects(const LineSegment &lineSegment, float &dNear, float &dFar) const
 {
 	float3 dir = lineSegment.b - lineSegment.a;
 	float len = dir.Length();
 	if (len <= 1e-4f) // Degenerate line segment? Fall back to point-in-AABB test.
 	{
-		if (dNear)
-			*dNear = 0.f;
-		if (dFar)
-			*dFar = 1.f;
+		dNear = 0.f;
+		dFar = 1.f;
 		return Contains(lineSegment.a);
 	}
 	float invLen = 1.f / len;
 	dir *= invLen;
-	float tNear = 0.f, tFar = len;
-	bool hit = IntersectLineAABB(lineSegment.a, dir, tNear, tFar);
-	if (dNear)
-		*dNear = tNear * invLen;
-	if (dFar)
-		*dFar = tFar * invLen;
+	dNear = 0.f;
+	dFar = len;
+	bool hit = IntersectLineAABB(lineSegment.a, dir, dNear, dFar);
+	dNear *= invLen;
+	dFar *= invLen;
 	return hit;
 }
 

@@ -800,21 +800,42 @@ bool OBB::Intersects(const Plane &p) const
 	return Abs(s) <= t;
 }
 
-bool OBB::Intersects(const Ray &ray, float *dNear, float *dFar) const
+bool OBB::Intersects(const Ray &ray) const
+{
+	AABB aabb(float3(0,0,0), float3(Size()));
+	Ray r = WorldToLocal() * ray;
+	return aabb.Intersects(r);
+}
+
+bool OBB::Intersects(const Ray &ray, float &dNear, float &dFar) const
 {
 	AABB aabb(float3(0,0,0), float3(Size()));
 	Ray r = WorldToLocal() * ray;
 	return aabb.Intersects(r, dNear, dFar);
 }
 
-bool OBB::Intersects(const Line &line, float *dNear, float *dFar) const
+bool OBB::Intersects(const Line &line) const
+{
+	AABB aabb(float3(0,0,0), float3(Size()));
+	Line l = WorldToLocal() * line;
+	return aabb.Intersects(l);
+}
+
+bool OBB::Intersects(const Line &line, float &dNear, float &dFar) const
 {
 	AABB aabb(float3(0,0,0), float3(Size()));
 	Line l = WorldToLocal() * line;
 	return aabb.Intersects(l, dNear, dFar);
 }
 
-bool OBB::Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const
+bool OBB::Intersects(const LineSegment &lineSegment) const
+{
+	AABB aabb(float3(0,0,0), float3(Size()));
+	LineSegment l = WorldToLocal() * lineSegment;
+	return aabb.Intersects(l);
+}
+
+bool OBB::Intersects(const LineSegment &lineSegment, float &dNear, float &dFar) const
 {
 	AABB aabb(float3(0,0,0), float3(Size()));
 	LineSegment l = WorldToLocal() * lineSegment;

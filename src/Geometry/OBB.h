@@ -375,13 +375,16 @@ public:
 			an epsilon threshold to test that the used axes are not degenerate. */
 	bool Intersects(const OBB &obb, float epsilon = 1e-3f) const;
 	bool Intersects(const Plane &plane) const;
-	/** @param dNear [out] If specified, receives the parametric distance along the line denoting where the line entered the
-			OBB. This pointer may be null.
-		@param dFar [out] If specified, receives the parametric distance along the line denoting where the line exited the
-			OBB. This pointer may be null. */
-	bool Intersects(const Ray &ray, float *dNear, float *dFar) const;
-	bool Intersects(const Line &line, float *dNear, float *dFar) const;
-	bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
+	/** @param dNear [out] If specified, receives the parametric distance along the line denoting where the 
+			line entered this OBB.
+		@param dFar [out] If specified, receives the parametric distance along the line denoting where the 
+			line exited this OBB. */
+	bool Intersects(const Ray &ray, float &dNear, float &dFar) const;
+	bool Intersects(const Ray &ray) const;
+	bool Intersects(const Line &line, float &dNear, float &dFar) const;
+	bool Intersects(const Line &line) const;
+	bool Intersects(const LineSegment &lineSegment, float &dNear, float &dFar) const;
+	bool Intersects(const LineSegment &lineSegment) const;
 	/** @param closestPointOnOBB [out] If specified, receives the closest point on this OBB To the given sphere. This
 			pointer may be null. */
 	bool Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const;

@@ -19,10 +19,7 @@
 
 #include "Math/MathFwd.h"
 #include "Math/float3.h"
-
-#ifdef MATH_SSE
 #include "Math/SSEMath.h"
-#endif
 
 #ifdef MATH_OGRE_INTEROP
 #include <OgreAxisAlignedBox.h>
@@ -390,15 +387,20 @@ public:
 		another, this function still returns true. (e.g. in case a line segment is contained inside this AABB, 
 		or this AABB is contained inside a Sphere, etc.)
 		The first parameter of this function specifies the other object to test against.
-		@param dNear [out] If specified, receives the parametric distance along the line denoting where the line entered the
-			OBB. This pointer may be null.
-		@param dFar [out] If specified, receives the parametric distance along the line denoting where the line exited the
-			OBB. This pointer may be null.
+		@param dNear [out] If specified, receives the parametric distance along the line denoting where the 
+			line entered this AABB.
+		@param dFar [out] If specified, receives the parametric distance along the line denoting where the 
+			line exited this AABB.
 		@see Contains(), Distance(), ClosestPoint().
+		@note If you do not need the intersection intervals, you should call the functions without these
+			parameters in the function signature for optimal performance.
 		@todo Add Intersects(Circle/Disc). */
-	bool Intersects(const Ray &ray, float *dNear, float *dFar) const;
-	bool Intersects(const Line &line, float *dNear, float *dFar) const;
-	bool Intersects(const LineSegment &lineSegment, float *dNear, float *dFar) const;
+	bool Intersects(const Ray &ray, float &dNear, float &dFar) const;
+	bool Intersects(const Ray &ray) const;
+	bool Intersects(const Line &line, float &dNear, float &dFar) const;
+	bool Intersects(const Line &line) const;
+	bool Intersects(const LineSegment &lineSegment, float &dNear, float &dFar) const;
+	bool Intersects(const LineSegment &lineSegment) const;
 	bool Intersects(const Plane &plane) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const OBB &obb) const;
@@ -515,7 +517,7 @@ public:
 
 	bool IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const;
 #ifdef MATH_SSE
-	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float &tNear, float &tFar) const;
+	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float tNear, float tFar) const;
 
 	__m128 &MinPoint_SSE() { return *(__m128*)minPoint.ptr(); }
 	__m128 &MaxPoint_SSE() { return *(__m128*)maxPoint.ptr(); }

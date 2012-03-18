@@ -148,12 +148,12 @@ public:
 	bool Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const;
 	bool Intersects(const Sphere &s) const;
 	/** @param dNear [out] If specified, receives the distance along this ray to where the ray enters
-		the bounding box. This pointer may be null.
+		the bounding box.
 		@param dFar [out] If specified, receives the distance along this ray to where the ray exits
-		the bounding box. This pointer may be null. */
-	bool Intersects(const AABB &aabb, float *dNear, float *dFar) const;
+		the bounding box. */
+	bool Intersects(const AABB &aabb, float &dNear, float &dFar) const;
 	bool Intersects(const AABB &aabb) const;
-	bool Intersects(const OBB &obb, float *dNear, float *dFar) const;
+	bool Intersects(const OBB &obb, float &dNear, float &dFar) const;
 	bool Intersects(const OBB &obb) const;
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Polygon &polygon) const;
