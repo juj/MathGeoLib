@@ -20,22 +20,48 @@
 /// Adjust this #define to choose the name of the namespace math is given to.
 #define MATH_NAMESPACE_NAME math
 
+// If MATH_ENABLE_NAMESPACE is defined, all math symbols are put inside a namespace.
 #define MATH_ENABLE_NAMESPACE
 
-#ifdef WIN32
+// If MATH_ASSERT_ON_ASSUME is defined, assume() resolves directly to assert().
+// When not defined, assume() prints out an error if the condition fails, but continues
+// execution.
 //#define MATH_ASSERT_ON_ASSUME
+
+// If MATH_SILENT_ASSUME is defined, all assume() tests are stripped from the build. This
+// overrides MATH_ASSERT_ON_ASSUME.
+#ifndef _DEBUG
+#define MATH_SILENT_ASSUME
 #endif
 
-//#define MATH_ASSERT_CORRECTNESS
+// If MATH_ASSERT_CORRECTNESS is defined, special (and possibly rather costly) mathassert() 
+// tests are enabled, which test the internal correctness of the library.
+#ifdef _DEBUG
+#define MATH_ASSERT_CORRECTNESS
+#endif
 
-#define MATH_SILENT_ASSUME
-
+// If MATH_ENABLE_STL_SUPPORT is defined, MathGeoLib utilizes STL data structures. Otherwise, 
+// features requiring STL are disabled (but the library can still be built).
 #define MATH_ENABLE_STL_SUPPORT
-#define MATH_TINYXML_INTEROP
+
+// If MATH_TINYXML_INTEROP is defined, MathGeoLib integrates with TinyXML to provide
+// serialization and deserialization to XML for the data structures.
+//#define MATH_TINYXML_INTEROP
+
+// If MATH_GRAPHICSENGINE_INTEROP is defined, MathGeoLib integrates with a certain
+// graphics engine. Do not enable, only for internal use.
 //#define MATH_GRAPHICSENGINE_INTEROP
+
+// If KNET_LOGGING_SUPPORT_ENABLED is defined, MathGeoLib utilizes logging functions
+// from the kNet library.
 #define KNET_LOGGING_SUPPORT_ENABLED
 
+// Uncomment to specify the SIMD instruction set level in use.
 //#define MATH_AVX
+//#define MATH_SSE41
+//#define MATH_SSE3
+//#define MATH_SSE2
+//#define MATH_SSE // SSE1.
 
 // MATH_AVX implies MATH_SSE41, which implies MATH_SSE3, which implies MATH_SSE2, which implies MATH_SSE.
 #ifdef MATH_AVX
