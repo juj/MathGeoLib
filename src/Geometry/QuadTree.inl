@@ -15,13 +15,16 @@ void QuadTree<T>::Clear(const float2 &minXY, const float2 &maxXY)
 template<typename T>
 void QuadTree<T>::Add(const T &object)
 {
+	PROFILE(QuadTree_Add);
 	Node *n = Root();
 	assert(n);
 
 	assert(boundingAABB.IsFinite());
+	assert(!boundingAABB.IsDegenerate());
 
 	AABB2D objectAABB = GetAABB2D(object);
 	assert(objectAABB.IsFinite());
+	assert(!objectAABB.IsDegenerate());
 	
 	if (objectAABB.minPoint.x >= boundingAABB.minPoint.x)
 	{
@@ -259,6 +262,7 @@ template<typename T>
 template<typename Func>
 inline void QuadTree<T>::AABBQuery(const AABB2D &aabb, Func &callback)
 {
+	PROFILE(QuadTree_AABBQuery);
 	std::vector<TraversalStackItem> stack;
 	TraversalStackItem n;
 	n.aabb = BoundingAABB();
@@ -340,6 +344,9 @@ public:
 		for(size_t i = 0; i < node.objects.size(); ++i)
 		{
 			AABB2D aabbI = GetAABB2D(node.objects[i]);
+			if (!queryAABB.Intersects(aabbI))
+				continue;
+
 			for(size_t j = i+1; j < node.objects.size(); ++j)
 			{
 				AABB2D aabbJ = GetAABB2D(node.objects[j]);
@@ -368,6 +375,7 @@ template<typename T>
 template<typename Func>
 inline void QuadTree<T>::CollidingPairsQuery(const AABB2D &aabb, Func &callback)
 {
+	PROFILE(QuadTree_CollidingPairsQuery);
 	FindCollidingPairs<T, Func> func;
 	func.collisionCallback = &callback;
 	AABBQuery(aabb, func);
@@ -595,7 +603,7 @@ template<typename T>
 int QuadTree<T>::NumLeaves() const
 {
 	int numLeaves = 0;
-	for(size_t i = 0; i < nodes.size(); ++i)
+	for(int i = 0; i < (int)nodes.size(); ++i)
 		if (i <= rootNodeIndex || i >= rootNodeIndex + 4) // The nodes rootNodeIndex+1, rootNodeIndex+2 and rootNodeIndex+3 are dummy unused, since the root node is not a quadrant.
 			if (nodes[i].IsLeaf())
 				++numLeaves;
@@ -608,7 +616,7 @@ template<typename T>
 int QuadTree<T>::NumInnerNodes() const
 {
 	int numInnerNodes = 0;
-	for(size_t i = 0; i < nodes.size(); ++i)
+	for(int i = 0; i < (int)nodes.size(); ++i)
 		if (i <= rootNodeIndex || i >= rootNodeIndex + 4) // The nodes rootNodeIndex+1, rootNodeIndex+2 and rootNodeIndex+3 are dummy unused, since the root node is not a quadrant.
 			if (!nodes[i].IsLeaf())
 				++numInnerNodes;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Time/Profiler.h"
 #include "Math/float2.h"
 #include "Types.h"
 
@@ -42,9 +43,14 @@ struct AABB2D
 			&& rhs.maxPoint.x <= maxPoint.x && rhs.maxPoint.y <= maxPoint.y;
 	}
 
+	bool IsDegenerate() const
+	{
+		return minPoint.x >= maxPoint.x || minPoint.y >= maxPoint.y;
+	}
+
 	bool IsFinite() const
 	{
-		return minPoint.IsFinite() && maxPoint.IsFinite();
+		return minPoint.IsFinite() && maxPoint.IsFinite() && minPoint.MinElement() > -1e-5f && maxPoint.MaxElement() < 1e5f;
 	}
 
 	AABB2D operator +(const float2 &pt) const
@@ -79,6 +85,7 @@ inline float MinX(const float3 &pt) { return pt.x; }
 inline float MaxX(const float3 &pt) { return pt.x; }
 inline float MinY(const float3 &pt) { return pt.y; }
 inline float MaxY(const float3 &pt) { return pt.y; }
+inline AABB2D GetAABB2D(const float3 &pt) { return AABB2D(pt.xy(), pt.xy()); }
 
 inline bool Contains(const AABB2D &aabb, const float3 &pt)
 {
@@ -243,5 +250,7 @@ private:
 	void GrowRootBottomLeft();
 	void GrowRootBottomRight();
 };
+
+inline void AssociateQuadTreeNode(const float3 &, QuadTree<float3>::Node *) {}
 
 #include "QuadTree.inl"
