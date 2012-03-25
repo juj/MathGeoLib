@@ -65,9 +65,17 @@ void EnableMemoryLeakLoggingAtExit();
 /// Prints out a variadic message to the log channel User.
 #define LOGUSER(msg, ...) ( IsLogChannelActive(LogUser) && (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 
-#ifndef LOGGING_SUPPORT_DISABLED
+#if defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
 
-#if defined(WIN32) || defined(__APPLE__) || defined(__GNUC__)
+#include <android/log.h>
+
+#define LOG(channel, ...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
+
+#elif (defined(WIN32) || defined(__APPLE__) || defined(__GNUC__)) && !defined(LOGGING_SUPPORT_DISABLED)
+
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.
 //#define LOG(channel, msg, ...)  ( IsLogChannelActive(channel) && (TimeOutputDebugStringVariadic(channel, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
@@ -80,16 +88,6 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGW(msg, ...)  ( kNet::IsLogChannelActive(LogWarning) && (kNet::TimeOutputDebugStringVariadic(LogWarning, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 #define LOGI(msg, ...)  ( kNet::IsLogChannelActive(LogInfo) && (kNet::TimeOutputDebugStringVariadic(LogInfo, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 */
-#elif defined(ANDROID)
-
-#include <android/log.h>
-
-#define LOG(channel, ...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
-#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
-
-#endif
 
 #else
 
