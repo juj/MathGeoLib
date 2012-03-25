@@ -382,6 +382,11 @@ float Sphere::Distance(const Line &line) const
 	return line.Distance(*this);
 }
 
+float Sphere::MaxDistance(const float3 &point) const
+{
+	return point.Distance(pos) + r;
+}
+
 float3 Sphere::ClosestPoint(const float3 &point) const
 {
 	float d = pos.Distance(point);

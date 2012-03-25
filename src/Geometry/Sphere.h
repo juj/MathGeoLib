@@ -74,14 +74,19 @@ public:
 
 	/// Computes the volume of this sphere.
 	/// @return 4*pi*r^3/3.
-	/// @see SurfaceArea().
+	/// @see SurfaceArea(), Diameter().
 	float Volume() const;
 
 	/// Computes the surface area of this sphere.
 	/// @return 4*pi*r^2.
-	/// @see Volume().
+	/// @see Volume(), Diameter().
 	float SurfaceArea() const;
 
+	/// Computes the diameter of this sphere.
+	/// @return 2*r.
+	/// @see r, SurfaceArea(), Volume().
+	float Diameter() const { return 2.f * r; }
+			
 	/// Returns the center of mass of this sphere.
 	/** @return pos.
 		@see pos */
@@ -216,6 +221,10 @@ public:
 	float Distance(const Ray &ray) const;
 	float Distance(const Line &line) const;
 	float Distance(const LineSegment &lineSegment) const;
+
+	/// Returns the maximal distance of this sphere to the given point.
+	/** The maximal distance is the distance of the farthest point inside this sphere to the target point. */
+	float MaxDistance(const float3 &point) const;
 
 	/// Computes the closest point on this sphere to the given object.
 	/** If the other object intersects this sphere, this function will return an arbitrary point inside
