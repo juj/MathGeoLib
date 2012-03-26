@@ -50,7 +50,7 @@ struct AABB2D
 
 	bool IsFinite() const
 	{
-		return minPoint.IsFinite() && maxPoint.IsFinite() && minPoint.MinElement() > -1e-5f && maxPoint.MaxElement() < 1e5f;
+		return minPoint.IsFinite() && maxPoint.IsFinite() && minPoint.MinElement() > -1e5f && maxPoint.MaxElement() < 1e5f;
 	}
 
 	AABB2D operator +(const float2 &pt) const
@@ -249,6 +249,8 @@ private:
 	void GrowRootTopRight();
 	void GrowRootBottomLeft();
 	void GrowRootBottomRight();
+
+	void GrowImpl(int quadrantForRoot);
 };
 
 inline void AssociateQuadTreeNode(const float3 &, QuadTree<float3>::Node *) {}

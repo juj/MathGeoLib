@@ -460,36 +460,8 @@ void QuadTree<T>::GrowRootTopLeft()
 	boundingAABB.minPoint.x -= boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
 	boundingAABB.minPoint.y -= boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
 
-	// rootNodeIndex always points to the first index of the four quadrants.
 	// The old root will become the bottom-right child of the new root, at index 3. Swap the root node to its proper place.
-	Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+3]);
-	Node *oldRoot = &nodes[rootNodeIndex+3];
-
-	// Fix up the refs to the swapped old root node.
-	if (!oldRoot->IsLeaf())
-	{
-		nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
-		nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
-		nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
-		nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
-	}
-
-	// Fix up object->node associations to the swapped old root node.
-	for(size_t i = 0; i < oldRoot->objects.size(); ++i)
-		AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
-
-	int oldRootNodeIndex = rootNodeIndex;
-	rootNodeIndex = AllocateNodeGroup(0);
-	Node *newRoot = &nodes[rootNodeIndex];
-	newRoot->childIndex = oldRootNodeIndex;
-	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
-	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
-	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
-	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
-
-	LOGI("TopLeft: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
-		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
-	DebugSanityCheckNode(Root());
+	GrowImpl(3);
 }
 
 template<typename T>
@@ -498,36 +470,8 @@ void QuadTree<T>::GrowRootTopRight()
 	boundingAABB.maxPoint.x += boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
 	boundingAABB.minPoint.y -= boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
 
-	// rootNodeIndex always points to the first index of the four quadrants.
 	// The old root will become the bottom-left child of the new root, at index 2. Swap the root node to its proper place.
-	Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+2]);
-	Node *oldRoot = &nodes[rootNodeIndex+2];
-
-	// Fix up the refs to the swapped old root node.
-	if (!oldRoot->IsLeaf())
-	{
-		nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
-		nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
-		nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
-		nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
-	}
-
-	// Fix up object->node associations to the swapped old root node.
-	for(size_t i = 0; i < oldRoot->objects.size(); ++i)
-		AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
-
-	int oldRootNodeIndex = rootNodeIndex;
-	rootNodeIndex = AllocateNodeGroup(0);
-	Node *newRoot = &nodes[rootNodeIndex];
-	newRoot->childIndex = oldRootNodeIndex;
-	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
-	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
-	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
-	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
-
-	LOGI("TopRight: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
-		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
-	DebugSanityCheckNode(Root());
+	GrowImpl(2);
 }
 
 template<typename T>
@@ -536,36 +480,8 @@ void QuadTree<T>::GrowRootBottomLeft()
 	boundingAABB.minPoint.x -= boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
 	boundingAABB.maxPoint.y += boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
 
-	// rootNodeIndex always points to the first index of the four quadrants.
 	// The old root will become the top-right child of the new root, at index 1. Swap the root node to its proper place.
-	Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+1]);
-	Node *oldRoot = &nodes[rootNodeIndex+1];
-
-	// Fix up the refs to the swapped old root node.
-	if (!oldRoot->IsLeaf())
-	{
-		nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
-		nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
-		nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
-		nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
-	}
-
-	// Fix up object->node associations to the swapped old root node.
-	for(size_t i = 0; i < oldRoot->objects.size(); ++i)
-		AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
-
-	int oldRootNodeIndex = rootNodeIndex;
-	rootNodeIndex = AllocateNodeGroup(0);
-	Node *newRoot = &nodes[rootNodeIndex];
-	newRoot->childIndex = oldRootNodeIndex;
-	nodes[newRoot->TopLeftChildIndex()].parent = newRoot;
-	nodes[newRoot->TopRightChildIndex()].parent = newRoot;
-	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
-	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
-
-	LOGI("BottomLeft: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
-		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
-	DebugSanityCheckNode(Root());
+	GrowImpl(1);
 }
 
 template<typename T>
@@ -574,8 +490,36 @@ void QuadTree<T>::GrowRootBottomRight()
 	boundingAABB.maxPoint.x += boundingAABB.maxPoint.x - boundingAABB.minPoint.x;
 	boundingAABB.maxPoint.y += boundingAABB.maxPoint.y - boundingAABB.minPoint.y;
 
-	// rootNodeIndex always points to the first index of the four quadrants.
 	// The old root will become the top-left child of the new root, at index 0, so no swapping is necessary.
+	GrowImpl(0);
+}
+
+template<typename T>
+void QuadTree<T>::GrowImpl(int quadrantForRoot)
+{
+	// quadrantForRoot specifies the child quadrant the old root is put to in the new root node.
+
+	// rootNodeIndex always points to the first index of the four quadrants.
+	Node *oldRoot = &nodes[rootNodeIndex+quadrantForRoot];
+
+	if (quadrantForRoot != 0)
+	{
+		Swap(nodes[rootNodeIndex], nodes[rootNodeIndex+quadrantForRoot]);
+
+		// Fix up the refs to the swapped old root node.
+		if (!oldRoot->IsLeaf())
+		{
+			nodes[oldRoot->TopLeftChildIndex()].parent = oldRoot;
+			nodes[oldRoot->TopRightChildIndex()].parent = oldRoot;
+			nodes[oldRoot->BottomLeftChildIndex()].parent = oldRoot;
+			nodes[oldRoot->BottomRightChildIndex()].parent = oldRoot;
+		}
+
+		// Fix up object->node associations to the swapped old root node.
+		for(size_t i = 0; i < oldRoot->objects.size(); ++i)
+			AssociateQuadTreeNode(oldRoot->objects[i], oldRoot);
+	}
+
 
 	int oldRootNodeIndex = rootNodeIndex;
 	rootNodeIndex = AllocateNodeGroup(0);
@@ -586,8 +530,6 @@ void QuadTree<T>::GrowRootBottomRight()
 	nodes[newRoot->BottomLeftChildIndex()].parent = newRoot;
 	nodes[newRoot->BottomRightChildIndex()].parent = newRoot;
 
-	LOGI("BottomRight: New Tree Size %s. %d total nodes. %d inner nodes. %d leaves. %d tree height.", 
-		boundingAABB.ToString().c_str(), NumNodes(), NumInnerNodes(), NumLeaves(), TreeHeight());
 	DebugSanityCheckNode(Root());
 }
 
