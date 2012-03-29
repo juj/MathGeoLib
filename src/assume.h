@@ -65,7 +65,7 @@ MATH_END_NAMESPACE
 #ifdef MATH_ASSERT_CORRECTNESS
 #define mathassert(x) assert(x)
 #else
-#define mathassert(x)
+#define mathassert(x) do {} while(0)
 #endif
 
 // Kill both assume() and mathassert() macros in OPTIMIZED_RELEASE builds.
@@ -76,6 +76,6 @@ MATH_END_NAMESPACE
 #ifdef mathassert
 #undef mathassert
 #endif
-#define assume(x)
-#define mathassert(x)
+#define assume(x) do {} while(0)
+#define mathassert(x) do {} while(0)
 #endif
