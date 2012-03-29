@@ -85,6 +85,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Algorithm\Random\LCG.h" />
     <ClInclude Include="..\src\Geometry\AABB.h" />
+    <ClInclude Include="..\src\Geometry\AABB2D.h" />
     <ClInclude Include="..\src\Geometry\Capsule.h" />
     <ClInclude Include="..\src\Geometry\Circle.h" />
     <ClInclude Include="..\src\Geometry\Frustum.h" />
