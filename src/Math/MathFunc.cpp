@@ -15,13 +15,13 @@
 /** @file MathFunc.cpp
 	@author Jukka Jylänki
 	@brief Common mathematical functions. */
+#include "Math/MathFunc.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #include <algorithm>
 #endif
 
 #include "myassert.h"
-#include "Math/MathFunc.h"
 #include "Math/float2.h"
 
 MATH_BEGIN_NAMESPACE
@@ -122,6 +122,12 @@ unsigned int RoundDownPow2(unsigned int x)
 	x |= x >> 8;
 	x |= x >> 16;
 	return x - (x >> 1);
+}
+
+int RoundIntUpToMultipleOfPow2(int x, int n)
+{
+	assert(IsPow2(n));
+	return (x + n-1) & ~(n-1);
 }
 
 float Pow(float base, float exponent)
