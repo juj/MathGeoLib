@@ -74,7 +74,7 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
 
-#elif (defined(WIN32) || defined(__APPLE__) || defined(__GNUC__)) && !defined(LOGGING_SUPPORT_DISABLED)
+#elif (defined(WIN32) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
 
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.
@@ -89,7 +89,7 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGI(msg, ...)  ( kNet::IsLogChannelActive(LogInfo) && (kNet::TimeOutputDebugStringVariadic(LogInfo, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 */
 
-#else
+#elif defined(LOGGING_SUPPORT_DISABLED)
 
 /// If kNet logging is disabled, LOG() macro is a no-op. This avoids having to evaluate the arguments of the
 /// LOG() call, which improves performance.
@@ -98,6 +98,9 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGW(...) ((void)0)
 #define LOGI(...) ((void)0)
 
+#else
+
+#error LOG/LOGE/LOGW/LOGI not implemented!
 #endif
 
 #endif
