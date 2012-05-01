@@ -15,8 +15,8 @@
 /** @file float2.cpp
 	@author Jukka Jylänki
 	@brief */
-#include <stdlib.h>
 #include "Math/float2.h"
+#include <stdlib.h>
 #include "Math/float3.h"
 #include "Math/float4.h"
 #include "Math/MathFunc.h"

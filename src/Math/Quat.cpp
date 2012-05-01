@@ -15,8 +15,8 @@
 /** @file Quat.cpp
 	@author Jukka Jylänki
 	@brief */
-#include <stdlib.h>
 #include "Math/Quat.h"
+#include <stdlib.h>
 #include "Math/float3.h"
 #include "Math/float4.h"
 #include "Math/float3x3.h"

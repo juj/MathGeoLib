@@ -15,9 +15,9 @@
 /** @file BitOps.cpp
 	@author Jukka Jylänki
 	@brief */
+#include "BitOps.h"
 #include <string.h>
 
-#include "BitOps.h"
 
 MATH_BEGIN_NAMESPACE
 

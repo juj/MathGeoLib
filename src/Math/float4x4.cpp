@@ -15,6 +15,7 @@
 /** @file float4x4.cpp
 	@author Jukka Jylänki
 	@brief */
+#include "Math/float4x4.h"
 #include <string.h>
 
 #include "Math/MathFunc.h"
@@ -22,7 +23,6 @@
 #include "Math/float4.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
-#include "Math/float4x4.h"
 #include "Matrix.inl"
 #include "Math/Quat.h"
 #include "TransformOps.h"

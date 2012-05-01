@@ -15,12 +15,12 @@
 /** @file float3x3.cpp
 	@author Jukka Jylänki
 	@brief */
+#include "Math/float3x3.h"
 #include <string.h>
 #include "assume.h"
 #include "Math/MathFunc.h"
 #include "Math/float3.h"
 #include "Math/float4.h"
-#include "Math/float3x3.h"
 #include "Math/float3x4.h"
 #include "Math/float4x4.h"
 #include "Matrix.inl"

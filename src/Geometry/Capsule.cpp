@@ -15,6 +15,7 @@
 /** @file Capsule.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Capsule geometry object. */
+#include "Geometry/Capsule.h"
 #include "Math/MathConstants.h"
 #include "Math/MathFunc.h"
 #include "Math/float3x3.h"
@@ -28,7 +29,6 @@
 #include "Geometry/Ray.h"
 #include "Geometry/Line.h"
 #include "Geometry/LineSegment.h"
-#include "Geometry/Capsule.h"
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Sphere.h"

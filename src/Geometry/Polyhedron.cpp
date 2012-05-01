@@ -15,6 +15,7 @@
 /** @file Polyhedron.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Polyhedron geometry object. */
+#include "Geometry/Polyhedron.h"
 #include <set>
 #include <utility>
 #include "assume.h"
@@ -24,7 +25,6 @@
 #include "Geometry/Frustum.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Polygon.h"
-#include "Geometry/Polyhedron.h"
 #include "Geometry/Line.h"
 #include "Geometry/Ray.h"
 #include "Geometry/LineSegment.h"

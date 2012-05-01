@@ -15,11 +15,11 @@
 /** @file AABB.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Axis-Aligned Bounding Box (AABB) geometry object. */
+#include "Geometry/AABB.h"
 #include "Math/MathFunc.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #endif
-#include "Geometry/AABB.h"
 #include "Geometry/Frustum.h"
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"

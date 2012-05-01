@@ -17,9 +17,9 @@
 
 #ifdef WIN32
 
+#include "Time/Clock.h"
 #include "myassert.h"
 
-#include "Time/Clock.h"
 #include "Log.h"
 
 #ifndef NOMINMAX

@@ -15,6 +15,7 @@
 /** @file Sphere.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Sphere geometry object. */
+#include "Geometry/Sphere.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #include <vector>
@@ -35,7 +36,6 @@
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Plane.h"
-#include "Geometry/Sphere.h"
 #include "Math/float2.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"

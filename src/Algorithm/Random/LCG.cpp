@@ -8,8 +8,8 @@
 	@brief A linear congruential random number generator.
 */
 
-#include "Math/MathFunc.h"
 #include "Algorithm/Random/LCG.h"
+#include "Math/MathFunc.h"
 #include "Time/Clock.h"
 #include "Types.h"
 #include "myassert.h"

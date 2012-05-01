@@ -15,11 +15,11 @@
 /** @file OBB.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Oriented Bounding Box (OBB) geometry object. */
+#include "Geometry/OBB.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #endif
 #include "Math/MathFunc.h"
-#include "Geometry/OBB.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Frustum.h"
 #include "Algorithm/Random/LCG.h"

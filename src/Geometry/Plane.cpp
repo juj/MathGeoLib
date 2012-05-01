@@ -15,11 +15,11 @@
 /** @file Plane.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Plane geometry object. */
+#include "Geometry/Plane.h"
 #include "Math/MathFunc.h"
 #include "Math/Polynomial.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Circle.h"
-#include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Polygon.h"

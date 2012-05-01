@@ -15,9 +15,9 @@
 /** @file LineSegment.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the LineSegment geometry object. */
+#include "Geometry/LineSegment.h"
 #include "Math/MathFunc.h"
 #include "Geometry/AABB.h"
-#include "Geometry/LineSegment.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Line.h"
 #include "Geometry/Plane.h"

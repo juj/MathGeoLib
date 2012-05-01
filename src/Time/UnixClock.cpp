@@ -17,6 +17,7 @@
 
 #if defined(UNIX) || defined(ANDROID)
 
+#include "Time/Clock.h"
 #include "myassert.h"
 
 #include <time.h>
@@ -24,7 +25,6 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "Time/Clock.h"
 #include "Log.h"
 
 tick_t Clock::appStartTime = 0;

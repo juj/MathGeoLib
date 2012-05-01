@@ -15,6 +15,7 @@
 /** @file float3.cpp
 	@author Jukka Jylänki
 	@brief */
+#include "Math/float3.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #include <utility>
@@ -22,7 +23,6 @@
 #include <stdlib.h>
 
 #include "Math/float2.h"
-#include "Math/float3.h"
 #include "Math/float4.h"
 #include "Math/float3x3.h"
 #include "Geometry/Line.h"

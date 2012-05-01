@@ -15,9 +15,9 @@
 /** @file Ray.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Ray geometry object. */
+#include "Geometry/Ray.h"
 #include "Geometry/AABB.h"
 #include "Geometry/Line.h"
-#include "Geometry/Ray.h"
 #include "Geometry/LineSegment.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"

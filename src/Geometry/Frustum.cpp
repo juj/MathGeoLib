@@ -15,10 +15,10 @@
 /** @file Frustum.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Frustum geometry object. */
+#include "Frustum.h"
 #include "Geometry/AABB.h"
 #include "Circle.h"
 #include "Math/MathFunc.h"
-#include "Frustum.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
 #include "Geometry/OBB.h"

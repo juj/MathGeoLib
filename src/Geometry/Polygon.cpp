@@ -15,6 +15,7 @@
 /** @file Polygon.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Polygon geometry object. */
+#include "Geometry/Polygon.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #include <utility>
@@ -24,7 +25,6 @@
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Frustum.h"
-#include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Line.h"
