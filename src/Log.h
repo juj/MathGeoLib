@@ -74,7 +74,7 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
 
-#elif (defined(WIN32) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
+#elif (defined(PEPPER) || defined(WIN32) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
 
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.

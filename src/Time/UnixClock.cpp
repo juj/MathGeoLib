@@ -15,7 +15,7 @@
 /** @file UnixClock.cpp
 	@brief */
 
-#if defined(UNIX) || defined(ANDROID)
+#if defined(UNIX) || defined(ANDROID) || defined(__native_client__)
 
 #include "Time/Clock.h"
 #include "myassert.h"
@@ -44,6 +44,7 @@ Clock::Clock()
 
 void Clock::Sleep(int milliseconds)
 {
+#ifndef __native_client__
 	// http://linux.die.net/man/2/nanosleep
 	timespec ts;
 	ts.tv_sec = milliseconds / 1000;
@@ -51,6 +52,9 @@ void Clock::Sleep(int milliseconds)
 	int ret = nanosleep(&ts, NULL);
 	if (ret == -1)
 		LOG(LogError, "nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
+#else
+#warning Clock::Sleep not implemented!
+#endif
 }
 
 int Clock::Year()
