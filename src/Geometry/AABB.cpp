@@ -1073,24 +1073,26 @@ AABB AABB::Intersection(const AABB &aabb) const
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void AABB::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 {
-    int x = 1;
-    int y = 1;
-    int z = 1;
-    Array<float3> pos;
-    Array<float3> normal;
-    Array<float2> uv;
-    int numVertices = (x*y+y*z+x*z)*2*6;
-    pos.Resize_pod(numVertices);
-    normal.Resize_pod(numVertices);
-    uv.Resize_pod(numVertices);
-    Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
-    int startIndex = vb.AppendVertices(numVertices);
-    for(size_t i = 0; i < pos.size(); ++i)
-    {
-        vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
-        vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
-        vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
-    }
+	int x = 1;
+	int y = 1;
+	int z = 1;
+	Array<float3> pos;
+	Array<float3> normal;
+	Array<float2> uv;
+	int numVertices = (x*y+y*z+x*z)*2*6;
+	pos.Resize_pod(numVertices);
+	normal.Resize_pod(numVertices);
+	uv.Resize_pod(numVertices);
+	Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
+	int startIndex = vb.AppendVertices(numVertices);
+	for(size_t i = 0; i < pos.size(); ++i)
+	{
+		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
+			vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+		if (vb.Declaration()->TypeOffset(VDUV) >= 0)
+			vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
+	}
 }
 #endif
 
