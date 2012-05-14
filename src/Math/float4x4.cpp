@@ -291,7 +291,7 @@ float4x4 float4x4::FromEulerXYZ(float x, float y, float z)
 	r.SetTranslatePart(0,0,0);
 	r.SetRow(3, 0,0,0,1);
 	Set3x3PartRotateEulerXYZ(r, x, y, z);
-	assume(r.Equals(float4x4::RotateX(x) * float4x4::RotateY(y) * float4x4::RotateX(z)));
+	assume(r.Equals(float4x4::RotateX(x) * float4x4::RotateY(y) * float4x4::RotateZ(z)));
 	return r;
 }
 

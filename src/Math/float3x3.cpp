@@ -177,7 +177,7 @@ float3x3 float3x3::FromEulerXYZ(float x, float y, float z)
 {
 	float3x3 r;
 	Set3x3PartRotateEulerXYZ(r, x, y, z);
-	assume(r.Equals(float3x3::RotateX(x) * float3x3::RotateY(y) * float3x3::RotateX(z)));
+	assume(r.Equals(float3x3::RotateX(x) * float3x3::RotateY(y) * float3x3::RotateZ(z)));
 	return r;
 }
 
