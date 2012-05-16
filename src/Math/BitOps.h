@@ -62,7 +62,7 @@ template<int Bits>
 class LSBT
 {
 public:
-	enum { val = (1 << Bits) - 1 };
+	static const u32 val = (1 << Bits) - 1;
 };
 
 /// @cond FULL
@@ -71,14 +71,14 @@ template<>
 class LSBT<32>
 {
 public:
-	enum { val = 0xFFFFFFFF };
+	static const u32 val = 0xFFFFFFFF;
 };
 
 template<>
 class LSBT<31>
 {
 public:
-	enum { val = 0x7FFFFFFF };
+	static const u32 val = 0x7FFFFFFF;
 };
 
 /// @endcond
@@ -106,7 +106,7 @@ class BitMaskT
 {
 public:
 //	enum { val = (Pow<2, Bits>::val - 1) << Pos };		// Alternate way to calculate this value.
-	enum { val = LSBT<Pos+Bits>::val & ~LSBT<Pos>::val }; // But this is nicer.
+	static const u32 val = LSBT<Pos+Bits>::val & ~LSBT<Pos>::val; // But this is nicer.
 };
 
 /** @return A mask with the given number of bits set at the given position of a u32 variable. This is 
