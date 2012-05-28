@@ -1071,19 +1071,16 @@ AABB AABB::Intersection(const AABB &aabb) const
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-void AABB::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
+void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const
 {
-	int x = 1;
-	int y = 1;
-	int z = 1;
 	Array<float3> pos;
 	Array<float3> normal;
 	Array<float2> uv;
-	int numVertices = (x*y+y*z+x*z)*2*6;
+	int numVertices = (numFacesX*numFacesY + numFacesY*numFacesZ + numFacesX*numFacesZ)*2*6;
 	pos.Resize_pod(numVertices);
 	normal.Resize_pod(numVertices);
 	uv.Resize_pod(numVertices);
-	Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
+	Triangulate(numFacesX, numFacesY, numFacesZ, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
 	for(size_t i = 0; i < pos.size(); ++i)
 	{

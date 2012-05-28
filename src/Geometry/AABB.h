@@ -531,7 +531,7 @@ public:
 #endif
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const;
+	void Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const;
 #endif
 };
 
