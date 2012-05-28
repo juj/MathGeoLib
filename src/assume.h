@@ -48,7 +48,7 @@ MATH_END_NAMESPACE
 #define NOMINMAX
 #endif
 #include <Windows.h>
-#define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); if (MathBreakOnAssume()) DebugBreak(); } } while(0)
+#define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); if (MATH_NS::MathBreakOnAssume()) DebugBreak(); } } while(0)
 
 #elif defined(ANDROID)
 

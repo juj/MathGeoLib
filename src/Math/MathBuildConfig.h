@@ -17,11 +17,17 @@
 	@brief Specifies all build flags for the library. */
 #pragma once
 
-/// Adjust this #define to choose the name of the namespace math is given to.
-#define MATH_NAMESPACE_NAME math
-
 // If MATH_ENABLE_NAMESPACE is defined, all math symbols are put inside a namespace.
 #define MATH_ENABLE_NAMESPACE
+
+/// Adjust this #define to choose the name of the namespace math is given to.
+// This flag does not have any effect if MATH_ENABLE_NAMESPACE is not defined.
+#define MATH_NAMESPACE_NAME math
+
+// If MATH_AUTO_USE_NAMESPACE is defined, a 'using namespace math;' directive is issued in all header files, causing
+// the math namespace to exist only for internal symbol hiding purposes, and not for external code.
+// This flag does not have any effect if MATH_ENABLE_NAMESPACE is not defined.
+#define MATH_AUTO_USE_NAMESPACE
 
 // If MATH_ASSERT_ON_ASSUME is defined, assume() resolves directly to assert().
 // When not defined, assume() prints out an error if the condition fails, but continues

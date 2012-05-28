@@ -14,6 +14,8 @@
 #include "Types.h"
 #include "myassert.h"
 
+MATH_BEGIN_NAMESPACE
+
 LCG::LCG()
 {
 	Seed(Clock::TickU32());
@@ -104,3 +106,5 @@ float LCG::Float(float a, float b)
 
 	return Float()*(b-a)+a;
 }
+
+MATH_END_NAMESPACE

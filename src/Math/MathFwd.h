@@ -74,10 +74,9 @@ class TranslateOp;
 class Torus;
 class ScaleOp;
 class Triangle;
+class LCG;
 
 MATH_END_NAMESPACE
-
-class LCG;
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 class VertexBuffer;

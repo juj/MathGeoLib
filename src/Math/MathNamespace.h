@@ -26,7 +26,9 @@
 MATH_BEGIN_NAMESPACE
 MATH_END_NAMESPACE
 
+#ifdef MATH_AUTO_USE_NAMESPACE
 // It is very unconventional to put a 'using namespace' inside a .h file, but here
 // the math namespace only exists to allow shadowing all symbols outside the math libraries.
 // This enables hiding the unwanted stuff from the math libraries (e.g. Windows GDI Polygon function).
 USE_MATH_NAMESPACE
+#endif
