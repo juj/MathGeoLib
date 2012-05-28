@@ -155,6 +155,12 @@ public:
 		@see CornerPoint(). */
 	float3 ExtremePoint(const float3 &direction) const;
 
+	/// Sets the pos, front and up members of this frustum from the given world transform.
+	/** This function sets the 'front' parameter of this Frustum to look towards the -Z axis of the given matrix, 
+		and the 'up' parameter of this Frustum to point towards the +Y axis of the given matrix.
+		@param worldTransform An orthonormalized matrix with determinant of +1 (no mirroring). */
+	void SetWorldMatrix(const float3x4 &worldTransform);
+
 	/// Computes the matrix that transforms from the view space to the world (global) space of this Frustum.
 	/** @note The returned matrix is the inverse of the matrix returned by ViewMatrix().
 		@return An orthonormal affine matrix that performs the view->world transformation. The returned

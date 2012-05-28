@@ -89,6 +89,18 @@ Plane Frustum::BottomPlane() const
 	return Plane(pos, bottomSideNormal);
 }
 
+void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
+{
+	pos = worldTransform.TranslatePart();
+	front = -worldTransform.Col(2); // The camera looks towards -Z axis of the given transform.
+	up = worldTransform.Col(1); // The camera up points towards +Y of the given transform.
+	assume(pos.IsFinite());
+	assume(front.IsNormalized());
+	assume(up.IsNormalized());
+	assume(worldTransform.IsColOrthogonal3()); // Front and up must be orthogonal to each other.
+	assume(EqualAbs(worldTransform.Determinant(), 1.f)); // The matrix cannot contain mirroring.
+}
+
 float3x4 Frustum::WorldMatrix() const
 {
 	assume(up.IsNormalized());
