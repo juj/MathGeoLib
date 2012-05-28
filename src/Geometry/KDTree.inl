@@ -1,5 +1,8 @@
 #pragma once
 
+#include "AABB.h"
+#include "OBB.h"
+
 template<typename T>
 int KdTree<T>::AllocateNodePair()
 {
