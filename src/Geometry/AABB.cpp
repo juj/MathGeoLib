@@ -1091,6 +1091,17 @@ void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFa
 			vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
 	}
 }
+
+void AABB::ToLineList(VertexBuffer &vb)
+{
+	Array<float3> pos;
+	pos.Resize_pod(NumVerticesInEdgeList());
+	ToEdgeList(&pos[0]);
+	int startIndex = vb.AppendVertices(pos.size());
+	for(size_t i = 0; i < pos.size(); ++i)
+		vb.Set(startIndex+i, VDPosition, float4(pos[i], 1.f));
+}
+
 #endif
 
 MATH_END_NAMESPACE
