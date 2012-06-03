@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
 project(MathGeoLib)
 
-add_definitions(-DMATH_ENABLE_STL_SUPPORT)
+include(CommonOptions.cmake)
+
 include_directories(./src)
-file(GLOB_RECURSE sourceFiles1 ./src/Algorithm/*.cpp)
-file(GLOB_RECURSE sourceFiles2 ./src/Math/*.cpp)
-file(GLOB_RECURSE sourceFiles2 ./src/Geometry/*.cpp)
-add_library(MathGeoLib STATIC ${sourceFiles1} ${sourceFiles2} ${sourceFiles3})
+
+include_directories(../CodeLib/src)
+include_directories(../GraphicsEngine/src)
+
+file(GLOB_RECURSE sourceFiles ./src/*.cpp)
+
+add_library(MathGeoLib STATIC ${sourceFiles})
+set_target_properties(MathGeoLib PROPERTIES 
+	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+
