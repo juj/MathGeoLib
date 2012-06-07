@@ -2,6 +2,7 @@
 
 #include "AABB.h"
 #include "OBB.h"
+#include "Ray.h"
 
 template<typename T>
 int KdTree<T>::AllocateNodePair()
@@ -303,6 +304,8 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	StackPtr entryPoint = 0;
 	stack[entryPoint].t = tNear;
 
+    const float travelEpsilon = 1e-4f;
+    
 	// Check if the ray has internal or external origin relative to the scene root node.
 	if (tNear >= 0.f)
 		stack[entryPoint].pos = r.pos + (tNear + travelEpsilon) * r.dir;
