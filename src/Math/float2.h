@@ -228,6 +228,35 @@ public:
 	/** @see x, y, At().. */
 	void Set(float x, float y);
 
+	/// Converts the given vector represented in polar coordinates to an euclidean float2 (x,y) pair.
+	/** @param theta The direction (aimed angle, azimuth) of the vector, in radians. The value theta==0 returns a value in the +X direction,
+		the value theta=pi/2 corresponds to +Y, theta=pi corresponds to -X and theta=-pi/2 (or 3pi/2) corresponds to -Y.
+			This value is typically in the range [-pi, pi] (, or [0, 2pi]).
+		@param length The magnitude of the vector. This is usually >= 0, although passing in the zero vector as radius returns (0,0), and passing
+			in a negative radius mirrors the coordinate along the origin.
+		@see FromPolarCoordinates, ToPolarCoordinates, AimedAngle. */
+	void SetFromPolarCoordinates(float theta, float length);
+	void SetFromPolarCoordinates(const float2 &polar) { SetFromPolarCoordinates(polar.x, polar.y); }
+	static float2 FromPolarCoordinates(float theta, float length);
+	static float2 FromPolarCoordinates(const float2 &polar) { return FromPolarCoordinates(polar.x, polar.y); }
+
+	/// Converts this euclidean (x,y) float2 to polar coordinates representation in the form (theta, length).
+	/** @note It is valid for the magnitude of this vector to be (very close to) zero, in which case the return value is the zero vector.
+		@return A float2 that has the first component (x) representing the aimed angle (azimuth) of this direction vector, in radians, 
+		and is equal to atan2(this.y, this.x). The x component has a range of ]-pi/2, pi/2]. The second component (y) of the returned vector 
+		stores the length (radius) of this vector.
+		@see SetFromPolarCoordinates, FromPolarCoorindates, AimedAngle. */
+	float2 ToPolarCoordinates() const;
+
+	/// Returns the aimed angle direction of this vector, in radians.
+	/** The aimed angle of a 2D vector corresponds to the theta part (or azimuth) of the polar coordinate representation of this vector. Essentially,
+		describes the direction this vector is pointing at. A vector pointing towards +X returns 0, vector pointing towards +Y returns pi/2, vector
+		pointing towards -X returns pi, and a vector pointing towards -Y returns -pi/2 (equal to 3pi/2).
+		@note This vector does not need to be normalized for this function to work, but it DOES need to be non-zero (unlike the function ToPolarCoordinates).
+		@return The aimed angle in the range ]-pi/2, pi/2].
+		@see ToPolarCoordinates, FromPolarCoordinates, SetFromPolarCoordinates. */
+	float AimedAngle() const;
+
 	/// Computes the length of this vector.
 	/** @return Sqrt(x*x + y*y).
 		@see LengthSq(), Distance(), DistanceSq(). */

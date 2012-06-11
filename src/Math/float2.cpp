@@ -111,6 +111,34 @@ float float2::Length() const
 	return sqrtf(LengthSq());
 }
 
+void float2::SetFromPolarCoordinates(float theta, float length)
+{
+	x = Cos(theta) * length;
+	y = Sin(theta) * length;
+}
+
+static float2 FromPolarCoordinates(float theta, float length)
+{
+	float2 euclidean;
+	euclidean.SetFromPolarCoordinates(theta, length);
+	return euclidean;
+}
+
+float2 float2::ToPolarCoordinates() const
+{
+	float radius = Length();
+	if (radius > 1e-4f)
+		return float2(atan2(y, x), radius);
+	else
+		return float2::zero;
+}
+
+float float2::AimedAngle() const
+{
+	assume(!IsZero());
+	return atan2(y, x);
+}
+
 float float2::Normalize()
 { 
 	assume(IsFinite());
