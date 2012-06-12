@@ -117,7 +117,7 @@ void float2::SetFromPolarCoordinates(float theta, float length)
 	y = Sin(theta) * length;
 }
 
-static float2 FromPolarCoordinates(float theta, float length)
+float2 float2::FromPolarCoordinates(float theta, float length)
 {
 	float2 euclidean;
 	euclidean.SetFromPolarCoordinates(theta, length);
