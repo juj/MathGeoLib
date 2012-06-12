@@ -354,7 +354,7 @@ public:
 	bool Intersects(const Frustum &frustum) const;
 	bool Intersects(const Polyhedron &polyhedron) const;
 
-#ifdef MATH_TINYXML_INTEROP
+#if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
 	void DeserializeFromXml(TiXmlElement *e);
 #endif
 

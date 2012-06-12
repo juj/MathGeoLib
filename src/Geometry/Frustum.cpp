@@ -34,7 +34,7 @@
 #include "Math/float4.h"
 #include "Math/Quat.h"
 
-#ifdef MATH_TINYXML_INTEROP
+#if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
 #include "Container/UString.h"
 #endif
 
@@ -131,7 +131,7 @@ float4x4 Frustum::ProjectionMatrix() const
 	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
 	if (type == PerspectiveFrustum)
 	{
-		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov);
 	}
 	else
 	{
@@ -572,7 +572,7 @@ bool Frustum::Intersects(const Polyhedron &polyhedron) const
 	return this->ToPolyhedron().Intersects(polyhedron);
 }
 
-#ifdef MATH_TINYXML_INTEROP
+#if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
 
 void Frustum::DeserializeFromXml(TiXmlElement *e)
 {

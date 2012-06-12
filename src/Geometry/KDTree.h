@@ -2,8 +2,6 @@
 
 #include "Types.h"
 
-#define MATH_CONTAINERLIB_SUPPORT
-
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Container/MaxHeap.h"
 #endif
