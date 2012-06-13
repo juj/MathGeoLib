@@ -74,7 +74,28 @@ void EnableMemoryLeakLoggingAtExit();
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
 
-#elif (defined(PEPPER) || defined(WIN32) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
+#elif defined(WIN32) && !defined(LOGGING_SUPPORT_DISABLED)
+
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <stdio.h>
+
+#define LOG(channel, ...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGI(...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGW(...) do { \
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); \
+	printf("Warning: "); printf(__VA_ARGS__); printf("\n"); \
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); \
+	} while(0)
+
+#define LOGE(...) do { \
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY); \
+	printf("Error: "); printf(__VA_ARGS__); printf("\n"); \
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); \
+	} while(0)
+
+#elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
 
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.
