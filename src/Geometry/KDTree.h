@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "myassert.h"
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Container/MaxHeap.h"

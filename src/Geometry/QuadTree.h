@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "Time/Profiler.h"
+#else
+#define PROFILE(x)
+#endif
 #include "Math/float2.h"
 #include "Geometry/AABB2D.h"
 #include "Types.h"
