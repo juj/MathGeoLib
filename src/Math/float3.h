@@ -291,7 +291,7 @@ public:
 			in a negative radius mirrors the coordinate along the origin.
 		@see FromSphericalCoordinates, ToSphericalCoordinates, ToSphericalCoordinatesNormalized. */
 	void SetFromSphericalCoordinates(float azimuth, float inclination, float radius);
-	float3 SetFromSphericalCoordinates(const float3 &spherical) { SetFromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
+	void SetFromSphericalCoordinates(const float3 &spherical) { SetFromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
 	static float3 FromSphericalCoordinates(float azimuth, float inclination, float radius);
 	static float3 FromSphericalCoordinates(const float3 &spherical) { return FromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
 
