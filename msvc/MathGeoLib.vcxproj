@@ -1,13 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug NPAPI|Android">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>Android</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug NPAPI|Clang">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug NPAPI|Emscripten">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>Emscripten</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug NPAPI|MinGW">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>MinGW</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug NPAPI|NaCl">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>NaCl</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug NPAPI|Win32">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug NPAPI|x64">
+      <Configuration>Debug NPAPI</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug Pepper|Android">
       <Configuration>Debug Pepper</Configuration>
       <Platform>Android</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Pepper|Clang">
+      <Configuration>Debug Pepper</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug Pepper|Emscripten">
       <Configuration>Debug Pepper</Configuration>
       <Platform>Emscripten</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Pepper|MinGW">
+      <Configuration>Debug Pepper</Configuration>
+      <Platform>MinGW</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug Pepper|NaCl">
       <Configuration>Debug Pepper</Configuration>
@@ -29,9 +65,17 @@
       <Configuration>Debug</Configuration>
       <Platform>Android</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Clang">
+      <Configuration>Debug</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Emscripten">
       <Configuration>Debug</Configuration>
       <Platform>Emscripten</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|MinGW">
+      <Configuration>Debug</Configuration>
+      <Platform>MinGW</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|NaCl">
       <Configuration>Debug</Configuration>
@@ -53,6 +97,14 @@
       <Configuration>Emcc_Debug</Configuration>
       <Platform>Android</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Emcc_Debug|Clang">
+      <Configuration>Emcc_Debug</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Emcc_Debug|MinGW">
+      <Configuration>Emcc_Debug</Configuration>
+      <Platform>MinGW</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Emcc_Debug|NaCl">
       <Configuration>Emcc_Debug</Configuration>
       <Platform>NaCl</Platform>
@@ -73,9 +125,17 @@
       <Configuration>Optimized Release</Configuration>
       <Platform>Android</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Release|Clang">
+      <Configuration>Optimized Release</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Optimized Release|Emscripten">
       <Configuration>Optimized Release</Configuration>
       <Platform>Emscripten</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Optimized Release|MinGW">
+      <Configuration>Optimized Release</Configuration>
+      <Platform>MinGW</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Optimized Release|NaCl">
       <Configuration>Optimized Release</Configuration>
@@ -97,9 +157,17 @@
       <Configuration>Release</Configuration>
       <Platform>Android</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Clang">
+      <Configuration>Release</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Emscripten">
       <Configuration>Release</Configuration>
       <Platform>Emscripten</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|MinGW">
+      <Configuration>Release</Configuration>
+      <Platform>MinGW</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|NaCl">
       <Configuration>Release</Configuration>
@@ -153,35 +221,6 @@
     <ClCompile Include="..\src\Math\Polynomial.cpp" />
     <ClCompile Include="..\src\Math\Quat.cpp" />
     <ClCompile Include="..\src\Math\TransformOps.cpp" />
-    <ClCompile Include="..\src\Time\UnixClock.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Emcc_Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Emcc_Debug|vs-tool'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Emcc_Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Emcc_Debug|NaCl'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Android'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Android'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Emcc_Debug|Android'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|vs-tool'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|NaCl'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Release|vs-tool'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Release|NaCl'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Android'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Release|Android'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\Time\W32Clock.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|vs-tool'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|vs-tool'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|NaCl'">true</ExcludedFromBuild>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Algorithm\Random\LCG.h" />
@@ -190,6 +229,8 @@
     <ClInclude Include="..\src\Geometry\Capsule.h" />
     <ClInclude Include="..\src\Geometry\Circle.h" />
     <ClInclude Include="..\src\Geometry\Frustum.h" />
+    <ClInclude Include="..\src\Geometry\GeometryAll.h" />
+    <ClInclude Include="..\src\Geometry\GeomType.h" />
     <ClInclude Include="..\src\Geometry\HitInfo.h" />
     <ClInclude Include="..\src\Geometry\KDTree.h" />
     <ClInclude Include="..\src\Geometry\KDTree_tris.h" />
@@ -216,6 +257,7 @@
     <ClInclude Include="..\src\Math\float4.h" />
     <ClInclude Include="..\src\Math\float4x4.h" />
     <ClInclude Include="..\src\Math\FloatCmp.h" />
+    <ClInclude Include="..\src\Math\MathAll.h" />
     <ClInclude Include="..\src\Math\MathBuildConfig.h" />
     <ClInclude Include="..\src\Math\MathConstants.h" />
     <ClInclude Include="..\src\Math\MathFunc.h" />
@@ -251,6 +293,11 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -262,6 +309,12 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|vs-tool'" Label="Configuration">
+    <ConfigurationType>StaticLibraryA</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>nacl</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|vs-tool'" Label="Configuration">
     <ConfigurationType>StaticLibraryA</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
@@ -284,12 +337,23 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl'" Label="Configuration">
+    <ConfigurationType>StaticLibraryA</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <NaClArch>x86_64</NaClArch>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|NaCl'" Label="Configuration">
     <ConfigurationType>StaticLibraryA</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
@@ -316,7 +380,13 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <AndroidArch>armv5te</AndroidArch>
+    <AndroidArch>armv7-a</AndroidArch>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Android'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <AndroidArch>armv7-a</AndroidArch>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Android'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -394,8 +464,10 @@
     <AndroidArch>armv7-a</AndroidArch>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
-    <ConfigurationType>StaticLibraryBc</ConfigurationType>
-    <PlatformToolset>emcc</PlatformToolset>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Emscripten'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Emscripten'" Label="Configuration">
     <ConfigurationType>StaticLibraryBc</ConfigurationType>
@@ -416,6 +488,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -423,6 +498,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|vs-tool'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|vs-tool'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|vs-tool'" Label="PropertySheets">
@@ -434,10 +512,16 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|NaCl'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|NaCl'" Label="PropertySheets">
@@ -450,6 +534,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Android'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Android'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Android'" Label="PropertySheets">
@@ -494,6 +581,11 @@
     <IntDir>vs_tool\$(Configuration)\</IntDir>
     <NaclPath>C:\nacl_sdk\pepper_18\toolchain\win_x86_newlib\bin</NaclPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|vs-tool'">
+    <OutDir>$(SolutionDir)vs_tool\$(Configuration)\</OutDir>
+    <IntDir>vs_tool\$(Configuration)\</IntDir>
+    <NaclPath>C:\nacl_sdk\pepper_18\toolchain\win_x86_newlib\bin</NaclPath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|vs-tool'">
     <OutDir>$(SolutionDir)vs_tool\$(Configuration)\</OutDir>
     <IntDir>vs_tool\$(Configuration)\</IntDir>
@@ -517,6 +609,19 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;ENABLE_TOUCH_INPUT;_WINSOCKAPI_;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NPAPI;_CRT_SECURE_NO_WARNINGS;ENABLE_TOUCH_INPUT;_WINSOCKAPI_;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
@@ -551,6 +656,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|vs-tool'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EchoCommandLines>true</EchoCommandLines>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|vs-tool'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -607,6 +726,19 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>PERFORMANCEPROFILING;MATH_TINYXML_INTEROP;_CRT_SECURE_NO_WARNINGS;MATH_ENABLE_STL_SUPPORT;WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -630,6 +762,27 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <TargetArchitecture>x64</TargetArchitecture>
       <AdditionalOptions>-m64 %(AdditionalOptions)</AdditionalOptions>
+      <GenerateDependencyFile>false</GenerateDependencyFile>
+      <DependencyFileName>
+      </DependencyFileName>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|NaCl'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../GraphicsEngine/src;$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>PEPPER;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <TargetArchitecture>x64</TargetArchitecture>
+      <AdditionalOptions>-m64 %(AdditionalOptions)</AdditionalOptions>
+      <GenerateDependencyFile>false</GenerateDependencyFile>
+      <DependencyFileName>
+      </DependencyFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -676,6 +829,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Android'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <OmitFramePointer>false</OmitFramePointer>
+      <UnswitchLoops>false</UnswitchLoops>
+      <AdditionalOptions>-Wall</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Android'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -917,7 +1084,14 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
-      <AdditionalOptions>-MD -MF "Emscripten\Debug\%(FileName).d" %(AdditionalOptions)</AdditionalOptions>
+      <EchoCommandLines>false</EchoCommandLines>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|Emscripten'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
+      <EchoCommandLines>true</EchoCommandLines>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Pepper|Emscripten'">
@@ -941,6 +1115,18 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)../src;$(ProjectDir)../../CodeLib/src;$(ProjectDir)../../GraphicsEngine/src</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|MinGW'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)../CodeLib/src;$(SolutionDir)../GraphicsEngine/src;$(SolutionDir)../MathGeoLib/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug NPAPI|MinGW'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)../CodeLib/src;$(SolutionDir)../GraphicsEngine/src;$(SolutionDir)../MathGeoLib/src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
