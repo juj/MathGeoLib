@@ -106,9 +106,9 @@ float3x4 Frustum::WorldMatrix() const
 	assume(up.IsNormalized());
 	assume(front.IsNormalized());
 	float3x4 m;
-	m.SetCol(0, up.Cross(front).Normalized());
+	m.SetCol(0, front.Cross(up).Normalized());
 	m.SetCol(1, up);
-	m.SetCol(2, front);
+	m.SetCol(2, -front);
 	m.SetCol(3, pos);
 	assume(!m.HasNegativeScale());
 	return m;
@@ -131,7 +131,11 @@ float4x4 Frustum::ProjectionMatrix() const
 	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
 	if (type == PerspectiveFrustum)
 	{
+#if USE_D3D11
 		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov);
+#else
+		return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov);
+#endif
 	}
 	else
 	{
