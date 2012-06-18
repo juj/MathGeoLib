@@ -270,6 +270,7 @@ public:
 	/// Creates a new float4x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
 	static float4x4 D3DOrthoProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 	static float4x4 D3DPerspProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+	static float4x4 OpenGLPerspProjRH(float n, float f, float h, float v);
 	static float4x4 OrthographicProjection(const Plane &target);
 	static float4x4 OrthographicProjectionYZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]
 	static float4x4 OrthographicProjectionXZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]
@@ -809,7 +810,7 @@ public:
 #endif
 
 	/// Extracts the rotation part of this matrix into Euler rotation angles (in radians). [indexTitle: ToEuler***]
-	/// @note It is better to thinkg about the returned float3 as an array of three floats, and
+	/// @note It is better to think about the returned float3 as an array of three floats, and
 	/// not as a triple of xyz, because e.g. the .y component returned by ToEulerYXZ() does
 	/// not return the amount of rotation about the y axis, but contains the amount of rotation
 	/// in the second axis, in this case the x axis.

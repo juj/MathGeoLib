@@ -460,8 +460,19 @@ float4x4 float4x4::D3DPerspProjRH(float n, float f, float h, float v)
 	float4x4 p;
 	p[0][0] = 2.f * n / h; p[0][1] = 0;           p[0][2] = 0;           p[0][3] = 0.f;
 	p[1][0] = 0;           p[1][1] = 2.f * n / v; p[1][2] = 0;           p[1][3] = 0.f;
-	p[2][0] = 0;           p[2][1] = 0;           p[2][2] = f / (f-n);   p[2][3] = n * f / (f-n);
-	p[3][0] = 0;           p[3][1] = 0;           p[3][2] = 1.f;         p[3][3] = 1.f;
+	p[2][0] = 0;           p[2][1] = 0;           p[2][2] = f / (n-f);   p[2][3] = n * f / (n-f);
+	p[3][0] = 0;           p[3][1] = 0;           p[3][2] = -1.f;        p[3][3] = 0.f;
+
+	return p;
+}
+
+float4x4 float4x4::OpenGLPerspProjRH(float n, float f, float h, float v)
+{
+	float4x4 p;
+	p[0][0] = 2.f *n / h;  p[0][1] = 0;           p[0][2] = 0;              p[0][3] = 0.f;
+	p[1][0] = 0;           p[1][1] = 2.f * n / v; p[1][2] = 0;              p[1][3] = 0.f;
+	p[2][0] = 0;           p[2][1] = 0;           p[2][2] = (n+f) / (n-f);  p[2][3] = 2.f*n*f / (n-f);
+	p[3][0] = 0;           p[3][1] = 0;           p[3][2] = -1.f;           p[3][3] = 1.f;
 
 	return p;
 }
