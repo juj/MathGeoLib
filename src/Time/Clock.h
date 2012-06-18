@@ -89,9 +89,6 @@ public:
 	static inline float SecondsSinceF(tick_t oldTick) { return TimespanToSecondsF(oldTick, Tick()); }
 	static inline double SecondsSinceD(tick_t oldTick) { return TimespanToSecondsD(oldTick, Tick()); }
 
-	static inline float TicksToMicrosecondsF(tick_t ticks) { return ticks * 1000000.f / TicksPerSec(); }
-	static inline double TicksToMicrosecondsD(tick_t ticks) { return ticks * 1000000.0 / TicksPerSec(); }
-
 	static inline float TicksToMillisecondsF(tick_t ticks) { return ticks * 1000.f / TicksPerSec(); }
 	static inline double TicksToMillisecondsD(tick_t ticks) { return ticks * 1000.0 / TicksPerSec(); }
 
