@@ -221,6 +221,7 @@
     <ClCompile Include="..\src\Math\Polynomial.cpp" />
     <ClCompile Include="..\src\Math\Quat.cpp" />
     <ClCompile Include="..\src\Math\TransformOps.cpp" />
+    <ClCompile Include="..\src\Time\Clock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Algorithm\Random\LCG.h" />
