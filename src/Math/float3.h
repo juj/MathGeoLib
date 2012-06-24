@@ -389,6 +389,10 @@ public:
 	/** @see IsNormalized(), IsZero(), IsPerpendicular(), Equals(). */
 	bool IsPerpendicular(const float3 &other, float epsilon = 1e-3f) const;
 
+	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
+	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
+	static bool AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon = 1e-4f);
+
 	/// Tests if two vectors are equal, up to the given epsilon.
 	/** @see IsPerpendicular(). */
 	bool Equals(const float3 &other, float epsilon = 1e-3f) const;
@@ -590,7 +594,7 @@ public:
 	static void Orthogonalize(const float3 &a, float3 &b, float3 &c);
 
 	/// Returns true if the given vectors are orthogonal to each other.
-	/** @see Orthogonalize(), Orthonormalize(), AreOrthonormal(). */
+	/** @see Orthogonalize(), Orthonormalize(), AreOrthonormal(), AreCollinear(). */
 	static bool AreOrthogonal(const float3 &a, const float3 &b, float epsilon = 1e-3f);
 	static bool AreOrthogonal(const float3 &a, const float3 &b, const float3 &c, float epsilon = 1e-3f);
 
@@ -604,7 +608,7 @@ public:
 	static void Orthonormalize(float3 &a, float3 &b, float3 &c);
 
 	/// Returns true if the given vectors are orthogonal to each other and all of length 1.
-	/** @see Orthogonalize(), AreOrthogonal(), Orthonormalize(). */
+	/** @see Orthogonalize(), AreOrthogonal(), Orthonormalize(), AreCollinear(). */
 	static bool AreOrthonormal(const float3 &a, const float3 &b, float epsilon = 1e-3f);
 	static bool AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, float epsilon = 1e-3f);
 

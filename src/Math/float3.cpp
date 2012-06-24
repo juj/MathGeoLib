@@ -205,6 +205,11 @@ bool float3::IsPerpendicular(const float3 &other, float epsilon) const
 	return fabs(Dot(other)) <= epsilon;
 }
 
+bool float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
+{
+	return (p2-p1).Cross(p3-p1).LengthSq() <= epsilon;
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float3::ToString() const
 { 

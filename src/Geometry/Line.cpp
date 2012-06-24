@@ -294,8 +294,7 @@ float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, fl
 
 bool Line::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
 {
-	///@todo Improve this check to be distance length -invariant.
-	return Abs((p2-p1).Dot(p3-p1)) <= epsilon;
+	return float3::AreCollinear(p1, p2, p3, epsilon);
 }
 
 Ray Line::ToRay() const
