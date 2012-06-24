@@ -858,7 +858,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, float &s, float 
 
 	float denom = BB*CC - BC*BC;
 
-	if (EqualAbs(denom, 0.f))
+	if (EqualAbs(denom, 0.f, 5e-3f))
 		return false;
 
 	denom = 0.5f / denom; // == 1 / (2 * B^2 * C^2 - (BC)^2)
@@ -965,29 +965,32 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	float3 ac = c-a;
 
 	float s, t;
-	bool success = FitSphereThroughPoints(ab, ac, s, t);
-	if (!success)
+	bool areCollinear = ab.Cross(ac).LengthSq() < 1e-4f; // Manually test that we don't try to fit sphere to three collinear points.
+	bool success = !areCollinear && FitSphereThroughPoints(ab, ac, s, t);
+	if (!success || Abs(s) > 10000.f || Abs(t) > 10000.f) // If s and t are very far from the triangle, do a manual box fitting for numerical stability.
 	{
 		float3 minPt = Min(a, b, c);
 		float3 maxPt = Max(a, b, c);
 		sphere.pos = (minPt + maxPt) * 0.5f;
 		sphere.r = sphere.pos.Distance(minPt);
 	}
-
-	if (s < 0.f)
+	else if (s < 0.f)
 	{
 		sphere.pos = (a + c) * 0.5f;
 		sphere.r = a.Distance(c) * 0.5f;
+		sphere.r = Max(sphere.r, b.Distance(sphere.pos)); // For numerical stability, expand the radius of the sphere so it certainly contains the third point.
 	}
 	else if (t < 0.f)
 	{
 		sphere.pos = (a + b) * 0.5f;
 		sphere.r = a.Distance(b) * 0.5f;
+		sphere.r = Max(sphere.r, c.Distance(sphere.pos)); // For numerical stability, expand the radius of the sphere so it certainly contains the third point.
 	}
 	else if (s+t > 1.f)
 	{
 		sphere.pos = (b + c) * 0.5f;
 		sphere.r = b.Distance(c) * 0.5f;
+		sphere.r = Max(sphere.r, a.Distance(sphere.pos)); // For numerical stability, expand the radius of the sphere so it certainly contains the third point.
 	}
 	else
 	{
@@ -1004,11 +1007,18 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 
 	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 	// really contain the points (note that the points must be sufficiently near enough to the origin)
-	sphere.r += epsilon;
+	sphere.r += 2.f * epsilon; // We test against one epsilon, so expand by two epsilons.
 
-	mathassert(sphere.Contains(a));
-	mathassert(sphere.Contains(b));
-	mathassert(sphere.Contains(c));
+#ifdef MATH_ASSERT_CORRECTNESS
+	if (!sphere.Contains(a, epsilon) || !sphere.Contains(b, epsilon) || !sphere.Contains(c, epsilon))
+	{
+		LOGE("Pos: %s, r: %f", sphere.pos.ToString().c_str(), sphere.r);
+		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(sphere.pos));
+		LOGE("B: %s, dist: %f", b.ToString().c_str(), b.Distance(sphere.pos));
+		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(sphere.pos));
+		mathassert(false);
+	}
+#endif
 	return sphere;
 }
 
@@ -1025,16 +1035,17 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 	if (!success || s < 0.f || t < 0.f || u < 0.f || s+t+u > 1.f)
 	{
 		sphere = OptimalEnclosingSphere(a,b,c);
-		if (!sphere.Contains(d, epsilon))
+		if (!sphere.Contains(d))
 		{
 			sphere = OptimalEnclosingSphere(a,b,d);
-			if (!sphere.Contains(c, epsilon))
+			if (!sphere.Contains(c))
 			{
 				sphere = OptimalEnclosingSphere(a,c,d);
-				if (!sphere.Contains(b, epsilon))
+				if (!sphere.Contains(b))
 				{
 					sphere = OptimalEnclosingSphere(b,c,d);
-					assume(sphere.Contains(a, epsilon));
+					sphere.r = Max(sphere.r, a.Distance(sphere.pos)); // For numerical stability, expand the radius of the sphere so it certainly contains the fourth point.
+					assume(sphere.Contains(a));
 				}
 			}
 		}
@@ -1060,16 +1071,23 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 		// For robustness, take the radius to be the distance to the farthest point (though the distance are all
 		// equal).
 		sphere.r = Sqrt(Max(sphere.pos.DistanceSq(a), sphere.pos.DistanceSq(b), sphere.pos.DistanceSq(c), sphere.pos.DistanceSq(d)));
+	}
 
 		// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 		// really contain the points (note that the points must be sufficiently near enough to the origin)
-		sphere.r += epsilon;
-	}
+		sphere.r += 2.f*epsilon; // We test against one epsilon, so expand using 2 epsilons.
 
-	mathassert(sphere.Contains(a));
-	mathassert(sphere.Contains(b));
-	mathassert(sphere.Contains(c));
-	mathassert(sphere.Contains(d));
+#ifdef MATH_ASSERT_CORRECTNESS
+	if (!sphere.Contains(a, epsilon) || !sphere.Contains(b, epsilon) || !sphere.Contains(c, epsilon) || !sphere.Contains(d, epsilon))
+	{
+		LOGE("Pos: %s, r: %f", sphere.pos.ToString().c_str(), sphere.r);
+		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(sphere.pos));
+		LOGE("B: %s, dist: %f", b.ToString().c_str(), b.Distance(sphere.pos));
+		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(sphere.pos));
+		LOGE("D: %s, dist: %f", d.ToString().c_str(), d.Distance(sphere.pos));
+		mathassert(false);
+	}
+#endif
 
 	return sphere;
 }
