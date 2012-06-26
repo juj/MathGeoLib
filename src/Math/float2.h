@@ -536,11 +536,15 @@ public:
 	static int ConvexHullInPlace(float2 *pointArray, int numPoints);
 #endif
 
-    /// Computes the minimum-area rectangle that bounds the given point set. [noscript]
+	/// Computes the minimum-area rectangle that bounds the given point set. [noscript]
 	/** @param center [out] This variable will receive the center point of the rectangle.
-		@param uDir [out] This variable will receive a normalized direction vector pointing one of the sides of the rectangle.
-		@param VDir [out] This variable will receive a normalized direction vector pointing the other side of the rectangle. */
-	static float MinAreaRect(const float2 *pointArray, int numPoints, float2 &center, float2 &uDir, float2 &vDir);
+		@param uDir [out] This variable will receive a normalized direction vector pointing one of the side directionss of the rectangle.
+		@param VDir [out] This variable will receive a normalized direction vector pointing the other side direction of the rectangle.
+		@note This algorithm runs in O(n^2) time to the number of points in the input.
+		@note For best performance, the input point array should contain only the points in the convex hull of the point set. This algorithm
+			does not compute the convex hull for you.
+		@return The area of the resulting rectangle. */
+	static float MinAreaRect(const float2 *pointArray, int numPoints, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV);
 
 	/// Generates a direction vector of the given length pointing at a uniformly random direction.
 	static float2 RandomDir(LCG &lcg, float length = 1.f);
