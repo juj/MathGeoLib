@@ -37,6 +37,7 @@
 #include "Math/Quat.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Triangle.h"
+#include "Algorithm/Sort/Sort.h"
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
@@ -406,7 +407,7 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 	}
 	if (idxSmallest)
 		*idxSmallest = smallest;
-	else //if (idxLargest)
+	if (idxLargest)
 		*idxLargest = largest;
 }
 
@@ -414,6 +415,96 @@ OBB OBB::PCAEnclosingOBB(const float3 *pointArray, int numPoints)
 {
 	assume(false && "Not implemented!"); /// @todo Implement.
 	return OBB();
+}
+
+int LexFloat3Cmp(const float3 &a, const float3 &b)
+{
+	LEXCMP(a.x, b.x);
+	LEXCMP(a.y, b.y);
+	LEXCMP(a.z, b.z);
+	return 0;
+}
+
+OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
+{
+	OBB minOBB;
+	float minVolume = FLOAT_INF;
+
+	std::vector<float2> pts;
+	pts.resize(numPoints);
+	///\todo Convex hull'ize.
+
+	std::vector<float3> dirs;
+	dirs.reserve((numPoints * numPoints-1) / 2);
+	for(int i = 0; i < numPoints; ++i)
+		for(int j = i+1; j < numPoints; ++j)
+		{
+			float3 edge = pointArray[i]-pointArray[j];
+			float oldLength = edge.Normalize();
+			if (edge.z < 0.f)
+				edge = -edge;
+			if (oldLength > 0.f)
+				dirs.push_back(edge);
+		}
+
+	LOGI("Got %d directions.", dirs.size());
+	sort::QuickSort(&dirs[0], dirs.size(), LexFloat3Cmp);
+	for(int i = dirs.size()-1; i >= 0; --i)
+		for(int j = i-1; j >= 0; --j)
+		{
+			float distX = dirs[i].x - dirs[j].x;
+			if (distX > 1e-1f)
+				break;
+			if (dirs[i].DistanceSq(dirs[j]) < 1e-3f)
+			{
+				dirs.erase(dirs.begin() + j);
+				--i;
+			}
+		}
+	LOGI("Pruned to %d directions.", dirs.size());
+
+	int incr = 1;//Max(1, numPoints / 10);
+//	for(int i = 0; i < numPoints; ++i)
+	{
+		//for(int j = i+1; j < numPoints; ++j)
+		for(size_t i = 0; i < dirs.size(); ++i)
+		{
+			float3 edge = dirs[i];//(pointArray[i]-pointArray[j]).Normalized();
+
+			int e1, e2;
+			ExtremePointsAlongDirection(edge, pointArray, numPoints, &e1, &e2);
+			float edgeLength = Abs(Dot(pointArray[e1], edge) - Dot(pointArray[e2], edge));
+
+			float3 u = edge.Perpendicular();
+			float3 v = edge.AnotherPerpendicular();
+			for(int k = 0; k < numPoints; ++k)
+				pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
+
+			float2 rectCenter;
+			float2 rectU;
+			float2 rectV;
+			float minU, maxU, minV, maxV;
+			float rectArea = float2::MinAreaRect(&pts[0], pts.size(), rectCenter, rectU, rectV, minU, maxU, minV, maxV);
+			float3 rectCenterPos = u * rectCenter.x + v * rectCenter.y;
+			
+			float volume = rectArea * edgeLength;
+			if (volume < minVolume)
+			{
+				minOBB.axis[0] = edge;
+				minOBB.axis[1] = rectU.x * u + rectU.y * v;
+				minOBB.axis[2] = rectV.x * u + rectV.y * v;
+				minOBB.pos = (Dot(pointArray[e1], edge) + Dot(pointArray[e2], edge)) * 0.5f * edge + rectCenterPos;
+				minOBB.r[0] = edgeLength * 0.5f;
+				minOBB.r[1] = (maxU - minU) * 0.5f;
+				minOBB.r[2] = (maxV - minV) * 0.5f;
+				minVolume = volume;
+			}
+			if (i % 100 == 0)
+				LOGI("%d/%d.", i, dirs.size());
+		}
+	}
+
+	return minOBB;
 }
 
 float3 OBB::Size() const

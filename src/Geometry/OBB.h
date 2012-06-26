@@ -283,6 +283,9 @@ public:
 		@see SetFromApproximate(). */
 	static OBB PCAEnclosingOBB(const float3 *pointArray, int numPoints);
 
+	///\todo This function is strongly WIP! (Works, but is very very slow!)
+	static OBB OptimalEnclosingOBB(const float3 *pointArray, int numPoints);
+
 	/// Generates a random point inside this OBB.
 	/** The points are distributed uniformly.
 		@see class LCG, PointInside(), RandomPointOnSurface(), RandomPointOnEdge(), RandomCornerPoint(). */

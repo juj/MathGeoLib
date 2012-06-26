@@ -17,9 +17,13 @@
 	@brief Implementation for the Polyhedron geometry object. */
 #include "Geometry/Polyhedron.h"
 #include <set>
+#include <map>
 #include <utility>
+#include <list>
+#include <sstream>
 #include "assume.h"
 #include "Math/MathFunc.h"
+#include "Math/float3x4.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Frustum.h"
@@ -32,7 +36,25 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/Capsule.h"
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+#include "VertexBuffer.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
+
+void Polyhedron::Face::FlipWindingOrder()
+{
+	for(size_t i = 0; i < v.size()/2; ++i)
+		Swap(v[i], v[v.size()-1-i]);
+}
+
+std::string Polyhedron::Face::ToString() const
+{
+	std::stringstream ss;
+	for(size_t i = 0; i < v.size(); ++i)
+		ss << v[i] << ((i!=v.size()-1) ? ", " : "");
+	return ss.str();
+}
 
 int Polyhedron::NumEdges() const
 {
@@ -114,7 +136,28 @@ Polygon Polyhedron::FacePolygon(int faceIndex) const
 
 Plane Polyhedron::FacePlane(int faceIndex) const
 {
-	return FacePolygon(faceIndex).PlaneCCW();
+	const Face &face = f[faceIndex];
+	if (face.v.size() >= 3)
+		return Plane(v[face.v[0]], v[face.v[1]], v[face.v[2]]);
+	else if (face.v.size() == 2)
+		return Plane(Line(v[face.v[0]], v[face.v[1]]), (v[face.v[0]]-v[face.v[1]]).Perpendicular());
+	else if (face.v.size() == 1)
+		return Plane(v[face.v[0]], float3(0,1,0));
+	else
+		return Plane();
+}
+
+float3 Polyhedron::FaceNormal(int faceIndex) const
+{
+	const Face &face = f[faceIndex];
+	if (face.v.size() >= 3)
+		return (v[face.v[1]]-v[face.v[0]]).Cross(v[face.v[2]]-v[face.v[0]]).Normalized();
+	else if (face.v.size() == 2)
+		return (v[face.v[1]]-v[face.v[0]]).Cross((v[face.v[0]]-v[face.v[1]]).Perpendicular()-v[face.v[0]]).Normalized();
+	else if (face.v.size() == 1)
+		return float3(0,1,0);
+	else
+		return float3::nan;
 }
 
 int Polyhedron::ExtremeVertex(const float3 &direction) const
@@ -175,6 +218,11 @@ AABB Polyhedron::MinimalEnclosingAABB() const
 	return aabb;
 }
 
+OBB Polyhedron::MinimalEnclosingOBB() const
+{
+	return OBB::OptimalEnclosingOBB(&v[0], v.size());
+}
+
 bool Polyhedron::FaceIndicesValid() const
 {
 	// Test condition 1: Face indices in proper range.
@@ -210,7 +258,10 @@ bool Polyhedron::IsClosed() const
 		{
 			int y = f[i].v[j];
 			if (uniqueEdges.find(std::make_pair(x, y)) != uniqueEdges.end())
+			{
+				LOGW("The edge (%d,%d) is used twice. Polyhedron is not simple and closed!", x, y);
 				return false; // This edge is being used twice! Cannot be simple and closed.
+			}
 			uniqueEdges.insert(std::make_pair(x, y));
 			x = y;
 		}
@@ -221,7 +272,10 @@ bool Polyhedron::IsClosed() const
 	{
 		std::pair<int, int> reverse = std::make_pair(iter->second, iter->first);
 		if (uniqueEdges.find(reverse) == uniqueEdges.end())
+		{
+			LOGW("The edge (%d,%d) does not exist. Polyhedron is not closed!", iter->second, iter->first);
 			return false;
+		}
 	}
 
 	return true;
@@ -242,8 +296,14 @@ bool Polyhedron::IsConvex() const
 	{
 		Plane p = FacePlane(f);
 		for(int i = 0; i < NumVertices(); ++i)
-			if (p.SignedDistance(Vertex(i)) > 1e-3f) // Tolerate a small epsilon error.
+		{
+			float d = p.SignedDistance(Vertex(i));
+			if (d > 1e-3f) // Tolerate a small epsilon error.
+			{
+				LOGW("Distance of vertex %d from plane %d: %f", i, f, d);
 				return false;
+			}
+		}
 	}
 	return true;
 }
@@ -251,6 +311,25 @@ bool Polyhedron::IsConvex() const
 bool Polyhedron::EulerFormulaHolds() const
 {
 	return NumVertices() + NumFaces() - NumEdges() == 2;
+}
+
+bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
+{
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		const Face &face = f[i];
+		if (face.v.size() < 3)
+			return false;
+		if (face.v.size() >= 4)
+		{
+			Plane facePlane = FacePlane(i);
+			for(size_t j = 0; j < face.v.size(); ++j)
+				if (facePlane.Distance(v[face.v[j]]) > 1e-2f)
+					return false;
+		}
+	}
+
+	return true;
 }
 
 bool Polyhedron::Contains(const float3 &point) const
@@ -572,4 +651,376 @@ bool Polyhedron::IntersectsConvex(const LineSegment &lineSegment) const
 	return ClipLineSegmentToConvexPolyhedron(lineSegment.a, lineSegment.b - lineSegment.a, tFirst, tLast);
 }
 
+void Polyhedron::MergeConvex(const float3 &point)
+{
+//	LOGI("mergeconvex.");
+	std::set<std::pair<int, int> > deletedEdges;
+	std::map<std::pair<int, int>, int> remainingEdges;
+
+	for(size_t i = 0; i < v.size(); ++i)
+//	for(size_t i = 0; i < v.size(); ++i)
+		if (point.DistanceSq(v[i]) < 1e-3f)
+			return;
+
+	bool hadDisconnectedHorizon = false;
+
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		// Delete all faces that don't contain the given point. (they have point in their positive side)
+		Plane p = FacePlane(i);
+		Face &face = f[i];
+		if (p.SignedDistance(point) > 1e-5f)
+		{
+			bool isConnected = (deletedEdges.size() == 0);
+
+			int v0 = face.v.back();
+			for(size_t j = 0; j < face.v.size() && !isConnected; ++j)
+			{
+				int v1 = face.v[j];
+				if (deletedEdges.find(std::make_pair(v1, v0)) != deletedEdges.end())
+				{
+					isConnected = true;
+					break;
+				}
+				v0 = v1;
+			}
+
+			if (isConnected)
+			{
+				v0 = face.v.back();
+				for(size_t j = 0; j < face.v.size(); ++j)
+				{
+					int v1 = face.v[j];
+					deletedEdges.insert(std::make_pair(v0, v1));
+			//		LOGI("Edge %d,%d is to be deleted.", v0, v1);
+					v0 = v1;
+				}
+		//		LOGI("Deleting face %d: %s. Distance to vertex %f", i, face.ToString().c_str(), p.SignedDistance(point));
+				std::swap(f[i], f.back());
+				f.pop_back();
+				--i;
+				continue;
+			}
+			else
+				hadDisconnectedHorizon = true;
+		}
+
+		int v0 = face.v.back();
+		for(size_t j = 0; j < face.v.size(); ++j)
+		{
+			int v1 = face.v[j];
+			remainingEdges[std::make_pair(v0, v1)] = i;
+	//		LOGI("Edge %d,%d is to be deleted.", v0, v1);
+			v0 = v1;
+		}
+
+	}
+
+	// The polyhedron contained our point, nothing to merge.
+	if (deletedEdges.size() == 0)
+		return;
+
+	// Add the new point to this polyhedron.
+//	if (!v.back().Equals(point))
+		v.push_back(point);
+
+/*
+	// Create a look-up index of all remaining uncapped edges of the polyhedron.
+	std::map<std::pair<int,int>, int> edgesToFaces;
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		Face &face = f[i];
+		int v0 = face.v.back();
+		for(size_t j = 0; j < face.v.size(); ++j)
+		{
+			int v1 = face.v[j];
+			edgesToFaces[std::make_pair(v1, v0)] = i;
+			v0 = v1;
+		}
+	}
+*/
+	// Now fix all edges by adding new triangular faces for the point.
+//	for(size_t i = 0; i < deletedEdges.size(); ++i)
+	for(std::set<std::pair<int, int> >::iterator iter = deletedEdges.begin(); iter != deletedEdges.end(); ++iter)
+	{
+		std::pair<int, int> opposite = std::make_pair(iter->second, iter->first);
+		if (deletedEdges.find(opposite) != deletedEdges.end())
+			continue;
+
+//		std::map<std::pair<int,int>, int>::iterator iter = edgesToFaces.find(deletedEdges[i]);
+//		std::map<std::pair<int,int>, int>::iterator iter = edgesToFaces.find(deletedEdges[i]);
+//		if (iter != edgesToFaces.end())
+		{ 
+			// If the adjoining face is planar to the triangle we'd like to add, instead extend the face to enclose
+			// this vertex.
+			float3 newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
+
+			std::map<std::pair<int, int>, int>::iterator existing = remainingEdges.find(opposite);
+			assert(existing != remainingEdges.end());
+
+			int adjoiningFace = existing->second;
+
+#if 0			
+			if (FaceNormal(adjoiningFace).Dot(newTriangleNormal) >= 0.99999f) ///\todo float3::IsCollinear
+			{
+				bool added = false;
+				Face &adjoining = f[adjoiningFace];
+				for(size_t i = 0; i < adjoining.v.size(); ++i)
+					if (adjoining.v[i] == iter->second)
+					{
+						adjoining.v.insert(adjoining.v.begin() + i + 1, v.size()-1);
+						added = true;
+						/*
+						int prev2 = (i + adjoining.v.size() - 1) % adjoining.v.size();
+						int prev = i;
+						int cur = i + 1;
+						int next = (i + 2) % adjoining.v.size();
+						int next2 = (i + 3) % adjoining.v.size();
+
+						if (float3::AreCollinear(v[prev2], v[prev], v[cur]))
+							adjoining.v.erase(adjoining.v.begin() + prev);
+						else if (float3::AreCollinear(v[prev], v[cur], v[next]))
+							adjoining.v.erase(adjoining.v.begin() + cur);
+						else if (float3::AreCollinear(v[cur], v[next], v[next2]))
+							adjoining.v.erase(adjoining.v.begin() + next2);
+							*/
+
+						break;
+					}
+				assert(added);
+				assume(added);
+			}
+			else
+#endif
+//			if (!v[deletedEdges[i].first].Equals(point) && !v[deletedEdges[i].second].Equals(point))
+			{
+				Face tri;
+				tri.v.push_back(iter->second);
+				tri.v.push_back(v.size()-1);
+				tri.v.push_back(iter->first);
+				f.push_back(tri);
+	//			LOGI("Added face %d: %s.", (int)f.size()-1, tri.ToString().c_str());
+			}
+		}
+	}
+
+#define mathasserteq(lhs, op, rhs) do { if (!((lhs) op (rhs))) { LOGE("Condition %s %s %s (%g %s %g) failed!", #lhs, #op, #rhs, (double)(lhs), #op, (double)(rhs)); assert(false); } } while(0)
+
+//	mathasserteq(NumVertices() + NumFaces(), ==, 2 + NumEdges());
+	assert(FaceIndicesValid());
+//	assert(EulerFormulaHolds());
+//	assert(IsClosed());
+//	assert(FacesAreNondegeneratePlanar());
+//	assert(IsConvex());
+
+//	if (hadDisconnectedHorizon)
+//		MergeConvex(point);
+}
+
+void Polyhedron::OrientNormalsOutsideConvex()
+{
+	float3 center = v[0];
+	for(size_t i = 1; i < v.size(); ++i)
+		center += v[i];
+
+	center /= (float)v.size();
+	for(size_t i = 0; i < f.size(); ++i)
+		if (FacePlane(i).SignedDistance(center) > 0.f)
+			f[i].FlipWindingOrder();
+}
+
+/// Edge from v1->v2.
+struct AdjEdge
+{
+//	int v1;
+//	int v2;
+	int f1; // The face that has v1->v2.
+	int f2; // The face that has v2->v1.
+};
+
+#include <list>
+
+struct CHullHelp
+{
+	std::map<std::pair<int,int>, AdjEdge> edges;
+	std::list<int> livePlanes;
+};
+
+Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
+{
+	///\todo Check input ptr and size!
+	std::set<int> extremes;
+
+	const float3 dirs[] = 
+	{
+		float3(1,0,0), float3(0,1,0), float3(0,0,1),
+		float3(1,1,0), float3(1,0,1), float3(0,1,1),
+		float3(1,1,1)
+	};
+
+	for(int i = 0; i < sizeof(dirs)/sizeof(dirs[0]); ++i)
+	{
+		int idx1, idx2;
+		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, &idx1, &idx2);
+		extremes.insert(idx1);
+		extremes.insert(idx2);
+	}
+
+	Polyhedron p;
+	assume(extremes.size() >= 4); ///\todo Fix this case!
+	int i = 0;
+	std::set<int>::iterator iter = extremes.begin();
+	for(; iter != extremes.end() && i < 4; ++iter, ++i)
+		p.v.push_back(pointArray[*iter]);
+
+	Face f;
+	f.v.resize(3);
+	f.v[0] = 0; f.v[1] = 1; f.v[2] = 2; p.f.push_back(f);
+	f.v[0] = 0; f.v[1] = 1; f.v[2] = 3; p.f.push_back(f);
+	f.v[0] = 0; f.v[1] = 2; f.v[2] = 3; p.f.push_back(f);
+	f.v[0] = 1; f.v[1] = 2; f.v[2] = 3; p.f.push_back(f);
+	p.OrientNormalsOutsideConvex(); // Ensure that the winding order of the generated tetrahedron is correct for each face.
+
+//	assert(p.IsClosed());
+	//assert(p.IsConvex());
+	assert(p.FaceIndicesValid());
+	assert(p.EulerFormulaHolds());
+//	assert(p.FacesAreNondegeneratePlanar());
+
+	CHullHelp hull;
+	for(size_t i = 0; i < p.f.size(); ++i)
+	{
+		hull.livePlanes.push_back(i);
+
+	}
+
+	// For better performance, merge the remaining extreme points first.
+	for(; iter != extremes.end(); ++iter)
+	{
+		p.MergeConvex(pointArray[*iter]);
+
+		mathassert(p.FaceIndicesValid());
+//		mathassert(p.IsClosed());
+//		mathassert(p.FacesAreNondegeneratePlanar());
+//		mathassert(p.IsConvex());
+	}
+
+	// Merge all the rest of the points.
+	for(int i = 0; i < numPoints; ++i)
+	{
+		if (p.f.size() > 5000 && (i & 255) == 0)
+			LOGI("Mergeconvex %d/%d, #vertices %d, #faces %d", i, numPoints, p.v.size(), p.f.size());
+		p.MergeConvex(pointArray[i]);
+
+		mathassert(p.FaceIndicesValid());
+//		mathassert(p.IsClosed());
+//		mathassert(p.FacesAreNondegeneratePlanar());
+		//mathassert(p.IsConvex());
+
+//		if (p.f.size() > 5000)
+//			break;
+	}
+
+	return p;
+}
+
+int IntTriCmp(int a, int b)
+{
+	return a - b;
+}
+
+/** Does a binary search on the array list that is sorted in ascending order.
+	@param value The element to search for.
+	@return The index where a matching element lies, or -1 if not found. Note that if there are more than
+	        one matching element, the first that is found is returned. */
+template<typename T, typename CmpFunc>
+int ArrayBinarySearch(const T *list, int numItems, const T &value, CmpFunc &cmp)
+{
+	int left = 0;
+	int right = numItems-1;
+	int order = cmp(list[left], value);
+	if (order > 0) return -1;
+	if (order == 0) return left;
+
+	order = cmp(list[right], value);
+	if (order < 0) return -1;
+	if (order == 0) return right;
+
+	int round = 0; // Counter to alternatingly round up or down.
+	do
+	{
+		int middle = (left + right + round) / 2;
+		round = (round+1)&1;
+		order = cmp(list[middle], value);
+		if (order == 0) 
+			return middle;
+		if (order < 0) 
+			left = middle;
+		else right = middle;
+	} while(left < right);
+	return -1;
+}
+
+void Polyhedron::RemoveRedundantVertices()
+{
+	std::set<int> usedVertices;
+
+	// Gather all used vertices.
+	for(size_t i = 0; i < f.size(); ++i)
+		for(size_t j = 0; j < f[i].v.size(); ++j)
+			usedVertices.insert(f[i].v[j]);
+
+	// Turn the used vertices set into a vector for random access.
+	std::vector<int> usedVerticesArray;
+	usedVerticesArray.reserve(usedVertices.size());
+	for(std::set<int>::iterator iter = usedVertices.begin(); iter != usedVertices.end(); ++iter)
+		usedVerticesArray.push_back(*iter);
+
+	// Shift all face indices to point to the new vertex array.
+	for(size_t i = 0; i < f.size(); ++i)
+		for(size_t j = 0; j < f[i].v.size(); ++j)
+		{
+			int oldIndex = f[i].v[j];
+			int newIndex = ArrayBinarySearch(&usedVerticesArray[0], usedVerticesArray.size(), f[i].v[j], IntTriCmp);
+			assert(newIndex != -1);
+			f[i].v[j] = newIndex;
+		}
+
+	// Delete all unused vertices from the vertex array.
+	for(size_t i = 0; i < usedVerticesArray.size(); ++i)
+		v[i] = v[usedVerticesArray[i]];
+	v.resize(usedVerticesArray.size());
+	
+	assert(FaceIndicesValid());
+}
+
+void Polyhedron::MergeAdjacentPlanarFaces()
+{
+
+}
+
+void Polyhedron::Transform(const float3x4 &matrix)
+{
+	if (v.size() > 0)
+		matrix.BatchTransformPos(&v[0], v.size());
+}
+
+void Polyhedron::ToLineList(VertexBuffer &vb)
+{
+	std::vector<LineSegment> edges = Edges();
+
+	int startIndex = vb.AppendVertices(edges.size()*2);
+	for(size_t i = 0; i < edges.size(); ++i)
+	{
+		vb.Set(startIndex+2*i, VDPosition, float4(edges[i].a, 1.f));
+		vb.Set(startIndex+2*i+1, VDPosition, float4(edges[i].b, 1.f));
+	}
+}
+
+/*
+Polyhedron operator *(const float3x3 &m, const Polyhedron &s);
+Polyhedron operator *(const float3x4 &m, const Polyhedron &s);
+Polyhedron operator *(const float4x4 &m, const Polyhedron &s);
+Polyhedron operator *(const Quat &q, const Polyhedron &s);
+*/
 MATH_END_NAMESPACE

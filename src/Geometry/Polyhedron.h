@@ -22,6 +22,7 @@
 
 //#ifdef MATH_ENABLE_STL_SUPPORT
 #include <vector>
+#include <string>
 //#endif
 
 MATH_BEGIN_NAMESPACE
@@ -39,6 +40,12 @@ public:
 		/// The positive direction of the plane (the direction the face outwards normal points to) 
 		/// is the one where the vertices are wound in counter-clockwise order.
 		std::vector<int> v;
+
+		/// Reverses the winding order of this face. This has the effect of reversing the direction
+		/// the normal of this face points to.
+		void FlipWindingOrder();
+
+		std::string ToString() const;
 	};
 
 	/// Specifies the vertices of this polyhedron.
@@ -113,6 +120,8 @@ public:
 		@see NumFaces(), FacePolygon(). */
 	Plane FacePlane(int faceIndex) const;
 
+	float3 FaceNormal(int faceIndex) const;
+
 	/// Returns the index of the vertex of this polyhedron that reaches farthest in the given direction.
 	/** @param direction The direction vector to query for. This vector can be unnormalized.
 		@return The supporting point of this polyhedron that reaches farthest in the given direction.
@@ -150,6 +159,10 @@ public:
 	/// @todo Add MinimalEnclosingSphere() and MinimalEnclosingOBB().
 	AABB MinimalEnclosingAABB() const;
 
+	OBB MinimalEnclosingOBB() const;
+
+	void MergeAdjacentPlanarFaces();
+
 	/// Tests if the faces in this polyhedron refer to valid existing vertices.
 	/** This function performs sanity checks on the face indices array.
 		1) Each vertex index for each face must be in the range [0, NumVertices()-1], i.e. refer to a vertex 
@@ -162,6 +175,18 @@ public:
 			ill-formed.
 		@see IsNull(), IsClosed(), IsConvex(). */
 	bool FaceIndicesValid() const; 
+
+	/// Flips the winding order of all faces in this polyhedron.
+	void FlipWindingOrder();
+
+	/// Assuming that this polyhedron is convex, reorients all faces of this polyhedron
+	/// so that each face plane has its normal pointing outwards. That is, the "negative" side of the
+	/// polyhedron lies inside the polyhedron, and the positive side of the polyhedron is outside the convex
+	/// shape.
+	void OrientNormalsOutsideConvex();
+
+	/// Removes from the vertex array all vertices that are not referred to by any of the faces of this polyhedron.
+	void RemoveRedundantVertices();
 
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */
@@ -183,6 +208,10 @@ public:
 	/// Returns true if the Euler formula (V + F - E == 2) holds for this Polyhedron.
 	/** @see NumVertices(), NumEdges(), NumFaces(). */
 	bool EulerFormulaHolds() const;
+
+	/// Tests whether all the faces of this polyhedron are non-degenerate (have at least 3 vertices)
+	/// and in case they have more than 3 vertices, tests that the faces are planar.
+	bool FacesAreNondegeneratePlanar(float epsilon = 1e-4f) const;
 
 	/// Clips the line/ray/line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast, 
 	/// inside this <b>convex</b> polyhedron.
@@ -279,13 +308,31 @@ public:
 	bool IntersectsConvex(const Line &line) const;
 	bool IntersectsConvex(const Ray &ray) const;
 	bool IntersectsConvex(const LineSegment &lineSegment) const;
+
+	void MergeConvex(const float3 &point);
+
+	void Transform(const float3x4 &matrix);
+
+	/// Creates a Polyhedron object that represents the convex hull of the given point array.
+	/// \todo This function is strongly WIP!
+	static Polyhedron ConvexHull(const float3 *pointArray, int numPoints);
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+//	void Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const;
+	void ToLineList(VertexBuffer &vb);
+#endif
 };
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Polyhedron)
 Q_DECLARE_METATYPE(Polyhedron*)
 #endif
-
+/*
+Polyhedron operator *(const float3x3 &m, const Polyhedron &s);
+Polyhedron operator *(const float3x4 &m, const Polyhedron &s);
+Polyhedron operator *(const float4x4 &m, const Polyhedron &s);
+Polyhedron operator *(const Quat &q, const Polyhedron &s);
+*/
 // @todo Add this
 //#ifdef MATH_ENABLE_STL_SUPPORT
 //std::ostream &operator <<(std::ostream &o, const Polyhedron &polyhedron);
