@@ -1044,7 +1044,7 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b, const fl
 				if (!sphere.Contains(b))
 				{
 					sphere = OptimalEnclosingSphere(b,c,d);
-					sphere.r = Max(sphere.r, a.Distance(sphere.pos)); // For numerical stability, expand the radius of the sphere so it certainly contains the fourth point.
+					sphere.r = Max(sphere.r, a.Distance(sphere.pos) + 1e-3f); // For numerical stability, expand the radius of the sphere so it certainly contains the fourth point.
 					assume(sphere.Contains(a));
 				}
 			}
