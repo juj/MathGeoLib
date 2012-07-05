@@ -1055,7 +1055,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <AdditionalOptions>-Wall -mfloat-abi=softfp -mfpu=neon %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wall</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1074,6 +1074,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <AdditionalOptions>-Wall</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

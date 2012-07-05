@@ -359,6 +359,11 @@ public:
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+	void Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const float3 &centerPoint, int numFacesU, int numFacesV, bool ccwIsFrontFacing) const;
+#endif
+
 };
 
 Plane operator *(const float3x3 &transform, const Plane &plane);

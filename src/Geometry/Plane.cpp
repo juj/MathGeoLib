@@ -35,6 +35,10 @@
 #include "Math/Quat.h"
 #include "Geometry/Frustum.h"
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+#include "VertexBuffer.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Plane::Plane(const float3 &normal_, float d_)
@@ -756,4 +760,53 @@ std::ostream &operator <<(std::ostream &o, const Plane &plane)
 
 #endif
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+void Plane::Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const float3 &centerPoint, int numFacesU, int numFacesV, bool ccwIsFrontFacing) const
+{
+	float3 topLeft = Point(-uWidth*0.5f, -vHeight *0.5f, centerPoint);
+	float3 uEdge = (Point(uWidth*0.5f, -vHeight *0.5f, centerPoint) - topLeft) / (float)numFacesU;
+	float3 vEdge = (Point(-uWidth*0.5f, vHeight *0.5f, centerPoint) - topLeft) / (float)numFacesV;
+
+	int i = vb.AppendVertices(numFacesU * numFacesV * 6);
+	for(int y = 0; y < numFacesV; ++y)
+		for(int x = 0; x < numFacesU; ++x)
+		{
+			float4 tl = float4(topLeft + uEdge * (float)x + vEdge * (float)y, 1.f);
+			float4 tr = float4(topLeft + uEdge * (float)(x+1) + vEdge * (float)y, 1.f);
+			float4 bl = float4(topLeft + uEdge * (float)x + vEdge * (float)(y+1), 1.f);
+			float4 br = float4(topLeft + uEdge * (float)(x+1) + vEdge * (float)(y+1), 1.f);
+			int i0 = ccwIsFrontFacing ? i : i+5;
+			int i1 = ccwIsFrontFacing ? i+5 : i;
+			vb.Set(i0, VDPosition, tl);
+			vb.Set(i+1, VDPosition, tr);
+			vb.Set(i+2, VDPosition, bl);
+			vb.Set(i+3, VDPosition, bl);
+			vb.Set(i+4, VDPosition, tr);
+			vb.Set(i1, VDPosition, br);
+
+			if (vb.Declaration()->HasType(VDUV))
+			{
+				float4 uvTL((float)x/numFacesU, (float)y/numFacesV, 0.f, 1.f);
+				float4 uvTR((float)(x+1)/numFacesU, (float)y/numFacesV, 0.f, 1.f);
+				float4 uvBL((float)x/numFacesU, (float)(y+1)/numFacesV, 0.f, 1.f);
+				float4 uvBR((float)(x+1)/numFacesU, (float)(y+1)/numFacesV, 0.f, 1.f);
+
+				vb.Set(i0, VDUV, uvTL);
+				vb.Set(i+1, VDUV, uvTR);
+				vb.Set(i+2, VDUV, uvBL);
+				vb.Set(i+3, VDUV, uvBL);
+				vb.Set(i+4, VDUV, uvTR);
+				vb.Set(i1, VDUV, uvBR);
+			}
+
+			if (vb.Declaration()->HasType(VDNormal))
+			{
+				for(int k = 0; k < 6; ++k)
+					vb.Set(i+k, VDNormal, float4(normal, 0.f));
+			}
+
+			i += 6;
+		}
+}
+#endif
 MATH_END_NAMESPACE
