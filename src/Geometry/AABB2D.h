@@ -58,6 +58,11 @@ struct AABB2D
 		return minPoint.x >= maxPoint.x || minPoint.y >= maxPoint.y;
 	}
 
+	bool HasNegativeVolume() const
+	{
+		return maxPoint.x < minPoint.x || maxPoint.y < minPoint.y;
+	}
+
 	bool IsFinite() const
 	{
 		return minPoint.IsFinite() && maxPoint.IsFinite() && minPoint.MinElement() > -1e5f && maxPoint.MaxElement() < 1e5f;
