@@ -18,7 +18,9 @@
 #pragma once
 
 #include "Math/MathFwd.h"
+#include "Math/float2.h"
 #include "Math/float3.h"
+#include "Geometry/Ray.h"
 
 #ifdef MATH_TINYXML_INTEROP
 #include "Config/tinyxml/tinyxml.h"
@@ -200,12 +202,27 @@ public:
 		Specifying (-1, -1) returns the bottom-left corner of the near plane.
 		The point (1, 1) corresponds to the top-right corner of the near plane. */
 	Ray UnProject(float x, float y) const;
+	Ray UnProject(const float2 &xy) const { return UnProject(xy.x, xy.y); }
 
 	///\todo Add float3 UnProject(const float3 &point) const;
 	/** Like LookAt, but if the frustum type is PerspectiveFrustum, the ray originates at the near plane, 
 		and not at the camera eye point. For orthographic frustum, LookAt and LookAtFromNearPlane are identical
 		(always originates at near plane). */
 	Ray UnProjectFromNearPlane(float x, float y) const;
+
+	/// Returns the world-space line segment of the points that project to the given normalized viewport coordinate (x,y).
+	/** The (x,y) coordinate specifies the normalized viewport coordinate through which the line segment passes.
+		Both x and y must be in the range [-1,1]. */
+	LineSegment UnProjectLineSegment(float x, float y) const;
+
+	/// Returns a point inside this frustum parameterized by three scalar coordinates.
+	/** @param x The horizontal normalized viewport coordinate in the range [-1, 1].
+		@param y The vertical normalized viewport coordinate in the range [-1, 1].
+		@param z The linear depth coordinate in the range [0, 1].
+		@note This function is slightly different than multiplying by inv(view*proj), since depth is handled linearly.
+		@see FastRandomPointInside(), UniformRandomPointInside(). */
+	float3 PointInside(float x, float y, float z) const;
+	float3 PointInside(const float3 &xyz) const { return PointInside(xyz.x, xyz.y, xyz.z); }
 
 	/// Projects the given point onto the near plane of this frustum.
 	/** The (x,y) component of the returned float3 gives the normalized viewport coordinates of the point on the
@@ -264,10 +281,15 @@ public:
 	/// Computes the volume of this Frustum.
 	float Volume() const;
 
-	/// Generates a random point inside this Frustum.
-	/** The points are distributed uniformly.
-		@see class LCG. */
-	float3 RandomPointInside(LCG &rng) const;
+	/// Quickly generates a random point inside this Frustum.
+	/** If the frustum type is orthographic, then the points are uniformly distributed. If the frustum type is perspective, then not.
+		@see class LCG, UniformRandomPointInside(), PointInside(). */
+	float3 FastRandomPointInside(LCG &rng) const;
+
+	/// Generates a uniformly random point inside this Frustum.
+	/** For orthographic frustum type, this function is identical to FastRandomPointInside. 
+		@see class LCG, FastRandomPointInside(), PointInside(). */
+	float3 UniformRandomPointInside(LCG &rng) const;
 
 	/// Moves this Frustum by the given offset vector.
 	/** @note This function operates in-place.

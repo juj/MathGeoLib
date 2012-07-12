@@ -33,6 +33,7 @@
 #include "Math/float3x4.h"
 #include "Math/float4.h"
 #include "Math/Quat.h"
+#include "Algorithm/Random/LCG.h"
 
 #if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
 #include "Container/UString.h"
@@ -219,6 +220,10 @@ float2 Frustum::ScreenToViewportSpace(const float2 &point, int screenWidth, int 
 
 Ray Frustum::UnProject(float x, float y) const
 {
+	assume(x >= -1.f);
+	assume(x <= 1.f);
+	assume(y >= -1.f);
+	assume(y <= 1.f);
 	if (type == PerspectiveFrustum)
 	{
 		float3 nearPlanePos = NearPlanePos(x, y);
@@ -228,11 +233,23 @@ Ray Frustum::UnProject(float x, float y) const
 		return UnProjectFromNearPlane(x, y);
 }
 
-Ray Frustum::UnProjectFromNearPlane(float x, float y) const
+LineSegment Frustum::UnProjectLineSegment(float x, float y) const
 {
 	float3 nearPlanePos = NearPlanePos(x, y);
 	float3 farPlanePos = FarPlanePos(x, y);
-	return Ray(nearPlanePos, (farPlanePos - nearPlanePos).Normalized());
+	return LineSegment(nearPlanePos, farPlanePos);
+}
+
+Ray Frustum::UnProjectFromNearPlane(float x, float y) const
+{
+	return UnProjectLineSegment(x, y).ToRay();
+}
+
+float3 Frustum::PointInside(float x, float y, float z) const
+{
+	assume(z >= 0.f);
+	assume(z <= 1.f);
+	return UnProjectLineSegment(x, y).GetPoint(z);
 }
 
 float3 Frustum::Project(const float3 &point) const
@@ -342,10 +359,20 @@ float Frustum::Volume() const
 	return ToPolyhedron().Volume();
 }
 
-float3 Frustum::RandomPointInside(LCG &rng) const
+float3 Frustum::FastRandomPointInside(LCG &rng) const
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
-	return float3();
+	return PointInside(rng.Float(-1.f, 1.f), rng.Float(-1.f, 1.f), rng.Float(0.f, 1.f));
+}
+
+float3 Frustum::UniformRandomPointInside(LCG &rng) const
+{
+	if (type == OrthographicFrustum)
+		return FastRandomPointInside(rng);
+	else
+	{
+		assume(false && "Not implemented!");
+		return FastRandomPointInside(rng); ///\todo This will not generate a uniform result! Implement rejection sampling!
+	}
 }
 
 void Frustum::Translate(const float3 &offset)
