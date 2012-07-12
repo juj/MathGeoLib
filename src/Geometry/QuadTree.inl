@@ -8,8 +8,14 @@ void QuadTree<T>::Clear(const float2 &minXY, const float2 &maxXY)
 	boundingAABB.minPoint = minXY;
 	boundingAABB.maxPoint = maxXY;
 
+	assert(!boundingAABB.IsDegenerate());
+
 	rootNodeIndex = AllocateNodeGroup(0);
 	assert(Root());
+
+#ifdef QUADTREE_VERBOSE_LOGGING
+	totalNumObjectsInTree = 0;
+#endif
 }
 
 template<typename T>
@@ -17,15 +23,19 @@ void QuadTree<T>::Add(const T &object)
 {
 	PROFILE(QuadTree_Add);
 	Node *n = Root();
-	assert(n);
+	assert(n && "Error: QuadTree has not been initialized with a root node! Call QuadTree::Clear() to initialize the root node.");
 
 	assert(boundingAABB.IsFinite());
 	assert(!boundingAABB.IsDegenerate());
 
 	AABB2D objectAABB = GetAABB2D(object);
 	assert(objectAABB.IsFinite());
-	assert(!objectAABB.IsDegenerate());
-	
+	assert(!objectAABB.HasNegativeVolume());
+
+#ifdef QUADTREE_VERBOSE_LOGGING
+	++totalNumObjectsInTree;
+#endif
+
 	if (objectAABB.minPoint.x >= boundingAABB.minPoint.x)
 	{
 		// Object fits left.
@@ -82,7 +92,13 @@ void QuadTree<T>::Remove(const T &object)
 {
 	Node *n = GetQuadTreeNode(object);
 	if (n)
+	{
 		n->Remove(object);
+
+#ifdef QUADTREE_VERBOSE_LOGGING
+		--totalNumObjectsInTree;
+#endif
+	}
 }
 
 template<typename T>
@@ -111,7 +127,7 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 //			n->bucket.push_back(objectId);
 			n->objects.push_back(object);
 			AssociateQuadTreeNode(object, n);
-			if (n->IsLeaf() && n->objects.size() > 16 && aabb.Width() >= minQuadrantSize && aabb.Height() >= minQuadrantSize)
+			if (n->IsLeaf() && n->objects.size() > minQuadTreeNodeObjectCount && aabb.Width() >= minQuadTreeQuadrantSize && aabb.Height() >= minQuadTreeQuadrantSize)
 				SplitLeaf(n, aabb);
 			return;
 		}
@@ -381,22 +397,28 @@ inline void QuadTree<T>::CollidingPairsQuery(const AABB2D &aabb, Func &callback)
 	AABBQuery(aabb, func);
 }
 
+template<typename T>
+struct TraversalNode
+{
+	/// The squared distance of this node to the query point.
+	float d;
+	/// Stores the 2D bounding rectangle of this node.
+	AABB2D aabb;
+	typename QuadTree<T>::Node *node;
+
+	/// We compare in reverse order, since we want the node with the smallest distance to be visited first,
+	/// and MaxHeap stores the node that compares largest in the root.
+	bool operator <(const TraversalNode &t) const { return d > t.d; }
+	bool operator ==(const TraversalNode &t) const { return d == t.d; }
+};
+
 #ifdef MATH_CONTAINERLIB_SUPPORT
 template<typename T>
 template<typename Func>
-inline void QuadTree<T>::NearestObjects(const float2 &point, Func &leafCallback)
+inline void QuadTree<T>::NearestNeighborNodes(const float2 &point, Func &leafCallback)
 {
-	struct TraversalNode
-	{
-		float d;
-		AABB2D aabb;
-		Node *node;
-
-		bool operator <(const TraversalNode &t) const { return d > t.d; }
-	};
-
-	MaxHeap<TraversalNode> queue;
-	TraversalNode t;
+	MaxHeap<TraversalNode<T> > queue;
+	TraversalNode<T> t;
 	t.d = 0.f;
 	t.aabb = BoundingAABB();
 	t.node = Root();
@@ -407,15 +429,16 @@ inline void QuadTree<T>::NearestObjects(const float2 &point, Func &leafCallback)
 		t = queue.Front();
 		queue.PopFront();
 
-		if (t.node->bucket.size() > 0)
+		if (t.node->objects.size() > 0)
 		{
 			bool stopIteration = leafCallback(*this, point, *t.node, t.aabb, t.d);
 			if (stopIteration)
 				return;
 		}
-		else if (!t.node->IsLeaf())
+		
+		if (!t.node->IsLeaf())
 		{
-			TraversalNode n;
+			TraversalNode<T> n;
 
 			float halfX = (t.aabb.minPoint.x + t.aabb.maxPoint.x) * 0.5f;
 			float halfY = (t.aabb.minPoint.y + t.aabb.maxPoint.y) * 0.5f;
@@ -451,6 +474,96 @@ inline void QuadTree<T>::NearestObjects(const float2 &point, Func &leafCallback)
 			queue.Insert(n);
 		}
 	}
+}
+
+template<typename ObjectCallbackFunc, typename T>
+struct NearestNeighborObjectSearch
+{
+	NearestNeighborObjectSearch()
+	:objectCallback(0), numObjectsOutputted(0)
+#ifdef QUADTREE_VERBOSE_LOGGING
+	,numNodesVisited(0)
+#endif
+	{
+	}
+
+	ObjectCallbackFunc *objectCallback;
+
+	struct NearestObject
+	{
+		/// The squared distance of this node to the query point.
+		float d;
+
+		/// Stores the 2D bounding rectangle of this node.
+		AABB2D aabb;
+		typename QuadTree<T>::Node *node;
+
+		T *object;
+
+		/// We compare in reverse order, since we want the object with the smallest distance to be visited first,
+		/// and MaxHeap stores the object that compares largest in the root.
+		bool operator <(const NearestObject &t) const { return d > t.d; }
+		bool operator ==(const NearestObject &t) const { return d == t.d; }
+	};
+
+	MaxHeap<NearestObject> queue;
+
+	int numObjectsOutputted;
+
+#ifdef QUADTREE_VERBOSE_LOGGING
+	int numNodesVisited;
+#endif
+
+	template<typename T>
+	bool operator ()(QuadTree<T> &tree, const float2 &point, typename QuadTree<T>::Node &leaf, const AABB2D &aabb, float minDistanceSquared)
+	{
+#ifdef QUADTREE_VERBOSE_LOGGING
+		++numNodesVisited;
+#endif
+
+		// Output all points that are closer than the next closest AABB node.
+		while(queue.Size() > 0 && queue.Front().d <= minDistanceSquared)
+		{
+			const NearestObject &nextNearestPoint = queue.Front();
+			bool shouldStopIteration = (*objectCallback)(tree, point, nextNearestPoint.node, nextNearestPoint.aabb, nextNearestPoint.d, *nextNearestPoint.object, numObjectsOutputted++);
+			if (shouldStopIteration)
+			{
+#ifdef QUADTREE_VERBOSE_LOGGING
+				int numPoints = tree.NumObjects();
+				LOGI("Visited %d/%d (%.2f%%) of QuadTree nodes (tree height: %d). Saw %d/%d (%.2f%%) points of the QuadTree before outputting %d points.",
+					numNodesVisited, tree.NumNodes(), 100.f * numNodesVisited / tree.NumNodes(), tree.TreeHeight(),
+					(int)queue.Size() + numObjectsOutputted, numPoints, ((int)queue.Size() + numObjectsOutputted) * 100.f / numPoints,
+					numObjectsOutputted);
+#endif
+				return true;
+			}
+
+			queue.PopFront();
+		}
+
+		// Queue up all points in the new AABB node.
+		for(size_t i = 0; i < leaf.objects.size(); ++i)
+		{
+			NearestObject obj;
+			obj.d = leaf.objects[i].DistanceSq(point);
+			obj.aabb = aabb;
+			obj.node = &leaf;
+			obj.object = &leaf.objects[i];
+			queue.Insert(obj);
+		}
+
+		return false;
+	}
+};
+
+template<typename T>
+template<typename Func>
+inline void QuadTree<T>::NearestNeighborObjects(const float2 &point, Func &leafCallback)
+{
+	NearestNeighborObjectSearch<Func, T> search;
+	search.objectCallback = &leafCallback;
+
+	NearestNeighborNodes(point, search);
 }
 #endif
 
@@ -533,14 +646,12 @@ void QuadTree<T>::GrowImpl(int quadrantForRoot)
 	DebugSanityCheckNode(Root());
 }
 
-/// Returns the total number of nodes (all nodes, i.e. inner nodes + leaves) in the tree.
 template<typename T>
 int QuadTree<T>::NumNodes() const
 {
 	return std::max<int>(0, nodes.size() - 3); // The nodes rootNodeIndex+1, rootNodeIndex+2 and rootNodeIndex+3 are dummy unused, since the root node is not a quadrant.
 }
 
-/// Returns the total number of leaf nodes in the tree.
 template<typename T>
 int QuadTree<T>::NumLeaves() const
 {
@@ -553,7 +664,6 @@ int QuadTree<T>::NumLeaves() const
 	return numLeaves;
 }
 
-/// Returns the total number of inner nodes in the tree.
 template<typename T>
 int QuadTree<T>::NumInnerNodes() const
 {
@@ -564,6 +674,19 @@ int QuadTree<T>::NumInnerNodes() const
 				++numInnerNodes;
 
 	return numInnerNodes;
+}
+
+template<typename T>
+int QuadTree<T>::NumObjects() const
+{
+#ifdef QUADTREE_VERBOSE_LOGGING
+	return totalNumObjectsInTree;
+#else
+	int numObjects = 0;
+	for(int i = 0; i < (int)nodes.size(); ++i)
+		numObjects += (int)nodes[i].objects.size();
+	return numObjects;
+#endif
 }
 
 template<typename T>
