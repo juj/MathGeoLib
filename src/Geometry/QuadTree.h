@@ -30,7 +30,7 @@ inline float MaxY(const float3 &pt) { return pt.y; }
 
 //#ifdef _DEBUG
 /// If enabled, QuadTree queries generate debug trace/stats logging when invoked. Use only for debugging/behavioral profiling.
-#define QUADTREE_VERBOSE_LOGGING
+//#define QUADTREE_VERBOSE_LOGGING
 //#endif
 
 template<typename T>

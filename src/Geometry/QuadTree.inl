@@ -514,7 +514,6 @@ struct NearestNeighborObjectSearch
 	int numNodesVisited;
 #endif
 
-	template<typename T>
 	bool operator ()(QuadTree<T> &tree, const float2 &point, typename QuadTree<T>::Node &leaf, const AABB2D &aabb, float minDistanceSquared)
 	{
 #ifdef QUADTREE_VERBOSE_LOGGING
@@ -531,7 +530,7 @@ struct NearestNeighborObjectSearch
 #ifdef QUADTREE_VERBOSE_LOGGING
 				int numPoints = tree.NumObjects();
 				LOGI("Visited %d/%d (%.2f%%) of QuadTree nodes (tree height: %d). Saw %d/%d (%.2f%%) points of the QuadTree before outputting %d points.",
-					numNodesVisited, tree.NumNodes(), 100.f * numNodesVisited / tree.NumNodes(), tree.TreeHeight(),
+					numNodesVisited, tree.NumNodes(), 100.f * numNodesVisited / tree.NumNodes(), -1/*tree.TreeHeight()*/,
 					(int)queue.Size() + numObjectsOutputted, numPoints, ((int)queue.Size() + numObjectsOutputted) * 100.f / numPoints,
 					numObjectsOutputted);
 #endif
