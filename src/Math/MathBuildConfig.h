@@ -34,15 +34,21 @@
 // execution.
 //#define MATH_ASSERT_ON_ASSUME
 
+#ifndef _DEBUG
 // If MATH_SILENT_ASSUME is defined, all assume() tests are stripped from the build. This
 // overrides MATH_ASSERT_ON_ASSUME.
-#ifndef _DEBUG
 #define MATH_SILENT_ASSUME
+
+// If MATH_ENABLE_INSECURE_OPTIMIZATIONS, several security checks (unsafe index out of bounds accesses etc.) are disabled.
+// Use this for absolutely fastest performance on MathGeoLib, but only if you know your code is 100% well-formed and uses
+// MathGeoLib bug-free.
+// #define MATH_ENABLE_INSECURE_OPTIMIZATIONS
+
 #endif
 
+#ifdef _DEBUG
 // If MATH_ASSERT_CORRECTNESS is defined, special (and possibly rather costly) mathassert() 
 // tests are enabled, which test the internal correctness of the library.
-#ifdef _DEBUG
 #define MATH_ASSERT_CORRECTNESS
 #endif
 
@@ -54,15 +60,27 @@
 
 // If MATH_TINYXML_INTEROP is defined, MathGeoLib integrates with TinyXML to provide
 // serialization and deserialization to XML for the data structures.
+#ifndef MATH_TINYXML_INTEROP
 //#define MATH_TINYXML_INTEROP
+#endif
+
+// If MATH_CONTAINERLIB_SUPPORT is defined, MathGeoLib integrates with a certain
+// STL replacement container library. Do not enable, only for internal use.
+#ifndef MATH_CONTAINERLIB_SUPPORT
+//#define MATH_CONTAINERLIB_SUPPORT
+#endif
 
 // If MATH_GRAPHICSENGINE_INTEROP is defined, MathGeoLib integrates with a certain
 // graphics engine. Do not enable, only for internal use.
+#ifndef MATH_GRAPHICSENGINE_INTEROP
 //#define MATH_GRAPHICSENGINE_INTEROP
+#endif
 
 // If KNET_LOGGING_SUPPORT_ENABLED is defined, MathGeoLib utilizes logging functions
 // from the kNet library.
-#define KNET_LOGGING_SUPPORT_ENABLED
+#ifndef KNET_LOGGING_SUPPORT_ENABLED
+//#define KNET_LOGGING_SUPPORT_ENABLED
+#endif
 
 // Uncomment to specify the SIMD instruction set level in use.
 //#define MATH_AVX
@@ -70,6 +88,11 @@
 //#define MATH_SSE3
 //#define MATH_SSE2
 //#define MATH_SSE // SSE1.
+
+#ifdef ANDROID
+//#define MATH_NEON
+//#include <arm_neon.h>
+#endif
 
 // MATH_AVX implies MATH_SSE41, which implies MATH_SSE3, which implies MATH_SSE2, which implies MATH_SSE.
 #ifdef MATH_AVX
