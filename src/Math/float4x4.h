@@ -267,10 +267,22 @@ public:
 	/// @note The returned matrix contains a last row that differs from [0 0 0 1].
 	static float4x4 PerspectiveProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalFov, float verticalFov);
 
-	/// Creates a new float4x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
+	/// Identical to D3DXMatrixOrthoLH, except transposed to account for Matrix * vector convention used in MathGeoLib.
+	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205346(v=vs.85).aspx
+	static float4x4 D3DOrthoProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+	/// Identical to D3DXMatrixOrthoRH, except transposed to account for Matrix * vector convention used in MathGeoLib.
+	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205349(v=vs.85).aspx
 	static float4x4 D3DOrthoProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+	/// Identical to D3DXMatrixPerspectiveLH, except transposed to account for Matrix * vector convention used in MathGeoLib. 
+	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205352(v=vs.85).aspx
+	static float4x4 D3DPerspProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+	/// Identical to D3DXMatrixPerspectiveRH, except transposed to account for Matrix * vector convention used in MathGeoLib. 
+	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205355(v=vs.85).aspx
 	static float4x4 D3DPerspProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+
 	static float4x4 OpenGLPerspProjRH(float n, float f, float h, float v);
+
+	/// Creates a new float4x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
 	static float4x4 OrthographicProjection(const Plane &target);
 	static float4x4 OrthographicProjectionYZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]
 	static float4x4 OrthographicProjectionXZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]

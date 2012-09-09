@@ -423,6 +423,17 @@ float4x4 float4x4::PerspectiveProjection(float nearPlaneDistance, float farPlane
 	return float4x4(); ///@todo
 }
 
+float4x4 float4x4::D3DOrthoProjLH(float n, float f, float h, float v)
+{
+	float4x4 p;
+	p[0][0] = 2.f / h; p[0][1] = 0;       p[0][2] = 0;           p[0][3] = 0.f;
+	p[1][0] = 0;       p[1][1] = 2.f / v; p[1][2] = 0;           p[1][3] = 0.f;
+	p[2][0] = 0;       p[2][1] = 0;       p[2][2] = 1.f / (f-n); p[2][3] = n / (n-f);
+	p[3][0] = 0;       p[3][1] = 0;       p[3][2] = 0.f;         p[3][3] = 1.f;
+
+	return p;
+}
+
 /** This function generates an orthographic projection matrix that maps from
 	the Direct3D view space to the Direct3D normalized viewport space as follows:
 
@@ -446,17 +457,34 @@ float4x4 float4x4::PerspectiveProjection(float nearPlaneDistance, float farPlane
 	*/
 float4x4 float4x4::D3DOrthoProjRH(float n, float f, float h, float v)
 {
+	// D3DOrthoProjLH and D3DOrthoProjRH differ from each other in that the third column is negated.
+	// This corresponds to LH = RH * In, where In is a diagonal matrix with elements [1 1 -1 1].
+
 	float4x4 p;
 	p[0][0] = 2.f / h; p[0][1] = 0;       p[0][2] = 0;           p[0][3] = 0.f;
 	p[1][0] = 0;       p[1][1] = 2.f / v; p[1][2] = 0;           p[1][3] = 0.f;
-	p[2][0] = 0;       p[2][1] = 0;       p[2][2] = 1.f / (f-n); p[2][3] = n / (n-f);
+	p[2][0] = 0;       p[2][1] = 0;       p[2][2] = 1.f / (n-f); p[2][3] = n / (n-f);
 	p[3][0] = 0;       p[3][1] = 0;       p[3][2] = 0.f;         p[3][3] = 1.f;
+
+	return p;
+}
+
+float4x4 float4x4::D3DPerspProjLH(float n, float f, float h, float v)
+{
+	float4x4 p;
+	p[0][0] = 2.f * n / h; p[0][1] = 0;           p[0][2] = 0;           p[0][3] = 0.f;
+	p[1][0] = 0;           p[1][1] = 2.f * n / v; p[1][2] = 0;           p[1][3] = 0.f;
+	p[2][0] = 0;           p[2][1] = 0;           p[2][2] = f / (f-n);   p[2][3] = n * f / (n-f);
+	p[3][0] = 0;           p[3][1] = 0;           p[3][2] = 1.f;         p[3][3] = 0.f;
 
 	return p;
 }
 
 float4x4 float4x4::D3DPerspProjRH(float n, float f, float h, float v)
 {
+	// D3DPerspProjLH and D3DPerspProjRH differ from each other in that the third column is negated.
+	// This corresponds to LH = RH * In, where In is a diagonal matrix with elements [1 1 -1 1].
+
 	float4x4 p;
 	p[0][0] = 2.f * n / h; p[0][1] = 0;           p[0][2] = 0;           p[0][3] = 0.f;
 	p[1][0] = 0;           p[1][1] = 2.f * n / v; p[1][2] = 0;           p[1][3] = 0.f;
