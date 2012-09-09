@@ -205,7 +205,7 @@ bool Polygon::IsPlanar(float epsilon) const
 		return true;
 	Plane plane(p[0], p[1], p[2]);
 	for(size_t i = 3; i < p.size(); ++i)
-		if (plane.Distance(p[i]) > 1e-2f)
+		if (plane.Distance(p[i]) > epsilon)
 			return false;
 	return true;
 }

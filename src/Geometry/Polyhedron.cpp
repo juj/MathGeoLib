@@ -1005,6 +1005,7 @@ void Polyhedron::Transform(const float3x4 &matrix)
 		matrix.BatchTransformPos(&v[0], v.size());
 }
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
 void Polyhedron::ToLineList(VertexBuffer &vb)
 {
 	std::vector<LineSegment> edges = Edges();
@@ -1016,6 +1017,7 @@ void Polyhedron::ToLineList(VertexBuffer &vb)
 		vb.Set(startIndex+2*i+1, VDPosition, float4(edges[i].b, 1.f));
 	}
 }
+#endif
 
 /*
 Polyhedron operator *(const float3x3 &m, const Polyhedron &s);
