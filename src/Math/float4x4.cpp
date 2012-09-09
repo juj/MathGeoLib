@@ -485,6 +485,8 @@ float4x4 float4x4::D3DPerspProjRH(float n, float f, float h, float v)
 	// D3DPerspProjLH and D3DPerspProjRH differ from each other in that the third column is negated.
 	// This corresponds to LH = RH * In, where In is a diagonal matrix with elements [1 1 -1 1].
 
+	// In Direct3D, the post-perspective unit cube ranges in [-1, 1] in X and Y directions,
+	// and in [0, 1] for the Z direction. See http://msdn.microsoft.com/en-us/library/windows/desktop/bb147302(v=vs.85).aspx
 	float4x4 p;
 	p[0][0] = 2.f * n / h; p[0][1] = 0;           p[0][2] = 0;           p[0][3] = 0.f;
 	p[1][0] = 0;           p[1][1] = 2.f * n / v; p[1][2] = 0;           p[1][3] = 0.f;
@@ -496,6 +498,9 @@ float4x4 float4x4::D3DPerspProjRH(float n, float f, float h, float v)
 
 float4x4 float4x4::OpenGLPerspProjRH(float n, float f, float h, float v)
 {
+	// In OpenGL, the post-perspective unit cube ranges in [-1, 1] in all X, Y and Z directions.
+	// See http://www.songho.ca/opengl/gl_projectionmatrix.html , unlike in Direct3D, where the
+	// Z coordinate ranges in [0, 1]. This is the only difference between D3DPerspProjRH and OpenGLPerspProjRH.
 	float4x4 p;
 	p[0][0] = 2.f *n / h;  p[0][1] = 0;           p[0][2] = 0;              p[0][3] = 0.f;
 	p[1][0] = 0;           p[1][1] = 2.f * n / v; p[1][2] = 0;              p[1][3] = 0.f;
