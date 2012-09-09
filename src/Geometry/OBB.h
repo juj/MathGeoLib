@@ -283,8 +283,10 @@ public:
 		@see SetFromApproximate(). */
 	static OBB PCAEnclosingOBB(const float3 *pointArray, int numPoints);
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
 	///\todo This function is strongly WIP! (Works, but is very very slow!)
 	static OBB OptimalEnclosingOBB(const float3 *pointArray, int numPoints);
+#endif
 
 	/// Generates a random point inside this OBB.
 	/** The points are distributed uniformly.

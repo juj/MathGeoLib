@@ -37,7 +37,10 @@
 #include "Math/Quat.h"
 #include "Geometry/Ray.h"
 #include "Geometry/Triangle.h"
+
+#ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Algorithm/Sort/Sort.h"
+#endif
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
@@ -417,6 +420,7 @@ OBB OBB::PCAEnclosingOBB(const float3 *pointArray, int numPoints)
 	return OBB();
 }
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
 int LexFloat3Cmp(const float3 &a, const float3 &b)
 {
 	LEXCMP(a.x, b.x);
@@ -506,6 +510,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 
 	return minOBB;
 }
+#endif
 
 float3 OBB::Size() const
 {

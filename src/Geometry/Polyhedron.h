@@ -159,7 +159,9 @@ public:
 	/// @todo Add MinimalEnclosingSphere() and MinimalEnclosingOBB().
 	AABB MinimalEnclosingAABB() const;
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
 	OBB MinimalEnclosingOBB() const;
+#endif
 
 	void MergeAdjacentPlanarFaces();
 

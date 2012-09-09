@@ -544,8 +544,8 @@ bool float3::AreOrthogonal(const float3 &a, const float3 &b, float epsilon)
 bool float3::AreOrthogonal(const float3 &a, const float3 &b, const float3 &c, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon) &&
-		   a.IsPerpendicular(c, epsilon) &&
-		   b.IsPerpendicular(c, epsilon);
+	       a.IsPerpendicular(c, epsilon) &&
+	       b.IsPerpendicular(c, epsilon);
 }
 
 void float3::Orthonormalize(float3 &a, float3 &b)
@@ -578,11 +578,11 @@ bool float3::AreOrthonormal(const float3 &a, const float3 &b, float epsilon)
 bool float3::AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon) &&
-		   a.IsPerpendicular(c, epsilon) &&
-		   b.IsPerpendicular(c, epsilon) &&
-		   a.IsNormalized(epsilon*epsilon) &&
-		   b.IsNormalized(epsilon*epsilon) &&
-		   c.IsNormalized(epsilon*epsilon);
+	       a.IsPerpendicular(c, epsilon) &&
+	       b.IsPerpendicular(c, epsilon) &&
+	       a.IsNormalized(epsilon*epsilon) &&
+	       b.IsNormalized(epsilon*epsilon) &&
+	       c.IsNormalized(epsilon*epsilon);
 }
 
 float3 float3::FromScalar(float scalar)

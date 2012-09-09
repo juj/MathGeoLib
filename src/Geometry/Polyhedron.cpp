@@ -218,10 +218,12 @@ AABB Polyhedron::MinimalEnclosingAABB() const
 	return aabb;
 }
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
 OBB Polyhedron::MinimalEnclosingOBB() const
 {
 	return OBB::OptimalEnclosingOBB(&v[0], v.size());
 }
+#endif
 
 bool Polyhedron::FaceIndicesValid() const
 {
