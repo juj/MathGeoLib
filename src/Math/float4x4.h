@@ -280,7 +280,9 @@ public:
 	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205355(v=vs.85).aspx
 	static float4x4 D3DPerspProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 
-	static float4x4 OpenGLPerspProjRH(float n, float f, float h, float v);
+	/// Identical to http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml , except uses viewport sizes instead of FOV to set up the
+	/// projection matrix.
+	static float4x4 OpenGLPerspProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 
 	/// Creates a new float4x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
 	static float4x4 OrthographicProjection(const Plane &target);
