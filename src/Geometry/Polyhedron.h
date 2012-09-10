@@ -64,12 +64,12 @@ public:
 	/// Returns the number of vertices in this polyhedron.
 	/** The running time of this function is O(1).
 		@see NumFaces(), NumEdges(), EulerFormulaHolds(). */
-	int NumVertices() const { return v.size(); }
+	int NumVertices() const { return (int)v.size(); }
 
 	/// Returns the number of faces in this polyhedron.
 	/** The running time of this function is O(1).
 		@see NumVertices(), NumEdges(), EulerFormulaHolds(), FacePolygon(), FacePlane(). */
-	int NumFaces() const { return f.size(); }
+	int NumFaces() const { return (int)f.size(); }
 
 	/// Returns the number of (unique) edges in this polyhedron.
 	/** This function will enumerate through all faces of this polyhedron to compute the number of unique edges.

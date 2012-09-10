@@ -1082,7 +1082,7 @@ void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFa
 	uv.Resize_pod(numVertices);
 	Triangulate(numFacesX, numFacesY, numFacesZ, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
-	for(size_t i = 0; i < pos.size(); ++i)
+	for(int i = 0; i < (int)pos.size(); ++i)
 	{
 		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
@@ -1098,7 +1098,7 @@ void AABB::ToLineList(VertexBuffer &vb)
 	pos.Resize_pod(NumVerticesInEdgeList());
 	ToEdgeList(&pos[0]);
 	int startIndex = vb.AppendVertices(pos.size());
-	for(size_t i = 0; i < pos.size(); ++i)
+	for(int i = 0; i < (int)pos.size(); ++i)
 		vb.Set(startIndex+i, VDPosition, float4(pos[i], 1.f));
 }
 
