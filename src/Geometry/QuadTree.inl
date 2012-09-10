@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Math/MathFunc.h"
+
 template<typename T>
 void QuadTree<T>::Clear(const float2 &minXY, const float2 &maxXY)
 {
