@@ -124,4 +124,10 @@ void EnableMemoryLeakLoggingAtExit();
 #error LOG/LOGE/LOGW/LOGI not implemented!
 #endif
 
+#ifdef GFXAPI_TRACE_ENABLED
+#define TRACE LOGI
+#else
+#define TRACE(...) ((void)0)
+#endif
+
 #endif
