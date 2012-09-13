@@ -67,6 +67,7 @@ void EnableMemoryLeakLoggingAtExit();
 
 #if defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
 
+/// This will require you to pass '-llog' on the command line to link against the Android logging libraries.
 #include <android/log.h>
 
 #define LOG(channel, ...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
