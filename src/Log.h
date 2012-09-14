@@ -65,7 +65,17 @@ void EnableMemoryLeakLoggingAtExit();
 /// Prints out a variadic message to the log channel User.
 #define LOGUSER(msg, ...) ( IsLogChannelActive(LogUser) && (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 
-#if defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
+#if defined(NPAPI) && !defined(LOGGING_SUPPORT_DISABLED)
+#include <stdio.h>
+///\todo Temporary. Implement logmsg as variadic directly instead of this kind of #define workaround.
+void logmsg(const char *msg);
+
+#define LOGI(...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
+#define LOGW(...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
+#define LOGE(...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
+#define LOG(channel, ...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
+
+#elif defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
 
 /// This will require you to pass '-llog' on the command line to link against the Android logging libraries.
 #include <android/log.h>
