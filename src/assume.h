@@ -47,8 +47,13 @@ MATH_END_NAMESPACE
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
 #include <Windows.h>
+#ifdef WIN8RT // Win8 metro apps don't have DebugBreak.
+#define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
+#else
 #define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); if (MATH_NS::MathBreakOnAssume()) DebugBreak(); } } while(0)
+#endif
 
 #elif defined(ANDROID)
 

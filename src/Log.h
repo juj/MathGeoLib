@@ -65,6 +65,10 @@ void EnableMemoryLeakLoggingAtExit();
 /// Prints out a variadic message to the log channel User.
 #define LOGUSER(msg, ...) ( IsLogChannelActive(LogUser) && (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 
+#define STRINGIZE_HELPER(x) #x
+#define STRINGIZE(x) STRINGIZE_HELPER(x)
+#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " #desc)
+
 #if defined(NPAPI) && !defined(LOGGING_SUPPORT_DISABLED)
 #include <stdio.h>
 ///\todo Temporary. Implement logmsg as variadic directly instead of this kind of #define workaround.
@@ -94,6 +98,8 @@ void logmsg(const char *msg);
 
 #define LOG(channel, ...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
 #define LOGI(...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
+
+#ifndef WIN8RT // Win8 metro apps don't have SetConsoleTextAttribute.
 #define LOGW(...) do { \
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); \
 	printf("Warning: "); printf(__VA_ARGS__); printf("\n"); \
@@ -105,6 +111,10 @@ void logmsg(const char *msg);
 	printf("Error: "); printf(__VA_ARGS__); printf("\n"); \
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); \
 	} while(0)
+#else
+#define LOGW(...) do { printf("Warning: "); printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGE(...) do { printf("Error: "); printf(__VA_ARGS__); printf("\n"); } while(0)
+#endif
 
 #elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
 

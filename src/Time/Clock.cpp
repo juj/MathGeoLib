@@ -63,7 +63,7 @@ void Clock::InitClockData()
 		LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
 
 	if (appStartTime == 0)
-		appStartTime = GetTickCount();
+		appStartTime = (tick_t)GetTickCount64();
 
 	///\todo Test here that the return values of QueryPerformanceCounter is nondecreasing.
 #endif
@@ -76,7 +76,9 @@ Clock::Clock()
 
 void Clock::Sleep(int milliseconds)
 {
-#ifdef WIN32
+#ifdef WIN8RT
+#pragma WARNING(Clock::Sleep has not been implemented!)
+#elif defined(WIN32)
 	::Sleep(milliseconds);
 #elif !defined(__native_client__) && !defined(EMSCRIPTEN) && !defined(__APPLE__)
 	// http://linux.die.net/man/2/nanosleep
@@ -166,7 +168,7 @@ int Clock::Sec()
 unsigned long Clock::SystemTime()
 {
 #ifdef WIN32
-	return GetTickCount();
+	return (unsigned long)GetTickCount64();
 #else
 	return TickU32();
 #endif
