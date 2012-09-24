@@ -18,6 +18,8 @@
 #include "Circle.h"
 #include "Geometry/Plane.h"
 #include "Math/MathFunc.h"
+#include "Math/float3x3.h"
+#include "Math/Quat.h"
 #include "Geometry/Ray.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
@@ -65,6 +67,44 @@ float3 Circle::ExtremePoint(const float3 &direction) const
 Plane Circle::ContainingPlane() const
 {
 	return Plane(pos, normal);
+}
+
+void Circle::Translate(const float3 &offset)
+{
+	pos += offset;
+}
+
+void Circle::Transform(const float3x3 &transform)
+{
+	assume(transform.HasUniformScale());
+	assume(transform.IsColOrthogonal());
+	pos = transform.Mul(pos);
+	normal = transform.Mul(normal).Normalized();
+	r *= transform.Col(0).Length(); // Scale the radius of the circle.
+}
+
+void Circle::Transform(const float3x4 &transform)
+{
+	assume(transform.HasUniformScale());
+	assume(transform.IsColOrthogonal());
+	pos = transform.MulPos(pos);
+	normal = transform.MulDir(normal).Normalized();
+	r *= transform.Col(0).Length(); // Scale the radius of the circle.
+}
+
+void Circle::Transform(const float4x4 &transform)
+{
+	assume(transform.HasUniformScale());
+	assume(transform.IsColOrthogonal());
+	pos = transform.MulPos(pos);
+	normal = transform.MulDir(normal).Normalized();
+	r *= transform.Col3(0).Length(); // Scale the radius of the circle.
+}
+
+void Circle::Transform(const Quat &transform)
+{
+	pos = transform.Mul(pos);
+	normal = transform.Mul(normal);
 }
 
 bool Circle::EdgeContains(const float3 &point, float maxDistance) const
@@ -215,5 +255,33 @@ std::ostream &operator <<(std::ostream &o, const Circle &circle)
 }
 
 #endif
+
+Circle operator *(const float3x3 &transform, const Circle &circle)
+{
+	Circle c(circle);
+	c.Transform(transform);
+	return c;
+}
+
+Circle operator *(const float3x4 &transform, const Circle &circle)
+{
+	Circle c(circle);
+	c.Transform(transform);
+	return c;
+}
+
+Circle operator *(const float4x4 &transform, const Circle &circle)
+{
+	Circle c(circle);
+	c.Transform(transform);
+	return c;
+}
+
+Circle operator *(const Quat &transform, const Circle &circle)
+{
+	Circle c(circle);
+	c.Transform(transform);
+	return c;
+}
 
 MATH_END_NAMESPACE

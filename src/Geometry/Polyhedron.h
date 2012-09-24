@@ -313,7 +313,18 @@ public:
 
 	void MergeConvex(const float3 &point);
 
-	void Transform(const float3x4 &matrix);
+	/// Translates this Polyhedron in world space.
+	/** @param offset The amount of displacement to apply to this Polyhedron, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &point);
+
+	/// Applies a transformation to this Polyhedron.
+	/** This function operates in-place.
+		@see Translate(), classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
 
 	/// Creates a Polyhedron object that represents the convex hull of the given point array.
 	/// \todo This function is strongly WIP!
@@ -324,6 +335,11 @@ public:
 	void ToLineList(VertexBuffer &vb);
 #endif
 };
+
+Polyhedron operator *(const float3x3 &transform, const Polyhedron &polyhedron);
+Polyhedron operator *(const float3x4 &transform, const Polyhedron &polyhedron);
+Polyhedron operator *(const float4x4 &transform, const Polyhedron &polyhedron);
+Polyhedron operator *(const Quat &transform, const Polyhedron &polyhedron);
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Polyhedron)

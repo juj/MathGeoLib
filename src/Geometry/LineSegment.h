@@ -90,9 +90,14 @@ public:
 		@see a, b.*/
 	float3 ExtremePoint(const float3 &direction) const;
 
+	/// Translates this LineSegment in world space.
+	/** @param offset The amount of displacement to apply to this LineSegment, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &point);
+
 	/// Applies a transformation to this line.
 	/** This function operates in-place.
-		@see classes float3x3, float3x4, float4x4, Quat. */
+		@see Translate(), classes float3x3, float3x4, float4x4, Quat, Transform(). */
 	void Transform(const float3x3 &transform);
 	void Transform(const float3x4 &transform);
 	void Transform(const float4x4 &transform);

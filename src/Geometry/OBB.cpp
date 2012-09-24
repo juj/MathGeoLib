@@ -1029,4 +1029,32 @@ void OBB::ToLineList(VertexBuffer &vb)
 
 #endif
 
+OBB operator *(const float3x3 &transform, const OBB &obb)
+{
+	OBB o(obb);
+	o.Transform(transform);
+	return o;
+}
+
+OBB operator *(const float3x4 &transform, const OBB &obb)
+{
+	OBB o(obb);
+	o.Transform(transform);
+	return o;
+}
+
+OBB operator *(const float4x4 &transform, const OBB &obb)
+{
+	OBB o(obb);
+	o.Transform(transform);
+	return o;
+}
+
+OBB operator *(const Quat &transform, const OBB &obb)
+{
+	OBB o(obb);
+	o.Transform(transform);
+	return o;
+}
+
 MATH_END_NAMESPACE

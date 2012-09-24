@@ -390,6 +390,11 @@ public:
 #endif
 };
 
+Frustum operator *(const float3x3 &transform, const Frustum &frustum);
+Frustum operator *(const float3x4 &transform, const Frustum &frustum);
+Frustum operator *(const float4x4 &transform, const Frustum &frustum);
+Frustum operator *(const Quat &transform, const Frustum &frustum);
+
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Frustum)
 Q_DECLARE_METATYPE(Frustum*)

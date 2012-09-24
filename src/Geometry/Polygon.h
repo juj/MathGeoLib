@@ -218,6 +218,19 @@ public:
 		@see NormalCCW(), NormalCW(). */
 	Plane PlaneCW() const;
 
+	/// Translates this Polygon in world space.
+	/** @param offset The amount of displacement to apply to this Polygon, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &point);
+
+	/// Applies a transformation to this Polygon.
+	/** This function operates in-place.
+		@see Translate(), classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
+
 	// Returns true if the edges of this polygon self-intersect.
 //	bool IsSelfIntersecting() const;
 
@@ -333,6 +346,11 @@ public:
 	// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
 //	static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 };
+
+Polygon operator *(const float3x3 &transform, const Polygon &polygon);
+Polygon operator *(const float3x4 &transform, const Polygon &polygon);
+Polygon operator *(const float4x4 &transform, const Polygon &polygon);
+Polygon operator *(const Quat &transform, const Polygon &polygon);
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Polygon)

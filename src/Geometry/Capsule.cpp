@@ -198,6 +198,7 @@ void Capsule::Scale(const float3 &centerPoint, float scaleFactor)
 void Capsule::Transform(const float3x3 &transform)
 {
 	assume(transform.HasUniformScale());
+	assume(transform.IsColOrthogonal());
 	l.Transform(transform);
 	r *= transform.Col(0).Length(); // Scale the radius.
 }
@@ -205,6 +206,7 @@ void Capsule::Transform(const float3x3 &transform)
 void Capsule::Transform(const float3x4 &transform)
 {
 	assume(transform.HasUniformScale());
+	assume(transform.IsColOrthogonal());
 	l.Transform(transform);
 	r *= transform.Col(0).Length(); // Scale the radius.
 }
@@ -212,6 +214,7 @@ void Capsule::Transform(const float3x4 &transform)
 void Capsule::Transform(const float4x4 &transform)
 {
 	assume(transform.HasUniformScale());
+	assume(transform.IsColOrthogonal());
 	l.Transform(transform);
 	r *= transform.Col3(0).Length(); // Scale the radius.
 }
@@ -406,5 +409,33 @@ std::ostream &operator <<(std::ostream &o, const Capsule &capsule)
 }
 
 #endif
+
+Capsule operator *(const float3x3 &transform, const Capsule &capsule)
+{
+	Capsule c(capsule);
+	c.Transform(transform);
+	return c;
+}
+
+Capsule operator *(const float3x4 &transform, const Capsule &capsule)
+{
+	Capsule c(capsule);
+	c.Transform(transform);
+	return c;
+}
+
+Capsule operator *(const float4x4 &transform, const Capsule &capsule)
+{
+	Capsule c(capsule);
+	c.Transform(transform);
+	return c;
+}
+
+Capsule operator *(const Quat &transform, const Capsule &capsule)
+{
+	Capsule c(capsule);
+	c.Transform(transform);
+	return c;
+}
 
 MATH_END_NAMESPACE

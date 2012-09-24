@@ -33,6 +33,10 @@
 #include "Geometry/Triangle.h"
 #include "Geometry/Sphere.h"
 #include "Math/MathFunc.h"
+#include "Math/float3x3.h"
+#include "Math/float3x4.h"
+#include "Math/float4x4.h"
+#include "Math/Quat.h"
 #include "Math/float2.h"
 
 MATH_BEGIN_NAMESPACE
@@ -280,6 +284,36 @@ Plane Polygon::PlaneCW() const
 	if (p.size() == 1)
 		return Plane(p[0], float3(0,1,0));
 	return Plane();
+}
+
+void Polygon::Translate(const float3 &point)
+{
+	for(size_t i = 0; i < p.size(); ++i)
+		p[i] += point;
+}
+
+void Polygon::Transform(const float3x3 &transform)
+{
+	if (p.size() > 0)
+		transform.BatchTransform(&p[0], p.size());
+}
+
+void Polygon::Transform(const float3x4 &transform)
+{
+	if (p.size() > 0)
+		transform.BatchTransformPos(&p[0], p.size());
+}
+
+void Polygon::Transform(const float4x4 &transform)
+{
+	for(size_t i = 0; i < p.size(); ++i)
+		p[i] = transform.MulPos(p[i]);
+}
+
+void Polygon::Transform(const Quat &transform)
+{
+	for(size_t i = 0; i < p.size(); ++i)
+		p[i] = transform * p[i];
 }
 
 bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) const
@@ -730,5 +764,33 @@ bool IsSupportingPoint(const float3 &point) const;
 /// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
 static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 */
+
+Polygon operator *(const float3x3 &transform, const Polygon &polygon)
+{
+	Polygon p(polygon);
+	p.Transform(transform);
+	return p;
+}
+
+Polygon operator *(const float3x4 &transform, const Polygon &polygon)
+{
+	Polygon p(polygon);
+	p.Transform(transform);
+	return p;
+}
+
+Polygon operator *(const float4x4 &transform, const Polygon &polygon)
+{
+	Polygon p(polygon);
+	p.Transform(transform);
+	return p;
+}
+
+Polygon operator *(const Quat &transform, const Polygon &polygon)
+{
+	Polygon p(polygon);
+	p.Transform(transform);
+	return p;
+}
 
 MATH_END_NAMESPACE

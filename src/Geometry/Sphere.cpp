@@ -70,6 +70,38 @@ Sphere::Sphere(const float3 &a, const float3 &b, const float3 &c, const float3 &
 	*this = FitThroughPoints(a, b, c, d);
 }
 
+void Sphere::Translate(const float3 &point)
+{
+	pos += point;
+}
+
+void Sphere::Transform(const float3x3 &transform)
+{
+	assume(transform.HasUniformScale());
+	pos = transform * pos;
+	r *= transform.Col(0).Length();
+}
+
+void Sphere::Transform(const float3x4 &transform)
+{
+	assume(transform.HasUniformScale());
+	pos = transform.MulPos(pos);
+	r *= transform.Col(0).Length();
+}
+
+void Sphere::Transform(const float4x4 &transform)
+{
+	assume(transform.HasUniformScale());
+	assume(!transform.ContainsProjection());
+	pos = transform.MulPos(pos);
+	r *= transform.Col3(0).Length();
+}
+
+void Sphere::Transform(const Quat &transform)
+{
+	pos = transform * pos;
+}
+
 AABB Sphere::MinimalEnclosingAABB() const
 {
 	AABB aabb;
@@ -1196,28 +1228,32 @@ std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
 
 #endif
 
-Sphere operator *(const float3x3 &m, const Sphere &s)
+Sphere operator *(const float3x3 &transform, const Sphere &sphere)
 {
-	assume(m.HasUniformScale());
-	return Sphere(m * s.pos, s.r * m.Col(0).Length());
+	Sphere s(sphere);
+	s.Transform(transform);
+	return s;
 }
 
-Sphere operator *(const float3x4 &m, const Sphere &s)
+Sphere operator *(const float3x4 &transform, const Sphere &sphere)
 {
-	assume(m.HasUniformScale());
-	return Sphere(m.MulPos(s.pos), s.r * m.Col(0).Length());
+	Sphere s(sphere);
+	s.Transform(transform);
+	return s;
 }
 
-Sphere operator *(const float4x4 &m, const Sphere &s)
+Sphere operator *(const float4x4 &transform, const Sphere &sphere)
 {
-	assume(m.HasUniformScale());
-	assume(!m.ContainsProjection());
-	return Sphere(m.MulPos(s.pos), s.r * m.Col3(0).Length());
+	Sphere s(sphere);
+	s.Transform(transform);
+	return s;
 }
 
-Sphere operator *(const Quat &q, const Sphere &s)
+Sphere operator *(const Quat &transform, const Sphere &sphere)
 {
-	return q.ToFloat3x3() * s;
+	Sphere s(sphere);
+	s.Transform(transform);
+	return s;
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP

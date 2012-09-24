@@ -96,6 +96,11 @@ float3 Line::GetPoint(float d) const
 	return pos + d * dir;
 }
 
+void Line::Translate(const float3 &point)
+{
+	pos += point;
+}
+
 void Line::Transform(const float3x3 &transform)
 {
 	pos = transform.Transform(pos);

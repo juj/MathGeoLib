@@ -15,6 +15,7 @@
 /** @file Triangle.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Triangle geometry object. */
+#include "Geometry/Triangle.h"
 #include "Math/MathFunc.h"
 #include "Math/float2.h"
 #include "Math/float3.h"
@@ -24,7 +25,6 @@
 #include "Math/Quat.h"
 #include "Geometry/Capsule.h"
 #include "Geometry/Frustum.h"
-#include "Geometry/Triangle.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Polygon.h"
 #include "Geometry/Polyhedron.h"
@@ -41,6 +41,37 @@ MATH_BEGIN_NAMESPACE
 Triangle::Triangle(const float3 &a_, const float3 &b_, const float3 &c_)
 :a(a_), b(b_), c(c_)
 {
+}
+
+void Triangle::Translate(const float3 &point)
+{
+	a += point;
+	b += point;
+	c += point;
+}
+
+void Triangle::Transform(const float3x3 &transform)
+{
+	transform.BatchTransform(&a, 3);
+}
+
+void Triangle::Transform(const float3x4 &transform)
+{
+	transform.BatchTransformPos(&a, 3);
+}
+
+void Triangle::Transform(const float4x4 &transform)
+{
+	a = transform.MulPos(a);
+	b = transform.MulPos(b);
+	c = transform.MulPos(c);
+}
+
+void Triangle::Transform(const Quat &transform)
+{
+	a = transform * a;
+	b = transform * b;
+	c = transform * c;
 }
 
 float3 Triangle::BarycentricUVW(const float3 &point) const
@@ -1053,24 +1084,32 @@ float3 Triangle::RandomPointOnEdge(LCG &rng) const
 	return c + (a-c) * r / ca;
 }
 
-Triangle operator *(const float3x3 &transform, const Triangle &t)
+Triangle operator *(const float3x3 &transform, const Triangle &triangle)
 {
-	return Triangle(transform*t.a, transform*t.b, transform*t.c);
+	Triangle t(triangle);
+	t.Transform(transform);
+	return t;
 }
 
-Triangle operator *(const float3x4 &transform, const Triangle &t)
+Triangle operator *(const float3x4 &transform, const Triangle &triangle)
 {
-	return Triangle(transform.MulPos(t.a), transform.MulPos(t.b), transform.MulPos(t.c));
+	Triangle t(triangle);
+	t.Transform(transform);
+	return t;
 }
 
-Triangle operator *(const float4x4 &transform, const Triangle &t)
+Triangle operator *(const float4x4 &transform, const Triangle &triangle)
 {
-	return Triangle(transform.MulPos(t.a), transform.MulPos(t.b), transform.MulPos(t.c));
+	Triangle t(triangle);
+	t.Transform(transform);
+	return t;
 }
 
-Triangle operator *(const Quat &transform, const Triangle &t)
+Triangle operator *(const Quat &transform, const Triangle &triangle)
 {
-	return Triangle(transform*t.a, transform*t.b, transform*t.c);
+	Triangle t(triangle);
+	t.Transform(transform);
+	return t;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT

@@ -51,6 +51,18 @@ public:
 		@see a, b, c. */
 	Triangle(const float3 &a, const float3 &b, const float3 &c);
 
+	/// Translates this Triangle in world space.
+	/** @param offset The amount of displacement to apply to this Triangle, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &point);
+
+	/// Applies a transformation to this Triangle, in-place.
+	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
+
 	/// Expresses the given point in barycentric (u,v,w) coordinates.
 	/** @note There are two different conventions for representing barycentric coordinates. One uses
 			a (u,v,w) triplet with the equation pt == u*a + v*b + w*c, and the other uses a (u,v) pair

@@ -536,6 +536,11 @@ public:
 #endif
 };
 
+OBB operator *(const float3x3 &transform, const AABB &aabb);
+OBB operator *(const float3x4 &transform, const AABB &aabb);
+OBB operator *(const float4x4 &transform, const AABB &aabb);
+OBB operator *(const Quat &transform, const AABB &aabb);
+
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(AABB)
 Q_DECLARE_METATYPE(AABB*)

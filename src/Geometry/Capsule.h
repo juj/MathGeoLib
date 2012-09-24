@@ -263,6 +263,11 @@ public:
 #endif
 };
 
+Capsule operator *(const float3x3 &transform, const Capsule &capsule);
+Capsule operator *(const float3x4 &transform, const Capsule &capsule);
+Capsule operator *(const float4x4 &transform, const Capsule &capsule);
+Capsule operator *(const Quat &transform, const Capsule &capsule);
+
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Capsule)
 Q_DECLARE_METATYPE(Capsule*)

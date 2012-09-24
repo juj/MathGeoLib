@@ -650,4 +650,32 @@ std::ostream &operator <<(std::ostream &o, const Frustum &frustum)
 
 #endif
 
+Frustum operator *(const float3x3 &transform, const Frustum &frustum)
+{
+	Frustum f(frustum);
+	f.Transform(transform);
+	return f;
+}
+
+Frustum operator *(const float3x4 &transform, const Frustum &frustum)
+{
+	Frustum f(frustum);
+	f.Transform(transform);
+	return f;
+}
+
+Frustum operator *(const float4x4 &transform, const Frustum &frustum)
+{
+	Frustum f(frustum);
+	f.Transform(transform);
+	return f;
+}
+
+Frustum operator *(const Quat &transform, const Frustum &frustum)
+{
+	Frustum f(frustum);
+	f.Transform(transform);
+	return f;
+}
+
 MATH_END_NAMESPACE

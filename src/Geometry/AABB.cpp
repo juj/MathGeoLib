@@ -1104,4 +1104,24 @@ void AABB::ToLineList(VertexBuffer &vb)
 
 #endif
 
+OBB operator *(const float3x3 &transform, const AABB &aabb)
+{
+	return aabb.Transform(transform);
+}
+
+OBB operator *(const float3x4 &transform, const AABB &aabb)
+{
+	return aabb.Transform(transform);
+}
+
+OBB operator *(const float4x4 &transform, const AABB &aabb)
+{
+	return aabb.Transform(transform);
+}
+
+OBB operator *(const Quat &transform, const AABB &aabb)
+{
+	return aabb.Transform(transform);
+}
+
 MATH_END_NAMESPACE

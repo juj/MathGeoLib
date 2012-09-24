@@ -24,6 +24,7 @@
 #include "assume.h"
 #include "Math/MathFunc.h"
 #include "Math/float3x4.h"
+#include "Math/Quat.h"
 #include "Geometry/AABB.h"
 #include "Geometry/OBB.h"
 #include "Geometry/Frustum.h"
@@ -819,6 +820,36 @@ void Polyhedron::MergeConvex(const float3 &point)
 //		MergeConvex(point);
 }
 
+void Polyhedron::Translate(const float3 &point)
+{
+	for(size_t i = 0; i < v.size(); ++i)
+		v[i] += point;
+}
+
+void Polyhedron::Transform(const float3x3 &transform)
+{
+	if (v.size() > 0)
+		transform.BatchTransform(&v[0], v.size());
+}
+
+void Polyhedron::Transform(const float3x4 &transform)
+{
+	if (v.size() > 0)
+		transform.BatchTransformPos(&v[0], v.size());
+}
+
+void Polyhedron::Transform(const float4x4 &transform)
+{
+	for(size_t i = 0; i < v.size(); ++i)
+		v[i] = transform.MulPos(v[i]); ///\todo Add float4x4::BatchTransformPos.
+}
+
+void Polyhedron::Transform(const Quat &transform)
+{
+	for(size_t i = 0; i < v.size(); ++i)
+		v[i] = transform * v[i];
+}
+
 void Polyhedron::OrientNormalsOutsideConvex()
 {
 	float3 center = v[0];
@@ -1001,12 +1032,6 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 
 }
 
-void Polyhedron::Transform(const float3x4 &matrix)
-{
-	if (v.size() > 0)
-		matrix.BatchTransformPos(&v[0], v.size());
-}
-
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void Polyhedron::ToLineList(VertexBuffer &vb)
 {
@@ -1021,10 +1046,32 @@ void Polyhedron::ToLineList(VertexBuffer &vb)
 }
 #endif
 
-/*
-Polyhedron operator *(const float3x3 &m, const Polyhedron &s);
-Polyhedron operator *(const float3x4 &m, const Polyhedron &s);
-Polyhedron operator *(const float4x4 &m, const Polyhedron &s);
-Polyhedron operator *(const Quat &q, const Polyhedron &s);
-*/
+Polyhedron operator *(const float3x3 &transform, const Polyhedron &polyhedron)
+{
+	Polyhedron p(polyhedron);
+	p.Transform(transform);
+	return p;
+}
+
+Polyhedron operator *(const float3x4 &transform, const Polyhedron &polyhedron)
+{
+	Polyhedron p(polyhedron);
+	p.Transform(transform);
+	return p;
+}
+
+Polyhedron operator *(const float4x4 &transform, const Polyhedron &polyhedron)
+{
+	Polyhedron p(polyhedron);
+	p.Transform(transform);
+	return p;
+}
+
+Polyhedron operator *(const Quat &transform, const Polyhedron &polyhedron)
+{
+	Polyhedron p(polyhedron);
+	p.Transform(transform);
+	return p;
+}
+
 MATH_END_NAMESPACE

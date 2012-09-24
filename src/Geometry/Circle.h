@@ -106,6 +106,21 @@ public:
 		@see class Plane. */
 	Plane ContainingPlane() const;
 
+	/// Translates this Circle in world space.
+	/** @param offset The amount of displacement to apply to this Circle, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &offset);
+
+	/// Applies a transformation to this Circle.
+	/** @param transform The transformation to apply to this Circle. This transformation must be 
+		affine, and must contain an orthogonal set of column vectors (may not contain shear or projection).
+		The transformation can only contain uniform scale, and may not contain mirroring.
+		@see Translate(), Scale(), classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
+
 	/// Tests if the given point is contained at the edge of this circle.
 	/** @param maxDistance The epsilon threshold to test the distance against. This effectively turns the circle into a torus
 			for this test.
@@ -185,6 +200,11 @@ public:
 	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
+
+Circle operator *(const float3x3 &transform, const Circle &circle);
+Circle operator *(const float3x4 &transform, const Circle &circle);
+Circle operator *(const float4x4 &transform, const Circle &circle);
+Circle operator *(const Quat &transform, const Circle &circle);
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Circle)

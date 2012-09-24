@@ -57,6 +57,18 @@ public:
 	/** @note The resulting sphere may not be the minimal enclosing sphere for the four points! */
 	Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
 
+	/// Translates this Sphere in world space.
+	/** @param offset The amount of displacement to apply to this Sphere, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &point);
+
+	/// Applies a transformation to this Sphere, in-place.
+	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */
+	void Transform(const float3x3 &transform);
+	void Transform(const float3x4 &transform);
+	void Transform(const float4x4 &transform);
+	void Transform(const Quat &transform);
+
 	/// Returns the smallest AABB that encloses this sphere.
 	/** The returned AABB is a cube, with a center position coincident with this sphere, and a side length of 2*r.
 		@see MaximalContainedAABB(). */

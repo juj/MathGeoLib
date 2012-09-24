@@ -68,8 +68,13 @@ public:
 		@see pos, dir. */
 	float3 GetPoint(float distance) const;
 
+	/// Translates this Line in world space.
+	/** @param offset The amount of displacement to apply to this Line, in world space coordinates.
+		@see Transform(). */
+	void Translate(const float3 &point);
+
 	/// Applies a transformation to this line, in-place.
-	/** @see classes float3x3, float3x4, float4x4, Quat. */
+	/** @see Translate(), classes float3x3, float3x4, float4x4, Quat. */
 	void Transform(const float3x3 &transform);
 	void Transform(const float3x4 &transform);
 	void Transform(const float4x4 &transform);
