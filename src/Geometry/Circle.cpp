@@ -95,7 +95,7 @@ void Circle::Transform(const float3x4 &transform)
 void Circle::Transform(const float4x4 &transform)
 {
 	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal());
+	assume(transform.IsColOrthogonal3());
 	pos = transform.MulPos(pos);
 	normal = transform.MulDir(normal).Normalized();
 	r *= transform.Col3(0).Length(); // Scale the radius of the circle.

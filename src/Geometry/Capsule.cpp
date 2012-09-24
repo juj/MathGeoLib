@@ -214,7 +214,7 @@ void Capsule::Transform(const float3x4 &transform)
 void Capsule::Transform(const float4x4 &transform)
 {
 	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal());
+	assume(transform.IsColOrthogonal3());
 	l.Transform(transform);
 	r *= transform.Col3(0).Length(); // Scale the radius.
 }
