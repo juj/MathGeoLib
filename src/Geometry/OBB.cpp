@@ -820,7 +820,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 	{
 		float ra = r[0] * AbsR[0][i] + r[1] * AbsR[1][i] + r[2] * AbsR[2][i];
 		float rb = b.r[i];
-		if (Abs(t.x + R[0][i] + t.y * R[1][i] + t.z * R[2][i]) > ra + rb)
+		if (Abs(t.x * R[0][i] + t.y * R[1][i] + t.z * R[2][i]) > ra + rb)
 			return false;
 	}
 
