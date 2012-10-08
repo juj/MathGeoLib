@@ -12,7 +12,4 @@ file(GLOB_RECURSE sourceFiles ./src/*.cpp)
 file(GLOB_RECURSE headerFiles ./src/*.h)
 
 add_library(MathGeoLib STATIC ${sourceFiles} ${headerFiles})
-set_target_properties(MathGeoLib PROPERTIES 
-	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
-	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
