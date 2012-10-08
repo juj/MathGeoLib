@@ -32,6 +32,7 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Triangle.h"
 #include "Geometry/Sphere.h"
+#include "Algorithm/Random/LCG.h"
 #include "Math/MathFunc.h"
 #include "Math/float3x3.h"
 #include "Math/float3x4.h"
@@ -602,6 +603,33 @@ float3 Polygon::Centroid() const
 	for(int i = 0; i < NumVertices(); ++i)
 		centroid += Vertex(i);
 	return centroid / (float)NumVertices();
+}
+
+float3 Polygon::PointOnEdge(float normalizedDistance) const
+{
+	if (p.size() == 0)
+		return float3::nan;
+	if (p.size() < 2)
+		return p[0];
+	normalizedDistance = Frac(normalizedDistance); // Take modulo 1 so we have the range [0,1[.
+	float perimeter = Perimeter();
+	float d = normalizedDistance * perimeter;
+	for(int i = 0; i < NumVertices(); ++i)
+	{
+		LineSegment edge = Edge(i);
+		float len = edge.Length();
+		assume(len != 0.f && "Degenerate Polygon detected!");
+		if (d <= len)
+			return edge.GetPoint(d / len);
+		d -= len;
+	}
+	mathassert(false && "Polygon::PointOnEdge reached end of loop which shouldn't!");
+	return p[0];
+}
+
+float3 Polygon::RandomPointOnEdge(LCG &rng) const
+{
+	return PointOnEdge(rng.Float());
 }
 
 Polyhedron Polygon::ToPolyhedron() const

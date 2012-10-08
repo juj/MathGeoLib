@@ -314,6 +314,19 @@ public:
 	/** @see Area(), Perimeter(). */
 	float3 Centroid() const;
 
+	/// Computes a point on the perimeter of this polygon.
+	/** @param normalizedDistance A value in the range [0,1[ specifying the distance along the polygon edge to travel.
+		The polygon perimeter forms a closed loop, so PointOnEdge(0.f) == PointOnEdge(1.f) and is equal to the point p[0] of this
+		polygon. As another example, PointOnEdge(0.5f) returns the point half-way around the polygon edge (but not necessarily the farthest
+		point from p[0]).
+		@see p, RandomPointOnEdge(). */
+	float3 PointOnEdge(float normalizedDistance) const;
+
+	/// Computes a random point on the perimeter of this polygon.
+	/** This function generates points with uniform distribution.
+		@see PointOnEdge(). */
+	float3 RandomPointOnEdge(LCG &rng) const;
+
 	/// Converts this Polygon to a Polyhedron representation.
 	/** This function will create a Polyhedron with two faces, one for the front face of this Polygon,
 		and one for the back face.
