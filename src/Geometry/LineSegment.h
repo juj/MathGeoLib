@@ -215,6 +215,10 @@ public:
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+	void ToLineList(VertexBuffer &vb) const;
+#endif
 };
 
 LineSegment operator *(const float3x3 &transform, const LineSegment &line);

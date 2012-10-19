@@ -34,6 +34,10 @@
 #include "Geometry/Triangle.h"
 #include "Geometry/Circle.h"
 
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+#include "VertexBuffer.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 LineSegment::LineSegment(const float3 &a_, const float3 &b_)
@@ -358,6 +362,17 @@ std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment)
 {
 	o << lineSegment.ToString();
 	return o;
+}
+
+#endif
+
+#ifdef MATH_GRAPHICSENGINE_INTEROP
+
+void LineSegment::ToLineList(VertexBuffer &vb) const
+{
+	int startIndex = vb.AppendVertices(2);
+	vb.Set(startIndex, VDPosition, float4(a, 1.f));
+	vb.Set(startIndex+1, VDPosition, float4(b, 1.f));
 }
 
 #endif
