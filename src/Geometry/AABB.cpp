@@ -1092,7 +1092,7 @@ void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFa
 	}
 }
 
-void AABB::ToLineList(VertexBuffer &vb)
+void AABB::ToLineList(VertexBuffer &vb) const
 {
 	Array<float3> pos;
 	pos.Resize_pod(NumVerticesInEdgeList());

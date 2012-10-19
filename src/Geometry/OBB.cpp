@@ -1017,7 +1017,7 @@ void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFaci
 	}
 }
 
-void OBB::ToLineList(VertexBuffer &vb)
+void OBB::ToLineList(VertexBuffer &vb) const
 {
 	Array<float3> pos;
 	pos.Resize_pod(NumVerticesInEdgeList());
