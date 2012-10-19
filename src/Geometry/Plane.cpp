@@ -813,5 +813,32 @@ void Plane::Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const flo
 			i += 6;
 		}
 }
+
+void Plane::ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const float3 &centerPoint, int numLinesU, int numLinesV) const
+{
+	float3 topLeft = Point(-uWidth*0.5f, -vHeight *0.5f, centerPoint);
+	float3 uEdge = (Point(uWidth*0.5f, -vHeight *0.5f, centerPoint) - topLeft) / (float)numLinesU;
+	float3 vEdge = (Point(-uWidth*0.5f, vHeight *0.5f, centerPoint) - topLeft) / (float)numLinesV;
+
+	int i = vb.AppendVertices((numLinesU + numLinesV) * 2);
+	for(int y = 0; y < numLinesV; ++y)
+	{
+		float4 start = float4(topLeft + vEdge * (float)y, 1.f);
+		float4 end   = float4(topLeft + uWidth * uEdge + vEdge * (float)y, 1.f);
+		vb.Set(i, VDPosition, start);
+		vb.Set(i+1, VDPosition, end);
+		i += 2;
+	}
+
+	for(int x = 0; x < numLinesU; ++x)
+	{
+		float4 start = float4(topLeft + uEdge * (float)x, 1.f);
+		float4 end   = float4(topLeft + vHeight * vEdge + uEdge * (float)x, 1.f);
+		vb.Set(i, VDPosition, start);
+		vb.Set(i+1, VDPosition, end);
+		i += 2;
+	}
+}
+
 #endif
 MATH_END_NAMESPACE

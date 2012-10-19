@@ -367,6 +367,7 @@ public:
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const float3 &centerPoint, int numFacesU, int numFacesV, bool ccwIsFrontFacing) const;
+	void ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const float3 &centerPoint, int numLinesU, int numLinesV) const;
 #endif
 
 };
