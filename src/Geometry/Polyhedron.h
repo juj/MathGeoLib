@@ -96,6 +96,8 @@ public:
 		@see NumEdges(), Edge(), EdgeIndices(). */
 	std::vector<LineSegment> Edges() const;
 
+	std::vector<Polygon> Faces() const;
+
 	/// Returns all the (unique) edges of this polyhedron, as indices to the polyhedron vertex array.
 	/** Has complexity of O(|V|log|V|), where |V| is the number of vertices in the polyhedron. 
 		@todo Support this in linear time.
@@ -330,9 +332,15 @@ public:
 	/// \todo This function is strongly WIP!
 	static Polyhedron ConvexHull(const float3 *pointArray, int numPoints);
 
+	static Polyhedron Tetrahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Octahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Hexahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Icosahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Dodecahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-//	void Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const;
-	void ToLineList(VertexBuffer &vb);
+	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const;
+	void ToLineList(VertexBuffer &vb) const;
 #endif
 };
 

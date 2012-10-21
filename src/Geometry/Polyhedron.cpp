@@ -119,6 +119,15 @@ std::vector<std::pair<int, int> > Polyhedron::EdgeIndices() const
 	return edges;
 }
 
+std::vector<Polygon> Polyhedron::Faces() const
+{
+	std::vector<Polygon> faces;
+	faces.reserve(NumFaces());
+	for(int i = 0; i < NumFaces(); ++i)
+		faces.push_back(FacePolygon(i));
+	return faces;
+}
+
 Polygon Polyhedron::FacePolygon(int faceIndex) const
 {
 	Polygon p;
@@ -247,6 +256,12 @@ bool Polyhedron::FaceIndicesValid() const
 					return false;
 
 	return true;
+}
+
+void Polyhedron::FlipWindingOrder()
+{
+	for(size_t i = 0; i < f.size(); ++i)
+		f[i].FlipWindingOrder();
 }
 
 bool Polyhedron::IsClosed() const
@@ -957,6 +972,211 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 	return p;
 }
 
+/// See http://paulbourke.net/geometry/platonic/
+Polyhedron Polyhedron::Tetrahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+{
+	const float3 vertices[4] = { float3(1,1,1),
+	                             float3(-1,1,-1),
+	                             float3(1,-1,-1),
+	                             float3(-1,-1,1) };
+	const int faces[4][3] = { { 0, 1, 2 },
+	                          { 1, 3, 2 },
+	                          { 0, 2, 3 },
+	                          { 0, 3, 1 } };
+
+	scale /= 2.f;
+	Polyhedron p;
+
+	for(int i = 0; i < 4; ++i)
+		p.v.push_back(vertices[i]*scale + centerPos);
+
+	for(int i = 0; i < 4; ++i)
+	{
+		Face f;
+		for(int j = 0; j < 3; ++j)
+			f.v.push_back(faces[i][j]);
+		p.f.push_back(f);
+	}
+
+	if (!ccwIsFrontFacing)
+		p.FlipWindingOrder();
+
+	return p;
+}
+
+/// See http://paulbourke.net/geometry/platonic/
+Polyhedron Polyhedron::Octahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+{
+	float a = 1.f / (2.f * Sqrt(2.f));
+	float b = 0.5f;
+
+	const float3 vertices[6] = { float3(-a, 0, a),
+	                             float3(-a, 0,-a),
+	                             float3( 0, b, 0),
+	                             float3( a, 0,-a),
+	                             float3( 0,-b, 0),
+	                             float3( a, 0, a) };
+	const int faces[8][3] = { { 0, 1, 2 },
+	                          { 1, 3, 2 },
+	                          { 3, 5, 2 },
+	                          { 5, 0, 2 },
+	                          { 3, 1, 4 },
+	                          { 1, 0, 4 },
+	                          { 5, 3, 4 },
+	                          { 0, 5, 4 } };
+
+	scale /= 2.f;
+	Polyhedron p;
+
+	for(int i = 0; i < 6; ++i)
+		p.v.push_back(vertices[i]*scale + centerPos);
+
+	for(int i = 0; i < 8; ++i)
+	{
+		Face f;
+		for(int j = 0; j < 3; ++j)
+			f.v.push_back(faces[i][j]);
+		p.f.push_back(f);
+	}
+
+	if (!ccwIsFrontFacing)
+		p.FlipWindingOrder();
+
+	return p;
+}
+
+/// See http://paulbourke.net/geometry/platonic/
+Polyhedron Polyhedron::Hexahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+{
+	AABB aabb(float3(-1,-1,-1), float3(1,1,1));
+	aabb.Scale(float3::zero, scale * 0.5f);
+	aabb.Translate(centerPos);
+	Polyhedron p = aabb.ToPolyhedron();
+	if (ccwIsFrontFacing)
+		p.FlipWindingOrder();
+	return p;
+}
+
+/// See http://paulbourke.net/geometry/platonic/
+Polyhedron Polyhedron::Icosahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+{
+	float a = 0.5f;
+	float phi = (1.f + Sqrt(5.f)) / 2.f;
+	float b = 1.f / (2.f * phi);
+
+	const float3 vertices[12] = { float3( 0,  b, -a),
+	                              float3( b,  a,  0),
+	                              float3(-b,  a,  0),
+	                              float3( 0,  b,  a),
+	                              float3( 0, -b,  a),
+	                              float3(-a,  0,  b),
+	                              float3( a,  0,  b),
+	                              float3( 0, -b, -a),
+	                              float3(-a,  0, -b),
+	                              float3(-b, -a,  0),
+	                              float3( b, -a,  0),
+	                              float3( a,  0, -b) };
+	const int faces[20][3] = { { 0,  1,  2 },
+	                           { 3,  2,  1 },
+	                           { 3,  4,  5 },
+	                           { 3,  6,  4 },
+	                           { 0,  7, 11 },
+	                           { 0,  8,  7 },
+	                           { 4, 10,  9 },
+	                           { 7,  9, 10 },
+	                           { 2,  5,  8 },
+	                           { 9,  8,  5 },
+	                           { 1, 11,  6 },
+	                           { 10, 6, 11 },
+	                           { 3,  5,  2 },
+	                           { 3,  1,  6 },
+	                           { 0,  2,  8 },
+	                           { 0, 11,  1 },
+	                           { 7,  8,  9 },
+	                           { 7, 10, 11 },
+	                           { 4,  9,  5 },
+	                           { 4,  6, 10 } };
+
+	Polyhedron p;
+
+	for(int i = 0; i < 12; ++i)
+		p.v.push_back(vertices[i]*scale + centerPos);
+
+	for(int i = 0; i < 20; ++i)
+	{
+		Face f;
+		for(int j = 0; j < 3; ++j)
+			f.v.push_back(faces[i][j]);
+		p.f.push_back(f);
+	}
+
+	if (!ccwIsFrontFacing)
+		p.FlipWindingOrder();
+
+	return p;
+}
+
+/// See http://paulbourke.net/geometry/platonic/
+Polyhedron Polyhedron::Dodecahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+{
+	float phi = (1.f + Sqrt(5.f)) / 2.f;
+	float b = 1.f / phi;
+	float c = 2.f - phi;
+
+	const float3 vertices[20] = { float3( c,  0,  1),
+	                              float3(-c,  0,  1),
+	                              float3(-b,  b,  b),
+	                              float3( 0,  1,  c),
+	                              float3( b,  b,  b),
+	                              float3( b, -b,  b),
+	                              float3( 0, -1,  c),
+	                              float3(-b, -b,  b),
+	                              float3( 0, -1, -c),
+	                              float3( b, -b, -b),
+	                              float3(-c,  0, -1),
+	                              float3( c,  0, -1),
+	                              float3(-b, -b, -b),
+	                              float3( b,  b, -b),
+	                              float3( 0,  1, -c),
+	                              float3(-b,  b, -b),
+	                              float3( 1,  c,  0),
+	                              float3(-1,  c,  0),
+	                              float3(-1, -c,  0),
+	                              float3( 1, -c,  0) };
+
+	const int faces[12][5] = { {  0,  1,  2,  3,  4 },
+	                           {  1,  0,  5,  6,  7 },
+	                           { 11, 10, 12,  8,  9 },
+	                           { 10, 11, 13, 14, 15 },
+	                           { 13, 16,  4,  3, 14 }, // Note: The winding order of this face was flipped from PBourke's original representation.
+	                           {  2, 17, 15, 14,  3 }, //       Winding order flipped.
+	                           { 12, 18,  7,  6,  8 }, //       Winding order flipped.
+	                           {  5, 19,  9,  8,  6 }, //       Winding order flipped.
+	                           { 16, 19,  5,  0,  4 },
+	                           { 19, 16, 13, 11,  9 },
+	                           { 17, 18, 12, 10, 15 },
+	                           { 18, 17,  2,  1,  7 } };
+
+	scale /= 2.f;
+	Polyhedron p;
+
+	for(int i = 0; i < 20; ++i)
+		p.v.push_back(vertices[i]*scale + centerPos);
+
+	for(int i = 0; i < 12; ++i)
+	{
+		Face f;
+		for(int j = 0; j < 5; ++j)
+			f.v.push_back(faces[i][j]);
+		p.f.push_back(f);
+	}
+
+	if (!ccwIsFrontFacing)
+		p.FlipWindingOrder();
+
+	return p;
+}
+
 int IntTriCmp(int a, int b)
 {
 	return a - b;
@@ -1033,7 +1253,41 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-void Polyhedron::ToLineList(VertexBuffer &vb)
+void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
+{
+	for(int i = 0; i < NumFaces(); ++i)
+	{
+		Polygon p = FacePolygon(i);
+		std::vector<Triangle> tris = p.Triangulate();
+		int idx = vb.AppendVertices(3*tris.size());
+		for(size_t j = 0; j < tris.size(); ++j)
+		{
+			vb.Set(idx, VDPosition, float4(tris[j].a, 1.f));
+			if (ccwIsFrontFacing)
+			{
+				vb.Set(idx+1, VDPosition, float4(tris[j].c, 1.f));
+				vb.Set(idx+2, VDPosition, float4(tris[j].b, 1.f));
+			}
+			else
+			{
+				vb.Set(idx+1, VDPosition, float4(tris[j].b, 1.f));
+				vb.Set(idx+2, VDPosition, float4(tris[j].c, 1.f));
+			}
+			// Generate flat normals if VB has space for normals.
+			if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
+			{
+				float3 normal = ccwIsFrontFacing ? tris[j].NormalCCW() : tris[j].NormalCW();
+				vb.Set(idx, VDNormal, float4(normal, 0.f));
+				vb.Set(idx+1, VDNormal, float4(normal, 0.f));
+				vb.Set(idx+2, VDNormal, float4(normal, 0.f));
+			}
+			idx += 3;
+
+		}
+	}
+}
+
+void Polyhedron::ToLineList(VertexBuffer &vb) const
 {
 	std::vector<LineSegment> edges = Edges();
 
