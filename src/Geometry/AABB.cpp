@@ -903,8 +903,8 @@ void AABB::Enclose(const LineSegment &lineSegment)
 
 void AABB::Enclose(const AABB &aabb)
 {
-	Enclose(aabb.minPoint);
-	Enclose(aabb.maxPoint);
+	minPoint = Min(minPoint, aabb.minPoint);
+	maxPoint = Max(maxPoint, aabb.maxPoint);
 }
 
 void AABB::Enclose(const OBB &obb)
