@@ -127,7 +127,7 @@ float3 Polygon::BasisV() const
 {
 	if (p.size() < 2)
 		return float3::unitY;
-	return Cross(BasisU(), PlaneCCW().normal).Normalized();
+	return Cross(PlaneCCW().normal, BasisU()).Normalized();
 }
 
 LineSegment Polygon::Diagonal(int i, int j) const
@@ -753,7 +753,7 @@ std::vector<Triangle> Polygon::Triangulate() const
 	assume(p2d.size() == 3);
 	if (p2d.size() > 3) // If this occurs, then the polygon is NOT counter-clockwise oriented.
 		return t;
-	/*
+/*
 	{
 		// For conveniency, create a copy that has the winding order fixed, and triangulate that instead.
 		// (Causes a large performance hit!)
@@ -761,8 +761,8 @@ std::vector<Triangle> Polygon::Triangulate() const
 		for(size_t i = 0; i < p2.p.size()/2; ++i)
 			std::swap(p2.p[i], p2.p[p2.p.size()-1-i]);
 		return p2.Triangulate();
-	}*/
-
+	}
+*/
 	// Add the last poly.
 	t.push_back(Triangle(p[polyIndices[0]], p[polyIndices[1]], p[polyIndices[2]]));
 
