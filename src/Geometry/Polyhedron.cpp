@@ -521,19 +521,34 @@ float Polyhedron::Distance(const float3 &point) const
 }
 
 bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir, 
-												   float &tFirst, float &tLast) const
+                                                   float &tFirst, float &tLast) const
 {
 	assume(IsConvex());
+
 	// Intersect line segment against each plane.
 	for(int i = 0; i < NumFaces(); ++i)
 	{
+		/* Denoting the dot product of vectors a and b with <a,b>, we have:
+
+		   The points P on the plane p satisfy the equation <P, p.normal> == p.d.
+		   The points P on the line have the parametric equation P = ptA + dir * t.
+		   Solving for the distance along the line for intersection gives
+		
+		   t = (p.d - <p.normal, ptA>) / <p.normal, dir>.
+		*/
+
 		Plane p = FacePlane(i);
 		float denom = Dot(p.normal, dir);
 		float dist = p.d - Dot(p.normal, ptA);
-		// Test if segment runs parallel to the plane.
+
+		// Avoid division by zero. In this case the line segment runs parallel to the plane.
 		if (Abs(denom) < 1e-5f)
 		{
-			if (dist > 0.f) return false; 
+			// If <P, p.normal> < p.d, then the point lies in the negative halfspace of the plane, which is inside the polyhedron.
+			// If <P, p.normal> > p.d, then the point lies in the positive halfspace of the plane, which is outside the polyhedron.
+			// Therefore, if p.d - <ptA, p.normal> == dist < 0, then the whole line is outside the polyhedron.
+			if (dist < 0.f)
+				return false;
 		}
 		else
 		{
