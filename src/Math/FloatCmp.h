@@ -17,6 +17,8 @@
 	@brief */
 #pragma once
 
+#include "MathFunc.h"
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #endif
@@ -25,7 +27,7 @@ MATH_BEGIN_NAMESPACE
 
 bool Equal(double a, double b, double epsilon = 1e-6)
 {
-	return std::abs(a-b) < epsilon;
+	return Abs(a-b) < epsilon;
 }
 
 MATH_END_NAMESPACE
