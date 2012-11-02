@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright Jukka Jylänki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -11,11 +11,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License. */
-#ifndef LOG_H
-#define LOG_H
 
 /** @file Log.h
+	@author Jukka Jylänki
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
+#pragma once
 
 /// A bitfield type that describes single or multiple log channels (each bit represents a channel).
 typedef unsigned int LogChannel;
@@ -149,6 +149,4 @@ void logmsg(const char *msg);
 #define TRACE LOGI
 #else
 #define TRACE(...) ((void)0)
-#endif
-
 #endif
