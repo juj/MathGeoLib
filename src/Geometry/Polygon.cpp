@@ -154,7 +154,7 @@ bool Polygon::IsConvex() const
 	int j = (int)p.size()-1;
 	int k = 0;
 
-	while(k < p.size())
+	while(k < (int)p.size())
 	{
 		float2 a = MapTo2D(i);
 		float2 b = MapTo2D(j);
@@ -224,7 +224,7 @@ bool Polygon::IsSimple() const
 		LineSegment si = plane.Project(Edge(i));
 		for(int j = i+2; j < (int)p.size(); ++j)
 		{
-			if (i == 0 && j == p.size() - 1)
+			if (i == 0 && j == (int)p.size() - 1)
 				continue; // These two edges are consecutive and share a vertex. Don't check that pair.
 			LineSegment sj = plane.Project(Edge(j));
 			if (si.Intersects(sj))
