@@ -265,10 +265,6 @@ public:
 		they were. */
 	static float4x4 Mirror(const Plane &p);
 
-	/// Creates a new float4x4 that performs perspective projection.
-	/// @note The returned matrix contains a last row that differs from [0 0 0 1].
-	static float4x4 PerspectiveProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalFov, float verticalFov);
-
 	/// Identical to D3DXMatrixOrthoLH, except transposed to account for Matrix * vector convention used in MathGeoLib.
 	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205346(v=vs.85).aspx
 	static float4x4 D3DOrthoProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);

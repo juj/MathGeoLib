@@ -417,12 +417,6 @@ float4x4 float4x4::Mirror(const Plane &p)
 	return v;
 }
 
-float4x4 float4x4::PerspectiveProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalFov, float verticalFov)
-{
-	assume(false && "Not implemented!"); /// @todo Implement.
-	return float4x4(); ///@todo
-}
-
 float4x4 float4x4::D3DOrthoProjLH(float n, float f, float h, float v)
 {
 	float4x4 p;
