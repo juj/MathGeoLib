@@ -215,7 +215,7 @@ public:
 
 	/// Tests whether all the faces of this polyhedron are non-degenerate (have at least 3 vertices)
 	/// and in case they have more than 3 vertices, tests that the faces are planar.
-	bool FacesAreNondegeneratePlanar(float epsilon = 1e-4f) const;
+	bool FacesAreNondegeneratePlanar(float epsilon = 1e-2f) const;
 
 	/// Clips the line/ray/line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast, 
 	/// inside this <b>convex</b> polyhedron.

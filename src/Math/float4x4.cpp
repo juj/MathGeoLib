@@ -1854,7 +1854,7 @@ bool float4x4::IsInvertible(float epsilon) const
 {
 	///@todo Optimize.
 	float4x4 copy = *this;
-	return copy.Inverse();
+	return copy.Inverse(epsilon);
 }
 
 bool float4x4::IsSymmetric(float epsilon) const

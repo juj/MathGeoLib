@@ -342,7 +342,7 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 		{
 			Plane facePlane = FacePlane(i);
 			for(size_t j = 0; j < face.v.size(); ++j)
-				if (facePlane.Distance(v[face.v[j]]) > 1e-2f)
+				if (facePlane.Distance(v[face.v[j]]) > epsilon)
 					return false;
 		}
 	}
@@ -791,9 +791,9 @@ void Polyhedron::MergeConvex(const float3 &point)
 			std::map<std::pair<int, int>, int>::iterator existing = remainingEdges.find(opposite);
 			assert(existing != remainingEdges.end());
 
+#if 0			
 			int adjoiningFace = existing->second;
 
-#if 0			
 			if (FaceNormal(adjoiningFace).Dot(newTriangleNormal) >= 0.99999f) ///\todo float3::IsCollinear
 			{
 				bool added = false;
@@ -1249,7 +1249,7 @@ void Polyhedron::RemoveRedundantVertices()
 		for(size_t j = 0; j < f[i].v.size(); ++j)
 		{
 			int oldIndex = f[i].v[j];
-			int newIndex = ArrayBinarySearch(&usedVerticesArray[0], usedVerticesArray.size(), f[i].v[j], IntTriCmp);
+			int newIndex = ArrayBinarySearch(&usedVerticesArray[0], usedVerticesArray.size(), oldIndex, IntTriCmp);
 			assert(newIndex != -1);
 			f[i].v[j] = newIndex;
 		}

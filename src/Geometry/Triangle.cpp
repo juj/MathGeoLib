@@ -251,7 +251,7 @@ bool Triangle::IsFinite() const
 
 bool Triangle::IsDegenerate(float epsilon) const
 {
-	return IsDegenerate(a, b, c);
+	return IsDegenerate(a, b, c, epsilon);
 }
 
 bool Triangle::IsDegenerate(const float3 &a, const float3 &b, const float3 &c, float epsilon)
