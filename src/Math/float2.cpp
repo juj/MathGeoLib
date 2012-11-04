@@ -510,7 +510,7 @@ void float2::ConvexHull(const float2 *pointArray, int numPoints, std::vector<flo
 	if (numPoints == 0)
 		return;
 	outConvexHull.insert(outConvexHull.end(), pointArray, pointArray + numPoints);
-	int convexHullSize = ConvexHullInPlace(&outConvexHull[0], outConvexHull.size());
+	int convexHullSize = ConvexHullInPlace(&outConvexHull[0], (int)outConvexHull.size());
 	outConvexHull.resize(convexHullSize);
 }
 #endif
