@@ -486,9 +486,10 @@ bool Plane::Intersects(const Ray &ray, float *d) const
 bool Plane::Intersects(const Line &line, float *d) const
 {
 	float t;
-	return IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, t);
+	bool intersects = IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, t);
 	if (d)
 		*d = t;
+	return intersects;
 }
 
 bool Plane::Intersects(const LineSegment &lineSegment, float *d) const
