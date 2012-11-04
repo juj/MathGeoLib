@@ -1375,7 +1375,7 @@ void float4x4::RemoveScale()
 	assume(x != 0 && y != 0 && z != 0 && "float4x4::RemoveScale failed!");
 	MARK_UNUSED(x);
 	MARK_UNUSED(y);
-	MARK_UNUSED(y);
+	MARK_UNUSED(z);
 }
 
 /// Algorithm from Eric Lengyel's Mathematics for 3D Game Programming & Computer Graphics, 2nd Ed.
