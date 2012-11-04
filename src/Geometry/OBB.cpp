@@ -131,15 +131,25 @@ void OBB::SetFrom(const Sphere &sphere)
 	axis[2] = float3(0,0,1);
 }
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
 bool OBB::SetFrom(const Polyhedron &polyhedron)
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
-	return false;
+	if (polyhedron.v.size() > 0)
+	{
+		*this = OBB::OptimalEnclosingOBB(&polyhedron.v[0], polyhedron.v.size());
+		return true;
+	}
+	else
+	{
+		SetNegativeInfinity();
+		return false;
+	}
 }
+#endif
 
 void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
+	*this = PCAEnclosingOBB(pointArray, numPoints);
 }
 
 Polyhedron OBB::ToPolyhedron() const

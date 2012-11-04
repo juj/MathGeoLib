@@ -90,12 +90,14 @@ public:
 		@see class Sphere, MinimalEnclosingSphere(). */
 	void SetFrom(const Sphere &sphere);
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
 	/// Sets this OBB to enclose the given polyhedron.		
 	/** This function computes the smallest OBB (in terms of volume) that contains the given polyhedron, and stores the result in this structure.
 		@note An OBB cannot generally exactly represent a polyhedron. Converting a polyhedron to an OBB loses some features of the polyhedron.
 		@return True if the resulting OBB is not degenerate, false otherwise. In either case, the old values of this OBB are destroyed.
 		@see SetFromApproximate(), ToPolyhedron(). */
 	bool SetFrom(const Polyhedron &polyhedron);
+#endif
 
 	/// Sets this OBB to enclose the given point cloud.
 	/** This functions uses principal component analysis to generate an approximation of the smallest OBB that encloses the
