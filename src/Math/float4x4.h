@@ -77,13 +77,15 @@ public:
 
 	/// Stores the data in this matrix in row-major format.
 	/** [noscript] */
+#ifdef MATH_SSE
 	union
 	{
+#endif
 		float v[Rows][Cols];
 #ifdef MATH_SSE
 		__m128 row[4];
-#endif
 	};
+#endif
 
 	/// A constant matrix that has zeroes in all its entries.
 	static const float4x4 zero;

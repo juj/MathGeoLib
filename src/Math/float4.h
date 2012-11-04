@@ -48,10 +48,12 @@ public:
 		Size = 4
 	};
 
+#ifdef MATH_SSE
 	union
 	{
 		struct
 		{
+#endif
 			/// The x component.
 			/** A float4 is 16 bytes in size. This element lies in the memory offsets 0-3 of this class. */
 			float x;
@@ -64,11 +66,11 @@ public:
 			/// The w component. [similarOverload: x]
 			/** This element is packed to the memory offsets 12-15 of this class. */
 			float w;
-		};
 #ifdef MATH_SSE
+		};
 		__m128 v;
-#endif
 	};
+#endif
 
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members x, y, z and w are all undefined after creating a new float4 using 
