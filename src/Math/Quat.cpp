@@ -122,6 +122,7 @@ Quat Quat::Normalized() const
 	Quat copy = *this;
 	float success = copy.Normalize();
 	assume(success > 0 && "Quat::Normalized failed!");
+	MARK_UNUSED(success);
 	return copy;
 }
 
