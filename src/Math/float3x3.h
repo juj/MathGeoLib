@@ -403,7 +403,7 @@ public:
 
 	/// Inverts this matrix using Cramer's rule.
 	/// @return Returns true on success, false otherwise.
-	bool Inverse();
+	bool Inverse(float epsilon = 1e-3f);
 
 	/// Returns an inverted copy of this matrix. This function uses the Cramer's rule.
 	/// If this matrix does not have an inverse, returns the matrix that was the result of running

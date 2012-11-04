@@ -760,7 +760,7 @@ float3x3 float3x3::Adjugate() const
 	return a;
 }
 */
-bool float3x3::Inverse()
+bool float3x3::Inverse(float epsilon)
 {
 #ifdef MATH_ASSERT_CORRECTNESS
 	float3x3 orig = *this;
@@ -768,10 +768,10 @@ bool float3x3::Inverse()
 
 	// There exists a generic matrix inverse calculator that uses Gaussian elimination.
 	// It would be invoked by calling
-	// return InverseMatrix(*this);
+	// return InverseMatrix(*this, epsilon);
 	// Instead, compute the inverse directly using Cramer's rule.
 	float d = Determinant();
-	if (EqualAbs(d, 0.f, 1e-3f))
+	if (EqualAbs(d, 0.f, epsilon))
 		return false;
 
 	d = 1.f / d;
@@ -1208,9 +1208,10 @@ bool float3x3::IsUpperTriangular(float epsilon) const
 
 bool float3x3::IsInvertible(float epsilon) const
 {
-	///@todo Optimize.
-	float3x3 copy = *this;
-	return copy.Inverse();
+	float d = Determinant();
+	bool isSingular = EqualAbs(d, 0.f, epsilon);
+	mathassert(float3x3(*this).Inverse(epsilon) != isSingular); // IsInvertible() and Inverse() must match!
+	return !isSingular;
 }
 
 bool float3x3::IsSymmetric(float epsilon) const

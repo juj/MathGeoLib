@@ -744,7 +744,7 @@ void InverseAffineMatrixNonuniformScale(Matrix &mat)
 }
 
 template<typename Matrix>
-bool InverseMatrix(Matrix &mat)
+bool InverseMatrix(Matrix &mat, float epsilon)
 {
 	Matrix inversed = Matrix::identity; // will contain the inverse matrix
 
@@ -756,7 +756,7 @@ bool InverseMatrix(Matrix &mat)
 			if (fabs(mat[i][column]) > fabs(mat[greatest][column]))
 				greatest = i;
 
-		if (EqualAbs(mat[greatest][column], 0))
+		if (EqualAbs(mat[greatest][column], 0, epsilon))
 		{
 			mat = inversed;
 			return false;
@@ -770,7 +770,7 @@ bool InverseMatrix(Matrix &mat)
 		}
 		
 		// multiply rows
-		assume(!EqualAbs(mat[column][column], 0.f));
+		assume(!EqualAbs(mat[column][column], 0.f, epsilon));
 		inversed.ScaleRow(column, 1.f / mat[column][column]);
 		mat.ScaleRow(column, 1.f / mat[column][column]);
 		

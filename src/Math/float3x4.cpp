@@ -840,14 +840,14 @@ float float3x4::Determinant() const
 	return a*e*i + b*f*g + c*d*h - a*f*h - b*d*i - c*e*g;
 }
 
-bool float3x4::Inverse()
+bool float3x4::Inverse(float epsilon)
 {
 	///\todo SSE.
 #ifdef MATH_ASSERT_CORRECTNESS
 	float3x4 orig = *this;
 #endif
 	float4x4 temp(*this); ///@todo It is possible optimize to avoid copying here by writing the inverse function specifically for float3x4.
-	bool success = temp.Inverse();
+	bool success = temp.Inverse(epsilon);
 	*this = temp.Float3x4Part();
 	mathassert(!success || (orig * *this).IsIdentity());
 	return success;
@@ -1425,9 +1425,13 @@ bool float3x4::IsUpperTriangular(float epsilon) const
 
 bool float3x4::IsInvertible(float epsilon) const
 {
-	///@todo Optimize.
-	float3x4 copy = *this;
-	return copy.Inverse();
+	float d = Determinant();
+	bool isSingular = EqualAbs(d, 0.f, epsilon);
+#ifdef MATH_ASSERT_CORRECTNESS
+	float3x3 temp = Float3x3Part();
+	mathassert(temp.Inverse(epsilon) != isSingular); // IsInvertible() and Inverse() must match!
+#endif
+	return !isSingular;
 }
 
 bool float3x4::IsSymmetric(float epsilon) const

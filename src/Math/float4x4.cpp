@@ -1247,13 +1247,13 @@ bool float4x4::LUDecompose(float4x4 &outLower, float4x4 &outUpper) const
 	return LUDecomposeMatrix(*this, outLower, outUpper);
 }
 
-bool float4x4::Inverse()
+bool float4x4::Inverse(float epsilon)
 {
 	///\todo SSE
 #ifdef MATH_ASSERT_CORRECTNESS
 	float4x4 copy = *this;
-	bool success = InverseMatrix(*this);
-	mathassert(!(success == false && Abs(Determinant4()) > 1e-3f));
+	bool success = InverseMatrix(*this, epsilon);
+	mathassert(!(success == false && Abs(Determinant4()) > epsilon));
 	mathassert(!success || (copy * *this).IsIdentity());
 	return success;
 #else
