@@ -1257,7 +1257,7 @@ bool float4x4::Inverse(float epsilon)
 	mathassert(!success || (copy * *this).IsIdentity());
 	return success;
 #else
-	return InverseMatrix(*this);
+	return InverseMatrix(*this, epsilon);
 #endif
 }
 
