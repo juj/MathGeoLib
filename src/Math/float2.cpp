@@ -161,6 +161,7 @@ float2 float2::Normalized() const
 	float2 copy = *this;
 	float oldLength = copy.Normalize();
 	assume(oldLength > 0.f && "float2::Normalized() failed!");
+	MARK_UNUSED(oldLength);
 	return copy;
 }
 
