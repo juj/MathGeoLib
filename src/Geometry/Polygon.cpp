@@ -44,12 +44,12 @@ MATH_BEGIN_NAMESPACE
 
 int Polygon::NumVertices() const
 {
-	return p.size();
+	return (int)p.size();
 }
 
 int Polygon::NumEdges() const
 {
-	return p.size();
+	return (int)p.size();
 }
 
 float3 Polygon::Vertex(int vertexIndex) const
@@ -150,9 +150,9 @@ bool Polygon::IsConvex() const
 		return false;
 	if (p.size() <= 3)
 		return true;
-	size_t i = p.size()-2;
-	size_t j = p.size()-1;
-	size_t k = 0;
+	int i = (int)p.size()-2;
+	int j = (int)p.size()-1;
+	int k = 0;
 
 	while(k < p.size())
 	{
@@ -219,10 +219,10 @@ bool Polygon::IsSimple() const
 {
 	assume(IsPlanar());
 	Plane plane = PlaneCCW();
-	for(size_t i = 0; i < p.size(); ++i)
+	for(int i = 0; i < (int)p.size(); ++i)
 	{
 		LineSegment si = plane.Project(Edge(i));
-		for(size_t j = i+2; j < p.size(); ++j)
+		for(int j = i+2; j < (int)p.size(); ++j)
 		{
 			if (i == 0 && j == p.size() - 1)
 				continue; // These two edges are consecutive and share a vertex. Don't check that pair.
@@ -296,13 +296,13 @@ void Polygon::Translate(const float3 &point)
 void Polygon::Transform(const float3x3 &transform)
 {
 	if (p.size() > 0)
-		transform.BatchTransform(&p[0], p.size());
+		transform.BatchTransform(&p[0], (int)p.size());
 }
 
 void Polygon::Transform(const float3x4 &transform)
 {
 	if (p.size() > 0)
-		transform.BatchTransformPos(&p[0], p.size());
+		transform.BatchTransformPos(&p[0], (int)p.size());
 }
 
 void Polygon::Transform(const float4x4 &transform)
@@ -339,7 +339,7 @@ bool Polygon::Contains2D(const float2 &localSpacePoint) const
 
 	LineSegment l(float3(localSpacePoint, 0), float3(localSpacePoint,0) + float3(1,1,0).Normalized());
 	int numIntersections = 0;
-	for(size_t i = 0; i < p.size(); ++i)
+	for(int i = 0; i < (int)p.size(); ++i)
 		if (Edge2D(i).Intersects(l))
 			++numIntersections;
 	return numIntersections % 2 == 1;
@@ -361,7 +361,7 @@ bool Polygon::Contains(const LineSegment &worldSpaceLineSegment, float polygonTh
 	if (!Contains(l.a) || !Contains(l.b))
 		return false;
 
-	for(size_t i = 0; i < p.size(); ++i)
+	for(int i = 0; i < (int)p.size(); ++i)
 		if (plane.Project(Edge(i)).Intersects(l))
 			return false;
 
@@ -383,7 +383,7 @@ bool Polygon::Contains2D(const LineSegment &localSpaceLineSegment) const
 	if (!Contains2D(localSpaceLineSegment.a.xy()) || !Contains2D(localSpaceLineSegment.b.xy()))
 		return false;
 
-	for(size_t i = 0; i < p.size(); ++i)
+	for(int i = 0; i < (int)p.size(); ++i)
 		if (Edge2D(i).Intersects(localSpaceLineSegment))
 			return false;
 
@@ -675,7 +675,7 @@ bool IntersectLineSegmentLineSegment2D(const float2 &a1, const float2 &a2, const
 bool IsAnEar(const std::vector<float2> &poly, int i, int j)
 {
 	float2 dummy;
-	int x = poly.size()-1;
+	int x = (int)poly.size()-1;
 	for(int y = 0; y < i; ++y)
 	{
 		if (IntersectLineSegmentLineSegment2D(poly[i], poly[j], poly[x], poly[y], dummy))
@@ -683,7 +683,7 @@ bool IsAnEar(const std::vector<float2> &poly, int i, int j)
 		x = y;
 	}
 	x = j+1;
-	for(size_t y = x+1; y < poly.size(); ++y)
+	for(int y = x+1; y < (int)poly.size(); ++y)
 	{
 		if (IntersectLineSegmentLineSegment2D(poly[i], poly[j], poly[x], poly[y], dummy))
 			return false;
@@ -734,9 +734,9 @@ std::vector<Triangle> Polygon::Triangulate() const
 			// The previous index might now have become an ear. Move back one index to see if so.
 			if (i > 0)
 			{
-				i = (i + p2d.size() - 1) % p2d.size();
-				j = (j + p2d.size() - 1) % p2d.size();
-				k = (k + p2d.size() - 1) % p2d.size();
+				i = (i + (int)p2d.size() - 1) % p2d.size();
+				j = (j + (int)p2d.size() - 1) % p2d.size();
+				k = (k + (int)p2d.size() - 1) % p2d.size();
 			}
 			numTries = 0;
 		}

@@ -59,7 +59,7 @@ std::string Polyhedron::Face::ToString() const
 
 int Polyhedron::NumEdges() const
 {
-	return EdgeIndices().size();
+	return (int)EdgeIndices().size();
 }
 
 float3 Polyhedron::Vertex(int vertexIndex) const
@@ -333,7 +333,7 @@ bool Polyhedron::EulerFormulaHolds() const
 
 bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 {
-	for(size_t i = 0; i < f.size(); ++i)
+	for(int i = 0; i < (int)f.size(); ++i)
 	{
 		const Face &face = f[i];
 		if (face.v.size() < 3)
@@ -341,7 +341,7 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 		if (face.v.size() >= 4)
 		{
 			Plane facePlane = FacePlane(i);
-			for(size_t j = 0; j < face.v.size(); ++j)
+			for(int j = 0; j < (int)face.v.size(); ++j)
 				if (facePlane.Distance(v[face.v[j]]) > epsilon)
 					return false;
 		}
@@ -697,7 +697,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 
 	bool hadDisconnectedHorizon = false;
 
-	for(size_t i = 0; i < f.size(); ++i)
+	for(int i = 0; i < (int)f.size(); ++i)
 	{
 		// Delete all faces that don't contain the given point. (they have point in their positive side)
 		Plane p = FacePlane(i);
@@ -829,7 +829,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 			{
 				Face tri;
 				tri.v.push_back(iter->second);
-				tri.v.push_back(v.size()-1);
+				tri.v.push_back((int)v.size()-1);
 				tri.v.push_back(iter->first);
 				f.push_back(tri);
 	//			LOGI("Added face %d: %s.", (int)f.size()-1, tri.ToString().c_str());
@@ -859,13 +859,13 @@ void Polyhedron::Translate(const float3 &point)
 void Polyhedron::Transform(const float3x3 &transform)
 {
 	if (v.size() > 0)
-		transform.BatchTransform(&v[0], v.size());
+		transform.BatchTransform(&v[0], (int)v.size());
 }
 
 void Polyhedron::Transform(const float3x4 &transform)
 {
 	if (v.size() > 0)
-		transform.BatchTransformPos(&v[0], v.size());
+		transform.BatchTransformPos(&v[0], (int)v.size());
 }
 
 void Polyhedron::Transform(const float4x4 &transform)
@@ -887,7 +887,7 @@ void Polyhedron::OrientNormalsOutsideConvex()
 		center += v[i];
 
 	center /= (float)v.size();
-	for(size_t i = 0; i < f.size(); ++i)
+	for(int i = 0; i < (int)f.size(); ++i)
 		if (FacePlane(i).SignedDistance(center) > 0.f)
 			f[i].FlipWindingOrder();
 }
@@ -951,11 +951,8 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 //	assert(p.FacesAreNondegeneratePlanar());
 
 	CHullHelp hull;
-	for(size_t i = 0; i < p.f.size(); ++i)
-	{
+	for(int i = 0; i < (int)p.f.size(); ++i)
 		hull.livePlanes.push_back(i);
-
-	}
 
 	// For better performance, merge the remaining extreme points first.
 	for(; iter != extremes.end(); ++iter)
@@ -1249,7 +1246,7 @@ void Polyhedron::RemoveRedundantVertices()
 		for(size_t j = 0; j < f[i].v.size(); ++j)
 		{
 			int oldIndex = f[i].v[j];
-			int newIndex = ArrayBinarySearch(&usedVerticesArray[0], usedVerticesArray.size(), oldIndex, IntTriCmp);
+			int newIndex = ArrayBinarySearch(&usedVerticesArray[0], (int)usedVerticesArray.size(), oldIndex, IntTriCmp);
 			assert(newIndex != -1);
 			f[i].v[j] = newIndex;
 		}
