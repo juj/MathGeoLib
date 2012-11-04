@@ -132,6 +132,7 @@ void Plane::Transform(const float3x4 &transform)
 	float3x3 r = transform.Float3x3Part();
 	bool success = r.Inverse(); ///@todo Can optimize the inverse here by assuming orthogonality or orthonormality.
 	assume(success);
+	MARK_UNUSED(success);
 	d = d + Dot(normal, r * transform.TranslatePart());
 	normal = normal * r;
 }

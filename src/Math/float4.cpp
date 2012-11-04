@@ -282,6 +282,7 @@ float4 float4::Normalized3() const
 	float4 copy = *this;
 	float length = copy.Normalize3();
 	assume(length > 0);
+	MARK_UNUSED(length);
 	return copy;
 }
 
@@ -312,6 +313,7 @@ float4 float4::Normalized4() const
 	float4 copy = *this;
 	float length = copy.Normalize4();
 	assume(length > 0);
+	MARK_UNUSED(length);
 	return copy;
 }
 

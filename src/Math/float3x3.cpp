@@ -965,6 +965,9 @@ void float3x3::RemoveScale()
 	float y = Row(1).Normalize();
 	float z = Row(2).Normalize();
 	assume(x != 0 && y != 0 && z != 0 && "float3x3::RemoveScale failed!");
+	MARK_UNUSED(x);
+	MARK_UNUSED(y);
+	MARK_UNUSED(z);
 }
 
 float3 float3x3::Transform(const float3 &vector) const

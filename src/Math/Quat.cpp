@@ -383,6 +383,7 @@ void SetQuatFrom(Quat &q, const M &m)
 	}
 	float oldLength = q.Normalize();
 	assume(oldLength > 0.f);
+	MARK_UNUSED(oldLength);
 }
 
 void Quat::Set(const float3x3 &m)

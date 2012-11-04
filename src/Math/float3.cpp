@@ -156,6 +156,7 @@ float3 float3::Normalized() const
 	float3 copy = *this;
 	float oldLength = copy.Normalize();
 	assume(oldLength > 0.f && "float3::Normalized() failed!");
+	MARK_UNUSED(oldLength);
 	return copy;
 }
 
