@@ -24,6 +24,14 @@
 #include "myassert.h"
 #include "Math/float2.h"
 
+#ifdef WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include <Windows.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 bool mathBreakOnAssume = false;
@@ -36,6 +44,17 @@ void SetMathBreakOnAssume(bool isEnabled)
 /// Returns the current state of the math break-on-assume flag.
 bool MathBreakOnAssume()
 {
+	return mathBreakOnAssume;
+}
+
+bool AssumeFailed()
+{
+	if (mathBreakOnAssume)
+	{
+#if defined(WIN32) && !defined(WIN8RT) // Win8 metro apps don't have DebugBreak.
+		DebugBreak();
+#endif
+	}
 	return mathBreakOnAssume;
 }
 

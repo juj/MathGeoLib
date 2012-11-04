@@ -23,6 +23,7 @@
 #ifdef WIN32
 #include "myassert.h"
 #endif
+#include "Log.h"
 
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
 
@@ -45,6 +46,10 @@ void SetMathBreakOnAssume(bool isEnabled);
 /// The default startup value for this flag is false.
 bool MathBreakOnAssume();
 
+/// Breaks to debugger if math break-on-assume flag
+/// Returns the current state of the math break-on-assume flag.
+bool AssumeFailed();
+
 MATH_END_NAMESPACE
 
 // If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
@@ -56,21 +61,12 @@ MATH_END_NAMESPACE
 #ifdef MATH_ASSERT_ON_ASSUME
 #define assume(x) assert(x)
 #elif defined(MATH_SILENT_ASSUME)
-#define assume(x) do { } while(0)
+#define assume(x) ((void)0)
 #else 
 
 #ifdef _MSC_VER
 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-#include <Windows.h>
-#ifdef WIN8RT // Win8 metro apps don't have DebugBreak.
-#define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
-#else
-#define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); if (MATH_NS::MathBreakOnAssume()) DebugBreak(); } } while(0)
-#endif
+#define assume(x) (void)((!!(x)) || ( printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__) && MATH_NS::AssumeFailed()) )
 
 #elif defined(ANDROID)
 
@@ -93,7 +89,7 @@ MATH_END_NAMESPACE
 #ifdef MATH_ASSERT_CORRECTNESS
 #define mathassert(x) assert(x)
 #else
-#define mathassert(x) do {} while(0)
+#define mathassert(x) ((void)0)
 #endif
 
 // Kill both assume() and mathassert() macros in OPTIMIZED_RELEASE builds.
@@ -104,6 +100,6 @@ MATH_END_NAMESPACE
 #ifdef mathassert
 #undef mathassert
 #endif
-#define assume(x) do {} while(0)
-#define mathassert(x) do {} while(0)
+#define assume(x) ((void)0)
+#define mathassert(x) ((void)0)
 #endif

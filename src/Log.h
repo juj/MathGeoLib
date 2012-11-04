@@ -17,6 +17,19 @@
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
 #pragma once
 
+// From http://cnicholson.net/2009/03/stupid-c-tricks-dowhile0-and-c4127/
+#define MULTI_LINE_MACRO_BEGIN do {
+
+#ifdef _MSC_VER
+#define MULTI_LINE_MACRO_END \
+	__pragma(warning(push)) \
+	__pragma(warning(disable:4127)) \
+	} while(0) \
+	__pragma(warning(pop))
+#else
+#define MULTI_LINE_MACRO_END } while(0)
+#endif
+
 /// A bitfield type that describes single or multiple log channels (each bit represents a channel).
 typedef unsigned int LogChannel;
 
@@ -62,6 +75,17 @@ void SetLogFile(const char *filename);
 /// linux, this is a no-op.
 void EnableMemoryLeakLoggingAtExit();
 
+enum ConsoleTextColor
+{
+	ColorRed = 4, // == FOREGROUND_RED in WinCon.h
+	ColorGreen  = 2, // == FOREGROUND_GREEN in WinCon.h
+	ColorBlue = 0x10, // == FOREGROUND_BLUE in WinCon.h
+	ColorIntensity = 8 // == FOREGROUND_INTENSITY in WinCon.h
+};
+
+/// Specifies a new print color for stdout. Only works on Win32, other platforms are no-op implementations.
+void SetStdoutTextColor(int newColor);
+
 /// Prints out a variadic message to the log channel User.
 #define LOGUSER(msg, ...) ( IsLogChannelActive(LogUser) && (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 
@@ -91,30 +115,33 @@ void logmsg(const char *msg);
 
 #elif defined(WIN32) && !defined(LOGGING_SUPPORT_DISABLED)
 
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 #include <stdio.h>
 
-#define LOG(channel, ...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
-#define LOGI(...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOG(channel, ...) \
+	MULTI_LINE_MACRO_BEGIN \
+		printf(__VA_ARGS__); \
+		printf("\n"); \
+	MULTI_LINE_MACRO_END
 
-#ifndef WIN8RT // Win8 metro apps don't have SetConsoleTextAttribute.
-#define LOGW(...) do { \
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); \
-	printf("Warning: "); printf(__VA_ARGS__); printf("\n"); \
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); \
-	} while(0)
+#define LOGI(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		printf(__VA_ARGS__); \
+		printf("\n"); \
+	MULTI_LINE_MACRO_END
 
-#define LOGE(...) do { \
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY); \
-	printf("Error: "); printf(__VA_ARGS__); printf("\n"); \
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); \
-	} while(0)
-#else
-#define LOGW(...) do { printf("Warning: "); printf(__VA_ARGS__); printf("\n"); } while(0)
-#define LOGE(...) do { printf("Error: "); printf(__VA_ARGS__); printf("\n"); } while(0)
-#endif
+#define LOGW(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		SetStdoutTextColor(ColorRed | ColorGreen | ColorIntensity); \
+		printf("Warning: "); printf(__VA_ARGS__); printf("\n"); \
+		SetStdoutTextColor(ColorRed | ColorGreen | ColorBlue); \
+	MULTI_LINE_MACRO_END
+
+#define LOGE(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		SetStdoutTextColor(ColorRed | ColorGreen | ColorIntensity); \
+		printf("Error: "); printf(__VA_ARGS__); printf("\n"); \
+		SetStdoutTextColor(ColorRed | ColorGreen | ColorBlue); \
+	MULTI_LINE_MACRO_END
 
 #elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
 
