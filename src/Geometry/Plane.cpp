@@ -207,9 +207,14 @@ float3x4 Plane::OrthoProjection() const
 	return float3x4::OrthographicProjection(*this);
 }
 
-float3x4 Plane::ObliqueProjection(const float3 &obliqueProjectionDir) const
+float3x4 Plane::ObliqueProjection(const float3 & /*obliqueProjectionDir*/) const
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
+#ifdef _MSC_VER
+#pragma WARNING(Plane::ObliqueProjection not implemented!)
+#else
+#warning Plane::ObliqueProjection not implemented!
+#endif
+	assume(false && "Plane::ObliqueProjection not implemented!"); /// @todo Implement.
 	return float3x4();
 }
 
@@ -306,9 +311,14 @@ float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
 			return Project(lineSegment.b);
 }
 
-float3 Plane::ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const
+float3 Plane::ObliqueProject(const float3 & /*point*/, const float3 & /*obliqueProjectionDir*/) const
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
+#ifdef _MSC_VER
+#pragma WARNING(Plane::ObliqueProject not implemented!)
+#else
+#warning Plane::ObliqueProject not implemented!
+#endif
+	assume(false && "Plane::ObliqueProject not implemented!"); /// @todo Implement.
 	return float3();
 }
 

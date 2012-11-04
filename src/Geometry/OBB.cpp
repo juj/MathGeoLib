@@ -193,7 +193,12 @@ AABB OBB::MinimalEnclosingAABB() const
 
 AABB OBB::MaximalContainedAABB() const
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
+#ifdef _MSC_VER
+#pragma WARNING(OBB::MaximalContainedAABB not implemented!)
+#else
+#warning OBB::MaximalContainedAABB not implemented!
+#endif
+	assume(false && "OBB::MaximalContainedAABB not implemented!"); /// @todo Implement.
 	return AABB();
 }
 
@@ -424,9 +429,14 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 		*idxLargest = largest;
 }
 
-OBB OBB::PCAEnclosingOBB(const float3 *pointArray, int numPoints)
+OBB OBB::PCAEnclosingOBB(const float3 * /*pointArray*/, int /*numPoints*/)
 {
-	assume(false && "Not implemented!"); /// @todo Implement.
+#ifdef _MSC_VER
+#pragma WARNING(OBB::PCAEnclosingOBB not implemented!)
+#else
+#warning OBB::PCAEnclosingOBB not implemented!
+#endif
+	assume(false && "OBB::PCAEnclosingOBB not implemented!"); /// @todo Implement.
 	return OBB();
 }
 

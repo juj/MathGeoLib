@@ -370,7 +370,12 @@ float3 Frustum::UniformRandomPointInside(LCG &rng) const
 		return FastRandomPointInside(rng);
 	else
 	{
-		assume(false && "Not implemented!");
+#ifdef _MSC_VER
+#pragma WARNING(Frustum::UniformRandomPointInside not implemented for perspective frustums!)
+#else
+#warning Frustum::UniformRandomPointInside not implemented for perspective frustums!
+#endif
+		assume(false && "Frustum::UniformRandomPointInside not implemented for perspective frustums!");
 		return FastRandomPointInside(rng); ///\todo This will not generate a uniform result! Implement rejection sampling!
 	}
 }

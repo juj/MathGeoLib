@@ -132,6 +132,12 @@ __m128 float4::Swizzled_SSE(int i, int j, int k, int l) const
 	__m128i permute = _mm_set_epi32(l, k, j, i);
 	return _mm_permutevar_ps(v, permute);
 #else
+
+#ifdef _MSC_VER
+#pragma WARNING(float4::Swizzled_SSE is not implemented!)
+#else
+#warning float4::Swizzled_SSE is not implemented!
+#endif
 	///\todo How to perform a swizzle if AVX is not available?
 	assert(false && "Not implemented!");
 	return __m128();
