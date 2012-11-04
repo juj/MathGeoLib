@@ -26,6 +26,6 @@
 void SetStdoutTextColor(int newColor)
 {
 #if defined(WIN32) && !defined(WIN8RT) // Win8 metro apps don't have SetConsoleTextAttribute.
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)newColor);
 #endif
 }
