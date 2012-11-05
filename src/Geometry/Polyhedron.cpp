@@ -969,7 +969,7 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 	for(int i = 0; i < numPoints; ++i)
 	{
 		if (p.f.size() > 5000 && (i & 255) == 0)
-			LOGI("Mergeconvex %d/%d, #vertices %d, #faces %d", i, numPoints, p.v.size(), p.f.size());
+			LOGI("Mergeconvex %d/%d, #vertices %d, #faces %d", i, numPoints, (int)p.v.size(), (int)p.f.size());
 		p.MergeConvex(pointArray[i]);
 
 		mathassert(p.FaceIndicesValid());
