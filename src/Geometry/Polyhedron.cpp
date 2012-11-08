@@ -441,7 +441,7 @@ float3 Polyhedron::ClosestPointConvex(const float3 &point) const
 	assume(IsConvex());
 	if (ContainsConvex(point))
 		return point;
-	float3 closestPoint;
+	float3 closestPoint = float3::nan;
 	float closestDistance = FLOAT_MAX;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
@@ -460,7 +460,7 @@ float3 Polyhedron::ClosestPoint(const float3 &point) const
 {
 	if (Contains(point))
 		return point;
-	float3 closestPoint;
+	float3 closestPoint = float3::nan;
 	float closestDistance = FLOAT_MAX;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
@@ -494,9 +494,9 @@ float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegm
 			*lineSegmentPt = lineSegment.b;
 		return lineSegment.b;
 	}
-	float3 closestPt;
+	float3 closestPt = float3::nan;
 	float closestDistance = FLOAT_MAX;
-	float3 closestLineSegmentPt;
+	float3 closestLineSegmentPt = float3::nan;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
 		float3 lineSegPt;
