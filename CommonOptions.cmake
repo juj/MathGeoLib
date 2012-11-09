@@ -1,4 +1,4 @@
-if (WIN32)
+if (WIN32 AND NOT MINGW)
 	add_definitions(/EHsc /arch:SSE2 -D_CRT_SECURE_NO_WARNINGS)
 endif()
 

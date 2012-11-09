@@ -329,7 +329,9 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 {
 	assert(sizeof(float3) == 3*sizeof(float));
 	assert(sizeof(Triangle) == 3*sizeof(float3));
+#ifdef _DEBUG
 	assert(vertexDataLayout == 0); // Must be AoS structured!
+#endif
 
 	float nearestD = FLOAT_INF;
 	float u, v, d;

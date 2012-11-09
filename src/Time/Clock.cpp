@@ -63,7 +63,13 @@ void Clock::InitClockData()
 		LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
 
 	if (appStartTime == 0)
+	{
+#if WINVER >= 0x0600
 		appStartTime = (tick_t)GetTickCount64();
+#else
+		appStartTime = (tick_t)GetTickCount();
+#endif		
+	}
 
 	///\todo Test here that the return values of QueryPerformanceCounter is nondecreasing.
 #endif
@@ -168,7 +174,11 @@ int Clock::Sec()
 unsigned long Clock::SystemTime()
 {
 #ifdef WIN32
+#if WINVER >= 0x0600
 	return (unsigned long)GetTickCount64();
+#else
+	return (unsigned long)GetTickCount();
+#endif		
 #else
 	return TickU32();
 #endif
