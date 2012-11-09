@@ -95,8 +95,6 @@ void AABB::SetFrom(const float3 *pointArray, int numPoints)
 		Enclose(pointArray[i]);
 }
 
-#pragma message("TODO: Implement AABB::SetFrom(Polyhedron)")
-
 Polyhedron AABB::ToPolyhedron() const
 {
 	// Note to maintainer: This function is an exact copy of OBB:ToPolyhedron() and Frustum::ToPolyhedron().
