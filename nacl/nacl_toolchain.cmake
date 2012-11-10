@@ -1,5 +1,9 @@
-message(STATUS "TODO: Assuming NaCl SDK is found from C:/nacl_sdk/pepper_19") # TODO REMOVE THIS in favor of an environment variable
-set(NACL_PATH "C:/nacl_sdk/pepper_19" CACHE STRING "Native Client SDK Root Path")
+if ($ENV{NACL_SDK_ROOT} STREQUAL "")
+	message(STATUS "Environment variable NACL_SDK_ROOT was not set! Assuming NaCl SDK is found from C:/nacl_sdk/pepper_19")
+	set(NACL_PATH "C:/nacl_sdk/pepper_19" CACHE STRING "Native Client SDK Root Path")
+else()
+	set(NACL_PATH $ENV{NACL_SDK_ROOT} CACHE STRING "Native Client SDK Root Path")
+endif()
 
 set(NACL_TAG i686-nacl)
 if (APPLE)
