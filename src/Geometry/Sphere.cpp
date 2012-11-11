@@ -1259,9 +1259,6 @@ Sphere operator *(const Quat &transform, const Sphere &sphere)
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void Sphere::Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacing) const
 {
-	int x = 1;
-	int y = 1;
-	int z = 1;
 	Array<float3> pos;
 	Array<float3> normal;
 	Array<float2> uv;
