@@ -487,7 +487,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 		}
 	LOGI("Pruned to %d directions.", dirs.size());
 
-	int incr = 1;//Max(1, numPoints / 10);
+//	int incr = 1;//Max(1, numPoints / 10);
 //	for(int i = 0; i < numPoints; ++i)
 	{
 		//for(int j = i+1; j < numPoints; ++j)
