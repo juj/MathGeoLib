@@ -1015,7 +1015,7 @@ void float3x3::BatchTransform(float3 *pointArray, int numPoints, int stride) con
 	if (!pointArray)
 		return;
 #endif
-	assume(stride >= sizeof(float3));
+	assume(stride >= (int)sizeof(float3));
 	u8 *data = reinterpret_cast<u8*>(pointArray);
 	for(int i = 0; i < numPoints; ++i)
 	{
@@ -1042,7 +1042,7 @@ void float3x3::BatchTransform(float4 *vectorArray, int numVectors, int stride) c
 	if (!vectorArray)
 		return;
 #endif
-	assume(stride >= sizeof(float4));
+	assume(stride >= (int)sizeof(float4));
 	u8 *data = reinterpret_cast<u8*>(vectorArray);
 	for(int i = 0; i < numVectors; ++i)
 	{
