@@ -98,10 +98,40 @@ void SetStdoutTextColor(int newColor);
 ///\todo Temporary. Implement logmsg as variadic directly instead of this kind of #define workaround.
 void logmsg(const char *msg);
 
-#define LOGI(...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
-#define LOGW(...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
-#define LOGE(...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
-#define LOG(channel, ...) do { char str____[16384]; sprintf(str____, __VA_ARGS__); logmsg(str____); logmsg("\n"); } while(0)
+#define LOGI(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		sprintf(str____, __VA_ARGS__); \
+		logmsg(str____); \
+		logmsg("\n"); \
+	MULTI_LINE_MACRO_END
+
+#define LOGW(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		logmsg("Warning: "); \
+		sprintf(str____, __VA_ARGS__); \
+		logmsg(str____); \
+		logmsg("\n"); \
+	MULTI_LINE_MACRO_END
+
+#define LOGE(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		logmsg("Error: "); \
+		sprintf(str____, __VA_ARGS__); \
+		logmsg(str____); \
+		logmsg("\n"); \
+	MULTI_LINE_MACRO_END
+
+#define LOG(channel, ...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		logmsg(#channel); \
+		sprintf(str____, __VA_ARGS__); \
+		logmsg(str____); \
+		logmsg("\n"); \
+	MULTI_LINE_MACRO_END
 
 #elif defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
 
