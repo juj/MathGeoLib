@@ -195,7 +195,7 @@ float3 Triangle::UnnormalizedNormalCW() const
 
 float3 Triangle::ExtremePoint(const float3 &direction) const
 {
-	float3 mostExtreme;
+	float3 mostExtreme = float3::nan;
 	float mostExtremeDist = -FLOAT_MAX;
 	for(int i = 0; i < 3; ++i)
 	{
