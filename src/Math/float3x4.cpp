@@ -363,17 +363,6 @@ float3x4 float3x4::Mirror(const Plane &p)
 	return v;
 }
 
-float3x4 float3x4::OrthographicProjection(float /*nearPlaneDistance*/, float /*farPlaneDistance*/, float /*horizontalViewportSize*/, float /*verticalViewportSize*/)
-{
-#ifdef _MSC_VER
-#pragma WARNING(float3x4::OrthographicProjection is not implemented!)
-#else
-#warning float3x4::OrthographicProjection is not implemented!
-#endif
-	assume(false && "Not implemented!"); /// @todo Implement.
-	return float3x3(); ///@todo
-}
-
 float3x4 float3x4::OrthographicProjection(const Plane &p)
 {
 	float3x4 v;

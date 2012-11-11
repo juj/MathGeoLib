@@ -253,7 +253,6 @@ public:
 	static float3x4 Mirror(const Plane &p);
 
 	/// Creates a new float3x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]
-	static float3x4 OrthographicProjection(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 	static float3x4 OrthographicProjection(const Plane &target);
 	static float3x4 OrthographicProjectionYZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]
 	static float3x4 OrthographicProjectionXZ(); ///< [similarOverload: OrthographicProjection] [hideIndex]
