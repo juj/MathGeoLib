@@ -483,7 +483,7 @@ float3 Polygon::ClosestPoint(const float3 &point) const
 	if (Contains(ptOnPlane))
 		return ptOnPlane;
 
-	float3 closestPt;
+	float3 closestPt = float3::nan;
 	float closestDist = FLOAT_MAX;
 	for(int i = 0; i < NumEdges(); ++i)
 	{
@@ -506,8 +506,8 @@ float3 Polygon::ClosestPoint(const LineSegment &lineSegment) const
 float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const
 {
 	std::vector<Triangle> tris = Triangulate();
-	float3 closestPt;
-	float3 closestLineSegmentPt;
+	float3 closestPt = float3::nan;
+	float3 closestLineSegmentPt = float3::nan;
 	float closestDist = FLOAT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
@@ -544,7 +544,7 @@ Plane Polygon::EdgePlane(int edgeIndex) const
 
 float3 Polygon::ExtremePoint(const float3 &direction) const
 {
-	float3 mostExtreme;
+	float3 mostExtreme = float3::nan;
 	float mostExtremeDist = -FLOAT_MAX;
 	for(int i = 0; i < NumVertices(); ++i)
 	{
@@ -578,6 +578,8 @@ float Polygon::Area() const
 {
 	assume(IsPlanar());
 	float3 area = float3::zero;
+	if (p.size() <= 2)
+		return 0.f;
 
 	int i = NumEdges()-1;
 	for(int j = 0; j < NumEdges(); ++j)
@@ -599,6 +601,8 @@ float Polygon::Perimeter() const
 ///\bug This function does not properly compute the centroid.
 float3 Polygon::Centroid() const
 {
+	if (NumVertices() == 0)
+		return float3::nan;
 	float3 centroid = float3::zero;
 	for(int i = 0; i < NumVertices(); ++i)
 		centroid += Vertex(i);
