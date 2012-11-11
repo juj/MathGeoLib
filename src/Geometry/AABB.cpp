@@ -1097,7 +1097,7 @@ void AABB::ToLineList(VertexBuffer &vb) const
 	Array<float3> pos;
 	pos.Resize_pod(NumVerticesInEdgeList());
 	ToEdgeList(&pos[0]);
-	int startIndex = vb.AppendVertices(pos.size());
+	int startIndex = vb.AppendVertices((int)pos.size());
 	for(int i = 0; i < (int)pos.size(); ++i)
 		vb.Set(startIndex+i, VDPosition, float4(pos[i], 1.f));
 }

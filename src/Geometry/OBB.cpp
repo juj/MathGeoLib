@@ -136,7 +136,7 @@ bool OBB::SetFrom(const Polyhedron &polyhedron)
 {
 	if (polyhedron.v.size() > 0)
 	{
-		*this = OBB::OptimalEnclosingOBB(&polyhedron.v[0], polyhedron.v.size());
+		*this = OBB::OptimalEnclosingOBB(&polyhedron.v[0], (int)polyhedron.v.size());
 		return true;
 	}
 	else
@@ -472,8 +472,8 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 		}
 
 	LOGI("Got %d directions.", dirs.size());
-	sort::QuickSort(&dirs[0], dirs.size(), LexFloat3Cmp);
-	for(int i = dirs.size()-1; i >= 0; --i)
+	sort::QuickSort(&dirs[0], (int)dirs.size(), LexFloat3Cmp);
+	for(int i = (int)dirs.size()-1; i >= 0; --i)
 		for(int j = i-1; j >= 0; --j)
 		{
 			float distX = dirs[i].x - dirs[j].x;
@@ -508,7 +508,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 			float2 rectU;
 			float2 rectV;
 			float minU, maxU, minV, maxV;
-			float rectArea = float2::MinAreaRect(&pts[0], pts.size(), rectCenter, rectU, rectV, minU, maxU, minV, maxV);
+			float rectArea = float2::MinAreaRect(&pts[0], (int)pts.size(), rectCenter, rectU, rectV, minU, maxU, minV, maxV);
 			float3 rectCenterPos = u * rectCenter.x + v * rectCenter.y;
 			
 			float volume = rectArea * edgeLength;
@@ -1027,7 +1027,7 @@ void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFaci
 	uv.Resize_pod(numVertices);
 	Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
-	for(size_t i = 0; i < pos.size(); ++i)
+	for(int i = 0; i < (int)pos.size(); ++i)
 	{
 		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
@@ -1042,8 +1042,8 @@ void OBB::ToLineList(VertexBuffer &vb) const
 	Array<float3> pos;
 	pos.Resize_pod(NumVerticesInEdgeList());
 	ToEdgeList(&pos[0]);
-	int startIndex = vb.AppendVertices(pos.size());
-	for(size_t i = 0; i < pos.size(); ++i)
+	int startIndex = vb.AppendVertices((int)pos.size());
+	for(int i = 0; i < (int)pos.size(); ++i)
 		vb.Set(startIndex+i, VDPosition, float4(pos[i], 1.f));
 }
 

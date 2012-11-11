@@ -231,7 +231,7 @@ AABB Polyhedron::MinimalEnclosingAABB() const
 #ifdef MATH_CONTAINERLIB_SUPPORT
 OBB Polyhedron::MinimalEnclosingOBB() const
 {
-	return OBB::OptimalEnclosingOBB(&v[0], v.size());
+	return OBB::OptimalEnclosingOBB(&v[0], (int)v.size());
 }
 #endif
 
@@ -1271,7 +1271,7 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 	{
 		Polygon p = FacePolygon(i);
 		std::vector<Triangle> tris = p.Triangulate();
-		int idx = vb.AppendVertices(3*tris.size());
+		int idx = vb.AppendVertices(3*(int)tris.size());
 		for(size_t j = 0; j < tris.size(); ++j)
 		{
 			vb.Set(idx, VDPosition, float4(tris[j].a, 1.f));
@@ -1303,8 +1303,8 @@ void Polyhedron::ToLineList(VertexBuffer &vb) const
 {
 	std::vector<LineSegment> edges = Edges();
 
-	int startIndex = vb.AppendVertices(edges.size()*2);
-	for(size_t i = 0; i < edges.size(); ++i)
+	int startIndex = vb.AppendVertices((int)edges.size()*2);
+	for(int i = 0; i < (int)edges.size(); ++i)
 	{
 		vb.Set(startIndex+2*i, VDPosition, float4(edges[i].a, 1.f));
 		vb.Set(startIndex+2*i+1, VDPosition, float4(edges[i].b, 1.f));
