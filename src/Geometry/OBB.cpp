@@ -471,7 +471,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 				dirs.push_back(edge);
 		}
 
-	LOGI("Got %d directions.", dirs.size());
+	LOGI("Got %d directions.", (int)dirs.size());
 	sort::QuickSort(&dirs[0], (int)dirs.size(), LexFloat3Cmp);
 	for(int i = (int)dirs.size()-1; i >= 0; --i)
 		for(int j = i-1; j >= 0; --j)
@@ -485,7 +485,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 				--i;
 			}
 		}
-	LOGI("Pruned to %d directions.", dirs.size());
+	LOGI("Pruned to %d directions.", (int)dirs.size());
 
 //	int incr = 1;//Max(1, numPoints / 10);
 //	for(int i = 0; i < numPoints; ++i)
@@ -524,7 +524,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 				minVolume = volume;
 			}
 			if (i % 100 == 0)
-				LOGI("%d/%d.", i, dirs.size());
+				LOGI("%d/%d.", (int)i, (int)dirs.size());
 		}
 	}
 
