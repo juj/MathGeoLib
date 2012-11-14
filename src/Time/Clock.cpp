@@ -27,10 +27,6 @@
 #include <windows.h>
 #endif
 
-#ifdef __ANDROID__
-//#include "AndroidCore.h"
-#endif
-
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #endif
@@ -64,7 +60,7 @@ void Clock::InitClockData()
 
 	if (appStartTime == 0)
 	{
-#if WINVER >= 0x0600
+#if WINVER >= 0x0600 && !defined(MATH_ENABLE_WINXP_SUPPORT)
 		appStartTime = (tick_t)GetTickCount64();
 #else
 		appStartTime = (tick_t)GetTickCount();
@@ -174,7 +170,7 @@ int Clock::Sec()
 unsigned long Clock::SystemTime()
 {
 #ifdef WIN32
-#if WINVER >= 0x0600
+#if WINVER >= 0x0600 && !defined(MATH_ENABLE_WINXP_SUPPORT)
 	return (unsigned long)GetTickCount64();
 #else
 	return (unsigned long)GetTickCount();

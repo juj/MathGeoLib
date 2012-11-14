@@ -29,6 +29,9 @@
 // This flag does not have any effect if MATH_ENABLE_NAMESPACE is not defined.
 #define MATH_AUTO_USE_NAMESPACE
 
+// If MATH_ENABLE_WINXP_SUPPORT is defined, we avoid using Windows symbols that require Vista or newer (e.g. GetTickCount64)
+#define MATH_ENABLE_WINXP_SUPPORT
+
 // If MATH_ASSERT_ON_ASSUME is defined, assume() resolves directly to assert().
 // When not defined, assume() prints out an error if the condition fails, but continues
 // execution.
