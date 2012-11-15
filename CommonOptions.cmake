@@ -5,6 +5,11 @@ if (WIN32 AND NOT MINGW)
 	endif()
 endif()
 
+# If requested from the command line, run Visual Studio 2012 static code analysis. Warning: this is very slow!
+if (MSVC11 AND RUN_VS2012_ANALYZE)
+	add_definitions(/ANALYZE)
+endif()
+
 if (EMSCRIPTEN)
 	add_definitions(-emit-llvm)
 	SET(CMAKE_LINK_LIBRARY_SUFFIX "")
