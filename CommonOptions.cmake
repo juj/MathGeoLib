@@ -1,5 +1,8 @@
 if (WIN32 AND NOT MINGW)
-	add_definitions(/EHsc /arch:SSE2 -D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(/EHsc -D_CRT_SECURE_NO_WARNINGS)
+	if (NOT MSVC11) # Visual Studio 2012 always has SSE2 enabled, so the command line option no longer exists.
+		add_definitions(/arch:SSE2)
+	endif()
 endif()
 
 if (EMSCRIPTEN)
