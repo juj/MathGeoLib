@@ -448,12 +448,12 @@ static void FindIntersectingLineSegments(const Triangle &t, float da, float db, 
 	else if (db*dc > 0.f)
 	{
 		l1 = LineSegment(t.a, t.b);
-		l1 = LineSegment(t.a, t.c);
+		l2 = LineSegment(t.a, t.c);
 	}
 	else
 	{
 		l1 = LineSegment(t.a, t.b);
-		l1 = LineSegment(t.b, t.c);
+		l2 = LineSegment(t.b, t.c);
 	}
 }
 
