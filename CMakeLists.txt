@@ -3,6 +3,11 @@ project(MathGeoLib)
 
 include(CommonOptions.cmake)
 
+# If requested from the command line, run Visual Studio 2012 static code analysis. Warning: this is very slow!
+if (MSVC11 AND RUN_VS2012_ANALYZE)
+	add_definitions(/analyze)
+endif()
+
 include_directories(./src)
 
 include_directories(../CodeLib/src)
