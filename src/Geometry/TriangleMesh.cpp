@@ -58,84 +58,86 @@ SIMDCapability DetectSIMDCapability()
 #ifdef MATH_SSE
 	int CPUInfo[4] = {-1};
 
-	unsigned    nIds, nExIds, i;
+	unsigned    nIds;//, nExIds, i;
 	int nFeatureInfo = 0;
-	bool    bSSE3Instructions = false;
-    bool    bSupplementalSSE3 = false;
-    bool    bCMPXCHG16B = false;
-    bool    bSSE41Extensions = false;
-    bool    bSSE42Extensions = false;
-    bool    bPOPCNT = false;
+//	bool    bSSE3Instructions = false;
+//	bool    bSupplementalSSE3 = false;
+//	bool    bCMPXCHG16B = false;
+//	bool    bSSE41Extensions = false;
+//	bool    bSSE42Extensions = false;
+//	bool    bPOPCNT = false;
 
-    bool    bLAHF_SAHFAvailable = false;
-    bool    bCmpLegacy = false;
-    bool    bLZCNT = false;
-    bool    bSSE4A = false;
-    bool    bMisalignedSSE = false;
-    bool    bPREFETCH = false;
-    bool    bMMXExtensions = false;
-    bool    b3DNowExt = false;
-    bool    b3DNow = false;
-    bool    bFP128 = false;
+//	bool    bLAHF_SAHFAvailable = false;
+//	bool    bCmpLegacy = false;
+//	bool    bLZCNT = false;
+//	bool    bSSE4A = false;
+//	bool    bMisalignedSSE = false;
+//	bool    bPREFETCH = false;
+//	bool    bMMXExtensions = false;
+//	bool    b3DNowExt = false;
+//	bool    b3DNow = false;
+//	bool    bFP128 = false;
 	bool    hasAVX = false;
-    bool    bMOVOptimization = false;
+//	bool    bMOVOptimization = false;
 
 	__cpuid(CPUInfo, 0);
-    nIds = CPUInfo[0];
+	nIds = CPUInfo[0];
 
-    // Get the information associated with each valid Id
-    for (i=0; i<=nIds; ++i)
-    {
-        __cpuid(CPUInfo, i);
+	// Get the information associated with each valid Id
+//	for (i=0; i<=nIds; ++i)
+	if (nIds >= 1)
+	{
+	//	__cpuid(CPUInfo, i);
 
+		__cpuid(CPUInfo, 1);
 		// Interpret CPU feature information.
-        if  (i == 1)
-        {
-            bSSE3Instructions = (CPUInfo[2] & 0x1) || false;
-            bSupplementalSSE3 = (CPUInfo[2] & 0x200) || false;
-            bCMPXCHG16B= (CPUInfo[2] & 0x2000) || false;
-            bSSE41Extensions = (CPUInfo[2] & 0x80000) || false;
-            bSSE42Extensions = (CPUInfo[2] & 0x100000) || false;
-            bPOPCNT= (CPUInfo[2] & 0x800000) || false;
+//		if  (i == 1)
+		{
+//			bSSE3Instructions = (CPUInfo[2] & 0x1) || false;
+//			bSupplementalSSE3 = (CPUInfo[2] & 0x200) || false;
+//			bCMPXCHG16B= (CPUInfo[2] & 0x2000) || false;
+//			bSSE41Extensions = (CPUInfo[2] & 0x80000) || false;
+//			bSSE42Extensions = (CPUInfo[2] & 0x100000) || false;
+//			bPOPCNT= (CPUInfo[2] & 0x800000) || false;
 			hasAVX = (CPUInfo[2] & 0x10000000) || false;
 			nFeatureInfo = CPUInfo[3];
-        }
-    }
+		}
+	}
 
-	const bool hasMMX = (nFeatureInfo & (1 << 23)) != 0;
+//	const bool hasMMX = (nFeatureInfo & (1 << 23)) != 0;
 	const bool hasSSE = (nFeatureInfo & (1 << 25)) != 0;
 	const bool hasSSE2 = (nFeatureInfo & (1 << 26)) != 0;
 
-    // Calling __cpuid with 0x80000000 as the InfoType argument
-    // gets the number of valid extended IDs.
-    __cpuid(CPUInfo, 0x80000000);
-    nExIds = CPUInfo[0];
+	// Calling __cpuid with 0x80000000 as the InfoType argument
+	// gets the number of valid extended IDs.
+	__cpuid(CPUInfo, 0x80000000);
+//	nExIds = CPUInfo[0];
+/*
+	// Get the information associated with each extended ID.
+	for (i=0x80000000; i<=nExIds; ++i)
+	{
+		__cpuid(CPUInfo, i);
 
-    // Get the information associated with each extended ID.
-    for (i=0x80000000; i<=nExIds; ++i)
-    {
-        __cpuid(CPUInfo, i);
+		if  (i == 0x80000001)
+		{
+			bLAHF_SAHFAvailable = (CPUInfo[2] & 0x1) || false;
+			bCmpLegacy = (CPUInfo[2] & 0x2) || false;
+			bLZCNT = (CPUInfo[2] & 0x20) || false;
+			bSSE4A = (CPUInfo[2] & 0x40) || false;
+			bMisalignedSSE = (CPUInfo[2] & 0x80) || false;
+			bPREFETCH = (CPUInfo[2] & 0x100) || false;
+			bMMXExtensions = (CPUInfo[3] & 0x40000) || false;
+			b3DNowExt = (CPUInfo[3] & 0x40000000) || false;
+			b3DNow = (CPUInfo[3] & 0x80000000) || false;
+		}
 
-        if  (i == 0x80000001)
-        {
-            bLAHF_SAHFAvailable = (CPUInfo[2] & 0x1) || false;
-            bCmpLegacy = (CPUInfo[2] & 0x2) || false;
-            bLZCNT = (CPUInfo[2] & 0x20) || false;
-            bSSE4A = (CPUInfo[2] & 0x40) || false;
-            bMisalignedSSE = (CPUInfo[2] & 0x80) || false;
-            bPREFETCH = (CPUInfo[2] & 0x100) || false;
-            bMMXExtensions = (CPUInfo[3] & 0x40000) || false;
-            b3DNowExt = (CPUInfo[3] & 0x40000000) || false;
-            b3DNow = (CPUInfo[3] & 0x80000000) || false;
-        }
-
-        if  (i == 0x8000001A)
-        {
-            bFP128 = (CPUInfo[0] & 0x1) || false;
-            bMOVOptimization = (CPUInfo[0] & 0x2) || false;
-        }
-    }
-
+		if  (i == 0x8000001A)
+		{
+			bFP128 = (CPUInfo[0] & 0x1) || false;
+			bMOVOptimization = (CPUInfo[0] & 0x2) || false;
+		}
+	}
+*/
 #ifdef MATH_AVX
 	if (hasAVX)
 		return SIMD_AVX;
