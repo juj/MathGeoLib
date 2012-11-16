@@ -16,7 +16,6 @@
 	@author Jukka Jylänki
 	@brief Implementation for the TriangleMesh geometry object. */
 #ifdef WIN32
-
 #include "TriangleMesh.h"
 #include <malloc.h>
 #include <string.h>
@@ -63,7 +62,9 @@ SIMDCapability DetectSIMDCapability()
 //	bool    bSSE3Instructions = false;
 //	bool    bSupplementalSSE3 = false;
 //	bool    bCMPXCHG16B = false;
-//	bool    bSSE41Extensions = false;
+#ifdef MATH_SSE41
+	bool    bSSE41Extensions = false;
+#endif
 //	bool    bSSE42Extensions = false;
 //	bool    bPOPCNT = false;
 
@@ -77,7 +78,9 @@ SIMDCapability DetectSIMDCapability()
 //	bool    b3DNowExt = false;
 //	bool    b3DNow = false;
 //	bool    bFP128 = false;
+#ifdef MATH_AVX
 	bool    hasAVX = false;
+#endif
 //	bool    bMOVOptimization = false;
 
 	__cpuid(CPUInfo, 0);
@@ -99,18 +102,18 @@ SIMDCapability DetectSIMDCapability()
 //			bSSE41Extensions = (CPUInfo[2] & 0x80000) || false;
 //			bSSE42Extensions = (CPUInfo[2] & 0x100000) || false;
 //			bPOPCNT= (CPUInfo[2] & 0x800000) || false;
+#ifdef MATH_AVX
 			hasAVX = (CPUInfo[2] & 0x10000000) || false;
+#endif
 			nFeatureInfo = CPUInfo[3];
 		}
 	}
 
 //	const bool hasMMX = (nFeatureInfo & (1 << 23)) != 0;
-	const bool hasSSE = (nFeatureInfo & (1 << 25)) != 0;
-	const bool hasSSE2 = (nFeatureInfo & (1 << 26)) != 0;
 
 	// Calling __cpuid with 0x80000000 as the InfoType argument
 	// gets the number of valid extended IDs.
-	__cpuid(CPUInfo, 0x80000000);
+//	__cpuid(CPUInfo, 0x80000000);
 //	nExIds = CPUInfo[0];
 /*
 	// Get the information associated with each extended ID.
@@ -147,10 +150,12 @@ SIMDCapability DetectSIMDCapability()
 		return SIMD_SSE41;
 #endif
 #ifdef MATH_SSE2
+	const bool hasSSE2 = (nFeatureInfo & (1 << 26)) != 0;
 	if (hasSSE2)
 		return SIMD_SSE2;
 #endif
 #ifdef MATH_SSE
+	const bool hasSSE = (nFeatureInfo & (1 << 25)) != 0;
 	if (hasSSE)
 		return SIMD_SSE;
 #endif

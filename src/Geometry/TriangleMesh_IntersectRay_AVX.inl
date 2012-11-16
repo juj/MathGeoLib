@@ -178,7 +178,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 	_mm256_store_ps(alignedDS, nearestD);
 
 	float smallestT = FLOAT_INF;
-	float u = FLOAT_NAN, v = FLOAT_NAN;
+//	float u = FLOAT_NAN, v = FLOAT_NAN;
 	for(int i = 0; i < 8; ++i)
 		if (alignedDS[i] < smallestT)
 		{

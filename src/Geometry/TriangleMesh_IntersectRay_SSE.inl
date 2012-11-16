@@ -210,7 +210,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 	_mm_store_ps(alignedDS, nearestD);
 
 	float smallestT = FLOAT_INF;
-	float u = FLOAT_NAN, v = FLOAT_NAN;
+//	float u = FLOAT_NAN, v = FLOAT_NAN;
 	for(int i = 0; i < 4; ++i)
 		if (alignedDS[i] < smallestT)
 		{
