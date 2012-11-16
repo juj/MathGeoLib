@@ -951,8 +951,8 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 //	assert(p.FacesAreNondegeneratePlanar());
 
 	CHullHelp hull;
-	for(int i = 0; i < (int)p.f.size(); ++i)
-		hull.livePlanes.push_back(i);
+	for(int j = 0; j < (int)p.f.size(); ++j)
+		hull.livePlanes.push_back(j);
 
 	// For better performance, merge the remaining extreme points first.
 	for(; iter != extremes.end(); ++iter)
@@ -966,10 +966,10 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 	}
 
 	// Merge all the rest of the points.
-	for(int i = 0; i < numPoints; ++i)
+	for(int j = 0; j < numPoints; ++j)
 	{
-		if (p.f.size() > 5000 && (i & 255) == 0)
-			LOGI("Mergeconvex %d/%d, #vertices %d, #faces %d", i, numPoints, (int)p.v.size(), (int)p.f.size());
+		if (p.f.size() > 5000 && (j & 255) == 0)
+			LOGI("Mergeconvex %d/%d, #vertices %d, #faces %d", j, numPoints, (int)p.v.size(), (int)p.f.size());
 		p.MergeConvex(pointArray[i]);
 
 		mathassert(p.FaceIndicesValid());
