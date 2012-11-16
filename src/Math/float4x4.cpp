@@ -1482,7 +1482,7 @@ void float4x4::TransformPos(float3 *pointArray, int numPoints, int strideBytes) 
 		float3 *v = reinterpret_cast<float3*>(data);
 		*v = this->TransformPos(*v);
 		data += strideBytes;
-	}		
+	}
 }
 
 void float4x4::TransformDir(float3 *dirArray, int numVectors) const
@@ -1509,7 +1509,7 @@ void float4x4::TransformDir(float3 *dirArray, int numVectors, int strideBytes) c
 		float3 *v = reinterpret_cast<float3*>(data);
 		*v = this->TransformDir(*v);
 		data += strideBytes;
-	}		
+	}
 }
 
 void float4x4::Transform(float4 *vectorArray, int numVectors) const
@@ -1536,7 +1536,7 @@ void float4x4::Transform(float4 *vectorArray, int numVectors, int strideBytes) c
 		float4 *v = reinterpret_cast<float4*>(data);
 		*v = *this * *v;
 		data += strideBytes;
-	}		
+	}
 }
 
 float4x4 float4x4::operator *(const float3x3 &rhs) const
