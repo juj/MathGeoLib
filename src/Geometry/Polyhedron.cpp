@@ -704,7 +704,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 		Face &face = f[i];
 		if (p.SignedDistance(point) > 1e-5f)
 		{
-			bool isConnected = (deletedEdges.size() == 0);
+			bool isConnected = (deletedEdges.empty());
 
 			int v0 = face.v.back();
 			for(size_t j = 0; j < face.v.size() && !isConnected; ++j)
@@ -750,7 +750,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 	}
 
 	// The polyhedron contained our point, nothing to merge.
-	if (deletedEdges.size() == 0)
+	if (deletedEdges.empty())
 		return;
 
 	// Add the new point to this polyhedron.
