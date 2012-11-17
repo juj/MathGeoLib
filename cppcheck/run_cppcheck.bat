@@ -4,7 +4,7 @@
 
 "C:\Program Files (x86)\Cppcheck\cppcheck" --version
 
-"C:\Program Files (x86)\Cppcheck\cppcheck" --enable=all --suppress=unusedFunction --suppress=uninitMemberVar --suppress=incorrectStringBooleanError --force ../src
+"C:\Program Files (x86)\Cppcheck\cppcheck" -UMATH_QT_INTEROP -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=uninitMemberVar --suppress=incorrectStringBooleanError --force ../src
 
 pause
 
