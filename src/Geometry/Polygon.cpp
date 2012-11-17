@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file Polygon.cpp
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief Implementation for the Polygon geometry object. */
 #include "Geometry/Polygon.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -67,7 +67,7 @@ LineSegment Polygon::Edge(int i) const
 {
 	if (p.empty())
 		return LineSegment(float3::nan, float3::nan);
-	if (p.empty())
+	if (p.size() == 1)
 		return LineSegment(p[0], p[0]);
 	return LineSegment(p[i], p[(i+1)%p.size()]);
 }
