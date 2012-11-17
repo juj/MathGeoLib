@@ -899,11 +899,11 @@ public:
 	float4 Mul_ColMajor_SSE(const float4 &rhs) const;
 	float4 Mul_ColMajor_SSE_2(const float4 &rhs) const;
 
-	float4x4 float4x4::Mul_SSE(const float4x4 &rhs) const;
+	float4x4 Mul_SSE(const float4x4 &rhs) const;
 	/* Temporary alternative implementations: Profiled the Mul_SSE version above to be the fastest.
-	float4x4 float4x4::Mul_SSE1_2(const float4x4 &rhs) const;
-	float4x4 float4x4::Mul_SSE1_dpps(const float4x4 &rhs) const;
-	float4x4 float4x4::Mul_SSE1_dpps_2(const float4x4 &rhs) const;
+	float4x4 Mul_SSE1_2(const float4x4 &rhs) const;
+	float4x4 Mul_SSE1_dpps(const float4x4 &rhs) const;
+	float4x4 Mul_SSE1_dpps_2(const float4x4 &rhs) const;
 	*/
 #endif
 };

@@ -790,6 +790,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 
 			std::map<std::pair<int, int>, int>::iterator existing = remainingEdges.find(opposite);
 			assert(existing != remainingEdges.end());
+			MARK_UNUSED(existing);
 
 #if 0			
 			int adjoiningFace = existing->second;
@@ -858,13 +859,13 @@ void Polyhedron::Translate(const float3 &point)
 
 void Polyhedron::Transform(const float3x3 &transform)
 {
-	if (v.size() > 0)
+	if (!v.empty())
 		transform.BatchTransform(&v[0], (int)v.size());
 }
 
 void Polyhedron::Transform(const float3x4 &transform)
 {
-	if (v.size() > 0)
+	if (!v.empty())
 		transform.BatchTransformPos(&v[0], (int)v.size());
 }
 

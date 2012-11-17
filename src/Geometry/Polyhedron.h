@@ -194,7 +194,7 @@ public:
 
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */
-	bool IsNull() const { return v.size() == 0 && f.size() == 0; }
+	bool IsNull() const { return v.empty() && f.empty(); }
 
 	/// Returns true if this polyhedron is closed and does not have any gaps.
 	/** \note This function performs a quick check, which might not be complete.

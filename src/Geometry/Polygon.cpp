@@ -65,16 +65,16 @@ float3 Polygon::Vertex(int vertexIndex) const
 
 LineSegment Polygon::Edge(int i) const
 {
-	if (p.size() == 0)
+	if (p.empty())
 		return LineSegment(float3::nan, float3::nan);
-	if (p.size() == 1)
+	if (p.empty())
 		return LineSegment(p[0], p[0]);
 	return LineSegment(p[i], p[(i+1)%p.size()]);
 }
 
 LineSegment Polygon::Edge2D(int i) const
 {
-	if (p.size() == 0)
+	if (p.empty())
 		return LineSegment(float3::nan, float3::nan);
 	if (p.size() == 1)
 		return LineSegment(float3::zero, float3::zero);
@@ -146,7 +146,7 @@ LineSegment Polygon::Diagonal(int i, int j) const
 bool Polygon::IsConvex() const
 {
 	assume(IsPlanar());
-	if (p.size() == 0)
+	if (p.empty())
 		return false;
 	if (p.size() <= 3)
 		return true;
@@ -181,9 +181,9 @@ float2 Polygon::MapTo2D(int i) const
 
 float2 Polygon::MapTo2D(const float3 &point) const
 {
-	assume(p.size() > 0);
+	assume(!p.empty());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (p.size() == 0)
+	if (p.empty())
 		return float2::nan;
 #endif
 	float3 basisU = BasisU();
@@ -194,9 +194,9 @@ float2 Polygon::MapTo2D(const float3 &point) const
 
 float3 Polygon::MapFrom2D(const float2 &point) const
 {
-	assume(p.size() > 0);
+	assume(!p.empty());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (p.size() == 0)
+	if (p.empty())
 		return float3::nan;
 #endif
 	return p[0] + point.x * BasisU() + point.y * BasisV();
@@ -204,7 +204,7 @@ float3 Polygon::MapFrom2D(const float2 &point) const
 
 bool Polygon::IsPlanar(float epsilon) const
 {
-	if (p.size() == 0)
+	if (p.empty())
 		return false;
 	if (p.size() <= 3)
 		return true;
@@ -236,7 +236,7 @@ bool Polygon::IsSimple() const
 
 bool Polygon::IsNull() const
 {
-	return p.size() == 0;
+	return p.empty();
 }
 
 bool Polygon::IsFinite() const
@@ -295,13 +295,13 @@ void Polygon::Translate(const float3 &point)
 
 void Polygon::Transform(const float3x3 &transform)
 {
-	if (p.size() > 0)
+	if (!p.empty())
 		transform.BatchTransform(&p[0], (int)p.size());
 }
 
 void Polygon::Transform(const float3x4 &transform)
 {
-	if (p.size() > 0)
+	if (!p.empty())
 		transform.BatchTransformPos(&p[0], (int)p.size());
 }
 
@@ -611,7 +611,7 @@ float3 Polygon::Centroid() const
 
 float3 Polygon::PointOnEdge(float normalizedDistance) const
 {
-	if (p.size() == 0)
+	if (p.empty())
 		return float3::nan;
 	if (p.size() < 2)
 		return p[0];
