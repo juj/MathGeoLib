@@ -338,6 +338,8 @@ public:
 	static Polyhedron Icosahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Dodecahedron(const float3 &centerPos = float3(0,0,0), float scale = 1.f, bool ccwIsFrontFacing = true);
 
+	std::vector<Triangle> Triangulate() const;
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb) const;

@@ -1265,6 +1265,18 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 
 }
 
+std::vector<Triangle> Polyhedron::Triangulate() const
+{
+	std::vector<Triangle> outTriangleList;
+	for(int i = 0; i < NumFaces(); ++i)
+	{
+		Polygon p = FacePolygon(i);
+		std::vector<Triangle> tris = p.Triangulate();
+		outTriangleList.insert(outTriangleList.end(), tris.begin(), tris.end());
+	}
+	return outTriangleList;
+}
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 {
@@ -1295,7 +1307,6 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 				vb.Set(idx+2, VDNormal, float4(normal, 0.f));
 			}
 			idx += 3;
-
 		}
 	}
 }
