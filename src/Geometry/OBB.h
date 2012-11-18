@@ -42,7 +42,7 @@ public:
 	/// Specifies normalized direction vectors for the local axes. [noscript] [similarOverload: pos]
 	/** axis[0] specifies the +X direction in the local space of this OBB, axis[1] the +Y direction and axis[2]
 		the +Z direction.
-		The scale of these vectors is always normalized. The (half-)length of the OBB along its local axes is
+		The scale of these vectors is always normalized. The half-length of the OBB along its local axes is
 		specified by the vector r.
 		The axis vectors must always be orthonormal. Be sure to guarantee that condition holds if you 
 		directly set to this member variable. */

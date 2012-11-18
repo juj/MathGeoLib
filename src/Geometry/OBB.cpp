@@ -768,11 +768,20 @@ void OBB::Enclose(const float3 &point)
 	float3 p = point - pos;
 	for(int i = 0; i < 3; ++i)
 	{
+		assert(EqualAbs(axis[i].Length(), 1.f));
 		float dist = p.Dot(axis[i]);
-		if (Abs(dist) > r[i])
+		float distanceFromOBB = Abs(dist) - r[i];
+		if (distanceFromOBB > 0.f)
 		{
-			pos += axis[i] * (dist - r[i]) * 0.5f;
-			r[i] += Abs(dist - r[i]) * 0.5f;
+			r[i] += distanceFromOBB * 0.5f;
+			if (dist > 0.f) ///\todo Optimize out this comparison!
+				pos += axis[i] * distanceFromOBB * 0.5f;
+			else
+				pos -= axis[i] * distanceFromOBB * 0.5f;
+
+			p = point-pos; ///\todo Can we omit this? (redundant since axis[i] are orthonormal?)
+
+			mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i]));
 		}
 	}
 	// Should now contain the point.
