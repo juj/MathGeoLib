@@ -101,11 +101,27 @@ public:
 		@see horizontalFov, verticalFov. */
 	float AspectRatio() const;
 
+	/// Computes the direction vector that points logically to the right-hand side of the Frustum.
+	/** This vector together with the member variables 'front' and 'up' form the orthonormal basis of the view frustum.
+		@see pos, front. */
+	float3 WorldRight() const
+	{
+		return Cross(front, up);
+	}
+
 	/// Computes the plane equation of the near plane of this Frustum.
 	/** The normal vector of the returned plane points outwards from the volume inside the frustum, i.e. towards the eye point
 		(towards -front).
 		@see front, FarPlane(), LeftPlane(), RightPlane(), TopPlane(), BottomPlane(), GetPlane(), GetPlanes(). */
 	Plane NearPlane() const;
+
+	/// Computes the width of the near plane quad in world space units.
+	/** @see NearPlaneHeight(). */
+	float NearPlaneWidth() const;
+
+	/// Computes the height of the near plane quad in world space units.
+	/** @see NearPlaneHeight(). */
+	float NearPlaneHeight() const;
 
 	/// Computes the plane equation of the far plane of this Frustum. [similarOverload: NearPlane]
 	/** The normal vector of the returned plane points outwards from the volume inside the frustum, i.e. away from the eye point.

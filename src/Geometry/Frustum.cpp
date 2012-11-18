@@ -46,6 +46,18 @@ float Frustum::AspectRatio() const
 	return horizontalFov / verticalFov;
 }
 
+float Frustum::NearPlaneWidth() const
+{
+	///\todo Optimize!
+	return NearPlanePos(-1.f, 0.f).Distance(NearPlanePos(1.f, 0.f));
+}
+
+float Frustum::NearPlaneHeight() const
+{
+	///\todo Optimize!
+	return NearPlanePos(0.f, -1.f).Distance(NearPlanePos(0.f, 1.f));
+}
+
 Plane Frustum::NearPlane() const
 {
 	return Plane(pos + front * nearPlaneDistance, -front);
@@ -67,7 +79,7 @@ Plane Frustum::LeftPlane() const
 
 Plane Frustum::RightPlane() const
 {
-	float3 right = Cross(front, up);
+	float3 right = WorldRight();
 	right.ScaleToLength(Tan(horizontalFov*0.5f));
 	float3 rightSide = front + right;
 	float3 rightSideNormal = Cross(rightSide, up).Normalized();
@@ -77,7 +89,7 @@ Plane Frustum::RightPlane() const
 Plane Frustum::TopPlane() const
 {
 	float3 topSide = front + Tan(verticalFov * 0.5f) * up;
-	float3 right = Cross(front, up);
+	float3 right = WorldRight();
 	float3 topSideNormal = Cross(right, topSide).Normalized();
 	return Plane(pos, topSideNormal);
 }
@@ -133,9 +145,9 @@ float4x4 Frustum::ProjectionMatrix() const
 	if (type == PerspectiveFrustum)
 	{
 #if USE_D3D11
-		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov);
+		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
 #else
-		return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov);
+		return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
 #endif
 	}
 	else
@@ -154,12 +166,12 @@ float3 Frustum::NearPlanePos(float x, float y) const
 		float frontPlaneHalfHeight = Tan(verticalFov*0.5f)*nearPlaneDistance;
 		x = x * frontPlaneHalfWidth; // Map [-1,1] to [-width/2, width/2].
 		y = y * frontPlaneHalfHeight;  // Map [-1,1] to [-height/2, height/2].
-		float3 right = Cross(up, front).Normalized();
-		return pos + front * nearPlaneDistance + x * right - y * up;
+		float3 right = WorldRight();
+		return pos + front * nearPlaneDistance + x * right + y * up;
 	}
 	else
 	{
-		float3 right = Cross(up, front).Normalized();
+		float3 right = WorldRight();
 		return pos + front * nearPlaneDistance 
 				   + x * orthographicWidth * 0.5f * right
 				   + y * orthographicHeight * 0.5f * up;
@@ -181,12 +193,12 @@ float3 Frustum::FarPlanePos(float x, float y) const
 		float farPlaneHalfHeight = Tan(verticalFov*0.5f)*farPlaneDistance;
 		x = x * farPlaneHalfWidth;
 		y = y * farPlaneHalfHeight;
-		float3 right = Cross(up, front).Normalized();
-		return pos + front * farPlaneDistance + x * right - y * up;
+		float3 right = WorldRight();
+		return pos + front * farPlaneDistance + x * right + y * up;
 	}
 	else
 	{
-		float3 right = Cross(up, front).Normalized();
+		float3 right = WorldRight();
 		return pos + front * farPlaneDistance 
 				   + x * orthographicWidth * 0.5f * right
 				   + y * orthographicHeight * 0.5f * up;
@@ -262,9 +274,15 @@ float3 Frustum::Project(const float3 &point) const
 bool Frustum::Contains(const float3 &point) const
 {
 	float3 projected = Project(point);
+#ifdef USE_D3D11
 	return projected.x >= -1.f && projected.x <= 1.f &&
 		projected.y >= -1.f && projected.y <= 1.f &&
 		projected.z >= 0.f && projected.z <= 1.f;
+#else
+	return projected.x >= -1.f && projected.x <= 1.f &&
+		projected.y >= -1.f && projected.y <= 1.f &&
+		projected.z >= -1.f && projected.z <= 1.f;
+#endif
 }
 
 bool Frustum::Contains(const LineSegment &lineSegment) const
@@ -370,13 +388,15 @@ float3 Frustum::UniformRandomPointInside(LCG &rng) const
 		return FastRandomPointInside(rng);
 	else
 	{
-#ifdef _MSC_VER
-#pragma WARNING(Frustum::UniformRandomPointInside not implemented for perspective frustums!)
-#else
-#warning Frustum::UniformRandomPointInside not implemented for perspective frustums!
-#endif
-		assume(false && "Frustum::UniformRandomPointInside not implemented for perspective frustums!");
-		return FastRandomPointInside(rng); ///\todo This will not generate a uniform result! Implement rejection sampling!
+		OBB o = MinimalEnclosingOBB();
+		for(int numTries = 0; numTries < 1000; ++numTries)
+		{
+			float3 pt = o.RandomPointInside(rng);
+			if (Contains(pt))
+				return pt;
+		}
+		LOGW("Rejection sampling failed in Frustum::UniformRandomPointInside! Producing a non-uniformly distributed point inside the frustum!");
+		return FastRandomPointInside(rng);
 	}
 }
 
@@ -519,12 +539,12 @@ Polyhedron Frustum::ToPolyhedron() const
 	// Generate the 6 faces of this Frustum.
 	const int faces[6][4] = 
 	{ 
-		{ 0, 1, 3, 2 }, // X-
-		{ 4, 6, 7, 5 }, // X+
-		{ 0, 4, 5, 1 }, // Y-
-		{ 7, 6, 2, 3 }, // Y+
-		{ 0, 2, 6, 4 }, // Z-
-		{ 1, 5, 7, 3 }, // Z+
+		{ 0, 2, 3, 1 }, // X-
+		{ 4, 5, 7, 6 }, // X+
+		{ 0, 1, 5, 4 }, // Y-
+		{ 7, 3, 2, 6 }, // Y+
+		{ 0, 4, 6, 2 }, // Z-
+		{ 1, 3, 7, 5 }, // Z+
 	};
 
 	for(int f = 0; f < 6; ++f)
