@@ -488,7 +488,13 @@ int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const fl
 
 	float D = B*B - 4.f * C; // D = B^2 - 4AC.
 	if (D < 0.f) // There is no solution to the square root, so the ray doesn't intersect the sphere.
+	{
+		// Output a degenerate enter-exit range so that batch processing code may use min of t1's and max of t2's to
+		// compute the nearest enter and farthest exit without requiring branching on the return value of this function.
+		t1 = FLOAT_INF;
+		t2 = -FLOAT_INF;
 		return 0;
+	}
 
 	if (D < 1e-4f) // The expression inside Sqrt is ~ 0. The line is tangent to the sphere, and we have one solution.
 	{
