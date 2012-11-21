@@ -62,8 +62,6 @@ void KdTree<T>::SplitLeaf(int nodeIndex, const AABB &nodeAABB, int numObjectsInB
 	u32 *leftBucket = new u32[numObjectsInBucket+1];
 	u32 *rightBucket = new u32[numObjectsInBucket+1];
 
-	int leftIdx = 0;
-	int rightIdx = 0;
 	u32 *curObject = buckets[curBucketIndex];
 	u32 *l = leftBucket;
 	u32 *r = rightBucket;

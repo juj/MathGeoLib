@@ -171,13 +171,13 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 template<typename T>
 typename QuadTree<T>::Node *QuadTree<T>::Root()
 {
-	return nodes.size() > 0 ? &nodes[rootNodeIndex] : 0;
+	return nodes.empty() ? 0 : &nodes[rootNodeIndex];
 }
 
 template<typename T>
 const typename QuadTree<T>::Node *QuadTree<T>::Root() const
 {
-	return nodes.size() > 0 ? &nodes[rootNodeIndex] : 0;
+	return nodes.empty() ? 0 : &nodes[rootNodeIndex];
 }
 
 template<typename T>
@@ -289,7 +289,7 @@ inline void QuadTree<T>::AABBQuery(const AABB2D &aabb, Func &callback)
 		return;
 	stack.push_back(n);
 
-	while(stack.size() > 0)
+	while(!stack.empty())
 	{
 		TraversalStackItem i = stack.back();
 		stack.pop_back();
@@ -357,7 +357,7 @@ class FindCollidingPairs
 public:
 	Func *collisionCallback;
 
-	bool operator ()(QuadTree<T> &tree, const AABB2D queryAABB, typename QuadTree<T>::Node &node, const AABB2D &nodeAABB)
+	bool operator ()(QuadTree<T> &tree, const AABB2D &queryAABB, typename QuadTree<T>::Node &node, const AABB2D &nodeAABB)
 	{
 		for(size_t i = 0; i < node.objects.size(); ++i)
 		{
