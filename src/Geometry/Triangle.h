@@ -269,7 +269,7 @@ public:
 	/** @param outLine [out] If specified, receives the line segment of the common points shared by the two
 			intersecting triangles. If the two triangles do not intersect, this pointer is not written to.
 			This pointer may be null. */
-	bool Intersects(const Triangle &triangle, LineSegment *outLine) const;
+	bool Intersects(const Triangle &triangle, LineSegment *outLine = 0) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const OBB &obb) const;
 	bool Intersects(const Polygon &polygon) const;
@@ -297,7 +297,7 @@ public:
 	float3 ClosestPoint(const float3 &point) const;
 	/** @param otherPt [out] If specified, receives the closest point on the other object to this triangle.
 		This pointer may be null. */
-	float3 ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const;
+	float3 ClosestPoint(const LineSegment &lineSegment, float3 *otherPt = 0) const;
 	/** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
 			This pointer may be null.
 		@param outV [out] If specified, receives the barycentric V coordinate of the returned point (in the UV convention).
@@ -306,8 +306,8 @@ public:
 		@return The closest point on this triangle to the given object.
 		@todo Add ClosestPoint(Ray/Plane/Polygon/Circle/Disk/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron).
 		@see Distance(), Contains(), Intersects(), ClosestPointToTriangleEdge(), Line::GetPoint. */
-	float3 ClosestPoint(const Line &line, float *outU, float *outV, float *outD) const;
-	float3 ClosestPoint(const Triangle &triangle, float3 *otherPt) const;
+	float3 ClosestPoint(const Line &line, float *outU = 0, float *outV = 0, float *outD = 0) const;
+	float3 ClosestPoint(const Triangle &triangle, float3 *otherPt = 0) const;
 
 	/// Computes the closest point on the edge of this triangle to the given object.
 	/** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
