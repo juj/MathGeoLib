@@ -18,3 +18,6 @@ file(GLOB_RECURSE headerFiles ./src/*.h)
 
 add_library(MathGeoLib STATIC ${sourceFiles} ${headerFiles})
 
+if (WIN8RT)
+	set_target_properties(MathGeoLib PROPERTIES VS_WINRT_EXTENSIONS TRUE)
+endif()
