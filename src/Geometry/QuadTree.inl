@@ -745,5 +745,7 @@ void QuadTree<T>::DebugSanityCheckNode(Node *n)
 		DebugSanityCheckNode(&nodes[n->BottomLeftChildIndex()]);
 		DebugSanityCheckNode(&nodes[n->BottomRightChildIndex()]);
 	}
+#else
+	MARK_UNUSED(n);
 #endif
 }
