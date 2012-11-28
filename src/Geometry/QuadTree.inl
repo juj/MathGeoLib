@@ -184,7 +184,7 @@ template<typename T>
 int QuadTree<T>::AllocateNodeGroup(Node *parent)
 {
 #ifdef _DEBUG
-	int oldCap = nodes.capacity();
+	size_t oldCap = nodes.capacity();
 #endif
 	int index = nodes.size();
 	Node n;
