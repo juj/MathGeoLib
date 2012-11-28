@@ -839,6 +839,8 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 		Schneider, Eberly. Geometric Tools for Computer Graphics pp. 433 - 441. */
 	///@todo The Triangle-Line code is currently untested. Run tests to ensure the following code works properly.
 
+	LOGW("Warning: Calling work-in-progress broken Triangle::ClosestPoint.");
+
 	// Point on triangle: T(u,v) = a + u*b + v*c;
 	// Point on line:  L(t) = p + t*d;
 	// Minimize the function Q(u,v,t) = ||T(u,v) - L(t)||.
@@ -857,7 +859,7 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 	float3x3 m;
 	m[0][0] = d_e0e0;  m[0][1] = d_e0e1;  m[0][2] = -d_e0d;
 	m[1][0] = d_e0e1;  m[1][1] = d_e1e1;  m[1][2] = -d_e1d;
-	m[2][0] = -d_e0d;  m[2][1] = -d_e1d;  m[2][2] = d_dd;
+	m[2][0] = -d_e0d;  m[2][1] = -d_e1d;  m[2][2] =   d_dd;
 
 	///@todo Add optimized float3x3::InverseSymmetric().
 	bool inv = m.Inverse();
@@ -877,39 +879,31 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 	float u = uvt.x;
 	float v = uvt.y;
 	float t = uvt.z;
-	if (u < 0)
+	if (u <= 0)
 	{
 		if (outU) *outU = 0;
 
 		// Solve 2x2 matrix for the (v,t) solution when u == 0.
-		float m00 = m[2][2];
-		float m01 = -m[2][1];
-		float m10 = -m[1][2];
-		float m11 = m[1][1];
-        /// @bug This variable should be used somewhere below? Review the code, and test!
-		float det = m00*m11 - m01*m10;
-
-		// 2x2 * 2 matrix*vec mul.
-		v = m00*b[1] + m01*b[2];
-		t = m10*b[1] + m11*b[2];
-		if (outD) *outD = t;
+		v = m[1][1]*b[1] + m[1][2]*b[2];
+		t = m[2][1]*b[1] + m[2][2]*b[2];
 
 		// Check if the solution is still out of bounds.
 		if (v <= 0)
 		{
 			if (outV) *outV = 0;
-			t = v_m_p_d / d_dd;
+			if (outD) *outD = v_m_p_d / d_dd;
 			return Point(0, 0);
 		}
 		else if (v >= 1)
 		{
 			if (outV) *outV = 1;
-			t = (v_m_p_d - d_e1d) / d_dd;
+			if (outD) *outD = (v_m_p_d - d_e1d) / d_dd;
 			return Point(0, 1);
 		}
 		else // (0 <= v <= 1).
 		{
 			if (outV) *outV = v;
+			if (outD) *outD = t;
 			return Point(0, v);
 		}
 	}
@@ -918,77 +912,74 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 		if (outV) *outV = 0;
 
 		// Solve 2x2 matrix for the (u,t) solution when v == 0.
-		float m00 = m[2][2];
-		float m01 = -m[2][0];
-		float m10 = -m[0][2];
-		float m11 = m[0][0];
-		float det = 1.f / (m00*m11 - m01*m10);
-
-		// 2x2 * 2 matrix*vec mul.
-		u = (m00*b[0] + m01*b[2]) * det;
-		t = (m10*b[0] + m11*b[2]) * det;
-		if (outD) *outD = t;
+		u = m[0][0]*b[0] + m[0][2]*b[2];
+		t = m[2][0]*b[0] + m[2][2]*b[2];
 
 		// Check if the solution is still out of bounds.
 		if (u <= 0)
 		{
 			if (outU) *outU = 0;
-			t = v_m_p_d / d_dd;
+			if (outD) *outD = v_m_p_d / d_dd;
 			return Point(0, 0);
 		}
 		else if (u >= 1)
 		{
 			if (outU) *outU = 1;
-			t = (v_m_p_d - d_e0d) / d_dd;
+			if (outD) *outD = (v_m_p_d - d_e0d) / d_dd;
 			return Point(1, 0);
 		}
 		else // (0 <= u <= 1).
 		{
 			if (outU) *outU = u;
+			if (outD) *outD = t;
 			return Point(u, 0);
 		}
 	}
 	else if (u + v >= 1.f)
 	{
 		// Set v = 1-u.
+#if 0
 		float m00 = d_e0e0 + d_e1e1 - 2.f * d_e0e1;
 		float m01 = -d_e0d + d_e1d;
 		float m10 = -d_e0d + d_e1d;
 		float m11 = d_dd;
-		float det = 1.f / (m00*m11 - m01*m10);
+//		float det = 1.f / (m00*m11 - m01*m10);
 
 		float b0 = d_e1e1 - d_e0e1 + v_m_p_e0 - v_m_p_e1;
 		float b1 = d_e1d + v_m_p_d;
+		/*
 		// Inverse 2x2 matrix.
 		Swap(m00, m11);
 		Swap(m01, m10);
 		m01 = -m01;
 		m10 = -m10;
-
+		*/
 		// 2x2 * 2 matrix*vec mul.
-		u = (m00*b0 + m01*b1) * det;
-		t = (m10*b0 + m11*b1) * det;
-		if (outD) *outD = t;
+		u = (m00*b0 + m01*b1);// * det;
+		t = (m10*b0 + m11*b1);// * det;
+#endif
+//		u = m[0][0]*b[0] + 
 
 		// Check if the solution is still out of bounds.
 		if (u <= 0)
 		{
 			if (outU) *outU = 0;
 			if (outV) *outV = 1;
-			t = (d_e1d + v_m_p_d) / d_dd;
+			if (outD) *outD = (d_e1d + v_m_p_d) / d_dd;
 			return Point(0, 1);
 		}
 		else if (u >= 1)
 		{
 			if (outU) *outU = 1;
 			if (outV) *outV = 0;
-			t = (v_m_p_d + d_e0d) / d_dd;
+			if (outD) *outD = (v_m_p_d + d_e0d) / d_dd;
 			return Point(1, 0);
 		}
 		else // (0 <= u <= 1).
 		{
 			if (outU) *outU = u;
 			if (outV) *outV = 1.f - u;
+			if (outD) *outD = t;
 			return Point(u, 1.f - u);
 		}
 	}

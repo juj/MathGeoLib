@@ -695,7 +695,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 		if (point.DistanceSq(v[i]) < 1e-3f)
 			return;
 
-	bool hadDisconnectedHorizon = false;
+//	bool hadDisconnectedHorizon = false;
 
 	for(int i = 0; i < (int)f.size(); ++i)
 	{
@@ -734,8 +734,8 @@ void Polyhedron::MergeConvex(const float3 &point)
 				--i;
 				continue;
 			}
-			else
-				hadDisconnectedHorizon = true;
+//			else
+//				hadDisconnectedHorizon = true;
 		}
 
 		int v0 = face.v.back();
@@ -786,7 +786,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 		{ 
 			// If the adjoining face is planar to the triangle we'd like to add, instead extend the face to enclose
 			// this vertex.
-			float3 newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
+			//float3 newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
 
 			std::map<std::pair<int, int>, int>::iterator existing = remainingEdges.find(opposite);
 			assert(existing != remainingEdges.end());
