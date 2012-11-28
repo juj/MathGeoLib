@@ -147,10 +147,12 @@ bool OBB::SetFrom(const Polyhedron &polyhedron)
 }
 #endif
 
+#if 0
 void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
 {
 	*this = PCAEnclosingOBB(pointArray, numPoints);
 }
+#endif
 
 Polyhedron OBB::ToPolyhedron() const
 {
@@ -191,6 +193,8 @@ AABB OBB::MinimalEnclosingAABB() const
 	return aabb;
 }
 
+#if 0
+
 AABB OBB::MaximalContainedAABB() const
 {
 #ifdef _MSC_VER
@@ -201,6 +205,7 @@ AABB OBB::MaximalContainedAABB() const
 	assume(false && "OBB::MaximalContainedAABB not implemented!"); /// @todo Implement.
 	return AABB();
 }
+#endif
 
 Sphere OBB::MinimalEnclosingSphere() const
 {
@@ -429,6 +434,7 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 		*idxLargest = largest;
 }
 
+#if 0
 OBB OBB::PCAEnclosingOBB(const float3 * /*pointArray*/, int /*numPoints*/)
 {
 #ifdef _MSC_VER
@@ -439,6 +445,7 @@ OBB OBB::PCAEnclosingOBB(const float3 * /*pointArray*/, int /*numPoints*/)
 	assume(false && "OBB::PCAEnclosingOBB not implemented!"); /// @todo Implement.
 	return OBB();
 }
+#endif
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 int LexFloat3Cmp(const float3 &a, const float3 &b)

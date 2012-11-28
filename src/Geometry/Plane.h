@@ -184,6 +184,7 @@ public:
 	Triangle Project(const Triangle &triangle) const;
 	Polygon Project(const Polygon &polygon) const;
 
+#if 0
 	/// Computes the affine transformation matrix that projects onto this plane in an oblique (slanted) angle.
 	/** @param obliqueProjectionDir The projection direction. This vector must be normalized. If a vector collinear to the
 			normal of this plane is specified, this function returns the same matrix as calling OrthoProjection() would.
@@ -196,6 +197,7 @@ public:
 		@note This mapping can be expressed as a float3x4 operation. See the ObliqueProjection() function.
 		@see ObliqueProjection(), Project(). */
 	float3 ObliqueProject(const float3 &point, const float3 &obliqueProjectionDir) const;
+#endif
 
 	/// Returns the transformation matrix that mirrors objects along this plane.
 	/** This matrix maps each point to its mirror point on the opposite side of this plane.

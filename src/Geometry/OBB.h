@@ -99,12 +99,14 @@ public:
 	bool SetFrom(const Polyhedron &polyhedron);
 #endif
 
+#if 0
 	/// Sets this OBB to enclose the given point cloud.
 	/** This functions uses principal component analysis to generate an approximation of the smallest OBB that encloses the
 		given point set. The resulting OBB will always contain all the specified points, but might not be the optimally
 		smallest OBB in terms of volume.
 		@see SetFrom(), ToPolyhedron(), PCAEnclosingOBB(). */
 	void SetFromApproximate(const float3 *pointArray, int numPoints);
+#endif
 
 	/// Converts this OBB to a polyhedron.
 	/** This function returns a polyhedron representation of this OBB. This conversion is exact, meaning that the returned
@@ -118,11 +120,13 @@ public:
 		@see SetFrom(), MaximalContainedAABB(), MinimalEnclosingSphere(), MaximalContainedSphere(). */
 	AABB MinimalEnclosingAABB() const;
 
+#if 0
 	/// Returns the largest AABB that can fit inside this OBB.
 	/** This function computes the largest AABB that can fit inside this OBB. This AABB is unique up to the center point of the
 		AABB. The returned AABB will be centered to the center point of this OBB.
 		@see MinimalEnclosingAABB(), MinimalEnclosingSphere(), MaximalContainedSphere(). */
 	AABB MaximalContainedAABB() const;
+#endif
 
 	/// Returns the smallest sphere that contains this OBB.
 	/** This function computes the optimal minimum volume sphere that encloses this OBB.
@@ -277,6 +281,7 @@ public:
 			This pointer may be left null, if this information is of no interest. */
 	static void ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int *idxSmallest, int *idxLargest);
 
+#if 0
 	/// Generates an OBB that encloses the given point set.
 	/** This function uses principal component analysis as the heuristics to generate the OBB. The returned OBB
 		is not necessarily the optimal OBB that encloses the given point set.
@@ -284,6 +289,7 @@ public:
 		@param numPoints The number of elements in the input array.
 		@see SetFromApproximate(). */
 	static OBB PCAEnclosingOBB(const float3 *pointArray, int numPoints);
+#endif
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 	///\todo This function is strongly WIP! (Works, but is very very slow!)
