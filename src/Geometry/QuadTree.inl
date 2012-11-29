@@ -129,7 +129,7 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 //			n->bucket.push_back(objectId);
 			n->objects.push_back(object);
 			AssociateQuadTreeNode(object, n);
-			if (n->IsLeaf() && n->objects.size() > minQuadTreeNodeObjectCount && aabb.Width() >= minQuadTreeQuadrantSize && aabb.Height() >= minQuadTreeQuadrantSize)
+			if (n->IsLeaf() && (int)n->objects.size() > minQuadTreeNodeObjectCount && aabb.Width() >= minQuadTreeQuadrantSize && aabb.Height() >= minQuadTreeQuadrantSize)
 				SplitLeaf(n, aabb);
 			return;
 		}
@@ -186,7 +186,7 @@ int QuadTree<T>::AllocateNodeGroup(Node *parent)
 #ifdef _DEBUG
 	size_t oldCap = nodes.capacity();
 #endif
-	int index = nodes.size();
+	int index = (int)nodes.size();
 	Node n;
 	n.parent = parent;
 	n.childIndex = 0xFFFFFFFF;

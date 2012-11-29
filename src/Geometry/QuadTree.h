@@ -130,7 +130,7 @@ public:
 		float halfY = (aabb.minPoint.y + aabb.maxPoint.y) * 0.5f;
 		u32 parentChildIndex = node->parent->childIndex;
 		const Node *parentChildBase = &nodes[parentChildIndex];
-		int quadrant = node - parentChildBase;
+		int quadrant = (int)(node - parentChildBase); // The difference between these pointers is always [0-3], denoting the this node is in.
 		switch(quadrant)
 		{
 		case 0: 
