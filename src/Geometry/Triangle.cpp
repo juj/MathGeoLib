@@ -105,6 +105,11 @@ bool Triangle::BarycentricInsideTriangle(const float3 &barycentric)
 		EqualAbs(barycentric.x + barycentric.y + barycentric.z, 1.f);
 }
 
+float3 Triangle::Point(float u, float v) const
+{
+	return a + (b-a) * u + (c-a) * v;
+}
+
 float3 Triangle::Point(float u, float v, float w) const
 {
 	return u * a + v * b + w * c;
@@ -265,7 +270,7 @@ bool Triangle::Contains(const float3 &point, float triangleThickness) const
 		return false; ///@todo The plane-point distance test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
 
 	float3 br = BarycentricUVW(point);
-	return br.y >= 0.f && br.z >= 0.f && (br.y + br.z) <= 1.f;
+	return br.x >= 0.f && br.y >= 0.f && br.z >= 0.f;
 }
 
 bool Triangle::Contains(const LineSegment &lineSegment, float triangleThickness) const

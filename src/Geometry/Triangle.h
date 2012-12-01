@@ -108,8 +108,8 @@ public:
 			this triangle.
 		@return a + (b-a)*u + (c-a)*v.
 		@see BarycentricUV(), BarycentricUVW(), BarycentricInsideTriangle(). */
-	float3 Point(float u, float v) const { return a + (b-a) * u + (c-a) * v; }
-	float3 Point(const float2 &uv) const;
+	float3 Point(float u, float v) const;
+ 	float3 Point(const float2 &uv) const;
 
 	/// Computes the center of mass of this triangle.
 	/** @return The point (a+b+c)/3. */
