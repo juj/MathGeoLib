@@ -90,6 +90,11 @@ Line::Line(const LineSegment &lineSegment)
 {
 }
 
+bool Line::IsFinite() const
+{
+	return pos.IsFinite() && dir.IsFinite();
+}
+
 float3 Line::GetPoint(float d) const
 {
 	assert(dir.IsNormalized());

@@ -53,6 +53,11 @@ Ray::Ray(const LineSegment &lineSegment)
 {
 }
 
+bool Ray::IsFinite() const
+{
+	return pos.IsFinite() && dir.IsFinite();
+}
+
 float3 Ray::GetPoint(float d) const
 {
 	assert(dir.IsNormalized());

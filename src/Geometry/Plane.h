@@ -74,6 +74,8 @@ public:
 	Plane(const Line &line, const float3 &normal);
 	Plane(const LineSegment &line, const float3 &normal);
 
+	bool IsDegenerate() const;
+
 	/// Sets this plane by specifying three points on the plane. 
 	/** The normal of the plane will point to the halfspace from which the points are observed to be oriented in 
 		counter-clockwise order.

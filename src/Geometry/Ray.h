@@ -63,6 +63,8 @@ public:
 		@see class LineSegment, ToLineSegment(). */
 	explicit Ray(const LineSegment &lineSegment);
 
+	bool IsFinite() const;
+
 	/// Gets a point along the ray at the given distance.
 	/** Use this function to convert a 1D parametric point along the Ray to a 3D point in the linear space.
 		@param distance The point to compute. GetPoint(0) will return pos. GetPoint(t) will return a point

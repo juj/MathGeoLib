@@ -75,6 +75,11 @@ Plane::Plane(const LineSegment &lineSegment, const float3 &normal)
 	Set(lineSegment.a, perpNormal.Normalized());
 }
 
+bool Plane::IsDegenerate() const
+{
+	return !normal.IsFinite() || normal.IsZero() || !isfinite(d);
+}
+
 void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
 {
 	normal = (v2-v1).Cross(v3-v1);
