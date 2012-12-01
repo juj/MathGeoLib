@@ -172,7 +172,10 @@ public:
 		@see RotateFromTo(). */
 	static float3x3 LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
-	/// Returns a uniformly random 3x3 matrix that performs a rotation.
+	/// Returns a uniformly random 3x3 matrix that performs only rotation.
+	/** This matrix produces a random orthonormal basis for an orientation of an object. There is no mirroring
+		or scaling present in the generated matrix. Also, naturally since float3x3 cannot represent translation or projection,
+		those properties are not present either. */
 	static float3x3 RandomRotation(LCG &lcg);
 
 	/// Returns a random 3x3 matrix with each entry randomized between the range[minElem, maxElem].

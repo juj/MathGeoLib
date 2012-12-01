@@ -177,6 +177,12 @@ public:
 		This function is mostly used for testing and debugging purposes only. */
 	static float3x4 RandomGeneral(LCG &lcg, float minElem, float maxElem);
 
+	/// Returns a uniformly random 3x4 matrix that performs only rotation.
+	/** This matrix produces a random orthonormal basis for an orientation of an object. There is no translation, mirroring
+		or scaling present in the generated matrix. Also, naturally since float3x4 cannot represent projection,
+		that property are not present either. */
+	static float3x4 RandomRotation(LCG &lcg);
+
 	/// Creates a new float3x4 that rotates one coordinate system to coincide with another.
 	/** This function rotates the sourceDirection vector to coincide with the targetDirection vector, and then 
 			rotates sourceDirection2 (which was transformed by 1.) to targetDirection2, but keeping the constraint that 

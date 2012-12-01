@@ -159,6 +159,11 @@ float3x4 float3x4::RandomGeneral(LCG &lcg, float minElem, float maxElem)
 	return m;
 }
 
+float3x4 float3x4::RandomRotation(LCG &lcg)
+{
+	return float3x4(float3x3::RandomRotation(lcg));
+}
+
 float3x4 float3x4::FromQuat(const Quat &orientation)
 {
 	float3x4 r;
