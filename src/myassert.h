@@ -25,6 +25,14 @@
 #define assert(x)
 #else
 
+#ifdef FAIL_USING_EXCEPTIONS
+
+#include <stdexcept>
+
+#define assert(x) do { if (!(x)) throw std::runtime_error(#x); } while(0)
+
+#else
+
 #ifdef WIN32
 #include <cassert>
 #else
@@ -34,6 +42,8 @@
 #define assert(x) do { if (!(x)) LOGW("Assertion failed: " #x); } while(0)
 #else
 #define assert(x)
+#endif
+
 #endif
 
 #endif
