@@ -357,7 +357,7 @@ class FindCollidingPairs
 public:
 	Func *collisionCallback;
 
-	bool operator ()(QuadTree<T> &tree, const AABB2D &queryAABB, typename QuadTree<T>::Node &node, const AABB2D &nodeAABB)
+	bool operator ()(QuadTree<T> & /*tree*/, const AABB2D &queryAABB, typename QuadTree<T>::Node &node, const AABB2D & /*nodeAABB*/)
 	{
 		for(size_t i = 0; i < node.objects.size(); ++i)
 		{

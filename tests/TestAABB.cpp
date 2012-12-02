@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "MathGeoLib.h"
+#include "myassert.h"
 
 LCG rng(Clock::Tick());
 
@@ -77,6 +78,22 @@ LineSegment RandomLineSegmentContainingPoint(const float3 &pt)
 	return l;
 }
 
+Capsule RandomCapsuleContainingPoint(const float3 &pt)
+{
+	float3 dir = float3::RandomDir(rng);
+	float a = rng.Float(0, SCALE);
+	float b = rng.Float(0, SCALE);
+	float r = rng.Float(0.001f, SCALE);
+	Capsule c(pt + a*dir, pt - b*dir, r);
+	float3 d = float3::RandomSphere(rng, float3::zero, c.r);
+	c.l.a += d;
+	c.l.b += d;
+	assert(c.IsFinite());
+	assert(c.Contains(pt));
+
+	return c;
+}
+
 Plane RandomPlaneContainingPoint(const float3 &pt)
 {
 	float3 dir = float3::RandomDir(rng);
@@ -114,6 +131,7 @@ void TestAABBAABBIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	AABB b = RandomAABBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
+//	assert(a.Distance(b) == 0.f);
 }
 
 void TestAABBOBBIntersect()
@@ -165,6 +183,13 @@ void TestAABBSphereIntersect()
 	assert(a.Intersects(b));
 }
 
+void TestAABBCapsuleIntersect()
+{
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Capsule b = RandomCapsuleContainingPoint(pt);
+	assert(a.Intersects(b));
+}
 void TestAABBTriangleIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -228,6 +253,7 @@ int main()
 	AddTest("AABB-Plane positive intersection", TestAABBPlaneIntersect);
 	AddTest("AABB-Sphere positive intersection", TestAABBSphereIntersect);
 	AddTest("AABB-Triangle positive intersection", TestAABBTriangleIntersect);
+	AddTest("AABB-Capsule positive intersection", TestAABBCapsuleIntersect);
 
-	RunTests(1000000);
+	RunTests(10000);
 }
