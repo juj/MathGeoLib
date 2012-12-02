@@ -47,6 +47,36 @@ Sphere RandomSphereContainingPoint(const float3 &pt, float maxRadius)
 	return s;
 }
 
+Frustum RandomFrustumContainingPoint(const float3 &pt)
+{
+	Frustum f;
+	if (rng.Int(0,1))
+	{
+		f.type = PerspectiveFrustum;
+		f.orthographicWidth = rng.Float(0.001f, SCALE);
+		f.orthographicHeight = rng.Float(0.001f, SCALE);
+	}
+	else
+	{
+		f.type = OrthographicFrustum;
+		f.horizontalFov = rng.Float(0.001f, pi-0.001f);
+		f.verticalFov = rng.Float(0.001f, pi-0.001f);
+	}
+	f.nearPlaneDistance = rng.Float(0.1f, SCALE);
+	f.farPlaneDistance = f.nearPlaneDistance + rng.Float(0.1f, SCALE);
+	f.pos = float3::zero;
+	f.front = float3::RandomDir(rng);
+	f.up = f.front.RandomPerpendicular(rng);
+
+	float3 pt2 = f.UniformRandomPointInside(rng);
+	f.pos += pt - pt2;
+
+	assert(f.IsFinite());
+//	assert(!f.IsDegenerate());
+	assert(f.Contains(pt));
+	return f;
+}
+
 Line RandomLineContainingPoint(const float3 &pt)
 {
 	float3 dir = float3::RandomDir(rng);
@@ -125,6 +155,43 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 	return t;
 }
 
+Polyhedron RandomPolyhedronContainingPoint(const float3 &pt)
+{
+	switch(rng.Int(0,7))
+	{
+	case 0: return RandomAABBContainingPoint(pt, SCALE).ToPolyhedron();
+	case 1: return RandomOBBContainingPoint(pt, SCALE).ToPolyhedron();
+	case 2: return RandomFrustumContainingPoint(pt).ToPolyhedron();
+	case 3: return Polyhedron::Tetrahedron(pt, SCALE); break;
+	case 4: return Polyhedron::Octahedron(pt, SCALE); break;
+	case 5: return Polyhedron::Hexahedron(pt, SCALE); break;
+	case 6: return Polyhedron::Icosahedron(pt, SCALE); break;
+	default: return Polyhedron::Dodecahedron(pt, SCALE); break;
+	}
+
+//	assert(t.IsFinite());
+//	assert(!t.IsDegenerate());
+//	assert(t.Contains(pt));
+}
+
+Polygon RandomPolygonContainingPoint(const float3 &pt)
+{
+	Polyhedron p = RandomPolyhedronContainingPoint(pt);
+	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
+
+	float3 pt2 = poly.FastRandomPointInside(rng);
+	assert(poly.Contains(pt2));
+	poly.Translate(pt - pt2);
+
+	assert(!poly.IsDegenerate());
+	assert(!poly.IsNull());
+	assert(poly.IsPlanar());
+	assert(poly.IsFinite());
+	assert(poly.Contains(pt));
+
+	return poly;
+}
+
 void TestAABBAABBIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -198,6 +265,30 @@ void TestAABBTriangleIntersect()
 	assert(a.Intersects(b));
 }
 
+void TestAABBFrustumIntersect()
+{
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	assert(a.Intersects(b));
+}
+
+void TestAABBPolyhedronIntersect()
+{
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Polyhedron b = RandomPolyhedronContainingPoint(pt);
+	assert(a.Intersects(b));
+}
+
+void TestAABBPolygonIntersect()
+{
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Polygon b = RandomPolygonContainingPoint(pt);
+	assert(a.Intersects(b));
+}
+
 typedef void (*TestFunctionPtr)();
 struct Test
 {
@@ -254,6 +345,9 @@ int main()
 	AddTest("AABB-Sphere positive intersection", TestAABBSphereIntersect);
 	AddTest("AABB-Triangle positive intersection", TestAABBTriangleIntersect);
 	AddTest("AABB-Capsule positive intersection", TestAABBCapsuleIntersect);
+	AddTest("AABB-Frustum positive intersection", TestAABBFrustumIntersect);
+	AddTest("AABB-Polygon positive intersection", TestAABBPolygonIntersect);
+	AddTest("AABB-Polyhedron positive intersection", TestAABBPolyhedronIntersect);
 
-	RunTests(10000);
+	RunTests(100000);
 }
