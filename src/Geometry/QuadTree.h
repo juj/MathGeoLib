@@ -105,7 +105,7 @@ public:
 	}
 
 	/// Removes all nodes and objects in this tree and reinitializes the tree to a single root node.
-	void Clear(const float2 &minXY, const float2 &maxXY);
+	void Clear(const float2 &minXY = float2(-1.f, -1.f), const float2 &maxXY = float2(1.f, 1.f));
 
 	/// Places the given object into the proper (leaf) node of the tree. After placing, if the leaf split rule is 
 	/// satisfied, subdivides the leaf node into 4 subquadrants and reassigns the objects to new leaves.
