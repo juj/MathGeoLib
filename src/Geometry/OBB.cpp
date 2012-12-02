@@ -788,7 +788,7 @@ void OBB::Enclose(const float3 &point)
 
 			p = point-pos; ///\todo Can we omit this? (redundant since axis[i] are orthonormal?)
 
-			mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i]));
+			mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i], 1e-3f));
 		}
 	}
 	// Should now contain the point.
