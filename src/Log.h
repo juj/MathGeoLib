@@ -79,7 +79,7 @@ enum ConsoleTextColor
 {
 	ColorRed = 4, // == FOREGROUND_RED in WinCon.h
 	ColorGreen  = 2, // == FOREGROUND_GREEN in WinCon.h
-	ColorBlue = 0x10, // == FOREGROUND_BLUE in WinCon.h
+	ColorBlue = 1, // == FOREGROUND_BLUE in WinCon.h
 	ColorIntensity = 8 // == FOREGROUND_INTENSITY in WinCon.h
 };
 
@@ -126,11 +126,14 @@ void logmsg(const char *msg);
 
 #define LOG(channel, ...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
-		logmsg(#channel); \
-		sprintf(str____, __VA_ARGS__); \
-		logmsg(str____); \
-		logmsg("\n"); \
+		if (IsLogChannelActive(channel)) \
+		{ \
+			char str____[16384]; \
+			logmsg(#channel); \
+			sprintf(str____, __VA_ARGS__); \
+			logmsg(str____); \
+			logmsg("\n"); \
+		} \
 	MULTI_LINE_MACRO_END
 
 #elif defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
@@ -138,7 +141,9 @@ void logmsg(const char *msg);
 /// This will require you to pass '-llog' on the command line to link against the Android logging libraries.
 #include <android/log.h>
 
-#define LOG(channel, ...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#ifndef LOG
+#define LOG(channel, ...) do { if (IsLogChannelActive(channel)) (void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__); } while(0)
+#endif
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
@@ -147,11 +152,13 @@ void logmsg(const char *msg);
 
 #include <stdio.h>
 
+#ifndef LOG
 #define LOG(channel, ...) \
 	MULTI_LINE_MACRO_BEGIN \
 		printf(__VA_ARGS__); \
 		printf("\n"); \
 	MULTI_LINE_MACRO_END
+#endif
 
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
