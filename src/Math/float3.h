@@ -526,6 +526,10 @@ public:
 		@see Perpendicular(), Cross(). */
 	float3 AnotherPerpendicular(const float3 &hint = float3(0,1,0), const float3 &hint2 = float3(0,0,1)) const;
 
+	/// Generates a random vector that is perpendicular to this vector.
+	/** The distribution is uniformly random. */
+	float3 RandomPerpendicular(LCG &rng) const;
+
 	/// Computes the scalar triple product of the given three vectors.
 	/** @return [u v w] = (u x v) . w = u . (v x w)
 		@see Dot(), Cross(). */

@@ -443,6 +443,11 @@ float3 float3::AnotherPerpendicular(const float3 &hint, const float3 &hint2) con
 	return v.Normalized();
 }
 
+float3 float3::RandomPerpendicular(LCG &rng) const
+{
+	return Perpendicular(RandomDir(rng));
+}
+
 float float3::ScalarTripleProduct(const float3 &u, const float3 &v, const float3 &w)
 {
 	return u.Cross(v).Dot(w);
