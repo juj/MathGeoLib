@@ -337,7 +337,7 @@ bool Polygon::Contains2D(const float2 &localSpacePoint) const
 	if (p.size() < 3)
 		return false;
 
-	LineSegment l(float3(localSpacePoint, 0), float3(localSpacePoint,0) + float3(1,1,0).Normalized());
+	LineSegment l(float3(localSpacePoint, 0), float3(localSpacePoint,0) + float3(1e5,1e5,0));
 	int numIntersections = 0;
 	for(int i = 0; i < (int)p.size(); ++i)
 		if (Edge2D(i).Intersects(l))
@@ -634,6 +634,14 @@ float3 Polygon::PointOnEdge(float normalizedDistance) const
 float3 Polygon::RandomPointOnEdge(LCG &rng) const
 {
 	return PointOnEdge(rng.Float());
+}
+
+float3 Polygon::FastRandomPointInside(LCG &rng) const
+{
+	std::vector<Triangle> tris = Triangulate();
+	if (tris.empty())
+		return float3::nan;
+	return tris[rng.Int(0, (int)tris.size()-1)].RandomPointInside(rng);
 }
 
 Polyhedron Polygon::ToPolyhedron() const

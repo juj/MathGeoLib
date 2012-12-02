@@ -327,6 +327,8 @@ public:
 		@see PointOnEdge(). */
 	float3 RandomPointOnEdge(LCG &rng) const;
 
+	float3 FastRandomPointInside(LCG &rng) const;
+
 	/// Converts this Polygon to a Polyhedron representation.
 	/** This function will create a Polyhedron with two faces, one for the front face of this Polygon,
 		and one for the back face.
