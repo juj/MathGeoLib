@@ -308,12 +308,13 @@ void TestAABBPlaneNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-
+#endif
 void TestAABBSphereNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Sphere b = RandomSphereInHalfspace(pt, SCALE);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Sphere b = RandomSphereInHalfspace(p, SCALE);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -323,7 +324,7 @@ void TestAABBSphereNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-
+#if 0
 void TestAABBCapsuleNoIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -476,12 +477,13 @@ void TestOBBPlaneNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-
+#endif
 void TestOBBSphereNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Sphere b = RandomSphereInHalfspace(pt, SCALE);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Sphere b = RandomSphereInHalfspace(p, SCALE);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -491,7 +493,7 @@ void TestOBBSphereNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-
+#if 0
 void TestOBBCapsuleNoIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -1331,9 +1333,9 @@ void AddNegativeIntersectionTests()
 //	AddTest("AABB-Ray negative intersection", TestAABBRayNoIntersect);
 //	AddTest("AABB-LineSegment negative intersection", TestAABBLineSegmentNoIntersect);
 	AddTest("AABB-AABB negative intersection", TestAABBAABBNoIntersect);
-	AddTest("AABB-OBB negative intersection", TestAABBOBBNoIntersect);/*
+	AddTest("AABB-OBB negative intersection", TestAABBOBBNoIntersect);
+	AddTest("AABB-Sphere negative intersection", TestAABBSphereNoIntersect);/*
 	AddTest("AABB-Plane negative intersection", TestAABBPlaneNoIntersect);
-	AddTest("AABB-Sphere negative intersection", TestAABBSphereNoIntersect);
 	AddTest("AABB-Triangle negative intersection", TestAABBTriangleNoIntersect);
 	AddTest("AABB-Capsule negative intersection", TestAABBCapsuleNoIntersect);
 	AddTest("AABB-Frustum negative intersection", TestAABBFrustumNoIntersect);
@@ -1345,7 +1347,7 @@ void AddNegativeIntersectionTests()
 	AddTest("OBB-LineSegment negative intersection", TestOBBLineSegmentNoIntersect);
 	AddTest("OBB-OBB negative intersection", TestOBBOBBNoIntersect);
 	AddTest("OBB-Plane negative intersection", TestOBBPlaneNoIntersect);
-	AddTest("OBB-Sphere negative intersection", TestOBBSphereNoIntersect);
+*/	AddTest("OBB-Sphere negative intersection", TestOBBSphereNoIntersect); /*
 	AddTest("OBB-Triangle negative intersection", TestOBBTriangleNoIntersect);
 	AddTest("OBB-Capsule negative intersection", TestOBBCapsuleNoIntersect);
 	AddTest("OBB-Frustum negative intersection", TestOBBFrustumNoIntersect);
