@@ -64,7 +64,7 @@ void SetLogChannels(LogChannel logChannel);
 LogChannel GetLogChannels();
 
 /// Returns true if the specified log channel is not suppressed.
-bool IsLogChannelActive(LogChannel channel);
+//bool IsLogChannelActive(LogChannel channel);
 
 /// Sets the output for log messages. By default all logging is output to std::cout. Setting a log file
 /// redirects all logging to that file. Calling this function with a null filename pointer restores
@@ -87,7 +87,7 @@ enum ConsoleTextColor
 void SetStdoutTextColor(int newColor);
 
 /// Prints out a variadic message to the log channel User.
-#define LOGUSER(msg, ...) ( IsLogChannelActive(LogUser) && (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
+#define LOGUSER(msg, ...) ( /*IsLogChannelActive(LogUser) &&*/ (TimeOutputDebugStringVariadic(LogUser, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 
 #define STRINGIZE_HELPER(x) #x
 #define STRINGIZE(x) STRINGIZE_HELPER(x)
@@ -126,7 +126,7 @@ void logmsg(const char *msg);
 
 #define LOG(channel, ...) \
 	MULTI_LINE_MACRO_BEGIN \
-		if (IsLogChannelActive(channel)) \
+		/*if (IsLogChannelActive(channel))*/ \
 		{ \
 			char str____[16384]; \
 			logmsg(#channel); \
@@ -142,7 +142,7 @@ void logmsg(const char *msg);
 #include <android/log.h>
 
 #ifndef LOG
-#define LOG(channel, ...) do { if (IsLogChannelActive(channel)) (void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__); } while(0)
+#define LOG(channel, ...) do { /*if (IsLogChannelActive(channel))*/ (void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__); } while(0)
 #endif
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
