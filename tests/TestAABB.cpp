@@ -198,7 +198,13 @@ void TestAABBAABBIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	AABB b = RandomAABBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBOBBIntersect()
@@ -207,6 +213,13 @@ void TestAABBOBBIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBLineIntersect()
@@ -215,6 +228,13 @@ void TestAABBLineIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBRayIntersect()
@@ -223,6 +243,13 @@ void TestAABBRayIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBLineSegmentIntersect()
@@ -231,6 +258,13 @@ void TestAABBLineSegmentIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBPlaneIntersect()
@@ -239,6 +273,13 @@ void TestAABBPlaneIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBSphereIntersect()
@@ -247,6 +288,13 @@ void TestAABBSphereIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBCapsuleIntersect()
@@ -255,13 +303,28 @@ void TestAABBCapsuleIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
+
 void TestAABBTriangleIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBFrustumIntersect()
@@ -270,6 +333,13 @@ void TestAABBFrustumIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBPolyhedronIntersect()
@@ -278,6 +348,13 @@ void TestAABBPolyhedronIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestAABBPolygonIntersect()
@@ -286,6 +363,13 @@ void TestAABBPolygonIntersect()
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -297,6 +381,13 @@ void TestOBBOBBIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBLineIntersect()
@@ -305,6 +396,13 @@ void TestOBBLineIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBRayIntersect()
@@ -313,6 +411,13 @@ void TestOBBRayIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBLineSegmentIntersect()
@@ -321,6 +426,13 @@ void TestOBBLineSegmentIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBPlaneIntersect()
@@ -329,6 +441,13 @@ void TestOBBPlaneIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBSphereIntersect()
@@ -337,6 +456,13 @@ void TestOBBSphereIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+////	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBCapsuleIntersect()
@@ -345,13 +471,28 @@ void TestOBBCapsuleIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
+
 void TestOBBTriangleIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBFrustumIntersect()
@@ -360,6 +501,13 @@ void TestOBBFrustumIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBPolyhedronIntersect()
@@ -368,6 +516,13 @@ void TestOBBPolyhedronIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestOBBPolygonIntersect()
@@ -376,6 +531,13 @@ void TestOBBPolygonIntersect()
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+///	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -388,6 +550,13 @@ void TestSphereSphereIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSphereLineIntersect()
@@ -396,6 +565,13 @@ void TestSphereLineIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSphereRayIntersect()
@@ -404,6 +580,13 @@ void TestSphereRayIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSphereLineSegmentIntersect()
@@ -412,6 +595,13 @@ void TestSphereLineSegmentIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSpherePlaneIntersect()
@@ -420,6 +610,13 @@ void TestSpherePlaneIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSphereCapsuleIntersect()
@@ -428,13 +625,28 @@ void TestSphereCapsuleIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
+
 void TestSphereTriangleIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSphereFrustumIntersect()
@@ -443,6 +655,13 @@ void TestSphereFrustumIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSpherePolyhedronIntersect()
@@ -451,6 +670,13 @@ void TestSpherePolyhedronIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestSpherePolygonIntersect()
@@ -459,6 +685,13 @@ void TestSpherePolygonIntersect()
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -470,6 +703,13 @@ void TestFrustumLineIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumRayIntersect()
@@ -478,6 +718,13 @@ void TestFrustumRayIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumLineSegmentIntersect()
@@ -486,6 +733,13 @@ void TestFrustumLineSegmentIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumPlaneIntersect()
@@ -494,6 +748,13 @@ void TestFrustumPlaneIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumCapsuleIntersect()
@@ -502,13 +763,28 @@ void TestFrustumCapsuleIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
+
 void TestFrustumTriangleIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumFrustumIntersect()
@@ -517,6 +793,13 @@ void TestFrustumFrustumIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumPolyhedronIntersect()
@@ -525,6 +808,13 @@ void TestFrustumPolyhedronIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestFrustumPolygonIntersect()
@@ -533,6 +823,13 @@ void TestFrustumPolygonIntersect()
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -544,6 +841,13 @@ void TestCapsuleLineIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestCapsuleRayIntersect()
@@ -552,6 +856,13 @@ void TestCapsuleRayIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestCapsuleLineSegmentIntersect()
@@ -560,6 +871,13 @@ void TestCapsuleLineSegmentIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestCapsulePlaneIntersect()
@@ -568,6 +886,13 @@ void TestCapsulePlaneIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestCapsuleCapsuleIntersect()
@@ -576,13 +901,28 @@ void TestCapsuleCapsuleIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
+
 void TestCapsuleTriangleIntersect()
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+///	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestCapsulePolyhedronIntersect()
@@ -591,6 +931,13 @@ void TestCapsulePolyhedronIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+///	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestCapsulePolygonIntersect()
@@ -599,6 +946,13 @@ void TestCapsulePolygonIntersect()
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -611,6 +965,13 @@ void TestPolyhedronLineIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolyhedronRayIntersect()
@@ -619,6 +980,13 @@ void TestPolyhedronRayIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolyhedronLineSegmentIntersect()
@@ -627,6 +995,13 @@ void TestPolyhedronLineSegmentIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolyhedronPlaneIntersect()
@@ -635,6 +1010,13 @@ void TestPolyhedronPlaneIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolyhedronTriangleIntersect()
@@ -643,6 +1025,13 @@ void TestPolyhedronTriangleIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolyhedronPolyhedronIntersect()
@@ -651,6 +1040,13 @@ void TestPolyhedronPolyhedronIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolyhedronPolygonIntersect()
@@ -659,6 +1055,13 @@ void TestPolyhedronPolygonIntersect()
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -669,6 +1072,13 @@ void TestPolygonLineIntersect()
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolygonRayIntersect()
@@ -677,6 +1087,13 @@ void TestPolygonRayIntersect()
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolygonLineSegmentIntersect()
@@ -685,6 +1102,13 @@ void TestPolygonLineSegmentIntersect()
 	Polygon a = RandomPolygonContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolygonPlaneIntersect()
@@ -693,6 +1117,13 @@ void TestPolygonPlaneIntersect()
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolygonTriangleIntersect()
@@ -701,6 +1132,13 @@ void TestPolygonTriangleIntersect()
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPolygonPolygonIntersect()
@@ -709,6 +1147,13 @@ void TestPolygonPolygonIntersect()
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+///	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -719,6 +1164,13 @@ void TestTriangleLineIntersect()
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+//	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestTriangleRayIntersect()
@@ -727,6 +1179,13 @@ void TestTriangleRayIntersect()
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestTriangleLineSegmentIntersect()
@@ -735,6 +1194,13 @@ void TestTriangleLineSegmentIntersect()
 	Triangle a = RandomTriangleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+//	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestTrianglePlaneIntersect()
@@ -743,6 +1209,13 @@ void TestTrianglePlaneIntersect()
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestTriangleTriangleIntersect()
@@ -751,6 +1224,13 @@ void TestTriangleTriangleIntersect()
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+	assert(a.Contains(b.ClosestPoint(a)));
+	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -762,6 +1242,13 @@ void TestPlaneLineIntersect()
 	Plane a = RandomPlaneContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
+///	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPlaneRayIntersect()
@@ -770,6 +1257,13 @@ void TestPlaneRayIntersect()
 	Plane a = RandomPlaneContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPlaneLineSegmentIntersect()
@@ -778,6 +1272,13 @@ void TestPlaneLineSegmentIntersect()
 	Plane a = RandomPlaneContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(a.Distance(b) == 0.f);
+	assert(b.Distance(a) == 0.f);
+	assert(a.Contains(a.ClosestPoint(b)));
+	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestPlanePlaneIntersect()
@@ -786,6 +1287,13 @@ void TestPlanePlaneIntersect()
 	Plane a = RandomPlaneContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+//	assert(a.Distance(b) == 0.f);
+//	assert(b.Distance(a) == 0.f);
+//	assert(a.Contains(a.ClosestPoint(b)));
+//	assert(b.Contains(a.ClosestPoint(b)));
+//	assert(a.Contains(b.ClosestPoint(a)));
+//	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 typedef void (*TestFunctionPtr)();
