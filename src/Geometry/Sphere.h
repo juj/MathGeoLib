@@ -259,9 +259,9 @@ public:
 	int Intersects(const Line &line, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
 	int Intersects(const Ray &ray, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
 	bool Intersects(const Plane &plane) const;
-	bool Intersects(const AABB &aabb, float3 *closestPointOnAABB) const;
-	bool Intersects(const OBB &obb, float3 *closestPointOnOBB) const;
-	bool Intersects(const Triangle &triangle, float3 *closestPointOnTriangle) const;
+	bool Intersects(const AABB &aabb, float3 *closestPointOnAABB = 0) const;
+	bool Intersects(const OBB &obb, float3 *closestPointOnOBB = 0) const;
+	bool Intersects(const Triangle &triangle, float3 *closestPointOnTriangle = 0) const;
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Polygon &polygon) const;
 	bool Intersects(const Frustum &frustum) const;

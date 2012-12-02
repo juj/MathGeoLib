@@ -400,7 +400,7 @@ public:
 	bool Intersects(const LineSegment &lineSegment) const;
 	/** @param closestPointOnOBB [out] If specified, receives the closest point on this OBB To the given sphere. This
 			pointer may be null. */
-	bool Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const;
+	bool Intersects(const Sphere &sphere, float3 *closestPointOnOBB = 0) const;
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Triangle &triangle) const;
 	bool Intersects(const Polygon &polygon) const;

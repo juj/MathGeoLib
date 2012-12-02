@@ -257,9 +257,9 @@ public:
 			may be null.
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
 		@see Contains(), Distance(), ClosestPoint(), LineSegment::GetPoint(). */
-	bool Intersects(const LineSegment &lineSegment, float *d, float3 *intersectionPoint) const;
-	bool Intersects(const Line &line, float *d, float3 *intersectionPoint) const;
-	bool Intersects(const Ray &ray, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const LineSegment &lineSegment, float *d = 0, float3 *intersectionPoint = 0) const;
+	bool Intersects(const Line &line, float *d = 0, float3 *intersectionPoint = 0) const;
+	bool Intersects(const Ray &ray, float *d = 0, float3 *intersectionPoint = 0) const;
 	bool Intersects(const Plane &plane) const;
 	/** @param closestPointOnTriangle [out] If specified, receives the point of intersection between the Sphere
 			and this Triangle. Even if no intersection occurred, this parameter will receive the closest point on
