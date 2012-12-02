@@ -25,7 +25,7 @@
 
 MATH_BEGIN_NAMESPACE
 
-bool Equal(double a, double b, double epsilon = 1e-6)
+inline bool Equal(double a, double b, double epsilon = 1e-6)
 {
 	return Abs(a-b) < epsilon;
 }

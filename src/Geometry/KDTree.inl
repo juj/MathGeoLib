@@ -441,6 +441,8 @@ inline void KdTree<T>::AABBQuery(const AABB &aabb, Func &leafCallback)
 	}
 }
 
+#if 0 ///\bug Doesn't work properly. Fix up!
+
 struct StackElem
 {
 	KdTreeNode *thisNode;
@@ -454,7 +456,6 @@ struct StackElem
 const int cMaxStackItems = 50*2;
 StackElem stack[cMaxStackItems*1000];
 
-#if 0 ///\bug Doesn't work properly. Fix up!
 
 template<typename T>
 template<typename Func>
