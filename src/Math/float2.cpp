@@ -25,6 +25,7 @@
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
+#include <iostream>
 #include <utility>
 #include <algorithm>
 #endif
