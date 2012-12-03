@@ -548,7 +548,6 @@ bool Plane::IntersectLinePlane(const float3 &planeNormal, float planeD, const fl
 	if (EqualAbs(denom, 0.f))
 	{
 		t = 0.f;
-		float f = Dot(planeNormal, linePos);
 		return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-2f);
 	}
 	else
