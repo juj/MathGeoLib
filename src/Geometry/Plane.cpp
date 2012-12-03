@@ -297,16 +297,23 @@ Polygon Plane::Project(const Polygon &polygon) const
 
 float3 Plane::ClosestPoint(const Ray &ray) const
 {
-	///@todo Output parametric d as well.
-	float d;
-	if (ray.Intersects(*this, &d))
-		return ray.GetPoint(d);
+	assume(ray.IsFinite());
+	assume(!IsDegenerate());
+
+	float denom = Dot(normal, ray.dir);
+	if (EqualAbs(denom, 0.f))
+		return Project(ray.pos); // Output t == 0.
 	else
-		return Project(ray.pos);
+	{
+		///@todo Output parametric t along the ray as well.
+		float t = (d - Dot(normal, ray.pos)) / denom;
+		return ray.GetPoint(t);
+	}
 }
 
 float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
 {
+	/*
 	///@todo Output parametric d as well.
 	float d;
 	if (lineSegment.Intersects(*this, &d))
@@ -316,6 +323,24 @@ float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
 			return Project(lineSegment.a);
 		else
 			return Project(lineSegment.b);
+	*/
+
+	assume(lineSegment.IsFinite());
+	assume(!IsDegenerate());
+
+	float aDist = Dot(normal, lineSegment.a);
+	float bDist = Dot(normal, lineSegment.b);
+
+	float denom = bDist - aDist;
+	if (EqualAbs(denom, 0.f))
+		return Abs(aDist) < Abs(bDist) ? lineSegment.a : lineSegment.b;
+	else
+	{
+		///@todo Output parametric t along the ray as well.
+		float t = (d - Dot(normal, lineSegment.a)) / (bDist - aDist);
+		t = Clamp01(t);
+		return Project(lineSegment.GetPoint(t));
+	}
 }
 
 #if 0
@@ -386,7 +411,7 @@ bool Plane::Equals(const Plane &other, float epsilon) const
 
 bool Plane::Intersects(const Plane &plane, Line *outLine) const
 {
-	float3 perp = Cross(normal, plane.normal);
+	float3 perp = normal.Perpendicular(plane.normal);//float3::Perpendicular Cross(normal, plane.normal);
 
 	float3x3 m;
 	m.SetRow(0, normal);
@@ -395,10 +420,10 @@ bool Plane::Intersects(const Plane &plane, Line *outLine) const
 	bool success = m.Inverse();
 	if (!success) // Inverse failed, so the planes must be parallel.
 	{
-		if (EqualAbs(d, plane.d)) // The planes are equal?
+		if ((normal*d).Equals(plane.normal*plane.d, 1e-2f)) // The planes are equal?
 		{
 			if (outLine)
-				*outLine = Line(plane.PointOnPlane(), plane.normal.Perpendicular());
+				*outLine = Line(normal*d, plane.normal.Perpendicular());
 			return true;
 		}
 		else
@@ -459,6 +484,7 @@ bool Plane::Intersects(const Polygon &polygon) const
 	return polygon.Intersects(*this);
 }
 
+#if 0
 bool Plane::IntersectLinePlane(const float3 &p, const float3 &n, const float3 &a, const float3 &d, float &t)
 {
 	/* The set of points x lying on a plane is defined by the equation
@@ -483,6 +509,8 @@ bool Plane::IntersectLinePlane(const float3 &p, const float3 &n, const float3 &a
 	if (EqualAbs(denom, 0.f))
 	{
 		t = 0.f;
+		float f = Dot(a-p, n);
+		bool b = EqualAbs(Dot(a-p, n), 0.f);
 		return EqualAbs(Dot(a-p, n), 0.f); // If (a-p)*n == 0, then then above equation holds for all t, and return true.
 	}
 	else
@@ -492,11 +520,50 @@ bool Plane::IntersectLinePlane(const float3 &p, const float3 &n, const float3 &a
 		return true;
 	}
 }
+#endif
+
+bool Plane::IntersectLinePlane(const float3 &planeNormal, float planeD, const float3 &linePos, const float3 &lineDir, float &t)
+{
+	/* The set of points x lying on a plane is defined by the equation
+
+		<planeNormal, x> = planeD.
+
+	The set of points x on a line is constructed explicitly by a single parameter t by
+
+		x = linePos + t*lineDir.
+
+	To solve the intersection of these two objects, substitute the second equation to the first above,
+	and we get
+
+	                     <planeNormal, linePos + t*lineDir> == planeD, or
+	    <planeNormal, linePos> + t * <planeNormal, lineDir> == planeD, or
+	                                                      t == (planeD - <planeNormal, linePos>) / <planeNormal, lineDir>,
+	
+	                                                           assuming that <planeNormal, lineDir> != 0.
+
+	If <planeNormal, lineDir> == 0, then the line is parallel to the plane, and either no intersection occurs, or the whole line
+	is embedded on the plane, and infinitely many intersections occur. */
+
+	float denom = Dot(planeNormal, lineDir);
+	if (EqualAbs(denom, 0.f))
+	{
+		t = 0.f;
+		float f = Dot(planeNormal, linePos);
+		return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-2f);
+	}
+	else
+	{
+		// Compute the distance from the line starting point to the point of intersection.
+		t = (planeD - Dot(planeNormal, linePos)) / denom;
+		return true;
+	}
+}
+
 
 bool Plane::Intersects(const Ray &ray, float *d) const
 {
 	float t;
-	bool success = IntersectLinePlane(PointOnPlane(), normal, ray.pos, ray.dir, t);
+	bool success = IntersectLinePlane(normal, this->d, ray.pos, ray.dir, t);
 	if (d)
 		*d = t;
 	return success && t >= 0.f;
@@ -505,7 +572,7 @@ bool Plane::Intersects(const Ray &ray, float *d) const
 bool Plane::Intersects(const Line &line, float *d) const
 {
 	float t;
-	bool intersects = IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, t);
+	bool intersects = IntersectLinePlane(normal, this->d, line.pos, line.dir, t);
 	if (d)
 		*d = t;
 	return intersects;
@@ -514,7 +581,7 @@ bool Plane::Intersects(const Line &line, float *d) const
 bool Plane::Intersects(const LineSegment &lineSegment, float *d) const
 {
 	float t;
-	bool success = IntersectLinePlane(PointOnPlane(), normal, lineSegment.a, lineSegment.Dir(), t);
+	bool success = IntersectLinePlane(normal, this->d, lineSegment.a, lineSegment.Dir(), t);
 	const float lineSegmentLength = lineSegment.Length();
 	if (d)
 		*d = t / lineSegmentLength;
@@ -607,7 +674,7 @@ int Plane::Intersects(const Circle &circle) const
 bool Plane::Clip(float3 &a, float3 &b) const
 {
 	float t;
-	bool intersects = IntersectLinePlane(PointOnPlane(), normal, a, b-a, t);
+	bool intersects = IntersectLinePlane(normal, d, a, b-a, t);
 	if (!intersects || t <= 0.f || t >= 1.f)
 	{
 		if (SignedDistance(a) <= 0.f)
@@ -633,7 +700,7 @@ bool Plane::Clip(LineSegment &line) const
 int Plane::Clip(const Line &line, Ray &outRay) const
 {
 	float t;
-	bool intersects = IntersectLinePlane(PointOnPlane(), normal, line.pos, line.dir, t);
+	bool intersects = IntersectLinePlane(normal, d, line.pos, line.dir, t);
 	if (!intersects)
 	{
 		if (SignedDistance(line.pos) <= 0.f)

@@ -37,7 +37,7 @@ public:
 	float3 normal;
 	/// The offset of this plane from the origin. [similarOverload: normal]
 	/** The value -d gives the signed distance of this plane from origin.
-		This class uses the convention ax+by+cz = d, which means that:
+		Denoting normal:=(a,b,c), this class uses the convention ax+by+cz = d, which means that:
 		 - If this variable is positive, the vector space origin (0,0,0) is on the negative side of this plane.
 		 - If this variable is negative, the vector space origin (0,0,0) is on the on the positive side of this plane.
 		@note Some sources use the opposite convention ax+by+cz+d = 0 to define the variable d. When comparing equations
@@ -352,8 +352,10 @@ public:
 					That is, the point lineStart + t * lineDir will be the intersection point. Note that if |lineDir| != 1,
 					then t will not contain the real distance, but one scaled to the units of lineDir.
 		@return If an intersection occurs, this function returns true. */
-	static bool IntersectLinePlane(const float3 &ptOnPlane, const float3 &planeNormal, 
-	                               const float3 &lineStart, const float3 &lineDir, float &t);
+//	static bool IntersectLinePlane(const float3 &ptOnPlane, const float3 &planeNormal, 
+//	                               const float3 &lineStart, const float3 &lineDir, float &t);
+
+	static bool IntersectLinePlane(const float3 &planeNormal, float planeD, const float3 &linePos, const float3 &lineDir, float &t);
 
 #ifdef MATH_OGRE_INTEROP
 	Plane(const Ogre::Plane &other) { normal = other.normal; d = other.d; }
