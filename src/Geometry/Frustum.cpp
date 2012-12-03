@@ -515,8 +515,12 @@ AABB Frustum::MinimalEnclosingAABB() const
 
 OBB Frustum::MinimalEnclosingOBB() const
 {
+	assume(IsFinite());
+	assume(front.IsNormalized());
+	assume(up.IsNormalized());
+
 	OBB obb;
-	obb.pos = (NearPlanePos(0, 0) + FarPlanePos(0, 0)) * 0.5f;
+	obb.pos = pos + (nearPlaneDistance + farPlaneDistance) * 0.5f * front;
 	obb.axis[1] = up;
 	obb.axis[2] = -front;
 	obb.axis[0] = Cross(obb.axis[1], obb.axis[2]);
