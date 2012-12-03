@@ -176,7 +176,7 @@ void logmsg(const char *msg);
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		SetStdoutTextColor(ColorRed | ColorIntensity); \
-		printf("Error: "); printf(__VA_ARGS__); printf("\n"); \
+		fprintf(stderr, "Error: "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); \
 		SetStdoutTextColor(ColorRed | ColorGreen | ColorBlue); \
 	MULTI_LINE_MACRO_END
 

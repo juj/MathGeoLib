@@ -34,18 +34,18 @@ void RunTests(int numTimes)
 		}
 		catch(const std::exception &e)
 		{
-			printf("FAILED: '%s' (%d passes)\n", e.what(), numPasses);
+			LOGE("FAILED: '%s' (%d passes)", e.what(), numPasses);
 			++numFails;
 		}
 
 		if (numFails == 0)
 		{
-			printf("ok (%d passes)\n", numPasses);
+			LOGI("ok (%d passes)", numPasses);
 			++numTestsPassed;
 		}
 	}
 
-	printf("Done. %d tests run. %d passed. %d failed.\n", (int)tests.size(), numTestsPassed, (tests.size() - numTestsPassed));
+	LOGI("Done. %d tests run. %d passed. %d failed.", (int)tests.size(), numTestsPassed, (tests.size() - numTestsPassed));
 }
 
 void AddPositiveIntersectionTests();
