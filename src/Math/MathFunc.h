@@ -406,11 +406,11 @@ template<> bool inline Equal(const double &a, const double &b) { return Abs(a-b)
 template<> bool inline Equal(const long double &a, const long double &b) { return Abs(a-b) <= eps; }
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */
-bool EqualAbs(float a, float b, float epsilon = 1e-6f);
+bool EqualAbs(float a, float b, float epsilon = 1e-4f);
 
 /** Compares the two values for equality, allowing the given amount of relative error. 
 	Beware that for values very near 0, the relative error is significant. */
-bool EqualRel(float a, float b, float maxRelError = 1e-5f);
+bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 
 /** Compares two floats interpreted as integers, see 
 	http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm 
