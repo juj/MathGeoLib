@@ -143,7 +143,6 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 	assert(t.Contains(pt));
 
 	float3 d = t.RandomPointInside(rng);
-	float3 br = t.BarycentricUVW(d);
 	assert(t.Contains(d));
 	d = d - t.a;
 	t.a -= d;
