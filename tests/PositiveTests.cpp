@@ -141,7 +141,7 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 	float3 c = p.Point(rng.Float(-SCALE, SCALE), rng.Float(-SCALE, SCALE));
 	Triangle t(a,b,c);
 	assert(t.Contains(pt));
-	/*
+
 	float3 d = t.RandomPointInside(rng);
 	float3 br = t.BarycentricUVW(d);
 	assert(t.Contains(d));
@@ -149,7 +149,7 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 	t.a -= d;
 	t.b -= d;
 	t.c -= d;
-	*/
+
 	assert(t.IsFinite());
 	assert(!t.IsDegenerate());
 	assert(t.Contains(pt));
@@ -565,8 +565,6 @@ void TestSphereLineIntersect()
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
-	float da = a.Distance(b);
-	float db = b.Distance(a);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
 	assert(a.Distance(b) == 0.f);
