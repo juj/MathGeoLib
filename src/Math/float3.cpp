@@ -643,7 +643,7 @@ float3 float3::FromSphericalCoordinates(float azimuth, float inclination)
 float3 float3::ToSphericalCoordinates() const
 {
 	// R_y * R_x * (0,0,length) = (cosx*siny, -sinx, cosx*cosy).
-	float3 v;
+	float3 v = *this;
 	float len = v.Normalize();
 	if (len <= 1e-5f)
 		return float3::zero;
