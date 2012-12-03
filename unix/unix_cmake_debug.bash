@@ -1,5 +1,5 @@
 #!/bin/bash
-cmake -G "Unix Makefiles" ..
+cmake -G -DCMAKE_BUILD_TYPE=Debug "Unix Makefiles" ..
 
 echo "make --version"
 make --version
