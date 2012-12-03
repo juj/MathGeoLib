@@ -428,7 +428,7 @@ float3 Sphere::ClosestPoint(const float3 &point) const
 
 bool Sphere::Intersects(const Sphere &sphere) const
 {
-	return (pos - sphere.pos).LengthSq() <= r*r + sphere.r*sphere.r;
+	return (pos - sphere.pos).LengthSq() <= (r + sphere.r) * (r + sphere.r);
 }
 
 bool Sphere::Intersects(const Capsule &capsule) const
@@ -478,6 +478,8 @@ int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const fl
 	    B = 2 * <a, lineDir>, and
 	    A = <lineDir, lineDir> == 1, since we assumed lineDir is normalized. */
 
+	// Warning! If Dot(a,a) is large (distance between line pos and sphere center) and sphere radius very small,
+	// catastrophic cancellation can occur here!
 	const float C = Dot(a,a) - radSq;
 	const float B = 2.f * Dot(a, lineDir);
 
