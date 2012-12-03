@@ -82,7 +82,7 @@ void Clock::Sleep(int milliseconds)
 #pragma WARNING(Clock::Sleep has not been implemented!)
 #elif defined(WIN32)
 	::Sleep(milliseconds);
-#elif !defined(__native_client__) && !defined(EMSCRIPTEN) && !defined(__APPLE__)
+#elif !defined(__native_client__) && !defined(EMSCRIPTEN)
 	// http://linux.die.net/man/2/nanosleep
 	timespec ts;
 	ts.tv_sec = milliseconds / 1000;
