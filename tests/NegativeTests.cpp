@@ -236,7 +236,7 @@ void TestAABBOBBNoIntersect()
 {
 	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
-	p.ReverseNormal();
+	p.ReverseNormal(); p.d += 1e-2f;
 	OBB b = RandomOBBInHalfspace(p, 10.f);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
