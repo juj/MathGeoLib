@@ -19,6 +19,7 @@
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #include <vector>
+#include <iostream>
 #else
 #include "Container/Array.h"
 #endif

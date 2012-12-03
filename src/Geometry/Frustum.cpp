@@ -35,6 +35,10 @@
 #include "Math/Quat.h"
 #include "Algorithm/Random/LCG.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 #if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
 #include "Container/UString.h"
 #endif

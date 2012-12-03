@@ -17,6 +17,7 @@
 	@brief */
 #include "Math/float3.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
 #include "myassert.h"
 #include <utility>
 #endif

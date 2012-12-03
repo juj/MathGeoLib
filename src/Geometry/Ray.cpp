@@ -34,6 +34,10 @@
 #include "Geometry/Circle.h"
 #include "Math/MathFunc.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Ray::Ray(const float3 &pos_, const float3 &dir_)

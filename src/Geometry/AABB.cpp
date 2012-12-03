@@ -18,6 +18,7 @@
 #include "Geometry/AABB.h"
 #include "Math/MathFunc.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
 #include <utility>
 #endif
 #include "Geometry/Frustum.h"

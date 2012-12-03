@@ -35,6 +35,10 @@
 #include "Math/Quat.h"
 #include "Geometry/Frustum.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
 #endif

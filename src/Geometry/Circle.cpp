@@ -26,6 +26,10 @@
 #include "Geometry/LineSegment.h"
 #include "Geometry/Line.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Circle::Circle(const float3 &center, const float3 &n, float radius)

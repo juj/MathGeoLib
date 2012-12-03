@@ -34,6 +34,10 @@
 #include "Geometry/Triangle.h"
 #include "Geometry/Circle.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
 #endif

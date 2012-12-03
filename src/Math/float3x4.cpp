@@ -30,6 +30,10 @@
 #include "TransformOps.h"
 #include "SSEMath.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 float3x4::float3x4(float _00, float _01, float _02, float _03,

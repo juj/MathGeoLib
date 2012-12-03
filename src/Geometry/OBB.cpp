@@ -17,6 +17,7 @@
 	@brief Implementation for the Oriented Bounding Box (OBB) geometry object. */
 #include "Geometry/OBB.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
 #include <utility>
 #endif
 #include "Math/MathFunc.h"

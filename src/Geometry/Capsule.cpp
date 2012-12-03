@@ -37,6 +37,10 @@
 #include "Algorithm/Random/LCG.h"
 #include "assume.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Capsule::Capsule(const LineSegment &endPoints, float radius)

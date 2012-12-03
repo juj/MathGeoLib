@@ -29,6 +29,10 @@
 #include "Geometry/Plane.h"
 #include "TransformOps.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 float3x3::float3x3(float _00, float _01, float _02,
@@ -789,7 +793,7 @@ bool float3x3::Inverse(float epsilon)
 	i[2][2] = d * (v[0][0] * v[1][1] - v[0][1] * v[1][0]);
 	*this = i;
 
-	mathassert((orig * *this).IsIdentity());
+	mathassert((orig * *this).IsIdentity(1e-2f));
 	return true;
 }
 

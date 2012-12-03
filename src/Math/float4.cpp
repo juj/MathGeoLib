@@ -19,6 +19,7 @@
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #include <utility>
+#include <iostream>
 #endif
 
 #include <stdlib.h>

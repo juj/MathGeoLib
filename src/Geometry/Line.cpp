@@ -34,6 +34,10 @@
 #include "Geometry/Circle.h"
 #include "Math/MathFunc.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A helper function to compute the line-line closest point.
