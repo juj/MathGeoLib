@@ -21,7 +21,7 @@ void RunTests(int numTimes)
 
 	for(size_t i = 0; i < tests.size(); ++i)
 	{
-		printf("Testing '%s': ", tests[i].name.c_str());
+		fprintf(stdout, "Testing '%s': ", tests[i].name.c_str());
 		int numFails = 0;
 		int numPasses = 0;
 		try
@@ -40,12 +40,12 @@ void RunTests(int numTimes)
 
 		if (numFails == 0)
 		{
-			LOGI("ok (%d passes)", numPasses);
+			fprintf(stdout, "ok (%d passes)\n", numPasses);
 			++numTestsPassed;
 		}
 	}
 
-	LOGI("Done. %d tests run. %d passed. %d failed.", (int)tests.size(), numTestsPassed, (tests.size() - numTestsPassed));
+	fprintf(stdout, "Done. %d tests run. %d passed. %d failed.\n", (int)tests.size(), numTestsPassed, (tests.size() - numTestsPassed));
 }
 
 void AddPositiveIntersectionTests();
