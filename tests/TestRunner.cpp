@@ -22,6 +22,7 @@ void RunTests(int numTimes)
 	for(size_t i = 0; i < tests.size(); ++i)
 	{
 		fprintf(stdout, "Testing '%s': ", tests[i].name.c_str());
+		fflush(stdout);
 		int numFails = 0;
 		int numPasses = 0;
 		try
@@ -34,18 +35,21 @@ void RunTests(int numTimes)
 		}
 		catch(const std::exception &e)
 		{
-			LOGE("FAILED: '%s' (%d passes)", e.what(), numPasses);
+			fprintf(stderr, "FAILED: '%s' (%d passes)\n", e.what(), numPasses);
+			fflush(stderr);
 			++numFails;
 		}
 
 		if (numFails == 0)
 		{
 			fprintf(stdout, "ok (%d passes)\n", numPasses);
+			fflush(stdout);
 			++numTestsPassed;
 		}
 	}
 
 	fprintf(stdout, "Done. %d tests run. %d passed. %d failed.\n", (int)tests.size(), numTestsPassed, (tests.size() - numTestsPassed));
+	fflush(stdout);
 }
 
 void AddPositiveIntersectionTests();
