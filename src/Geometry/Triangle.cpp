@@ -36,6 +36,10 @@
 #include "Geometry/OBB.h"
 #include "Algorithm/Random/LCG.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <iostream>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Triangle::Triangle(const float3 &a_, const float3 &b_, const float3 &c_)
@@ -326,7 +330,7 @@ float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 	float3 vE1, vE2;
 	float3 vT, vP, vQ;
 
-	const float epsilon = 1e-6f;
+	const float epsilon = 1e-4f;
 
 	// Edge vectors
 	vE1 = v1 - v0;
@@ -348,7 +352,7 @@ float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 
 	// Output barycentric u
 	u = vT.Dot(vP) * recipDet;
-	if (u < 0.f || u > 1.f)
+	if (u < -epsilon || u > 1.f + epsilon)
 		return FLOAT_INF; // Barycentric U is outside the triangle - early out.
 
 	// Prepare to test V parameter
@@ -356,7 +360,7 @@ float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 
 	// Output barycentric v
 	v = lineDir.Dot(vQ) * recipDet;
-	if (v < 0.f || u + v > 1.f) // Barycentric V or the combination of U and V are outside the triangle - no intersection.
+	if (v < -epsilon || u + v > 1.f + epsilon) // Barycentric V or the combination of U and V are outside the triangle - no intersection.
 		return FLOAT_INF;
 
 	// Barycentric u and v are in limits, the ray intersects the triangle. 
@@ -1049,9 +1053,9 @@ float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const
 float3 Triangle::RandomPointInside(LCG &rng) const
 {
 	///@todo rng.Float() returns [0,1[, but to be completely uniform, we'd need [0,1] here.
-	float s = rng.Float();
-	float t = rng.Float();
-	if (s + t > 1.f)
+	float s = rng.Float(0, 1.f);//1e-2f, 1.f - 1e-2f);
+	float t = rng.Float(0, 1.f);//1e-2f, 1.f - 1e-2f);
+	if (s + t >= 1.f)
 	{
 		s = 1.f - s;
 		t = 1.f - t;
