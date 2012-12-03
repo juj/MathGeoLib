@@ -1305,7 +1305,6 @@ void TestPlanePlaneIntersect()
 
 void AddPositiveIntersectionTests()
 {
-#if 0 
 	AddTest("AABB-Line positive intersection", TestAABBLineIntersect);
 	AddTest("AABB-Ray positive intersection", TestAABBRayIntersect);
 	AddTest("AABB-LineSegment positive intersection", TestAABBLineSegmentIntersect);
@@ -1314,10 +1313,10 @@ void AddPositiveIntersectionTests()
 	AddTest("AABB-Plane positive intersection", TestAABBPlaneIntersect);
 	AddTest("AABB-Sphere positive intersection", TestAABBSphereIntersect);
 	AddTest("AABB-Triangle positive intersection", TestAABBTriangleIntersect);
-//	AddTest("AABB-Capsule positive intersection", TestAABBCapsuleIntersect);
-//	AddTest("AABB-Frustum positive intersection", TestAABBFrustumIntersect);
-//	AddTest("AABB-Polygon positive intersection", TestAABBPolygonIntersect);
-//	AddTest("AABB-Polyhedron positive intersection", TestAABBPolyhedronIntersect);
+	AddTest("AABB-Capsule positive intersection", TestAABBCapsuleIntersect);
+	AddTest("AABB-Frustum positive intersection", TestAABBFrustumIntersect);
+	AddTest("AABB-Polygon positive intersection", TestAABBPolygonIntersect);
+	AddTest("AABB-Polyhedron positive intersection", TestAABBPolyhedronIntersect);
 
 	AddTest("OBB-Line positive intersection", TestOBBLineIntersect);
 	AddTest("OBB-Ray positive intersection", TestOBBRayIntersect);
@@ -1326,10 +1325,10 @@ void AddPositiveIntersectionTests()
 	AddTest("OBB-Plane positive intersection", TestOBBPlaneIntersect);
 	AddTest("OBB-Sphere positive intersection", TestOBBSphereIntersect);
 	AddTest("OBB-Triangle positive intersection", TestOBBTriangleIntersect);
-//	AddTest("OBB-Capsule positive intersection", TestOBBCapsuleIntersect);
-//	AddTest("OBB-Frustum positive intersection", TestOBBFrustumIntersect);
-//	AddTest("OBB-Polygon positive intersection", TestOBBPolygonIntersect);
-//	AddTest("OBB-Polyhedron positive intersection", TestOBBPolyhedronIntersect);
+	AddTest("OBB-Capsule positive intersection", TestOBBCapsuleIntersect);
+	AddTest("OBB-Frustum positive intersection", TestOBBFrustumIntersect);
+	AddTest("OBB-Polygon positive intersection", TestOBBPolygonIntersect);
+	AddTest("OBB-Polyhedron positive intersection", TestOBBPolyhedronIntersect);
 
 	AddTest("Sphere-Line positive intersection", TestSphereLineIntersect);
 	AddTest("Sphere-Ray positive intersection", TestSphereRayIntersect);
@@ -1337,21 +1336,21 @@ void AddPositiveIntersectionTests()
 	AddTest("Sphere-Plane positive intersection", TestSpherePlaneIntersect);
 	AddTest("Sphere-Sphere positive intersection", TestSphereSphereIntersect);
 	AddTest("Sphere-Triangle positive intersection", TestSphereTriangleIntersect);
-//	AddTest("Sphere-Capsule positive intersection", TestSphereCapsuleIntersect);
-//	AddTest("Sphere-Frustum positive intersection", TestSphereFrustumIntersect);
-//	AddTest("Sphere-Polygon positive intersection", TestSpherePolygonIntersect);
-//	AddTest("Sphere-Polyhedron positive intersection", TestSpherePolyhedronIntersect);
-/*
+	AddTest("Sphere-Capsule positive intersection", TestSphereCapsuleIntersect);
+	AddTest("Sphere-Frustum positive intersection", TestSphereFrustumIntersect);
+	AddTest("Sphere-Polygon positive intersection", TestSpherePolygonIntersect);
+	AddTest("Sphere-Polyhedron positive intersection", TestSpherePolyhedronIntersect);
+
 	AddTest("Frustum-Line positive intersection", TestFrustumLineIntersect);
 	AddTest("Frustum-Ray positive intersection", TestFrustumRayIntersect);
 	AddTest("Frustum-LineSegment positive intersection", TestFrustumLineSegmentIntersect);
 	AddTest("Frustum-Plane positive intersection", TestFrustumPlaneIntersect);
-	AddTest("Frustum-Triangle positive intersection", TestFrustumTriangleIntersect); */
-//	AddTest("Frustum-Capsule positive intersection", TestFrustumCapsuleIntersect);
-//	AddTest("Frustum-Frustum positive intersection", TestFrustumFrustumIntersect);
-//	AddTest("Frustum-Polygon positive intersection", TestFrustumPolygonIntersect);
-//	AddTest("Frustum-Polyhedron positive intersection", TestFrustumPolyhedronIntersect);
-	/*
+	AddTest("Frustum-Triangle positive intersection", TestFrustumTriangleIntersect);
+	AddTest("Frustum-Capsule positive intersection", TestFrustumCapsuleIntersect);
+	AddTest("Frustum-Frustum positive intersection", TestFrustumFrustumIntersect);
+	AddTest("Frustum-Polygon positive intersection", TestFrustumPolygonIntersect);
+	AddTest("Frustum-Polyhedron positive intersection", TestFrustumPolyhedronIntersect);
+
 	AddTest("Capsule-Line positive intersection", TestCapsuleLineIntersect);
 	AddTest("Capsule-Ray positive intersection", TestCapsuleRayIntersect);
 	AddTest("Capsule-LineSegment positive intersection", TestCapsuleLineSegmentIntersect);
@@ -1375,15 +1374,13 @@ void AddPositiveIntersectionTests()
 	AddTest("Polygon-Plane positive intersection", TestPolygonPlaneIntersect);
 	AddTest("Polygon-Triangle positive intersection", TestPolygonTriangleIntersect);
 	AddTest("Polygon-Polygon positive intersection", TestPolygonPolygonIntersect);
-	*/
-	/*
+
 	AddTest("Triangle-Line positive intersection", TestTriangleLineIntersect);
 	AddTest("Triangle-Ray positive intersection", TestTriangleRayIntersect);
 	AddTest("Triangle-LineSegment positive intersection", TestTriangleLineSegmentIntersect);
 	AddTest("Triangle-Plane positive intersection", TestTrianglePlaneIntersect);
 	AddTest("Triangle-Triangle positive intersection", TestTriangleTriangleIntersect);
-	*/
-#endif
+
 	AddTest("Plane-Line positive intersection", TestPlaneLineIntersect);
 	AddTest("Plane-Ray positive intersection", TestPlaneRayIntersect);
 	AddTest("Plane-LineSegment positive intersection", TestPlaneLineSegmentIntersect);

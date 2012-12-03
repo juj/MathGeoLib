@@ -56,5 +56,5 @@ int main()
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 
-	RunTests(1000000);
+	RunTests(100000);
 }
