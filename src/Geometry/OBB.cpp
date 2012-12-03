@@ -704,8 +704,8 @@ bool OBB::Contains(const float3 &point) const
 {
 	float3 pt = point - pos;
 	return Abs(Dot(pt, axis[0])) <= r[0] &&
-		   Abs(Dot(pt, axis[1])) <= r[1] &&
-		   Abs(Dot(pt, axis[2])) <= r[2];
+	       Abs(Dot(pt, axis[1])) <= r[1] &&
+	       Abs(Dot(pt, axis[2])) <= r[2];
 }
 
 bool OBB::Contains(const LineSegment &lineSegment) const
@@ -788,7 +788,7 @@ void OBB::Enclose(const float3 &point)
 
 			p = point-pos; ///\todo Can we omit this? (redundant since axis[i] are orthonormal?)
 
-			mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i], 1e-3f));
+			mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i], 1e-1f));
 		}
 	}
 	// Should now contain the point.
