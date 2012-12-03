@@ -660,7 +660,7 @@ bool Polyhedron::Intersects(const Capsule &capsule) const
 {
 	float3 pt, ptOnLineSegment;
 	pt = ClosestPoint(capsule.l, &ptOnLineSegment);
-	return pt.DistanceSq(ptOnLineSegment) <= capsule.r;
+	return pt.DistanceSq(ptOnLineSegment) <= capsule.r * capsule.r;
 }
 
 bool Polyhedron::IntersectsConvex(const Line &line) const
