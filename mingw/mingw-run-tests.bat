@@ -4,6 +4,7 @@ del /Q /S *.gcda > NUL 2> NUL
 del /Q *.gcno > NUL 2> NUL
 
 MathGeoLib.exe
+SET ERRORLEV=%ERRORLEVEL%
 
 for /R %%x in (*.gcda, *.gcno) do copy %%x . > NUL
 
@@ -28,4 +29,5 @@ del /Q /S *.gcda > NUL 2> NUL
 
 move *.gcov gcov_results >  NUL 2> NUL
 
+cmd /C exit %ERRORLEV%
 pause
