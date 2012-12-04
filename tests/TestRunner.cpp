@@ -19,6 +19,7 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 int RunTests(int numTimes)
 {
 	int numTestsPassed = 0;
+	int numWarnings = 0;
 
 	for(size_t i = 0; i < tests.size(); ++i)
 	{
@@ -42,17 +43,26 @@ int RunTests(int numTimes)
 			}
 		}
 
+		float successRate = (float)numPasses * 100.f / numTimes;
+
 		if (numFails == 0)
 		{
 			LOGI("ok (%d passes, 100%%)", numPasses);
 			++numTestsPassed;
 		}
+		else if (successRate >= 0.95f)
+		{
+			printf("ok ");
+			LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+			++numTestsPassed;
+			++numWarnings;
+		}
 		else
-			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, (float)numPasses * 100.f / numTimes);
+			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
 	}
 
 	int numFailures = (int)tests.size() - numTestsPassed;
-	LOGI("Done. %d tests run. %d passed. %d failed.", (int)tests.size(), numTestsPassed, numFailures);
+	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)tests.size(), numTestsPassed, numWarnings, numFailures);
 	return numFailures;
 }
 
