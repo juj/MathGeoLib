@@ -416,11 +416,18 @@ bool Polygon::Intersects(const LineSegment &lineSegment) const
 
 bool Polygon::Intersects(const Plane &plane) const
 {
-	Line intersectLine;
-	bool intersects = plane.Intersects(PlaneCCW(), &intersectLine);
-	if (!intersects)
-		return false;
-	return Intersects(intersectLine);
+	// Project the points of this polygon onto the 1D axis of the plane normal.
+	// If there are points on both sides of the plane, then the polygon intersects the plane.
+	float minD = inf;
+	float maxD = -inf;
+	for(size_t i = 0; i < p.size(); ++i)
+	{
+		float d = plane.SignedDistance(p[i]);
+		minD = Min(minD, d);
+		maxD = Max(maxD, d);
+	}
+	// Allow a very small epsilon tolerance.
+	return minD <= 1e-4f && maxD >= -1e-4f;
 }
 
 bool Polygon::Intersects(const AABB &aabb) const
