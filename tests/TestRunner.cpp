@@ -50,7 +50,7 @@ int RunTests(int numTimes)
 			LOGI("ok (%d passes, 100%%)", numPasses);
 			++numTestsPassed;
 		}
-		else if (successRate >= 0.95f)
+		else if (successRate >= 95.0f)
 		{
 			printf("ok ");
 			LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
@@ -74,6 +74,6 @@ int main()
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 
-	int numFailures = RunTests(100000);
+	int numFailures = RunTests(10000);
 	return numFailures; // exit code of 0 denotes a successful run.
 }
