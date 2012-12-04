@@ -653,7 +653,7 @@ Polyhedron Polygon::ToPolyhedron() const
 	for(int i = 0; i < NumVertices(); ++i)
 	{
 		poly.f[0].v.push_back(i);
-		poly.f[0].v.push_back(NumVertices()-1-i);
+		poly.f[1].v.push_back(NumVertices()-1-i);
 	}
 	return poly;
 }

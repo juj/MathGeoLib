@@ -64,6 +64,6 @@ int main()
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 
-	int numFailures = RunTests(1000);
+	int numFailures = RunTests(100000);
 	return numFailures; // exit code of 0 denotes a successful run.
 }
