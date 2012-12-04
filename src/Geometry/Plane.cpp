@@ -424,7 +424,8 @@ bool Plane::Intersects(const Plane &plane, Line *outLine) const
 	bool success = m.Inverse();
 	if (!success) // Inverse failed, so the planes must be parallel.
 	{
-		if ((normal*d).Equals(plane.normal*plane.d, 1e-2f)) // The planes are equal?
+		float normalDir = Dot(normal,plane.normal);
+		if ((normalDir > 0.f && EqualAbs(d, plane.d)) || (normalDir < 0.f && EqualAbs(d, -plane.d)))
 		{
 			if (outLine)
 				*outLine = Line(normal*d, plane.normal.Perpendicular());
