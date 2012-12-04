@@ -15,7 +15,8 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 	tests.push_back(t);
 }
 
-void RunTests(int numTimes)
+// Returns the number of failures.
+int RunTests(int numTimes)
 {
 	int numTestsPassed = 0;
 
@@ -34,18 +35,20 @@ void RunTests(int numTimes)
 		}
 		catch(const std::exception &e)
 		{
-			LOGE("FAILED: '%s' (%d passes)\n", e.what(), numPasses);
+			LOGE("FAILED: '%s' (%d passes)", e.what(), numPasses);
 			++numFails;
 		}
 
 		if (numFails == 0)
 		{
-			LOGI("ok (%d passes)\n", numPasses);
+			LOGI("ok (%d passes)", numPasses);
 			++numTestsPassed;
 		}
 	}
 
-	LOGI("Done. %d tests run. %d passed. %d failed.\n", (int)tests.size(), numTestsPassed, (tests.size() - numTestsPassed));
+	int numFailures = (int)tests.size() - numTestsPassed;
+	LOGI("Done. %d tests run. %d passed. %d failed.", (int)tests.size(), numTestsPassed, numFailures);
+	return numFailures;
 }
 
 void AddPositiveIntersectionTests();
@@ -56,5 +59,6 @@ int main()
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 
-	RunTests(100000);
+	int numFailures = RunTests(100000);
+	return numFailures; // exit code of 0 denotes a successful run.
 }

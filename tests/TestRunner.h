@@ -12,4 +12,4 @@ struct Test
 };
 
 void AddTest(std::string name, TestFunctionPtr function, std::string description = "");
-void RunTests(int numTimes);
+int RunTests(int numTimes);

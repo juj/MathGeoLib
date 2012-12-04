@@ -848,8 +848,6 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 		Schneider, Eberly. Geometric Tools for Computer Graphics pp. 433 - 441. */
 	///@todo The Triangle-Line code is currently untested. Run tests to ensure the following code works properly.
 
-	LOGW("Calling work-in-progress broken Triangle::ClosestPoint.");
-
 	// Point on triangle: T(u,v) = a + u*b + v*c;
 	// Point on line:  L(t) = p + t*d;
 	// Minimize the function Q(u,v,t) = ||T(u,v) - L(t)||.
