@@ -25,25 +25,30 @@ int RunTests(int numTimes)
 		printf("Testing '%s': ", tests[i].name.c_str());
 		int numFails = 0;
 		int numPasses = 0;
-		try
+		std::string failReason; // Stores the failure reason of the first failure.
+		std::vector<std::string> failReasons;
+		for(int j = 0; j < numTimes; ++j)
 		{
-			for(int j = 0; j < numTimes; ++j)
+			try
 			{
 				tests[i].function();
 				++numPasses;
 			}
-		}
-		catch(const std::exception &e)
-		{
-			LOGE("FAILED: '%s' (%d passes)", e.what(), numPasses);
-			++numFails;
+			catch(const std::exception &e)
+			{
+				if (failReason.empty())
+					failReason = e.what();
+				++numFails;
+			}
 		}
 
 		if (numFails == 0)
 		{
-			LOGI("ok (%d passes)", numPasses);
+			LOGI("ok (%d passes, 100%%)", numPasses);
 			++numTestsPassed;
 		}
+		else
+			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, (float)numPasses * 100.f / numTimes);
 	}
 
 	int numFailures = (int)tests.size() - numTestsPassed;
@@ -59,6 +64,6 @@ int main()
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 
-	int numFailures = RunTests(100000);
+	int numFailures = RunTests(1000);
 	return numFailures; // exit code of 0 denotes a successful run.
 }
