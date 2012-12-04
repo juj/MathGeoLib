@@ -236,8 +236,12 @@ float3x4 Plane::MirrorMatrix() const
 
 float3 Plane::Mirror(const float3 &point) const
 {
+#ifdef MATH_ASSERT_CORRECTNESS
+	float signedDistance = SignedDistance(point);
+#endif
 	assume(normal.IsNormalized());
-	float3 reflected = point - 2.f * (Dot(point, normal) + d) * normal;
+	float3 reflected = point - 2.f * (Dot(point, normal) - d) * normal;
+	mathassert(EqualAbs(signedDistance, -SignedDistance(reflected)));
 	mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));
 	return reflected;
 }
