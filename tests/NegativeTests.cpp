@@ -9,6 +9,8 @@ extern LCG rng;
 
 #define SCALE 1e2f
 
+#define GUARDBAND 1e-2f
+
 AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 {
 	float w = rng.Float(0, maxSideLength);
@@ -17,16 +19,19 @@ AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 
 	AABB a(float3(0,0,0), float3(w,h,d));
 
-	float3 extremePoint = a.ExtremePoint(-plane.normal);
-	float distance = plane.Distance(extremePoint);
-	a.Translate((distance + 1e-3f) * plane.normal);
+	a.Translate(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)));
+
+	float3 aabbExtremePoint = a.ExtremePoint(-plane.normal);
+	float distance = plane.Distance(aabbExtremePoint);
+	a.Translate((distance + GUARDBAND) * plane.normal);
 
 	assert(!a.IsDegenerate());
 	assert(a.IsFinite());
 	assert(!a.Intersects(plane));
 //	assert(a.SignedDistance(plane) > 0.f);
-	extremePoint = a.ExtremePoint(-plane.normal);
-	assert(plane.SignedDistance(extremePoint) > 0.f);
+	aabbExtremePoint = a.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(aabbExtremePoint) > 0.f);
+	assert(plane.SignedDistance(a) > 0.f);
 	return a;
 }
 
@@ -37,16 +42,17 @@ OBB RandomOBBInHalfspace(const Plane &plane, float maxSideLength)
 	float3x4 tm = float3x4::Translate(a.CenterPoint()) * rot * float3x4::Translate(-a.CenterPoint());
 	OBB o = a.Transform(tm);
 
-	float3 extremePoint = o.ExtremePoint(-plane.normal);
-	float distance = plane.Distance(extremePoint);
-	o.Translate((distance + 1e-3f) * plane.normal);
+	float3 obbExtremePoint = o.ExtremePoint(-plane.normal);
+	float distance = plane.Distance(obbExtremePoint);
+	o.Translate((distance + GUARDBAND) * plane.normal);
 
 	assert(!o.IsDegenerate());
 	assert(o.IsFinite());
 	assert(!o.Intersects(plane));
 //	assert(o.SignedDistance(plane) > 0.f);
-	extremePoint = o.ExtremePoint(-plane.normal);
-	assert(plane.SignedDistance(extremePoint) > 0.f);
+	obbExtremePoint = o.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(obbExtremePoint) > 0.f);
+	assert(plane.SignedDistance(o) > 0.f);
 
 	return o;
 }
@@ -54,11 +60,11 @@ OBB RandomOBBInHalfspace(const Plane &plane, float maxSideLength)
 Sphere RandomSphereInHalfspace(const Plane &plane, float maxRadius)
 {
 	Sphere s(float3::zero, rng.Float(0.001f, maxRadius));
-	s.pos += float3::RandomSphere(rng, float3::zero, s.r);
+	s.Translate(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)));
 
 	float3 extremePoint = s.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
-	s.Translate((distance + 1e-3f) * plane.normal);
+	s.Translate((distance + GUARDBAND) * plane.normal);
 
 	assert(s.IsFinite());
 	assert(!s.IsDegenerate());
@@ -66,10 +72,11 @@ Sphere RandomSphereInHalfspace(const Plane &plane, float maxRadius)
 //	assert(s.SignedDistance(plane) > 0.f);
 	extremePoint = s.ExtremePoint(-plane.normal);
 	assert(plane.SignedDistance(extremePoint) > 0.f);
+	assert(plane.SignedDistance(s) > 0.f);
 	return s;
 }
-#if 0
-Frustum RandomFrustumInHalfspace(const float3 &pt)
+
+Frustum RandomFrustumInHalfspace(const Plane &plane)
 {
 	Frustum f;
 	if (rng.Int(0,1))
@@ -86,134 +93,185 @@ Frustum RandomFrustumInHalfspace(const float3 &pt)
 	}
 	f.nearPlaneDistance = rng.Float(0.1f, SCALE);
 	f.farPlaneDistance = f.nearPlaneDistance + rng.Float(0.1f, SCALE);
-	f.pos = float3::zero;
+	f.pos = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	f.front = float3::RandomDir(rng);
 	f.up = f.front.RandomPerpendicular(rng);
 
-	float3 pt2 = f.UniformRandomPointInside(rng);
-	f.pos += pt - pt2;
+//	assert(!f.IsDegenerate());
+
+	float3 extremePoint = f.ExtremePoint(-plane.normal);
+	float distance = plane.Distance(extremePoint);
+	f.Translate((distance + GUARDBAND) * plane.normal);
 
 	assert(f.IsFinite());
 //	assert(!f.IsDegenerate());
-	assert(f.Contains(pt));
+	assert(!f.Intersects(plane));
+//	assert(s.SignedDistance(plane) > 0.f);
+	extremePoint = f.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(extremePoint) > 0.f);
+	assert(plane.SignedDistance(f) > 0.f);
+
 	return f;
 }
 
-Line RandomLineInHalfspace(const float3 &pt)
+Line RandomLineInHalfspace(const Plane &plane)
 {
-	float3 dir = float3::RandomDir(rng);
-	Line l(pt, dir);
-	l.pos = l.GetPoint(rng.Float(-SCALE, SCALE));
+	float3 linePos = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	if (plane.SignedDistance(linePos) < 0.f)
+		linePos = plane.Mirror(linePos);
+	linePos += plane.normal * 1e-2f;
+	float sd = plane.SignedDistance(linePos);
+	assert(plane.SignedDistance(linePos) >= 1e-3f);
+
+	float3 dir = plane.normal.RandomPerpendicular(rng);
+	Line l(linePos, dir);
 	assert(l.IsFinite());
-	assert(l.Contains(pt));
+	assert(!plane.Intersects(l));
+	assert(plane.SignedDistance(l) > 0.f);
 	return l;
 }
 
-Ray RandomRayInHalfspace(const float3 &pt)
+Ray RandomRayInHalfspace(const Plane &plane)
 {
+	if (rng.Int(0, 10) == 0)
+		return RandomLineInHalfspace(plane).ToRay();
+
+	float3 rayPos = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	if (plane.SignedDistance(rayPos) < 0.f)
+		rayPos = plane.Mirror(rayPos);
+	rayPos += plane.normal * 1e-2f;
+	assert(plane.SignedDistance(rayPos) >= 1e-3f);
+
 	float3 dir = float3::RandomDir(rng);
-	Ray l(pt, dir);
-	l.pos = l.GetPoint(rng.Float(-SCALE, 0));
-	assert(l.IsFinite());
-	assert(l.Contains(pt));
-	return l;
+	if (dir.Dot(plane.normal) < 0.f)
+		dir = -dir;
+	Ray r(rayPos, dir);
+	assert(r.IsFinite());
+	assert(plane.SignedDistance(r.GetPoint(SCALE*10.f)) > 0.f);
+	assert(!plane.Intersects(r));
+	assert(plane.SignedDistance(r) > 0.f);
+	return r;
 }
 
-LineSegment RandomLineSegmentInHalfspace(const float3 &pt)
+LineSegment RandomLineSegmentInHalfspace(const Plane &plane)
 {
-	float3 dir = float3::RandomDir(rng);
-	float a = rng.Float(0, SCALE);
-	float b = rng.Float(0, SCALE);
-	LineSegment l(pt + a*dir, pt - b*dir);
-	assert(l.IsFinite());
-	assert(l.Contains(pt));
-	return l;
+	LineSegment ls = RandomRayInHalfspace(plane).ToLineSegment(0.f, rng.Float(0.f, SCALE));
+	assert(ls.IsFinite());
+	assert(plane.SignedDistance(ls) > 0.f);
+
+	return ls;
 }
 
-Capsule RandomCapsuleInHalfspace(const float3 &pt)
+Capsule RandomCapsuleInHalfspace(const Plane &plane)
 {
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 dir = float3::RandomDir(rng);
 	float a = rng.Float(0, SCALE);
 	float b = rng.Float(0, SCALE);
 	float r = rng.Float(0.001f, SCALE);
 	Capsule c(pt + a*dir, pt - b*dir, r);
-	float3 d = float3::RandomSphere(rng, float3::zero, c.r);
-	c.l.a += d;
-	c.l.b += d;
 	assert(c.IsFinite());
-	assert(c.Contains(pt));
+
+	float3 extremePoint = c.ExtremePoint(-plane.normal);
+	float distance = plane.Distance(extremePoint);
+	c.Translate((distance + GUARDBAND) * plane.normal);
+
+	assert(c.IsFinite());
+//	assert(!c.IsDegenerate());
+	assert(!c.Intersects(plane));
+//	assert(c.SignedDistance(plane) > 0.f);
+	extremePoint = c.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(extremePoint) > 0.f);
+	assert(plane.SignedDistance(c) > 0.f);
 
 	return c;
 }
 
-Plane RandomPlaneInHalfspace(const float3 &pt)
+Plane RandomPlaneInHalfspace(Plane &plane)
 {
-	float3 dir = float3::RandomDir(rng);
-	Plane p(pt, dir);
-	assert(!p.IsDegenerate());
-	return p;
+	Plane p2;
+	p2.normal = plane.normal;
+	p2.d = rng.Float(plane.d + 1e-2f, plane.d + 1e-2f + SCALE);
+	assert(!p2.IsDegenerate());
+	return p2;
 }
 
-Triangle RandomTriangleInHalfspace(const float3 &pt)
+Triangle RandomTriangleInHalfspace(const Plane &plane)
 {
-	Plane p = RandomPlaneInHalfspace(pt);
-	float3 a = pt;
-	float3 b = p.Point(rng.Float(-SCALE, SCALE), rng.Float(-SCALE, SCALE));
-	float3 c = p.Point(rng.Float(-SCALE, SCALE), rng.Float(-SCALE, SCALE));
+	float3 a = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	float3 b = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	float3 c = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle t(a,b,c);
-	assert(t.Contains(pt));
-	/*
-	float3 d = t.RandomPointInside(rng);
-	float3 br = t.BarycentricUVW(d);
-	assert(t.Contains(d));
-	d = d - t.a;
-	t.a -= d;
-	t.b -= d;
-	t.c -= d;
-	*/
+
 	assert(t.IsFinite());
 	assert(!t.IsDegenerate());
-	assert(t.Contains(pt));
+
+	float3 extremePoint = t.ExtremePoint(-plane.normal);
+	float distance = plane.Distance(extremePoint);
+	t.Translate((distance + GUARDBAND) * plane.normal);
+
+	assert(t.IsFinite());
+	assert(!t.IsDegenerate());
+	assert(!t.Intersects(plane));
+//	assert(t.SignedDistance(plane) > 0.f);
+	extremePoint = t.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(extremePoint) > 0.f);
+	assert(plane.SignedDistance(t) > 0.f);
+
 	return t;
 }
 
-Polyhedron RandomPolyhedronInHalfspace(const float3 &pt)
+Polyhedron RandomPolyhedronInHalfspace(const Plane &plane)
 {
+	Polyhedron p;
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+
 	switch(rng.Int(0,7))
 	{
-	case 0: return RandomAABBInHalfspace(pt, SCALE).ToPolyhedron();
-	case 1: return RandomOBBInHalfspace(pt, SCALE).ToPolyhedron();
-	case 2: return RandomFrustumInHalfspace(pt).ToPolyhedron();
-	case 3: return Polyhedron::Tetrahedron(pt, SCALE); break;
-	case 4: return Polyhedron::Octahedron(pt, SCALE); break;
-	case 5: return Polyhedron::Hexahedron(pt, SCALE); break;
-	case 6: return Polyhedron::Icosahedron(pt, SCALE); break;
-	default: return Polyhedron::Dodecahedron(pt, SCALE); break;
+	case 0: p = RandomAABBInHalfspace(plane, SCALE).ToPolyhedron();
+	case 1: p = RandomOBBInHalfspace(plane, SCALE).ToPolyhedron();
+	case 2: p = RandomFrustumInHalfspace(plane).ToPolyhedron();
+	case 3: p = Polyhedron::Tetrahedron(pt, SCALE); break;
+	case 4: p = Polyhedron::Octahedron(pt, SCALE); break;
+	case 5: p = Polyhedron::Hexahedron(pt, SCALE); break;
+	case 6: p = Polyhedron::Icosahedron(pt, SCALE); break;
+	default: p = Polyhedron::Dodecahedron(pt, SCALE); break;
 	}
 
-//	assert(t.IsFinite());
-//	assert(!t.IsDegenerate());
-//	assert(t.Contains(pt));
+//	assert(p.IsFinite());
+//	assert(!p.IsDegenerate());
+
+	float3 extremePoint = p.ExtremePoint(-plane.normal);
+	float distance = plane.Distance(extremePoint);
+	p.Translate((distance + GUARDBAND) * plane.normal);
+
+//	assert(p.IsFinite());
+//	assert(!p.IsDegenerate());
+	assert(!p.Intersects(plane));
+//	assert(p.SignedDistance(plane) > 0.f);
+	extremePoint = p.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(extremePoint) > 0.f);
+	assert(plane.SignedDistance(p) > 0.f);
+
+	return p;
 }
 
-Polygon RandomPolygonInHalfspace(const float3 &pt)
+Polygon RandomPolygonInHalfspace(const Plane &plane)
 {
-	Polyhedron p = RandomPolyhedronInHalfspace(pt);
+	Polyhedron p = RandomPolyhedronInHalfspace(plane);
 	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
-
-	float3 pt2 = poly.FastRandomPointInside(rng);
-	assert(poly.Contains(pt2));
-	poly.Translate(pt - pt2);
 
 	assert(!poly.IsDegenerate());
 	assert(!poly.IsNull());
 	assert(poly.IsPlanar());
 	assert(poly.IsFinite());
-	assert(poly.Contains(pt));
+	assert(!poly.Intersects(plane));
+	float3 extremePoint = poly.ExtremePoint(-plane.normal);
+	assert(plane.SignedDistance(extremePoint) > 0.f);
+	assert(plane.SignedDistance(poly) > 0.f);
 
 	return poly;
 }
-#endif
 
 void TestAABBAABBNoIntersect()
 {
@@ -236,7 +294,7 @@ void TestAABBOBBNoIntersect()
 {
 	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
-	p.ReverseNormal(); p.d += 1e-2f;
+	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
@@ -248,12 +306,17 @@ void TestAABBOBBNoIntersect()
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-#if 0
 void TestAABBLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
+	if (a.Intersects(b))
+	{
+		LOGI("AABB: %s", a.ToString().c_str());
+		LOGI("Line: %s", b.ToString().c_str());
+	}
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -266,9 +329,10 @@ void TestAABBLineNoIntersect()
 
 void TestAABBRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -281,9 +345,10 @@ void TestAABBRayNoIntersect()
 
 void TestAABBLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -296,9 +361,10 @@ void TestAABBLineSegmentNoIntersect()
 
 void TestAABBPlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -308,7 +374,7 @@ void TestAABBPlaneNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-#endif
+
 void TestAABBSphereNoIntersect()
 {
 	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
@@ -324,12 +390,13 @@ void TestAABBSphereNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-#if 0
+
 void TestAABBCapsuleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Capsule b = RandomCapsuleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -342,9 +409,10 @@ void TestAABBCapsuleNoIntersect()
 
 void TestAABBTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -357,9 +425,10 @@ void TestAABBTriangleNoIntersect()
 
 void TestAABBFrustumNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Frustum b = RandomFrustumInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -372,9 +441,10 @@ void TestAABBFrustumNoIntersect()
 
 void TestAABBPolyhedronNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Polyhedron b = RandomPolyhedronInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -387,9 +457,10 @@ void TestAABBPolyhedronNoIntersect()
 
 void TestAABBPolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	AABB a = RandomAABBInHalfspace(pt, 10.f);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -405,9 +476,10 @@ void TestAABBPolygonNoIntersect()
 
 void TestOBBOBBNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	OBB b = RandomOBBInHalfspace(pt, 10.f);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	OBB b = RandomOBBInHalfspace(p, 10.f);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -420,9 +492,10 @@ void TestOBBOBBNoIntersect()
 
 void TestOBBLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -435,9 +508,10 @@ void TestOBBLineNoIntersect()
 
 void TestOBBRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -450,9 +524,10 @@ void TestOBBRayNoIntersect()
 
 void TestOBBLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -465,9 +540,10 @@ void TestOBBLineSegmentNoIntersect()
 
 void TestOBBPlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -477,7 +553,7 @@ void TestOBBPlaneNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-#endif
+
 void TestOBBSphereNoIntersect()
 {
 	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
@@ -493,12 +569,13 @@ void TestOBBSphereNoIntersect()
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-#if 0
+
 void TestOBBCapsuleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Capsule b = RandomCapsuleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -511,9 +588,10 @@ void TestOBBCapsuleNoIntersect()
 
 void TestOBBTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -526,9 +604,10 @@ void TestOBBTriangleNoIntersect()
 
 void TestOBBFrustumNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Frustum b = RandomFrustumInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -541,9 +620,10 @@ void TestOBBFrustumNoIntersect()
 
 void TestOBBPolyhedronNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Polyhedron b = RandomPolyhedronInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -556,9 +636,10 @@ void TestOBBPolyhedronNoIntersect()
 
 void TestOBBPolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	OBB a = RandomOBBInHalfspace(pt, 10.f);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 ///	assert(a.Distance(b) > 0.f);
@@ -575,9 +656,10 @@ void TestOBBPolygonNoIntersect()
 
 void TestSphereSphereNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Sphere b = RandomSphereInHalfspace(pt, 10.f);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Sphere b = RandomSphereInHalfspace(p, 10.f);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -590,9 +672,10 @@ void TestSphereSphereNoIntersect()
 
 void TestSphereLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -605,9 +688,10 @@ void TestSphereLineNoIntersect()
 
 void TestSphereRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -620,9 +704,10 @@ void TestSphereRayNoIntersect()
 
 void TestSphereLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -635,9 +720,10 @@ void TestSphereLineSegmentNoIntersect()
 
 void TestSpherePlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -650,9 +736,10 @@ void TestSpherePlaneNoIntersect()
 
 void TestSphereCapsuleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Capsule b = RandomCapsuleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -665,9 +752,10 @@ void TestSphereCapsuleNoIntersect()
 
 void TestSphereTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -680,9 +768,10 @@ void TestSphereTriangleNoIntersect()
 
 void TestSphereFrustumNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Frustum b = RandomFrustumInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -695,9 +784,10 @@ void TestSphereFrustumNoIntersect()
 
 void TestSpherePolyhedronNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Polyhedron b = RandomPolyhedronInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -710,9 +800,10 @@ void TestSpherePolyhedronNoIntersect()
 
 void TestSpherePolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Sphere a = RandomSphereInHalfspace(pt, 10.f);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -728,9 +819,10 @@ void TestSpherePolygonNoIntersect()
 
 void TestFrustumLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -743,9 +835,10 @@ void TestFrustumLineNoIntersect()
 
 void TestFrustumRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -758,9 +851,10 @@ void TestFrustumRayNoIntersect()
 
 void TestFrustumLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -773,9 +867,10 @@ void TestFrustumLineSegmentNoIntersect()
 
 void TestFrustumPlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -788,9 +883,10 @@ void TestFrustumPlaneNoIntersect()
 
 void TestFrustumCapsuleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Capsule b = RandomCapsuleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -803,9 +899,10 @@ void TestFrustumCapsuleNoIntersect()
 
 void TestFrustumTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -818,9 +915,10 @@ void TestFrustumTriangleNoIntersect()
 
 void TestFrustumFrustumNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Frustum b = RandomFrustumInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -833,9 +931,10 @@ void TestFrustumFrustumNoIntersect()
 
 void TestFrustumPolyhedronNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Polyhedron b = RandomPolyhedronInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -848,9 +947,10 @@ void TestFrustumPolyhedronNoIntersect()
 
 void TestFrustumPolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Frustum a = RandomFrustumInHalfspace(pt);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -866,9 +966,10 @@ void TestFrustumPolygonNoIntersect()
 
 void TestCapsuleLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -881,9 +982,10 @@ void TestCapsuleLineNoIntersect()
 
 void TestCapsuleRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -896,9 +998,10 @@ void TestCapsuleRayNoIntersect()
 
 void TestCapsuleLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -911,9 +1014,10 @@ void TestCapsuleLineSegmentNoIntersect()
 
 void TestCapsulePlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -926,9 +1030,10 @@ void TestCapsulePlaneNoIntersect()
 
 void TestCapsuleCapsuleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Capsule b = RandomCapsuleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -941,9 +1046,10 @@ void TestCapsuleCapsuleNoIntersect()
 
 void TestCapsuleTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -956,9 +1062,10 @@ void TestCapsuleTriangleNoIntersect()
 
 void TestCapsulePolyhedronNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Polyhedron b = RandomPolyhedronInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 ///	assert(a.Distance(b) > 0.f);
@@ -971,9 +1078,10 @@ void TestCapsulePolyhedronNoIntersect()
 
 void TestCapsulePolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Capsule a = RandomCapsuleInHalfspace(pt);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -990,9 +1098,10 @@ void TestCapsulePolygonNoIntersect()
 
 void TestPolyhedronLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1005,9 +1114,10 @@ void TestPolyhedronLineNoIntersect()
 
 void TestPolyhedronRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1020,9 +1130,10 @@ void TestPolyhedronRayNoIntersect()
 
 void TestPolyhedronLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1035,9 +1146,10 @@ void TestPolyhedronLineSegmentNoIntersect()
 
 void TestPolyhedronPlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1050,9 +1162,10 @@ void TestPolyhedronPlaneNoIntersect()
 
 void TestPolyhedronTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1065,9 +1178,10 @@ void TestPolyhedronTriangleNoIntersect()
 
 void TestPolyhedronPolyhedronNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	Polyhedron b = RandomPolyhedronInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1080,9 +1194,10 @@ void TestPolyhedronPolyhedronNoIntersect()
 
 void TestPolyhedronPolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polyhedron a = RandomPolyhedronInHalfspace(pt);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1097,9 +1212,10 @@ void TestPolyhedronPolygonNoIntersect()
 
 void TestPolygonLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polygon a = RandomPolygonInHalfspace(pt);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polygon a = RandomPolygonInHalfspace(p);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1112,9 +1228,10 @@ void TestPolygonLineNoIntersect()
 
 void TestPolygonRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polygon a = RandomPolygonInHalfspace(pt);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polygon a = RandomPolygonInHalfspace(p);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1127,9 +1244,10 @@ void TestPolygonRayNoIntersect()
 
 void TestPolygonLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polygon a = RandomPolygonInHalfspace(pt);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polygon a = RandomPolygonInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1142,9 +1260,10 @@ void TestPolygonLineSegmentNoIntersect()
 
 void TestPolygonPlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polygon a = RandomPolygonInHalfspace(pt);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polygon a = RandomPolygonInHalfspace(p);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1157,9 +1276,10 @@ void TestPolygonPlaneNoIntersect()
 
 void TestPolygonTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polygon a = RandomPolygonInHalfspace(pt);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polygon a = RandomPolygonInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1172,9 +1292,10 @@ void TestPolygonTriangleNoIntersect()
 
 void TestPolygonPolygonNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Polygon a = RandomPolygonInHalfspace(pt);
-	Polygon b = RandomPolygonInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polygon a = RandomPolygonInHalfspace(p);
+	p.ReverseNormal();
+	Polygon b = RandomPolygonInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1189,9 +1310,10 @@ void TestPolygonPolygonNoIntersect()
 
 void TestTriangleLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Triangle a = RandomTriangleInHalfspace(pt);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 //	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1204,9 +1326,10 @@ void TestTriangleLineNoIntersect()
 
 void TestTriangleRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Triangle a = RandomTriangleInHalfspace(pt);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1219,9 +1342,10 @@ void TestTriangleRayNoIntersect()
 
 void TestTriangleLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Triangle a = RandomTriangleInHalfspace(pt);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 //	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1234,9 +1358,10 @@ void TestTriangleLineSegmentNoIntersect()
 
 void TestTrianglePlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Triangle a = RandomTriangleInHalfspace(pt);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1249,9 +1374,10 @@ void TestTrianglePlaneNoIntersect()
 
 void TestTriangleTriangleNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Triangle a = RandomTriangleInHalfspace(pt);
-	Triangle b = RandomTriangleInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1267,9 +1393,10 @@ void TestTriangleTriangleNoIntersect()
 
 void TestPlaneLineNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Plane a = RandomPlaneInHalfspace(pt);
-	Line b = RandomLineInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane a = RandomPlaneInHalfspace(p);
+	p.ReverseNormal();
+	Line b = RandomLineInHalfspace(p);
 	assert(!a.Intersects(b));
 ///	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1282,9 +1409,10 @@ void TestPlaneLineNoIntersect()
 
 void TestPlaneRayNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Plane a = RandomPlaneInHalfspace(pt);
-	Ray b = RandomRayInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane a = RandomPlaneInHalfspace(p);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1297,9 +1425,10 @@ void TestPlaneRayNoIntersect()
 
 void TestPlaneLineSegmentNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Plane a = RandomPlaneInHalfspace(pt);
-	LineSegment b = RandomLineSegmentInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane a = RandomPlaneInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
@@ -1312,9 +1441,10 @@ void TestPlaneLineSegmentNoIntersect()
 
 void TestPlanePlaneNoIntersect()
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	Plane a = RandomPlaneInHalfspace(pt);
-	Plane b = RandomPlaneInHalfspace(pt);
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane a = RandomPlaneInHalfspace(p);
+	p.ReverseNormal();
+	Plane b = RandomPlaneInHalfspace(p);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
@@ -1325,16 +1455,14 @@ void TestPlanePlaneNoIntersect()
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-#endif
-
 void AddNegativeIntersectionTests()
 {
-//	AddTest("AABB-Line negative intersection", TestAABBLineNoIntersect);
-//	AddTest("AABB-Ray negative intersection", TestAABBRayNoIntersect);
-//	AddTest("AABB-LineSegment negative intersection", TestAABBLineSegmentNoIntersect);
+	AddTest("AABB-Line negative intersection", TestAABBLineNoIntersect);
+	AddTest("AABB-Ray negative intersection", TestAABBRayNoIntersect);
+	AddTest("AABB-LineSegment negative intersection", TestAABBLineSegmentNoIntersect);
 	AddTest("AABB-AABB negative intersection", TestAABBAABBNoIntersect);
 	AddTest("AABB-OBB negative intersection", TestAABBOBBNoIntersect);
-	AddTest("AABB-Sphere negative intersection", TestAABBSphereNoIntersect);/*
+	AddTest("AABB-Sphere negative intersection", TestAABBSphereNoIntersect);
 	AddTest("AABB-Plane negative intersection", TestAABBPlaneNoIntersect);
 	AddTest("AABB-Triangle negative intersection", TestAABBTriangleNoIntersect);
 	AddTest("AABB-Capsule negative intersection", TestAABBCapsuleNoIntersect);
@@ -1347,7 +1475,7 @@ void AddNegativeIntersectionTests()
 	AddTest("OBB-LineSegment negative intersection", TestOBBLineSegmentNoIntersect);
 	AddTest("OBB-OBB negative intersection", TestOBBOBBNoIntersect);
 	AddTest("OBB-Plane negative intersection", TestOBBPlaneNoIntersect);
-*/	AddTest("OBB-Sphere negative intersection", TestOBBSphereNoIntersect); /*
+	AddTest("OBB-Sphere negative intersection", TestOBBSphereNoIntersect);
 	AddTest("OBB-Triangle negative intersection", TestOBBTriangleNoIntersect);
 	AddTest("OBB-Capsule negative intersection", TestOBBCapsuleNoIntersect);
 	AddTest("OBB-Frustum negative intersection", TestOBBFrustumNoIntersect);
@@ -1409,5 +1537,4 @@ void AddNegativeIntersectionTests()
 	AddTest("Plane-Ray negative intersection", TestPlaneRayNoIntersect);
 	AddTest("Plane-LineSegment negative intersection", TestPlaneLineSegmentNoIntersect);
 	AddTest("Plane-Plane negative intersection", TestPlanePlaneNoIntersect);
-	*/
 }
