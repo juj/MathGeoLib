@@ -299,14 +299,14 @@ public:
 		This pointer may be null. */
 	float3 ClosestPoint(const LineSegment &lineSegment, float3 *otherPt = 0) const;
 	/** @param outU [out] If specified, receives the barycentric U coordinate of the returned point (in the UV convention).
-			This pointer may be null.
+			This pointer may be null. TODO Add this parameter back.
 		@param outV [out] If specified, receives the barycentric V coordinate of the returned point (in the UV convention).
-			This pointer may be null.
-		@param outD [out] If specified, receives the distance along the line of the closest point on the line to this triangle.
+			This pointer may be null. TODO Add this parameter back.
+		@param outD [out] If specified, receives the distance along the line of the closest point on the line to this triangle. TODO Add this parameter back.
 		@return The closest point on this triangle to the given object.
 		@todo Add ClosestPoint(Ray/Plane/Polygon/Circle/Disk/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron).
 		@see Distance(), Contains(), Intersects(), ClosestPointToTriangleEdge(), Line::GetPoint. */
-	float3 ClosestPoint(const Line &line, float *outU = 0, float *outV = 0, float *outD = 0) const;
+	float3 ClosestPoint(const Line &line, float3 *otherPt = 0) const;
 	float3 ClosestPoint(const Triangle &triangle, float3 *otherPt = 0) const;
 
 	/// Computes the closest point on the edge of this triangle to the given object.

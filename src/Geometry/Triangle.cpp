@@ -274,7 +274,7 @@ bool Triangle::Contains(const float3 &point, float triangleThickness) const
 		return false; ///@todo The plane-point distance test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
 
 	float3 br = BarycentricUVW(point);
-	return br.x >= 0.f && br.y >= 0.f && br.z >= 0.f;
+	return br.x >= -1e-3f && br.y >= -1e-3f && br.z >= -1e-3f; // Allow for a small epsilon to properly account for points very near the edges of the triangle.
 }
 
 bool Triangle::Contains(const LineSegment &lineSegment, float triangleThickness) const
@@ -668,110 +668,291 @@ float3 Triangle::ClosestPoint(const float3 &p) const
 /// [groupSyntax]
 float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const
 {
-	///@todo The Triangle-LineSegment test is naive. Optimize!
-	float3 closestToA = ClosestPoint(lineSegment.a);
-	float3 closestToB = ClosestPoint(lineSegment.b);
-	float d;
-	float3 closestToSegment = ClosestPointToTriangleEdge(lineSegment, 0, 0, &d);
-	float3 segmentPt = lineSegment.GetPoint(d);
-	float distA = closestToA.DistanceSq(lineSegment.a);
-	float distB = closestToB.DistanceSq(lineSegment.b);
-	float distC = closestToSegment.DistanceSq(segmentPt);
-	if (distA <= distB && distA <= distC)
-	{
-		if (otherPt)
-			*otherPt = lineSegment.a;
-		return closestToA;
-	}
-	else if (distB <= distC)
-	{
-		if (otherPt)
-			*otherPt = lineSegment.b;
-		return closestToB;
-	}
-	else
-	{
-		if (otherPt)
-			*otherPt = segmentPt;
-		return closestToSegment;
-	}
-}
+	float3 e0 = b - a;
+	float3 e1 = c - a;
+	float3 v_p = a - lineSegment.a;
+	float3 d = lineSegment.b - lineSegment.a;
 
-/*
-float3 Triangle::ClosestPoint(const LineSegment &line, float3 *otherPt) const
-{
-	float3 intersectionPoint;
-	bool success = Intersects(line, 0, &intersectionPoint);
-	if (success)
-		return intersectionPoint;
+	float v_p_dot_e0 = Dot(v_p, e0);
+	float v_p_dot_e1 = Dot(v_p, e1);
+	float v_p_dot_d = Dot(v_p, d);
 
-	Plane p = PlaneCCW();
-	float d1 = p.Distance(line.a);
-	float d2 = p.Distance(line.b);
-	/// \bug The following two lines are not correct. This algorithm does not
-	/// produce correct answers. Rewrite.
-	bool aProjectsInsideTriangle = BarycentricInsideTriangle(line.a);
-	bool bProjectsInsideTriangle = BarycentricInsideTriangle(line.b);
+	float3x3 m;
+	m[0][0] = Dot(e0, e0); m[0][1] = Dot(e0, e1); m[0][2] = -Dot(e0, d);
+	m[1][0] =     m[0][1]; m[1][1] = Dot(e1, e1); m[1][2] = -Dot(e1, d);
+	m[2][0] =     m[0][2]; m[2][1] =     m[1][2]; m[2][2] =  Dot(d, d);
 
-	if (aProjectsInsideTriangle && bProjectsInsideTriangle)
+	float3 B(-v_p_dot_e0, -v_p_dot_e1, v_p_dot_d);
+
+	float3x3 m2 = m;
+	bool success = m2.Inverse();
+	if (!success)
 	{
-		// We tested above for intersection, so cannot intersect now.
-		if (d1 <= d2)
+		float t1, t2, t3;
+		float s1, s2, s3;
+		LineSegment e1 = Edge(0);
+		LineSegment e2 = Edge(1);
+		LineSegment e3 = Edge(2);
+		float d1 = e1.Distance(lineSegment, &t1, &s1);
+		float d2 = e2.Distance(lineSegment, &t2, &s2);
+		float d3 = e3.Distance(lineSegment, &t3, &s3);
+		if (d1 < d2 && d1 < d3)
 		{
 			if (otherPt)
-				*otherPt = line.a;
-			return p.Project(line.a);
+				*otherPt = lineSegment.GetPoint(s1);
+			return e1.GetPoint(t1);
+		}
+		else if (d2 < d3)
+		{
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(s2);
+			return e2.GetPoint(t2);
 		}
 		else
 		{
 			if (otherPt)
-				*otherPt = line.b;
-			return p.Project(line.b);
+				*otherPt = lineSegment.GetPoint(s3);
+			return e3.GetPoint(t3);
 		}
 	}
-	LineSegment ab(a, b);
-	LineSegment ac(a, c);
-	LineSegment bc(b, c);
 
-	float tab, tac, tbc;
-	float tab2, tac2, tbc2;
+	float3 uvt = m2 * B;
+	if (uvt.x < 0.f)
+	{
+		// Clamp to u == 0 and solve again.
+		float m_00 = m[2][2];
+		float m_01 = -m[1][2];
+		float m_10 = -m[2][1];
+		float m_11 = m[1][1];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float v = m_00 * B[1] + m_01 * B[2];
+		float t = m_10 * B[1] + m_11 * B[2];
+		v /= det;
+		t /= det;
+		if (v < 0.f)
+		{
+			// Clamp to v == 0 and solve for t.
+			t = B[2] / m[2][2];
+			t = Clamp01(t); // The solution for t must also be in the range [0,1].
+			// The solution is (u,v,t)=(0,0,t).
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
+			return a;
+		}
+		else if (v > 1.f)
+		{
+			// Clamp to v == 1 and solve for t.
+			t = (B[2] - m[2][1]) / m[2][2];
+			t = Clamp01(t);
+			// The solution is (u,v,t)=(0,1,t).
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
+			return c; // == a + v*e1
+		}
+		else if (t < 0.f)
+		{ 
+			// Clamp to t == 0 and solve for v.
+			v = B[1] / m[1][1];
+//			mathassert(EqualAbs(v, Clamp01(v)));
+			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
+			// The solution is (u,v,t)=(0,v,0).
+			if (otherPt)
+				*otherPt = lineSegment.a;
+			return a + v * e1;
+		}
+		else if (t > 1.f)
+		{
+			// Clamp to t == 1 and solve for v.
+			v = (B[1] - m[1][2]) / m[1][1];
+//			mathassert(EqualAbs(v, Clamp01(v)));
+			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
+			// The solution is (u,v,t)=(0,v,0).
+			if (otherPt)
+				*otherPt = lineSegment.b;
+			return a + v * e1;
+		}
+		else
+		{
+			// The solution is (u,v,t)=(0,v,t).
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
+			return a + v * e1;
+		}
+	}
+	else if (uvt.y < 0.f)
+	{
+		// Clamp to v == 0 and solve again.
+		float m_00 = m[2][2];
+		float m_01 = -m[0][2];
+		float m_10 = -m[2][0];
+		float m_11 = m[0][0];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float u = m_00 * B[0] + m_01 * B[2];
+		float t = m_10 * B[0] + m_11 * B[2];
+		u /= det;
+		t /= det;
 
-	float dab = ab.Distance(line, &tab, &tab2);
-	float dac = ac.Distance(line, &tac, &tac2);
-	float dbc = bc.Distance(line, &tbc, &tbc2);
+		if (u < 0.f)
+		{
+			// Clamp to u == 0 and solve for t.
+			t = B[2] / m[2][2];
+			t = Clamp01(t); // The solution for t must also be in the range [0,1].
+			// The solution is (u,v,t)=(0,0,t).
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
+			return a;
+		}
+		else if (u > 1.f)
+		{
+			// Clamp to u == 1 and solve for t.
+			t = (B[2] - m[2][0]) / m[2][2];
+			t = Clamp01(t); // The solution for t must also be in the range [0,1].
+			// The solution is (u,v,t)=(1,0,t).
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
+			return b;
+		}
+		else if (t < 0.f)
+		{
+			// Clamp to t == 0 and solve for u.
+			u = B[0] / m[0][0];
+//			mathassert(EqualAbs(u, Clamp01(u)));
+			u = Clamp01(u); // The solution for u must also be in the range [0,1].
+			if (otherPt)
+				*otherPt = lineSegment.a;
+			return a + u * e0;
+		}
+		else if (t > 1.f)
+		{
+			// Clamp to t == 1 and solve for u.
+			u = (B[0] - m[0][2]) / m[0][0];
+//			mathassert(EqualAbs(u, Clamp01(u)));
+			u = Clamp01(u); // The solution for u must also be in the range [0,1].
+			if (otherPt)
+				*otherPt = lineSegment.b;
+			return a + u * e0;
+		}
+		else
+		{
+			// The solution is (u, 0, t).
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
+			return a + u * e0;
+		}
+	}
+	else if (uvt.z < 0.f)
+	{
+		if (otherPt)
+			*otherPt = lineSegment.a;
+		// Clamp to t == 0 and solve again.
+		float m_00 = m[1][1];
+		float m_01 = -m[0][1];
+		float m_10 = -m[1][0];
+		float m_11 = m[0][0];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float u = m_00 * B[0] + m_01 * B[1];
+		float v = m_10 * B[0] + m_11 * B[1];
+		u /= det;
+		v /= det;
+		if (u < 0.f)
+		{
+			// Clamp to u == 0 and solve for v.
+			v = B[1] / m[1][1];
+			v = Clamp01(v);
+			return a + v*e1;
+		}
+		else if (v < 0.f)
+		{
+			// Clamp to v == 0 and solve for u.
+			u = B[0] / m[0][0];
+			u = Clamp01(u);
+			return a + u*e0;
+		}
+		else if (u+v > 1.f)
+		{
+			// Set v = 1-u and solve again.
+			u = (B[0] - m[0][0]) / (m[0][0] - m[0][1]);
+//			mathassert(EqualAbs(u, Clamp01(u)));
+			u = Clamp01(u); // The solution for u must also be in the range [0,1].
+			return a + u*e0;
+		}
+		else
+		{
+			// The solution is (u, v, 0)
+			return a + u * e0 + v * e1;
+		}
+	}
+	else if (uvt.z > 1.f)
+	{
+		if (otherPt)
+			*otherPt = lineSegment.b;
+		// Clamp to t == 1 and solve again.
+		float m_00 = m[1][1];
+		float m_01 = -m[0][1];
+		float m_10 = -m[1][0];
+		float m_11 = m[0][0];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float u = m_00 * (B[0]-m[0][2]) + m_01 * (B[1]-m[1][2]);
+		float v = m_10 * (B[0]-m[0][2]) + m_11 * (B[1]-m[1][2]);
+		u /= det;
+		v /= det;
+		mathassert(u >= 0.f);
+		mathassert(v >= 0.f);
+		if (u+v > 1.f)
+		{
+			// Set v = 1-u and solve again.
+			u = (B[0] - m[0][1] - m[0][2]) / (m[0][0] - m[0][1]);
+//			mathassert(EqualAbs(u, Clamp01(u)));
+			u = Clamp01(u);
+			return a + u*e0;
+		}
+		else
+		{
+			// The solution is (u, v, 1)
+			return a + u*e0 + v*e1;
+		}
+	}
+	else if (uvt.x + uvt.y > 1.f)
+	{
+		// Clamp to v = 1-u and solve again.
+		float m_00 = m[2][2];
+		float m_01 = m[1][2] - m[0][2];
+		float m_10 = m_01;
+		float m_11 = m[0][0] + m[1][1] - 2.f * m[0][1];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float b0 = m[1][1] - m[0][1] + v_p_dot_e1 - v_p_dot_e0;
+		float b1 = -m[1][2] + v_p_dot_d;
+		float u = m_00 * b0 + m_01 * b1;
+		float t = m_10 * b0 + m_11 * b1;
+		u /= det;
+		t /= det;
 
-	if (dab <= dac && dab <= dbc && dab <= d1 && dab <= d2)
-	{
+		t = Clamp01(t);
 		if (otherPt)
-			*otherPt = line.GetPoint(tab2);
-		return ab.GetPoint(tab);
+			*otherPt = lineSegment.GetPoint(t);
+
+		if (u < 0.f)
+		{
+			// The solution is (u,v,t)=(0,1,t)
+			return c;
+		}
+		if (u > 1.f)
+		{
+			// The solution is (u,v,t)=(1,0,t)
+			return b;
+		}
+		mathassert(t >= 0.f);
+		mathassert(t <= 1.f);
+		return a + u*e0 + (1.f-u)*e1;
+
 	}
-	else if (dac <= dbc && dac <= d1 && dac <= d2)
+	else // All parameters are within range, so the triangle and the line segment intersect, and the intersection point is the closest point.
 	{
 		if (otherPt)
-			*otherPt = line.GetPoint(tac2);
-		return ab.GetPoint(tac);
-	}
-	else if (dbc <= d1 && dbc <= d2)
-	{
-		if (otherPt)
-			*otherPt = line.GetPoint(tbc2);
-		return ab.GetPoint(tbc);
-	}
-	else if (d1 <= d2)
-	{
-		if (otherPt)
-			*otherPt = line.a;
-		return p.Project(line.a);
-	}
-	else
-	{
-		if (otherPt)
-			*otherPt = line.b;
-		return p.Project(line.b);
+			*otherPt = lineSegment.GetPoint(uvt.z);
+		return a + uvt.x * e0 + uvt.y * e1;
 	}
 }
-*/
 
 float3 Triangle::ClosestPointToTriangleEdge(const Line &other, float *outU, float *outV, float *outD) const
 {
@@ -841,6 +1022,173 @@ float3 Triangle::ClosestPointToTriangleEdge(const LineSegment &lineSegment, floa
 	}
 }
 
+float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
+{
+	float3 e0 = b - a;
+	float3 e1 = c - a;
+	float3 v_p = a - line.pos;
+	float3 d = line.dir;
+
+	float v_p_dot_e0 = Dot(v_p, e0);
+	float v_p_dot_e1 = Dot(v_p, e1);
+	float v_p_dot_d = Dot(v_p, d);
+
+	float3x3 m;
+	m[0][0] = Dot(e0, e0); m[0][1] = Dot(e0, e1); m[0][2] = -Dot(e0, d);
+	m[1][0] =     m[0][1]; m[1][1] = Dot(e1, e1); m[1][2] = -Dot(e1, d);
+	m[2][0] =     m[0][2]; m[2][1] =     m[1][2]; m[2][2] =  Dot(d, d);
+
+	float3 B(-v_p_dot_e0, -v_p_dot_e1, v_p_dot_d);
+
+	float3x3 m2 = m;
+	bool success = m2.Inverse();
+	if (!success)
+	{
+		float t1, t2, t3;
+		float s1, s2, s3;
+		LineSegment e1 = Edge(0);
+		LineSegment e2 = Edge(1);
+		LineSegment e3 = Edge(2);
+		float d1 = e1.Distance(line, &t1, &s1);
+		float d2 = e2.Distance(line, &t2, &s2);
+		float d3 = e3.Distance(line, &t3, &s3);
+		if (d1 < d2 && d1 < d3)
+		{
+			if (otherPt)
+				*otherPt = line.GetPoint(s1);
+			return e1.GetPoint(t1);
+		}
+		else if (d2 < d3)
+		{
+			if (otherPt)
+				*otherPt = line.GetPoint(s2);
+			return e2.GetPoint(t2);
+		}
+		else
+		{
+			if (otherPt)
+				*otherPt = line.GetPoint(s3);
+			return e3.GetPoint(t3);
+		}
+	}
+
+	float3 uvt = m2 * B;
+	if (uvt.x < 0.f)
+	{
+		// Clamp to u == 0 and solve again.
+		float m_00 = m[2][2];
+		float m_01 = -m[1][2];
+		float m_10 = -m[2][1];
+		float m_11 = m[1][1];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float v = m_00 * B[1] + m_01 * B[2];
+		float t = m_10 * B[1] + m_11 * B[2];
+		v /= det;
+		t /= det;
+		if (v < 0.f)
+		{
+			// Clamp to v == 0 and solve for t.
+			t = B[2] / m[2][2];
+			// The solution is (u,v,t)=(0,0,t).
+			if (otherPt)
+				*otherPt = line.GetPoint(t);
+			return a;
+		}
+		else if (v > 1.f)
+		{
+			// Clamp to v == 1 and solve for t.
+			t = (B[2] - m[2][1]) / m[2][2];
+			// The solution is (u,v,t)=(0,1,t).
+			if (otherPt)
+				*otherPt = line.GetPoint(t);
+			return c; // == a + v*e1
+		}
+		else
+		{
+			// The solution is (u,v,t)=(0,v,t).
+			if (otherPt)
+				*otherPt = line.GetPoint(t);
+			return a + v * e1;
+		}
+	}
+	else if (uvt.y < 0.f)
+	{
+		// Clamp to v == 0 and solve again.
+		float m_00 = m[2][2];
+		float m_01 = -m[0][2];
+		float m_10 = -m[2][0];
+		float m_11 = m[0][0];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float u = m_00 * B[0] + m_01 * B[2];
+		float t = m_10 * B[0] + m_11 * B[2];
+		u /= det;
+		t /= det;
+
+		if (u < 0.f)
+		{
+			// Clamp to u == 0 and solve for t.
+			t = B[2] / m[2][2];
+			// The solution is (u,v,t)=(0,0,t).
+			if (otherPt)
+				*otherPt = line.GetPoint(t);
+			return a;
+		}
+		else if (u > 1.f)
+		{
+			// Clamp to u == 1 and solve for t.
+			t = (B[2] - m[2][0]) / m[2][2];
+			// The solution is (u,v,t)=(1,0,t).
+			if (otherPt)
+				*otherPt = line.GetPoint(t);
+			return b;
+		}
+		else
+		{
+			// The solution is (u, 0, t).
+			if (otherPt)
+				*otherPt = line.GetPoint(t);
+			return a + u * e0;
+		}
+	}
+	else if (uvt.x + uvt.y > 1.f)
+	{
+		// Clamp to v = 1-u and solve again.
+		float m_00 = m[2][2];
+		float m_01 = m[1][2] - m[0][2];
+		float m_10 = m_01;
+		float m_11 = m[0][0] + m[1][1] - 2.f * m[0][1];
+		float det = m_00 * m_11 - m_01 * m_10;
+		float b0 = m[1][1] - m[0][1] + v_p_dot_e1 - v_p_dot_e0;
+		float b1 = -m[1][2] + v_p_dot_d;
+		float u = m_00 * b0 + m_01 * b1;
+		float t = m_10 * b0 + m_11 * b1;
+		u /= det;
+		t /= det;
+
+		if (otherPt)
+			*otherPt = line.GetPoint(t);
+
+		if (u < 0.f)
+		{
+			// The solution is (u,v,t)=(0,1,t)
+			return c;
+		}
+		if (u > 1.f)
+		{
+			// The solution is (u,v,t)=(1,0,t)
+			return b;
+		}
+		return a + u*e0 + (1.f-u)*e1;
+	}
+	else // All parameters are within range, so the triangle and the line segment intersect, and the intersection point is the closest point.
+	{
+		if (otherPt)
+			*otherPt = line.GetPoint(uvt.z);
+		return a + uvt.x * e0 + uvt.y * e1;
+	}
+}
+
+#if 0
 /// [groupSyntax]
 float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float *outD) const
 {
@@ -998,6 +1346,7 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 		return Point(u, v);
 	}
 }
+#endif
 
 /// [groupSyntax]
 float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const

@@ -251,7 +251,7 @@ Polyhedron RandomPolyhedronInHalfspace(const Plane &plane)
 	extremePoint = p.ExtremePoint(-plane.normal);
 	assert(plane.SignedDistance(extremePoint) > 0.f);
 	assert(plane.SignedDistance(p) > 0.f);
-
+	
 	return p;
 }
 
