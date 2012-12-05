@@ -120,7 +120,6 @@ Line RandomLineInHalfspace(const Plane &plane)
 	if (plane.SignedDistance(linePos) < 0.f)
 		linePos = plane.Mirror(linePos);
 	linePos += plane.normal * 1e-2f;
-	float sd = plane.SignedDistance(linePos);
 	assert(plane.SignedDistance(linePos) >= 1e-3f);
 
 	float3 dir = plane.normal.RandomPerpendicular(rng);
