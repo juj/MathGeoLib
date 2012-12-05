@@ -194,6 +194,8 @@ float Line::Distance(const LineSegment &other, float *d, float *d2) const
 	float u2;
 	float3 c = ClosestPoint(other, d, &u2);
 	if (d2) *d2 = u2;
+	mathassert(u2 >= 0.f);
+	mathassert(u2 <= 1.f);
 	return c.Distance(other.GetPoint(u2));
 }
 
@@ -282,8 +284,10 @@ float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const
 
 float3 Line::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
-	///\bug Properly cap d2.
-	return ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+	float3 closestPoint = ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+	if (d2)
+		*d2 = Max(0.f, *d2); // The parametric distance on the ray must be non-negative.
+	return closestPoint;
 }
 
 float3 Line::ClosestPoint(const Line &other, float *d, float *d2) const
@@ -293,8 +297,10 @@ float3 Line::ClosestPoint(const Line &other, float *d, float *d2) const
 
 float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
-	///\bug Properly cap d2.
-	return ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
+	float3 closestPoint = ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
+	if (d2) // The parametric distance only runs in the range [0, 1].
+		*d2 = Clamp01(*d2);
+	return closestPoint;
 }
 
 float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const
