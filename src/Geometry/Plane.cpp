@@ -211,6 +211,33 @@ float Plane::SignedDistance(const float3 &point) const
 	return normal.Dot(point) - d;
 }
 
+template<typename T>
+float Plane_SignedDistance(const Plane &plane, const T &object)
+{
+	float pMin, pMax;
+	assume(plane.normal.IsNormalized());
+	object.ProjectToAxis(plane.normal, pMin, pMax);
+	pMin -= plane.d;
+	pMax -= plane.d;
+	if (pMin * pMax <= 0.f)
+		return 0.f;
+	return Abs(pMin) < Abs(pMax) ? pMin : pMax;
+}
+
+float Plane::SignedDistance(const AABB &aabb) const { return Plane_SignedDistance(*this, aabb); }
+float Plane::SignedDistance(const OBB &obb) const { return Plane_SignedDistance(*this, obb); }
+float Plane::SignedDistance(const Capsule &capsule) const { return Plane_SignedDistance(*this, capsule); }
+//float Plane::SignedDistance(const Circle &circle) const { return Plane_SignedDistance(*this, circle); }
+float Plane::SignedDistance(const Frustum &frustum) const { return Plane_SignedDistance(*this, frustum); }
+float Plane::SignedDistance(const Line &line) const { return Plane_SignedDistance(*this, line); }
+float Plane::SignedDistance(const LineSegment &lineSegment) const { return Plane_SignedDistance(*this, lineSegment); }
+float Plane::SignedDistance(const Ray &ray) const { return Plane_SignedDistance(*this, ray); }
+//float Plane::SignedDistance(const Plane &plane) const { return Plane_SignedDistance(*this, plane); }
+float Plane::SignedDistance(const Polygon &polygon) const { return Plane_SignedDistance(*this, polygon); }
+float Plane::SignedDistance(const Polyhedron &polyhedron) const { return Plane_SignedDistance(*this, polyhedron); }
+float Plane::SignedDistance(const Sphere &sphere) const { return Plane_SignedDistance(*this, sphere); }
+float Plane::SignedDistance(const Triangle &triangle) const { return Plane_SignedDistance(*this, triangle); }
+
 float3x4 Plane::OrthoProjection() const
 {
 	return float3x4::OrthographicProjection(*this);

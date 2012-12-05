@@ -167,6 +167,20 @@ public:
 		@see Distance(), IsOnPositiveSide(), AreOnSameSide(). */
 	float SignedDistance(const float3 &point) const;
 
+	float SignedDistance(const AABB &aabb) const;
+	float SignedDistance(const OBB &obb) const;
+	float SignedDistance(const Capsule &capsule) const;
+//	float SignedDistance(const Circle &circle) const;
+	float SignedDistance(const Frustum &frustum) const;
+	float SignedDistance(const Line &line) const;
+	float SignedDistance(const LineSegment &lineSegment) const;
+	float SignedDistance(const Ray &ray) const;
+//	float SignedDistance(const Plane &plane) const;
+	float SignedDistance(const Polygon &polygon) const;
+	float SignedDistance(const Polyhedron &polyhedron) const;
+	float SignedDistance(const Sphere &sphere) const;
+	float SignedDistance(const Triangle &triangle) const;
+
 	/// Computes the affine transformation matrix that projects orthographically onto this plane.
 	/** @see ObliqueProjection(), MirrorMatrix(), Project(). */
 	float3x4 OrthoProjection() const;
