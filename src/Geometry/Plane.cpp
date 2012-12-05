@@ -368,12 +368,16 @@ float3 Plane::ClosestPoint(const LineSegment &lineSegment) const
 
 	float denom = bDist - aDist;
 	if (EqualAbs(denom, 0.f))
-		return Abs(aDist) < Abs(bDist) ? lineSegment.a : lineSegment.b;
+		return Project(Abs(aDist) < Abs(bDist) ? lineSegment.a : lineSegment.b); // Project()ing the result here is not strictly necessary,
+		                                                                         // but done for numerical stability, so that Plane::Contains()
+		                                                                         // will return true for the returned point.
 	else
 	{
 		///@todo Output parametric t along the ray as well.
 		float t = (d - Dot(normal, lineSegment.a)) / (bDist - aDist);
 		t = Clamp01(t);
+		// Project()ing the result here is necessary only if we clamped, but done for numerical stability, so that Plane::Contains() will
+		// return true for the returned point.
 		return Project(lineSegment.GetPoint(t));
 	}
 }
