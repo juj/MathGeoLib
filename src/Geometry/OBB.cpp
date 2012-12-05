@@ -297,6 +297,16 @@ float3 OBB::ExtremePoint(const float3 &direction) const
 	return pt;
 }
 
+void OBB::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	float x = Abs(Dot(direction, axis[0]) * r.x);
+	float y = Abs(Dot(direction, axis[1]) * r.y);
+	float z = Abs(Dot(direction, axis[2]) * r.z);
+	float pt = Dot(direction, pos);
+	outMin = pt - x - y - z;
+	outMax = pt + x + y + z;
+}
+
 float3 OBB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);

@@ -566,6 +566,15 @@ float3 Polygon::ExtremePoint(const float3 &direction) const
 	return mostExtreme;
 }
 
+void Polygon::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	///\todo Optimize!
+	float3 minPt = ExtremePoint(-direction);
+	float3 maxPt = ExtremePoint(direction);
+	outMin = Dot(minPt, direction);
+	outMax = Dot(maxPt, direction);
+}
+
 /*
 /// Returns true if the edges of this polygon self-intersect.
 bool IsSelfIntersecting() const;

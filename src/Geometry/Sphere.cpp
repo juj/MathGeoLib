@@ -140,6 +140,13 @@ float3 Sphere::ExtremePoint(const float3 &direction) const
 	return pos + direction.ScaledToLength(r);
 }
 
+void Sphere::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	float d = Dot(direction, pos);
+	outMin = d - r;
+	outMax = d + r;
+}
+
 bool Sphere::IsFinite() const
 {
 	return pos.IsFinite() && isfinite(r);

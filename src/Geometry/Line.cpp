@@ -321,6 +321,20 @@ LineSegment Line::ToLineSegment(float d) const
 	return LineSegment(pos, GetPoint(d));
 }
 
+void Line::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	// Most of the time, the projection of a line spans the whole 1D axis.
+	// As a special case, if the line is perpendicular to the direction vector in question,
+	// then the projection interval of this line is a single point.
+	if (dir.IsPerpendicular(direction))
+		outMin = outMax = Dot(direction, pos);
+	else
+	{
+		outMin = -FLOAT_INF;
+		outMax = FLOAT_INF;
+	}
+}
+
 LineSegment Line::ToLineSegment(float dStart, float dEnd) const
 {
 	return LineSegment(GetPoint(dStart), GetPoint(dEnd));

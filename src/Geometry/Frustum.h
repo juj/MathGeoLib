@@ -173,6 +173,15 @@ public:
 		@see CornerPoint(). */
 	float3 ExtremePoint(const float3 &direction) const;
 
+	/// Projects this Frustum onto the given 1D axis direction vector.
+	/** This function collapses this Frustum onto an 1D axis for the purposes of e.g. separate axis test computations.
+		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
+		@param direction The 1D axis to project to. This vector may be unnormalized, in which case the output
+			of this function gets scaled by the length of this vector.
+		@param outMin [out] Returns the minimum extent of this object along the projection axis.
+		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
+	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+
 	/// Sets the pos, front and up members of this frustum from the given world transform.
 	/** This function sets the 'front' parameter of this Frustum to look towards the -Z axis of the given matrix, 
 		and the 'up' parameter of this Frustum to point towards the +Y axis of the given matrix.

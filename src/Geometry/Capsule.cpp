@@ -84,6 +84,20 @@ float3 Capsule::ExtremePoint(const float3 &direction) const
 	return (Dot(direction, l.b - l.a) >= 0.f ? l.b : l.a) + direction.ScaledToLength(r);
 }
 
+void Capsule::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	outMin = Dot(direction, l.a);
+	outMax = Dot(direction, l.b);
+	if (outMax < outMin)
+		Swap(outMin, outMax);
+
+	// The following requires that direction is normalized, otherwise we would have to sub/add 'r * direction.Length()', but
+	// don't want to do that for performance reasons.
+	assume(direction.IsNormalized());
+	outMin -= r;
+	outMax += r;
+}
+
 float3 Capsule::Top() const
 {
 	return l.b + UpDirection() * r;

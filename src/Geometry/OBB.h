@@ -234,6 +234,15 @@ public:
 		@see CornerPoint(). */
 	float3 ExtremePoint(const float3 &direction) const;
 
+	/// Projects this OBB onto the given 1D axis direction vector.
+	/** This function collapses this OBB onto an 1D axis for the purposes of e.g. separate axis test computations.
+		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
+		@param direction The 1D axis to project to. This vector may be unnormalized, in which case the output
+			of this function gets scaled by the length of this vector.
+		@param outMin [out] Returns the minimum extent of this object along the projection axis.
+		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
+	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+
 	/// Returns a point on an edge of this OBB.
 	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.
 		@param u A normalized value between [0,1]. This specifies the relative distance of the point along the edge.

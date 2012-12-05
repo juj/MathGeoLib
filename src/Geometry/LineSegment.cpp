@@ -333,6 +333,14 @@ Line LineSegment::ToLine() const
 	return Line(a, Dir());
 }
 
+void LineSegment::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	outMin = Dot(direction, a);
+	outMax = Dot(direction, b);
+	if (outMax < outMin)
+		Swap(outMin, outMax);
+}
+
 LineSegment operator *(const float3x3 &transform, const LineSegment &l)
 {
 	return LineSegment(transform * l.a, transform * l.b);

@@ -191,6 +191,15 @@ public:
 		@see pos, dir, Line::Line, class LineSegment, ToLine(). */
 	LineSegment ToLineSegment(float dStart, float dEnd) const;
 
+	/// Projects this Line onto the given 1D axis direction vector.
+	/** This function collapses this Line onto an 1D axis for the purposes of e.g. separate axis test computations.
+		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
+		@param direction The 1D axis to project to. This vector may be unnormalized, in which case the output
+			of this function gets scaled by the length of this vector.
+		@param outMin [out] Returns the minimum extent of this object along the projection axis.
+		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
+	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+
 	/// Tests if the given three points are collinear.
 	/** This function tests whether the given three functions all lie on the same line.
 		@param epsilon The comparison threshold to use to account for floating-point inaccuracies. */

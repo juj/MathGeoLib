@@ -183,6 +183,15 @@ public:
 		@see pos, dir, Ray::Ray, class LineSegment, ToLine(). */
 	LineSegment ToLineSegment(float d) const;
 
+	/// Projects this Ray onto the given 1D axis direction vector.
+	/** This function collapses this Ray onto an 1D axis for the purposes of e.g. separate axis test computations.
+		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
+		@param direction The 1D axis to project to. This vector may be unnormalized, in which case the output
+			of this function gets scaled by the length of this vector.
+		@param outMin [out] Returns the minimum extent of this object along the projection axis.
+		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
+	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+
 	/// Converts this Ray to a LineSegment.
 	/** @param dStart Specifies the position of the first endpoint along this Ray. This parameter may be negative,
 		in which case the starting point lies outside this Ray to the opposite direction of the Ray.

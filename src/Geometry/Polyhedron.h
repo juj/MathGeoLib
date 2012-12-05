@@ -144,6 +144,15 @@ public:
 		@see CornerPoint(). */
 	float3 ExtremePoint(const float3 &direction) const;
 
+	/// Projects this Polyhedron onto the given 1D axis direction vector.
+	/** This function collapses this Polyhedron onto an 1D axis for the purposes of e.g. separate axis test computations.
+		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
+		@param direction The 1D axis to project to. This vector may be unnormalized, in which case the output
+			of this function gets scaled by the length of this vector.
+		@param outMin [out] Returns the minimum extent of this object along the projection axis.
+		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
+	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+
 	/// Returns the arithmetic mean of all the corner vertices.
 	/** @bug This is not the proper centroid of the polyhedron! */
 	/** @see SurfaceArea(), Volume(). */

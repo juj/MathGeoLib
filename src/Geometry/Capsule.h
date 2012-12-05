@@ -95,6 +95,15 @@ public:
 		@return The extreme point of this Capsule in the given direction. */
 	float3 ExtremePoint(const float3 &direction) const;
 
+	/// Projects this Capsule onto the given 1D axis direction vector.
+	/** This function collapses this Capsule onto an 1D axis for the purposes of e.g. separate axis test computations.
+		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
+		@param direction The 1D axis to project to. This vector may be unnormalized, in which case the output
+			of this function gets scaled by the length of this vector.
+		@param outMin [out] Returns the minimum extent of this object along the projection axis.
+		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
+	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+
 	/// Returns the topmost point of this Capsule.
 	/** <img src="CapsuleFunctions.png" />
 		@note The topmost point is only a naming convention, and does not correspond to the topmost point along any world axis. The returned

@@ -290,6 +290,18 @@ LineSegment Ray::ToLineSegment(float dStart, float dEnd) const
 	return LineSegment(GetPoint(dStart), GetPoint(dEnd));
 }
 
+void Ray::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	outMin = outMax = Dot(direction, pos);
+	float d = Dot(direction, dir);
+
+	// Most of the time, the projection interval will be a half-infinite range, extending to either -inf or +inf.
+	if (d > 1e-4f)
+		outMax = FLOAT_INF;
+	else if (d < -1e4f)
+		outMin = -FLOAT_INF;
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string Ray::ToString() const
 {

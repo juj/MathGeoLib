@@ -191,6 +191,15 @@ float3 Polyhedron::ExtremePoint(const float3 &direction) const
 	return Vertex(ExtremeVertex(direction));
 }
 
+void Polyhedron::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+{
+	///\todo Optimize!
+	float3 minPt = ExtremePoint(-direction);
+	float3 maxPt = ExtremePoint(direction);
+	outMin = Dot(minPt, direction);
+	outMax = Dot(maxPt, direction);
+}
+
 float3 Polyhedron::Centroid() const
 {
 	float3 centroid = float3::zero;
