@@ -181,8 +181,15 @@ float3 Ray::ClosestPoint(const float3 &targetPoint, float *d) const
 
 float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
-	///\bug Properly cap d2.
-	return Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+	float u, u2;
+	Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &u, &u2);
+	u = Max(0.f, u);
+	u2 = Max(0.f, u2);
+	if (d)
+		*d = u;
+	if (d2)
+		*d2 = u2;
+	return GetPoint(u);
 }
 
 float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
@@ -192,8 +199,15 @@ float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 
 float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
-	///\bug Properly cap d2.
-	return Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
+	float u, u2;
+	Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, &u, &u2);
+	u = Max(0.f, u);
+	u2 = Clamp01(u2);
+	if (d)
+		*d = u;
+	if (d2)
+		*d2 = u2;
+	return GetPoint(u);
 }
 
 bool Ray::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const
