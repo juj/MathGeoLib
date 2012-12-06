@@ -78,23 +78,66 @@ void Triangle::Transform(const Quat &transform)
 	c = transform * c;
 }
 
+/// Implementation from Christer Ericson's Real-Time Collision Detection, pp. 51-52.
+inline float TriArea2D(float x1, float y1, float x2, float y2, float x3, float y3)
+{
+	return (x1-x2)*(y2-y3) - (x2-x3)*(y1-y2);
+}
+
 float3 Triangle::BarycentricUVW(const float3 &point) const
 {
-	/// @note An alternate mechanism to compute the barycentric is given in Christer Ericson's
-	/// Real-Time Collision Detection, pp. 51-52, which might be slightly faster than the current implementation.
+	// Implementation from Christer Ericson's Real-Time Collision Detection, pp. 51-52.
+
+	// Unnormalized triangle normal.
+	float3 m = Cross(b-a, c-a);
+
+	// Nominators and one-over-denominator for u and v ratios.
+	float nu, nv, ood;
+
+	// Absolute components for determining projection plane.
+	float x = Abs(m.x);
+	float y = Abs(m.y);
+	float z = Abs(m.z);
+
+	if (x >= y && x >= z)
+	{
+		// Project to the yz plane.
+		nu = TriArea2D(point.y, point.z, b.y, b.z, c.y, c.z); // Area of PBC in yz-plane.
+		nv = TriArea2D(point.y, point.z, c.y, c.z, a.y, a.z); // Area OF PCA in yz-plane.
+		ood = 1.f / m.x; // 1 / (2*area of ABC in yz plane)
+	}
+	else if (y >= z) // Note: The book has a redundant 'if (y >= x)' comparison
+	{
+		// y is largest, project to the xz-plane.
+		nu = TriArea2D(point.x, point.z, b.x, b.z, c.x, c.z);
+		nv = TriArea2D(point.x, point.z, c.x, c.z, a.x, a.z);
+		ood = 1.f / -m.y;
+	}
+	else // z is largest, project to the xy-plane.
+	{
+		nu = TriArea2D(point.x, point.y, b.x, b.y, c.x, c.y);
+		nv = TriArea2D(point.x, point.y, c.x, c.y, a.x, a.y);
+		ood = 1.f / m.z;
+	}
+	float u = nu * ood;
+	float v = nv * ood;
+	float w = 1.f - u - v;
+	return float3(u,v,w);
+#if 0 // TODO: This version should be more SIMD-friendly, but for some reason, it doesn't return good values for all points inside the triangle.
 	float3 v0 = b - a;
 	float3 v1 = c - a;
 	float3 v2 = point - a;
 	float d00 = Dot(v0, v0);
 	float d01 = Dot(v0, v1);
+	float d02 = Dot(v0, v2);
 	float d11 = Dot(v1, v1);
-	float d20 = Dot(v2, v0);
-	float d21 = Dot(v2, v1);
+	float d12 = Dot(v1, v2);
 	float denom = 1.f / (d00 * d11 - d01 * d01);
-	float v = (d11 * d20 - d01 * d21) * denom;
-	float w = (d00 * d21 - d01 * d20) * denom;
+	float v = (d11 * d02 - d01 * d12) * denom;
+	float w = (d00 * d12 - d01 * d02) * denom;
 	float u = 1.0f - v - w;
 	return float3(u, v, w);
+#endif
 }
 
 float2 Triangle::BarycentricUV(const float3 &point) const
@@ -1412,14 +1455,27 @@ float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const
 
 float3 Triangle::RandomPointInside(LCG &rng) const
 {
+	float epsilon = 1e-3f;
 	///@todo rng.Float() returns [0,1[, but to be completely uniform, we'd need [0,1] here.
-	float s = rng.Float(0, 1.f);//1e-2f, 1.f - 1e-2f);
-	float t = rng.Float(0, 1.f);//1e-2f, 1.f - 1e-2f);
+	float s = rng.Float(epsilon, 1.f - epsilon);//1e-2f, 1.f - 1e-2f);
+	float t = rng.Float(epsilon, 1.f - epsilon);//1e-2f, 1.f - 1e-2f
 	if (s + t >= 1.f)
 	{
 		s = 1.f - s;
 		t = 1.f - t;
 	}
+#ifdef MATH_ASSERT_CORRECTNESS
+	float3 pt = Point(s, t);
+	float2 uv = BarycentricUV(pt);
+	assert(uv.x >= 0.f);
+	assert(uv.y >= 0.f);
+	assert(uv.x + uv.y <= 1.f);
+	float3 uvw = BarycentricUVW(pt);
+	assert(uvw.x >= 0.f);
+	assert(uvw.y >= 0.f);
+	assert(uvw.z >= 0.f);
+	assert(EqualAbs(uvw.x + uvw.y + uvw.z, 1.f));
+#endif
 	return Point(s, t);
 }
 
