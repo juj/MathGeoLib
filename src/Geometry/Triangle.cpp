@@ -896,9 +896,22 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 		float v = m_10 * (B[0]-m[0][2]) + m_11 * (B[1]-m[1][2]);
 		u /= det;
 		v /= det;
-		mathassert(u >= 0.f);
-		mathassert(v >= 0.f);
-		if (u+v > 1.f)
+		if (u < 0.f)
+		{
+			// Clamp to u == 0 and solve again.
+			v = (B[1] - m[1][2]) / m[1][1];
+			v = Clamp01(v);
+			return a + v*e1;
+		}
+		else if (u > 1.f)
+		{
+			// Clamp to u == 1 and solve again.
+			v = (B[1] - m[1][0] - m[1][2]) / m[1][1];
+			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
+			// The solution is (u,v,t)=(1,v,1).
+			return a + v*e1;
+		}
+		else if (u+v > 1.f)
 		{
 			// Set v = 1-u and solve again.
 			u = (B[0] - m[0][1] - m[0][2]) / (m[0][0] - m[0][1]);
