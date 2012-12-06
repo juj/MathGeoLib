@@ -29,5 +29,8 @@ del /Q /S *.gcda > NUL 2> NUL
 
 move *.gcov gcov_results >  NUL 2> NUL
 
+:: Output the summary to stdout so that buildbot picks it up and parses it.
+type gcov_results\gcov_summary.txt
+
 cmd /C exit %ERRORLEV%
 pause
