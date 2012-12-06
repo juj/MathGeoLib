@@ -317,13 +317,6 @@ void Polygon::Transform(const Quat &transform)
 		p[i] = transform * p[i];
 }
 
-bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) const
-{
-	if (PlaneCCW().Distance(worldSpacePoint) > polygonThickness)
-		return false;
-	return Contains2D(MapTo2D(worldSpacePoint));
-}
-
 bool Polygon::Contains(const Polygon &worldSpacePolygon, float polygonThickness) const
 {
 	for(int i = 0; i < worldSpacePolygon.NumVertices(); ++i)
@@ -332,16 +325,64 @@ bool Polygon::Contains(const Polygon &worldSpacePolygon, float polygonThickness)
 	return true;
 }
 
-bool Polygon::Contains2D(const float2 &localSpacePoint) const
+bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) const
 {
+	// Implementation based on the description from http://erich.realtimerendering.com/ptinpoly/
+
 	if (p.size() < 3)
 		return false;
 
-	LineSegment l(float3(localSpacePoint, 0), float3(localSpacePoint,0) + float3(1e5,1e5,0));
+	if (PlaneCCW().Distance(worldSpacePoint) > polygonThickness)
+		return false;
+
 	int numIntersections = 0;
+
+	float3 basisU = BasisU();
+	float3 basisV = BasisV();
+	mathassert(basisU.IsNormalized());
+	mathassert(basisV.IsNormalized());
+	mathassert(basisU.IsPerpendicular(basisV));
+	mathassert(basisU.IsPerpendicular(PlaneCCW().normal));
+	mathassert(basisV.IsPerpendicular(PlaneCCW().normal));
+
+	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
+
+	const float epsilon = 1e-4f;
+
+	float2 p0 = float2(Dot(p[p.size()-1], basisU), Dot(p[p.size()-1], basisV)) - localSpacePoint;
+	if (Abs(p0.y) < epsilon)
+		p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
 	for(int i = 0; i < (int)p.size(); ++i)
-		if (Edge2D(i).Intersects(l))
-			++numIntersections;
+	{
+		float2 p1 = float2(Dot(p[i], basisU), Dot(p[i], basisV)) - localSpacePoint;
+		if (Abs(p1.y) < epsilon)
+			p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
+
+		if (p0.y * p1.y < 0.f)
+		{
+			if (p0.x > 1e-3f && p1.x > 1e-3f)
+				++numIntersections;
+			else
+			{
+				// P = p0 + t*(p1-p0) == (x,0)
+				//     p0.x + t*(p1.x-p0.x) == x
+				//     p0.y + t*(p1.y-p0.y) == 0
+				//                 t == -p0.y / (p1.y - p0.y)
+
+				// Test whether the lines (0,0) -> (+inf,0) and p0 -> p1 intersect at a positive X-coordinate.
+				float2 d = p1 - p0;
+				if (Abs(d.y) > 1e-5f)
+				{
+					float t = -p0.y / d.y;
+					float x = p0.x + t * d.x;
+					if (t >= 0.f && t <= 1.f && x > 1e-3f)
+						++numIntersections;
+				}
+			}
+		}
+		p0 = p1;
+	}
+
 	return numIntersections % 2 == 1;
 }
 
@@ -380,8 +421,9 @@ bool Polygon::Contains2D(const LineSegment &localSpaceLineSegment) const
 	if (p.size() < 3)
 		return false;
 
-	if (!Contains2D(localSpaceLineSegment.a.xy()) || !Contains2D(localSpaceLineSegment.b.xy()))
-		return false;
+///\todo Reimplement this!
+//	if (!Contains2D(localSpaceLineSegment.a.xy()) || !Contains2D(localSpaceLineSegment.b.xy()))
+//		return false;
 
 	for(int i = 0; i < (int)p.size(); ++i)
 		if (Edge2D(i).Intersects(localSpaceLineSegment))
@@ -486,23 +528,22 @@ float3 Polygon::ClosestPoint(const float3 &point) const
 {
 	assume(IsPlanar());
 
-	float3 ptOnPlane = PlaneCCW().Project(point);
-	if (Contains(ptOnPlane))
-		return ptOnPlane;
-
+	std::vector<Triangle> tris = Triangulate();
 	float3 closestPt = float3::nan;
 	float closestDist = FLOAT_MAX;
-	for(int i = 0; i < NumEdges(); ++i)
+	for(size_t i = 0; i < tris.size(); ++i)
 	{
-		float3 pt = Edge(i).ClosestPoint(point);
-		float d = pt.DistanceSq(point);
+		float3 lineSegPt;
+		float3 pt = tris[i].ClosestPoint(point);
+		float d = pt.DistanceSq(lineSegPt);
 		if (d < closestDist)
 		{
 			closestPt = pt;
 			closestDist = d;
 		}
 	}
-	return ptOnPlane;
+	return closestPt;
+
 }
 
 float3 Polygon::ClosestPoint(const LineSegment &lineSegment) const

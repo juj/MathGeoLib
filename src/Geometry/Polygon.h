@@ -273,7 +273,6 @@ public:
 	/** This test is exactly like in Contains(), except it is performed in 2D in the local space of this polygon.
 		@see Contains(), MapTo2D().
 		@todo Add Contains2D(Circle/Disc/Triangle/Polygon). */
-	bool Contains2D(const float2 &localSpacePoint) const;
 	bool Contains2D(const LineSegment &localSpaceLineSegment) const;
 
 	/// Tests whether this polyhedron and the given object intersect.
