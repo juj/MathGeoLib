@@ -809,7 +809,7 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 			v = (B[1] - m[1][2]) / m[1][1];
 //			mathassert(EqualAbs(v, Clamp01(v)));
 			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
-			// The solution is (u,v,t)=(0,v,0).
+			// The solution is (u,v,t)=(0,v,1).
 			if (otherPt)
 				*otherPt = lineSegment.b;
 			return a + v * e1;
@@ -914,10 +914,23 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 		else if (u+v > 1.f)
 		{
 			// Set v = 1-u and solve again.
-			u = (B[0] - m[0][0]) / (m[0][0] - m[0][1]);
+//			u = (B[0] - m[0][0]) / (m[0][0] - m[0][1]);
 //			mathassert(EqualAbs(u, Clamp01(u)));
-			u = Clamp01(u); // The solution for u must also be in the range [0,1].
-			return a + u*e0;
+//			u = Clamp01(u); // The solution for u must also be in the range [0,1].
+//			return a + u*e0;
+
+			// Clamp to v = 1-u and solve again.
+			float m_00 = m[2][2];
+			float m_01 = m[1][2] - m[0][2];
+			float m_10 = m_01;
+			float m_11 = m[0][0] + m[1][1] - 2.f * m[0][1];
+			float det = m_00 * m_11 - m_01 * m_10;
+			float b0 = m[1][1] - m[0][1] + v_p_dot_e1 - v_p_dot_e0;
+			float b1 = -m[1][2] + v_p_dot_d;
+			float u = m_00 * b0 + m_01 * b1;
+			u /= det;
+			u = Clamp01(u);
+			return a + u*e0 + (1.f-u)*e1;
 		}
 		else
 		{
