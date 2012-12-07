@@ -11,6 +11,8 @@ $sqlDatabaseName = "databasename"; // Configure this!
 function ConnectDB()
 {
 	global $sqlConnectionLink, $sqlAddress, $sqlUserName, $sqlPassword, $sqlDatabaseName;
+	if $sqlDatabaseName == "databasename")
+		return;
 	if ($sqlConnectionLink != 0)
 		return;
 	$sqlConnectionLink = mysql_connect($sqlAddress, $sqlUserName, $sqlPassword)
@@ -21,13 +23,18 @@ function ConnectDB()
 
 function DisconnectDB()
 {
-	global $sqlConnectionLink;
+	global $sqlConnectionLink, $sqlDatabaseName;
+	if $sqlDatabaseName == "databasename")
+		return;
 	mysql_close($sqlConnectionLink);
 	$sqlConnectionLink = 0;
 }
 
 function AddComment($username, $comment, $context)
 {
+	global $sqlConnectionLink;
+	if ($sqlConnectionLink == 0)
+		return;
 	mysql_query("INSERT INTO docgen_comments (username, comment, context, time, ip) VALUES (\""
 	 . mysql_real_escape_string($username)."\", \""
 	 . mysql_real_escape_string($comment)."\", \""
@@ -37,6 +44,9 @@ function AddComment($username, $comment, $context)
 
 function FindLastCommentTime($ip)
 {
+	global $sqlConnectionLink;
+	if ($sqlConnectionLink == 0)
+		return;
 	$result = mysql_query("SELECT time FROM docgen_comments WHERE ip='$ip' ORDER BY time DESC LIMIT 0, 3");
 	$numRows = mysql_num_rows($result);
 	if ($numRows > 0)
@@ -54,12 +64,18 @@ function FindLastCommentTime($ip)
 
 function FindNumCommentsWithin($numMinutes)
 {
+	global $sqlConnectionLink;
+	if ($sqlConnectionLink == 0)
+		return;
 	$result = mysql_query("SELECT time FROM docgen_comments WHERE time > date_add(current_timestamp, interval -$numMinutes minute);");
 	return mysql_num_rows($result);
 }
 
 function PrintComments($context)
 {
+	global $sqlConnectionLink;
+	if ($sqlConnectionLink == 0)
+		return;
 	if ($context == "all")
 		$result = mysql_query("SELECT * FROM docgen_comments;");
 	else
