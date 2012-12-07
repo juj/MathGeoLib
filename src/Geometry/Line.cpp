@@ -305,15 +305,11 @@ float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 
 float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const
 {
-	float d;
-	if (!outD)
-		outD = &d;
-	assert(!outU && "Not implemented!");
+s	assert(!outU && "Not implemented!");
 	assert(!outV && "Not implemented!");
 	assert(!outD && "Not implemented!");
-//	triangle.ClosestPoint(*this, outU, outV, outD);
+
 	return triangle.ClosestPoint(*this);
-//	return GetPoint(*outD);
 }
 
 bool Line::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
