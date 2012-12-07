@@ -40,6 +40,9 @@ int RunTests(int numTimes)
 	int numTestsPassed = 0;
 	int numWarnings = 0;
 
+	int numTrials = 100;
+	int numTimes1 = numTimes / numTrials;
+
 	for(size_t i = 0; i < tests.size(); ++i)
 	{
 		printf("Testing '%s': ", tests[i].name.c_str());
@@ -51,24 +54,27 @@ int RunTests(int numTimes)
 		int numPasses = 0;
 		std::string failReason; // Stores the failure reason of the first failure.
 		std::vector<std::string> failReasons;
-		for(int j = 0; j < numTimes; ++j)
+		for(int j = 0; j < numTimes1; ++j)
 		{
-			try
+			tick_t start = Clock::Tick();
+			for(int k = 0; k < numTrials; ++k)
 			{
-				tick_t start = Clock::Tick();
-				tests[i].function();
-				tick_t end = Clock::Tick();
-				times.push_back(end - start);
-				++numPasses;
+				try
+				{
+					tests[i].function();
+				}
+				catch(const std::exception &e)
+				{
+					if (failReason.empty())
+						failReason = e.what();
+					++numFails;
+				}
 			}
-			catch(const std::exception &e)
-			{
-				if (failReason.empty())
-					failReason = e.what();
-				++numFails;
-			}
+			tick_t end = Clock::Tick();
+			times.push_back(end - start);
 		}
 
+		numPasses = numTimes - numFails;
 		std::sort(times.begin(), times.end());
 
 		// Erase outliers. (x% slowest)
