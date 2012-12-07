@@ -305,7 +305,7 @@ float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 
 float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const
 {
-s	assert(!outU && "Not implemented!");
+	assert(!outU && "Not implemented!");
 	assert(!outV && "Not implemented!");
 	assert(!outD && "Not implemented!");
 
