@@ -8,6 +8,8 @@
 
 std::vector<Test> tests;
 
+volatile int globalPokedData = 0;
+
 void AddTest(std::string name, TestFunctionPtr function, std::string description)
 {
 	Test t;
@@ -122,4 +124,6 @@ int main()
 
 	int numFailures = RunTests(10000);
 	return numFailures; // exit code of 0 denotes a successful run.
+
+	LOGI("%d\n", globalPokedData);
 }

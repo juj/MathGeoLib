@@ -1191,6 +1191,22 @@ void TestPolyhedronPolyhedronNoIntersect()
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+#ifndef _DEBUG
+void TestPolyhedronPolyhedronIntersectionPerformance()
+{
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	p.ReverseNormal();
+	Polyhedron b = RandomPolyhedronInHalfspace(p);
+
+	for(size_t i = 0; i < 10; ++i)
+	{
+		globalPokedData += a.Intersects(b) ? 1 : 0;
+		globalPokedData += b.Intersects(a) ? 1 : 0;
+	}
+}
+#endif
+
 void TestPolyhedronPolygonNoIntersect()
 {
 	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
@@ -1518,7 +1534,10 @@ void AddNegativeIntersectionTests()
 	AddTest("Polyhedron-Triangle negative intersection", TestPolyhedronTriangleNoIntersect);
 	AddTest("Polyhedron-Polygon negative intersection", TestPolyhedronPolygonNoIntersect);
 	AddTest("Polyhedron-Polyhedron negative intersection", TestPolyhedronPolyhedronNoIntersect);
-
+#ifndef _DEBUG
+	AddTest("Polyhedron-Polyhedron negative intersection performance", TestPolyhedronPolyhedronIntersectionPerformance);
+#endif
+	
 	AddTest("Polygon-Line negative intersection", TestPolygonLineNoIntersect);
 	AddTest("Polygon-Ray negative intersection", TestPolygonRayNoIntersect);
 	AddTest("Polygon-LineSegment negative intersection", TestPolygonLineSegmentNoIntersect);
