@@ -450,10 +450,13 @@ bool Polygon::Intersects(const Ray &ray) const
 
 bool Polygon::Intersects(const LineSegment &lineSegment) const
 {
-	float d;
-	if (!PlaneCCW().Intersects(lineSegment, &d))
+	Plane plane = PlaneCCW();
+	float t;
+	bool intersects = Plane::IntersectLinePlane(plane.normal, plane.d, lineSegment.a, lineSegment.b - lineSegment.a, t);
+	if (!intersects || t < 0.f || t > 1.f)
 		return false;
-	return Contains(lineSegment.GetPoint(d));
+
+	return Contains(lineSegment.GetPoint(t));
 }
 
 bool Polygon::Intersects(const Plane &plane) const

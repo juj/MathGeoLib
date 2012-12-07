@@ -258,6 +258,9 @@ public:
 	bool Contains(const Frustum &frustum) const;
 	bool Contains(const Polyhedron &polyhedron) const;
 
+	/// Tests if the given face of this Polyhedron contains the given point.
+	bool FaceContains(int faceIndex, const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
+
 	/// Tests if the given object is fully contained inside this <b>convex</b> polyhedron.
 	/** This function behaves exactly like Contains(), except this version of the containment test 
 		assumes this polyhedron is convex, and uses a faster method of testing containment.

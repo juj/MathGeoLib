@@ -359,13 +359,94 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 	return true;
 }
 
+bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, float polygonThickness) const
+{
+	// N.B. This implementation is a duplicate of Polygon::Contains, but adapted to avoid dynamic memory allocation
+	// related to converting the face of a Polyhedron to a Polygon object.
+
+	// Implementation based on the description from http://erich.realtimerendering.com/ptinpoly/
+
+	const Face &face = f[faceIndex];
+	const std::vector<int> &vertices = face.v;
+
+	if (vertices.size() < 3)
+		return false;
+
+	Plane p = FacePlane(faceIndex);
+	if (FacePlane(faceIndex).Distance(worldSpacePoint) > polygonThickness)
+		return false;
+
+	int numIntersections = 0;
+
+	float3 basisU = v[vertices[1]] - v[vertices[0]];
+	basisU.Normalize();
+	float3 basisV = Cross(p.normal, basisU).Normalized();
+	mathassert(basisU.IsNormalized());
+	mathassert(basisV.IsNormalized());
+	mathassert(basisU.IsPerpendicular(basisV));
+	mathassert(basisU.IsPerpendicular(p.normal));
+	mathassert(basisV.IsPerpendicular(p.normal));
+
+	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
+
+	const float epsilon = 1e-4f;
+
+	float2 p0 = float2(Dot(v[vertices.back()], basisU), Dot(v[vertices.back()], basisV)) - localSpacePoint;
+	if (Abs(p0.y) < epsilon)
+		p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
+	for(size_t i = 0; i < vertices.size(); ++i)
+	{
+		float2 p1 = float2(Dot(v[vertices[i]], basisU), Dot(v[vertices[i]], basisV)) - localSpacePoint;
+		if (Abs(p1.y) < epsilon)
+			p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
+
+		if (p0.y * p1.y < 0.f)
+		{
+			if (p0.x > 1e-3f && p1.x > 1e-3f)
+				++numIntersections;
+			else
+			{
+				// P = p0 + t*(p1-p0) == (x,0)
+				//     p0.x + t*(p1.x-p0.x) == x
+				//     p0.y + t*(p1.y-p0.y) == 0
+				//                 t == -p0.y / (p1.y - p0.y)
+
+				// Test whether the lines (0,0) -> (+inf,0) and p0 -> p1 intersect at a positive X-coordinate.
+				float2 d = p1 - p0;
+				if (Abs(d.y) > 1e-5f)
+				{
+					float t = -p0.y / d.y;
+					float x = p0.x + t * d.x;
+					if (t >= 0.f && t <= 1.f && x > 1e-3f)
+						++numIntersections;
+				}
+			}
+		}
+		p0 = p1;
+	}
+
+	return numIntersections % 2 == 1;
+}
+
 bool Polyhedron::Contains(const float3 &point) const
 {
-	Ray r(point, float3::unitX);
+//	Ray r(point, float3::unitX);
 	int numIntersections = 0;
-	for(int i = 0; i < NumFaces(); ++i)
-		if (FacePolygon(i).Intersects(r))
+	for(int i = 0; i < f.size(); ++i)
+	{
+		Plane p(v[f[i].v[0]] - point, v[f[i].v[1]] - point, v[f[i].v[2]] - point);
+
+		// Find the intersection of the plane and the ray (0,0,0) -> (t,0,0), t >= 0.
+		// <normal, point_on_ray> == d
+		// n.x * t == d
+		//       t == d / n.x
+		float t = p.d / p.normal.x;
+		// If t >= 0, the plane and the ray intersect, and the ray potentially also intersects the polygon.
+		// Finish the test by checking whether the point of intersection is contained in the polygon, in
+		// which case the ray-polygon intersection occurs.
+		if (t >= 0.f && FaceContains(i, point + float3(t,0,0)))
 			++numIntersections;
+	}
 
 	return numIntersections % 2 == 1;
 }
@@ -579,8 +660,14 @@ bool Polyhedron::Intersects(const LineSegment &lineSegment) const
 	if (Contains(lineSegment))
 		return true;
 	for(int i = 0; i < NumFaces(); ++i)
-		if (FacePolygon(i).Intersects(lineSegment))
-			return true;
+	{
+		float t;
+		Plane plane = FacePlane(i);
+		bool intersects = Plane::IntersectLinePlane(plane.normal, plane.d, lineSegment.a, lineSegment.b - lineSegment.a, t);
+		if (intersects && t >= 0.f && t <= 1.f)
+			if (FaceContains(i, lineSegment.GetPoint(t)))
+				return true;
+	}
 
 	return false;
 }
@@ -618,15 +705,33 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	if (this->Contains(polyhedron.Centroid()))
 		return true;
 
-	std::vector<LineSegment> edges = this->Edges();
-	for(size_t i = 0; i < edges.size(); ++i)
-		if (polyhedron.Intersects(edges[i]))
-			return true;
+	// Test for each edge of this polyhedron whether the other polyhedron intersects it.
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		assert(!f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
+		float3 l0 = v[f[i].v.back()];
+		for(size_t j = 0; j < f[i].v.size(); ++j)
+		{
+			float3 l1 = v[f[i].v[j]];
+			if (polyhedron.Intersects(LineSegment(l0, l1)))
+				return true;
+			l0 = l1;
+		}
+	}
 
-	edges = polyhedron.Edges();
-	for(size_t i = 0; i < edges.size(); ++i)
-		if (this->Intersects(edges[i]))
-			return true;
+	// Test for each edge of the other polyhedron whether this polyhedron intersects it.
+	for(size_t i = 0; i < polyhedron.f.size(); ++i)
+	{
+		assert(!polyhedron.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
+		float3 l0 = polyhedron.v[polyhedron.f[i].v.back()];
+		for(size_t j = 0; j < polyhedron.f[i].v.size(); ++j)
+		{
+			float3 l1 = polyhedron.v[polyhedron.f[i].v[j]];
+			if (Intersects(LineSegment(l0, l1)))
+				return true;
+			l0 = l1;
+		}
+	}
 
 	return false;
 }
