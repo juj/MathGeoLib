@@ -705,17 +705,27 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	if (this->Contains(polyhedron.Centroid()))
 		return true;
 
+	// This test assumes that both this and the other polyhedron are closed.
+	// This means that for each edge running through vertices i and j, there's a face
+	// that contains the line segment (i,j) and another neighboring face that contains
+	// the line segment (j,i). These represent the same line segment (but in opposite direction)
+	// so we only have to test one of them for intersection. Take i < j as the canonical choice
+	// and skip the other winding order.
+
 	// Test for each edge of this polyhedron whether the other polyhedron intersects it.
 	for(size_t i = 0; i < f.size(); ++i)
 	{
 		assert(!f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
-		float3 l0 = v[f[i].v.back()];
+		int v0 = f[i].v.back();
+		float3 l0 = v[v0];
 		for(size_t j = 0; j < f[i].v.size(); ++j)
 		{
-			float3 l1 = v[f[i].v[j]];
-			if (polyhedron.Intersects(LineSegment(l0, l1)))
+			int v1 = f[i].v[j];
+			float3 l1 = v[v1];
+			if (v0 < v1 && polyhedron.Intersects(LineSegment(l0, l1))) // If v0 < v1, then this line segment is the canonical one.
 				return true;
 			l0 = l1;
+			v0 = v1;
 		}
 	}
 
@@ -723,13 +733,16 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	for(size_t i = 0; i < polyhedron.f.size(); ++i)
 	{
 		assert(!polyhedron.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
-		float3 l0 = polyhedron.v[polyhedron.f[i].v.back()];
+		int v0 = polyhedron.f[i].v.back();
+		float3 l0 = polyhedron.v[v0];
 		for(size_t j = 0; j < polyhedron.f[i].v.size(); ++j)
 		{
-			float3 l1 = polyhedron.v[polyhedron.f[i].v[j]];
-			if (Intersects(LineSegment(l0, l1)))
+			int v1 = polyhedron.f[i].v[j];
+			float3 l1 = polyhedron.v[v1];
+			if (v0 < v1 && Intersects(LineSegment(l0, l1))) // If v0 < v1, then this line segment is the canonical one.
 				return true;
 			l0 = l1;
+			v0 = v1;
 		}
 	}
 
