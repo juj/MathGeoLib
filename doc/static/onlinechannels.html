@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>MathGeoLib Source Code</title>
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <link rel="stylesheet" type="text/css" href="bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+    <body class="mainPage">
+        <div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="./">MathGeoLib</a>
+                    <ul class="nav">
+                        <li><a href="./">Home</a></li>
+                        <li><a href="usermanual.html">Documentation</a></li>
+                        <li><a href="sourcecode.html">Source Code</a></li>
+                        <li><a href="alternatives.html">Alternatives</a></li>
+						<li class="active"><a href="onlinechannels.html">Online Activity</a></li>
+                        <li><a href="reference.html">Class Reference</a></li>
+                        <li><a href="docs/todos.html">Todos</a></li>
+                        <li><a href="docs/bugs.html">Bugs</a></li>
+                        <li><a href="http://clb.demon.fi/contact">Contact Me</a></li>
+                    </ul>
+                    <!--
+                    <form action="" class="pull-right">
+                        <input class="input-small" type="text" placeholder="Keyword">
+                        <button class="btn" type="submit">Search</button>
+                    </form>
+                    -->
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="content">
+                <div class="page-header">
+                    <h1> Game Math and Geometry Library</h1>
+                    <h3>My C++ library for 3D mathematics and geometry manipulation.</h3>
+                    <h6>Jukka Jyl&auml;nki </h6>
+                </div>
+                <div class="row">
+                    <div class="span16">
+                        <h1>Game Math and Geometry Library</h1>
+                        <p>There are a number of online resources available related to MathGeoLib.</p>
+						
+						<h3><a name="bugtracker">Bug Tracker</a></h3>
+						<p>MathGeoLib uses the <a href="https://github.com/juj/MathGeoLib/issues?state=open">Github bug tracker</a> to follow outstanding issues and feature requests. Feel
+free to post any problems you have there, but remember that submitting a bug is a privilege, not a right. I am not obliged to provide pro-gratis support.</p>
+
+                        <h3><a name="irc">IRC Channel</a></h3>
+                        <p>The home channel for MathGeoLib is located in the <a href="http://www.afternet.org/">Afternet</a> IRC network. Connect to <a href="irc://irc.afternet.org/">
+irc.afternet.org</a> and join the channel #MathGeoLib. As commits are pushed to the <a href="https://github.com/juj/MathGeoLib">MathGeoLib github repository</a>, notifications are posted 
+in real-time to this IRC channel.</p>
+
+                        <h3><a name="liveeditor">Live Editor</a></h3>
+                        <p>As an experimental feature, a direct JavaScript port of MathGeoLib code has been implemented with the help of the <a href="https://github.com/kripken/emscripten">
+emscripten compiler</a>. The result is a live interpreter that allows prototyping with MathGeoLib directly from your web browser. <a href="https://dl.dropbox.com/u/40949268/emcc/MathGeoLibTest.html">
+Start MathGeoLibJS live interpreter.</a> The interpreter uses another project of mine, <a href="http://clb.demon.fi/gfxapi/">gfxapi</a>, for 3D visualization, and therefore requires a modern
+browser with WebGL support.
+
+						<p>The underlying technology is still developing and not all of MathGeoLib functionality is available. A number of bugs related to the live interpreter are
+tracked in the <a href="https://github.com/kripken/emscripten/issues?direction=desc&labels=embind&sort=updated&state=open">emscripten bug tracker</a>.</p>
+
+                        <h3><a name="continuousbuilds">Continuous Builds</a></h3>
+						<p>I maintain a build farm that continually rebuilds MathGeoLib on a number of systems whenever commits are pushed to the github repository. You can review the 
+current build status of MathGeoLib real-time from the <a href="http://clb.demon.fi:8113/waterfall">MathGeoLib build report page</a>. If something is broken, you should see it there.</p>
+
+						<p>The build bots push notifications about their build results to the #MathGeoLib IRC channel, so you can also idle there to receive status updates.</p>
+
+						<h3><a name="staticcodeanalysis">Static Code Analysis</a></h3>
+						<p>As part of the continuous build cycle, a number of static C/C++ code analyzer passes are performed. The win-cppcheck builder runs the MathGeoLib codebase through
+<a href="http://cppcheck.sourceforge.net/">Cppcheck</a>. The vs2012 builders apply the <a href="http://msdn.microsoft.com/en-us/library/ms182025.aspx">Visual Studio 2012 /analyze tool</a> during
+their builds. Third, the osx-xcode-MathGeoLib-64bit builder uses the <a href="http://clang-analyzer.llvm.org/index.html">Clang Static Analyzer tool</a> as part of its build.
+						<p>The results of these static analyzer tools are always shown on the <a href="http://clb.demon.fi:8113/waterfall">MathGeoLib build report page</a>.
+
+						<h3><a name="forums">Discussion Forums</a></h3>
+						<p>There are no dedicated forums for MathGeoLib. I frequent in the <a href="http://www.gamedev.net/index.php?app=core&module=search&do=viewNewContent&search_app=forums&search_app_filters[forums][searchInKey]=&period=today&userMode=&followedItemsOnly=0">
+GameDev discussion forums</a>, which is a good place to ask questions related to game math programming and MathGeoLib.</p>
+                        <p style="margin-bottom:30px;"></p>
+                    </div>
+                </div>
+                <div class="indent">
+                    <a href="index.html" class="btn large">&larr; Back to main page</a>
+                </div>
+            </div>
+            <footer>
+                <p> &copy; Jukka Jyl&auml;nki 2011 </p>
+            </footer>
+        </div>
+    </body>
+</html>

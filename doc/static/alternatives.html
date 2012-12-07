@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>MathGeoLib Alternatives</title>
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <link rel="stylesheet" type="text/css" href="bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+    <body class="mainPage">
+        <div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="./">MathGeoLib</a>
+                    <ul class="nav">
+                        <li><a href="./">Home</a></li>
+                        <li><a href="usermanual.html">Documentation</a></li>
+                        <li><a href="sourcecode.html">Source Code</a></li>
+                        <li class="active"><a href="alternatives.html">Alternatives</a></li>
+                        <li><a href="onlinechannels.html">Online Activity</a></li>
+                        <li><a href="reference.html">Class Reference</a></li>
+                        <li><a href="docs/todos.html">Todos</a></li>
+                        <li><a href="docs/bugs.html">Bugs</a></li>
+                        <li><a href="http://clb.demon.fi/contact">Contact Me</a></li>
+                    </ul>
+                    <!--
+                    <form action="" class="pull-right">
+                        <input class="input-small" type="text" placeholder="Keyword">
+                        <button class="btn" type="submit">Search</button>
+                    </form>
+                    -->
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="content">
+                <div class="page-header">
+                    <h1> Game Math and Geometry Library</h1>
+                    <h3>My C++ library for 3D mathematics and geometry manipulation.</h3>
+                    <h6>Jukka Jyl&auml;nki </h6>
+                </div>
+                <div class="row">
+                    <div class="span16">
+                        <h1>Alternative Libraries</h1>
+                        <p>
+                        If you do not like my library, then perhaps one of these packages works for you better. This list has been collected from the names I have seen pop up at GameDev discussion forums. These are the ones that people are probably using the most. Note that this page is not trying to argue that any of these libraries are bad, but only compares them to my library, and tries to explain the reasons why I did not want to use them.</p>
+                        <h4>Eigen</h4>
+                        <p>From their <a href="http://eigen.tuxfamily.org/index.php?title=Main_Page">homepage</a>: <i>"Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms."</i>
+                        There is a huge development team behind Eigen. It can do generic N-by-M matrices and N-vectors, using a custom type T as scalar, which this library cannot do. It can also be used for 2D and 3D operations, see the handy <a href="http://eigen.tuxfamily.org/dox-devel/group__matrixtypedefs.html">typedefs page</a>. Eigen has a very powerful set of solvers and algorithms for different matrix decompositions, which I do not care about. It also contains the <a href="http://eigen.tuxfamily.org/dox-devel/group__Geometry__Module.html">Geometry module</a>, which has classes AlignedBox (AABB in my library) and Quaternion. Eigen uses doxygen for its reference documentation, and I found it difficult to browse (see e.g. <a href="http://eigen.tuxfamily.org/dox/annotated.html">here</a>). They do have an extensive set of tutorials however. It lacks other geometry classes found in my library, and I didn't want to base my library on templates, so I had to pass on it. Eigen is dual-licensed under LGPL3+ and GPL2+.</p>
+                        <h4>CML</h4>
+                        <p>
+                        From their <a href="http://cmldev.net/">homepage</a>: <i>"The CML (Configurable Math Library) is a free C++ math library for games and graphics."</i> This library uses templates extensively, both for vector/matrix sizes and scalar types. It contains classes <a href="http://cmldev.net/?p=406">vector</a>, <a href="http://cmldev.net/?p=407">matrix</a> and <a href="http://cmldev.net/?p=408">quaternion</a>. They also template based on row/column major storage and the M*v or v*M convention. CML has some utility functions similar to my Frustum class (<a href="http://cmldev.net/?p=405">point projection, picking, frustum management</a>), but apart from that, it does not contain functionality for geometric objects, therefore it was not the library I was looking for. CML is licensed under the Boost Software License.</p>
+                        <h4>GLM</h4>
+                        <p>From their <a href="http://glm.g-truc.net/">homepage</a>: <i>"OpenGL Mathematics (GLM) is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specification."</i> It organizes its development similar to OpenGL - using an <a href="http://glm.g-truc.net/api-0.9.2/modules.html">extension registry</a> for new features. GLM has classes for <a href="http://glm.g-truc.net/api-0.9.2/annotated.html">matrix, vector and quaternion</a>, but nothing for geometry manipulation. I did not like the template-based implementation, and there is nothing for geometric objects, so I decided to pass. GLM is licensed under the MIT license.</p>
+                        <h4>Qt</h4>
+                        <p>
+                        The <a href="http://qt.nokia.com/">Qt toolkit</a> also comes with classes for linear algebra. They have classes <a href="http://doc.qt.nokia.com/latest/qvector2d.html">QVector2D</a>, <a href="http://doc.qt.nokia.com/latest/qvector3d.html">QVector3D</a>, <a href="http://doc.qt.nokia.com/latest/qvector4d.html">QVector4D</a>, <a href="http://doc.qt.nokia.com/latest/qquaternion.html">QQuaternion</a>, <a href="http://doc.qt.nokia.com/latest/qgenericmatrix.html">QGenericMatrix</a> and <a href="http://doc.qt.nokia.com/latest/qmatrix4x4.html">QMatrix4x4</a>. The Qt documentation is quite usable compared to doxygen output. I regard their implementation of QMatrix4x4 having somewhat <a href="http://qt.gitorious.org/qt/qt/blobs/4.7/src/gui/math3d/qmatrix4x4.h#line191">questionable</a><a href="http://qt.gitorious.org/qt/qt/blobs/4.7/src/gui/math3d/qmatrix4x4.cpp#line1794">optimizations</a> (<a href="http://qt.gitorious.org/qt/qt/blobs/4.7/src/gui/math3d/qmatrix4x4.h#line637">comparisons aren't exactly free!</a>), and their <a href="http://qt.gitorious.org/qt/qt/blobs/4.7/src/gui/math3d/qmatrix4x4.h#line451">lack of using fuzzy comparisons</a> is more than a bit <a href="http://qt.gitorious.org/qt/qt/blobs/4.7/src/gui/math3d/qmatrix4x4.h#line672">fishy</a>. The provided functionality on the vector and matrix classes is somewhat lacking for 3D games purposes, and they don't have any geometric objects either. I decided to leave this be as well. Qt is licensed under LGPL.</p>
+                        <h4>Ogre 3D</h4>
+                        <p>
+                        The <a href="http://www.ogre3d.org/">Ogre3D rendering engine</a> (MIT License) also comes with its own math and geometry routines. There are basic math classes <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Vector2.html">Vector2</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Vector3.html">Vector3</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Vector4.html">Vector4</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Matrix3.html">Matrix3</a> (3x3 matrix), <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Matrix4.html">Matrix4</a> (4x4 matrix) and <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Quaternion.html">Quaternion</a>. For geometric operations, it has the classes <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1AxisAlignedBox.html">AxisAlignedBox</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Ray.html">Ray</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Frustum.html">Frustum</a> (not strictly a value type), <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Polygon.html">Polygon</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Plane.html">Plane</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1PlaneBoundedVolume.html">PlaneBoundedVolume</a> (convex polyhedron) and <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Sphere.html">Sphere</a>. This is the most comprehensive set of functionality I have found for my purpose, and for a while I was using Ogre exactly because of this, but after a hands-on experience, I felt unsatisfied due to <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Quaternion.html#a3ccc60338011887023b397a02a7f3336">poor documentation</a>, <a href="http://www.ogre3d.org/docs/api/html/classOgre_1_1Quaternion.html#ab4f38aa582a50dd81c05c3e772680f6b">unwritten conventions</a> and missing functionality.</p>
+                        <h4>Irrlicht</h4>
+                        <p>
+                        <a href="http://irrlicht.sourceforge.net/">Irrlicht</a> is another open source engine (zlib/libpng license). They have classes <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1aabbox3d.html">irr::core::aabbox3d&lt;T&gt;</a> (AABB), <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1_c_matrix4.html">irr::core::CMatrix4&lt;T&gt;</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1line2d.html">irr::core::line2d&lt;T&gt;</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1line3d.html">irr::core::line3d&lt;T&gt;</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1plane3d.html">irr::core::plane3d&lt;T&gt;</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1quaternion.html">irr::core::quaternion</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1triangle3d.html">irr::core::triangle3d&lt;T&gt;</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1vector2d.html">irr::core::vector2d&lt;T&gt;</a> and <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1vector3d.html">irr::core::vector3d&lt;T&gt;</a>. Overall, this library is better documented than Ogre, but they have fewer geometric object types. Their wording is a bit odd in places (e.g. <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1triangle3d.html#ab29f327aac047e9984256b11ace27318">1</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1aabbox3d.html#a904b14e6b6a99187820a7407b5d7cf23">2</a>, <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1aabbox3d.html#a7e252d09fdc83431955f48156ca2ae5c">3</a>) and I did not like their handling of <a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1quaternion.html#a651d5a90572f14b9a2a5c17caea0e764">Euler</a><a href="http://irrlicht.sourceforge.net/docu/classirr_1_1core_1_1_c_matrix4.html#a8ee5ef8619d4b0f56d72ac84495ed644">rotations</a>. The lack of geometric types and the use of templates had me look elsewhere.</p>
+                        <h4>D3DX</h4>
+                        <p>
+                        If you are on Windows, you can utilize the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb172965%28v=vs.85%29.aspx">Microsoft D3DX library</a>, which is a utility DLL that ships with the DirectX package. It has classes <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb205544(v=vs.85).aspx">D3DXVECTOR2</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb205546(v=vs.85).aspx">D3DXVECTOR3</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb205548(v=vs.85).aspx">D3DXVECTOR4</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb205402(v=vs.85).aspx">D3DXQUATERNION</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb172912(v=vs.85).aspx">D3DXMATRIX</a> (4x4 matrix) and <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb205385(v=vs.85).aspx">D3DXPLANE</a>. It has an <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb172972%28v=vs.85%29.aspx">extensive set of operations</a> available for matrices, vectors and quaternions, but only a single geometric function <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb205391%28v=vs.85%29.aspx">D3DXPlaneIntersectLine</a>. The documentation for D3DX is excellent and clean, but I did not like the C API, and using D3DX would have meant a Windows-only library. Pass.</p>
+                        <h4>Boost.Geometry and Boost.Polygon</h4>
+                        <p>
+                        Of course, Boost has its own libraries for the purpose: <a href="http://www.boost.org/doc/libs/1_47_0/libs/geometry/doc/html/index.html">Boost.Geometry</a> and <a href="http://www.boost.org/doc/libs/1_47_0/libs/polygon/doc/index.htm">Boost.Polygon</a>. It should naturally be expected that Boost comes filled with template machinery, and these libraries are surely no exception. Looking at the <a href="http://www.boost.org/doc/libs/1_47_0/libs/geometry/doc/html/geometry/design.html">Boost.Geometry introduction page</a>, it has chapter headers like: <i>Using Templates, Using Traits, Dimension Agnosticism, Coordinate Type, Coordinate System, Point Concept</i>. The summary of the same page says <i>"In this design rationale, Boost.Geometry is step by step designed using tag dispatching, concepts, traits, and metaprogramming."</i>. The documentation contains <a href="http://www.boost.org/doc/libs/1_47_0/libs/geometry/doc/html/geometry/indexes/matrix.html">a reference matrix</a> for the contents Boost.Geometry. Interestingly, very much from what I would have expected, it does not have a single three-dimensional geometric object built in to it (but I'm sure it can be extended to do so). Boost.Polygon is a library solely intended for managing 2D polygons. <p>The whole Boost library has become to me a paragon of genericity, extensibility, and unfortunately, incomprehensibility and sub-par reference documentation. For an example, <a href="http://www.boost.org/doc/libs/1_47_0/libs/geometry/doc/html/geometry/reference/concepts/concept_box.html">this</a> is how Boost.Geometry defines an AABB. Skip. Skip!</p>
+                        <h4>Wykobi</h4>
+                        <p>The <a href="http://www.wykobi.com/">Wykobi library</a> is something I stumbled upon at very random, while trying to search for help related to Eigen SSE optimizations. I don't know anyone who is using this library, but looking at their <a href="http://www.wykobi.com/features.html">Features page</a>, I like it! However, Wykobi is licensed under GPL2, which I do not approve, and therefore I have not put further interest into it.</p>
+                        <h4>CGAL</h4>
+                        <p>The <a href="http://www.cgal.org/">CGAL library</a> is a beast. It probably has all the functionality one might need for professional grade geometry library, but their <a href="http://www.cgal.org/license.html">licensing page</a> is unclear, and does not directly specify what is licensed under LGPL and what is under the more restrictive QPL. The library also uses templates extensively. Here is an <a href="http://www.cgal.org/Manual/latest/doc_html/cgal_manual/Circular_kernel_3/Chapter_main.html#Section_14.4">example</a> of how to compute 3D sphere intersections. Trying to follow their <a href="http://www.cgal.org/Manual/latest/doc_html/cgal_manual/contents.html">manual</a>, I tried to figure out how to do a Frustum-Sphere intersection with that library, but had to give up. It is obvious that the library is too much for me to handle.</p>
+                        <h4>Wild Magic 5.6</h4>
+                        <p>David Eberly maintains a <a href="http://www.geometrictools.com/">webpage</a> that is a companion for the books he has (co-)authored. This site is a treasure trove of information, and several implementations of the algorithms in my library are based on their book Geometric Tools for Computer Graphics. The website has a downloadable package of the Wild Magic 5.6 library, released under the Boost license, but I don't like the code provided on the site, mainly because of the heavy use of templates, namespacing and name decoration. I heartily recommend their books, but avoid the code myself.</p>
+                        <h4>Others</h4>
+                        <p>I also ran into the following libraries, but for some reason, discarded them rather quickly from consideration (inactive, not enough features, undocumented, bad license, too unwieldy, different purpose, etc.):</p>
+                        <ul>
+                            <li><a href="http://plib.sourceforge.net/download.html">Steve's Portable Game Library</a>.</li>
+                            <li>Andrew Aye's <a href="http://www.andrewaye.com/Teikitu%20Gaming%20System/index.html">Teikitu Gaming System</a>.</li>
+                            <li><a href="http://www.vtk.org/">VTK</a>.</li>
+                            <li>Geometros <a href="http://www.geometros.com/sgcore/index.htm">sgCore solid modeling library</a>.</li>
+                            <li><a href="http://www.opencsg.org/">OpenCSG</a>.</li>
+                            <li><a href="http://carve-csg.com/">Carve</a>.</li>
+                            <li><a href="http://gts.sourceforge.net/">GNU Triangulated Surface Library (GTS)</a>.</li>
+                            <li><a href="http://brlcad.org/">BRL-CAD</a>.</li>
+                            <li><a href="http://www.k-3d.org/wiki/Main_Page">K-3D</a>.</li>
+                            <li><a href="http://code.google.com/p/gbmath/">gbmath</a>.</li>
+                            <li><a href="http://sourceforge.net/projects/glmath/">GLmath</a>.</li>
+                            <li><a href="http://netlib.org/blas/">BLAS</a>.</li>
+                            <li><a href="http://www.netlib.org/lapack/">LAPACK</a>.</li>
+                            <li><a href="http://ggt.sourceforge.net/">GGT</a>.</li>
+                        </ul>
+                        <h4>Write Your Own</h4>
+                        <p>You looked at my source code, and laughed your ass off? <i>"What a POS.."</i>. Well, I hope you had a good one. Go ahead and write your own then. The <a href="http://realtimerendering.com/intersections.html">realtimerendering.com object/object intersection page</a> is probably the place to start. Also, basing your implementation on books is strongly recommended, simply because of the amount of review that (hopefully) goes into them. See <a href="http://realtimerendering.com/books.html">realtimerendering.com books reference</a> and <a href="http://www.gamedev.net/books">GameDev.net books reference</a> for sources. If I may place a recommendation, anything coming from Christer Ericson, David Eberly, Eric Lengyel or Wolfgang Engel is worth a buy.</p>
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+                <div class="indent">
+                    <a href="index.html" class="btn large">&larr; Back to main page</a>
+                </div>
+            </div>
+            <footer>
+                <p> &copy; Jukka Jyl&auml;nki 2011 </p>
+            </footer>
+        </div>
+    </body>
+</html>

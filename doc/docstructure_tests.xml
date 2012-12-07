@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<root>
+  <doctitle name="Math Library Reference Documentation" />
+  <group name="Math" column="1">
+    <class name="float2" />
+    <class name="float3" />
+    <class name="float4" />
+    <class name="float3x3" />
+    <class name="float3x4" />
+    <class name="float4x4" />
+    <class name="Quat" />
+    <class name="TranslateOp" />
+    <class name="ScaleOp" />
+  </group>
+  <group name="Geometry" column="2">
+    <class name="AABB" />
+    <class name="Capsule" />
+    <class name="Circle" />
+    <class name="Frustum" />
+    <class name="Line" />
+    <class name="LineSegment" />
+    <class name="OBB" />
+    <class name="Plane" />
+    <class name="Polygon" />
+    <class name="Polyhedron" />
+    <class name="Ray" />
+    <class name="Sphere" />
+    <class name="Triangle" />
+  </group>
+</root>

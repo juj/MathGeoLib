@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>MathGeoLib Source Code</title>
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <link rel="stylesheet" type="text/css" href="bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="style.css" />
+    </head>
+    <body class="mainPage">
+        <div class="topbar">
+            <div class="fill">
+                <div class="container">
+                    <a class="brand" href="./">MathGeoLib</a>
+                    <ul class="nav">
+                        <li><a href="./">Home</a></li>
+                        <li><a href="usermanual.html">Documentation</a></li>
+                        <li class="active"><a href="sourcecode.html">Source Code</a></li>
+                        <li><a href="alternatives.html">Alternatives</a></li>
+                        <li><a href="onlinechannels.html">Online Activity</a></li>
+                        <li><a href="reference.html">Class Reference</a></li>
+                        <li><a href="docs/todos.html">Todos</a></li>
+                        <li><a href="docs/bugs.html">Bugs</a></li>
+                        <li><a href="http://clb.demon.fi/contact">Contact Me</a></li>
+                    </ul>
+                    <!--
+                    <form action="" class="pull-right">
+                        <input class="input-small" type="text" placeholder="Keyword">
+                        <button class="btn" type="submit">Search</button>
+                    </form>
+                    -->
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="content">
+                <div class="page-header">
+                    <h1> Game Math and Geometry Library</h1>
+                    <h3>My C++ library for 3D mathematics and geometry manipulation.</h3>
+                    <h6>Jukka Jyl&auml;nki </h6>
+                </div>
+                <div class="row">
+                    <div class="span16">
+                        <h1>Game Math and Geometry Library</h1>
+                        <h3><a name="sourcecode">Source Code</a></h3>
+                        <p>I am not interested in evangelizing people to use my library, mainly because I cannot guarantee to have any time to maintain it in the future. Therefore at current stage, I am not providing or maintaining build scripts for any platform. Perhaps this will change at some point, but for now, you should know what to do with the .cpp and .h files yourself.</p>
+                        <p style="margin-top: 15px;">The main reason for making this library public is to provide a source of documentation for the project environment I am working on. For others, I hope this library can be used as a source of algorithm snippets for anyone implementing these features in their own libraries. Feel free to copy-paste anything you find useful into your own projects.</p>
+                        <h3><a name="license">License</a></h3>
+                        <p>This library is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 license</a>. I am not a lawyer, but to me that license means that you can use this code for any purpose, both commercial and closed source. You are however restricted from claiming you wrote it yourself, and cannot hold me liable for anything over this code.</p>
+                        <p style="margin-top: 15px;">I acknowledge that most of the non-trivial math routines are taken off a book or a research paper. In all places, I have tried to be diligent to properly attribute the original source. Please contact me if you feel I have misattributed something.</p>
+                        <h3><a name="repository">Github</a></h3>
+                        <p>The source code is hosted on Github at <a href="https://github.com/juj/MathGeoLib">juj/MathGeoLib</a>. If you are on Windows, download <a href="http://code.google.com/p/msysgit/">msysgit</a> and <a href="http://code.google.com/p/tortoisegit/">TortoiseGit</a>, and clone or fork the repository to get started.</p>
+                        <h3><a name="download">Download</a></h3>
+                        If you do not want to play around with git, you can also download a zipped version. The zip simply contains a set of .cpp and .h files. Probably the simplest way is to just embed the code files into your existing project, instead of creating any 3rd party library build steps for this library.</p>
+                        <ul>
+                            <li>2011/10/23: v1.0: <a href="https://github.com/juj/MathGeoLib/zipball/v1.0">MathGeoLib_v1_0.zip</a>. The first release.</li>
+                        </ul>
+                        <h3><a name="browse">Browse Files</a></h3>
+                        <p>The following directory tree shows all individual files in this package:</p>
+                        <ul>
+                            <li>Math/
+                                <ul>
+                                    <li><a href="docs/float2.h_code.html">float2.h</a> / <a href="docs/float2.cpp_code.html">float2.cpp</a></li>
+                                    <li><a href="docs/float3.h_code.html">float3.h</a> / <a href="docs/float3.cpp_code.html">float3.cpp</a></li>
+                                    <li><a href="docs/float4.h_code.html">float4.h</a> / <a href="docs/float4.cpp_code.html">float4.cpp</a></li>
+                                    <li><a href="docs/float3x3.h_code.html">float3x3.h</a> / <a href="docs/float3x3.cpp_code.html">float3x3.cpp</a></li>
+                                    <li><a href="docs/float3x4.h_code.html">float3x4.h</a> / <a href="docs/float3x4.cpp_code.html">float3x4.cpp</a></li>
+                                    <li><a href="docs/float4x4.h_code.html">float4x4.h</a> / <a href="docs/float4x4.cpp_code.html">float4x4.cpp</a></li>
+                                    <li><a href="docs/MathConstants.h_code.html">MathConstants.h</a></li>
+                                    <li><a href="docs/MathFunc.h_code.html">MathFunc.h</a> / <a href="docs/MathFunc.cpp_code.html">MathFunc.cpp</a></li>
+                                    <li><a href="docs/MathNamespace.h_code.html">MathNamespace.h</a></li>
+                                    <li><a href="docs/Quat.h_code.html">Quat.h</a> / <a href="docs/Quat.cpp_code.html">Quat.cpp</a></li>
+                                    <li><a href="docs/TransformOps.h_code.html">TransformOps.h</a> / <a href="docs/TransformOps.cpp_code.html">TransformOps.cpp</a></li>
+                                </ul></li>
+                            <li>Geometry/
+                                <ul>
+                                    <li><a href="docs/AABB.h_code.html">AABB.h</a> / <a href="docs/AABB.cpp_code.html">AABB.cpp</a></li>
+                                    <li><a href="docs/Capsule.h_code.html">Capsule.h</a> / <a href="docs/Capsule.cpp_code.html">Capsule.cpp</a></li>
+                                    <li><a href="docs/Circle.h_code.html">Circle.h</a> / <a href="docs/Circle.cpp_code.html">Circle.cpp</a></li>
+                                    <li><a href="docs/Frustum.h_code.html">Frustum.h</a> / <a href="docs/Frustum.cpp_code.html">Frustum.cpp</a></li>
+                                    <li><a href="docs/Line.h_code.html">Line.h</a> / <a href="docs/Line.cpp_code.html">Line.cpp</a></li>
+                                    <li><a href="docs/LineSegment.h_code.html">LineSegment.h</a> / <a href="docs/LineSegment.cpp_code.html">LineSegment.cpp</a></li>
+                                    <li><a href="docs/OBB.h_code.html">OBB.h</a> / <a href="docs/OBB.cpp_code.html">OBB.cpp</a></li>
+                                    <li><a href="docs/Plane.h_code.html">Plane.h</a> / <a href="docs/Plane.cpp_code.html">Plane.cpp</a></li>
+                                    <li><a href="docs/Polygon.h_code.html">Polygon.h</a> / <a href="docs/Polygon.cpp_code.html">Polygon.cpp</a></li>
+                                    <li><a href="docs/Polyhedron.h_code.html">Polyhedron.h</a> / <a href="docs/Polyhedron.cpp_code.html">Polyhedron.cpp</a></li>
+                                    <li><a href="docs/Ray.h_code.html">Ray.h</a> / <a href="docs/Ray.cpp_code.html">Ray.cpp</a></li>
+                                    <li><a href="docs/Sphere.h_code.html">Sphere.h</a> / <a href="docs/Sphere.cpp_code.html">Sphere.cpp</a></li>
+                                    <li><a href="docs/Triangle.h_code.html">Triangle.h</a> / <a href="docs/Triangle.cpp_code.html">Triangle.cpp</a></li>
+                                </ul></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="indent">
+                    <a href="index.html" class="btn large">&larr; Back to main page</a>
+                </div>
+            </div>
+            <footer>
+                <p> &copy; Jukka Jyl&auml;nki 2011 </p>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,376 @@
+.nomargin {
+margin: 0px;
+padding: 0px;
+}
+
+body
+{
+   margin: 0px;
+}
+
+#pageTitle {
+  font-family: Calibri;
+  margin-left: 5px;
+}
+
+.functionSignature {
+  font-family: Consolas;
+  font-size: 12px;
+  padding: 5px;
+  border: solid 1px #808080;
+  background-color: #F0F0F0;
+  display: block;
+  margin-left: 20px;
+  margin-right: 30px;
+}
+
+h2 {
+margin: 3px;
+}
+
+.syntaxHighlight {
+  color: #0000FF;
+}
+
+.indexTable {
+  vertical-align: top;
+  height: 100%;
+}
+
+.indexTr {
+  vertical-align: top;
+}
+
+.indexTd {
+  vertical-align: top;
+  height: 100%;
+}
+
+.indexTd2 {
+  font-family: Calibri;
+  vertical-align: top;
+  padding: 10px;
+}
+
+h4 {
+margin: 10px;
+margin-left: 0px;
+}
+
+p {
+margin: 0px;
+}
+
+.horizontalLine {
+width: 100%;
+height: 1px;
+background-color: #000000;
+margin-top: 10px;
+}
+
+.functionParametersBlock {
+  margin-left: 10px;
+}
+
+.functionParamType, .functionParamType a {
+  display: none;
+  color: #808080;
+  font-family: Consolas;
+  font-size: 12px;
+}
+
+.functionParamName {
+  font-weight: bold;
+  font-style: italic;
+  font-family: Consolas;
+  font-size: 13px;
+}
+
+.functionParamComment {
+  display: block;
+  margin: 10px;
+  padding-left: 30px;
+}
+
+.classHeader {
+    font-size: 15px;
+    padding-left: 15px;
+}
+.package {
+  margin: 5px;
+  background-color: #B0B0FF; 
+  border: solid 1px black;
+  font-family: Calibri;
+  width: 100%;
+}
+
+.packageHeader {
+    font-size: 25px;
+    margin: 5px;        
+}
+.packageContents {
+    padding-left: 0px;
+}
+
+.virtualLabel, .pureVirtualLabel {
+  color: #00D000;
+  padding: 5px;
+  font-size: 11px;
+  vertical-align: top;
+}
+
+.staticLabel {
+    color: #FF0000;
+    padding: 5px;
+    font-size: 11px;
+    vertical-align: top;
+}
+
+.backToIndexLink {
+   display:block;
+   margin:10px;
+}
+
+.constLabel {
+    color: #909090;
+    padding: 5px;
+    font-size: 11px;
+    vertical-align: top;
+}
+
+.summaryLabel {
+    color: #000000;
+    padding: 5px;
+    font-size: 11px;
+    vertical-align: center;
+}
+
+.categoryTitle {
+    font-weight: bold;
+    font-size: 15px;
+    padding-left: 20px;
+    width: 100%;
+    background-color: #B0B0FF; 
+}
+
+table.classTable {
+	border-width: 0px;
+	border-spacing: 0px;
+	border-style: solid;
+	border-color: #000000;
+	border-collapse: collapse;
+	background-color: #ffffff;
+	width: 100%;
+}
+.classTable th {
+	padding: 0px;
+	border-style: none;
+	border-color: #808080;
+	background-color: #B0B0FF;
+	-moz-border-radius: ;
+}
+.classTable td {
+	padding: 0px;
+	border-style: none;
+	border-color: #808080;
+	background-color: #B0B0FF;
+  font-size: 15px;
+	-moz-border-radius: ;
+}
+
+a {
+ color: black;
+}
+
+td.classNameEven {
+  font-weight: bold;
+	padding-left: 15px;
+	font-size: 16px;
+  background-color: #9090FF;
+  width: 250px;
+}
+
+td.classNameOdd {
+  font-weight: bold;
+	padding-left: 15px;
+	font-size: 16px;
+  background-color: #A0A0FF;
+  width: 250px;
+}
+
+td.classNameCommentEven {
+	padding-left: 15px;
+  background-color: #9090FF;
+}
+
+td.classNameCommentOdd {
+	padding-left: 15px;
+  background-color: #A0A0FF;
+}
+
+td.classMemberEven {
+	padding-left: 25px;
+	background-color: #FFFFFF;
+  font-size: 15px;
+  width: 250px;
+}
+
+td.classMemberOdd {
+	padding-left: 25px;
+	background-color: #F0F0F0;
+  font-size: 15px;
+  width: 250px;
+}
+
+td.classMemberCommentEven {
+	padding-left: 10px;
+	background-color: #FFFFFF;
+  font-size: 15px;
+}
+
+td.classMemberCommentOdd {
+	padding-left: 10px;
+	background-color: #F0F0F0;
+  font-size: 15px;
+}
+
+.numOverloadsText {
+  color: #808080;
+  font-size: 12px; 
+}
+
+.todoItemTitle {
+  margin: 10px;
+  margin-left: 15px;
+  color: #FF0000;
+}
+
+.todoItem {
+  margin-left: 35px;
+  color: #000000;
+}
+
+.noteItemTitle {
+  margin: 10px;
+  margin-left: 15px;
+  font-weight: bold;
+}
+
+.noteItem {
+  font-weight: normal;
+  margin-left: 35px;
+  color: #000000;
+}
+
+.functionArgs {
+  font-size: 12px;
+  color: #808080;
+}
+
+.wipBox {
+  margin: 20px;
+  border: solid 1px black;
+}
+
+.wipBox h4 {
+  margin: 0px;
+  padding-left: 5px;
+  background-color: #FFB0FF;
+}
+
+.performanceBox {
+  margin: 20px;
+  border: solid 1px black;
+}
+
+.performanceBox p {
+  padding: 2px;
+  font-size: 13px;
+  padding-bottom: 8px;
+  }
+.performanceBox h4 {
+  margin: 0px;
+  padding-left: 5px;
+  background-color: #E0E0E0;
+}
+
+.mainPage {
+  font-family: Calibri;
+}
+
+.listItemHeader {
+  color: #0060FF; 
+  font-weight: bold;
+}
+
+.classDescriptionBlock {
+  font-family: Calibri;
+  margin: 10px;
+}
+.classDescriptionBlock h4 {
+  margin: 10px;
+}
+.classDescriptionBlock p {
+  margin-left: 30px;
+}
+
+sp {
+ display:inline;
+ padding-left: 8px;
+ }
+highlight.comment {
+  color: #008000;
+}
+highlight.normal {
+  color: #000000;
+}
+highlight.preprocessor {
+  color: #0000FF;
+}
+highlight.keyword {
+  color: #0000FF;
+}
+highlight.keywordflow {
+  color: #0000FF;
+}
+highlight.keywordtype {
+  color: #0000FF;
+}
+.codeListing {
+  font-family: Consolas; 
+  font-size: 13px;
+}
+
+.codeListing a {
+  padding-left: 10px;
+  padding-right: 5px;
+}
+
+.userCommentsBox {
+  margin: 20px;
+  border: solid 1px black;
+}
+
+.userCommentsInner{
+  padding: 5px;
+}
+
+.userCommentsBox p {
+  padding: 2px;
+  font-size: 14px;
+  padding-bottom: 8px;
+  }
+.userCommentsBox h4 {
+  margin: 0px;
+  padding-left: 5px;
+  background-color: #B0FFB0;
+}
+
+pre.cpp {
+  margin: 0px;
+  padding: 0px;
+}
+
+.comment {
+  padding-left: 10px;
+}
