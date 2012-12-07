@@ -793,7 +793,12 @@ bool float3x3::Inverse(float epsilon)
 	i[2][2] = d * (v[0][0] * v[1][1] - v[0][1] * v[1][0]);
 	*this = i;
 
-	mathassert((orig * *this).IsIdentity(1e-2f));
+#ifdef MATH_ASSERT_CORRECTNESS
+	float3x3 id = orig * *this;
+	float3x3 id2 = *this * orig;
+	mathassert(id.IsIdentity());
+	mathassert(id2.IsIdentity());
+#endif
 	return true;
 }
 
