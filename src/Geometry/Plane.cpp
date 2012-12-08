@@ -456,7 +456,8 @@ bool Plane::Intersects(const Plane &plane, Line *outLine) const
 	m.SetRow(0, normal);
 	m.SetRow(1, plane.normal);
 	m.SetRow(2, perp); // This is arbitrarily chosen, to produce m invertible.
-	bool success = m.Inverse();
+	float3 intersectionPos;
+	bool success = m.SolveAxb(float3(d, plane.d, 0.f),intersectionPos);
 	if (!success) // Inverse failed, so the planes must be parallel.
 	{
 		float normalDir = Dot(normal,plane.normal);
@@ -470,7 +471,7 @@ bool Plane::Intersects(const Plane &plane, Line *outLine) const
 			return false;
 	}
 	if (outLine)
-		*outLine = Line(m * float3(d, plane.d, 0.f), perp.Normalized());
+		*outLine = Line(intersectionPos, perp.Normalized());
 	return true;
 }
 
@@ -511,11 +512,12 @@ bool Plane::Intersects(const Plane &plane, const Plane &plane2, Line *outLine, f
 	m.SetRow(0, normal);
 	m.SetRow(1, plane.normal);
 	m.SetRow(2, plane2.normal);
-	bool success = m.Inverse();
+	float3 intersectionPos;
+	bool success = m.SolveAxb(float3(d, plane.d, plane2.d), intersectionPos);
 	if (!success)
 		return false;
 	if (outPoint)
-		*outPoint = m * float3(d, plane.d, plane2.d);
+		*outPoint = intersectionPos;
 	return true;
 }
 

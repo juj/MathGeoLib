@@ -728,8 +728,8 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 
 	float3 B(-v_p_dot_e0, -v_p_dot_e1, v_p_dot_d);
 
-	float3x3 m2 = m;
-	bool success = m2.Inverse();
+	float3 uvt;
+	bool success = m.SolveAxb(B, uvt);
 	if (!success)
 	{
 		float t1, t2, t3;
@@ -760,7 +760,6 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 		}
 	}
 
-	float3 uvt = m2 * B;
 	if (uvt.x < 0.f)
 	{
 		// Clamp to u == 0 and solve again.
@@ -1110,8 +1109,8 @@ float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
 
 	float3 B(-v_p_dot_e0, -v_p_dot_e1, v_p_dot_d);
 
-	float3x3 m2 = m;
-	bool success = m2.Inverse();
+	float3 uvt;
+	bool success = m.SolveAxb(B, uvt);
 	if (!success)
 	{
 		float t1, t2, t3;
@@ -1142,7 +1141,6 @@ float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
 		}
 	}
 
-	float3 uvt = m2 * B;
 	if (uvt.x < 0.f)
 	{
 		// Clamp to u == 0 and solve again.
