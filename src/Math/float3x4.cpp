@@ -615,7 +615,16 @@ void float3x4::SetRow(int row, const float3 &rowVector, float w)
 
 void float3x4::SetRow(int row, const float4 &rowVector)
 {
+#ifdef MATH_SSE
+
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (row < 0 || row >= Rows)
+		return; // Benign failure
+#endif
+	this->row[row] = rowVector.v;
+#else
 	SetRow(row, rowVector.x, rowVector.y, rowVector.z, rowVector.w);
+#endif
 }
 
 void float3x4::SetRow(int row, const float *data)
@@ -625,7 +634,17 @@ void float3x4::SetRow(int row, const float *data)
 	if (!data)
 		return;
 #endif
+
+#ifdef MATH_SSE
+
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (row < 0 || row >= Rows)
+		return; // Benign failure
+#endif
+	this->row[row] = _mm_loadu_ps(data); // Assume unaligned load, since we don't know if data is 16-byte-aligned.
+#else
 	SetRow(row, data[0], data[1], data[2], data[3]);
+#endif
 }
 
 void float3x4::SetCol(int column, float m_0c, float m_1c, float m_2c)
