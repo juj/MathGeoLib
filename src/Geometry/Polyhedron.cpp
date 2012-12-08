@@ -756,7 +756,7 @@ bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 		return true;
 
 	// Test for each edge of the AABB/OBB whether this polyhedron intersects it.
-	for(int i = 0; i < 12; ++i)
+	for(int i = 0; i < obj.NumEdges(); ++i)
 		if (p.Intersects(obj.Edge(i)))
 			return true;
 
@@ -797,10 +797,6 @@ bool Polyhedron::Intersects(const Triangle &triangle) const
 
 bool Polyhedron::Intersects(const Polygon &polygon) const
 {
-///@todo Investigate what is causing this to fail: PolyhedronIntersectsAABB_OBB
-//	return PolyhedronIntersectsAABB_OBB(*this, polygon);
-
-	// In the meanwhile, fall back to generic polyhedron-polyhedron intersection test.
 	return Intersects(polygon.ToPolyhedron());
 }
 

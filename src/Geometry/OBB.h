@@ -63,6 +63,8 @@ public:
 		@see class AABB, SetFrom(), MinimalEnclosingAABB(). */
 	OBB(const AABB &aabb);
 
+	int NumEdges() const { return 12; }
+
 	/// Sets this structure to a degenerate OBB that does not have any volume.
 	/** This function sets pos=(0,0,0), r = (-inf,-inf,-inf) and axis=float3x3::identity for this OBB.
 		@note This function operates in-place. After calling this function, this OBB is degenerate.

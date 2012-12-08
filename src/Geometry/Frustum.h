@@ -94,6 +94,8 @@ public:
 		@see type, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov, orthographicWidth, orthographicHeight. */
 	Frustum() {}
 
+	int NumEdges() const { return 12; }
+
 	/// Returns the aspect ratio of the view rectangle on the near plane.
 	/** The aspect ratio is the ratio of the width of the viewing rectangle to its height. This can also be computed by
 		the expression horizontalFov / verticalFov. To produce a proper non-stretched image when rendering, this
