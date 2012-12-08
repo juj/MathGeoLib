@@ -31,27 +31,15 @@
 #endif
 
 #if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
 #include <limits>
 #define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
 #define FLOAT_INF std::numeric_limits<float>::infinity()
-#define FLOAT_MAX std::numeric_limits<float>::max()
 #else
 #include <math.h>
 #include <float.h>
-#define FLOAT_MAX FLT_MAX
 #define FLOAT_NAN NAN
 #define FLOAT_INF INFINITY
 #endif
-
 
 MATH_BEGIN_NAMESPACE
 
@@ -84,9 +72,9 @@ const float NOT_NECESSARILY_USED negInf =	   -FLOAT_INF;
 /// Represents a floating-point not-a-number. \note Never compare a float against nan, use isfinite() instead!
 const float NOT_NECESSARILY_USED nan =		  FLOAT_NAN;
 /// Stores the largest positive non-infinite value for a float.
-const float NOT_NECESSARILY_USED floatMax =	 FLOAT_MAX;
+const float NOT_NECESSARILY_USED floatMax =	 FLT_MAX;
 /// Stores the largest negative non-infinite value for a float.
-const float NOT_NECESSARILY_USED floatMin =	 -FLOAT_MAX;
+const float NOT_NECESSARILY_USED floatMin =	 -FLT_MAX;
 
 /// Integral base to an integral power.
 template<u32 Base, u32 Power>

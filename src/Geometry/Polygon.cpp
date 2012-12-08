@@ -533,7 +533,7 @@ float3 Polygon::ClosestPoint(const float3 &point) const
 
 	std::vector<Triangle> tris = Triangulate();
 	float3 closestPt = float3::nan;
-	float closestDist = FLOAT_MAX;
+	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
 		float3 lineSegPt;
@@ -559,7 +559,7 @@ float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegment
 	std::vector<Triangle> tris = Triangulate();
 	float3 closestPt = float3::nan;
 	float3 closestLineSegmentPt = float3::nan;
-	float closestDist = FLOAT_MAX;
+	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
 		float3 lineSegPt;
@@ -596,7 +596,7 @@ Plane Polygon::EdgePlane(int edgeIndex) const
 float3 Polygon::ExtremePoint(const float3 &direction) const
 {
 	float3 mostExtreme = float3::nan;
-	float mostExtremeDist = -FLOAT_MAX;
+	float mostExtremeDist = -FLT_MAX;
 	for(int i = 0; i < NumVertices(); ++i)
 	{
 		float3 pt = Vertex(i);

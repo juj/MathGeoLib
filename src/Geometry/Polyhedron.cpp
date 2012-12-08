@@ -109,7 +109,7 @@ std::vector<std::pair<int, int> > Polyhedron::EdgeIndices() const
 		for(size_t j = 0; j < f[i].v.size(); ++j)
 		{
 			int y = f[i].v[j];
-			uniqueEdges.insert(std::make_pair(std::min(x, y), std::max(x, y)));
+			uniqueEdges.insert(std::make_pair(Min(x, y), Max(x, y)));
 			x = y;
 		}
 	}
@@ -173,7 +173,7 @@ float3 Polyhedron::FaceNormal(int faceIndex) const
 int Polyhedron::ExtremeVertex(const float3 &direction) const
 {
 	int mostExtreme = -1;
-	float mostExtremeDist = -FLOAT_MAX;
+	float mostExtremeDist = -FLT_MAX;
 	for(int i = 0; i < NumVertices(); ++i)
 	{
 		float d = Dot(direction, Vertex(i));
@@ -531,7 +531,7 @@ float3 Polyhedron::ClosestPointConvex(const float3 &point) const
 	if (ContainsConvex(point))
 		return point;
 	float3 closestPoint = float3::nan;
-	float closestDistance = FLOAT_MAX;
+	float closestDistance = FLT_MAX;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
 		float3 closestOnPoly = FacePolygon(i).ClosestPoint(point);
@@ -550,7 +550,7 @@ float3 Polyhedron::ClosestPoint(const float3 &point) const
 	if (Contains(point))
 		return point;
 	float3 closestPoint = float3::nan;
-	float closestDistance = FLOAT_MAX;
+	float closestDistance = FLT_MAX;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
 		float3 closestOnPoly = FacePolygon(i).ClosestPoint(point);
@@ -584,7 +584,7 @@ float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegm
 		return lineSegment.b;
 	}
 	float3 closestPt = float3::nan;
-	float closestDistance = FLOAT_MAX;
+	float closestDistance = FLT_MAX;
 	float3 closestLineSegmentPt = float3::nan;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
@@ -820,15 +820,15 @@ bool Polyhedron::Intersects(const Capsule &capsule) const
 
 bool Polyhedron::IntersectsConvex(const Line &line) const
 {
-	float tFirst = -FLOAT_MAX;
-	float tLast = FLOAT_MAX;
+	float tFirst = -FLT_MAX;
+	float tLast = FLT_MAX;
 	return ClipLineSegmentToConvexPolyhedron(line.pos, line.dir, tFirst, tLast);
 }
 
 bool Polyhedron::IntersectsConvex(const Ray &ray) const
 {
 	float tFirst = 0.f;
-	float tLast = FLOAT_MAX;
+	float tLast = FLT_MAX;
 	return ClipLineSegmentToConvexPolyhedron(ray.pos, ray.dir, tFirst, tLast);
 }
 

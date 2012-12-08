@@ -604,7 +604,7 @@ float float2::MinAreaRect(const float2 *pts, int numPoints, float2 &center, floa
 	assume(pts || numPoints == 0);
 	if (!pts)
 		return 0.f;
-	float minArea = FLOAT_MAX;
+	float minArea = FLT_MAX;
 
 	// Loop through all edges formed by pairs of points.
 	for(int i = 0, j = numPoints -1; i < numPoints; j = i, ++i)
