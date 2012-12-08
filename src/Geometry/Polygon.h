@@ -321,6 +321,9 @@ public:
 	/// Returns the center of mass of this polygon.
 	/** @see Area(), Perimeter(). */
 	float3 Centroid() const;
+	/// Identical to CenterPoint(), but provided to enable common signature with Triangle, AABB and OBB to allow them to be used
+	/// in template classes.
+	float3 CenterPoint() const { return Centroid(); }
 
 	/// Computes a point on the perimeter of this polygon.
 	/** @param normalizedDistance A value in the range [0,1[ specifying the distance along the polygon edge to travel.

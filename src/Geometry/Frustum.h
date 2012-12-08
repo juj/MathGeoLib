@@ -152,6 +152,14 @@ public:
 		@see GetPlane(), NearPlane(), FarPlane(), LeftPlane(), RightPlane(), TopPlane(), BottomPlane(). */
 	void GetPlanes(Plane *outArray) const;
 
+	float3 CenterPoint() const;
+
+	/// Returns an edge of this Frustum.
+	/** @param edgeIndex The index of the edge line segment to get, in the range [0, 11].
+		@todo Draw a diagram that shows which index generates which edge.
+		@see PointInside(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
+	LineSegment Edge(int edgeIndex) const;
+
 	/// Generates one of the eight corner points of this Frustum. 
 	/** @param cornerIndex The index of the corner point to generate, in the range [0, 7].
 		 The points are returned in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.

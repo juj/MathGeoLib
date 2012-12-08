@@ -463,6 +463,11 @@ void Frustum::GetPlanes(Plane *outArray) const
 		outArray[i] = GetPlane(i);
 }
 
+float3 Frustum::CenterPoint() const
+{
+	return pos + (nearPlaneDistance + farPlaneDistance) * 0.5f * front;
+}
+
 void Frustum::GetCornerPoints(float3 *outPointArray) const
 {
 	assume(outPointArray);
@@ -472,6 +477,27 @@ void Frustum::GetCornerPoints(float3 *outPointArray) const
 #endif
 	for(int i = 0; i < 8; ++i)
 		outPointArray[i] = CornerPoint(i);
+}
+
+LineSegment Frustum::Edge(int edgeIndex) const
+{
+	assume(0 <= edgeIndex && edgeIndex <= 11);
+	switch(edgeIndex)
+	{
+		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
+		case 0: return LineSegment(CornerPoint(0), CornerPoint(1));
+		case 1: return LineSegment(CornerPoint(0), CornerPoint(2));
+		case 2: return LineSegment(CornerPoint(0), CornerPoint(4));
+		case 3: return LineSegment(CornerPoint(1), CornerPoint(3));
+		case 4: return LineSegment(CornerPoint(1), CornerPoint(5));
+		case 5: return LineSegment(CornerPoint(2), CornerPoint(3));
+		case 6: return LineSegment(CornerPoint(2), CornerPoint(6));
+		case 7: return LineSegment(CornerPoint(3), CornerPoint(7));
+		case 8: return LineSegment(CornerPoint(4), CornerPoint(5));
+		case 9: return LineSegment(CornerPoint(4), CornerPoint(6));
+		case 10: return LineSegment(CornerPoint(5), CornerPoint(7));
+		case 11: return LineSegment(CornerPoint(6), CornerPoint(7));
+	}
 }
 
 float3 Frustum::CornerPoint(int cornerIndex) const

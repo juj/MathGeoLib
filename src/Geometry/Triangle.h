@@ -114,6 +114,9 @@ public:
 	/// Computes the center of mass of this triangle.
 	/** @return The point (a+b+c)/3. */
 	float3 Centroid() const;
+	/// Identical to CenterPoint(), but provided to enable common signature with Triangle, AABB and OBB to allow them to be used
+	/// in template classes.
+	float3 CenterPoint() const { return Centroid(); }
 
 	/// Computes the surface area of this triangle.
 	/** @return The surface area of this triangle.
