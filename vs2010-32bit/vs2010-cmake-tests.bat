@@ -1,0 +1,1 @@
+cmake -DBUILD_FOR_GCOV=1 -G "Visual Studio 10" ..
