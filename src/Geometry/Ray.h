@@ -77,7 +77,7 @@ public:
 	/// Translates this Ray in world space.
 	/** @param offset The amount of displacement to apply to this Ray, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this Ray, in-place.
 	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */

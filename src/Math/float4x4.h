@@ -552,17 +552,17 @@ public:
 	                       const float3 &localUp, const float3 &worldUp);
 
 	/// Sets this float4x4 to represent the same transformation as the given float3x3.
-	/// @important The remaining entries of this matrix are set to identity.
+	/// @note The remaining entries of this matrix are set to identity.
 	float4x4 &operator =(const float3x3 &rhs);
 
 	/// Sets this float4x4 to represent the same transformation as the given float3x4.
-	/// @important The remaining entries of this matrix are set to identity.
+	/// @note The remaining entries of this matrix are set to identity.
 	float4x4 &operator =(const float3x4 &rhs);
 
 	float4x4 &operator =(const float4x4 &rhs);
 
 	/// Sets this float4x4 to represent the same rotation as the given Quat.
-	/// @important The remaining entries of this matrix are set to identity.
+	/// @note The remaining entries of this matrix are set to identity.
 	float4x4 &operator =(const Quat &rhs);
 
 	/// Computes the determinant of the upper-left 3x3 submatrix of this matrix.

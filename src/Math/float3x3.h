@@ -636,8 +636,6 @@ public:
 		@note Remember that in the convention of this class, transforms are applied in the order M * v, so scale is
 		applied first, then rotation, and finally the translation last.
 		@note This function assumes that this matrix does not contain projection (the fourth row of this matrix is [0 0 0 1]).
-		@param translate [out] This vector receives the translation component this matrix performs. The translation is applied last
-			after rotation and scaling.
 		@param rotate [out] This object receives the rotation part of this transform.
 		@param scale [out] This vector receives the scaling along the local (before transformation by R) X, Y and Z axes 
 			performed by this matrix. */

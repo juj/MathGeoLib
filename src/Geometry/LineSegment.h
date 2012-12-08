@@ -93,7 +93,7 @@ public:
 	/// Translates this LineSegment in world space.
 	/** @param offset The amount of displacement to apply to this LineSegment, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this line.
 	/** This function operates in-place.

@@ -219,6 +219,8 @@ float SignOrZero(float f, float epsilon = 1e-8f);
 
 /// Linearly interpolates between a and b.
 /** @param t A value between [0,1]. 
+	@param a The first endpoint to lerp between.
+	@param b The second endpoint to lerp between.
 	@return This function computes a + t*(b-a). That is, if t==0, this function returns a. If t==1, this function returns b.
 		Otherwise, the returned value linearly moves from a to b as t ranges from 0 to 1.
 	@see LerpMod(), InvLerp(), Step(), SmoothStep(), PingPongMod(), Mod(), ModPos(), Frac(). */

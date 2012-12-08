@@ -73,7 +73,7 @@ public:
 	/// Translates this Line in world space.
 	/** @param offset The amount of displacement to apply to this Line, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this line, in-place.
 	/** @see Translate(), classes float3x3, float3x4, float4x4, Quat. */

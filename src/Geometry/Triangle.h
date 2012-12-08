@@ -54,7 +54,7 @@ public:
 	/// Translates this Triangle in world space.
 	/** @param offset The amount of displacement to apply to this Triangle, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this Triangle, in-place.
 	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */
@@ -89,7 +89,7 @@ public:
 	/** A barycentric UVW coordinate represents a point inside a triangle if
 		  a) 0 <= u,v,w <= 1 and
 		  b) u+v+w == 1.
-		@param barycentric The vector containing the barycentric (u,v,w) coordinates.
+		@param uvw The barycentric vector containing the barycentric (u,v,w) coordinates.
 		@return True if the given coordinates lie inside a triangle.
 		@see BarycentricUV(), BarycentricUVW(), Point(). */
 	static bool BarycentricInsideTriangle(const float3 &uvw);
@@ -99,8 +99,8 @@ public:
 		@param uvw The barycentric UVW coordinate triplet. The condition u+v+w == 1 should hold for the input coordinate.
 			If 0 <= u,v,w <= 1, the returned point lies inside this triangle.
 		@return u*a + v*b + w*c. */
-	float3 Point(float u, float v, float w) const;
 	float3 Point(const float3 &uvw) const;
+	float3 Point(float u, float v, float w) const;
 	/** These functions are an alternate form of Point(u,v,w) for the case when the barycentric coordinates are
 		represented as a (u,v) pair and not as a (u,v,w) triplet. This function is provided for convenience 
 		and effectively just computes Point(1-u-v, u, v).
@@ -108,8 +108,8 @@ public:
 			this triangle.
 		@return a + (b-a)*u + (c-a)*v.
 		@see BarycentricUV(), BarycentricUVW(), BarycentricInsideTriangle(). */
-	float3 Point(float u, float v) const;
  	float3 Point(const float2 &uv) const;
+	float3 Point(float u, float v) const;
 
 	/// Computes the center of mass of this triangle.
 	/** @return The point (a+b+c)/3. */

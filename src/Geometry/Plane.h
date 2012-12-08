@@ -114,7 +114,7 @@ public:
 	/// Translates this Plane in world space.
 	/** @param offset The amount of displacement to apply to this Plane, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this plane.
 	/** This function operates in-place.
@@ -360,15 +360,13 @@ public:
 	/// Computes the intersection of a line and a plane.
 	/** @param ptOnPlane An arbitrary point on the plane.
 		@param planeNormal The plane normal direction vector. This vector can be unnormalized.
-		@param lineStart The starting point of the line.
+		@param planeD The distance parameter of the plane equation.
+		@param linePos The starting point of the line.
 		@param lineDir The line direction vector. This vector does not need to be normalized.
 		@param t [out] If this function returns true, this parameter will receive the distance along the line where intersection occurs.
 					That is, the point lineStart + t * lineDir will be the intersection point. Note that if |lineDir| != 1,
 					then t will not contain the real distance, but one scaled to the units of lineDir.
 		@return If an intersection occurs, this function returns true. */
-//	static bool IntersectLinePlane(const float3 &ptOnPlane, const float3 &planeNormal, 
-//	                               const float3 &lineStart, const float3 &lineDir, float &t);
-
 	static bool IntersectLinePlane(const float3 &planeNormal, float planeD, const float3 &linePos, const float3 &lineDir, float &t);
 
 #ifdef MATH_OGRE_INTEROP

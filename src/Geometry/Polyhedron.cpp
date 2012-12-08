@@ -1009,10 +1009,10 @@ void Polyhedron::MergeConvex(const float3 &point)
 //		MergeConvex(point);
 }
 
-void Polyhedron::Translate(const float3 &point)
+void Polyhedron::Translate(const float3 &offset)
 {
 	for(size_t i = 0; i < v.size(); ++i)
-		v[i] += point;
+		v[i] += offset;
 }
 
 void Polyhedron::Transform(const float3x3 &transform)

@@ -71,9 +71,9 @@ Sphere::Sphere(const float3 &a, const float3 &b, const float3 &c, const float3 &
 	*this = FitThroughPoints(a, b, c, d);
 }
 
-void Sphere::Translate(const float3 &point)
+void Sphere::Translate(const float3 &offset)
 {
-	pos += point;
+	pos += offset;
 }
 
 void Sphere::Transform(const float3x3 &transform)

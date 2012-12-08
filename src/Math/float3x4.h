@@ -494,11 +494,11 @@ public:
 	                       const float3 &localUp, const float3 &worldUp);
 
 	/// Sets this float3x4 to represent the same transformation as the given float3x3.
-	/// @important The translate part of this float3x4 is reset to zero.
+	/// @note The translate part of this float3x4 is reset to zero.
 	float3x4 &operator =(const float3x3 &rhs);
 
 	/// Sets this float3x4 to represent the same rotation as the given Quat.
-	/// @important The translate part of this float3x4 is reset to zero.
+	/// @note The translate part of this float3x4 is reset to zero.
 	float3x4 &operator =(const Quat &rhs);
 
 	/// Sets this float3x4 to represent the same transformation as the given float3x4.

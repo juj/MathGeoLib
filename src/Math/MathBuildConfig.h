@@ -20,7 +20,7 @@
 // If MATH_ENABLE_NAMESPACE is defined, all math symbols are put inside a namespace.
 #define MATH_ENABLE_NAMESPACE
 
-/// Adjust this #define to choose the name of the namespace math is given to.
+// Adjust this #define to choose the name of the namespace math is given to.
 // This flag does not have any effect if MATH_ENABLE_NAMESPACE is not defined.
 #define MATH_NAMESPACE_NAME math
 

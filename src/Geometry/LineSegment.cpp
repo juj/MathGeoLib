@@ -84,10 +84,10 @@ float3 LineSegment::ExtremePoint(const float3 &direction) const
 	return Dot(direction, b-a) >= 0.f ? b : a;
 }
 
-void LineSegment::Translate(const float3 &point)
+void LineSegment::Translate(const float3 &offset)
 {
-	a += point;
-	b += point;
+	a += offset;
+	b += offset;
 }
 
 void LineSegment::Transform(const float3x3 &transform)

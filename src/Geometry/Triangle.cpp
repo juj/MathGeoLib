@@ -47,11 +47,11 @@ Triangle::Triangle(const float3 &a_, const float3 &b_, const float3 &c_)
 {
 }
 
-void Triangle::Translate(const float3 &point)
+void Triangle::Translate(const float3 &offset)
 {
-	a += point;
-	b += point;
-	c += point;
+	a += offset;
+	b += offset;
+	c += offset;
 }
 
 void Triangle::Transform(const float3x3 &transform)
@@ -352,20 +352,21 @@ float Triangle::Distance(const Sphere &sphere) const
 	return Max(0.f, Distance(sphere.pos) - sphere.r);
 }
 
-/** Calculates the intersection between a ray and a triangle. The facing is not accounted for, so
+/** Calculates the intersection between a line and a triangle. The facing is not accounted for, so
 	rays are reported to intersect triangles that are both front and backfacing.
 	According to "T. M&ouml;ller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
 	http://jgt.akpeters.com/papers/MollerTrumbore97/
-	@param ray The ray to test.
+	@param linePos The starting point of the line.
+	@param lineDir The direction vector of the line. This does not need to be normalized.
 	@param v0 Vertex 0 of the triangle.
 	@param v1 Vertex 1 of the triangle.
 	@param v2 Vertex 2 of the triangle.
 	@param u [out] The barycentric u coordinate is returned here if an intersection occurred.
 	@param v [out] The barycentric v coordinate is returned here if an intersection occurred.
-	@param t [out] The signed distance from ray origin to ray intersection position will be returned here. (if intersection occurred)
 	@return The distance along the ray to the point of intersection, or +inf if no intersection occurred. 
-		If no intersection, then u and v and t will contain undefined values.
-	@note This function will return a negative value (success) if the intersection occurred behind the ray origin. */
+		If no intersection, then u and v and t will contain undefined values. If lineDir was not normalized, then to get the 
+		real world-space distance, one must scale the returned value with lineDir.Length(). If the returned value is negative,
+		then the intersection occurs 'behind' the line starting position, with respect to the direction vector lineDir. */
 float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 		const float3 &v0, const float3 &v1, const float3 &v2,
 		float &u, float &v)

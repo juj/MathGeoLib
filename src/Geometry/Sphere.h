@@ -60,7 +60,7 @@ public:
 	/// Translates this Sphere in world space.
 	/** @param offset The amount of displacement to apply to this Sphere, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this Sphere, in-place.
 	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */
@@ -295,7 +295,7 @@ public:
 		This function uses the rejection method to generate a uniform distribution of points inside a sphere. Therefore
 		it is assumed that this sphere is not degenerate, i.e. it has a positive radius.
 		A fixed number of 1000 tries is performed, after which the sphere center position is returned as a fallback.
-		@param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
+		@param lcg A pre-seeded random number generator object that is to be used by this function to generate random values.
 		@see class LCG, RandomPointOnSurface(), IsDegenerate().
 		@todo Add Sphere::Point(polarYaw, polarPitch, radius). */
 	float3 RandomPointInside(LCG &lcg);
@@ -305,14 +305,14 @@ public:
 		This function uses the rejection method to generate a uniform distribution of points on the surface. Therefore
 		it is assumed that this sphere is not degenerate, i.e. it has a positive radius.
 		A fixed number of 1000 tries is performed, after which a fixed point on the surface is returned as a fallback.
-		@param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
+		@param lcg A pre-seeded random number generator object that is to be used by this function to generate random values.
 		@see class LCG, RandomPointInside(), IsDegenerate().
 		@todo Add Sphere::PointOnSurface(polarYaw, polarPitch). */
 	float3 RandomPointOnSurface(LCG &lcg);
 	static float3 RandomPointOnSurface(LCG &lcg, const float3 &center, float radius);
 
 	/// Returns a random normalized float3 vector.
-	/** @param rng A pre-seeded random number generator object that is to be used by this function to generate random values. */
+	/** @param lcg A pre-seeded random number generator object that is to be used by this function to generate random values. */
 	static float3 RandomUnitaryFloat3(LCG &lcg) { return Sphere(float3(0,0,0), 1.f).RandomPointOnSurface(lcg); }
 
 	/// Produces a geosphere-triangulation of this sphere.

@@ -68,9 +68,9 @@ float3 Ray::GetPoint(float d) const
 	return pos + d * dir;
 }
 
-void Ray::Translate(const float3 &point)
+void Ray::Translate(const float3 &offset)
 {
-	pos += point;
+	pos += offset;
 }
 
 void Ray::Transform(const float3x3 &transform)

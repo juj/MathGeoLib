@@ -287,10 +287,10 @@ Plane Polygon::PlaneCW() const
 	return Plane();
 }
 
-void Polygon::Translate(const float3 &point)
+void Polygon::Translate(const float3 &offset)
 {
 	for(size_t i = 0; i < p.size(); ++i)
-		p[i] += point;
+		p[i] += offset;
 }
 
 void Polygon::Transform(const float3x3 &transform)

@@ -123,9 +123,9 @@ float3 Plane::Point(float u, float v, const float3 &referenceOrigin) const
 	return Project(referenceOrigin) + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
 }
 
-void Plane::Translate(const float3 &point)
+void Plane::Translate(const float3 &offset)
 {
-	d -= Dot(normal, point);
+	d -= Dot(normal, offset);
 }
 
 void Plane::Transform(const float3x3 &transform)

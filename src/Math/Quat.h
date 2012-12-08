@@ -185,7 +185,7 @@ public:
 	void ToAxisAngle(float3 &rotationAxis, float &rotationAngleRadians) const;
 	/// Sets this quaternion by specifying the axis about which the rotation is performed, and the angle of rotation.
 	/// @param rotationAxis The axis of rotation. This vector must be normalized to call this function.
-	/// @param rotationAngle The angle of rotation in radians.
+	/// @param rotationAngleRadians The angle of rotation in radians.
 	void SetFromAxisAngle(const float3 &rotationAxis, float rotationAngleRadians);
 
 	/// Sets this quaternion to represent the same rotation as the given matrix.
@@ -378,20 +378,20 @@ private: // Hide the unsafe operations from the user, so that he doesn't acciden
 	/// Multiplies a quaternion by a scalar.
 	/// @note Technically, multiplication by scalar would not affect the rotation this quaternion represents, but since
 	/// Quat uses conjugation to compute the inverse (to optimize), an unnormalized quaternion will not produce a proper rotation transform.
-	/// @important Multiplication by a scalar does not "accumulate" rotations, e.g. "quat * 5.f" will not produce a quaternion that would rotate
+	/// @note Multiplication by a scalar does not "accumulate" rotations, e.g. "quat * 5.f" will not produce a quaternion that would rotate
 	///			"5 times more".
 	Quat operator *(float scalar) const;
 
 	Quat operator /(float scalar) const;
 
 	/// Adds two quaternions.
-	/// @important Adding two quaternions does not concatenate the two rotation operations. Use quaternion multiplication to achieve that.
+	/// @note Adding two quaternions does not concatenate the two rotation operations. Use quaternion multiplication to achieve that.
 	Quat operator +(const Quat &rhs) const;
 
 	Quat operator -(const Quat &rhs) const;
 
 	/// Negates the quaternion.
-	/// @important Negating a quaternion will not produce the inverse rotation. Call Quat::Inverse() to generate the inverse rotation.
+	/// @note Negating a quaternion will not produce the inverse rotation. Call Quat::Inverse() to generate the inverse rotation.
 	Quat operator -() const;
 };
 

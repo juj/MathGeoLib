@@ -230,7 +230,7 @@ public:
 	/// Translates this Polygon in world space.
 	/** @param offset The amount of displacement to apply to this Polygon, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &point);
+	void Translate(const float3 &offset);
 
 	/// Applies a transformation to this Polygon.
 	/** This function operates in-place.

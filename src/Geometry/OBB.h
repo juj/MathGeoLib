@@ -422,9 +422,9 @@ public:
 	void Enclose(const float3 &point);
 
 	/// Generates an unindexed triangle mesh representation of this OBB.
-	/** @param x The number of faces to generate along the X axis. This value must be >= 1.
-		@param y The number of faces to generate along the Y axis. This value must be >= 1.
-		@param z The number of faces to generate along the Z axis. This value must be >= 1.
+	/** @param numFacesX The number of faces to generate along the X axis. This value must be >= 1.
+		@param numFacesY The number of faces to generate along the Y axis. This value must be >= 1.
+		@param numFacesZ The number of faces to generate along the Z axis. This value must be >= 1.
 		@param outPos [out] An array of size numVertices which will receive a triangle list 
 							of vertex positions. Cannot be null.
 		@param outNormal [out] An array of size numVertices which will receive vertex normals. 

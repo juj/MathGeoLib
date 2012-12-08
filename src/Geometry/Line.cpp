@@ -105,9 +105,9 @@ float3 Line::GetPoint(float d) const
 	return pos + d * dir;
 }
 
-void Line::Translate(const float3 &point)
+void Line::Translate(const float3 &offset)
 {
-	pos += point;
+	pos += offset;
 }
 
 void Line::Transform(const float3x3 &transform)
