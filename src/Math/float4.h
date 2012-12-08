@@ -244,9 +244,9 @@ public:
 		@param k Chooses the element of this vector to pick for the z value of the returned vector, in the range [0, 3].
 		@param l Chooses the element of this vector to pick for the w value of the returned vector, in the range [0, 3].
 		@see xyz(). */
-	float2 Swizzled(int i, int j) const;
-	float3 Swizzled(int i, int j, int k) const;
 	float4 Swizzled(int i, int j, int k, int l) const;
+	float3 Swizzled(int i, int j, int k) const;
+	float2 Swizzled(int i, int j) const;
 
 	/// Returns float4(scalar, scalar, scalar, scalar).
 	/** @see float4::float4(float scalar), SetFromScalar(). */
@@ -484,6 +484,7 @@ public:
 
 	/// Linearly interpolates between this and the vector b.
 	/** This function assumes that the w components of this and the other vector are equal.
+		@param b The target endpoint to lerp towards to.
 		@param t The interpolation weight, in the range [0, 1].
 		Lerp(b, 0) returns this vector, Lerp(b, 1) returns the vector b.
 		Lerp(b, 0.5) returns the vector half-way in between the two vectors, and so on. */

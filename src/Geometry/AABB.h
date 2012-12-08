@@ -387,7 +387,7 @@ public:
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
 		another, this function still returns true. (e.g. in case a line segment is contained inside this AABB, 
 		or this AABB is contained inside a Sphere, etc.)
-		@oaram ray The first parameter of this function specifies the other object to test against.
+		@param ray The first parameter of this function specifies the other object to test against.
 		@param dNear [out] If specified, receives the parametric distance along the line denoting where the 
 			line entered this AABB.
 		@param dFar [out] If specified, receives the parametric distance along the line denoting where the 
@@ -405,7 +405,8 @@ public:
 	bool Intersects(const Plane &plane) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const OBB &obb) const;
-	/** @oaram sphere The first parameter of this function specifies the other object to test against.
+	/** For reference documentation on the Sphere-AABB intersection test, see Christer Ericson's Real-Time Collision Detection, p. 165. [groupSyntax]
+		@param sphere The first parameter of this function specifies the other object to test against.
 		@param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere. This pointer
 			may be null. */ 
 	bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB = 0) const;

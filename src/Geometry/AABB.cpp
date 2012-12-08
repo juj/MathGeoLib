@@ -851,8 +851,6 @@ bool AABB::Intersects(const OBB &obb) const
 	return obb.Intersects(*this);
 }
 
-/// For reference documentation on the Sphere-AABB intersection test, see 
-/// Christer Ericson's Real-Time Collision Detection, p. 165. [groupSyntax]
 bool AABB::Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const
 {
 	// Find the point on this AABB closest to the sphere center.

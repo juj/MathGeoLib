@@ -264,10 +264,10 @@ public:
 		@param i Chooses the element of this vector to pick for the x value of the returned vector, in the range [0, 2].
 		@param j Chooses the element of this vector to pick for the y value of the returned vector, in the range [0, 2].
 		@param k Chooses the element of this vector to pick for the z value of the returned vector, in the range [0, 2].
-		@param l Chooses the element of this vector to pick for the w value of the returned vector, in the range [0, 2]. */		
-	float2 Swizzled(int i, int j) const;
-	float3 Swizzled(int i, int j, int k) const;
+		@param l Chooses the element of this vector to pick for the w value of the returned vector, in the range [0, 2]. */
 	float4 Swizzled(int i, int j, int k, int l) const;
+	float3 Swizzled(int i, int j, int k) const;
+	float2 Swizzled(int i, int j) const;
 
 	/// Generates a new float3 by filling its entries by the given scalar.
 	/** @see float3::float3(float scalar), SetFromScalar(). */
@@ -580,7 +580,8 @@ public:
 	void Decompose(const float3 &direction, float3 &outParallel, float3 &outPerpendicular) const;
 
 	/// Linearly interpolates between this and the vector b.
-	/** @param t The interpolation weight, in the range [0, 1].
+	/** @param b The target endpoint to lerp towards to.
+		@param t The interpolation weight, in the range [0, 1].
 		@return Lerp(b, 0) returns this vector, Lerp(b, 1) returns the vector b.
 			Lerp(b, 0.5) returns the vector half-way in between the two vectors, and so on.
 			Lerp(b, t) returns (1-t)*this + t*b. */

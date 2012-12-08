@@ -211,10 +211,10 @@ public:
 		@param i Chooses the element of this vector to pick for the x value of the returned vector, in the range [0, 2].
 		@param j Chooses the element of this vector to pick for the y value of the returned vector, in the range [0, 2].
 		@param k Chooses the element of this vector to pick for the z value of the returned vector, in the range [0, 2].
-		@param l Chooses the element of this vector to pick for the w value of the returned vector, in the range [0, 2]. */		
-	float2 Swizzled(int i, int j) const;
-	float3 Swizzled(int i, int j, int k) const;
+		@param l Chooses the element of this vector to pick for the w value of the returned vector, in the range [0, 2]. */
 	float4 Swizzled(int i, int j, int k, int l) const;
+	float3 Swizzled(int i, int j, int k) const;
+	float2 Swizzled(int i, int j) const;
 
 	/// Generates a new float2 by filling its entries by the given scalar.
 	/** @see float2::float2(float scalar), SetFromScalar(). */
@@ -490,7 +490,8 @@ public:
 	void Decompose(const float2 &direction, float2 &outParallel, float2 &outPerpendicular) const;
 
 	/// Linearly interpolates between this and the vector b.
-	/** @param t The interpolation weight, in the range [0, 1].
+	/** @param b The target endpoint to lerp towards to.
+		@param t The interpolation weight, in the range [0, 1].
 		@return Lerp(b, 0) returns this vector, Lerp(b, 1) returns the vector b.
 			Lerp(b, 0.5) returns the vector half-way in between the two vectors, and so on.
 			Lerp(b, t) returns (1-t)*this + t*b. */
@@ -537,9 +538,16 @@ public:
 #endif
 
 	/// Computes the minimum-area rectangle that bounds the given point set. [noscript]
-	/** @param center [out] This variable will receive the center point of the rectangle.
+	/** Implementation adapted from Christer Ericson's Real-time Collision Detection, p.111.
+		@param pointArray [in] A pointer to an array of points to process.
+		@param numPoints The number of elements in the array pointed to by pointArray.
+		@param center [out] This variable will receive the center point of the rectangle.
 		@param uDir [out] This variable will receive a normalized direction vector pointing one of the side directionss of the rectangle.
-		@param VDir [out] This variable will receive a normalized direction vector pointing the other side direction of the rectangle.
+		@param vDir [out] This variable will receive a normalized direction vector pointing the other side direction of the rectangle.
+		@param minU [out] Receives the minimum extent of the processed point set along the u direction.
+		@param maxU [out] Receives the maximum extent of the processed point set along the u direction.
+		@param minV [out] Receives the minimum extent of the processed point set along the v direction.
+		@param maxV [out] Receives the maximum extent of the processed point set along the v direction.
 		@note This algorithm runs in O(n^2) time to the number of points in the input.
 		@note For best performance, the input point array should contain only the points in the convex hull of the point set. This algorithm
 			does not compute the convex hull for you.

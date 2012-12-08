@@ -599,7 +599,6 @@ int float2::ConvexHullInPlace(float2 *points, int nPoints)
 }
 #endif
 
-/** Implementation adapted from Christer Ericson's Real-time Collision Detection, p.111. */
 float float2::MinAreaRect(const float2 *pts, int numPoints, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV)
 {
 	assume(pts || numPoints == 0);
