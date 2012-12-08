@@ -168,6 +168,57 @@ void TestFloat3x4Neg()
 	assert(m2.Equals(m3));
 }
 
+void TestFloat3x3SolveAxb()
+{
+	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);
+	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
+
+	float3 b = float3::RandomBox(rng, float3::FromScalar(-10.f), float3::FromScalar(10.f));
+
+	float3 x;
+	bool success = A.SolveAxb(b, x);
+	assert(success || mayFail);
+	if (success)
+	{
+		float3 b2 = A*x;
+		assert(b2.Equals(b, 1e-1f));
+	}
+}
+
+void TestFloat3x3Inverse()
+{
+	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);
+	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
+
+	float3x3 A2 = A;
+	bool success = A2.Inverse();
+	assert(success || mayFail);
+	if (success)
+	{
+		float3x3 id = A * A2;
+		float3x3 id2 = A2 * A;
+		assert(id.Equals(float3x3::identity, 0.3f));
+		assert(id2.Equals(float3x3::identity, 0.3f));
+	}
+}
+
+void TestFloat3x3InverseFast()
+{
+	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);
+	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
+
+	float3x3 A2 = A;
+	bool success = A2.InverseFast();
+	assert(success || mayFail);
+	if (success)
+	{
+		float3x3 id = A * A2;
+		float3x3 id2 = A2 * A;
+		assert(id.Equals(float3x3::identity, 0.3f));
+		assert(id2.Equals(float3x3::identity, 0.3f));
+	}
+}
+
 void AddMatrixTests()
 {
 	AddTest("float3x4::ScaleRow", TestFloat3x4ScaleRow, false);
@@ -181,4 +232,9 @@ void AddMatrixTests()
 	AddTest("float3x4::operator+(float3x4)", TestFloat3x4AddFloat3x4);
 	AddTest("float3x4::operator-(float3x4)", TestFloat3x4SubFloat3x4);
 	AddTest("float3x4::operator-()", TestFloat3x4Neg);
+
+	AddTest("float3x3::SolveAxb", TestFloat3x3SolveAxb);
+	AddTest("float3x3::Inverse", TestFloat3x3InverseFast);
+	AddTest("float3x3::InverseFast", TestFloat3x3InverseFast);
+	
 }
