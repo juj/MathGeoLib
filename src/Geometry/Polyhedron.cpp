@@ -797,7 +797,11 @@ bool Polyhedron::Intersects(const Triangle &triangle) const
 
 bool Polyhedron::Intersects(const Polygon &polygon) const
 {
-	return PolyhedronIntersectsAABB_OBB(*this, polygon);
+///@todo Investigate what is causing this to fail: PolyhedronIntersectsAABB_OBB
+//	return PolyhedronIntersectsAABB_OBB(*this, polygon);
+
+	// In the meanwhile, fall back to generic polyhedron-polyhedron intersection test.
+	return Intersects(polygon.ToPolyhedron());
 }
 
 bool Polyhedron::Intersects(const Frustum &frustum) const
