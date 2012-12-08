@@ -8,6 +8,10 @@ if (MSVC11 AND RUN_VS2012_ANALYZE)
 	add_definitions(/analyze)
 endif()
 
+if (BUILD_FOR_GCOV)
+	add_definitions(-DFAIL_USING_EXCEPTIONS=1)
+endif()
+
 if (MINGW AND BUILD_FOR_GCOV)
 	add_definitions(-fprofile-arcs -ftest-coverage -DFAIL_USING_EXCEPTIONS=1)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
