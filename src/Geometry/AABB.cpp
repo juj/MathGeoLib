@@ -690,7 +690,7 @@ bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, f
 #ifdef MATH_SSE
 bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, float tNear, float tFar) const
 {
-	assume(lineDir.IsNormalized());
+	assume(rayDir.IsNormalized4());
 	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
 	/* For reference, this is the C++ form of the vectorized SSE code below.
 
