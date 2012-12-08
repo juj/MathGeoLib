@@ -77,9 +77,9 @@ const float NOT_NECESSARILY_USED pi =		   (float)3.14159265358979323846264338327
 const float NOT_NECESSARILY_USED e2 =		   (float)7.3890560989306502272304274605750078131803155705518473240871278225225737960790577633843124850791217948;
 /// A very small epsilon value to use in floating point equality comparisons.
 const float NOT_NECESSARILY_USED eps =		  (float)1e-5f;
-/// The floating point representation for +\inf.
+/// The floating point representation for +\f$\inf\f$.
 const float NOT_NECESSARILY_USED inf =		  FLOAT_INF;
-/// The floating point representation for -\inf.
+/// The floating point representation for -\f$\inf\f$.
 const float NOT_NECESSARILY_USED negInf =	   -FLOAT_INF;
 /// Represents a floating-point not-a-number. \note Never compare a float against nan, use isfinite() instead!
 const float NOT_NECESSARILY_USED nan =		  FLOAT_NAN;

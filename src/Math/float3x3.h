@@ -259,7 +259,7 @@ public:
 		@note You can use the index notation to set elements of the matrix, e.g. m[0][1] = 5.f;
 		@note MatrixProxy is a temporary helper class. Do not store references to it, but always
 		directly dereference it with the [] operator.
-		\example m[0][2] Returns the last element on the first row. */
+		For example, m[0][2] Returns the last element on the first row. */
 	MatrixProxy<Cols> &operator[](int row);
 	const MatrixProxy<Cols> &operator[](int row) const;
 

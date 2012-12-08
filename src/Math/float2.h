@@ -422,7 +422,7 @@ public:
 		@see PerpDot(), Rotated90CCW(). */
 	float2 Perp() const;
 
-	/// Computes the perp-dot product of this and the given float2 in the order this^perp <dot> rhs.
+	/// Computes the perp-dot product of this and the given float2 in the order this^perp (dot) rhs.
 	/** @see Dot(), Perp(). */
 	float PerpDot(const float2 &rhs) const;
 

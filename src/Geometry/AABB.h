@@ -98,8 +98,9 @@ public:
 	/// Sets this AABB to enclose the given OBB.
 	/** This function computes the minimal axis-aligned bounding box for the given oriented bounding box. If the orientation
 		of the OBB is not aligned with the world axes, this conversion is not exact and loosens the volume of the bounding box.
-		@param SetCenter(), class OBB.
-		@todo Implement SetFrom(Polyhedron). */
+		@param obb The oriented bounding box to convert into this AABB.
+		@todo Implement SetFrom(Polyhedron).
+		@see SetCenter(), class OBB. */
 	void SetFrom(const OBB &obb);
 
 	// Computes the minimal enclosing AABB of the given polyhedron.		
@@ -382,11 +383,11 @@ public:
 	bool Contains(const Frustum &frustum) const;
 	bool Contains(const Polyhedron &polyhedron) const;
 
-	/// Tests whether this AABB and the given object intersect.	   
+	/// Tests whether this AABB and the given object intersect.
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
 		another, this function still returns true. (e.g. in case a line segment is contained inside this AABB, 
 		or this AABB is contained inside a Sphere, etc.)
-		The first parameter of this function specifies the other object to test against.
+		@oaram ray The first parameter of this function specifies the other object to test against.
 		@param dNear [out] If specified, receives the parametric distance along the line denoting where the 
 			line entered this AABB.
 		@param dFar [out] If specified, receives the parametric distance along the line denoting where the 
@@ -404,7 +405,8 @@ public:
 	bool Intersects(const Plane &plane) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const OBB &obb) const;
-	/** @param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere. This pointer
+	/** @oaram sphere The first parameter of this function specifies the other object to test against.
+		@param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere. This pointer
 			may be null. */ 
 	bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB = 0) const;
 	bool Intersects(const Capsule &capsule) const;
@@ -444,6 +446,8 @@ public:
 			If this parameter is null, vertex normals are not returned.
 		@param outUV [out] An array of size numVertices which will receive vertex UV coordinates. 
 			If this parameter is null, a UV mapping is not generated.
+		@param ccwIsFrontFacing If true, then the front-facing direction of the faces will be the sides
+			with counterclockwise winding order. Otherwise, the faces are generated in clockwise winding order.
 		The number of vertices that outPos, outNormal and outUV must be able to contain is
 		(x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call
 		NumVerticesInTriangulation to obtain this value.
