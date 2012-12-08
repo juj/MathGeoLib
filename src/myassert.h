@@ -29,7 +29,11 @@
 
 #include <stdexcept>
 
-#define assert(x) do { if (!(x)) throw std::runtime_error(#x); } while(0)
+#define assert(x) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			throw std::runtime_error(#x); \
+	MULTI_LINE_MACRO_END
 
 #else
 

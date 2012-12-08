@@ -68,9 +68,17 @@ MATH_END_NAMESPACE
 #define assume(x) assert(x)
 #elif defined(MATH_SILENT_ASSUME)
 #define assume(x) ((void)0)
-#else 
+#elif defined(FAIL_USING_EXCEPTIONS)
 
-#ifdef _MSC_VER
+#include <stdexcept>
+
+#define assume(x) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			throw std::runtime_error(#x); \
+	MULTI_LINE_MACRO_END
+
+#elif defined(_MSC_VER)
 
 #define assume(x) (void)((!!(x)) || ( printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__) && MATH_NS::AssumeFailed()) )
 
@@ -87,7 +95,6 @@ MATH_END_NAMESPACE
 
 #define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
 
-#endif
 #endif
 
 // If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test
