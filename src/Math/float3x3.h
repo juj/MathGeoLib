@@ -408,6 +408,12 @@ public:
 	/// @return Returns true on success, false otherwise.
 	bool Inverse(float epsilon = 1e-3f);
 
+	bool InverseFast(float epsilon = 1e-3f);
+
+	/// Solves the linear equation Ax=b.
+	/** The matrix A in the equations is this matrix. */
+	bool SolveAxb(float3 b, float3 &x) const;
+
 	/// Returns an inverted copy of this matrix. This function uses the Cramer's rule.
 	/// If this matrix does not have an inverse, returns the matrix that was the result of running
 	/// Gauss's method on the matrix.

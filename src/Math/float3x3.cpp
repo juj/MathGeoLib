@@ -764,6 +764,7 @@ float3x3 float3x3::Adjugate() const
 	return a;
 }
 */
+
 bool float3x3::Inverse(float epsilon)
 {
 #ifdef MATH_ASSERT_CORRECTNESS
@@ -773,7 +774,31 @@ bool float3x3::Inverse(float epsilon)
 	// There exists a generic matrix inverse calculator that uses Gaussian elimination.
 	// It would be invoked by calling
 	// return InverseMatrix(*this, epsilon);
-	// Instead, compute the inverse directly using Cramer's rule.
+
+	float3x3 i = *this;
+	bool success = InverseMatrix(i, epsilon);
+	if (!success)
+		return false;
+
+#ifdef MATH_ASSERT_CORRECTNESS
+	float3x3 id = orig * i;
+	float3x3 id2 = i * orig;
+	mathassert(id.IsIdentity(0.5f));
+	mathassert(id2.IsIdentity(0.5f));
+#endif
+
+	*this = i;
+	return true;
+}
+
+bool float3x3::InverseFast(float epsilon)
+{
+#ifdef MATH_ASSERT_CORRECTNESS
+	float3x3 orig = *this;
+#endif
+
+	// Compute the inverse directly using Cramer's rule.
+	// Warning: This method is numerically very unstable!
 	float d = Determinant();
 	if (EqualAbs(d, 0.f, epsilon))
 		return false;
@@ -791,14 +816,122 @@ bool float3x3::Inverse(float epsilon)
 	i[2][0] = d * (v[1][0] * v[2][1] - v[1][1] * v[2][0]);
 	i[2][1] = d * (v[2][0] * v[0][1] - v[0][0] * v[2][1]);
 	i[2][2] = d * (v[0][0] * v[1][1] - v[0][1] * v[1][0]);
-	*this = i;
 
 #ifdef MATH_ASSERT_CORRECTNESS
-	float3x3 id = orig * *this;
-	float3x3 id2 = *this * orig;
-	mathassert(id.IsIdentity());
-	mathassert(id2.IsIdentity());
+	float3x3 id = orig * i;
+	float3x3 id2 = i * orig;
+	mathassert(id.IsIdentity(0.5f));
+	mathassert(id2.IsIdentity(0.5f));
 #endif
+
+	*this = i;
+	return true;
+}
+
+bool float3x3::SolveAxb(float3 b, float3 &x) const
+{
+	// Solve by pivotization.
+	float v00 = v[0][0];
+	float v10 = v[1][0];
+	float v20 = v[2][0];
+
+	float v01 = v[0][1];
+	float v11 = v[1][1];
+	float v21 = v[2][1];
+
+	float v02 = v[0][2];
+	float v12 = v[1][2];
+	float v22 = v[2][2];
+
+	float av00 = Abs(v00);
+	float av10 = Abs(v10);
+	float av20 = Abs(v20);
+
+	// Find which item in first column has largest absolute value.
+	if (av10 >= av00 && av10 >= av20)
+	{
+		Swap(v00, v10);
+		Swap(v01, v11);
+		Swap(v02, v12);
+		Swap(b[0], b[1]);
+	}
+	else if (v20 >= v00)
+	{
+		Swap(v00, v20);
+		Swap(v01, v21);
+		Swap(v02, v22);
+		Swap(b[0], b[2]);
+	}
+
+	/* a b c | x
+	   d e f | y
+	   g h i | z , where |a| >= |d| && |a| >= |g| */
+
+	if (EqualAbs(v00, 0.f))
+		return false;
+
+	// Scale row so that leading element is one.
+	float denom = 1.f / v00;
+//	v00 = 1.f;
+	v01 *= denom;
+	v02 *= denom;
+	b[0] *= denom;
+
+	/* 1 b c | x
+	   d e f | y
+	   g h i | z */
+
+	// Zero first column of second and third rows.
+	v11 -= v10 * v01;
+	v12 -= v10 * v02;
+	b[1] -= v10 * b[0];
+
+	v21 -= v20 * v01;
+	v22 -= v20 * v02;
+	b[2] -= v20 * b[0];
+
+	/* 1 b c | x
+	   0 e f | y
+	   0 h i | z */
+
+	// Pivotize again.
+	if (Abs(v21) > Abs(v11))
+	{
+		Swap(v11, v21);
+		Swap(v12, v22);
+		Swap(b[1], b[2]);
+	}
+
+	if (EqualAbs(v11, 0.f))
+		return false;
+
+	/* 1 b c | x
+	   0 e f | y
+	   0 h i | z, where |e| >= |h| */
+
+	denom = 1.f / v11;
+//	v11 = 1.f;
+	v12 *= denom;
+	b[1] *= denom;
+
+	/* 1 b c | x
+	   0 1 f | y
+	   0 h i | z */
+
+	v22 -= v21 * v12;
+	b[2] -= v21 * b[1];
+
+	/* 1 b c | x
+	   0 1 f | y
+	   0 0 i | z */
+
+	if (EqualAbs(v22, 0.f))
+		return false;
+
+	x[2] = b[2] / v22;
+	x[1] = b[1] - x[2] * v12;
+	x[0] = b[0] - x[2] * v02 - x[1] * v01;
+
 	return true;
 }
 
