@@ -30,8 +30,7 @@
 #define NOT_NECESSARILY_USED
 #endif
 
-#include <limits.h>
-#if defined(MATH_ENABLE_STL_SUPPORT) || defined(_MSC_VER)
+#if defined(_MSC_VER)
 #include <limits>
 #define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
 #define FLOAT_INF std::numeric_limits<float>::infinity()
