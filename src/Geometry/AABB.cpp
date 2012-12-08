@@ -174,6 +174,7 @@ LineSegment AABB::Edge(int edgeIndex) const
 	switch(edgeIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
+		/* For documentation, here's the segments that are returned:
 		case 0: return LineSegment(CornerPoint(0), CornerPoint(1));
 		case 1: return LineSegment(CornerPoint(0), CornerPoint(2));
 		case 2: return LineSegment(CornerPoint(0), CornerPoint(4));
@@ -186,6 +187,20 @@ LineSegment AABB::Edge(int edgeIndex) const
 		case 9: return LineSegment(CornerPoint(4), CornerPoint(6));
 		case 10: return LineSegment(CornerPoint(5), CornerPoint(7));
 		case 11: return LineSegment(CornerPoint(6), CornerPoint(7));
+		*/
+		// Force-optimize to avoid calling to CornerPoint for another switch-case statement.
+		case 0: return LineSegment(float3(minPoint.x, minPoint.y, minPoint.z), float3(minPoint.x, minPoint.y, maxPoint.z));
+		case 1: return LineSegment(float3(minPoint.x, minPoint.y, minPoint.z), float3(minPoint.x, maxPoint.y, minPoint.z));
+		case 2: return LineSegment(float3(minPoint.x, minPoint.y, minPoint.z), float3(maxPoint.x, minPoint.y, minPoint.z));
+		case 3: return LineSegment(float3(minPoint.x, minPoint.y, maxPoint.z), float3(minPoint.x, maxPoint.y, maxPoint.z));
+		case 4: return LineSegment(float3(minPoint.x, minPoint.y, maxPoint.z), float3(maxPoint.x, minPoint.y, maxPoint.z));
+		case 5: return LineSegment(float3(minPoint.x, maxPoint.y, minPoint.z), float3(minPoint.x, maxPoint.y, maxPoint.z));
+		case 6: return LineSegment(float3(minPoint.x, maxPoint.y, minPoint.z), float3(maxPoint.x, maxPoint.y, minPoint.z));
+		case 7: return LineSegment(float3(minPoint.x, maxPoint.y, maxPoint.z), float3(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 8: return LineSegment(float3(maxPoint.x, minPoint.y, minPoint.z), float3(maxPoint.x, minPoint.y, maxPoint.z));
+		case 9: return LineSegment(float3(maxPoint.x, minPoint.y, minPoint.z), float3(maxPoint.x, maxPoint.y, minPoint.z));
+		case 10: return LineSegment(float3(maxPoint.x, minPoint.y, maxPoint.z), float3(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 11: return LineSegment(float3(maxPoint.x, maxPoint.y, minPoint.z), float3(maxPoint.x, maxPoint.y, maxPoint.z));
 	}
 }
 
