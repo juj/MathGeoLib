@@ -431,7 +431,7 @@ bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, floa
 bool Polyhedron::Contains(const float3 &point) const
 {
 	int numIntersections = 0;
-	for(size_t i = 0; i < f.size(); ++i)
+	for(int i = 0; i < (int)f.size(); ++i)
 	{
 		Plane p(v[f[i].v[0]] - point, v[f[i].v[1]] - point, v[f[i].v[2]] - point);
 
@@ -756,7 +756,7 @@ bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 		return true;
 
 	// Test for each edge of the AABB/OBB whether this polyhedron intersects it.
-	for(size_t i = 0; i < 12; ++i)
+	for(int i = 0; i < 12; ++i)
 		if (p.Intersects(obj.Edge(i)))
 			return true;
 
