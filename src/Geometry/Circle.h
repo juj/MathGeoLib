@@ -122,7 +122,7 @@ public:
 	void Transform(const Quat &transform);
 
 	/// Tests if the given point is contained at the edge of this circle.
-	/** @point The target point to test.
+	/** @param point The target point to test.
 		@param maxDistance The epsilon threshold to test the distance against. This effectively turns the circle into a torus
 			for this test.
 		@see DistanceToEdge(), DistanceToDisc(), ClosestPointToEdge(), ClosestPointToDisc().

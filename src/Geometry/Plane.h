@@ -358,8 +358,7 @@ public:
 //	float3 RandomPointOnCircleEdge(const float3 &circleCenter, float radius) const;
 
 	/// Computes the intersection of a line and a plane.
-	/** @param ptOnPlane An arbitrary point on the plane.
-		@param planeNormal The plane normal direction vector. This vector can be unnormalized.
+	/** @param planeNormal The plane normal direction vector. This vector can be unnormalized.
 		@param planeD The distance parameter of the plane equation.
 		@param linePos The starting point of the line.
 		@param lineDir The line direction vector. This vector does not need to be normalized.
