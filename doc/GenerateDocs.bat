@@ -1,8 +1,8 @@
 echo Cleaning old documentation build directory.
-del /Q /S build
-del /Q /S xml
-mkdir build
-mkdir xml
+del /Q /S build > NUL 2> NUL
+del /Q /S xml > NUL 2> NUL
+mkdir build > NUL 2> NUL
+mkdir xml > NUL 2> NUL
 
 echo Doxygen Version:
 doxygen --version
@@ -11,7 +11,7 @@ echo Running Doxygen:
 doxygen doxyfile
 
 echo Deploying static doc content.
-xcopy /s static\*.* build\
+xcopy /s static\*.* build\ > NUL
 
 echo Generating documentation.
 DocGenerator docstructure.xml .\xml .\build\ ..\benchmarks\results > build\reference.html
