@@ -430,9 +430,8 @@ bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, floa
 
 bool Polyhedron::Contains(const float3 &point) const
 {
-//	Ray r(point, float3::unitX);
 	int numIntersections = 0;
-	for(int i = 0; i < f.size(); ++i)
+	for(size_t i = 0; i < f.size(); ++i)
 	{
 		Plane p(v[f[i].v[0]] - point, v[f[i].v[1]] - point, v[f[i].v[2]] - point);
 
@@ -699,7 +698,6 @@ bool Polyhedron::Intersects(const Plane &plane) const
 	As noted by the author, the algorithm is very naive (and here unoptimized), and better methods exist. [groupSyntax] */
 bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 {
-	///@todo Implement a more efficient algorithm.
 	if (polyhedron.Contains(this->Centroid()))
 		return true;
 	if (this->Contains(polyhedron.Centroid()))
@@ -749,32 +747,62 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	return false;
 }
 
+template<typename T>
+bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
+{
+	if (p.Contains(obj.CenterPoint()))
+		return true;
+	if (obj.Contains(p.Centroid()))
+		return true;
+
+	// Test for each edge of the AABB/OBB whether this polyhedron intersects it.
+	for(size_t i = 0; i < 12; ++i)
+		if (p.Intersects(obj.Edge(i)))
+			return true;
+
+	// Test for each edge of this polyhedron whether the AABB/OBB intersects it.
+	for(size_t i = 0; i < p.f.size(); ++i)
+	{
+		assert(!p.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
+		int v0 = p.f[i].v.back();
+		float3 l0 = p.v[v0];
+		for(size_t j = 0; j < p.f[i].v.size(); ++j)
+		{
+			int v1 = p.f[i].v[j];
+			float3 l1 = p.v[v1];
+			if (v0 < v1 && obj.Intersects(LineSegment(l0, l1))) // If v0 < v1, then this line segment is the canonical one.
+				return true;
+			l0 = l1;
+			v0 = v1;
+		}
+	}
+
+	return false;
+}
+
 bool Polyhedron::Intersects(const AABB &aabb) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return Intersects(aabb.ToPolyhedron());
+	return PolyhedronIntersectsAABB_OBB(*this, aabb);
 }
 
 bool Polyhedron::Intersects(const OBB &obb) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return Intersects(obb.ToPolyhedron());
+	return PolyhedronIntersectsAABB_OBB(*this, obb);
 }
 
 bool Polyhedron::Intersects(const Triangle &triangle) const
 {
-	return Intersects(triangle.ToPolyhedron());
+	return PolyhedronIntersectsAABB_OBB(*this, triangle);
 }
 
 bool Polyhedron::Intersects(const Polygon &polygon) const
 {
-	return Intersects(polygon.ToPolyhedron());
+	return PolyhedronIntersectsAABB_OBB(*this, polygon);
 }
 
 bool Polyhedron::Intersects(const Frustum &frustum) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return Intersects(frustum.ToPolyhedron());
+	return PolyhedronIntersectsAABB_OBB(*this, frustum);
 }
 
 bool Polyhedron::Intersects(const Sphere &sphere) const
@@ -818,7 +846,6 @@ void Polyhedron::MergeConvex(const float3 &point)
 	std::map<std::pair<int, int>, int> remainingEdges;
 
 	for(size_t i = 0; i < v.size(); ++i)
-//	for(size_t i = 0; i < v.size(); ++i)
 		if (point.DistanceSq(v[i]) < 1e-3f)
 			return;
 
