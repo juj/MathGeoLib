@@ -10,12 +10,13 @@ std::vector<Test> tests;
 
 volatile int globalPokedData = 0;
 
-void AddTest(std::string name, TestFunctionPtr function, std::string description)
+void AddTest(std::string name, TestFunctionPtr function, bool isRandomized, std::string description)
 {
 	Test t;
 	t.name = name;
 	t.description = description;
 	t.function = function;
+	t.isRandomized = isRandomized;
 	tests.push_back(t);
 }
 
@@ -56,10 +57,10 @@ int RunTests(int numTimes)
 		int numPasses = 0;
 		std::string failReason; // Stores the failure reason of the first failure.
 		std::vector<std::string> failReasons;
-		for(int j = 0; j < numTimes1; ++j)
+		for(int j = 0; j < (tests[i].isRandomized ? numTimes1 : 1); ++j)
 		{
 			tick_t start = Clock::Tick();
-			for(int k = 0; k < numTrials; ++k)
+			for(int k = 0; k < (tests[i].isRandomized ? numTrials : 1); ++k)
 			{
 				try
 				{
@@ -76,7 +77,7 @@ int RunTests(int numTimes)
 			times.push_back(end - start);
 		}
 
-		numPasses = numTimes - numFails;
+		numPasses = (tests[i].isRandomized ? numTimes : 1) - numFails;
 		std::sort(times.begin(), times.end());
 
 		// Erase outliers. (x% slowest)
@@ -85,14 +86,17 @@ int RunTests(int numTimes)
 		times.erase(times.end() - numSlowestToDiscard, times.end());
 
 		tick_t total = 0;
-		for(size_t i = 0; i < times.size(); ++i)
-			total += times[i];
+		for(size_t j = 0; j < times.size(); ++j)
+			total += times[j];
 
 		float successRate = (float)numPasses * 100.f / numTimes;
 
 		if (numFails == 0)
 		{
-			LOGI("ok (%d passes, 100%%)", numPasses);
+			if (tests[i].isRandomized)
+				LOGI("ok (%d passes, 100%%)", numPasses);
+			else
+				LOGI("ok");
 			++numTestsPassed;
 		}
 		else if (successRate >= 95.0f)
@@ -116,14 +120,15 @@ int RunTests(int numTimes)
 
 void AddPositiveIntersectionTests();
 void AddNegativeIntersectionTests();
+void AddMatrixTests();
 
 int main()
 {
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
+	AddMatrixTests();
 
 	int numFailures = RunTests(10000);
-	return numFailures; // exit code of 0 denotes a successful run.
-
 	LOGI("%d\n", globalPokedData);
+	return numFailures; // exit code of 0 denotes a successful run.
 }
