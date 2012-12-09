@@ -330,12 +330,11 @@ public:
 
 	/// Divides each element by w to produce a float4 of form (x, y, z, 1).
 	/** This function performs the <b>perspective divide</b> or the <b>homogeneous divide</b> on this vector, which is the
-		process of dividing each element of this vector by w.
+		process of dividing each element of this vector by w. If the w component of this vector is zero before division, the
+		result of this vector will be undefined.
 		@note This function operates in-place.
-		@return True if w != 0 for this vector, and the normalization of w succeeded. If this function succeeds, w == 1
-			for the resulting float4. If normalization fails, no error message is printed and false is returned.
-		@see IsWZeroOrOne(). */		
-	bool NormalizeW();
+		@see IsWZeroOrOne(). */
+	void NormalizeW();
 
 	/// Returns true if the w component of this float4 is either 0 or 1.
 	/** This is a required condition for several functions to work correctly.

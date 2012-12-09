@@ -100,13 +100,8 @@ void TestFloat4Normalized4()
 void TestFloat4NormalizeW()
 {
 	float4 f(-2.f, -4.f, 8.f, 2.f);
-	bool success = f.NormalizeW();
-	assert(success);
+	f.NormalizeW();
 	assert(f.Equals(float4(-1.f, -2.f, 4.f, 1.f)));
-
-	float4 f2(1,1,1,0);
-	success = f2.NormalizeW();
-	assert(!success);
 }
 
 void TestFloat4Scale3()
@@ -258,17 +253,17 @@ void TestFloat4Cross3()
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2(2.f, -1.f, 0.f, 4.f);
-	assert(f.Cross3(f2).xyz().Equals(f.Cross3(f2.xyz()).xyz()));
+	assert(f.Cross3(f2).Equals(f.Cross3(f2.xyz())));
 
 	float4 f3 = f.Cross3(f2);
-	assert(f3.xyz().Equals(float3(3.f, 6.f, -3.f)));
+	assert(f3.Equals(float4(3.f, 6.f, -3.f, 0.f)));
 
 	float4 z = float4::unitX.Cross3(float4::unitY);
 	float4 y = float4::unitZ.Cross3(float4::unitX);
 	float4 x = float4::unitY.Cross3(float4::unitZ);
-	assert(x.xyz().Equals(float3(1,0,0)));
-	assert(y.xyz().Equals(float3(0,1,0)));
-	assert(z.xyz().Equals(float3(0,0,1)));
+	assert(x.Equals(float4(1,0,0,0)));
+	assert(y.Equals(float4(0,1,0,0)));
+	assert(z.Equals(float4(0,0,1,0)));
 }
 
 void TestFloat4FromScalar()

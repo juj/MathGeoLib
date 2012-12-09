@@ -324,11 +324,10 @@ float4 float4::Normalized4() const
 	return copy;
 }
 
-bool float4::NormalizeW()
+void float4::NormalizeW()
 {
 #ifdef MATH_SSE
 	NormalizeW_SSE();
-	return true; ///\todo Either add SSE div by zero error reporting, or change this API not to return a dummy true.
 #else
 	if (fabs(w) > 1e-6f)
 	{
@@ -337,10 +336,7 @@ bool float4::NormalizeW()
 		y *= invW;
 		z *= invW;
 		w = 1.f;
-		return true;
 	}
-	else
-		return false;
 #endif
 }
 
@@ -731,29 +727,32 @@ float float4::Dot4(const float4 &rhs) const
 #ifdef MATH_SSE
 __m128 _mm_cross_ps(__m128 a, __m128 b)
 {
-	__m128 a_yzx = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 1, 2, 0)); // a_yzx = [w, y, z, x]
-	__m128 a_zxy = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 2, 0, 1)); // a_zxy = [w, z, x, y]
+	__m128 a_xzy = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
+	__m128 b_yxz = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
 
-	__m128 b_yzx = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 1, 2, 0)); // b_yzx = [w, y, z, x]
-	__m128 b_zxy = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 2, 0, 1)); // b_zxy = [w, z, x, y]
+	__m128 a_yxz = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
+	__m128 b_xzy = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
 
-	// The content of highest index (.w) in the returned vector is undefined.
-	return _mm_sub_ps(_mm_mul_ps(a_yzx, b_zxy), _mm_mul_ps(a_zxy, b_yzx));
+	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
+	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+
+	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 #endif
 
-/** dst = A x B - The standard cross product:
+/** dst = A x B - Apply the diagonal rule to derive the standard cross product formula:
 \code
-		|a cross b| = |a||b|sin(alpha)
-	
-		i		j		k		i		j		k		units (correspond to x,y,z)
-		a		b		c		a		b		c		this vector
-		d		e		f		d		e		f		vector v
-		-cei	-afj	-bdk	bfi	cdj	aek	result
-	
-		x = bfi - cei = (bf-ce)i;
-		y = cdj - afj = (cd-af)j;
-		z - aek - bdk = (ae-bd)k;
+	    |a cross b| = |a||b|sin(alpha)
+
+	    i            j            k            i            j            k        units (correspond to x,y,z)
+	    a.x          a.y          a.z          a.x          a.y          a.z      vector a (this)
+	    b.x          b.y          b.z          b.x          b.y          b.z      vector b
+	-a.z*b.y*i   -a.x*b.z*j   -a.y*b.x*k    a.y*b.z*i    a.z*b.x*j    a.x*b.y*k   result
+
+	Add up the results:
+	    x = a.y*b.z - a.z*b.y
+	    y = a.z*b.x - a.x*b.z
+	    z = a.x*b.y - a.y*b.x
 \endcode
 
 Cross product is anti-commutative, i.e. a x b == -b x a.
