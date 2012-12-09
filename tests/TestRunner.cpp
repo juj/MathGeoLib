@@ -60,7 +60,8 @@ int RunTests(int numTimes)
 		for(int j = 0; j < (tests[i].isRandomized ? numTimes1 : 1); ++j)
 		{
 			tick_t start = Clock::Tick();
-			for(int k = 0; k < (tests[i].isRandomized ? numTrials : 1); ++k)
+			for(int k = 0; k < numTrials; ++k)
+//			for(int k = 0; k < (tests[i].isRandomized ? numTrials : 1); ++k)
 			{
 				try
 				{
