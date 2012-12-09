@@ -69,9 +69,42 @@ void TestFloat3x4TransformFloat4()
 	float4 newDir = rot.Transform(float4(l.dir,0.f));
 	assert(newDir.w == 0.f);
 	l.dir = newDir.xyz();
+	assert(l.dir.IsNormalized(1e-1f));
 	l.dir.Normalize();
 	pt = rot.Transform(pt);
 	assert(pt.w == 1.f);
+	float d = l.Distance(pt.xyz());
+	assert(EqualAbs(d, 0.f));
+	assert(l.Contains(pt.xyz()));
+}
+
+void TestFloat3x4TransformPosDir()
+{
+	Line l = RandomLineContainingPoint(float3::zero);
+	l.pos = float3::zero;
+	assert(l.dir.IsNormalized());
+	float3 pt = l.GetPoint(rng.Float(-3.f, 3.f));
+	float3x4 rot = Quat::RandomRotation(rng).ToFloat3x4();
+	l.dir = rot.TransformDir(l.dir);
+	assert(l.dir.IsNormalized(1e-1f));
+	l.dir.Normalize();
+	pt = rot.TransformPos(pt);
+	float d = l.Distance(pt.xyz());
+	assert(EqualAbs(d, 0.f));
+	assert(l.Contains(pt.xyz()));
+}
+
+void TestFloat3x4TransformPosDirXyz()
+{
+	Line l = RandomLineContainingPoint(float3::zero);
+	l.pos = float3::zero;
+	assert(l.dir.IsNormalized());
+	float3 pt = l.GetPoint(rng.Float(-3.f, 3.f));
+	float3x4 rot = Quat::RandomRotation(rng).ToFloat3x4();
+	l.dir = rot.TransformDir(l.dir.x, l.dir.y, l.dir.z);
+	assert(l.dir.IsNormalized(1e-1f));
+	l.dir.Normalize();
+	pt = rot.TransformPos(pt.x, pt.y, pt.z);
 	float d = l.Distance(pt.xyz());
 	assert(EqualAbs(d, 0.f));
 	assert(l.Contains(pt.xyz()));
@@ -225,8 +258,10 @@ void AddMatrixTests()
 	AddTest("float3x4::SetRow", TestFloat3x4SetRow, false);
 	AddTest("float3x4::SwapRows", TestFloat3x4SwapRows, false);
 	AddTest("float3x4::Transform", TestFloat3x4TransformFloat4);
-	AddTest("float3x4::operator*(float3x4)", TestFloat3x4MulFloat3x4);
+	AddTest("float3x4::TransformPos/Dir", TestFloat3x4TransformPosDir);
+	AddTest("float3x4::TransformPos(xyz)/Dir(xyz)", TestFloat3x4TransformPosDirXyz);
 	
+	AddTest("float3x4::operator*(float3x4)", TestFloat3x4MulFloat3x4);
 	AddTest("float3x4::operator*(scalar)", TestFloat3x4MulScalar);
 	AddTest("float3x4::operator/(scalar)", TestFloat3x4DivScalar);
 	AddTest("float3x4::operator+(float3x4)", TestFloat3x4AddFloat3x4);
