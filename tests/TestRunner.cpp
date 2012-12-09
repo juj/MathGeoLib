@@ -122,12 +122,14 @@ int RunTests(int numTimes)
 void AddPositiveIntersectionTests();
 void AddNegativeIntersectionTests();
 void AddMatrixTests();
+void AddVectorTests();
 
 int main()
 {
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 	AddMatrixTests();
+	AddVectorTests();
 
 	int numFailures = RunTests(10000);
 	LOGI("%d\n", globalPokedData);

@@ -1054,6 +1054,22 @@ float4 &float4::operator *=(float scalar)
 	return *this;
 }
 
+float4 &float4::operator /=(float scalar)
+{
+#ifdef MATH_SSE
+	__m128 v2 = _mm_set1_ps(scalar);
+	v = _mm_div_ps(v, v2);
+#else
+	float invScalar = 1.f / scalar;
+	x *= invScalar;
+	y *= invScalar;
+	z *= invScalar;
+	w *= invScalar;
+#endif
+
+	return *this;
+}
+
 float4 float4::Add(float s) const
 {
 #ifdef MATH_SSE
@@ -1110,22 +1126,6 @@ float4 float4::Div(const float4 &rhs) const
 #else
 	return float4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
 #endif
-}
-
-float4 &float4::operator /=(float scalar)
-{
-#ifdef MATH_SSE
-	__m128 v2 = _mm_set1_ps(scalar);
-	v = _mm_div_ps(v, v2);
-#else
-	float invScalar = 1.f / scalar;
-	x *= invScalar;
-	y *= invScalar;
-	z *= invScalar;
-	w *= invScalar;
-#endif
-
-	return *this;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
