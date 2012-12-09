@@ -55,6 +55,13 @@
 #define MATH_ASSERT_CORRECTNESS
 #endif
 
+// If FAIL_USING_EXCEPTIONS is defined, all mathassert(), assert() and assume() macros turn into
+// throwing std::runtime_error exceptions. This macro is used by default when running tests, to get
+// a runtime error report on which tests pass and which fail.
+#ifndef FAIL_USING_EXCEPTIONS
+// #define FAIL_USING_EXCEPTIONS
+#endif
+
 // If MATH_ENABLE_STL_SUPPORT is defined, MathGeoLib utilizes STL data structures. Otherwise, 
 // features requiring STL are disabled (but the library can still be built).
 #ifndef MATH_ENABLE_STL_SUPPORT
