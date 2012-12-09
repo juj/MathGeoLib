@@ -10,13 +10,23 @@ std::vector<Test> tests;
 
 volatile int globalPokedData = 0;
 
-void AddTest(std::string name, TestFunctionPtr function, bool isRandomized, std::string description)
+void AddTest(std::string name, TestFunctionPtr function, std::string description)
 {
 	Test t;
 	t.name = name;
 	t.description = description;
 	t.function = function;
-	t.isRandomized = isRandomized;
+	t.isRandomized = false;
+	tests.push_back(t);
+}
+
+void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string description)
+{
+	Test t;
+	t.name = name;
+	t.description = description;
+	t.function = function;
+	t.isRandomized = true;
 	tests.push_back(t);
 }
 

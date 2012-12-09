@@ -14,5 +14,6 @@ struct Test
 
 extern volatile int globalPokedData;
 
-void AddTest(std::string name, TestFunctionPtr function, bool isRandomized = true, std::string description = "");
+void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string description = "");
+void AddTest(std::string name, TestFunctionPtr function, std::string description = "");
 int RunTests(int numTimes);

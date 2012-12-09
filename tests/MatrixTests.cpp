@@ -254,22 +254,21 @@ void TestFloat3x3InverseFast()
 
 void AddMatrixTests()
 {
-	AddTest("float3x4::ScaleRow", TestFloat3x4ScaleRow, false);
-	AddTest("float3x4::SetRow", TestFloat3x4SetRow, false);
-	AddTest("float3x4::SwapRows", TestFloat3x4SwapRows, false);
-	AddTest("float3x4::Transform", TestFloat3x4TransformFloat4);
-	AddTest("float3x4::TransformPos/Dir", TestFloat3x4TransformPosDir);
-	AddTest("float3x4::TransformPos(xyz)/Dir(xyz)", TestFloat3x4TransformPosDirXyz);
+	AddTest("float3x4::ScaleRow", TestFloat3x4ScaleRow);
+	AddTest("float3x4::SetRow", TestFloat3x4SetRow);
+	AddTest("float3x4::SwapRows", TestFloat3x4SwapRows);
+	AddRandomizedTest("float3x4::Transform", TestFloat3x4TransformFloat4);
+	AddRandomizedTest("float3x4::TransformPos/Dir", TestFloat3x4TransformPosDir);
+	AddRandomizedTest("float3x4::TransformPos(xyz)/Dir(xyz)", TestFloat3x4TransformPosDirXyz);
 	
-	AddTest("float3x4::operator*(float3x4)", TestFloat3x4MulFloat3x4);
-	AddTest("float3x4::operator*(scalar)", TestFloat3x4MulScalar);
-	AddTest("float3x4::operator/(scalar)", TestFloat3x4DivScalar);
-	AddTest("float3x4::operator+(float3x4)", TestFloat3x4AddFloat3x4);
-	AddTest("float3x4::operator-(float3x4)", TestFloat3x4SubFloat3x4);
-	AddTest("float3x4::operator-()", TestFloat3x4Neg);
+	AddRandomizedTest("float3x4::operator*(float3x4)", TestFloat3x4MulFloat3x4);
+	AddRandomizedTest("float3x4::operator*(scalar)", TestFloat3x4MulScalar);
+	AddRandomizedTest("float3x4::operator/(scalar)", TestFloat3x4DivScalar);
+	AddRandomizedTest("float3x4::operator+(float3x4)", TestFloat3x4AddFloat3x4);
+	AddRandomizedTest("float3x4::operator-(float3x4)", TestFloat3x4SubFloat3x4);
+	AddRandomizedTest("float3x4::operator-()", TestFloat3x4Neg);
 
-	AddTest("float3x3::SolveAxb", TestFloat3x3SolveAxb);
-	AddTest("float3x3::Inverse", TestFloat3x3InverseFast);
-	AddTest("float3x3::InverseFast", TestFloat3x3InverseFast);
-	
+	AddRandomizedTest("float3x3::SolveAxb", TestFloat3x3SolveAxb);
+	AddRandomizedTest("float3x3::Inverse", TestFloat3x3InverseFast);
+	AddRandomizedTest("float3x3::InverseFast", TestFloat3x3InverseFast);
 }
