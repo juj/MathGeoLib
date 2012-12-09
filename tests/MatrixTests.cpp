@@ -252,6 +252,94 @@ void TestFloat3x3InverseFast()
 	}
 }
 
+void TestFloat4x4Ctor()
+{
+	float3x3 m = float3x3::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2(m);
+	for(int y = 0; y < 3; ++y)
+		for(int x = 0; x < 3; ++x)
+			assert(EqualAbs(m.At(y,x), m2.At(y,x)));
+	assert(EqualAbs(m2[0][3], 0.f));
+	assert(EqualAbs(m2[1][3], 0.f));
+	assert(EqualAbs(m2[2][3], 0.f));
+
+	assert(EqualAbs(m2[3][0], 0.f));
+	assert(EqualAbs(m2[3][1], 0.f));
+	assert(EqualAbs(m2[3][2], 0.f));
+	assert(EqualAbs(m2[3][3], 1.f));
+
+	float3x4 m3 = float3x4::RandomGeneral(rng, -10.f, 10.f);
+	m2 = float4x4(m3);
+	for(int y = 0; y < 3; ++y)
+		for(int x = 0; x < 4; ++x)
+			assert(EqualAbs(m3.At(y,x), m2.At(y,x)));
+	assert(EqualAbs(m2[3][0], 0.f));
+	assert(EqualAbs(m2[3][1], 0.f));
+	assert(EqualAbs(m2[3][2], 0.f));
+	assert(EqualAbs(m2[3][3], 1.f));
+}
+
+void TestFloat4x4SetRow()
+{
+	float4x4 m;
+	m.SetRow(0, 1,2,3,4);
+	m.SetRow(1, float4(5,6,7,8));
+	m.SetRow(2, 9,10,11,12);
+	m.SetRow(3, 13,14,15,16);
+
+	float4x4 m3(1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16);
+	float4x4 m2;
+	m2.Set(1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16);
+	assert(m.Equals(m2));
+	assert(m.Equals(m3));
+}
+
+void TestFloat4x4Set3x4Part()
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = m;
+	float4x4 m4;
+	m4 = m2;
+	assert(m4.Equals(m2));
+	float3x4 m3 = float3x4::RandomGeneral(rng, -10.f, 10.f);
+	m2.Set3x4Part(m3);
+	for(int y = 0; y < 3; ++y)
+		for(int x = 0; x < 4; ++x)
+			assert(EqualAbs(m2[y][x], m3.At(y,x)));
+
+	assert(EqualAbs(m2[3][0], m[3][0]));
+	assert(EqualAbs(m2[3][1], m[3][1]));
+	assert(EqualAbs(m2[3][2], m[3][2]));
+	assert(EqualAbs(m2[3][3], m[3][3]));
+}
+
+void TestFloat4x4SwapRows()
+{
+	float4x4 m(1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16);
+	float4x4 m2(13,14,15,16, 9,10,11,12, 5,6,7,8, 1,2,3,4);
+	m.SwapRows(0,3);
+	m.SwapRows(1,2);
+	assert(m.Equals(m2));
+}
+
+void TestFloat4x4AssignFloat3x4()
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float3x4 m2 = float3x4::RandomGeneral(rng, -10.f, 10.f);
+
+	m = m2;
+
+	for(int y = 0; y < 3; ++y)
+		for(int x = 0; x < 4; ++x)
+			assert(EqualAbs(m[y][x], m2.At(y,x)));
+
+	assert(EqualAbs(m[3][0], 0.f));
+	assert(EqualAbs(m[3][1], 0.f));
+	assert(EqualAbs(m[3][2], 0.f));
+	assert(EqualAbs(m[3][3], 1.f));
+
+}
+
 void AddMatrixTests()
 {
 	AddTest("float3x4::ScaleRow", TestFloat3x4ScaleRow);
@@ -271,4 +359,9 @@ void AddMatrixTests()
 	AddRandomizedTest("float3x3::SolveAxb", TestFloat3x3SolveAxb);
 	AddRandomizedTest("float3x3::Inverse", TestFloat3x3InverseFast);
 	AddRandomizedTest("float3x3::InverseFast", TestFloat3x3InverseFast);
+	AddRandomizedTest("float4x4::float4x4", TestFloat4x4Ctor);
+	AddRandomizedTest("float4x4::SetRow", TestFloat4x4SetRow);
+	AddRandomizedTest("float4x4::Set3x4Part", TestFloat4x4Set3x4Part);
+	AddRandomizedTest("float4x4::SwapRows", TestFloat4x4SwapRows);
+	AddRandomizedTest("float4x4::operator=(float3x4)", TestFloat4x4AssignFloat3x4);
 }
