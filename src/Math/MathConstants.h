@@ -24,19 +24,20 @@
 #include "Types.h"
 #include "Math/MathNamespace.h"
 
+#include <limits>
+#include <math.h>
+#include <float.h>
+
 #ifdef __GNUC__
 #define NOT_NECESSARILY_USED __attribute__ ((unused))
 #else
 #define NOT_NECESSARILY_USED
 #endif
 
-#if defined(_MSC_VER)
-#include <limits>
+#if defined(_MSC_VER) || defined(EMSCRIPTEN)
 #define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
 #define FLOAT_INF std::numeric_limits<float>::infinity()
 #else
-#include <math.h>
-#include <float.h>
 #define FLOAT_NAN NAN
 #define FLOAT_INF INFINITY
 #endif
