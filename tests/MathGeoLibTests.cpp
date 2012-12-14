@@ -9,10 +9,10 @@ void AddClockTests();
 
 void AddMathGeoLibTests()
 {
+	AddClockTests();
 	AddPositiveIntersectionTests();
 	AddNegativeIntersectionTests();
 	AddMatrixTests();
 	AddVectorTests();
 	AddSerializationTests();
-	AddClockTests();
 }

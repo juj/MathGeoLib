@@ -19,7 +19,29 @@ void TestMonotonousClock()
 	assert(maxDiff > 0);
 }
 
+void TestSubMillisecondPrecision()
+{
+	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
+	assert(ticksPerMillisecond > 1);
+
+	tick_t minDiff = Clock::TicksPerSec();
+	tick_t prev = Clock::Tick();
+	for(int i = 0; i < 10000; ++i)
+	{
+		tick_t now = Clock::Tick();
+		tick_t diff = Clock::TicksInBetween(now, prev);
+		if (diff > 0)
+			minDiff = Min(diff, minDiff);
+
+		prev = now;
+	}
+
+	assert(minDiff > 0);
+	assert(minDiff < ticksPerMillisecond/2); // Smallest met quantity must be less than half a millisecond.
+}
+
 void AddClockTests()
 {
 	AddTest("Clock monotonity", TestMonotonousClock);
+	AddTest("Clock sub-millisecond precision", TestSubMillisecondPrecision);
 }
