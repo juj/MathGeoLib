@@ -132,6 +132,7 @@ int RunTests(int numTimes)
 	return numFailures;
 }
 
+#ifdef MATH_TESTS_EXECUTABLE
 int main()
 {
 	AddPositiveIntersectionTests();
@@ -144,3 +145,4 @@ int main()
 	LOGI("%d\n", globalPokedData);
 	return numFailures; // exit code of 0 denotes a successful run.
 }
+#endif

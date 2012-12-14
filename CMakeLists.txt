@@ -12,6 +12,10 @@ if (BUILD_FOR_GCOV)
 	add_definitions(-DFAIL_USING_EXCEPTIONS=1)
 endif()
 
+if (MATH_TESTS_EXECUTABLE)
+	add_definitions(-DMATH_TESTS_EXECUTABLE)
+endif()
+
 if (MINGW AND BUILD_FOR_GCOV)
 	add_definitions(-fprofile-arcs -ftest-coverage -DFAIL_USING_EXCEPTIONS=1)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
