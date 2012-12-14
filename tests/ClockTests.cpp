@@ -16,7 +16,7 @@ void TestMonotonousClock()
 		maxDiff = Max(diff, maxDiff);
 	}
 
-	assert(maxDiff > 0);
+	assert(maxDiff > 0); // The clock must proceed at least some amount.
 }
 
 void TestSubMillisecondPrecision()
