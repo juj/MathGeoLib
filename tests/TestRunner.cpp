@@ -137,10 +137,10 @@ void AddSerializationTests();
 
 int main()
 {
-//	AddPositiveIntersectionTests();
-//	AddNegativeIntersectionTests();
-//	AddMatrixTests();
-//	AddVectorTests();
+	AddPositiveIntersectionTests();
+	AddNegativeIntersectionTests();
+	AddMatrixTests();
+	AddVectorTests();
 	AddSerializationTests();
 
 	int numFailures = RunTests(10000);
