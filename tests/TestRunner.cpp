@@ -11,6 +11,10 @@ LCG rng(Clock::TickU32());
 
 std::vector<Test> tests;
 
+static int numTestsPassed = 0;
+static int numTestsFailed = 0;
+static int numTestsWarnings = 0;
+
 volatile int globalPokedData = 0;
 
 void AddTest(std::string name, TestFunctionPtr function, std::string description)
@@ -50,91 +54,119 @@ std::string FormatTime(tick_t ticks)
 	return str;
 }
 
-// Returns the number of failures.
-int RunTests(int numTimes)
+/// Returns 0: passed, 1: passed with warnings, -1: failed.
+int RunTest(Test &t, int numTimes, int numTrials)
 {
-	int numTestsPassed = 0;
-	int numWarnings = 0;
-
-	int numTrials = 100;
 	int numTimes1 = numTimes / numTrials;
+	printf("Testing '%s': ", t.name.c_str());
 
-	for(size_t i = 0; i < tests.size(); ++i)
+	std::vector<tick_t> times;
+	times.reserve(numTimes);
+
+	int numFails = 0;
+	int numPasses = 0;
+	std::string failReason; // Stores the failure reason of the first failure.
+	std::vector<std::string> failReasons;
+	for(int j = 0; j < (t.isRandomized ? numTimes1 : 1); ++j)
 	{
-		printf("Testing '%s': ", tests[i].name.c_str());
-
-		std::vector<tick_t> times;
-		times.reserve(numTimes);
-
-		int numFails = 0;
-		int numPasses = 0;
-		std::string failReason; // Stores the failure reason of the first failure.
-		std::vector<std::string> failReasons;
-		for(int j = 0; j < (tests[i].isRandomized ? numTimes1 : 1); ++j)
+		tick_t start = Clock::Tick();
+		for(int k = 0; k < numTrials; ++k)
+//			for(int k = 0; k < (t.isRandomized ? numTrials : 1); ++k)
 		{
-			tick_t start = Clock::Tick();
-			for(int k = 0; k < numTrials; ++k)
-//			for(int k = 0; k < (tests[i].isRandomized ? numTrials : 1); ++k)
+			try
 			{
-				try
-				{
-					tests[i].function();
-				}
-				catch(const std::exception &e)
-				{
-					if (failReason.empty())
-						failReason = e.what();
-					++numFails;
-				}
+				t.function();
 			}
-			tick_t end = Clock::Tick();
-			times.push_back(end - start);
+			catch(const std::exception &e)
+			{
+				if (failReason.empty())
+					failReason = e.what();
+				++numFails;
+			}
 		}
-
-		numPasses = (tests[i].isRandomized ? numTimes : 1) - numFails;
-		std::sort(times.begin(), times.end());
-
-		// Erase outliers. (x% slowest)
-		const float rateSlowestToDiscard = 0.05f;
-		int numSlowestToDiscard = (int)(times.size() * rateSlowestToDiscard);
-		times.erase(times.end() - numSlowestToDiscard, times.end());
-
-		tick_t total = 0;
-		for(size_t j = 0; j < times.size(); ++j)
-			total += times[j];
-
-		float successRate = (float)numPasses * 100.f / numTimes;
-
-		if (numFails == 0)
-		{
-			if (tests[i].isRandomized)
-				LOGI("ok (%d passes, 100%%)", numPasses);
-			else
-				LOGI("ok");
-			++numTestsPassed;
-		}
-		else if (successRate >= 95.0f)
-		{
-			printf("ok ");
-			LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
-			++numTestsPassed;
-			++numWarnings;
-		}
-		else
-		{
-			if (tests[i].isRandomized)
-				LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
-			else
-				LOGE("FAILED: '%s'", failReason.c_str());
-		}
-
-		if (!times.empty())
-			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(times[0]).c_str(), FormatTime(total / times.size()).c_str(), FormatTime(times.back()).c_str());
+		tick_t end = Clock::Tick();
+		times.push_back(end - start);
 	}
 
-	int numFailures = (int)tests.size() - numTestsPassed;
-	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)tests.size(), numTestsPassed, numWarnings, numFailures);
-	return numFailures;
+	numPasses = (t.isRandomized ? numTimes : 1) - numFails;
+	std::sort(times.begin(), times.end());
+
+	// Erase outliers. (x% slowest)
+	const float rateSlowestToDiscard = 0.05f;
+	int numSlowestToDiscard = (int)(times.size() * rateSlowestToDiscard);
+	times.erase(times.end() - numSlowestToDiscard, times.end());
+
+	tick_t total = 0;
+	for(size_t j = 0; j < times.size(); ++j)
+		total += times[j];
+
+	float successRate = (float)numPasses * 100.f / numTimes;
+
+	int ret = 0; // 0: Success
+
+	if (numFails == 0)
+	{
+		if (t.isRandomized)
+			LOGI("ok (%d passes, 100%%)", numPasses);
+		else
+			LOGI("ok");
+//		++numTestsPassed;
+	}
+	else if (successRate >= 95.0f)
+	{
+		printf("ok ");
+		LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+//		++numTestsPassed;
+//		++numWarnings;
+		ret = 1; // Success with warnings
+	}
+	else
+	{
+		if (t.isRandomized)
+			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+		else
+			LOGE("FAILED: '%s'", failReason.c_str());
+		ret = -1; // Failed
+	}
+
+	if (!times.empty())
+		LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(times[0]).c_str(), FormatTime(total / times.size()).c_str(), FormatTime(times.back()).c_str());
+
+	return ret;
+}
+
+int RunOneTest(int numTimes, int numTrials)
+{
+	if (tests.empty())
+		return -2; // No tests left to run
+	int ret = RunTest(tests.back(), numTimes, numTrials);
+	tests.pop_back();
+
+	if (ret == 0 || ret == 1)
+		++numTestsPassed;
+	if (ret == 1)
+		++numTestsWarnings;
+	if (ret == -1)
+		++numTestsFailed;
+
+	return ret;
+}
+
+// Returns the number of failures.
+int RunTests(int numTimes, int numTrials)
+{
+	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
+
+	for(size_t i = 0; i < tests.size(); ++i)
+		RunTest(tests[i], numTimes, numTrials);
+
+	PrintTestRunSummary();
+	return numTestsFailed;
+}
+
+void PrintTestRunSummary()
+{
+	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)tests.size(), numTestsPassed, numTestsWarnings, numTestsFailed);
 }
 
 #ifdef MATH_TESTS_EXECUTABLE
