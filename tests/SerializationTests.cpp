@@ -9,7 +9,7 @@ void TestQuat4FromString()
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
-	for(int i = -1; i < sizeof(locales)/sizeof(locales[0]); ++i)
+	for(int i = -1; i < (int)(sizeof(locales)/sizeof(locales[0])); ++i)
 	{
 		if (i != -1)
 			setlocale(LC_ALL, locales[i]);
