@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "TestRunner.h"
 #include "Time/Clock.h"
-#include <Algorithm>
+#include <algorithm>
 
 #include "myassert.h"
 
@@ -137,10 +137,10 @@ void AddSerializationTests();
 
 int main()
 {
-	AddPositiveIntersectionTests();
-	AddNegativeIntersectionTests();
-	AddMatrixTests();
-	AddVectorTests();
+//	AddPositiveIntersectionTests();
+//	AddNegativeIntersectionTests();
+//	AddMatrixTests();
+//	AddVectorTests();
 	AddSerializationTests();
 
 	int numFailures = RunTests(10000);
