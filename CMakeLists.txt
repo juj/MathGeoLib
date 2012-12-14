@@ -42,6 +42,10 @@ else()
 	add_library(MathGeoLib STATIC ${sourceFiles} ${headerFiles})
 endif()
 
+if (UNIX)
+	target_link_libraries(MathGeoLib rt)
+endif()
+
 if (WIN8RT)
 	set_target_properties(MathGeoLib PROPERTIES VS_WINRT_EXTENSIONS TRUE)
 endif()
