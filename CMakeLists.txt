@@ -43,6 +43,7 @@ else()
 endif()
 
 if (UNIX)
+	# clock_gettime() is found from the library librt on linux. 
 	target_link_libraries(MathGeoLib rt)
 endif()
 
