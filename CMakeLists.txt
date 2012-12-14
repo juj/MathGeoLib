@@ -42,7 +42,7 @@ else()
 	add_library(MathGeoLib STATIC ${sourceFiles} ${headerFiles})
 endif()
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if (LINUX)
 	# clock_gettime() is found from the library librt on linux. 
 	target_link_libraries(MathGeoLib rt)
 endif()

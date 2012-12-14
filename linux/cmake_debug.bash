@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm CMakeCache.txt
-cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_FOR_GCOV=1 -G "Unix Makefiles" ..
+cmake -DLINUX=1 -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ..
 
 echo "make --version"
 make --version
