@@ -180,4 +180,4 @@ private:
 	int TreeHeight(int nodeIndex) const;
 };
 
-#include "KdTree.inl"
+#include "KDTree.inl"
