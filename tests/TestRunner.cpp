@@ -135,12 +135,13 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	return ret;
 }
 
+static int nextTestToRun = 0;
+
 int RunOneTest(int numTimes, int numTrials)
 {
-	if (tests.empty())
+	if (nextTestToRun >= (int)tests.size())
 		return -2; // No tests left to run
-	int ret = RunTest(tests.back(), numTimes, numTrials);
-	tests.pop_back();
+	int ret = RunTest(tests[nextTestToRun++], numTimes, numTrials);
 
 	if (ret == 0 || ret == 1)
 		++numTestsPassed;
