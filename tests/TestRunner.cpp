@@ -6,6 +6,8 @@
 
 #include "myassert.h"
 
+LCG rng(Clock::TickU32());
+
 std::vector<Test> tests;
 
 volatile int globalPokedData = 0;

@@ -5,8 +5,6 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-extern LCG rng;
-
 void TestFloat4Swizzled()
 {
 	float4 f(float2(1,2),3,4);

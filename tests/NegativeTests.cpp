@@ -5,8 +5,6 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-extern LCG rng;
-
 #define SCALE 1e2f
 
 #define GUARDBAND 1e-2f

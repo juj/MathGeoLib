@@ -5,8 +5,6 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-extern LCG rng;
-
 void TestQuat4FromString()
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php

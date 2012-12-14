@@ -3,6 +3,9 @@
 #include <vector>
 #include <string>
 
+#include "Algorithm/Random/LCG.h"
+extern LCG rng;
+
 typedef void (*TestFunctionPtr)();
 struct Test
 {

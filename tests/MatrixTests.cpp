@@ -5,8 +5,6 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-extern LCG rng;
-
 void TestFloat3x4ScaleRow()
 {
 	float3x4 m2;
