@@ -3,6 +3,7 @@
 #include "TestRunner.h"
 #include "Time/Clock.h"
 #include <algorithm>
+#include "MathGeoLibTests.h"
 
 #include "myassert.h"
 
@@ -130,12 +131,6 @@ int RunTests(int numTimes)
 	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)tests.size(), numTestsPassed, numWarnings, numFailures);
 	return numFailures;
 }
-
-void AddPositiveIntersectionTests();
-void AddNegativeIntersectionTests();
-void AddMatrixTests();
-void AddVectorTests();
-void AddSerializationTests();
 
 int main()
 {
