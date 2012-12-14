@@ -135,11 +135,7 @@ int RunTests(int numTimes)
 #ifdef MATH_TESTS_EXECUTABLE
 int main()
 {
-	AddPositiveIntersectionTests();
-	AddNegativeIntersectionTests();
-	AddMatrixTests();
-	AddVectorTests();
-	AddSerializationTests();
+	AddMathGeoLibTests();
 
 	int numFailures = RunTests(10000);
 	LOGI("%d\n", globalPokedData);
