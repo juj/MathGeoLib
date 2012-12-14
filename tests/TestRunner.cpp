@@ -133,6 +133,7 @@ void AddPositiveIntersectionTests();
 void AddNegativeIntersectionTests();
 void AddMatrixTests();
 void AddVectorTests();
+void AddSerializationTests();
 
 int main()
 {
@@ -140,6 +141,7 @@ int main()
 	AddNegativeIntersectionTests();
 	AddMatrixTests();
 	AddVectorTests();
+	AddSerializationTests();
 
 	int numFailures = RunTests(10000);
 	LOGI("%d\n", globalPokedData);
