@@ -5,6 +5,7 @@ void AddNegativeIntersectionTests();
 void AddMatrixTests();
 void AddVectorTests();
 void AddSerializationTests();
+void AddClockTests();
 
 void AddMathGeoLibTests()
 {
@@ -13,4 +14,5 @@ void AddMathGeoLibTests()
 	AddMatrixTests();
 	AddVectorTests();
 	AddSerializationTests();
+	AddClockTests();
 }
