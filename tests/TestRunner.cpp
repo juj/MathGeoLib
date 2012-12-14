@@ -121,7 +121,12 @@ int RunTests(int numTimes)
 			++numWarnings;
 		}
 		else
-			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+		{
+			if (tests[i].isRandomized)
+				LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+			else
+				LOGE("FAILED: '%s'", failReason.c_str());
+		}
 
 		if (!times.empty())
 			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(times[0]).c_str(), FormatTime(total / times.size()).c_str(), FormatTime(times.back()).c_str());
