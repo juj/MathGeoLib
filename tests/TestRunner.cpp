@@ -159,7 +159,7 @@ int RunTests(int numTimes, int numTrials)
 	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
 	for(size_t i = 0; i < tests.size(); ++i)
-		RunTest(tests[i], numTimes, numTrials);
+		RunOneTest(numTimes, numTrials);
 
 	PrintTestRunSummary();
 	return numTestsFailed;
