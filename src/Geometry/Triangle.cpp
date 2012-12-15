@@ -352,6 +352,13 @@ float Triangle::Distance(const Sphere &sphere) const
 	return Max(0.f, Distance(sphere.pos) - sphere.r);
 }
 
+float Triangle::Distance(const Capsule &capsule) const
+{
+	float3 otherPt;
+	float3 thisPt = ClosestPoint(capsule.l, &otherPt);
+	return Max(0.f, thisPt.Distance(otherPt) - capsule.r);
+}
+
 /** Calculates the intersection between a line and a triangle. The facing is not accounted for, so
 	rays are reported to intersect triangles that are both front and backfacing.
 	According to "T. M&ouml;ller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
@@ -717,6 +724,10 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 	float3 v_p = a - lineSegment.a;
 	float3 d = lineSegment.b - lineSegment.a;
 
+	// Q(u,v) = a + u*e0 + v*e1
+	// L(t)   = ls.a + t*d
+	// Minimize the distance |Q(u,v) - L(t)|^2 under u >= 0, v >= 0, u+v <= 1, t >= 0, t <= 1.
+
 	float v_p_dot_e0 = Dot(v_p, e0);
 	float v_p_dot_e1 = Dot(v_p, e1);
 	float v_p_dot_d = Dot(v_p, d);
@@ -965,15 +976,27 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 			v = (B[1] - m[1][0] - m[1][2]) / m[1][1];
 			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
 			// The solution is (u,v,t)=(1,v,1).
-			return a + v*e1;
+			return a + e0 + v*e1;
 		}
 		else if (u+v > 1.f)
 		{
 			// Set v = 1-u and solve again.
+
+			// Q(u,1-u) = a + u*e0 + e1 - u*e1 = a+e1 + u*(e0-e1)
+			// L(1)   = ls.a + t*d = ls.b
+			// Minimize the distance |Q(u,1-u) - L(1)| = |a+e1+ls.b + u*(e0-e1)|
+
+			// |K + u*(e0-e1)|^2 = (K,K) + 2*u(K,e0-e1) + u^2 * (e0-e1,e0-e1)
+
+			// grad = 2*(K,e0-e1) + 2*u*(e0-e1,e0-e1) == 0
+			//                                      u == (K,e1-e0) / (e0-e1,e0-e1)
+
 			u = (B[0] - m[0][1] - m[0][2]) / (m[0][0] - m[0][1]);
+//			u = Dot(a + e1 + lineSegment.b, e1 - e0) / Dot(e0-e1, e0-e1);
+
 //			mathassert(EqualAbs(u, Clamp01(u)));
 			u = Clamp01(u);
-			return a + u*e0;
+			return a + u*e0 + (1-u)*e1;
 		}
 		else
 		{

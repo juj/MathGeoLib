@@ -250,6 +250,7 @@ public:
 		@see Contains(), Intersects(), ClosestPoint(). */
 	float Distance(const float3 &point) const;
 	float Distance(const Sphere &sphere) const;
+	float Distance(const Capsule &capsule) const;
 
 	/// Tests whether this triangle and the given object intersect.	   
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
