@@ -204,11 +204,15 @@ tick_t Clock::Tick()
 	LARGE_INTEGER ddwTimer;
 	QueryPerformanceCounter(&ddwTimer);
 	return ddwTimer.QuadPart;
+#elif defined(__APPLE__)
+	timeval t;
+	gettimeofday(&t, NULL);
+	return (tick_t)t.tv_sec * 1000 * 1000 + (tick_t)t.tv_usec;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 	timespec t;
 	clock_gettime(CLOCK_MONOTONIC, &t);
 	return (tick_t)t.tv_sec * 1000 * 1000 * 1000 + (tick_t)t.tv_nsec;
-#elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
+#elif defined(_POSIX_C_SOURCE)
 	timeval t;
 	gettimeofday(&t, NULL);
 	return (tick_t)t.tv_sec * 1000 * 1000 + (tick_t)t.tv_usec;
@@ -237,6 +241,8 @@ tick_t Clock::TicksPerSec()
 //	return CLOCKS_PER_SEC;
 #elif defined(WIN32)
 	return ddwTimerFrequency.QuadPart;
+#elif defined(__APPLE__)
+	return 1000 * 1000;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 	return 1000 * 1000 * 1000;
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
