@@ -9,7 +9,7 @@ if (MSVC11 AND RUN_VS2012_ANALYZE)
 endif()
 
 if (BUILD_FOR_GCOV)
-	add_definitions(-DFAIL_USING_EXCEPTIONS=1)
+	add_definitions(-DFAIL_USING_EXCEPTIONS)
 endif()
 
 if (MATH_TESTS_EXECUTABLE)
