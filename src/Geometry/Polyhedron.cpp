@@ -433,7 +433,8 @@ bool Polyhedron::Contains(const float3 &point) const
 	int numIntersections = 0;
 	for(int i = 0; i < (int)f.size(); ++i)
 	{
-		Plane p(v[f[i].v[0]] - point, v[f[i].v[1]] - point, v[f[i].v[2]] - point);
+		//Plane p(v[f[i].v[0]] - point, v[f[i].v[1]] - point, v[f[i].v[2]] - point);
+		Plane p = FacePlane(i);
 
 		// Find the intersection of the plane and the ray (0,0,0) -> (t,0,0), t >= 0.
 		// <normal, point_on_ray> == d
