@@ -136,12 +136,11 @@ float float3::Length() const
 }
 
 float float3::Normalize()
-{ 
+{
 	assume(IsFinite());
-	float lengthSq = LengthSq();
-	if (lengthSq > 1e-6f)
+	float length = Length();
+	if (length > 1e-6f)
 	{
-		float length = sqrtf(lengthSq); 
 		*this *= 1.f / length;
 		return length;
 	}

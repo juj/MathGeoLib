@@ -86,31 +86,15 @@ bool Plane::IsDegenerate() const
 
 void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
 {
-	/* We want to find a solution to (n, v) = d:
-		(n, v1) = 1
-		(n, v2) = 1
-		(n, v3) = 1
-
-		   ( v1 )       ( 1 )
-		   ( v2 ) * n = ( 1 )
-		   ( v3 )       ( 1 )
-	*/
-
-	float3x3 m;
-	m.SetRow(0, v1);
-	m.SetRow(1, v2);
-	m.SetRow(2, v3);
-	m.SolveAxb(float3(1,1,1), normal);
-	normal.Normalize();
-
-	/// Old method. This has an issue that it is not numerically as stable as above. @todo Profile which is faster.
-#if 0
-	normal = (v2-v1).Cross(v3-v1);
-	assume(!normal.IsZero());
-	normal.Normalize();
-#endif
-
+	normal = ((v2-v1).Cross(v3-v1)).Normalized();
 	d = Dot(v1, normal);
+
+#ifdef MATH_ASSERT_CORRECTNESS
+	float d2 = Dot(v2, normal);
+	float d3 = Dot(v3, normal);
+	mathassert(EqualAbs(d, d2));
+	mathassert(EqualAbs(d, d3));
+#endif
 }
 
 void Plane::Set(const float3 &point, const float3 &normal_)
