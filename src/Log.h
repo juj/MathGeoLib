@@ -145,8 +145,21 @@ void logmsg(const char *msg);
 #define LOG(channel, ...) do { /*if (IsLogChannelActive(channel))*/ (void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__); } while(0)
 #endif
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
-#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__))
+#define LOGW(...) do { \
+	char str[512]; \
+	sprintf(str, __VA_ARGS__); \
+	char str2[512]; \
+	sprintf(str2, "Warning: %s", str); \
+	((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", str)); \
+	} while(0)
+
+#define LOGE(...) do { \
+	char str[512]; \
+	sprintf(str, __VA_ARGS__); \
+	char str2[512]; \
+	sprintf(str2, "Error: %s", str); \
+	((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", str)); \
+	} while(0)
 
 #elif defined(WIN32) && !defined(LOGGING_SUPPORT_DISABLED)
 
