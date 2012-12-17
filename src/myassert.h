@@ -17,15 +17,18 @@
 	@brief Control over assert() macro for MathGeoLib. */
 #include "Log.h"
 
+#include <sstream>
+
 #ifdef assert
 #undef assert
 #endif
 
 #ifdef OPTIMIZED_RELEASE
-#define assert(x)
-#else
 
-#ifdef FAIL_USING_EXCEPTIONS
+#define assert(x)
+#define asserteq(x,y)
+
+#elif defined(FAIL_USING_EXCEPTIONS)
 
 #include <stdexcept>
 
@@ -35,21 +38,47 @@
 			throw std::runtime_error(#x); \
 	MULTI_LINE_MACRO_END
 
-#else
+#define asserteq(x,y) \
+	MULTI_LINE_MACRO_BEGIN \
+		if ((x) != (y)) \
+		{ \
+			std::stringstream std_stringstream; \
+			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			throw std::runtime_error(std_stringstream.str().c_str()); \
+		} \
+	MULTI_LINE_MACRO_END
 
-#ifdef WIN32
+#elif defined(WIN32)
+
 #include <cassert>
-#else
 
+#define asserteq(x,y) \
+	MULTI_LINE_MACRO_BEGIN \
+		if ((x) != (y)) \
+		{ \
+			std::stringstream std_stringstream; \
+			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			LOGE("%s", std_stringstream.str().c_str()); \
+			_CrtDebugBreak(); \
+		} \
+	MULTI_LINE_MACRO_END
 
-#ifdef _DEBUG
+#elif defined(_DEBUG)
+
 #define assert(x) do { if (!(x)) LOGW("Assertion failed: " #x); } while(0)
+#define asserteq(x,y) \
+	MULTI_LINE_MACRO_BEGIN \
+		if ((x) != (y)) \
+		{ \
+			std::stringstream std_stringstream; \
+			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			LOGE("%s", std_stringstream.str().c_str()); \
+		} \
+	MULTI_LINE_MACRO_END
+
 #else
+
 #define assert(x)
-#endif
-
-#endif
-
-#endif
+#define asserteq(x,y)
 
 #endif
