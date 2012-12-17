@@ -92,8 +92,8 @@ void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
 #ifdef MATH_ASSERT_CORRECTNESS
 	float d2 = Dot(v2, normal);
 	float d3 = Dot(v3, normal);
-	mathassert(EqualAbs(d, d2));
-	mathassert(EqualAbs(d, d3));
+	mathassert(EqualAbs(d, d2, 1e-2f));
+	mathassert(EqualAbs(d, d3, 1e-2f));
 #endif
 }
 
