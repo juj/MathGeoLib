@@ -941,6 +941,12 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 			float u = m_00 * b0 + m_01 * b1;
 			u /= det;
 			u = Clamp01(u);
+
+			float t = m_10 * b0 + m_11 * b1;
+			t /= det;
+			t = Clamp01(t);
+			if (otherPt)
+				*otherPt = lineSegment.GetPoint(t);
 			return a + u*e0 + (1.f-u)*e1;
 		}
 		else
@@ -1036,7 +1042,6 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 		mathassert(t >= 0.f);
 		mathassert(t <= 1.f);
 		return a + u*e0 + (1.f-u)*e1;
-
 	}
 	else // All parameters are within range, so the triangle and the line segment intersect, and the intersection point is the closest point.
 	{
