@@ -5,7 +5,7 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-void TestQuat4FromString()
+void TestQuatFromString()
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -16,6 +16,10 @@ void TestQuat4FromString()
 		assert(Quat::FromString("1, +2, 3.1, -4").Equals(Quat(1,2,3.1f,-4)));
 		assert(Quat::FromString("(1, +2, 3.1, -4").Equals(Quat(1,2,3.1f,-4)));
 		assert(Quat::FromString("(1, +2, 3.1, -4)").Equals(Quat(1,2,3.1f,-4)));
+
+		assert(Quat::FromString("1 ; +2; 3.1; -4").Equals(Quat(1,2,3.1f,-4)));
+		assert(Quat::FromString("(1 ; +2; 3.1; -4").Equals(Quat(1,2,3.1f,-4)));
+		assert(Quat::FromString("(1 ; +2: 3.1; -4)").Equals(Quat(1,2,3.1f,-4)));
 
 		assert(Quat::FromString("1,+2,3.1, -4").Equals(Quat(1,2,3.1f,-4)));
 		assert(Quat::FromString("(1,+2,3.1, -4").Equals(Quat(1,2,3.1f,-4)));
@@ -29,5 +33,5 @@ void TestQuat4FromString()
 
 void AddSerializationTests()
 {
-	AddTest("Quat4::FromString", TestQuat4FromString);
+	AddTest("Quat::FromString", TestQuatFromString);
 }
