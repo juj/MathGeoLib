@@ -24,7 +24,7 @@
 #include "Geometry/Ray.h"
 #include "Math/MathFwd.h"
 #include "Math/MathConstants.h"
-#include <cassert>
+#include "myassert.h"
 
 #ifdef MATH_SSE
 #include <intrin.h>
