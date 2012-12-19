@@ -5,8 +5,6 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-#define SCALE 1e2f
-
 AABB RandomAABBContainingPoint(const float3 &pt, float maxSideLength)
 {
 	float w = rng.Float(1e-2f, maxSideLength);

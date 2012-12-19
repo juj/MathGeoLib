@@ -4,6 +4,11 @@
 #include <string>
 
 #include "Algorithm/Random/LCG.h"
+
+#define SCALE 1e2f
+
+#define GUARDBAND 1e-2f
+
 extern LCG rng;
 
 typedef void (*TestFunctionPtr)();

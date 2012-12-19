@@ -338,6 +338,57 @@ void TestFloat4x4AssignFloat3x4()
 
 }
 
+void TestFloat4x4CtorCols()
+{
+	float4x4 m(float4(1,2,3,4), float4(5,6,7,8), float4(9,10,11,12), float4(13,14,15,16));
+	float4x4 m2(1,5,9,13, 2,6,10,14, 3,7,11,15, 4,8,12,16);
+	assert(m.Equals(m2));
+}
+
+void TestFloat4x4CtorFromQuat()
+{
+	Quat q = Quat::RandomRotation(rng);
+	float4x4 m(q);
+
+	float3 v = float3(-1, 5, 20.f);
+	float3 v1 = q * v;
+	float3 v2 = m.TransformPos(v);
+	assert(v1.Equals(v2));
+}
+
+void TestFloat4x4CtorFromQuatTrans()
+{
+	float3 t = float3::RandomBox(rng, float3(-SCALE, -SCALE, -SCALE), float3(SCALE, SCALE, SCALE));
+	Quat q = Quat::RandomRotation(rng);
+	float4x4 m(q, t);
+
+	float3 v = float3(-1, 5, 20.f);
+	float3 v1 = q * v + t;
+	float3 v2 = m.TransformPos(v);
+	assert(v1.Equals(v2));
+}
+
+void TestFloat4x4Translate()
+{
+	float3 t = float3::RandomBox(rng, float3(-SCALE, -SCALE, -SCALE), float3(SCALE, SCALE, SCALE));
+	float3 t2 = float3::RandomBox(rng, float3(-SCALE, -SCALE, -SCALE), float3(SCALE, SCALE, SCALE));
+	float4x4 m = float4x4::Translate(t);
+	float4x4 m2 = float4x4::Translate(t.x, t.y, t.z);
+
+	float3 v = t + t2;
+	float3 v1 = m.TransformPos(t2);
+	float3 v2 = m2.TransformPos(t2);
+	assert(v1.Equals(v2));
+	assert(v.Equals(v1));
+}
+
+void TestFloat4x4Scale()
+{
+	float4x4 m = float4x4::Scale(2,4,6);
+	float4x4 m2(2,0,0,0, 0,4,0,0, 0,0,6,0, 0,0,0,1);
+	assert(m.Equals(m2));
+}
+
 void AddMatrixTests()
 {
 	AddTest("float3x4::ScaleRow", TestFloat3x4ScaleRow);
@@ -362,4 +413,11 @@ void AddMatrixTests()
 	AddRandomizedTest("float4x4::Set3x4Part", TestFloat4x4Set3x4Part);
 	AddRandomizedTest("float4x4::SwapRows", TestFloat4x4SwapRows);
 	AddRandomizedTest("float4x4::operator=(float3x4)", TestFloat4x4AssignFloat3x4);
+
+	AddTest("float4x4(columns)", TestFloat4x4CtorCols);
+	AddRandomizedTest("float4x4(Quat)", TestFloat4x4CtorFromQuat);
+	AddRandomizedTest("float4x4(Quat, translate)", TestFloat4x4CtorFromQuatTrans);
+	AddRandomizedTest("float4x4::Translate", TestFloat4x4Translate);
+	AddTest("float4x4::Scale", TestFloat4x4Scale);
+
 }

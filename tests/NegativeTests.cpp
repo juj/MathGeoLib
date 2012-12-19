@@ -5,10 +5,6 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-#define SCALE 1e2f
-
-#define GUARDBAND 1e-2f
-
 AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 {
 	float w = rng.Float(0, maxSideLength);
