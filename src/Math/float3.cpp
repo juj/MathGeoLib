@@ -236,9 +236,13 @@ float3 float3::FromString(const char *str)
 		++str;
 	float3 f;
 	f.x = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	f.y = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	f.z = (float)strtod(str, const_cast<char**>(&str));

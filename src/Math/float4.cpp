@@ -440,12 +440,18 @@ float4 float4::FromString(const char *str)
 		++str;
 	float4 f;
 	f.x = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	f.y = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	f.z = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	f.w = (float)strtod(str, const_cast<char**>(&str));

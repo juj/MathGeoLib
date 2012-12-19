@@ -243,6 +243,8 @@ float2 float2::FromString(const char *str)
 		++str;
 	float2 f;
 	f.x = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t')
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	f.y = (float)strtod(str, const_cast<char**>(&str));
