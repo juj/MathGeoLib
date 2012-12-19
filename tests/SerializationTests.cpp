@@ -19,7 +19,7 @@ void TestQuatFromString()
 
 		assert(Quat::FromString("1 ; +2; 3.1; -4").Equals(Quat(1,2,3.1f,-4)));
 		assert(Quat::FromString("(1 ; +2; 3.1; -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1 ; +2: 3.1; -4)").Equals(Quat(1,2,3.1f,-4)));
+		assert(Quat::FromString("(1 ; +2; 3.1; -4)").Equals(Quat(1,2,3.1f,-4)));
 
 		assert(Quat::FromString("1,+2,3.1, -4").Equals(Quat(1,2,3.1f,-4)));
 		assert(Quat::FromString("(1,+2,3.1, -4").Equals(Quat(1,2,3.1f,-4)));

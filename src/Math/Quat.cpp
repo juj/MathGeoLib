@@ -579,12 +579,18 @@ Quat Quat::FromString(const char *str)
 		++str;
 	Quat q;
 	q.x = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	q.y = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t')
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	q.z = (float)strtod(str, const_cast<char**>(&str));
+	while(*str == ' ' || *str == '\t')
+		++str;
 	if (*str == ',' || *str == ';')
 		++str;
 	q.w = (float)strtod(str, const_cast<char**>(&str));
