@@ -536,9 +536,8 @@ float3 Polygon::ClosestPoint(const float3 &point) const
 	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
-		float3 lineSegPt;
 		float3 pt = tris[i].ClosestPoint(point);
-		float d = pt.DistanceSq(lineSegPt);
+		float d = pt.DistanceSq(point);
 		if (d < closestDist)
 		{
 			closestPt = pt;
@@ -546,7 +545,6 @@ float3 Polygon::ClosestPoint(const float3 &point) const
 		}
 	}
 	return closestPt;
-
 }
 
 float3 Polygon::ClosestPoint(const LineSegment &lineSegment) const
