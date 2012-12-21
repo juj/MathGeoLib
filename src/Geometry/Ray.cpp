@@ -194,7 +194,22 @@ float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 
 float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 {
-	return Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
+	float t;
+	float3 closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &t, d2);
+	if (t <= 0.f)
+	{
+		if (d)
+			*d = 0.f;
+		if (d2)
+			other.ClosestPoint(pos, d2);
+		return pos;
+	}
+	else
+	{
+		if (d)
+			*d = t;
+		return closestPoint;
+	}
 }
 
 float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const

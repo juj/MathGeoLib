@@ -284,10 +284,20 @@ float3 Line::ClosestPoint(const float3 &targetPoint, float *d) const
 
 float3 Line::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
-	float3 closestPoint = ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, d2);
-	if (d2)
-		*d2 = Max(0.f, *d2); // The parametric distance on the ray must be non-negative.
-	return closestPoint;
+	float t2;
+	float3 closestPoint = ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, &t2);
+	if (t2 <= 0.f)
+	{
+		if (d2)
+			*d2 = 0.f;
+		return ClosestPoint(other.pos, d);
+	}
+	else
+	{
+		if (d2)
+			*d2 = t2;
+		return closestPoint;
+	}
 }
 
 float3 Line::ClosestPoint(const Line &other, float *d, float *d2) const
