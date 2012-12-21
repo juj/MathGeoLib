@@ -417,7 +417,7 @@ bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, floa
 				{
 					float t = -p0.y / d.y;
 					float x = p0.x + t * d.x;
-					if (t >= 0.f && t <= 1.f && x > 1e-3f)
+					if (t >= 0.f && t <= 1.f && x > 1e-6f)
 						++numIntersections;
 				}
 			}
@@ -439,12 +439,15 @@ bool Polyhedron::Contains(const float3 &point) const
 		// <normal, point_on_ray> == d
 		// n.x * t == d
 		//       t == d / n.x
-		float t = p.d / p.normal.x;
-		// If t >= 0, the plane and the ray intersect, and the ray potentially also intersects the polygon.
-		// Finish the test by checking whether the point of intersection is contained in the polygon, in
-		// which case the ray-polygon intersection occurs.
-		if (t >= 0.f && FaceContains(i, point + float3(t,0,0)))
-			++numIntersections;
+		if (Abs(p.normal.x) > 1e-5f)
+		{
+			float t = p.d / p.normal.x;
+			// If t >= 0, the plane and the ray intersect, and the ray potentially also intersects the polygon.
+			// Finish the test by checking whether the point of intersection is contained in the polygon, in
+			// which case the ray-polygon intersection occurs.
+			if (t >= 0.f && FaceContains(i, point + float3(t,0,0)))
+				++numIntersections;
+		}
 	}
 
 	return numIntersections % 2 == 1;
