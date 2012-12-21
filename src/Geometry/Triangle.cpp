@@ -716,6 +716,52 @@ float3 Triangle::ClosestPoint(const float3 &p) const
 	return a + ab * v + ac * w;
 }
 
+float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const
+{
+	///\todo Optimize.
+	float3 intersectionPoint;
+	if (Intersects(lineSegment, 0, &intersectionPoint))
+	{
+		if (otherPt)
+			*otherPt = intersectionPoint;
+		return intersectionPoint;
+	}
+
+	float u1,v1,d1;
+	float3 pt1 = ClosestPointToTriangleEdge(lineSegment, &u1, &v1, &d1);
+
+	float3 pt2 = ClosestPoint(lineSegment.a);
+	float3 pt3 = ClosestPoint(lineSegment.b);
+	
+	float D1 = pt1.DistanceSq(lineSegment.GetPoint(d1));
+	float D2 = pt2.DistanceSq(lineSegment.a);
+	float D3 = pt3.DistanceSq(lineSegment.b);
+
+	if (D1 <= D2 && D1 <= D3)
+	{
+		if (otherPt)
+			*otherPt = lineSegment.GetPoint(d1);
+		return pt1;
+	}
+	else if (D2 <= D3)
+	{
+		if (otherPt)
+			*otherPt = lineSegment.a;
+		return pt2;
+	}
+	else
+	{
+		if (otherPt)
+			*otherPt = lineSegment.b;
+		return pt3;
+	}
+}
+
+#if 0
+///\todo Enable this codepath. This if rom Geometric Tools for Computer Graphics,
+/// but the algorithm in the book is broken and does not take into account the
+/// direction of the gradient to determine the proper region of intersection.
+/// Instead using a slower code path above.
 /// [groupSyntax]
 float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) const
 {
@@ -1050,7 +1096,7 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 		return a + uvt.x * e0 + uvt.y * e1;
 	}
 }
-
+#endif
 float3 Triangle::ClosestPointToTriangleEdge(const Line &other, float *outU, float *outV, float *outD) const
 {
 	///@todo Optimize!
@@ -1119,6 +1165,29 @@ float3 Triangle::ClosestPointToTriangleEdge(const LineSegment &lineSegment, floa
 	}
 }
 
+float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
+{
+	///\todo Optimize this function.
+	float3 intersectionPoint;
+	if (Intersects(line, 0, &intersectionPoint))
+	{
+		if (otherPt)
+			*otherPt = intersectionPoint;
+		return intersectionPoint;
+	}
+
+	float u1,v1,d1;
+	float3 pt1 = ClosestPointToTriangleEdge(line, &u1, &v1, &d1);
+	if (otherPt)
+		*otherPt = line.GetPoint(d1);
+	return pt1;
+}
+
+#if 0
+///\todo Enable this codepath. This if rom Geometric Tools for Computer Graphics,
+/// but the algorithm in the book is broken and does not take into account the
+/// direction of the gradient to determine the proper region of intersection.
+/// Instead using a slower code path above.
 float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
 {
 	float3 e0 = b - a;
@@ -1283,6 +1352,7 @@ float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
 		return a + uvt.x * e0 + uvt.y * e1;
 	}
 }
+#endif
 
 #if 0
 /// [groupSyntax]
