@@ -168,14 +168,30 @@ float3 LineSegment::ClosestPoint(const Ray &other, float *d, float *d2) const
 
 float3 LineSegment::ClosestPoint(const Line &other, float *d, float *d2) const
 {
-	float u, u2;
-	Line::ClosestPointLineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
-	u = Clamp01(u); // This is a line segment - cap both ends.
-	if (d)
-		*d = u;
-	if (d2)
-		*d2 = u2;
-	return GetPoint(u);
+	float t;
+	Line::ClosestPointLineLine(other.pos, other.pos + other.dir, a, b, d2, &t);
+	if (t <= 0.f)
+	{
+		if (d)
+			*d = 0.f;
+		if (d2)
+			other.ClosestPoint(a, d2);
+		return a;
+	}
+	else if (t >= 1.f)
+	{
+		if (d)
+			*d = 1.f;
+		if (d2)
+			other.ClosestPoint(b, d2);
+		return b;
+	}
+	else
+	{
+		if (d)
+			*d = t;
+		return GetPoint(t);
+	}
 }
 
 float3 LineSegment::ClosestPoint(const LineSegment &other, float *d, float *d2) const
@@ -213,12 +229,16 @@ float LineSegment::Distance(const Ray &other, float *d, float *d2) const
 float LineSegment::Distance(const Line &other, float *d, float *d2) const
 {
 	float u, u2;
-	ClosestPoint(other, &u, &u2);
+
+	Line::ClosestPointLineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
+	u = Clamp01(u); // This is a line segment - cap both ends.
+	float3 thisPt = GetPoint(u);
+	float3 otherPt = other.GetPoint(u2);
 	if (d)
 		*d = u;
 	if (d2)
 		*d2 = u2;
-	return GetPoint(u).Distance(other.GetPoint(u2));
+	return thisPt.Distance(otherPt);
 }
 
 float LineSegment::Distance(const LineSegment &other, float *d, float *d2) const

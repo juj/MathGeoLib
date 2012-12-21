@@ -297,10 +297,26 @@ float3 Line::ClosestPoint(const Line &other, float *d, float *d2) const
 
 float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
-	float3 closestPoint = ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, d2);
-	if (d2) // The parametric distance only runs in the range [0, 1].
-		*d2 = Clamp01(*d2);
-	return closestPoint;
+	float t2;
+	float3 closestPoint = ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, &t2);
+	if (t2 <= 0.f)
+	{
+		if (d2)
+			*d2 = 0.f;
+		return ClosestPoint(other.a, d);
+	}
+	else if (t2 >= 1.f)
+	{
+		if (d2)
+			*d2 = 1.f;
+		return ClosestPoint(other.b, d);
+	}
+	else
+	{
+		if (d2)
+			*d2 = t2;
+		return closestPoint;
+	}
 }
 
 float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const
