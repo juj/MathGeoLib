@@ -259,14 +259,73 @@ float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
 	float u, u2;
-	Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, &u, &u2);
-	u = Max(0.f, u);
-	u2 = Clamp01(u2);
-	if (d)
-		*d = u;
-	if (d2)
-		*d2 = u2;
-	return GetPoint(u);
+	float3 closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, &u, &u2);
+	if (u < 0.f)
+	{
+		if (u2 >= 0.f && u2 <= 1.f)
+		{
+			if (d)
+				*d = 0.f;
+			if (d2)
+				other.ClosestPoint(pos, d2);
+			return pos;
+		}
+
+		float3 p;
+		float t2;
+
+		if (u2 < 0.f)
+		{
+			p = other.a;
+			t2 = 0.f;
+		}
+		else // u2 > 1.f
+		{
+			p = other.b;
+			t2 = 1.f;
+		}
+
+		closestPoint = ClosestPoint(p, &u);
+		float3 closestPoint2 = other.ClosestPoint(pos, &u2);
+		if (closestPoint.DistanceSq(p) <= closestPoint2.DistanceSq(pos))
+		{
+			if (d)
+				*d = u;
+			if (d2)
+				*d2 = t2;
+			return closestPoint;
+		}
+		else
+		{
+			if (d)
+				*d = 0.f;
+			if (d2)
+				*d2 = u2;
+			return pos;
+		}
+	}
+	else if (u2 < 0.f)
+	{
+		closestPoint = ClosestPoint(other.a, d);
+		if (d2)
+			*d2 = 0.f;
+		return closestPoint;
+	}
+	else if (u2 > 1.f)
+	{
+		closestPoint = ClosestPoint(other.b, d);
+		if (d2)
+			*d2 = 1.f;
+		return closestPoint;
+	}
+	else
+	{
+		if (d)
+			*d = u;
+		if (d2)
+			*d2 = u2;
+		return closestPoint;
+	}
 }
 
 bool Ray::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const
