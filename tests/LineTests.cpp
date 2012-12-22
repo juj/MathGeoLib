@@ -29,7 +29,8 @@ void TestLineLineClosestPoint()
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
+	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 }
 
 void TestLineRayClosestPoint()
@@ -52,7 +53,8 @@ void TestLineRayClosestPoint()
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
+	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.pos) + 1e-3f);
 	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-3f);
@@ -78,7 +80,8 @@ void TestLineLineSegmentClosestPoint()
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
+	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
@@ -106,7 +109,8 @@ void TestRayRayClosestPoint()
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
+	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.pos) + 1e-3f);
 	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-3f);
@@ -135,7 +139,8 @@ void TestRayLineSegmentClosestPoint()
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
+	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
@@ -166,7 +171,8 @@ void TestLineSegmentLineSegmentClosestPoint()
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
+	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
 	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
