@@ -134,16 +134,16 @@ void TestRayLineSegmentClosestPoint()
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
-	assert(closestPointA.Distance(closestPointB) <= pt.Distance(pt2));
+	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-2f);
 	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB)));
 
-	assert(closestPointA.Distance(closestPointB) <= closestPointA.Distance(b.a));
-	assert(closestPointA.Distance(closestPointB) <= closestPointA.Distance(b.b));
-	assert(closestPointA.Distance(closestPointB) <= a.Distance(b.a));
-	assert(closestPointA.Distance(closestPointB) <= a.Distance(b.b));
+	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-2f);
+	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-2f);
+	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-2f);
+	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-2f);
 
-	assert(closestPointA.Distance(closestPointB) <= closestPointB.Distance(a.pos));
-	assert(closestPointA.Distance(closestPointB) <= b.Distance(a.pos));
+	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.pos) + 1e-2f);
+	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-2f);
 }
 
 void TestLineSegmentLineSegmentClosestPoint()
