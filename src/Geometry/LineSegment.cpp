@@ -315,16 +315,13 @@ float LineSegment::Distance(const Ray &other, float *d, float *d2) const
 float LineSegment::Distance(const Line &other, float *d, float *d2) const
 {
 	float u, u2;
-
-	Line::ClosestPointLineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
-	u = Clamp01(u); // This is a line segment - cap both ends.
-	float3 thisPt = GetPoint(u);
-	float3 otherPt = other.GetPoint(u2);
+	float3 closestPoint2 = other.ClosestPoint(*this, &u, &u2);
 	if (d)
-		*d = u;
+		*d = u2;
 	if (d2)
-		*d2 = u2;
-	return thisPt.Distance(otherPt);
+		*d2 = u;
+	float3 closestPoint = GetPoint(u2);
+	return closestPoint.Distance(closestPoint2);
 }
 
 float LineSegment::Distance(const LineSegment &other, float *d, float *d2) const
