@@ -156,14 +156,12 @@ float3 LineSegment::ClosestPoint(const float3 &point, float *d) const
 float3 LineSegment::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
 	float u, u2;
-	Line::ClosestPointLineLine(a, b, other.pos, other.pos + other.dir, &u, &u2);
-	u = Clamp01(u); // This is a line segment - cap both ends.
+	other.ClosestPoint(*this, &u, &u2);
 	if (d)
-		*d = u;
-	u2 = Max(0.f, u2); // The other primitive is a ray - cap negative side.
+		*d = u2;
 	if (d2)
-		*d2 = u2;
-	return GetPoint(u);
+		*d2 = u;
+	return GetPoint(u2);
 }
 
 float3 LineSegment::ClosestPoint(const Line &other, float *d, float *d2) const
@@ -197,14 +195,102 @@ float3 LineSegment::ClosestPoint(const Line &other, float *d, float *d2) const
 float3 LineSegment::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
 	float u, u2;
-	Line::ClosestPointLineLine(a, b, other.a, other.b, &u, &u2);
-	u = Clamp01(u); // This is a line segment - cap both ends.
-	if (d)
-		*d = u;
-	u2 = Clamp01(u2); // The other primitive is a line segment as well - cap both ends.
-	if (d2)
-		*d2 = u2;
-	return GetPoint(u);
+	float3 closestPoint = Line::ClosestPointLineLine(a, b, other.a, other.b, &u, &u2);
+	if (u >= 0.f && u <= 1.f && u2 >= 0.f && u2 <= 1.f)
+	{
+		if (d)
+			*d = u;
+		if (d2)
+			*d2 = u2;
+		return closestPoint;
+	}
+	else if (u >= 0.f && u <= 1.f) // Only u2 is out of bounds.
+	{
+		float3 p;
+		if (u2 < 0.f)
+		{
+			p = other.a;
+			if (d2)
+				*d2 = 0.f;
+		}
+		else
+		{
+			p = other.b;
+			if (d2)
+				*d2 = 1.f;
+		}
+
+		return ClosestPoint(p, d);
+	}
+	else if (u2 >= 0.f && u2 <= 1.f) // Only u is out of bounds.
+	{
+		float3 p;
+		if (u < 0.f)
+		{
+			p = a;
+			if (d)
+				*d = 0.f;
+		}
+		else
+		{
+			p = b;
+			if (d)
+				*d = 1.f;
+		}
+
+		if (d2)
+			other.ClosestPoint(p, d2);
+		return p;
+	}
+	else // Both u and u2 are out of bounds.
+	{
+		float3 p;
+		float t;
+		if (u < 0.f)
+		{
+			p = a;
+			t = 0.f;
+		}
+		else
+		{
+			p = b;
+			t = 1.f;
+		}
+
+		float3 p2;
+		float t2;
+		if (u2 < 0.f)
+		{
+			p2 = other.a;
+			t2 = 0.f;
+		}
+		else
+		{
+			p2 = other.b;
+			t2 = 1.f;
+		}
+
+		float T, T2;
+		closestPoint = ClosestPoint(p2, &T);
+		float3 closestPoint2 = other.ClosestPoint(p, &T2);
+
+		if (closestPoint.DistanceSq(p2) <= closestPoint2.DistanceSq(p))
+		{
+			if (d)
+				*d = T;
+			if (d2)
+				*d2 = t2;
+			return closestPoint;
+		}
+		else
+		{
+			if (d)
+				*d = t;
+			if (d2)
+				*d2 = T2;
+			return p;
+		}
+	}
 }
 
 float LineSegment::Distance(const float3 &point, float *d) const
