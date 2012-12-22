@@ -48,6 +48,16 @@
 		} \
 	MULTI_LINE_MACRO_END
 
+#define assertcmp(x, cmp, y) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!((x) cmp (y))) \
+		{ \
+			std::stringstream std_stringstream; \
+			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!)"; \
+			throw std::runtime_error(std_stringstream.str().c_str()); \
+		} \
+	MULTI_LINE_MACRO_END
+
 #elif defined(WIN32)
 
 #include <cassert>
@@ -58,6 +68,17 @@
 		{ \
 			std::stringstream std_stringstream; \
 			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			LOGE("%s", std_stringstream.str().c_str()); \
+			_CrtDebugBreak(); \
+		} \
+	MULTI_LINE_MACRO_END
+
+#define assertcmp(x, cmp, y) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!((x) cmp (y))) \
+		{ \
+			std::stringstream std_stringstream; \
+			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!)"; \
 			LOGE("%s", std_stringstream.str().c_str()); \
 			_CrtDebugBreak(); \
 		} \
@@ -75,10 +96,20 @@
 			LOGE("%s", std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
+#define assertcmp(x, cmp, y) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!((x) cmp (y))) \
+		{ \
+			std::stringstream std_stringstream; \
+			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!)"; \
+			LOGE("%s", std_stringstream.str().c_str()); \
+		} \
+	MULTI_LINE_MACRO_END
 
 #else
 
 #define assert(x)
 #define asserteq(x,y)
+#define assertcmp(x, cmp, y)
 
 #endif
