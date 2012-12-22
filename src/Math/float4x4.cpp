@@ -712,7 +712,7 @@ void float4x4::ScaleCol(int col, float scalar)
 	v[3][col] *= scalar;
 }
 
-const float3x3 float4x4::Float3x3Part() const
+CONST_WIN32 float3x3 float4x4::Float3x3Part() const
 {
 	return float3x3(v[0][0], v[0][1], v[0][2],
 					v[1][0], v[1][1], v[1][2],

@@ -344,7 +344,7 @@ public:
 	void ScaleCol(int col, float scalar);
 
 	/// Returns the upper-left 3-by-3 part.
-	const float3x3 Float3x3Part() const;
+	CONST_WIN32 float3x3 Float3x3Part() const;
 
 	/// Returns the upper-left 3-by-4 part. [noscript]
 	/// @note The float3x4 and float4x4 are bit-compatible, so this function simply casts.
