@@ -1168,8 +1168,8 @@ void TestTriangleLineIntersect()
 //	assert(b.Distance(a) == 0.f);
 	assert(a.Contains(a.ClosestPoint(b)));
 	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	assert(a.Contains(b.ClosestPoint(a)));
+	assert(b.Contains(b.ClosestPoint(a)));
 }
 
 void TestTriangleRayIntersect()

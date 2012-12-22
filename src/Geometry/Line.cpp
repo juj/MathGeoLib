@@ -331,11 +331,17 @@ float3 Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 
 float3 Line::ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *outD) const
 {
-	assert(!outU && "Not implemented!");
-	assert(!outV && "Not implemented!");
-	assert(!outD && "Not implemented!");
-
-	return triangle.ClosestPoint(*this);
+	///\todo Optimize this function!
+	float3 closestPointTriangle = triangle.ClosestPoint(*this);
+	if (outU || outV)
+	{
+		float2 uv = triangle.BarycentricUV(closestPointTriangle);
+		if (outU)
+			*outU = uv.x;
+		if (outV)
+			*outV = uv.y;
+	}
+	return ClosestPoint(closestPointTriangle, outD);
 }
 
 bool Line::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)

@@ -137,7 +137,7 @@ public:
 		@param outV [out] If specified, receives the barycentric V-coordinate (in two-coordinate barycentric UV convention)
 			representing the closest point on the triangle to this line. This pointer may be null.
 		@see Contains(), Distance(), Intersects(), GetPoint(), Triangle::Point(float u, float v). */
-	float3 ClosestPoint(const Triangle &triangle, float *outU, float *outV, float *d) const;
+	float3 ClosestPoint(const Triangle &triangle, float *outU = 0, float *outV = 0, float *d = 0) const;
 
 	/// Tests whether this line and the given object intersect.	   
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
