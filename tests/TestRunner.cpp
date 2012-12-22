@@ -17,13 +17,14 @@ static int numTestsWarnings = 0;
 
 volatile int globalPokedData = 0;
 
-void AddTest(std::string name, TestFunctionPtr function, std::string description)
+void AddTest(std::string name, TestFunctionPtr function, std::string description, bool runOnlyOnce)
 {
 	Test t;
 	t.name = name;
 	t.description = description;
 	t.function = function;
 	t.isRandomized = false;
+	t.runOnlyOnce = runOnlyOnce;
 	tests.push_back(t);
 }
 
@@ -34,6 +35,7 @@ void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string d
 	t.description = description;
 	t.function = function;
 	t.isRandomized = true;
+	t.runOnlyOnce = false;
 	tests.push_back(t);
 }
 
@@ -57,6 +59,8 @@ std::string FormatTime(tick_t ticks)
 /// Returns 0: passed, 1: passed with warnings, -1: failed.
 int RunTest(Test &t, int numTimes, int numTrials)
 {
+	if (t.runOnlyOnce)
+		numTimes = numTrials = 1;
 	int numTimes1 = numTimes / numTrials;
 	printf("Testing '%s': ", t.name.c_str());
 
