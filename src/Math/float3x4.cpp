@@ -845,6 +845,12 @@ float3x4 &float3x4::operator =(const float3x4 &rhs)
 	return *this;
 }
 
+float3x4 &float3x4::operator =(const Quat &rhs)
+{
+	*this = rhs.ToFloat3x4();
+	return *this;
+}
+
 float float3x4::Determinant() const
 {
 	///\todo SSE.
