@@ -127,7 +127,7 @@ public:
 		@param leafCallback A function or a function object of prototype
 			bool LeafCallbackFunction(KdTree<T> &tree, KdTreeNode &leaf, const AABB &aabb);
 			If the callback function returns true, the execution of the query is stopped and this function immediately
-			returns afterwards. If the callback function returns false, the execution of the query continues.
+			returns afterwards. If the callback function returns false, the execution of the query continues. */
 	template<typename Func>
 	inline void AABBQuery(const AABB &aabb, Func &leafCallback);
 
