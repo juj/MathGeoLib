@@ -153,12 +153,13 @@ public:
 	static TranslateOp Translate(float tx, float ty, float tz);
 	static TranslateOp Translate(const float3 &offset);
 
-	/// Creates a new float4x4 that rotates about one of the principal axes by the given angle. [indexTitle: RotateX/Y/Z]
-	/** Calling RotateX, RotateY or RotateZ is slightly faster than calling the more generic RotateAxisAngle function. */
-	static float4x4 RotateX(float angleRadians);
-	/** @param pointOnAxis If specified, the rotation is performed about an axis that passes through this point, and not
+	/// Creates a new float4x4 that rotates about one of the principal axes. [indexTitle: RotateX/Y/Z]
+	/** Calling RotateX, RotateY or RotateZ is slightly faster than calling the more generic RotateAxisAngle function.
+		@param angleRadians The angle to rotate by, in radians. Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
+		@param pointOnAxis If specified, the rotation is performed about an axis that passes through this point, and not
 		through the origin. The returned matrix will not be a pure rotation matrix, but will also contain translation. */
 	static float4x4 RotateX(float angleRadians, const float3 &pointOnAxis);
+	static float4x4 RotateX(float angleRadians);
 	/** [similarOverload: RotateX] [hideIndex] */
 	static float4x4 RotateY(float angleRadians);
 	/** [similarOverload: RotateX] [hideIndex] */
@@ -168,18 +169,24 @@ public:
 	/** [similarOverload: RotateX] [hideIndex] */
 	static float4x4 RotateZ(float angleRadians, const float3 &pointOnAxis);
 
-	/// Creates a new float4x4 that rotates about the given axis by the given angle.
-	static float4x4 RotateAxisAngle(const float3 &axisDirection, float angleRadians);
-	/** @param pointOnAxis If specified, the rotation is performed about an axis that passes through this point, and not
+	/// Creates a new float4x4 that rotates about the given axis.
+	/** @param axisDirection The axis to rotate about. This vector must be normalized.
+		@param angleRadians The angle to rotate by, in radians. Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
+		@param pointOnAxis If specified, the rotation is performed about an axis that passes through this point, and not
 		through the origin. The returned matrix will not be a pure rotation matrix, but will also contain translation. */
 	static float4x4 RotateAxisAngle(const float3 &axisDirection, float angleRadians, const float3 &pointOnAxis);
+	static float4x4 RotateAxisAngle(const float3 &axisDirection, float angleRadians);
 
 	/// Creates a new float4x4 that rotates sourceDirection vector to coincide with the targetDirection vector.
 	/** @note There are infinite such rotations - this function returns the rotation that has the shortest angle
-		(when decomposed to axis-angle notation). */
-	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
-	/** @param centerPoint If specified, rotation is performed using this point as the coordinate space origin. */
+		(when decomposed to axis-angle notation).
+		@param sourceDirection The 'from' direction vector. This vector must be normalized.
+		@param targetDirection The 'to' direction vector. This vector must be normalized.
+		@param centerPoint If specified, rotation is performed using this point as the coordinate space origin. If omitted,
+			the rotation is performed about the coordinate system origin (0,0,0).
+		@return A new rotation matrix R for which R*sourceDirection == targetDirection. */
 	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection, const float3 &centerPoint);
+	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
 
 	/// Returns a random 4x4 matrix with each entry randomized between the range[minElem, maxElem].
 	/** Warning: The matrices returned by this function do not represent well-formed 3D transformations.
@@ -232,21 +239,22 @@ public:
 	static ScaleOp Scale(float sx, float sy, float sz);
 	static ScaleOp Scale(const float3 &scale);
 
-	static ScaleOp Scale(float uniformScale);
-
 	/// Creates a new float4x4 that scales with respect to the given center point.
-	/** @param scale The amount of scale to apply to the x, y and z directions. */
+	/** @param scale The amount of scale to apply to the x, y and z directions.
+		@param scaleCenter The coordinate system center point for the scaling. If omitted, the origin (0,0,0) will
+			be used as the origin for the scale operation. */
 	static float4x4 Scale(const float3 &scale, const float3 &scaleCenter);
 
 	/// Creates a new float4x4 that scales points along the given axis.
 	/** @param axis A normalized direction vector that specifies the direction of scaling.
 		@param scalingFactor The amount of scaling to apply along the specified axis. */
-	static float4x4 ScaleAlongAxis(const float3 &axis, float scalingFactor);
 	/** @param scaleCenter If specified, this point will be used as the origin for the scale operation. */
 	static float4x4 ScaleAlongAxis(const float3 &axis, float scalingFactor, const float3 &scaleCenter);
+	static float4x4 ScaleAlongAxis(const float3 &axis, float scalingFactor);
 
 	/// Creates a new float4x4 that performs uniform scaling by the given amount.
 	static ScaleOp UniformScale(float uniformScale);
+	static float4x4 UniformScale(float uniformScale, const float3 &scaleCenter);
 
 	/// Returns the scaling performed by this matrix. This function assumes that the last row is [0 0 0 1].
 	/// GetScale().x specifies the amount of scaling applied to the local x direction vector when it is transformed by this matrix.
@@ -399,29 +407,33 @@ public:
 	const float *ptr() const;
 
 	/// Sets the three first elements of the given row. The fourth element is left unchanged.
-	/** @param row The index of the row to set, in the range [0-3]. */
-	void SetRow3(int row, const float3 &rowVector);
+	/** @param row The index of the row to set, in the range [0-3].
+		@param data A pointer to an array of 3 floats that contain the new x, y and z values for the row. */
 	void SetRow3(int row, const float *data);
+	void SetRow3(int row, const float3 &rowVector);
 	void SetRow3(int row, float m_r0, float m_r1, float m_r2);
 
 	/// Sets the values of the given row.
-	/// @param row The index of the row to set, in the range [0-3].
+	/** @param row The index of the row to set, in the range [0-3].
+		@param data A pointer to an array of 4 floats that contain the new x, y, z and w values for the row. */
+	void SetRow(int row, const float *data);
 	void SetRow(int row, const float3 &rowVector, float m_r3);
 	void SetRow(int row, const float4 &rowVector);
-	void SetRow(int row, const float *data);
 	void SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3);
 
 	/// Sets the three first elements of the given column. The fourth element is left unchanged.
-	/// @param column The index of the column to set, in the range [0-3].
-	void SetCol3(int column, const float3 &columnVector);
+	/** @param column The index of the column to set, in the range [0-3].
+		@param data A pointer to an array of 3 floats that contain the new x, y and z values for the column. */
 	void SetCol3(int column, const float *data);
+	void SetCol3(int column, const float3 &columnVector);
 	void SetCol3(int column, float m_0c, float m_1c, float m_2c);
 
 	/// Sets the values of the given column.
-	/// @param column The index of the column to set, in the range [0-3].
+	/** @param column The index of the column to set, in the range [0-3].
+		@param data A pointer to an array of 4 floats that contain the new x, y, z and w values for the column. */
+	void SetCol(int column, const float *data);
 	void SetCol(int column, const float3 &columnVector, float m_3c);
 	void SetCol(int column, const float4 &columnVector);
-	void SetCol(int column, const float *data);
 	void SetCol(int column, float m_0c, float m_1c, float m_2c, float m_3c);
 
 	/// Sets all values of this matrix.
@@ -434,13 +446,14 @@ public:
 	void Set(const float4x4 &rhs);
 
 	/// Sets all values of this matrix.
-	/// @param values The values in this array will be copied over to this matrix. The source must contain 16 floats in row-major order (the same
-	///		order as the Set() function above has its input parameters in).
+	/** @param values The values in this array will be copied over to this matrix. The source must contain 16 floats in row-major order (the same
+			order as the Set() function above has its input parameters in). */
 	void Set(const float *values);
 
 	/// Sets a single element of this matrix.
-	/// @param row The row index of the element to set, in the range [0-3].
-	/// @param col The col index of the element to set, in the range [0-3].
+	/** @param row The row index (y-coordinate) of the element to set, in the range [0-3].
+		@param col The col index (x-coordinate) of the element to set, in the range [0-3].
+		@param value The new value to set to the cell [row][col]. */
 	void Set(int row, int col, float value);
 
 	void Set3x3Part(const float3x3 &rotation);

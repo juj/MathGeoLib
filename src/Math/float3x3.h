@@ -330,16 +330,18 @@ public:
 	const float *ptr() const;
 
 	/// Sets the values of the given row.
-	/** @param row The index of the row to set, in the range [0-2]. */
+	/** @param row The index of the row to set, in the range [0-2].
+		@param data A pointer to an array of 3 floats that contain the new x, y and z values for the row. */
+	void SetRow(int row, const float *data);
 	void SetRow(int row, float x, float y, float z);
 	void SetRow(int row, const float3 &rowVector);
-	void SetRow(int row, const float *data);
 
 	/// Sets the values of the given column.
-	/// @param column The index of the column to set, in the range [0-2].
+	/** @param column The index of the column to set, in the range [0-2].
+		@param data A pointer to an array of 3 floats that contain the new x, y and z values for the column. */
+	void SetCol(int column, const float *data);
 	void SetCol(int column, float x, float y, float z);
 	void SetCol(int column, const float3 &columnVector);
-	void SetCol(int column, const float *data);
 
 	/// Sets all values of this matrix.
 	void Set(float _00, float _01, float _02,
@@ -355,8 +357,9 @@ public:
 	void Set(const float *values);
 
 	/// Sets a single element of this matrix.
-	/// @param row The row index of the element to set, in the range [0-2].
-	/// @param col The col index of the element to set, in the range [0-2].
+	/** @param row The row index (y-coordinate) of the element to set, in the range [0-2].
+		@param col The col index (x-coordinate) of the element to set, in the range [0-2].
+		@param value The new value to set to the cell [row][col]. */
 	void Set(int row, int col, float value);
 
 	/// Sets this matrix to equal the identity.

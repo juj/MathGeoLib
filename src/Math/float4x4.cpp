@@ -374,14 +374,14 @@ float4x4 float4x4::ScaleAlongAxis(const float3 &axis, float scalingFactor, const
 	return Translate(scaleCenter).ToFloat4x4() * Scale(axis * scalingFactor) * Translate(-scaleCenter);
 }
 
-ScaleOp float4x4::Scale(float uniformScale)
+ScaleOp float4x4::UniformScale(float uniformScale)
 {
 	return ScaleOp(uniformScale, uniformScale, uniformScale);
 }
 
-ScaleOp float4x4::UniformScale(float uniformScale)
+float4x4 float4x4::UniformScale(float uniformScale, const float3 &scaleCenter)
 {
-	return ScaleOp(uniformScale, uniformScale, uniformScale);
+	return float4x4(float4x4::Translate(scaleCenter)) * ScaleOp(uniformScale, uniformScale, uniformScale) * float4x4(float4x4::Translate(-scaleCenter));
 }
 
 float3 float4x4::GetScale() const
