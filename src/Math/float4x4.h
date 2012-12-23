@@ -155,9 +155,10 @@ public:
 
 	/// Creates a new float4x4 that rotates about one of the principal axes. [indexTitle: RotateX/Y/Z]
 	/** Calling RotateX, RotateY or RotateZ is slightly faster than calling the more generic RotateAxisAngle function.
-		@param angleRadians The angle to rotate by, in radians. Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
+		@param angleRadians The angle to rotate by, in radians. For example, Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
 		@param pointOnAxis If specified, the rotation is performed about an axis that passes through this point, and not
-		through the origin. The returned matrix will not be a pure rotation matrix, but will also contain translation. */
+		through the origin. The returned matrix will not be a pure rotation matrix, but will also contain translation.
+		@see DegToRad(). */
 	static float4x4 RotateX(float angleRadians, const float3 &pointOnAxis);
 	static float4x4 RotateX(float angleRadians);
 	/** [similarOverload: RotateX] [hideIndex] */

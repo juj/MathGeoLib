@@ -273,13 +273,16 @@ public:
 	/// Computes the closest point on this polyhedron to the given object.
 	/** If the other object intersects this polyhedron, this function will return an arbitrary point inside
 		the region of intersection.
+		@param lineSegment The line segment to find the closest point to.
+		@param lineSegmentPt [out] If specified, returns the closest point on the line segment to this
+		polyhedron. This pointer may be null.
+		@todo Make lineSegmentPt an out-reference instead of an out-pointer.
 		@see Contains(), ContainsConvex(), ClosestPointConvex(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add ClosestPoint(Line/Ray/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-	float3 ClosestPoint(const float3 &point) const;
-	float3 ClosestPoint(const LineSegment &lineSegment) const;
-	/** @param lineSegmentPt [out] If specified, returns the closest point on the line segment to this
-		polyhedron. This pointer may be null. */
 	float3 ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const;
+	float3 ClosestPoint(const LineSegment &lineSegment) const;
+	/** @param point The point to find the closest point to. */
+	float3 ClosestPoint(const float3 &point) const;
 
 	/// Returns the closest point on this <b>convex</b> polyhedron to the given point.
 	/** This function behaves exactly like ClosestPoint(), except this version of the test assumes

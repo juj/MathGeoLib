@@ -74,7 +74,9 @@ public:
 
 	/// Constructs this quaternion by specifying a rotation axis and the amount of rotation to be performed
 	/// about that axis.
-	/// @param rotationAxis The normalized rotation axis to rotate about.
+	/** @param rotationAxis The normalized rotation axis to rotate about.
+		@param rotationAngleRadians The angle to rotate by, in radians. For example, Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
+		@see DegToRad(). */
 	Quat(const float3 &rotationAxis, float rotationAngleRadians);
 
 	/// Returns the local +X axis in the post-transformed coordinate space. This is the same as transforming the vector (1,0,0) by this quaternion.

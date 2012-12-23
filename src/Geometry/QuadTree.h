@@ -183,10 +183,11 @@ public:
 
 	/// Performs an AABB intersection query in this Quadtreee, and calls the given callback function for each non-empty
 	/// node of the tree which intersects the given AABB.
-	/// @param callback A function or a function object of prototype
-	///    bool callbackFunction(QuadTree<T> &tree, const AABB2D &queryAABB, QuadTree<T>::Node &node, const AABB2D &nodeAABB);
-	///    If the callback function returns true, the execution of the query is stopped and this function immediately
-	///    returns afterwards. If the callback function returns false, the execution of the query continues.
+	/** @param aabb The axis-aligned bounding box to intersect this QuadTree with.
+		@param callback A function or a function object of prototype
+			bool callbackFunction(QuadTree<T> &tree, const AABB2D &queryAABB, QuadTree<T>::Node &node, const AABB2D &nodeAABB);
+		If the callback function returns true, the execution of the query is stopped and this function immediately
+		returns afterwards. If the callback function returns false, the execution of the query continues. */
 	template<typename Func>
 	inline void AABBQuery(const AABB2D &aabb, Func &callback);
 
