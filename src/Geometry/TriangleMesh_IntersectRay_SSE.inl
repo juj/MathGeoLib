@@ -17,7 +17,9 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 
 	assert(sizeof(float3) == 3*sizeof(float));
 	assert(sizeof(Triangle) == 3*sizeof(float3));
+#ifdef _DEBUG
 	assert(vertexDataLayout == 1); // Must be SoA4 structured!
+#endif
 	
 	const float inf = FLOAT_INF;
 	__m128 nearestD = _mm_set1_ps(inf);
