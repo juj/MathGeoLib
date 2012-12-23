@@ -316,7 +316,7 @@ ScaleOp float3x4::Scale(const float3 &scale)
 
 float3x4 float3x4::Scale(const float3 &scale, const float3 &scaleCenter)
 {
-	return float3x4(float3x4::Translate(scaleCenter)) * float3x4::Scale(scale) * float3x4::Translate(-scaleCenter);
+	return float3x4::Translate(scaleCenter) * float3x4::Scale(scale) * float3x4::Translate(-scaleCenter);
 }
 
 float3x4 float3x4::ScaleAlongAxis(const float3 &axis, float scalingFactor)
@@ -326,7 +326,7 @@ float3x4 float3x4::ScaleAlongAxis(const float3 &axis, float scalingFactor)
 
 float3x4 float3x4::ScaleAlongAxis(const float3 &axis, float scalingFactor, const float3 &scaleCenter)
 {
-	return float3x4(float3x4::Translate(scaleCenter)) * float3x4::Scale(axis * scalingFactor) * float3x4::Translate(-scaleCenter);
+	return float3x4::Translate(scaleCenter) * float3x4::Scale(axis * scalingFactor) * float3x4::Translate(-scaleCenter);
 }
 
 ScaleOp float3x4::UniformScale(float uniformScale)
@@ -336,7 +336,7 @@ ScaleOp float3x4::UniformScale(float uniformScale)
 
 float3x4 float3x4::UniformScale(float uniformScale, const float3 &scaleCenter)
 {
-	return float3x4(float3x4::Translate(scaleCenter)) * ScaleOp(uniformScale, uniformScale, uniformScale) * float3x4(float3x4::Translate(-scaleCenter));
+	return float3x4::Translate(scaleCenter) * float3x4::UniformScale(uniformScale) * float3x4::Translate(-scaleCenter);
 }
 
 float3 float3x4::GetScale() const
