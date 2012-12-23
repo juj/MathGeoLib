@@ -197,11 +197,19 @@ public:
 	/** This function rotates the sourceDirection vector to coincide with the targetDirection vector, and then 
 			rotates sourceDirection2 (which was transformed by 1.) to targetDirection2, but keeping the constraint that 
 			sourceDirection must look at targetDirection. */
-	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
-		const float3 &sourceDirection2, const float3 &targetDirection2);
-	/** @param centerPoint If specified, rotation is performed using this point as the coordinate space origin. */
+	/** @param sourceDirection The first 'from' direction. This vector must be normalized.
+		@param targetDirection The first 'to' direction. This vector must be normalized.
+		@param sourceDirection2 The second 'from' direction. This vector must be normalized.
+		@param targetDirection2 The second 'to' direction. This vector must be normalized.
+		@param centerPoint If specified, rotation is performed using this point as the coordinate space origin.
+		@return The returned matrix maps sourceDirection to targetDirection. Additionally, the returned matrix
+			rotates sourceDirection2 to point towards targetDirection2 as closely as possible, under the previous constraint.
+			The returned matrix is a rotation matrix, i.e. it is orthonormal with a determinant of +1, and optionally
+			has a translation component if the rotation is not performed w.r.t. the coordinate system origin. */
 	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
 		const float3 &sourceDirection2, const float3 &targetDirection2, const float3 &centerPoint);
+	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
+		const float3 &sourceDirection2, const float3 &targetDirection2);
 
 	/// Creates a new float4x4 that performs the rotation expressed by the given quaternion.
 	static float4x4 FromQuat(const Quat &orientation);
