@@ -12,6 +12,10 @@ if (BUILD_FOR_GCOV)
 	add_definitions(-DFAIL_USING_EXCEPTIONS)
 endif()
 
+if (MATH_SSE41)
+	add_definitions(-DMATH_SSE41)
+endif()
+
 if (MATH_TESTS_EXECUTABLE)
 	add_definitions(-DMATH_TESTS_EXECUTABLE)
 endif()
