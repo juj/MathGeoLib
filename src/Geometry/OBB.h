@@ -387,17 +387,20 @@ public:
 	bool Contains(const Frustum &frustum) const;
 	bool Contains(const Polyhedron &polyhedron) const;
 
-	/// Tests whether this OBB and the given object intersect.	   
+	/// Tests whether this OBB and the given object intersect.
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
 		another, this function still returns true. (e.g. in case a line segment is contained inside this OBB, 
 		or this OBB is contained inside a Sphere, etc.)
 		The first parameter of this function specifies the other object to test against.
+		The OBB-OBB intersection test is from Christer Ericson's book Real-Time Collision Detection, p. 101-106. 
+		See http://realtimecollisiondetection.net/ [groupSyntax]
+		@param obb The other oriented bounding box to test intersection with.
+		@param epsilon The OBB-OBB test utilizes a SAT test to detect the intersection. A robust implementation requires
+			an epsilon threshold to test that the used axes are not degenerate.
 		@see Contains(), Distance(), ClosestPoint().
 		@todo Add Intersects(Circle/Disc). */
-	bool Intersects(const AABB &aabb) const;
-	/** @param epsilon The OBB-OBB test utilizes a SAT test to detect the intersection. A robust implementation requires
-			an epsilon threshold to test that the used axes are not degenerate. */
 	bool Intersects(const OBB &obb, float epsilon = 1e-3f) const;
+	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const Plane &plane) const;
 	/** @param dNear [out] If specified, receives the parametric distance along the line denoting where the 
 			line entered this OBB.

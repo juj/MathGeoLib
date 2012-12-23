@@ -112,20 +112,22 @@ public:
 	const AABB &BoundingAABB() const { return rootAABB; }
 
 	/// Traverses a ray through this kD-tree, and calls the given leafCallback function for each leaf of the tree.
-	// The "recursive B" method.
-	/// @param leafCallback A function or a function object of prototype 
-	///    bool LeafCallbackFunction(KdTree<T> &tree, const KdTreeNode &leaf, const Ray &ray, float tNear, float tFar);
-	///    If the callback function returns true, the execution of the query is stopped and this function immediately
-	///    returns afterwards. If the callback function returns false, the execution of the query continues.
+	/// Uses the "recursive B" method from Vlastimil Havran's thesis.
+	/** @param r The ray to query through this kD-tree.
+		@param leafCallback A function or a function object of prototype 
+			bool LeafCallbackFunction(KdTree<T> &tree, const KdTreeNode &leaf, const Ray &ray, float tNear, float tFar);
+			If the callback function returns true, the execution of the query is stopped and this function immediately
+			returns afterwards. If the callback function returns false, the execution of the query continues. */
 	template<typename Func>
 	inline void RayQuery(const Ray &r, Func &leafCallback);
 
 	/// Performs an AABB intersection query in this kD-tree, and calls the given leafCallback function for each leaf
 	/// of the tree which intersects the given AABB.
-	/// @param leafCallback A function or a function object of prototype
-	///    bool LeafCallbackFunction(KdTree<T> &tree, KdTreeNode &leaf, const AABB &aabb);
-	///    If the callback function returns true, the execution of the query is stopped and this function immediately
-	///    returns afterwards. If the callback function returns false, the execution of the query continues.
+	/** @param aabb The axis-aligned bounding box to query through this kD-tree.
+		@param leafCallback A function or a function object of prototype
+			bool LeafCallbackFunction(KdTree<T> &tree, KdTreeNode &leaf, const AABB &aabb);
+			If the callback function returns true, the execution of the query is stopped and this function immediately
+			returns afterwards. If the callback function returns false, the execution of the query continues.
 	template<typename Func>
 	inline void AABBQuery(const AABB &aabb, Func &leafCallback);
 

@@ -256,6 +256,7 @@ public:
 	/** Only call this function if the polygon is planar.
 		This test is performed in global space of this polygon, i.e. by specifying the other object in global (world) 
 		space coordinates.
+		@param point The point to test for containment.
 		@param polygonThickness Since a polygon is a 2D object in a 3D space, a threshold value is used to
 			allow floating-point inaccuracies. This parameter defines how much "thickness" to give to the polygon
 			for the purposes of the test.
@@ -298,13 +299,14 @@ public:
 	/// Computes the closest point on this polygon to the given object.
 	/** If the other object intersects this polygon, this function will return an arbitrary point inside
 		the region of intersection.
+		@param lineSegment The line segment to find the closest point to.
+		@param lineSegmentPt [out] If specified, receives the closest point on the line segment to this polygon. This
+			pointer may be null.
 		@see Contains(), Distance(), Intersects().
 		@todo Add ClosestPoint(Line/Ray/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-	float3 ClosestPoint(const float3 &point) const;
-	float3 ClosestPoint(const LineSegment &lineSegment) const;
-	/** @param lineSegmentPt [out] If specified, receives the closest point on the line segment to this polygon. This
-			pointer may be null. */
 	float3 ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const;
+	float3 ClosestPoint(const LineSegment &lineSegment) const;
+	float3 ClosestPoint(const float3 &point) const;
 
 	/// Returns the distance between this polygon and the given point.
 	/** @see Contains(), ClosestPoint(), Intersects(). */

@@ -829,8 +829,6 @@ void OBB::ToEdgeList(float3 *outPos) const
 	}
 }
 
-/** The OBB-OBB intersection test is from Christer Ericson's book Real-Time Collision Detection, p. 101-106. 
-	See http://realtimecollisiondetection.net/ [groupSyntax] */
 bool OBB::Intersects(const OBB &b, float epsilon) const
 {
 	assume(pos.IsFinite());

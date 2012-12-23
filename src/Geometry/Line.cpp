@@ -57,6 +57,10 @@ float Dmnop(const float3 *v, int m, int n, int o, int p)
 /** The first line is specified by two points start0 and end0. The second line is specified by
 	two points start1 and end1.
 	The implementation of this function follows http://paulbourke.net/geometry/lineline3d/ .
+	@param start0 The starting point of the first line.
+	@param end0 The ending point of the first line.
+	@param start1 The starting point of the second line.
+	@param end1 The ending point of the second line.
 	@param d [out] If specified, receives the normalized distance of the closest point along the first line.
 		This pointer may be left null.
 	@param d2 [out] If specified, receives the normalized distance of the closest point along the second line.
