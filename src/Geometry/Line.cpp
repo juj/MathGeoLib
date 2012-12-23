@@ -43,7 +43,11 @@ MATH_BEGIN_NAMESPACE
 /// A helper function to compute the line-line closest point.
 /** This code is adapted from http://paulbourke.net/geometry/lineline3d/ .
 	dmnop = (xm - xn)(xo - xp) + (ym - yn)(yo - yp) + (zm - zn)(zo - zp).
-	@param v An array of four floats: [0]: line 0 start. [1]: line 0 end. [2]: line 1 start. [3]: line 1 end. */
+	@param v An array of four floats: [0]: line 0 start. [1]: line 0 end. [2]: line 1 start. [3]: line 1 end.
+	@param m An index in the range [0, 3].
+	@param n An index in the range [0, 3].
+	@param o An index in the range [0, 3].
+	@param p An index in the range [0, 3]. */
 float Dmnop(const float3 *v, int m, int n, int o, int p)
 {
 	return (v[m].x - v[n].x) * (v[o].x - v[p].x) + (v[m].y - v[n].y) * (v[o].y - v[p].y) + (v[m].z - v[n].z) * (v[o].z - v[p].z);

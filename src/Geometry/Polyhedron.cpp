@@ -1353,7 +1353,12 @@ int IntTriCmp(int a, int b)
 }
 
 /** Does a binary search on the array list that is sorted in ascending order.
+	@param list [in] A pointer to the array to search.
+	@param numItems The number of elements in the array 'list'.
 	@param value The element to search for.
+	@param cmp The comparison operator to use. The comparison function is of form
+		int CmpFunc(const T &a, const T &b), and it tests the mutual order of a and b.
+		It should return -1 if a < b, +1 if a > b, and 0 if a == b.
 	@return The index where a matching element lies, or -1 if not found. Note that if there are more than
 	        one matching element, the first that is found is returned. */
 template<typename T, typename CmpFunc>
