@@ -111,14 +111,14 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	if (numFails == 0)
 	{
 		if (t.isRandomized)
-			LOGI("ok (%d passes, 100%%)", numPasses);
+			LOGI(" ok (%d passes, 100%%)", numPasses);
 		else
-			LOGI("ok");
+			LOGI(" ok ");
 //		++numTestsPassed;
 	}
 	else if (successRate >= 95.0f)
 	{
-		printf("ok ");
+		printf(" ok ");
 		LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
 //		++numTestsPassed;
 //		++numWarnings;
