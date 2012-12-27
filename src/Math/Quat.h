@@ -153,9 +153,9 @@ public:
 	float4 Transform(const float4 &vec) const;
 
 	Quat Lerp(const Quat &target, float t) const;
-	static Quat Lerp(const Quat &source, const Quat &target, float t);
+	static MUST_USE_RESULT Quat Lerp(const Quat &source, const Quat &target, float t);
 	Quat Slerp(const Quat &target, float t) const;
-	static Quat Slerp(const Quat &source, const Quat &target, float t);
+	static MUST_USE_RESULT Quat Slerp(const Quat &source, const Quat &target, float t);
 
 	/// Returns the 'from' vector rotated towards the 'to' vector by the given normalized time parameter.
 	/** This function slerps the given 'from' vector towards the 'to' vector.
@@ -164,7 +164,7 @@ public:
 		@param t The interpolation time parameter, in the range [0,1]. Input values outside this range are 
 			silently clamped to the [0, 1] interval.
 		@return A spherical linear interpolation of the vector 'from' towards the vector 'to'. */
-	static float3 SlerpVector(const float3 &from, const float3 &to, float t);
+	static MUST_USE_RESULT float3 SlerpVector(const float3 &from, const float3 &to, float t);
 
 	/// Returns the 'from' vector rotated towards the 'to' vector by the given absolute angle, in radians.
 	/** This function slerps the given 'from' vector towards the 'to' vector.
@@ -174,7 +174,7 @@ public:
 			angle between 'from' and 'to' is smaller than this angle, then the vector 'to' is returned.
 			Input values outside this range are silently clamped to the [0, pi] interval.
 		@return A spherical linear interpolation of the vector 'from' towards the vector 'to'. */
-	static float3 SlerpVectorAbs(const float3 &from, const float3 &to, float angleRadians);
+	static MUST_USE_RESULT float3 SlerpVectorAbs(const float3 &from, const float3 &to, float angleRadians);
 
 	/// Returns the angle between this and the target orientation (the shortest route) in radians.
 	float AngleBetween(const Quat &target) const;
@@ -225,17 +225,17 @@ public:
 			quaternion Q it holds that M * localForward = targetDirection, and M * localUp lies in the plane spanned 
 			by the vectors targetDirection and worldUp.
 		@see RotateFromTo(). */
-	static Quat LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
+	static MUST_USE_RESULT Quat LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
 	/// Creates a new quaternion that rotates about the positive X axis by the given angle.
-	static Quat RotateX(float angleRadians);
+	static MUST_USE_RESULT Quat RotateX(float angleRadians);
 	/// Creates a new quaternion that rotates about the positive Y axis by the given angle.
-	static Quat RotateY(float angleRadians);
+	static MUST_USE_RESULT Quat RotateY(float angleRadians);
 	/// Creates a new quaternion that rotates about the positive Z axis by the given angle.
-	static Quat RotateZ(float angleRadians);
+	static MUST_USE_RESULT Quat RotateZ(float angleRadians);
 
 	/// Creates a new Quat that rotates about the given axis by the given angle.
-	static Quat RotateAxisAngle(const float3 &axisDirection, float angleRadians);
+	static MUST_USE_RESULT Quat RotateAxisAngle(const float3 &axisDirection, float angleRadians);
 
 	/// Creates a new quaternion that rotates sourceDirection vector (in world space) to coincide with the 
 	/// targetDirection vector (in world space).
@@ -243,33 +243,33 @@ public:
 	/// The vectors sourceDirection and targetDirection are assumed to be normalized.
 	/// @note There are multiple such rotations - this function returns the rotation that has the shortest angle
 	/// (when decomposed to axis-angle notation).
-	static Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
+	static MUST_USE_RESULT Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
 
 	/// Creates a new quaternion that
 	/// 1. rotates sourceDirection vector to coincide with the targetDirection vector, and then 
 	/// 2. rotates sourceDirection2 (which was transformed by 1.) to targetDirection2, but keeping the constraint that 
 	///	sourceDirection must look at targetDirection.
-	static Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
+	static MUST_USE_RESULT Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
 		const float3 &sourceDirection2, const float3 &targetDirection2);
 
 	/// Creates a new Quat from the given sequence of Euler rotation angles (in radians).
 	/** The FromEulerABC function returns a matrix M = A(a) * B(b) * C(c). Rotation
 		C is applied first, followed by B and then A. [indexTitle: FromEuler***] */
-	static Quat FromEulerXYX(float x2, float y, float x);
-	static Quat FromEulerXZX(float x2, float z, float x); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerYXY(float y2, float x, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerYZY(float y2, float z, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerZXZ(float z2, float x, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerZYZ(float z2, float y, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerXYZ(float x, float y, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerXZY(float x, float z, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerYXZ(float y, float x, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerYZX(float y, float z, float x); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerZXY(float z, float x, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
-	static Quat FromEulerZYX(float z, float y, float x); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerXYX(float x2, float y, float x);
+	static MUST_USE_RESULT Quat FromEulerXZX(float x2, float z, float x); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerYXY(float y2, float x, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerYZY(float y2, float z, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerZXZ(float z2, float x, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerZYZ(float z2, float y, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerXYZ(float x, float y, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerXZY(float x, float z, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerYXZ(float y, float x, float z); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerYZX(float y, float z, float x); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerZXY(float z, float x, float y); ///< [similarOverload: FromEulerXYX] [hideIndex]
+	static MUST_USE_RESULT Quat FromEulerZYX(float z, float y, float x); ///< [similarOverload: FromEulerXYX] [hideIndex]
 
 	/// Returns a uniformly random unitary quaternion.
-	static Quat RandomRotation(LCG &lcg);
+	static MUST_USE_RESULT Quat RandomRotation(LCG &lcg);
 
 	/// Extracts the rotation part of this quaternion into Euler rotation angles (in radians).
 	/** @note It is better to think about the returned float3 as an array of three floats, and
@@ -311,9 +311,9 @@ public:
 	std::string SerializeToString() const;
 #endif
 	/// Parses a string that is of form "x,y,z,w" or "(x,y,z,w)" or "(x;y;z;w)" or "x y z w" to a new quaternion.
-	static Quat FromString(const char *str);
+	static MUST_USE_RESULT Quat FromString(const char *str);
 #ifdef MATH_ENABLE_STL_SUPPORT
-	static Quat FromString(const std::string &str) { return FromString(str.c_str()); }
+	static MUST_USE_RESULT Quat FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif
 
 	/// Multiplies two quaternions together.
@@ -355,8 +355,8 @@ public:
 	operator QString() const { return toString(); }
 	QString toString() const { return ToString2().c_str(); }
 	QQuaternion ToQQuaternion() const { return (QQuaternion)*this; }
-	static Quat FromQQuaternion(const QQuaternion &q) { return (Quat)q; }
-	static Quat FromString(const QString &str) { return FromString(str.toStdString()); }
+	static MUST_USE_RESULT Quat FromQQuaternion(const QQuaternion &q) { return (Quat)q; }
+	static MUST_USE_RESULT Quat FromString(const QString &str) { return FromString(str.toStdString()); }
 #endif
 #ifdef MATH_BULLET_INTEROP
 	Quat(const btQuaternion &other) { w = other.w(); x = other.x(); y = other.y(); z = other.z(); }
