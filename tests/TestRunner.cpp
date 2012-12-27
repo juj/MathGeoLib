@@ -56,13 +56,20 @@ std::string FormatTime(tick_t ticks)
 	return str;
 }
 
+// Print text to log without appending a newline to the end, if possible.
+#ifdef ANDROID
+#define LOGI_NL LOGI
+#else
+#define LOGI_NL printf
+#endif
+
 /// Returns 0: passed, 1: passed with warnings, -1: failed.
 int RunTest(Test &t, int numTimes, int numTrials)
 {
 	if (t.runOnlyOnce)
 		numTimes = numTrials = 1;
 	int numTimes1 = numTimes / numTrials;
-	printf("Testing '%s': ", t.name.c_str());
+	LOGI_NL("Testing '%s': ", t.name.c_str());
 
 	std::vector<tick_t> times;
 	times.reserve(numTimes);
