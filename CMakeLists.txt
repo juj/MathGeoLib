@@ -36,10 +36,8 @@ file(GLOB_RECURSE sourceFiles ./src/*.cpp)
 file(GLOB_RECURSE headerFiles ./src/*.h)
 
 if (BUILD_FOR_GCOV)
-
 	file(REMOVE "MathGeoLib_code_files.txt")
 	foreach(filename ${sourceFiles})	
-		message(STATUS "${filename}")
 		get_filename_component(filebasename ${filename} NAME)
 		file(APPEND "MathGeoLib_code_files.txt" "${filebasename} ")
 	endforeach()
