@@ -82,3 +82,15 @@ typedef signed long long s64; ///< 8 bytes signed. 9,223,372,036,854,775,807 ~ 9
 #endif // ~KNET_NO_FIXEDWIDTH_TYPES
 
 #endif
+
+// Functions annotated with MUST_USE_RESULT require that the user stores the return value, or otherwise
+// a warning is printed.
+#if _MSC_VER >= 1700
+// http://msdn.microsoft.com/en-us/library/jj159529.aspx
+#define MUST_USE_RESULT _Check_return_
+#elif defined(__clang__) || (defined(__GNUC__) && ((__GNUC__*10000+__GNUC_MINOR*100) >= 30400))
+// http://gcc.gnu.org/onlinedocs/gcc-3.4.0/gcc/Function-Attributes.html
+#define MUST_USE_RESULT __attribute__((warn_unused_result))
+#else
+#define MUST_USE_RESULT
+#endif
