@@ -271,7 +271,7 @@ public:
 
 	/// Generates a new float3 by filling its entries by the given scalar.
 	/** @see float3::float3(float scalar), SetFromScalar(). */
-	static float3 FromScalar(float scalar);
+	static MUST_USE_RESULT float3 FromScalar(float scalar);
 
 	/// Fills each entry of this float3 by the given scalar.
 	/** @see float3::float3(float scalar), FromScalar(). */
@@ -292,14 +292,14 @@ public:
 		@see FromSphericalCoordinates, ToSphericalCoordinates, ToSphericalCoordinatesNormalized. */
 	void SetFromSphericalCoordinates(float azimuth, float inclination, float radius);
 	void SetFromSphericalCoordinates(const float3 &spherical) { SetFromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
-	static float3 FromSphericalCoordinates(float azimuth, float inclination, float radius);
-	static float3 FromSphericalCoordinates(const float3 &spherical) { return FromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
+	static MUST_USE_RESULT float3 FromSphericalCoordinates(float azimuth, float inclination, float radius);
+	static MUST_USE_RESULT float3 FromSphericalCoordinates(const float3 &spherical) { return FromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
 
 	/// Identical to SetFromSphericalCoordinates(azimuth, inclination, radius), except this function sets radius == 1 to generate a normalized 
 	/// vector on the unit sphere.
 	/** @see FromSphericalCoordinates, ToSphericalCoordinates, ToSphericalCoordinatesNormalized. */
 	void SetFromSphericalCoordinates(float azimuth, float inclination);
-	static float3 FromSphericalCoordinates(float azimuth, float inclination);
+	static MUST_USE_RESULT float3 FromSphericalCoordinates(float azimuth, float inclination);
 
 	/// @return float4(x,y,z,1).
 	/** @see x, y, z, class float4, ToDir4(). */
@@ -391,7 +391,7 @@ public:
 
 	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
 	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
-	static bool AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon = 1e-4f);
+	static MUST_USE_RESULT bool AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon = 1e-4f);
 
 	/// Tests if two vectors are equal, up to the given epsilon.
 	/** @see IsPerpendicular(). */
@@ -407,9 +407,9 @@ public:
 #endif
 
 	/// Parses a string that is of form "x,y,z" or "(x,y,z)" or "(x;y;z)" or "x y z" to a new float3.
-	static float3 FromString(const char *str);
+	static MUST_USE_RESULT float3 FromString(const char *str);
 #ifdef MATH_ENABLE_STL_SUPPORT
-	static float3 FromString(const std::string &str) { return FromString(str.c_str()); }
+	static MUST_USE_RESULT float3 FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif
 
 	/// @return x + y + z.
@@ -533,7 +533,7 @@ public:
 	/// Computes the scalar triple product of the given three vectors.
 	/** @return [u v w] = (u x v) . w = u . (v x w)
 		@see Dot(), Cross(). */
-	static float ScalarTripleProduct(const float3 &u, const float3 &v, const float3 &w);
+	static MUST_USE_RESULT float ScalarTripleProduct(const float3 &u, const float3 &v, const float3 &w);
 
 	/// Returns this vector reflected about a plane with the given normal.
 	/** By convention, both this and the reflected vector point away from the plane with the given normal
@@ -587,7 +587,7 @@ public:
 			Lerp(b, t) returns (1-t)*this + t*b. */
 	float3 Lerp(const float3 &b, float t) const;
 	/// This function is the same as calling a.Lerp(b, t).
-	static float3 Lerp(const float3 &a, const float3 &b, float t);
+	static MUST_USE_RESULT float3 Lerp(const float3 &a, const float3 &b, float t);
 
 	/// Makes the given vectors linearly independent.
 	/** This function directly follows the Gram-Schmidt procedure on the input vectors.
@@ -600,8 +600,8 @@ public:
 
 	/// Returns true if the given vectors are orthogonal to each other.
 	/** @see Orthogonalize(), Orthonormalize(), AreOrthonormal(), AreCollinear(). */
-	static bool AreOrthogonal(const float3 &a, const float3 &b, float epsilon = 1e-3f);
-	static bool AreOrthogonal(const float3 &a, const float3 &b, const float3 &c, float epsilon = 1e-3f);
+	static MUST_USE_RESULT bool AreOrthogonal(const float3 &a, const float3 &b, float epsilon = 1e-3f);
+	static MUST_USE_RESULT bool AreOrthogonal(const float3 &a, const float3 &b, const float3 &c, float epsilon = 1e-3f);
 
 	/// Makes the given vectors linearly independent and normalized in length.
 	/** This function directly follows the Gram-Schmidt procedure on the input vectors.
@@ -614,22 +614,22 @@ public:
 
 	/// Returns true if the given vectors are orthogonal to each other and all of length 1.
 	/** @see Orthogonalize(), AreOrthogonal(), Orthonormalize(), AreCollinear(). */
-	static bool AreOrthonormal(const float3 &a, const float3 &b, float epsilon = 1e-3f);
-	static bool AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, float epsilon = 1e-3f);
+	static MUST_USE_RESULT bool AreOrthonormal(const float3 &a, const float3 &b, float epsilon = 1e-3f);
+	static MUST_USE_RESULT bool AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, float epsilon = 1e-3f);
 
 	/// Generates a direction vector of the given length.
 	/** The returned vector points at a uniformly random direction.
 		@see RandomSphere(), RandomBox(). */
-	static float3 RandomDir(LCG &lcg, float length = 1.f);
+	static MUST_USE_RESULT float3 RandomDir(LCG &lcg, float length = 1.f);
 	/// Generates a random point inside a sphere.
 	/** The returned point is generated uniformly inside the sphere.
 		@see RandomDir(), RandomBox(). */
-	static float3 RandomSphere(LCG &lcg, const float3 &center, float radius);
+	static MUST_USE_RESULT float3 RandomSphere(LCG &lcg, const float3 &center, float radius);
 	/// Generates a random point inside an axis-aligned box.
 	/** The returned point is generated uniformly inside the box.
 		@see RandomDir(), RandomSphere(). */
-	static float3 RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax);
-	static float3 RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues);
+	static MUST_USE_RESULT float3 RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax);
+	static MUST_USE_RESULT float3 RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues);
 
 	/// Specifies a compile-time constant float3 with value (0, 0, 0).
 	/** @note Due to static data initialization order being undefined in C++, do NOT use this
