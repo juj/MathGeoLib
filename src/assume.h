@@ -26,7 +26,16 @@
 #include "Log.h"
 
 #ifndef MARK_UNUSED
+/// If a variable is labelled with this directive, the compiler should not emit a warning even if it is unused in the code.
 #define MARK_UNUSED(x) ((void)x)
+#endif
+
+#ifdef __GNUC__
+/// If a variable or a function definition is labelled with this directive, the compiler should not emit a warning even if it is unused
+/// in the code.
+#define DONT_WARN_UNUSED __attribute__((unused))
+#else
+#define DONT_WARN_UNUSED
 #endif
 
 #ifndef ARRAY_LENGTH
