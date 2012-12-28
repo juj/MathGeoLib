@@ -610,21 +610,21 @@ inline void KdTree<T>::KdTreeQuery(KdTree<T> &tree2, const float3x4 &thisWorldTr
 #endif
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
-struct TraversalNode
+struct NearestObjectsTraversalNode
 {
 	float d;
 	AABB aabb;
 	KdTreeNode *node;
 
-	bool operator <(const TraversalNode &t) const { return d > t.d; }
+	bool operator <(const NearestObjectsTraversalNode &t) const { return d > t.d; }
 };
 
 template<typename T>
 template<typename Func>
 inline void KdTree<T>::NearestObjects(const float3 &point, Func &leafCallback)
 {
-	MaxHeap<TraversalNode> queue;
-	TraversalNode t;
+	MaxHeap<NearestObjectsTraversalNode> queue;
+	NearestObjectsTraversalNode t;
 	t.d = 0.f;
 	t.aabb = BoundingAABB();
 	t.node = Root();
@@ -639,7 +639,7 @@ inline void KdTree<T>::NearestObjects(const float3 &point, Func &leafCallback)
 			leafCallback(*this, point, *t.node, t.aabb, t.d);
 		else
 		{
-			TraversalNode n;
+			NearestObjectsTraversalNode n;
 
 			// Insert left child node to the traversal queue.
 			n.aabb = t.aabb;
