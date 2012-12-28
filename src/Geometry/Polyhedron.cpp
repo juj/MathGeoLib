@@ -1082,7 +1082,7 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
 	{
 		int idx1, idx2;
-		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, &idx1, &idx2);
+		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
 		extremes.insert(idx1);
 		extremes.insert(idx2);
 	}

@@ -410,19 +410,16 @@ void OBB::GetFacePlanes(Plane *outPlaneArray) const
 }
 
 /// See Christer Ericson's book Real-Time Collision Detection, page 83.
-void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int *idxSmallest, int *idxLargest)
+void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int &idxSmallest, int &idxLargest)
 {
-	assume(idxSmallest || idxLargest);
 	assume(pointArray || numPoints == 0);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!pointArray)
 		return;
-	if (!idxSmallest && !idxLargest)
-		return;
 #endif
 
-	int smallest = 0;
-	int largest = 0;
+	idxSmallest = idxLargest = 0;
+
 	float smallestD = FLOAT_INF;
 	float largestD = -FLOAT_INF;
 	for(int i = 0; i < numPoints; ++i)
@@ -431,18 +428,14 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 		if (d < smallestD)
 		{
 			smallestD = d;
-			smallest = i;
+			idxSmallest = i;
 		}
 		if (d > largestD)
 		{
 			largestD = d;
-			largest = i;
+			idxLargest = i;
 		}
 	}
-	if (idxSmallest)
-		*idxSmallest = smallest;
-	if (idxLargest)
-		*idxLargest = largest;
 }
 
 #if 0
@@ -514,7 +507,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 			float3 edge = dirs[i];//(pointArray[i]-pointArray[j]).Normalized();
 
 			int e1, e2;
-			ExtremePointsAlongDirection(edge, pointArray, numPoints, &e1, &e2);
+			ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
 			float edgeLength = Abs(Dot(pointArray[e1], edge) - Dot(pointArray[e2], edge));
 
 			float3 u = edge.Perpendicular();

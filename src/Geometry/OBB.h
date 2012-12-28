@@ -290,7 +290,7 @@ public:
 			This pointer may be left null, if this information is of no interest.
 		@param idxLargest [out] The index of the largest point along the given direction will be received here. 
 			This pointer may be left null, if this information is of no interest. */
-	static void ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int *idxSmallest, int *idxLargest);
+	static void ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int &idxSmallest, int &idxLargest);
 
 #if 0
 	/// Generates an OBB that encloses the given point set.
