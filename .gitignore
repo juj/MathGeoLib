@@ -8,3 +8,17 @@ CMakeCache.txt
 *.smproj
 Makefile
 doc/
+*.gcov
+*.idb
+*.ipch
+*.lastbuildstate
+*.log
+*.obj
+*.opensdf
+*.pdb
+*.sdf
+*.sln
+*.suo
+*.tlog
+*.unsuccessfulbuild
+*.vcxproj
