@@ -94,6 +94,14 @@ inline u32 LSB(u32 bits)
 	return (1 << bits) - 1;
 }
 
+inline u64 LSB64(u64 bits)
+{
+	assert(bits <= 64);
+	if (bits >= 64)
+		return 0xFFFFFFFFFFFFFFFF;
+	return (1 << bits) - 1;
+}
+
 /** @brief A template-computed enum to create a mask of given amount of bits at given position of a u32 variable. 
 
 	For example, 
@@ -115,6 +123,11 @@ public:
 inline u32 BitMask(u32 pos, u32 bits)
 {
 	return LSB(pos + bits) & ~LSB(pos);
+}
+
+inline u64 BitMask64(u64 pos, u64 bits)
+{
+	return LSB64(pos + bits) & ~LSB64(pos);
 }
 
 /** @return The given 4 bit fields packed into a single larger bitfield.
