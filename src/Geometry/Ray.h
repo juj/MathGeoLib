@@ -52,7 +52,7 @@ public:
 	Ray(const float3 &pos, const float3 &dir);
 
 	/// Converts a Line to a Ray.
-	/** This conversion simply copies the members pos and dir over from the given Line to this Ray. 
+	/** This conversion simply copies the members pos and dir over from the given Line to this Ray.
 		This means that the new Ray starts at the same position, but only extends to one direction in space,
 		instead of two.
 		@see class Line, ToLine(). */
@@ -87,8 +87,8 @@ public:
 	void Transform(const Quat &transform);
 
 	/// Tests if the given object is fully contained on this ray.
-	/** @param distanceThreshold The magnitude of the epsilon test threshold to use. Since a Ray 
-		is a 1D object in a 3D space, an epsilon threshold is used to allow errors caused by floating-point 
+	/** @param distanceThreshold The magnitude of the epsilon test threshold to use. Since a Ray
+		is a 1D object in a 3D space, an epsilon threshold is used to allow errors caused by floating-point
 		inaccuracies.
 		@return True if this ray contains the given object, up to the given distance threshold.
 		@see class LineSegment, Distance(), ClosestPoint(), Intersects(). */
@@ -102,14 +102,14 @@ public:
 	/// Computes the distance between this ray and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-		@param d [out] If specified, receives the parametric distance along this ray that 
+		@param d [out] If specified, receives the parametric distance along this ray that
 			specifies the closest point on this ray to the given object. The value returned here can be negative.
 			This pointer may be null.
 		@see Contains(), Intersects(), ClosestPoint(), GetPoint(). */
 	float Distance(const float3 &point, float *d) const;
 	float Distance(const float3 &point) const;
 
-	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
+	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
 		closest point on that line to this ray. The value returned here can be negative. This pointer may
 		be null. */
 	float Distance(const Ray &other, float *d, float *d2 = 0) const;
@@ -124,22 +124,22 @@ public:
 	/// Computes the closest point on this ray to the given object.
 	/** If the other object intersects this ray, this function will return an arbitrary point inside
 		the region of intersection.
-		@param d [out] If specified, receives the parametric distance along this ray that 
+		@param d [out] If specified, receives the parametric distance along this ray that
 			specifies the closest point on this ray to the given object. The value returned here can be negative.
 			This pointer may be null.
 		@see Contains(), Distance(), Intersects(), GetPoint(). */
 	float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;
-	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
+	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
 		closest point on that line to this ray. The value returned here can be negative. This pointer may
 		be null. */
 	float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
 	float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
 	float3 ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
 
-	/// Tests whether this ray and the given object intersect.	   
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+	/// Tests whether this ray and the given object intersect.	
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true.
-		@param d [out] If specified, this parameter will receive the parametric distance of 
+		@param d [out] If specified, this parameter will receive the parametric distance of
 			the intersection point along this object. Use the GetPoint(d) function
 			to get the actual point of intersection. This pointer may be null.
 		@param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer

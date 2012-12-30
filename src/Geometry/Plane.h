@@ -55,14 +55,14 @@ public:
 		@param d The offset of this plane from the origin. The value -d gives the signed distance of this plane from the origin.
 		@see normal, d. */
 	Plane(const float3 &normal, float d);
-	/// Constructs a plane by specifying three points on the plane. 
-	/** The normal of the plane will point to 
+	/// Constructs a plane by specifying three points on the plane.
+	/** The normal of the plane will point to
 		the halfspace from which the points are observed to be oriented in counter-clockwise order.
 		@note The points v1, v2 and v3 must not all lie on the same line.
 		@see Set(). */
 	Plane(const float3 &v1, const float3 &v2, const float3 &v3);
 	/// Constructs a plane by specifying a single point on the plane, and the surface normal.
-	/** @param normal The direction the plane is facing. This vector must have been normalized in advance. 
+	/** @param normal The direction the plane is facing. This vector must have been normalized in advance.
 		@see Set(). */
 	Plane(const float3 &point, const float3 &normal);
 	/// Constructs a plane by specifying a line that lies on the plane, and the plane normal.
@@ -76,8 +76,8 @@ public:
 
 	bool IsDegenerate() const;
 
-	/// Sets this plane by specifying three points on the plane. 
-	/** The normal of the plane will point to the halfspace from which the points are observed to be oriented in 
+	/// Sets this plane by specifying three points on the plane.
+	/** The normal of the plane will point to the halfspace from which the points are observed to be oriented in
 		counter-clockwise order.
 		@note The points v1, v2 and v3 must not all lie on the same line. */
 	void Set(const float3 &v1, const float3 &v2, const float3 &v3);
@@ -91,7 +91,7 @@ public:
 	void ReverseNormal();
 
 	/// Returns a point on this plane.
-	/** @note This point has the special property that the line passing through the vector space origin (0,0,0) 
+	/** @note This point has the special property that the line passing through the vector space origin (0,0,0)
 			and the returned point is perpendicular to this plane (directed towards the normal vector of this plane).
 		@see Point(). */
 	float3 PointOnPlane() const;
@@ -133,7 +133,7 @@ public:
 	/// Tests if the given point lies on the positive side of this plane.
 	/** A plane divides the space in three sets: the negative halfspace, the plane itself, and the positive halfspace.
 		The normal vector of the plane points towards the positive halfspace.
-		@return This function returns true if the given point lies either on this plane itself, or in the positive 
+		@return This function returns true if the given point lies either on this plane itself, or in the positive
 			halfspace of this plane.
 		@see IsInPositiveDirection, AreOnSameSide(), Distance(), SignedDistance(). */
 	bool IsOnPositiveSide(const float3 &point) const;
@@ -152,7 +152,7 @@ public:
 
 	/// Returns the distance of this plane to the given object.
 	/** If the given object intersects or lies in this plane, then the returned distance is zero.
-		@note This function always returns a positive distance value, even when the given object lies on the negative side 
+		@note This function always returns a positive distance value, even when the given object lies on the negative side
 			of this plane. See the SignedDistance() function to produce a distance value that differentiates between the
 			front and back sides of this plane.
 		@see SignedDistance(), Intersects(), Contains(). */
@@ -190,9 +190,9 @@ public:
 		@see OrthoProjection(). */
 	float3 Project(const float3 &point) const;
 	LineSegment Project(const LineSegment &lineSegment) const;
-	/** @param nonDegenerate [out] If the line or ray is perpendicular to the plane, the projection is 
-		a single point. In that case, the .pos parameter of the returned object will specify the point 
-		location, the .dir parameter of the object will be undefined and the nonDegenerate pointer will be 
+	/** @param nonDegenerate [out] If the line or ray is perpendicular to the plane, the projection is
+		a single point. In that case, the .pos parameter of the returned object will specify the point
+		location, the .dir parameter of the object will be undefined and the nonDegenerate pointer will be
 		set to false. This pointer may be null. */
 	Line Project(const Line &line, bool *nonDegenerate) const;
 	Ray Project(const Ray &ray, bool *nonDegenerate) const;
@@ -287,11 +287,11 @@ public:
 	bool Intersects(const Plane &plane, const Plane &plane2, Line *outLine = 0, float3 *outPoint = 0) const;
 
 	/// Tests whether this plane and the given object intersect.
-	/** @param outLine [out] The intersection of two planes forms a line. If an intersection occurs, this parameter will receive 
+	/** @param outLine [out] The intersection of two planes forms a line. If an intersection occurs, this parameter will receive
 		the line of intersection. This pointer may be null.
 		@return True if the given object intersects with this plane. */
 	bool Intersects(const Plane &plane, Line *outLine = 0) const;
-	/** @param d [out] If specified, this parameter will receive the parametric distance of 
+	/** @param d [out] If specified, this parameter will receive the parametric distance of
 			the intersection point along the line object. Use the GetPoint(d) function of the line class
 			to get the actual point of intersection. This pointer may be null. */
 	bool Intersects(const Ray &ray, float *d = 0) const;

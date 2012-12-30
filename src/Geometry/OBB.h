@@ -24,7 +24,7 @@ MATH_BEGIN_NAMESPACE
 
 /// A 3D arbitrarily oriented bounding box.
 /** This data structure represents a box in 3D space. The local axes of this box can be arbitrarily oriented/rotated
-	with respect to the global world coordinate system. This allows OBBs to more tightly bound objects than AABBs do, 
+	with respect to the global world coordinate system. This allows OBBs to more tightly bound objects than AABBs do,
 	which always align with the world space axes. This flexibility has the drawback that the geometry tests and operations
 	involving OBBs are more costly, and representing an OBB in memory takes more space (15 floats vs 6 floats). */
 class OBB
@@ -44,7 +44,7 @@ public:
 		the +Z direction.
 		The scale of these vectors is always normalized. The half-length of the OBB along its local axes is
 		specified by the vector r.
-		The axis vectors must always be orthonormal. Be sure to guarantee that condition holds if you 
+		The axis vectors must always be orthonormal. Be sure to guarantee that condition holds if you
 		directly set to this member variable. */
 	float3 axis[3];
 
@@ -79,7 +79,7 @@ public:
 		@see classes AABB, float3x3, float3x4, float4x4, Quat, MinimalEnclosingAABB(). */
 	void SetFrom(const AABB &aabb);
 	/** @param transform If a transformation matrix is supplied, this transformation is applied to the AABB before
-		representing it as an oriented bounding box. The basis of this matrix is assumed to be orthogonal, which 
+		representing it as an oriented bounding box. The basis of this matrix is assumed to be orthogonal, which
 		means no projection or shear is allowed. Additionally, the matrix must contain only uniform scaling. */
 	void SetFrom(const AABB &aabb, const float3x3 &transform);
 	void SetFrom(const AABB &aabb, const float3x4 &transform);
@@ -136,7 +136,7 @@ public:
 	Sphere MinimalEnclosingSphere() const;
 
 	/// Returns the largest sphere that can fit inside this OBB. [similarOverload: MinimalEnclosingSphere]
-	/** This function computes the largest sphere that can fit inside this OBB. This sphere is unique up to the center point 
+	/** This function computes the largest sphere that can fit inside this OBB. This sphere is unique up to the center point
 		of the sphere. The returned sphere will be positioned to the same center point as this OBB.
 		@see MinimalEnclosingSphere(), MaximalContainedAABB(), MaximalContainedSphere(). */
 	Sphere MaximalContainedSphere() const;
@@ -219,7 +219,7 @@ public:
 	LineSegment Edge(int edgeIndex) const;
 
 	/// Returns a corner point of this OBB.
-	/** This function generates one of the eight corner points of this OBB. 
+	/** This function generates one of the eight corner points of this OBB.
 		@param cornerIndex The index of the corner point to generate, in the range [0, 7].
 		 The points are returned in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++. (corresponding the XYZ axis directions).
 		@todo Draw a diagram that shows which index generates which edge.
@@ -231,7 +231,7 @@ public:
 		this point is not necessarily unique.
 		@param direction The direction vector of the direction to find the extreme point. This vector may
 			be unnormalized, but may not be null.
-		@return An extreme point of this OBB in the given direction. The returned point is always a 
+		@return An extreme point of this OBB in the given direction. The returned point is always a
 			corner point of this OBB.
 		@see CornerPoint(). */
 	float3 ExtremePoint(const float3 &direction) const;
@@ -266,7 +266,7 @@ public:
 	float3 FacePoint(int faceIndex, float u, float v) const;
 
 	/// Returns the plane of the given face of this OBB.
-	/** The normal of the plane points outwards from this OBB, i.e. towards the space that 
+	/** The normal of the plane points outwards from this OBB, i.e. towards the space that
 		is not part of the OBB.
 		@param faceIndex The index of the face to get, in the range [0, 5].
 		@see PointInside(), Edge(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
@@ -286,9 +286,9 @@ public:
 	/** @param dir The direction vector to project the point array to. This vector does not need to be normalized.
 		@param pointArray [in] The list of points to process.
 		@param numPoints The number of elements in pointArray.
-		@param idxSmallest [out] The index of the smallest point along the given direction will be received here. 
+		@param idxSmallest [out] The index of the smallest point along the given direction will be received here.
 			This pointer may be left null, if this information is of no interest.
-		@param idxLargest [out] The index of the largest point along the given direction will be received here. 
+		@param idxLargest [out] The index of the largest point along the given direction will be received here.
 			This pointer may be left null, if this information is of no interest. */
 	static void ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int &idxSmallest, int &idxLargest);
 
@@ -333,7 +333,7 @@ public:
 	void Translate(const float3 &offset);
 
 	/// Applies a uniform scale to this OBB.
-	/** This function scales this OBB structure in-place, using the given center point as the origin 
+	/** This function scales this OBB structure in-place, using the given center point as the origin
 		for the scaling operation.
 		@param centerPoint Specifies the center of the scaling operation, in global (world) space.
 		@param scaleFactor The uniform scale factor to apply to each global (world) space axis.
@@ -341,7 +341,7 @@ public:
 	void Scale(const float3 &centerPoint, float scaleFactor);
 
 	/// Applies a non-uniform scale to the local axes of this OBB.
-	/** This function scales this OBB structure in-place, using the given global space center point as 
+	/** This function scales this OBB structure in-place, using the given global space center point as
 		the origin for the scaling operation.
 		@param centerPoint Specifies the center of the scaling operation, in global (world) space.
 		@param scaleFactor The non-uniform scale factors to apply to each local axis of this OBB.
@@ -367,7 +367,7 @@ public:
 	/// Computes the distance between this OBB and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-		@todo Add OBB::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron). 
+		@todo Add OBB::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron).
 		@see Contains(), Intersects(), ClosestPoint(). */
 	float Distance(const float3 &point) const;
 	float Distance(const Sphere &sphere) const;
@@ -388,11 +388,11 @@ public:
 	bool Contains(const Polyhedron &polyhedron) const;
 
 	/// Tests whether this OBB and the given object intersect.
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-		another, this function still returns true. (e.g. in case a line segment is contained inside this OBB, 
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
+		another, this function still returns true. (e.g. in case a line segment is contained inside this OBB,
 		or this OBB is contained inside a Sphere, etc.)
 		The first parameter of this function specifies the other object to test against.
-		The OBB-OBB intersection test is from Christer Ericson's book Real-Time Collision Detection, p. 101-106. 
+		The OBB-OBB intersection test is from Christer Ericson's book Real-Time Collision Detection, p. 101-106.
 		See http://realtimecollisiondetection.net/ [groupSyntax]
 		@param obb The other oriented bounding box to test intersection with.
 		@param epsilon The OBB-OBB test utilizes a SAT test to detect the intersection. A robust implementation requires
@@ -402,9 +402,9 @@ public:
 	bool Intersects(const OBB &obb, float epsilon = 1e-3f) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const Plane &plane) const;
-	/** @param dNear [out] If specified, receives the parametric distance along the line denoting where the 
+	/** @param dNear [out] If specified, receives the parametric distance along the line denoting where the
 			line entered this OBB.
-		@param dFar [out] If specified, receives the parametric distance along the line denoting where the 
+		@param dFar [out] If specified, receives the parametric distance along the line denoting where the
 			line exited this OBB. */
 	bool Intersects(const Ray &ray, float &dNear, float &dFar) const;
 	bool Intersects(const Ray &ray) const;
@@ -422,7 +422,7 @@ public:
 	bool Intersects(const Polyhedron &polyhedron) const;
 
 	/// Expands this OBB to enclose the given object. The axis directions of this OBB remain intact.
-	/** This function operates in-place. This function does not necessarily result in an OBB that is an 
+	/** This function operates in-place. This function does not necessarily result in an OBB that is an
 		optimal fit for the previous OBB and the given point. */
 	void Enclose(const float3 &point);
 
@@ -430,11 +430,11 @@ public:
 	/** @param numFacesX The number of faces to generate along the X axis. This value must be >= 1.
 		@param numFacesY The number of faces to generate along the Y axis. This value must be >= 1.
 		@param numFacesZ The number of faces to generate along the Z axis. This value must be >= 1.
-		@param outPos [out] An array of size numVertices which will receive a triangle list 
+		@param outPos [out] An array of size numVertices which will receive a triangle list
 							of vertex positions. Cannot be null.
-		@param outNormal [out] An array of size numVertices which will receive vertex normals. 
+		@param outNormal [out] An array of size numVertices which will receive vertex normals.
 							   If this parameter is null, vertex normals are not returned.
-		@param outUV [out] An array of size numVertices which will receive vertex UV coordinates. 
+		@param outUV [out] An array of size numVertices which will receive vertex UV coordinates.
 							   If this parameter is null, a UV mapping is not generated.
 		The number of vertices that outPos, outNormal and outUV must be able to contain is
 		(x*y + x*z + y*z)*2*6. If x==y==z==1, then a total of 36 vertices are required. Call

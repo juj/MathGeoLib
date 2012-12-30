@@ -149,9 +149,9 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 		nearestD = _mm_blendv_ps(t, nearestD, out);
 #else
 		// If SSE 4.1 is not available:
-		nearestD = _mm_and_ps(out, nearestD); 
-		t = _mm_andnot_ps(out, t); 
-		nearestD = _mm_or_ps(t, nearestD); 
+		nearestD = _mm_and_ps(out, nearestD);
+		t = _mm_andnot_ps(out, t);
+		nearestD = _mm_or_ps(t, nearestD);
 #endif
 
 #ifdef MATH_GEN_UV

@@ -53,10 +53,10 @@ public:
 
 	/// Returns a point on the line.
 	/** @param d The normalized distance along the line segment to compute. If a value in the range [0, 1] is passed, then the
-			returned point lies along this line segment. If some other value is specified, the returned point lies on the 
+			returned point lies along this line segment. If some other value is specified, the returned point lies on the
 			line defined by this line segment, but not inside the interval from a to b.
-		@note The meaning of d here differs from Line::GetPoint and Ray::GetPoint. For the class LineSegment, 
-			GetPoint(0) returns a, and GetPoint(1) returns b. This means that GetPoint(1) will not generally be exactly one unit 
+		@note The meaning of d here differs from Line::GetPoint and Ray::GetPoint. For the class LineSegment,
+			GetPoint(0) returns a, and GetPoint(1) returns b. This means that GetPoint(1) will not generally be exactly one unit
 			away from the starting point of this line segment, as is the case with Line and Ray.
 		@return (1-d)*a + d*b.
 		@see a, b, Line::GetPoint(), Ray::GetPoint(). */
@@ -109,7 +109,7 @@ public:
 	float Length() const;
 	/// Computes the squared length of this line segment.
 	/** Calling this function is faster than calling Length(), since this function avoids computing a square root.
-		If you only need to compare lengths to each other and are not interested in the actual length values, 
+		If you only need to compare lengths to each other and are not interested in the actual length values,
 		you can compare by using LengthSq(), instead of Length(), since Sqrt() is an order-preserving
 		(monotonous and non-decreasing) function. [similarOverload: Length] */
 	float LengthSq() const;
@@ -165,8 +165,8 @@ public:
 	float Distance(const Sphere &other) const;
 	float Distance(const Capsule &other) const;
 
-	/// Tests whether this line segment and the given object intersect.	   
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+	/// Tests whether this line segment and the given object intersect.	
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true. (for example, if this line segment is contained inside a sphere)
 		@todo Output intersection point. */
 	bool Intersects(const Plane &plane) const;
@@ -176,7 +176,7 @@ public:
 	bool Intersects(const Plane &plane, float *d) const;
 	/** @param intersectionPoint [out] If specified, receives the point of intersection. This pointer may be null. */
 	bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
-	/** @param intersectionNormal [out] If specified, receives the normal vector of the other object at the point of intersection. 
+	/** @param intersectionNormal [out] If specified, receives the normal vector of the other object at the point of intersection.
 			This pointer may be null. */
 	bool Intersects(const Sphere &s, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
 	/** @param dNear [out] If specified, receives the parametric distance along this line segment denoting where the line entered the

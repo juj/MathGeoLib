@@ -410,7 +410,7 @@ Line operator *(const Quat &transform, const Line &l)
 std::string Line::ToString() const
 {
 	char str[256];
-	sprintf(str, "Line(pos:(%.2f, %.2f, %.2f) dir:(%.2f, %.2f, %.2f))", 
+	sprintf(str, "Line(pos:(%.2f, %.2f, %.2f) dir:(%.2f, %.2f, %.2f))",
 		pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
 }

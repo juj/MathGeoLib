@@ -303,7 +303,7 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	stack[entryPoint].t = tNear;
 
     const float travelEpsilon = 1e-4f;
-    
+
 	// Check if the ray has internal or external origin relative to the scene root node.
 	if (tNear >= 0.f)
 		stack[entryPoint].pos = r.pos + (tNear + travelEpsilon) * r.dir;
@@ -476,7 +476,7 @@ inline void KdTree<T>::KdTreeQuery(KdTree<T> &tree2, const float3x4 &thisWorldTr
 
 	while(stackSize > 0)
 	{
-		assert(stackSize < cMaxStackItems*100); 
+		assert(stackSize < cMaxStackItems*100);
 		--stackSize;
 		KdTreeNode *thisNode = stack[stackSize].thisNode;
 		KdTreeNode *tree2Node = stack[stackSize].tree2Node;

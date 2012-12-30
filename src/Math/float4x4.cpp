@@ -41,9 +41,9 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
-	Set(_00, _01, _02, _03, 
-		_10, _11, _12, _13, 
-		_20, _21, _22, _23, 
+	Set(_00, _01, _02, _03,
+		_10, _11, _12, _13,
+		_20, _21, _22, _23,
 		_30, _31, _32, _33);
 }
 
@@ -442,7 +442,7 @@ float4x4 float4x4::D3DOrthoProjLH(float n, float f, float h, float v)
 
 	After the transformation, we're in the Direct3D normalized viewport space as follows:
 
-	(-1,-1,0) is the bottom-left corner of the viewport at the near plane. 
+	(-1,-1,0) is the bottom-left corner of the viewport at the near plane.
 	(1,1,0) is the top-right corner of the viewport at the near plane.
 	(0,0,0) is the center point at the near plane.
 	Coordinates with z=1 are at the far plane.
@@ -538,7 +538,7 @@ float4x4 float4x4::OrthographicProjectionXY()
 
 float4x4 float4x4::ComplementaryProjection() const
 {
-	assume(IsIdempotent()); 
+	assume(IsIdempotent());
 
 	return float4x4::identity - *this;
 }
@@ -760,7 +760,7 @@ float *float4x4::ptr()
 }
 
 const float *float4x4::ptr() const
-{ 
+{
 	return reinterpret_cast<const float *>(v);
 }
 
@@ -1112,7 +1112,7 @@ float4x4 float4x4::LookAt(const float3 &localForward, const float3 &targetDirect
 	return m;
 }
 
-float4x4 float4x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward, 
+float4x4 float4x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward,
                           const float3 &localUp, const float3 &worldUp)
 {
 	float4x4 m;
@@ -1940,7 +1940,7 @@ bool float4x4::ContainsProjection(float epsilon) const
 std::string float4x4::ToString() const
 {
 	char str[256];
-	sprintf(str, "(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)", 
+	sprintf(str, "(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)",
 		v[0][0], v[0][1], v[0][2], v[0][3],
 		v[1][0], v[1][1], v[1][2], v[1][3],
 		v[2][0], v[2][1], v[2][2], v[2][3],
@@ -1952,7 +1952,7 @@ std::string float4x4::ToString() const
 std::string float4x4::ToString2() const
 {
 	char str[256];
-	sprintf(str, "float3x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))", 
+	sprintf(str, "float3x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
 		v[0][0], v[1][0], v[2][0], v[3][0],
 		v[0][1], v[1][1], v[2][1], v[3][1],
 		v[0][2], v[1][2], v[2][2], v[3][2],

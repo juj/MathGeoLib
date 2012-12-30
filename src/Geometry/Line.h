@@ -83,8 +83,8 @@ public:
 	void Transform(const Quat &transform);
 
 	/// Tests if the given object is fully contained on this line.
-	/** @param distanceThreshold The magnitude of the epsilon test threshold to use. Since a Line 
-		is a 1D object in a 3D space, an epsilon threshold is used to allow errors caused by floating-point 
+	/** @param distanceThreshold The magnitude of the epsilon test threshold to use. Since a Line
+		is a 1D object in a 3D space, an epsilon threshold is used to allow errors caused by floating-point
 		inaccuracies.
 		@return True if this line contains the given object, up to the given distance threshold.
 		@see class LineSegment, class Ray, Distance(), ClosestPoint(), Intersects(). */
@@ -101,12 +101,12 @@ public:
 	/// Computes the distance between this line and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
-		@param d [out] If specified, receives the parametric distance along this line that 
+		@param d [out] If specified, receives the parametric distance along this line that
 			specifies the closest point on this line to the given object. The value returned here can be negative.
 			This pointer may be null.
 		@see Contains(), Intersects(), ClosestPoint(), GetPoint(). */
 	float Distance(const float3 &point, float *d = 0) const;
-	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
+	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
 		closest point on that line to this line. The value returned here can be negative. This pointer may
 		be null. */
 	float Distance(const Ray &other, float *d, float *d2 = 0) const;
@@ -121,12 +121,12 @@ public:
 	/// Computes the closest point on this line to the given object.
 	/** If the other object intersects this line, this function will return an arbitrary point inside
 		the region of intersection.
-		@param d [out] If specified, receives the parametric distance along this line that 
+		@param d [out] If specified, receives the parametric distance along this line that
 			specifies the closest point on this line to the given object. The value returned here can be negative.
 			This pointer may be null.
 		@see Contains(), Distance(), Intersects(), GetPoint(). */
 	float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;
-	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the 
+	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
 		closest point on that line to this line. The value returned here can be negative. This pointer may
 		be null. */
 	float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
@@ -139,10 +139,10 @@ public:
 		@see Contains(), Distance(), Intersects(), GetPoint(), Triangle::Point(float u, float v). */
 	float3 ClosestPoint(const Triangle &triangle, float *outU = 0, float *outV = 0, float *d = 0) const;
 
-	/// Tests whether this line and the given object intersect.	   
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+	/// Tests whether this line and the given object intersect.	
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true.
-		@param d [out] If specified, this parameter will receive the parametric distance of 
+		@param d [out] If specified, this parameter will receive the parametric distance of
 			the intersection point along this object. Use the GetPoint(d) function
 			to get the actual point of intersection. This pointer may be null.
 		@param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer
@@ -172,7 +172,7 @@ public:
 
 	/// Converts this Line to a Ray.
 	/** The pos and dir members of the returned Ray will be equal to this Line. The only difference is
-		that a Line extends to infinity in two directions, whereas the returned Ray spans only in 
+		that a Line extends to infinity in two directions, whereas the returned Ray spans only in
 		the positive direction.
 		@see dir, Line::Line, class Ray, ToLineSegment(). */
 	Ray ToRay() const;

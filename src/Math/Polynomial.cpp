@@ -31,7 +31,7 @@ int Polynomial::SolveQuadratic(float a, float b, float c, float &root1, float &r
 	float denom = 1.f / (2.f * a);
 	if (radicand < 1e-6f) // Consider the radicand to be zero, and hence only one solution.
 	{
-		root1 = -b * denom; 
+		root1 = -b * denom;
 		return 1;
 	}
 	radicand = Sqrt(radicand);

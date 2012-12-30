@@ -56,7 +56,7 @@ inline int ExtractLSB(unsigned long *value)
 		LSBT<0>::val = 0,
 		LSBT<1>::val = 1,
 		LSBT<2>::val = 11,
-		LSBT<24>::val = 11111111 11111111 11111111. 
+		LSBT<24>::val = 11111111 11111111 11111111.
 	LSBT<33> and greater are undefined. */
 template<int Bits>
 class LSBT
@@ -102,9 +102,9 @@ inline u64 LSB64(u64 bits)
 	return (1 << bits) - 1;
 }
 
-/** @brief A template-computed enum to create a mask of given amount of bits at given position of a u32 variable. 
+/** @brief A template-computed enum to create a mask of given amount of bits at given position of a u32 variable.
 
-	For example, 
+	For example,
 	BitMaskT<0,0>::val == 0,
 	BitMaskT<0,8>::val == 11111111,
 	BitMaskT<4, 12>::val == 11111111 11110000, etc.
@@ -117,7 +117,7 @@ public:
 	static const u32 val = LSBT<Pos+Bits>::val & ~LSBT<Pos>::val; // But this is nicer.
 };
 
-/** @return A mask with the given number of bits set at the given position of a u32 variable. This is 
+/** @return A mask with the given number of bits set at the given position of a u32 variable. This is
 	the runtime-equivalent of BitMaskT.
 	For example, BitMask(4,4)==11110000. */
 inline u32 BitMask(u32 pos, u32 bits)
@@ -138,7 +138,7 @@ template<typename ResultType, typename InputType,
 ResultType PackBits(InputType a, InputType r, InputType g, InputType b)
 {
 	return (ResultType)(
-		((ResultType)a << APos & BitMaskT<APos, ABits>::val) | 
+		((ResultType)a << APos & BitMaskT<APos, ABits>::val) |
 		((ResultType)r << RPos & BitMaskT<RPos, RBits>::val) |
 		((ResultType)g << GPos & BitMaskT<GPos, GBits>::val) |
 		((ResultType)b << BPos & BitMaskT<BPos, BBits>::val));
@@ -146,12 +146,12 @@ ResultType PackBits(InputType a, InputType r, InputType g, InputType b)
 
 /** @return The given 4 bit fields packed into a single larger bitfield. */
 template<typename ResultType, typename InputType>
-ResultType PackBits(int APos, int ABits, int RPos, int RBits, 
-									  int GPos, int GBits, int BPos, int BBits, 
+ResultType PackBits(int APos, int ABits, int RPos, int RBits,
+									  int GPos, int GBits, int BPos, int BBits,
 									  InputType a, InputType r, InputType g, InputType b)
 {
 	return (ResultType)(
-		((ResultType)a << APos & BitMask(APos, ABits)) | 
+		((ResultType)a << APos & BitMask(APos, ABits)) |
 		((ResultType)r << RPos & BitMask(RPos, RBits)) |
 		((ResultType)g << GPos & BitMask(GPos, GBits)) |
 		((ResultType)b << BPos & BitMask(BPos, BBits)));

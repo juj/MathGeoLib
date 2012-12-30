@@ -61,8 +61,8 @@ public:
 
 			/*
 			// Find the n and p points of the aabb. (The nearest and farthest corners relative to the plane)
-			const float3 &sign = npPointsSignLUT[((p[i].normal.z >= 0.f) ? 4 : 0) + 
-												 ((p[i].normal.y >= 0.f) ? 2 : 0) + 
+			const float3 &sign = npPointsSignLUT[((p[i].normal.z >= 0.f) ? 4 : 0) +
+												 ((p[i].normal.y >= 0.f) ? 2 : 0) +
 												 ((p[i].normal.x >= 0.f) ? 1 : 0)];
 			const float3 nPoint = c + sign*r;
 			const float3 pPoint = c - sign*r;

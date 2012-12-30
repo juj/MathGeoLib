@@ -69,17 +69,17 @@ float3::float3(const float *data)
 }
 
 float *float3::ptr()
-{ 
+{
 	return &x;
-} 
+}
 
 const float *float3::ptr() const
-{ 
+{
 	return &x;
-} 
+}
 
 CONST_WIN32 float float3::At(int index) const
-{ 
+{
 	assume(index >= 0);
 	assume(index < Size);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -90,7 +90,7 @@ CONST_WIN32 float float3::At(int index) const
 }
 
 float &float3::At(int index)
-{ 
+{
 	assume(index >= 0);
 	assume(index < Size);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -126,12 +126,12 @@ float4 float3::Swizzled(int i, int j, int k, int l) const
 }
 
 float float3::LengthSq() const
-{ 
+{
 	return x*x + y*y + z*z;
 }
 
 float float3::Length() const
-{ 
+{
 	return sqrtf(LengthSq());
 }
 
@@ -213,14 +213,14 @@ bool float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, 
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float3::ToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "(%.3f, %.3f, %.3f)", x, y, z);
 	return std::string(str);
 }
 
 std::string float3::SerializeToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "%f %f %f", x, y, z);
 	return std::string(str);
@@ -404,7 +404,7 @@ float float3::Dot(const float3 &rhs) const
 
 Cross product is anti-commutative, i.e. a x b == -b x a.
 It distributes over addition, meaning that a x (b + c) == a x b + a x c,
-and combines with scalar multiplication: (sa) x b == a x (sb). 
+and combines with scalar multiplication: (sa) x b == a x (sb).
 i x j == -(j x i) == k,
 (j x k) == -(k x j) == i,
 (k x i) == -(i x k) == j. */
@@ -596,7 +596,7 @@ bool float3::AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, f
 }
 
 float3 float3::FromScalar(float scalar)
-{ 
+{
 	return float3(scalar, scalar, scalar);
 }
 

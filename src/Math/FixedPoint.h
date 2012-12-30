@@ -26,7 +26,7 @@ MATH_BEGIN_NAMESPACE
 /** @brief Fixed-precision decimal number.
 
 	BaseT is the base type that is used to hold the value (it should be able to represent negative
-	numbers, so consider using a signed integer with either 8,16,32 or 64 bits. FracSize is the number 
+	numbers, so consider using a signed integer with either 8,16,32 or 64 bits. FracSize is the number
 	of bits to use for the fractional part of the value. */
 template<typename BaseT, int FracSize>
 class FixedPoint
@@ -61,7 +61,7 @@ public:
 	{
 	}
 
-	/** Converts a whole, (nomin/denom) combination to fixed-point. 
+	/** Converts a whole, (nomin/denom) combination to fixed-point.
 		For example, FixedPoint(2, 1, 3) would produce a fixed-point that corresponds to a rational 2 1/3, or 7/3. */
 	FixedPoint(const BaseT &whole, const BaseT &nomin, const BaseT &denom)
 	:value((whole << FracBits) + (nomin << FracBits) / denom)

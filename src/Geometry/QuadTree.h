@@ -34,8 +34,8 @@
 /// Leaves containing fewer than this many objects are always kept as leaves until the object count is exceeded.
 static const int minQuadTreeNodeObjectCount = 16;
 
-/// A fixed split limit rule for all QuadTrees: If the QuadTree node side length is smaller than this, the node will 
-/// never be split again into smaller subnodes. This provides a hard limit safety net for infinite/extra long recursion 
+/// A fixed split limit rule for all QuadTrees: If the QuadTree node side length is smaller than this, the node will
+/// never be split again into smaller subnodes. This provides a hard limit safety net for infinite/extra long recursion
 /// in case multiple identical overlapping objects are placed into the tree.
 static const float minQuadTreeQuadrantSize = 0.05f;
 
@@ -107,7 +107,7 @@ public:
 	/// Removes all nodes and objects in this tree and reinitializes the tree to a single root node.
 	void Clear(const float2 &minXY = float2(-1.f, -1.f), const float2 &maxXY = float2(1.f, 1.f));
 
-	/// Places the given object into the proper (leaf) node of the tree. After placing, if the leaf split rule is 
+	/// Places the given object into the proper (leaf) node of the tree. After placing, if the leaf split rule is
 	/// satisfied, subdivides the leaf node into 4 subquadrants and reassigns the objects to new leaves.
 	void Add(const T &object);
 
@@ -133,7 +133,7 @@ public:
 		int quadrant = (int)(node - parentChildBase); // The difference between these pointers is always [0-3], denoting the this node is in.
 		switch(quadrant)
 		{
-		case 0: 
+		case 0:
 			aabb.maxPoint.x = halfX;
 			aabb.maxPoint.y = halfY;
 			return aabb;
@@ -198,9 +198,9 @@ public:
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 	/// Performs a node-granular nearest neighbor search on this QuadTree.
-	/** This query calls the given nodeCallback function for each node of this QuadTree that contains objects, sorted by closest first 
+	/** This query calls the given nodeCallback function for each node of this QuadTree that contains objects, sorted by closest first
 		to the target point. At any given time, the nodeCallback function may terminate the search by returning true in its callback.
-		@param point The 
+		@param point The
 		@param nodeCallback A function or a function object of prototype
 		   bool NodeCallbackFunction(QuadTree<T> &tree, const float2 &targetPoint, QuadTree<T>::Node &node, const AABB2D &aabb, float minDistanceSquared);
 		   If the callback function returns true, the execution of the query is immediately stopped.

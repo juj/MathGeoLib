@@ -38,7 +38,7 @@
 MATH_BEGIN_NAMESPACE
 
 /// A 3-by-3 matrix for linear transformations of 3D geometry.
-/** This matrix can represent any kind of linear transformations of 3D geometry, which include rotation, 
+/** This matrix can represent any kind of linear transformations of 3D geometry, which include rotation,
 	scale, shear, mirroring and orthographic projection. A 3x3 matrix cannot represent translation (which requires
 	a 3x4 matrix), or perspective projection (which requires a 4x4 matrix).
 
@@ -51,19 +51,19 @@ MATH_BEGIN_NAMESPACE
 	The element m_yx is the value on the row y and column x.
 	You can access m_yx using the double-bracket notation m[y][x], or using the member function m.At(y, x);
 
-	@note The member functions in this class use the convention that transforms are applied to vectors in the form 
+	@note The member functions in this class use the convention that transforms are applied to vectors in the form
 	M * v. This means that "float3x3 M, M1, M2; M = M1 * M2;" gives a transformation M that applies M2 first, followed
 	by M1 second, i.e. M * v = M1 * M2 * v = M1 * (M2 * v). This is the convention commonly used with OpenGL. The
 	opposing convention (v * M) is commonly used with Direct3D.
 
-	@note This class uses row-major storage, which means that the elements are packed in memory in order 
+	@note This class uses row-major storage, which means that the elements are packed in memory in order
 	 m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], ...
-	The elements for a single row of the matrix hold successive memory addresses. This is the same memory layout as 
+	The elements for a single row of the matrix hold successive memory addresses. This is the same memory layout as
 	 with C++ multidimensional arrays.
 
-	Contrast this with column-major storage, in which the elements are packed in the memory in 
+	Contrast this with column-major storage, in which the elements are packed in the memory in
 	order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
-	There the elements for a single column of the matrix hold successive memory addresses. 
+	There the elements for a single column of the matrix hold successive memory addresses.
 	This is exactly opposite from the standard C++ multidimensional arrays, since if you have e.g.
 	int v[10][10], then v[0][9] comes in memory right before v[1][0]. ( [0][0], [0][1], [0][2], ... [1][0], [1][1], ...) */
 class float3x3
@@ -100,7 +100,7 @@ public:
 	float3x3() {}
 
 #ifdef MATH_EXPLICIT_COPYCTORS
-	/// The copy-ctor for float3x3 is the trivial copy-ctor, but it is explicitly written to be able to automatically 
+	/// The copy-ctor for float3x3 is the trivial copy-ctor, but it is explicitly written to be able to automatically
 	/// pick up this function for QtScript bindings.
 	float3x3(const float3x3 &rhs) { Set(rhs); }
 #endif
@@ -160,9 +160,9 @@ public:
 			vector localForward, i.e. localForward.Dot(localUp) == 0.
 		@param worldUp Specifies the global up direction of the scene in world space. Simply rotating one vector to
 			coincide with another (localForward->targetDirection) would cause the up direction of the resulting
-			orientation to drift (e.g. the model could be looking at its target its head slanted sideways). To keep 
-			the up direction straight, this function orients the localUp direction of the model to point towards the 
-			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be 
+			orientation to drift (e.g. the model could be looking at its target its head slanted sideways). To keep
+			the up direction straight, this function orients the localUp direction of the model to point towards the
+			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be
 			collinear, but they do not need to be perpendicular either.
 		@return A matrix that maps the given local space forward direction vector to point towards the given target
 			direction, and the given local up direction towards the given target world up direction. The returned
@@ -233,7 +233,7 @@ public:
 	float3 GetScale() const;
 
 	/// Produces a matrix that shears along a principal axis.
-	/** The shear matrix offsets the two other axes according to the 
+	/** The shear matrix offsets the two other axes according to the
 		position of the point along the shear axis. [indexTitle: ShearX/Y/Z] */
 	static float3x3 ShearX(float yFactor, float zFactor);
 	static float3x3 ShearY(float xFactor, float zFactor); ///< [similarOverload: ShearX] [hideIndex]
@@ -265,7 +265,7 @@ public:
 
 	/// Returns the given element. [noscript]
 	/** This function returns the element of this matrix at (row, col)==(i, j)==(y, x).
-		If you have a non-const object, you can set values of this matrix through this 
+		If you have a non-const object, you can set values of this matrix through this
 		reference, using the notation m.At(row, col) = someValue; */
 	float &At(int row, int col);
 	CONST_WIN32 float At(int row, int col) const;
@@ -381,17 +381,17 @@ public:
 
 	/// Sets this matrix to perform rotation about the given axis and angle. [indexTitle: SetRotatePart/X/Y/Z]
 	void SetRotatePart(const float3 &axisDirection, float angleRadians);
-	/// Sets this matrix to perform the rotation expressed by the given quaternion. 
+	/// Sets this matrix to perform the rotation expressed by the given quaternion.
 	void SetRotatePart(const Quat &orientation);
 
 	float3x3 &operator =(const Quat &rhs);
 	float3x3 &operator =(const float3x3 &rhs);
 
-	/// Computes the determinant of this matrix. 
+	/// Computes the determinant of this matrix.
 	/** If the determinant is nonzero, this matrix is invertible.
 		If the determinant is negative, this matrix performs reflection about some axis.
 		From http://msdn.microsoft.com/en-us/library/bb204853(VS.85).aspx :
-		"If the determinant is positive, the basis is said to be "positively" oriented (or right-handed). 
+		"If the determinant is positive, the basis is said to be "positively" oriented (or right-handed).
 		If the determinant is negative, the basis is said to be "negatively" oriented (or left-handed)."
 		@note This function computes 9 LOADs, 9 MULs and 5 ADDs. */
 	float Determinant() const;
@@ -423,19 +423,19 @@ public:
 	float3x3 Inverted() const;
 
 	/// Inverts a column-orthogonal matrix.
-	/// If a matrix is of form M=R*S, where 
+	/// If a matrix is of form M=R*S, where
 	/// R is a rotation matrix and S is a diagonal matrix with non-zero but potentially non-uniform scaling
 	/// factors (possibly mirroring), then the matrix M is column-orthogonal and this function can be used to compute the inverse.
 	/// Calling this function is faster than the calling the generic matrix Inverse() function.
 	/// Returns true on success. On failure, the matrix is not modified. This function fails if any of the
 	/// elements of this vector are not finite, or if the matrix contains a zero scaling factor on X, Y or Z.
-	/// @note The returned matrix will be row-orthogonal, but not column-orthogonal in general. 
-	/// The returned matrix will be column-orthogonal iff the original matrix M was row-orthogonal as well. 
+	/// @note The returned matrix will be row-orthogonal, but not column-orthogonal in general.
+	/// The returned matrix will be column-orthogonal iff the original matrix M was row-orthogonal as well.
 	/// (in which case S had uniform scale, InverseOrthogonalUniformScale() could have been used instead)
 	bool InverseColOrthogonal();
 
-	/// Inverts a matrix that is a concatenation of only rotate and uniform scale operations. 
-	/// If a matrix is of form M=R*S, where 
+	/// Inverts a matrix that is a concatenation of only rotate and uniform scale operations.
+	/// If a matrix is of form M=R*S, where
 	/// R is a rotation matrix and S is a diagonal matrix with non-zero and uniform scaling factors (possibly mirroring),
 	/// then the matrix M is both column- and row-orthogonal and this function can be used to compute the inverse.
 	/// This function is faster than calling InverseColOrthogonal() or the generic Inverse().
@@ -445,7 +445,7 @@ public:
 	bool InverseOrthogonalUniformScale();
 
 	/// Inverts a rotation matrix.
-	/// If a matrix is of form M=R*S, where R is a rotation matrix and S is either identity or a mirroring matrix, then 
+	/// If a matrix is of form M=R*S, where R is a rotation matrix and S is either identity or a mirroring matrix, then
 	/// the matrix M is orthonormal and this function can be used to compute the inverse.
 	/// This function is faster than calling InverseOrthogonalUniformScale(), InverseColOrthogonal() or the
 	/// generic Inverse().
@@ -467,11 +467,11 @@ public:
 	/// Returns a transposed copy of this matrix.
 	float3x3 Transposed() const;
 
-	/// Computes the inverse transpose of this matrix in-place. 
+	/// Computes the inverse transpose of this matrix in-place.
 	/** Use the inverse transpose to transform covariant vectors (normal vectors). */
 	bool InverseTranspose();
 
-	/// Returns the inverse transpose of this matrix. 
+	/// Returns the inverse transpose of this matrix.
 	/** Use that matrix to transform covariant vectors (normal vectors). */
 	float3x3 InverseTransposed() const;
 
@@ -487,7 +487,7 @@ public:
 	/// @note This function does not remove reflection (-1 scale along some axis).
 	void RemoveScale();
 
-	/// Transforms the given 3-vector by this matrix M, i.e. returns M * (x, y, z). 
+	/// Transforms the given 3-vector by this matrix M, i.e. returns M * (x, y, z).
 	float3 Transform(const float3 &vector) const;
 	float3 Transform(float x, float y, float z) const;
 
@@ -497,7 +497,7 @@ public:
 	/// (Remember that M * v != v * M in general).
 	float3 TransformLeft(const float3 &lhs) const;
 
-	/// Transforms the given 4-vector by this matrix M, i.e. returns M * (x, y, z, w). 
+	/// Transforms the given 4-vector by this matrix M, i.e. returns M * (x, y, z, w).
 	/// This function ignores the w component of the given input vector. This component is assumed to be either 0 or 1.
 	float4 Transform(const float4 &vector) const;
 
@@ -564,12 +564,12 @@ public:
 	bool IsSymmetric(float epsilon = 1e-3f) const;
 
 	/// Tests if this matrix is skew-symmetric (M == -M^T).
-	/** The test compares the floating point elements of this matrix up to the given epsilon. A matrix M is skew-symmetric 
+	/** The test compares the floating point elements of this matrix up to the given epsilon. A matrix M is skew-symmetric
 		the identity M=-M^T holds. */
 	bool IsSkewSymmetric(float epsilon = 1e-3f) const;
 
 	/// Returns true if this matrix does not perform any scaling.
-	/** A matrix does not do any scaling if the column vectors of this 
+	/** A matrix does not do any scaling if the column vectors of this
 		matrix are normalized in length, compared to the given epsilon. Note that this matrix may still perform
 		reflection, i.e. it has a -1 scale along some axis.
 		@note This function only examines the upper 3-by-3 part of this matrix.
@@ -578,8 +578,8 @@ public:
 
 	/// Returns true if this matrix performs a reflection along some plane.
 	/** In 3D space, an even number of reflections corresponds to a rotation about some axis, so a matrix consisting of
-		an odd number of consecutive mirror operations can only reflect about one axis. A matrix that contains reflection reverses 
-		the handedness of the coordinate system. This function tests if this matrix 
+		an odd number of consecutive mirror operations can only reflect about one axis. A matrix that contains reflection reverses
+		the handedness of the coordinate system. This function tests if this matrix
 		does perform mirroring. This occurs iff this matrix has a negative determinant. */
 	bool HasNegativeScale() const;
 
@@ -595,7 +595,7 @@ public:
 	bool IsColOrthogonal3(float epsilon = 1e-3f) const { return IsColOrthogonal(epsilon); }
 
 	/// Returns true if the column and row vectors of this matrix form an orthonormal set.
-	/// @note In math terms, there does not exist such a thing as 'orthonormal matrix'. In math terms, a matrix 
+	/// @note In math terms, there does not exist such a thing as 'orthonormal matrix'. In math terms, a matrix
 	/// is orthogonal iff its column and row vectors are orthogonal *unit* vectors.
 	/// In the terms of this library however, a matrix is orthogonal iff its column and row vectors are orthogonal (no need to be unitary),
 	/// and a matrix is orthonormal if the column and row vectors are orthonormal.
@@ -646,7 +646,7 @@ public:
 		applied first, then rotation, and finally the translation last.
 		@note This function assumes that this matrix does not contain projection (the fourth row of this matrix is [0 0 0 1]).
 		@param rotate [out] This object receives the rotation part of this transform.
-		@param scale [out] This vector receives the scaling along the local (before transformation by R) X, Y and Z axes 
+		@param scale [out] This vector receives the scaling along the local (before transformation by R) X, Y and Z axes
 			performed by this matrix. */
 	void Decompose(Quat &rotate, float3 &scale) const;
 	void Decompose(float3x3 &rotate, float3 &scale) const;
@@ -661,7 +661,7 @@ public:
 
 #ifdef MATH_OGRE_INTEROP
 	float3x3(const Ogre::Matrix3 &m) { Set(&m[0][0]); }
-	operator Ogre::Matrix3() { return Ogre::Matrix3(v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]); } 
+	operator Ogre::Matrix3() { return Ogre::Matrix3(v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]); }
 #endif
 
 #ifdef MATH_BULLET_INTEROP
@@ -685,7 +685,7 @@ std::ostream &operator <<(std::ostream &out, const float3x3 &rhs);
 float3x3 operator *(const Quat &lhs, const float3x3 &rhs);
 
 /// Transforms the given vector by the given matrix in the order v * M. Note that this form
-/// of multiplication is against the convention of this math system for transforming geometrical objects. 
+/// of multiplication is against the convention of this math system for transforming geometrical objects.
 /// Please use the M * v notation instead. (Remember that M * v != v * M in general).
 float3 operator *(const float3 &lhs, const float3x3 &rhs);
 

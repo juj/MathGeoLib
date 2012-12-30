@@ -47,7 +47,7 @@ float TriangleMesh::IntersectLineTriSSE(const float3 &linePos, const float3 &lin
 	if (v < 0.f || u + v > 1.f) // Barycentric V or the combination of U and V are outside the triangle - no intersection.
 		return FLOAT_INF;
 
-	// Barycentric u and v are in limits, the ray intersects the triangle. 
+	// Barycentric u and v are in limits, the ray intersects the triangle.
 	
 	// Output signed distance from ray to triangle.
 	return (vE2.x * vQ.x + vE2.y * vQ.y + vE2.z * vQ.z) * recipDet;

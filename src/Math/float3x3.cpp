@@ -93,7 +93,7 @@ float3x3 float3x3::RotateFromTo(const float3 &sourceDirection, const float3 &tar
 
 float3x3 float3x3::RandomRotation(LCG &lcg)
 {
-	// The easiest way to generate a random orientation is through quaternions, so convert a 
+	// The easiest way to generate a random orientation is through quaternions, so convert a
 	// random quaternion to a rotation matrix.
 	return FromQuat(Quat::RandomRotation(lcg));
 }
@@ -631,8 +631,8 @@ float3x3 float3x3::LookAt(const float3 &localForward, const float3 &targetDirect
 
 	// Generate the third basis vector for the world space.
 	float3 worldRight = worldUp.Cross(targetDirection).Normalized();
-	// Since the input worldUp vector is not necessarily perpendicular to the targetDirection vector, 
-	// we need to compute the real world space up vector that the "head" of the object will point 
+	// Since the input worldUp vector is not necessarily perpendicular to the targetDirection vector,
+	// we need to compute the real world space up vector that the "head" of the object will point
 	// towards when the model is looking towards the desired target direction.
 	float3 perpWorldUp = targetDirection.Cross(worldRight).Normalized();
 	
@@ -644,7 +644,7 @@ float3x3 float3x3::LookAt(const float3 &localForward, const float3 &targetDirect
 	// 3. localForward must be mapped to targetDirection. (M * localForward = targetDirection)
 	// i.e. we want to map the basis A to basis B.
 
-	// This matrix M exists, and it is an orthonormal rotation matrix with a determinant of +1, because 
+	// This matrix M exists, and it is an orthonormal rotation matrix with a determinant of +1, because
 	// the bases A and B are orthonormal with the same handedness.
 
 	// Below, use the notation that (a,b,c) is a 3x3 matrix with a as its first column, b second, and c third.
@@ -1423,7 +1423,7 @@ bool float3x3::Equals(const float3x3 &other, float epsilon) const
 std::string float3x3::ToString() const
 {
 	char str[256];
-	sprintf(str, "(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)", 
+	sprintf(str, "(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)",
 		v[0][0], v[0][1], v[0][2],
 		v[1][0], v[1][1], v[1][2],
 		v[2][0], v[2][1], v[2][2]);
@@ -1434,7 +1434,7 @@ std::string float3x3::ToString() const
 std::string float3x3::ToString2() const
 {
 	char str[256];
-	sprintf(str, "float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)", 
+	sprintf(str, "float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)",
 		v[0][0], v[1][0], v[2][0],
 		v[0][1], v[1][1], v[2][1],
 		v[0][2], v[1][2], v[2][2]);

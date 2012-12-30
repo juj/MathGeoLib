@@ -37,7 +37,7 @@ public:
 		/// Specifies the indices of the corner vertices of this polyhedron.
 		/// Indices point to the polyhedron vertex array.
 		/// The face vertices should all lie on the same plane.
-		/// The positive direction of the plane (the direction the face outwards normal points to) 
+		/// The positive direction of the plane (the direction the face outwards normal points to)
 		/// is the one where the vertices are wound in counter-clockwise order.
 		std::vector<int> v;
 
@@ -52,7 +52,7 @@ public:
 	std::vector<float3> v;
 
 	/// Specifies the individual faces of this polyhedron.  [similarOverload: v]
-	/** Each face is described by a list of indices to the vertex array. The indices define a 
+	/** Each face is described by a list of indices to the vertex array. The indices define a
 		simple polygon in counter-clockwise winding order. */
 	std::vector<Face> f;
 
@@ -91,7 +91,7 @@ public:
 	LineSegment Edge(int edgeIndex) const;
 
 	/// Returns all the (unique) edges of this polyhedron.
-	/** Has complexity of O(|V|log|V|), where |V| is the number of vertices in the polyhedron. 
+	/** Has complexity of O(|V|log|V|), where |V| is the number of vertices in the polyhedron.
 		@todo Support this in linear time.
 		@see NumEdges(), Edge(), EdgeIndices(). */
 	std::vector<LineSegment> Edges() const;
@@ -99,7 +99,7 @@ public:
 	std::vector<Polygon> Faces() const;
 
 	/// Returns all the (unique) edges of this polyhedron, as indices to the polyhedron vertex array.
-	/** Has complexity of O(|V|log|V|), where |V| is the number of vertices in the polyhedron. 
+	/** Has complexity of O(|V|log|V|), where |V| is the number of vertices in the polyhedron.
 		@todo Support this in linear time.
 		@see NumEdges(), Edge(), Edges(). */
 	std::vector<std::pair<int, int> > EdgeIndices() const;
@@ -108,13 +108,13 @@ public:
 	/** The winding order of the polygon will be the same as in the input. The normal of the polygon
 		points outwards from this polyhedron, i.e. towards the space that is not part of the polyhedron.
 		This function constructs a new Polygon object, so it has a time and space complexity of
-		O(|V|), where |V| is the number of vertices in this polyhedron. 
+		O(|V|), where |V| is the number of vertices in this polyhedron.
 		@param faceIndex The index of the face to get, in the range [0, NumFaces()-1].
 		@see NumFaces(), FacePlane(). */
 	Polygon FacePolygon(int faceIndex) const;
 
 	/// Returns the plane of the given polyhedron face.
-	/** The normal of the plane points outwards from this polyhedron, i.e. towards the space that 
+	/** The normal of the plane points outwards from this polyhedron, i.e. towards the space that
 		is not part of the polyhedron.
 		This function assumes that the given face of the polyhedron is planar, as should be for all
 		well-formed polyhedron.
@@ -139,7 +139,7 @@ public:
 		this point is not necessarily unique.
 		@param direction The direction vector of the direction to find the extreme point. This vector may
 			be unnormalized, but may not be null.
-		@return An extreme point of this Polyhedron in the given direction. The returned point is always a 
+		@return An extreme point of this Polyhedron in the given direction. The returned point is always a
 			corner point of this Polyhedron.
 		@see CornerPoint(). */
 	float3 ExtremePoint(const float3 &direction) const;
@@ -178,16 +178,16 @@ public:
 
 	/// Tests if the faces in this polyhedron refer to valid existing vertices.
 	/** This function performs sanity checks on the face indices array.
-		1) Each vertex index for each face must be in the range [0, NumVertices()-1], i.e. refer to a vertex 
+		1) Each vertex index for each face must be in the range [0, NumVertices()-1], i.e. refer to a vertex
 		   that exists in the array.
 		2) Each face must contain at least three vertices. If a face contains two or one vertex, it is
 		   degenerate.
 		3) Each face may refer to a vertex at most once.
-		@return True if the abovementioned conditions hold. Note that this does not guarantee that the 
+		@return True if the abovementioned conditions hold. Note that this does not guarantee that the
 			polyhedron is completely well-formed, but if false is returned, the polyhedron is definitely
 			ill-formed.
 		@see IsNull(), IsClosed(), IsConvex(). */
-	bool FaceIndicesValid() const; 
+	bool FaceIndicesValid() const;
 
 	/// Flips the winding order of all faces in this polyhedron.
 	void FlipWindingOrder();
@@ -226,7 +226,7 @@ public:
 	/// and in case they have more than 3 vertices, tests that the faces are planar.
 	bool FacesAreNondegeneratePlanar(float epsilon = 1e-2f) const;
 
-	/// Clips the line/ray/line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast, 
+	/// Clips the line/ray/line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast,
 	/// inside this <b>convex</b> polyhedron.
 	/** The implementation of this function is adapted from Christer Ericson's Real-time Collision Detection, p. 199.
 		@param ptA The first endpoint of the line segment.
@@ -262,7 +262,7 @@ public:
 	bool FaceContains(int faceIndex, const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
 
 	/// Tests if the given object is fully contained inside this <b>convex</b> polyhedron.
-	/** This function behaves exactly like Contains(), except this version of the containment test 
+	/** This function behaves exactly like Contains(), except this version of the containment test
 		assumes this polyhedron is convex, and uses a faster method of testing containment.
 		@see Contains(), ClosestPoint(), ClosestPointConvex(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add ContainsConvex(Polygon/AABB/OBB/Frustum/Polyhedron/Circle/Disc/Sphere/Capsule). */
@@ -299,8 +299,8 @@ public:
 	float Distance(const float3 &point) const;
 
 	/// Tests whether this polyhedron and the given object intersect.
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-		another, this function still returns true. (e.g. in case a line segment is contained inside this polyhedron, 
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
+		another, this function still returns true. (e.g. in case a line segment is contained inside this polyhedron,
 		or this polyhedron is contained inside a sphere, etc.)
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
 		@see Contains(), ContainsConvex(), ClosestPoint(), ClosestPointConvex(), Distance(), IntersectsConvex().

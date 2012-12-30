@@ -176,7 +176,7 @@ float3 Frustum::NearPlanePos(float x, float y) const
 	else
 	{
 		float3 right = WorldRight();
-		return pos + front * nearPlaneDistance 
+		return pos + front * nearPlaneDistance
 				   + x * orthographicWidth * 0.5f * right
 				   + y * orthographicHeight * 0.5f * up;
 	}
@@ -203,7 +203,7 @@ float3 Frustum::FarPlanePos(float x, float y) const
 	else
 	{
 		float3 right = WorldRight();
-		return pos + front * farPlaneDistance 
+		return pos + front * farPlaneDistance
 				   + x * orthographicWidth * 0.5f * right
 				   + y * orthographicHeight * 0.5f * up;
 	}
@@ -580,8 +580,8 @@ Polyhedron Frustum::ToPolyhedron() const
 		p.v.push_back(CornerPoint(i));
 
 	// Generate the 6 faces of this Frustum.
-	const int faces[6][4] = 
-	{ 
+	const int faces[6][4] =
+	{
 		{ 0, 2, 3, 1 }, // X-
 		{ 4, 5, 7, 6 }, // X+
 		{ 0, 1, 5, 4 }, // Y-
@@ -700,8 +700,8 @@ std::string FrustumTypeToString(FrustumType t)
 std::string Frustum::ToString() const
 {
 	char str[256];
-	sprintf(str, "Frustum(%s pos:(%.2f, %.2f, %.2f) front:(%.2f, %.2f, %.2f), up:(%.2f, %.2f, %.2f), near: %.2f, far: %.2f, %s: %.2f, %s: %.2f)", 
-		FrustumTypeToString(type).c_str(), pos.x, pos.y, pos.z, front.x, front.y, front.z, 
+	sprintf(str, "Frustum(%s pos:(%.2f, %.2f, %.2f) front:(%.2f, %.2f, %.2f), up:(%.2f, %.2f, %.2f), near: %.2f, far: %.2f, %s: %.2f, %s: %.2f)",
+		FrustumTypeToString(type).c_str(), pos.x, pos.y, pos.z, front.x, front.y, front.z,
 		up.x, up.y, up.z, nearPlaneDistance, farPlaneDistance,
 		type == OrthographicFrustum ? "ortho width:" : "hFov",
 		horizontalFov,

@@ -65,17 +65,17 @@ float4::float4(const float *data)
 }
 
 float *float4::ptr()
-{ 
+{
 	return &x;
-} 
+}
 
 const float *float4::ptr() const
-{ 
+{
 	return &x;
-} 
+}
 
 CONST_WIN32 float float4::At(int index) const
-{ 
+{
 	assume(index >= 0);
 	assume(index < Size);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -86,7 +86,7 @@ CONST_WIN32 float float4::At(int index) const
 }
 
 float &float4::At(int index)
-{ 
+{
 	assume(index >= 0);
 	assume(index < Size);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -179,8 +179,8 @@ __m128 float4::Normalize3_SSE()
 {
 	__m128 len = Length3_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
-	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero? 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
+	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	normalized = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
 	v = _mm_cmov_ps(v, normalized, SSEMaskXYZ()); // Return the original .w component to the vector (this function is supposed to preserve original .w).
@@ -191,7 +191,7 @@ void float4::Normalize3_Fast_SSE()
 {
 	__m128 len = Length3_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(v, normalized, SSEMaskXYZ()); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
@@ -200,8 +200,8 @@ __m128 float4::Normalize4_SSE()
 {
 	__m128 len = Length4_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
-	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero? 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
+	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
 	return len;
@@ -211,7 +211,7 @@ void float4::Normalize4_Fast_SSE()
 {
 	__m128 len = Length4_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0)); 
+	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	v = _mm_div_ps(v, len); // Normalize.
 }
 
@@ -233,7 +233,7 @@ float float4::LengthSq3() const
 }
 
 float float4::Length3() const
-{ 
+{
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(Length3_SSE());
 #else
@@ -242,7 +242,7 @@ float float4::Length3() const
 }
 
 float float4::LengthSq4() const
-{ 
+{
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(LengthSq4_SSE());
 #else
@@ -251,7 +251,7 @@ float float4::LengthSq4() const
 }
 
 float float4::Length4() const
-{ 
+{
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(Length4_SSE());
 #else
@@ -294,7 +294,7 @@ float4 float4::Normalized3() const
 }
 
 float float4::Normalize4()
-{ 
+{
 #ifdef MATH_SSE
 	__m128 len = Normalize4_SSE();
 	return M128_TO_FLOAT(len);
@@ -417,14 +417,14 @@ bool float4::IsPerpendicular3(const float4 &other, float epsilon) const
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float4::ToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
 	return std::string(str);
 }
 
 std::string float4::SerializeToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "%f %f %f %f", x, y, z, w);
 	return std::string(str);
@@ -489,7 +489,7 @@ float float4::MinElement() const
 
 int float4::MinElementIndex() const
 {
-	if (x < y) 
+	if (x < y)
 	{
 		if (z < w)
 			return (x < z) ? 0 : 2;
@@ -512,7 +512,7 @@ float float4::MaxElement() const
 
 int float4::MaxElementIndex() const
 {
-	if (x > y) 
+	if (x > y)
 	{
 		if (z > w)
 			return (x > z) ? 0 : 2;
@@ -763,7 +763,7 @@ __m128 _mm_cross_ps(__m128 a, __m128 b)
 
 Cross product is anti-commutative, i.e. a x b == -b x a.
 It distributes over addition, meaning that a x (b + c) == a x b + a x c,
-and combines with scalar multiplication: (sa) x b == a x (sb). 
+and combines with scalar multiplication: (sa) x b == a x (sb).
 i x j == -(j x i) == k,
 (j x k) == -(k x j) == i,
 (k x i) == -(i x k) == j. */
@@ -891,12 +891,12 @@ float4 float4::Lerp(const float4 &a, const float4 &b, float t)
 }
 
 float4 float4::FromScalar(float scalar)
-{ 
+{
 	return float4(scalar, scalar, scalar, scalar);
 }
 
 float4 float4::FromScalar(float scalar, float w)
-{ 
+{
 	return float4(scalar, scalar, scalar, w);
 }
 

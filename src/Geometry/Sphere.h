@@ -44,8 +44,8 @@ public:
 	Sphere(const float3 &center, float radius);
 
 	/// Constructs a sphere that passes through the given two points.
-	/** The constructed sphere will be the minimal sphere that encloses the given two points. The center point of this 
-		sphere will lie midway between pointA and pointB, and the radius will be half the distance between pointA and 
+	/** The constructed sphere will be the minimal sphere that encloses the given two points. The center point of this
+		sphere will lie midway between pointA and pointB, and the radius will be half the distance between pointA and
 		pointB. Both input points are assumed to be finite. */
 	Sphere(const float3 &pointA, const float3 &pointB);
 
@@ -105,7 +105,7 @@ public:
 	float3 Centroid() const { return pos; }
 
 	/// Computes the extreme point of this Sphere in the given direction.
-	/** An extreme point is a farthest point of this Sphere in the given direction. For 
+	/** An extreme point is a farthest point of this Sphere in the given direction. For
 		a Sphere, this point is unique.
 		@param direction The direction vector of the direction to find the extreme point. This vector may
 			be unnormalized, but may not be null.
@@ -192,7 +192,7 @@ public:
 
 	/// Computes the minimal bounding sphere for four points.
 	/** This function computes the smallest volume sphere that contains the given five points.
-		@param redundantPoint [out] Since a sphere is characterized by four points, one of the given points 
+		@param redundantPoint [out] Since a sphere is characterized by four points, one of the given points
 			will necessarily be redundant and not part of the support set of the minimal enclosing sphere. This
 			parameter will receive the index [0, 4] of the five input points denoting which point became redundant.
 			(Note that there may be more than one point not lying on the support set of the sphere, but this function
@@ -203,7 +203,7 @@ public:
 
 	/// Fits a sphere through the given two points.
 	/** Two points do not uniquely define a sphere in 3D space. This function computes the minimal enclosing
-		sphere for the given two points, which is uniquely defined. This function is identical to 
+		sphere for the given two points, which is uniquely defined. This function is identical to
 		OptimalEnclosingSphere(a, b) and is simply an alias for that function.
 		@see OptimalEnclosingSphere(). */
 	static Sphere FitThroughPoints(const float3 &a, const float3 &b) { return OptimalEnclosingSphere(a, b); }
@@ -214,7 +214,7 @@ public:
 		sphere that encloses three given points, since the smallest enclosing sphere does not necessarily pass
 		through all the three points.
 		@note The three points that are passed in must not be collinear, because in that case a sphere cannot
-			be fitted through these points. 
+			be fitted through these points.
 		@see OptimalEnclosingSphere(). */
 	static Sphere FitThroughPoints(const float3 &a, const float3 &b, const float3 &c);
 
@@ -250,13 +250,13 @@ public:
 	/// Computes the closest point on this sphere to the given object.
 	/** If the other object intersects this sphere, this function will return an arbitrary point inside
 		the region of intersection.
-		@see Contains(), Distance(), Intersects(). 
+		@see Contains(), Distance(), Intersects().
 		@todo Add Sphere::ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
 	float3 ClosestPoint(const float3 &point) const;
 
 	/// Tests whether this sphere and the given object intersect.
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
-		another, this function still returns true. (e.g. in case a line segment is contained inside this sphere, 
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
+		another, this function still returns true. (e.g. in case a line segment is contained inside this sphere,
 		or this sphere is contained inside a polyhedron, etc.)
 		@param intersectionPoint [out] If specified, receives the actual point of intersection. This pointer may be null.
 		@param intersectionNormal [out] If specified, receives the sphere normal at the point of intersection. This pointer may be null.
@@ -331,11 +331,11 @@ public:
 		@param lineDir The direction of the line. This vector must be normalized in advance.
 		@param sphereCenter The center position of the sphere to test.
 		@param sphereRadius The radius of the sphere, which must be >= 0.
-		@param t1 [out] This parameter receives the parametric distance along the line to the first point of intersection. 
-			If the sphere and the line do not intersect, this variable is not written to. To receive the actual 
+		@param t1 [out] This parameter receives the parametric distance along the line to the first point of intersection.
+			If the sphere and the line do not intersect, this variable is not written to. To receive the actual
 			world space point corresponding to this point of intersection, compute the vector 'linePos + t1 * lineDir'.
-		@param t2 [out] This parameter receives the parametric distance along the line to the second point of intersection. 
-			If the sphere and the line do not intersect, this variable is not written to. If the line is tangent to this 
+		@param t2 [out] This parameter receives the parametric distance along the line to the second point of intersection.
+			If the sphere and the line do not intersect, this variable is not written to. If the line is tangent to this
 			sphere (one point of intersection), this variable will be set equal to t1, so that the line segment
 			[t1, t2] always forms a line segment completely enclosed inside the sphere. To receive the actual world space
 			point corresponding to this point of intersection, compute the vector 'linePos + t2 * lineDir'.
@@ -345,7 +345,7 @@ public:
 		@note The outputted variables t1 and t2 always satisfy t1 < t2. This allows distinguishing between the "enter"
 			and "exit" positions of the line, if the line is interpreted more like a ray starting at linePos, and extending
 			towards lineDir. */
-	static int IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter, 
+	static int IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter,
 	                         float sphereRadius, float &t1, float &t2);
 
 #ifdef MATH_ENABLE_STL_SUPPORT

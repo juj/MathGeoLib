@@ -325,7 +325,7 @@ int Factorial(int n)
 /** @return Binomial coefficients with recursion, i.e. n choose k, C(n,k) or nCk. */
 int CombinatorialRec(int n, int k)
 {
-	/* We could do: 
+	/* We could do:
 			return factorial(n)/(factorial(n-k)*factorial(k));
 		But prefer the recursive approach instead, because it's not so prone
 		to numerical overflow. This approach uses the idea of the Pascal triangle. */

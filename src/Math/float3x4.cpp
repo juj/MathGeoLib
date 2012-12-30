@@ -811,7 +811,7 @@ float3x4 float3x4::LookAt(const float3 &localForwardDir, const float3 &targetFor
 	return m;
 }
 
-float3x4 float3x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward, 
+float3x4 float3x4::LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward,
                           const float3 &localUp, const float3 &worldUp)
 {
 	float3x4 m;
@@ -1530,7 +1530,7 @@ bool float3x4::Equals(const float3x4 &other, float epsilon) const
 std::string float3x4::ToString() const
 {
 	char str[256];
-	sprintf(str, "(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)", 
+	sprintf(str, "(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)",
 		v[0][0], v[0][1], v[0][2], v[0][3],
 		v[1][0], v[1][1], v[1][2], v[1][3],
 		v[2][0], v[2][1], v[2][2], v[2][3]);
@@ -1541,7 +1541,7 @@ std::string float3x4::ToString() const
 std::string float3x4::ToString2() const
 {
 	char str[256];
-	sprintf(str, "float3x4(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f))", 
+	sprintf(str, "float3x4(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f))",
 		v[0][0], v[1][0], v[2][0],
 		v[0][1], v[1][1], v[2][1],
 		v[0][2], v[1][2], v[2][2],

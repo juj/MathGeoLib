@@ -52,7 +52,7 @@
 MATH_BEGIN_NAMESPACE
 
 Sphere::Sphere(const float3 &center, float radius)
-:pos(center), r(radius) 
+:pos(center), r(radius)
 {
 }
 
@@ -327,10 +327,10 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 *pts, int numPoints)
 	}
 
 	// The set of supporting points for the minimal sphere. Even though the minimal enclosing
-	// sphere might have 2, 3 or 4 points in its support (sphere surface), always store here 
+	// sphere might have 2, 3 or 4 points in its support (sphere surface), always store here
 	// indices to exactly four points.
 	int sp[4] = { 0, 1, 2, 3 };
-	// Due to numerical issues, it can happen that the minimal sphere for four points {a,b,c,d} does not 
+	// Due to numerical issues, it can happen that the minimal sphere for four points {a,b,c,d} does not
 	// accommodate a fifth point e, but replacing any of the points a-d from the support with the point e
 	// does not accommodate the all the five points either.
 	// Therefore, keep a set of flags for each support point to avoid going in cycles, where the same
@@ -350,8 +350,8 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 *pts, int numPoints)
 			int redundant;
 			s = OptimalEnclosingSphere(pts[sp[0]], pts[sp[1]], pts[sp[2]], pts[sp[3]], pts[i], redundant);
 			rSq = s.r*s.r + epsilon;
-			// A sphere is uniquely defined by four points, so one of the five points passed in above is 
-			// now redundant, and can be removed from the support set. 
+			// A sphere is uniquely defined by four points, so one of the five points passed in above is
+			// now redundant, and can be removed from the support set.
 			if (redundant != 4 && (sp[redundant] < i || expendable[redundant]))
 			{
 				sp[redundant] = i; // Replace the old point with the new one.
@@ -362,9 +362,9 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 *pts, int numPoints)
 				if (sp[2] < i) expendable[2] = true;
 				if (sp[3] < i) expendable[3] = true;
 
-				// Have to start all over and make sure all old points also lie inside this new sphere, 
+				// Have to start all over and make sure all old points also lie inside this new sphere,
 				// since our guess for the minimal enclosing sphere changed.
-				i = 0; 
+				i = 0;
 			}
 		}
 	}
@@ -444,7 +444,7 @@ bool Sphere::Intersects(const Capsule &capsule) const
 	return capsule.Intersects(*this);
 }
 
-int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter, 
+int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter,
                           float sphereRadius, float &t1, float &t2)
 {
 	assume(lineDir.IsNormalized());
@@ -466,13 +466,13 @@ int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const fl
 	const float3 a = linePos - sphereCenter;
 	const float radSq = sphereRadius * sphereRadius;
 
-	/* so now the equation looks like 
+	/* so now the equation looks like
 
 	    || a + t * lineDir ||^2 == radSq.
 
 	  Since ||x||^2 == <x,x> (i.e. the square of a vector norm equals the dot product with itself), we get
 	
-	    <a + t * lineDir, a + t * lineDir> == radSq, 
+	    <a + t * lineDir, a + t * lineDir> == radSq,
 	
 	  and using the identity <a+b, a+b> == <a,a> + 2*<a,b> + <b,b> (which holds for dot product when a and b are reals),
 	  we have
@@ -491,7 +491,7 @@ int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const fl
 	const float C = Dot(a,a) - radSq;
 	const float B = 2.f * Dot(a, lineDir);
 
-	/* The equation A + Bt + Ct^2 == 0 is a second degree equation on t, which is easily solvable using the 
+	/* The equation A + Bt + Ct^2 == 0 is a second degree equation on t, which is easily solvable using the
 	  known formula, and we obtain
 
 	    t = [-B +/- Sqrt(B^2 - 4AC)] / 2A. */
@@ -845,7 +845,7 @@ Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b)
 	@param s [out] Outputs the s-coordinate of the sphere center (in the 2D barycentric UV convention)
 	@param t [out] Outputs the t-coordinate of the sphere center (in the 2D barycentric UV convention) To
 		compute the actual point, calculate the expression origin + s*ab + t*ac.
-	@note The returned sphere is one that passes through the three points (0,0,0), ab and ac. It is NOT necessarily the 
+	@note The returned sphere is one that passes through the three points (0,0,0), ab and ac. It is NOT necessarily the
 		smallest sphere that encloses these three points!
 	@return True if the function succeeded. False on failure. This function fails if the points (0,0,0), ab and ac
 		are collinear, in which case there does not exist a sphere that passes through the three given points. */
@@ -857,7 +857,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, float &s, float 
 
 	   Denote by p the sphere center position, and r the sphere radius. If the sphere
 	   is to run through the points a, b and c, then the center point of the sphere
-	   must be equidistant to these points, i.e. 
+	   must be equidistant to these points, i.e.
 
 	      || p - a || == || p - b || == || p - c ||,
 
@@ -876,7 +876,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, float &s, float 
 
 	      p == a + s*(b-a) + t*(c-a).        (3)
 
-	   Now, without loss of generality, assume that the point a lies at origin (translate the origin 
+	   Now, without loss of generality, assume that the point a lies at origin (translate the origin
 	   of the coordinate system to be centered at the point a), i.e. make the substitutions
 	   A = (0,0,0), B = b-a, C = c-a, and we have:and we have:
 
@@ -894,7 +894,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, float &s, float 
 	   ( BC   C^2 )   (t)   (C^2 / 2)
 
 	   which equals
-	   
+	
 	   (s) = ( B^2  BC  )^-1  *  (B^2 / 2)
 	   (t)   ( BC   C^2 )        (C^2 / 2)
 
@@ -940,7 +940,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 
 	   Denote by p the sphere center position, and r the sphere radius. If the sphere
 	   is to run through the points a, b, c and d, then the center point of the sphere
-	   must be equidistant to these points, i.e. 
+	   must be equidistant to these points, i.e.
 
 	      || p - a || == || p - b || == || p - c || == || p - d ||,
 
@@ -959,7 +959,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 
 	      p == a + s*(b-a) + t*(c-a) + u*(d-a).        (4)
 
-	   Now, without loss of generality, assume that the point a lies at origin (translate the origin 
+	   Now, without loss of generality, assume that the point a lies at origin (translate the origin
 	   of the coordinate system to be centered at the point a, i.e. make the substitutions
 	   A = (0,0,0), B = b-a, C = c-a, D = d-a, and we have:
 
@@ -975,7 +975,7 @@ bool FitSphereThroughPoints(const float3 &ab, const float3 &ac, const float3 &ad
 	      ( BD   CD  D^2)   (u)   (D^2 / 2)
 
 	   which equals
-	   
+	
 	      (s)   ( B^2  BC  BD )^-1   (B^2 / 2)
 	      (t) = ( BC   C^2 CD )    * (C^2 / 2)
 	      (u)   ( BD   CD  D^2)      (D^2 / 2)
@@ -1192,9 +1192,9 @@ Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &
 
 	const float3 p = s*ab + t*ac;
 
-	// In our translated coordinate space, the origin lies on the sphere, so the distance of p from origin 
+	// In our translated coordinate space, the origin lies on the sphere, so the distance of p from origin
 	// gives the radius of the sphere.
-	sphere.r = p.Length(); 
+	sphere.r = p.Length();
 
 	// Translate back to original coordinate space.
 	sphere.pos = a + p;
@@ -1231,7 +1231,7 @@ Sphere Sphere::FitThroughPoints(const float3 &a, const float3 &b, const float3 &
 std::string Sphere::ToString() const
 {
 	char str[256];
-	sprintf(str, "Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)", 
+	sprintf(str, "Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)",
 		pos.x, pos.y, pos.z, r);
 	return str;
 }

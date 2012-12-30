@@ -294,7 +294,7 @@ bool Polyhedron::IsClosed() const
 		}
 	}
 
-	for(std::set<std::pair<int, int> >::iterator iter = uniqueEdges.begin(); 
+	for(std::set<std::pair<int, int> >::iterator iter = uniqueEdges.begin();
 		iter != uniqueEdges.end(); ++iter)
 	{
 		std::pair<int, int> reverse = std::make_pair(iter->second, iter->first);
@@ -612,7 +612,7 @@ float Polyhedron::Distance(const float3 &point) const
 	return pt.Distance(point);
 }
 
-bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir, 
+bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir,
                                                    float &tFirst, float &tLast) const
 {
 	assume(IsConvex());
@@ -940,7 +940,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 //		std::map<std::pair<int,int>, int>::iterator iter = edgesToFaces.find(deletedEdges[i]);
 //		std::map<std::pair<int,int>, int>::iterator iter = edgesToFaces.find(deletedEdges[i]);
 //		if (iter != edgesToFaces.end())
-		{ 
+		{
 			// If the adjoining face is planar to the triangle we'd like to add, instead extend the face to enclose
 			// this vertex.
 			//float3 newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
@@ -1072,7 +1072,7 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 	///\todo Check input ptr and size!
 	std::set<int> extremes;
 
-	const float3 dirs[] = 
+	const float3 dirs[] =
 	{
 		float3(1,0,0), float3(0,1,0), float3(0,0,1),
 		float3(1,1,0), float3(1,0,1), float3(0,1,1),
@@ -1380,9 +1380,9 @@ int ArrayBinarySearch(const T *list, int numItems, const T &value, CmpFunc &cmp)
 		int middle = (left + right + round) / 2;
 		round = (round+1)&1;
 		order = cmp(list[middle], value);
-		if (order == 0) 
+		if (order == 0)
 			return middle;
-		if (order < 0) 
+		if (order < 0)
 			left = middle;
 		else right = middle;
 	} while(left < right);

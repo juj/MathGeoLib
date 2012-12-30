@@ -50,7 +50,7 @@
 #endif
 
 #ifdef _DEBUG
-// If MATH_ASSERT_CORRECTNESS is defined, special (and possibly rather costly) mathassert() 
+// If MATH_ASSERT_CORRECTNESS is defined, special (and possibly rather costly) mathassert()
 // tests are enabled, which test the internal correctness of the library.
 #define MATH_ASSERT_CORRECTNESS
 #endif
@@ -62,7 +62,7 @@
 // #define FAIL_USING_EXCEPTIONS
 #endif
 
-// If MATH_ENABLE_STL_SUPPORT is defined, MathGeoLib utilizes STL data structures. Otherwise, 
+// If MATH_ENABLE_STL_SUPPORT is defined, MathGeoLib utilizes STL data structures. Otherwise,
 // features requiring STL are disabled (but the library can still be built).
 #ifndef MATH_ENABLE_STL_SUPPORT
 #define MATH_ENABLE_STL_SUPPORT

@@ -51,7 +51,7 @@ public:
 	Quat() {}
 
 #ifdef MATH_EXPLICIT_COPYCTORS
-	/// The copy-ctor for Quat is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up 
+	/// The copy-ctor for Quat is the trivial copy-ctor, but it is explicitly written to be able to automatically pick up
 	/// this function for QtScript bindings.
 	Quat(const Quat &rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
 #endif
@@ -161,7 +161,7 @@ public:
 	/** This function slerps the given 'from' vector towards the 'to' vector.
 		@param from A normalized direction vector specifying the direction of rotation at t=0.
 		@param to A normalized direction vector specifying the direction of rotation at t=1.
-		@param t The interpolation time parameter, in the range [0,1]. Input values outside this range are 
+		@param t The interpolation time parameter, in the range [0,1]. Input values outside this range are
 			silently clamped to the [0, 1] interval.
 		@return A spherical linear interpolation of the vector 'from' towards the vector 'to'. */
 	static MUST_USE_RESULT float3 SlerpVector(const float3 &from, const float3 &to, float t);
@@ -216,13 +216,13 @@ public:
 			vector localForward, i.e. localForward.Dot(localUp) == 0.
 		@param worldUp Specifies the global up direction of the scene in world space. Simply rotating one vector to
 			coincide with another (localForward->targetDirection) would cause the up direction of the resulting
-			orientation to drift (e.g. the model could be looking at its target its head slanted sideways). To keep 
-			the up direction straight, this function orients the localUp direction of the model to point towards the 
-			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be 
+			orientation to drift (e.g. the model could be looking at its target its head slanted sideways). To keep
+			the up direction straight, this function orients the localUp direction of the model to point towards the
+			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be
 			collinear, but they do not need to be perpendicular either.
 		@return A quaternion that maps the given local space forward direction vector to point towards the given target
-			direction, and the given local up direction towards the given target world up direction. For the returned 
-			quaternion Q it holds that M * localForward = targetDirection, and M * localUp lies in the plane spanned 
+			direction, and the given local up direction towards the given target world up direction. For the returned
+			quaternion Q it holds that M * localForward = targetDirection, and M * localUp lies in the plane spanned
 			by the vectors targetDirection and worldUp.
 		@see RotateFromTo(). */
 	static MUST_USE_RESULT Quat LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
@@ -237,7 +237,7 @@ public:
 	/// Creates a new Quat that rotates about the given axis by the given angle.
 	static MUST_USE_RESULT Quat RotateAxisAngle(const float3 &axisDirection, float angleRadians);
 
-	/// Creates a new quaternion that rotates sourceDirection vector (in world space) to coincide with the 
+	/// Creates a new quaternion that rotates sourceDirection vector (in world space) to coincide with the
 	/// targetDirection vector (in world space).
 	/// Rotation is performed around the origin.
 	/// The vectors sourceDirection and targetDirection are assumed to be normalized.
@@ -246,8 +246,8 @@ public:
 	static MUST_USE_RESULT Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
 
 	/// Creates a new quaternion that
-	/// 1. rotates sourceDirection vector to coincide with the targetDirection vector, and then 
-	/// 2. rotates sourceDirection2 (which was transformed by 1.) to targetDirection2, but keeping the constraint that 
+	/// 1. rotates sourceDirection vector to coincide with the targetDirection vector, and then
+	/// 2. rotates sourceDirection2 (which was transformed by 1.) to targetDirection2, but keeping the constraint that
 	///	sourceDirection must look at targetDirection.
 	static MUST_USE_RESULT Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
 		const float3 &sourceDirection2, const float3 &targetDirection2);
@@ -278,7 +278,7 @@ public:
 			in the second axis, in this case the x axis.
 		@return A float3 which specifies the rotation of this quaternion in radian Euler angles.
 			The function ToEulerABC returns a float3 where the first
-			element ([0], or x) specifies the rotation about the axis A (not necessarily the X axis!), 
+			element ([0], or x) specifies the rotation about the axis A (not necessarily the X axis!),
 			[1] or y specifies the rotation about the B axis (not necessarily the Y axis!) and
 			[2] or z specifies the rotation about the C axis (not necessarily the Z axis!). The
 			order of rotations follows the M*v convention, meaning that ToEulerXYZ returns the Euler
@@ -322,7 +322,7 @@ public:
 	Quat operator *(const Quat &rhs) const;
 
 	/// Transforms the given vector by this Quaternion.
-	/// @note Technically, this function does not perform a simple multiplication of 'q * v', 
+	/// @note Technically, this function does not perform a simple multiplication of 'q * v',
 	/// but instead performs a conjugation operation 'q*v*q^-1'. This corresponds to transforming
 	/// the given vector by this Quaternion.
 	float3 operator *(const float3 &rhs) const;
@@ -369,7 +369,7 @@ public:
 	/// Converts the given matrix to a quaternion and computes the concatenated transform 'this * rhs'.
 	Quat Mul(const float3x3 &rhs) const;
 	/// Transforms the given vector by this Quaternion.
-	/// @note Technically, this function does not perform a simple multiplication of 'q * v', 
+	/// @note Technically, this function does not perform a simple multiplication of 'q * v',
 	/// but instead performs a conjugation operation 'q*v*q^-1'. This corresponds to transforming
 	/// the given vector by this Quaternion.
 	float3 Mul(const float3 &vector) const;

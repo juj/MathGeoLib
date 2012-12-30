@@ -79,7 +79,7 @@ void AABB::SetFrom(const OBB &obb)
 	float3 halfSize = Abs(obb.axis[0]*obb.r[0]) + Abs(obb.axis[1]*obb.r[1]) + Abs(obb.axis[2]*obb.r[2]);
 	SetFromCenterAndSize(obb.pos, 2.f*halfSize);
 }
- 
+
 void AABB::SetFrom(const Sphere &s)
 {
 	minPoint = s.pos - float3(s.r, s.r, s.r);
@@ -106,8 +106,8 @@ Polyhedron AABB::ToPolyhedron() const
 		p.v.push_back(CornerPoint(i));
 
 	// Generate the 6 faces of this AABB.
-	const int faces[6][4] = 
-	{ 
+	const int faces[6][4] =
+	{
 		{ 0, 1, 3, 2 }, // X-
 		{ 4, 6, 7, 5 }, // X+
 		{ 0, 4, 5, 1 }, // Y-
@@ -424,7 +424,7 @@ void AABB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
 	maxPoint = transform.MulPos(maxPoint);
 }
 
-/// See Christer Ericson's Real-time Collision Detection, p. 87, or 
+/// See Christer Ericson's Real-time Collision Detection, p. 87, or
 /// James Arvo's "Transforming Axis-aligned Bounding Boxes" in Graphics Gems 1, pp. 548-550.
 /// http://www.graphicsgems.org/
 template<typename Matrix>
@@ -570,7 +570,7 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
 
 bool AABB::IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
 {
-	// Never call the SSE version here. The SSE version does not output tNear and tFar, because 
+	// Never call the SSE version here. The SSE version does not output tNear and tFar, because
 	// the memory stores have been profiled to make it slower than the CPP version. Therefore the SSE
 	// version does not output tNear and tFar (profile shows it to be about 10x faster than the CPP version).
 	return IntersectLineAABB_CPP(linePos, lineDir, tNear, tFar);
@@ -643,7 +643,7 @@ bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, f
 		// tNear tracks distance to intersect (enter) the AABB.
 		// tFar tracks the distance to exit the AABB.
 		if (t1 < t2)
-			tNear = Max(t1, tNear), tFar = Min(t2, tFar); 
+			tNear = Max(t1, tNear), tFar = Min(t2, tFar);
 		else // Swap t1 and t2.
 			tNear = Max(t2, tNear), tFar = Min(t1, tFar);
 
@@ -660,7 +660,7 @@ bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, f
 		float t2 = (maxPoint.y - linePos.y) * recipDir;
 
 		if (t1 < t2)
-			tNear = Max(t1, tNear), tFar = Min(t2, tFar); 
+			tNear = Max(t1, tNear), tFar = Min(t2, tFar);
 		else // Swap t1 and t2.
 			tNear = Max(t2, tNear), tFar = Min(t1, tFar);
 
@@ -677,7 +677,7 @@ bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, f
 		float t2 = (maxPoint.z - linePos.z) * recipDir;
 
 		if (t1 < t2)
-			tNear = Max(t1, tNear), tFar = Min(t2, tFar); 
+			tNear = Max(t1, tNear), tFar = Min(t2, tFar);
 		else // Swap t1 and t2.
 			tNear = Max(t2, tNear), tFar = Min(t1, tFar);
 	}
@@ -744,7 +744,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	__m128 rayDirAbs = _mm_abs_ps(rayDir.v);
 
 	const __m128 epsilon = _mm_set1_ps(1e-4f);
-	// zeroDirections[i] will be nonzero for each axis i the ray is parallel to. 
+	// zeroDirections[i] will be nonzero for each axis i the ray is parallel to.
 	__m128 zeroDirections = _mm_cmple_ps(rayDirAbs, epsilon);
 
 	const __m128 floatInf = _mm_set1_ps(FLOAT_INF);

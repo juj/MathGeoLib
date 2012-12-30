@@ -370,8 +370,8 @@ float Triangle::Distance(const Capsule &capsule) const
 	@param v2 Vertex 2 of the triangle.
 	@param u [out] The barycentric u coordinate is returned here if an intersection occurred.
 	@param v [out] The barycentric v coordinate is returned here if an intersection occurred.
-	@return The distance along the ray to the point of intersection, or +inf if no intersection occurred. 
-		If no intersection, then u and v and t will contain undefined values. If lineDir was not normalized, then to get the 
+	@return The distance along the ray to the point of intersection, or +inf if no intersection occurred.
+		If no intersection, then u and v and t will contain undefined values. If lineDir was not normalized, then to get the
 		real world-space distance, one must scale the returned value with lineDir.Length(). If the returned value is negative,
 		then the intersection occurs 'behind' the line starting position, with respect to the direction vector lineDir. */
 float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
@@ -414,7 +414,7 @@ float Triangle::IntersectLineTri(const float3 &linePos, const float3 &lineDir,
 	if (v < -epsilon || u + v > 1.f + epsilon) // Barycentric V or the combination of U and V are outside the triangle - no intersection.
 		return FLOAT_INF;
 
-	// Barycentric u and v are in limits, the ray intersects the triangle. 
+	// Barycentric u and v are in limits, the ray intersects the triangle.
 	
 	// Output signed distance from ray to triangle.
 	return vE2.Dot(vQ) * recipDet;
@@ -518,7 +518,7 @@ static void FindIntersectingLineSegments(const Triangle &t, float da, float db, 
 }
 
 /// [groupSyntax]
-/** The Triangle-Triangle test implementation is based on pseudo-code from Tomas M&ouml;ller's 
+/** The Triangle-Triangle test implementation is based on pseudo-code from Tomas M&ouml;ller's
 	"A Fast Triangle-Triangle Intersection Test": http://jgt.akpeters.com/papers/Moller97/.
 	See also Christer Ericson's Real-Time Collision Detection, p. 172. */
 bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
@@ -538,7 +538,7 @@ bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 	if (t1da*t1db > 0.f && t1da*t1dc > 0.f)
 		return false;
 
-	// Find the intersection line of the two planes. 
+	// Find the intersection line of the two planes.
 	Line l;
 	bool success = p1.Intersects(p2, &l);
 	assume(success); // We already determined the two triangles have intersecting planes, so this should always succeed.
@@ -580,9 +580,9 @@ bool RangesOverlap(float start1, float end1, float start2, float end2)
 /// [groupSyntax]
 bool Triangle::Intersects(const AABB &aabb) const
 {
-/** The AABB-Triangle test implementation is based on the pseudo-code in 
+/** The AABB-Triangle test implementation is based on the pseudo-code in
 	Christer Ericson's Real-Time Collision Detection, pp. 169-172. */
-	///@todo The Triangle-AABB intersection test can be greatly optimized by manually unrolling loops, trivial math and by avoiding 
+	///@todo The Triangle-AABB intersection test can be greatly optimized by manually unrolling loops, trivial math and by avoiding
 	/// unnecessary copying.
 	float t1, t2, a1, a2;
 	const float3 e[3] = { float3(1,0,0), float3(0,1,0), float3(0,0,1) };
@@ -850,7 +850,7 @@ float3 Triangle::ClosestPoint(const LineSegment &lineSegment, float3 *otherPt) c
 			return c; // == a + v*e1
 		}
 		else if (t < 0.f)
-		{ 
+		{
 			// Clamp to t == 0 and solve for v.
 			v = B[1] / m[1][1];
 //			mathassert(EqualAbs(v, Clamp01(v)));
@@ -1358,7 +1358,7 @@ float3 Triangle::ClosestPoint(const Line &line, float3 *otherPt) const
 /// [groupSyntax]
 float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float *outD) const
 {
-	/** The implementation of the Triangle-Line test is based on the pseudo-code in 
+	/** The implementation of the Triangle-Line test is based on the pseudo-code in
 		Schneider, Eberly. Geometric Tools for Computer Graphics pp. 433 - 441. */
 	///@todo The Triangle-Line code is currently untested. Run tests to ensure the following code works properly.
 
@@ -1394,7 +1394,7 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 	float3 b = float3(-v_m_p_e0, -v_m_p_e1, v_m_p_d);
 	float3 uvt = m * b;
 	// We cannot simply clamp the solution to (uv) inside the constraints, since the expression we
-	// are minimizing is quadratic. 
+	// are minimizing is quadratic.
 	// So, examine case-by-case which part of the space the solution lies in. Because the function is convex,
 	// we can clamp the search space to the boundary planes.
 	float u = uvt.x;
@@ -1479,7 +1479,7 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 		u = (m00*b0 + m01*b1);// * det;
 		t = (m10*b0 + m11*b1);// * det;
 #endif
-//		u = m[0][0]*b[0] + 
+//		u = m[0][0]*b[0] +
 
 		// Check if the solution is still out of bounds.
 		if (u <= 0)
@@ -1517,7 +1517,7 @@ float3 Triangle::ClosestPoint(const Line &other, float *outU, float *outV, float
 /// [groupSyntax]
 float3 Triangle::ClosestPoint(const Triangle &other, float3 *otherPt) const
 {
-	/** The code for computing the closest point pair on two Triangles is based 
+	/** The code for computing the closest point pair on two Triangles is based
 		on pseudo-code from Christer Ericson's Real-Time Collision Detection, pp. 155-156. */
 
 	// First detect if the two triangles are intersecting.
@@ -1642,7 +1642,7 @@ Triangle operator *(const Quat &transform, const Triangle &triangle)
 std::string Triangle::ToString() const
 {
 	char str[256];
-	sprintf(str, "Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))", 
+	sprintf(str, "Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))",
 		a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
 	return str;
 }

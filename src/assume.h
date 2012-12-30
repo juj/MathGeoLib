@@ -47,7 +47,7 @@
 // The assume() macro operates differently depending on which #defines are present:
 // #define MATH_ASSERT_ON_ASSUME - the assume() macro resolves to the assert() macro.
 // #define MATH_DISABLE_ASSUME   - the assume() macro is silent, and disabled altogether. (no prints or breaks or anything, the checks by assume() are ignored)
-// If neither of the above is defined (default), then 
+// If neither of the above is defined (default), then
 //  - WIN32: if MathBreakOnAssume() == true, the system will break to debugger using a call to DebugBreak().
 //  - Other: if MathBreakOnAssume() == true, the assume() macro is equal to the assert() macro.
 //  -   All: if MathBreakOnAssume() == false, the assume() macro uses printf() to log warnings of failed math-related assumptions.
@@ -69,7 +69,7 @@ MATH_END_NAMESPACE
 
 // If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
 // not be checked against at runtime.
-// If this flag is undefined (the default), all input is sanity checked so that user cannot crash the system 
+// If this flag is undefined (the default), all input is sanity checked so that user cannot crash the system
 // e.g. with out-of-bounds accesses.
 //#define MATH_ENABLE_INSECURE_OPTIMIZATIONS
 

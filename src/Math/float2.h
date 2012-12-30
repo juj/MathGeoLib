@@ -53,14 +53,14 @@ public:
 	float y;
 
 	/// The default constructor does not initialize any members of this class.
-	/** This means that the values of the members x and y are both undefined after creating a new float2 using 
+	/** This means that the values of the members x and y are both undefined after creating a new float2 using
 		this default constructor. Remember to assign to them before use.
 		@see x, y. */
 	float2() {}
 
 #ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float2 copy constructor.
-	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up 
+	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up
 		this function for script bindings. */
 	float2(const float2 &rhs) { x = rhs.x; y = rhs.y; }
 #endif
@@ -77,7 +77,7 @@ public:
 	/** @param data An array containing two elements for x and y. This pointer may not be null. */
 	explicit float2(const float *data);
 
-	/// Casts this float2 to a C array. 
+	/// Casts this float2 to a C array.
 	/** This function does not allocate new memory or make a copy of this float2. This function simply
 		returns a C pointer view to this data structure. Use ptr()[0] to access the x component of this float2
 		and ptr()[1] to access the y component.
@@ -92,8 +92,8 @@ public:
 	const float *ptr() const;
 
 	/// Accesses an element of this vector using array notation.
-	/** @param index The element to get. Pass in 0 for x and 1 for y. 
-		@note If you have a non-const instance of this class, you can use this notation to set the elements of 
+	/** @param index The element to get. Pass in 0 for x and 1 for y.
+		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec[1] = 10.f; would set the y-component of this vector.
 		@see ptr(), At(). */
 	float &operator [](int index) { return At(index); }
@@ -101,7 +101,7 @@ public:
 
 	/// Accesses an element of this vector.
 	/** @param index The element to get. Pass in 0 for x and 1 for y.
-		@note If you have a non-const instance of this class, you can use this notation to set the elements of 
+		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec.At(1) = 10.f; would set the y-component of this vector.
 		@see ptr(), operator [](). */
 	float &At(int index);
@@ -153,7 +153,7 @@ public:
 	float2 Add(const float2 &v) const { return *this + v; }
 
 	/// Adds the vector (s,s) to this vector.
-	/// @note Mathematically, the addition of a vector and scalar is not defined in linear space structures, 
+	/// @note Mathematically, the addition of a vector and scalar is not defined in linear space structures,
 	///	 but this function is provided here for syntactical convenience.
 	/// @return (x+s, y+s).
 	float2 Add(float s) const;
@@ -163,19 +163,19 @@ public:
 	float2 Sub(const float2 &v) const { return *this - v; }
 
 	/// Subtracts the vector (s,s) from this vector. [similarOverload: Add] [hideIndex]
-	/// @note Mathematically, the subtraction of a vector by a scalar is not defined in linear space structures, 
+	/// @note Mathematically, the subtraction of a vector by a scalar is not defined in linear space structures,
 	///	 but this function is provided here for syntactical convenience.
 	/// @return (x-s, y-s).
 	float2 Sub(float s) const;
 
 	/// Subtracts this vector from the vector (s,s). [similarOverload: Add] [hideIndex]
-	/// @note Mathematically, the subtraction of a scalar by a vector is not defined in linear space structures, 
+	/// @note Mathematically, the subtraction of a scalar by a vector is not defined in linear space structures,
 	///	 but this function is provided here for syntactical convenience.
 	/// @return (s-x, s-y).
 	float2 SubLeft(float s) const;
 
 	/// Multiplies this vector by a vector, element-wise. [similarOverload: Add] [hideIndex]
-	/// @note Mathematically, the multiplication of two vectors is not defined in linear space structures, 
+	/// @note Mathematically, the multiplication of two vectors is not defined in linear space structures,
 	///	 but this function is provided here for syntactical convenience.
 	/// @return (x*v.x, y*v.y).
 	float2 Mul(const float2 &v) const;
@@ -185,7 +185,7 @@ public:
 	float2 Mul(float s) const { return *this * s; }
 
 	/// Divides this vector by a vector, element-wise. [similarOverload: Add] [hideIndex]
-	/// @note Mathematically, the division of two vectors is not defined in linear space structures, 
+	/// @note Mathematically, the division of two vectors is not defined in linear space structures,
 	///	 but this function is provided here for syntactical convenience.
 	/// @return (x/v.x, y/v.y).
 	float2 Div(const float2 &v) const;
@@ -195,7 +195,7 @@ public:
 	float2 Div(float s) const { return *this / s; }
 	
 	/// Divides the vector (s,s) by this vector, element-wise. [similarOverload: Add] [hideIndex]
-	/// @note Mathematically, the division of a scalar by a vector is not defined in linear space structures, 
+	/// @note Mathematically, the division of a scalar by a vector is not defined in linear space structures,
 	///	 but this function is provided here for syntactical convenience.
 	/// @return (s/x, s/y).
 	float2 DivLeft(float s) const;
@@ -242,8 +242,8 @@ public:
 
 	/// Converts this euclidean (x,y) float2 to polar coordinates representation in the form (theta, length).
 	/** @note It is valid for the magnitude of this vector to be (very close to) zero, in which case the return value is the zero vector.
-		@return A float2 that has the first component (x) representing the aimed angle (azimuth) of this direction vector, in radians, 
-		and is equal to atan2(this.y, this.x). The x component has a range of ]-pi/2, pi/2]. The second component (y) of the returned vector 
+		@return A float2 that has the first component (x) representing the aimed angle (azimuth) of this direction vector, in radians,
+		and is equal to atan2(this.y, this.x). The x component has a range of ]-pi/2, pi/2]. The second component (y) of the returned vector
 		stores the length (radius) of this vector.
 		@see SetFromPolarCoordinates, FromPolarCoorindates, AimedAngle. */
 	float2 ToPolarCoordinates() const;
@@ -262,9 +262,9 @@ public:
 		@see LengthSq(), Distance(), DistanceSq(). */
 	float Length() const;
 
-	/// Computes the squared length of this vector. 
+	/// Computes the squared length of this vector.
 	/** Calling this function is faster than calling Length(), since this function avoids computing a square root.
-		If you only need to compare lengths to each other, but are not interested in the actual length values, 
+		If you only need to compare lengths to each other, but are not interested in the actual length values,
 		you can compare by using LengthSq(), instead of Length(), since Sqrt() is an order-preserving
 		(monotonous and non-decreasing) function.
 		@return x*x + y*y.
@@ -272,13 +272,13 @@ public:
 	float LengthSq() const;
 
 	/// Normalizes this float2.
-	/** In the case of failure, this vector is set to (1, 0), so calling this function will never result in an 
+	/** In the case of failure, this vector is set to (1, 0), so calling this function will never result in an
 		unnormalized vector.
-		@note If this function fails to normalize the vector, no error message is printed, the vector is set to (1,0) and 
-			an error code 0 is returned. This is different than the behavior of the Normalized() function, which prints an 
-			error if normalization fails. 
+		@note If this function fails to normalize the vector, no error message is printed, the vector is set to (1,0) and
+			an error code 0 is returned. This is different than the behavior of the Normalized() function, which prints an
+			error if normalization fails.
 		@note This function operates in-place.
-		@return The old length of this vector, or 0 if normalization failed. 
+		@return The old length of this vector, or 0 if normalization failed.
 		@see Normalized(). */
 	float Normalize();
 
@@ -295,7 +295,7 @@ public:
 		unnormalized vector.
 		@note This function operates in-place.
 		@return The old length of this vector. If this function returns 0, the scaling failed, and this vector is arbitrarily
-			reset to (newLength, 0). In case of failure, no error message is generated. You are expected to handle the failure 
+			reset to (newLength, 0). In case of failure, no error message is generated. You are expected to handle the failure
 			yourself.
 		@see ScaledToLength(). */
 	float ScaleToLength(float newLength);
@@ -401,7 +401,7 @@ public:
 
 	/// Computes the squared distance between this and the given point.
 	/** Calling this function is faster than calling Distance(), since this function avoids computing a square root.
-		If you only need to compare distances to each other, but are not interested in the actual distance values, 
+		If you only need to compare distances to each other, but are not interested in the actual distance values,
 		you can compare by using DistanceSq(), instead of Distance(), since Sqrt() is an order-preserving
 		(monotonous and non-decreasing) function.
 		@see Distance(), Length(), LengthSq(). */
@@ -450,7 +450,7 @@ public:
 		@see Refract(). */
 	float2 Reflect(const float2 &normal) const;
 
-	/// Refracts this vector about a plane with the given normal. 
+	/// Refracts this vector about a plane with the given normal.
 	/** By convention, the this vector points towards the plane, and the returned vector points away from the plane.
 		When the ray is going from a denser material to a lighter one, total internal reflection can occur.
 		In this case, this function will just return a reflected vector from a call to Reflect().

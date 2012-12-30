@@ -56,17 +56,17 @@ float2::float2(const float *data)
 }
 
 float *float2::ptr()
-{ 
+{
 	return &x;
-} 
+}
 
 const float *float2::ptr() const
-{ 
+{
 	return &x;
-} 
+}
 
 CONST_WIN32 float float2::At(int index) const
-{ 
+{
 	assume(index >= 0);
 	assume(index < Size);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -77,7 +77,7 @@ CONST_WIN32 float float2::At(int index) const
 }
 
 float &float2::At(int index)
-{ 
+{
 	assume(index >= 0);
 	assume(index < Size);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -103,12 +103,12 @@ float4 float2::Swizzled(int i, int j, int k, int l) const
 }
 
 float float2::LengthSq() const
-{ 
+{
 	return x*x + y*y;
 }
 
 float float2::Length() const
-{ 
+{
 	return sqrtf(LengthSq());
 }
 
@@ -141,7 +141,7 @@ float float2::AimedAngle() const
 }
 
 float float2::Normalize()
-{ 
+{
 	assume(IsFinite());
 	float lengthSq = LengthSq();
 	if (lengthSq > 1e-6f)
@@ -220,14 +220,14 @@ bool float2::Equals(float x_, float y_, float epsilon) const
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float2::ToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "(%f, %f)", x, y);
 	return std::string(str);
 }
 
 std::string float2::SerializeToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "%f %f", x, y);
 	return std::string(str);
@@ -443,7 +443,7 @@ void float2::Orthonormalize(float2 &a, float2 &b)
 }
 
 float2 float2::FromScalar(float scalar)
-{ 
+{
 	return float2(scalar, scalar);
 }
 
@@ -519,8 +519,8 @@ void float2::ConvexHull(const float2 *pointArray, int numPoints, std::vector<flo
 #endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-/** This function implements the Graham's Scan algorithm for finding the convex hull of 
-	a 2D point set. The running time is O(nlogn). For details, see 
+/** This function implements the Graham's Scan algorithm for finding the convex hull of
+	a 2D point set. The running time is O(nlogn). For details, see
 	"Introduction to Algorithms, 2nd ed.", by Cormen, Leiserson, Rivest, p.824, or
 	a lecture by Shai Simonson: http://www.aduni.org/courses/algorithms/index.php?view=cw , lecture 02-13-01. */
 int float2::ConvexHullInPlace(float2 *points, int nPoints)
@@ -547,7 +547,7 @@ int float2::ConvexHullInPlace(float2 *points, int nPoints)
 		bool dropLastPointFromHull = false;
 		if (lineALen >= 1e-5f)
 			lineA /= sqrt(lineALen);
-		else 
+		else
 			dropLastPointFromHull = true;
 		if (lineBLen >= 1e-5f)
 			lineB /= sqrt(lineBLen);

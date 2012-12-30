@@ -168,7 +168,7 @@ void Quat::Inverse()
 }
 
 Quat Quat::Inverted() const
-{ 
+{
 	assume(IsNormalized());
 	assume(IsInvertible());
 	return Conjugated();
@@ -352,7 +352,7 @@ void SetQuatFrom(Quat &q, const M &m)
 	//    2xz - 2wy           2yz + 2wx         1 - 2x^2 - 2y^2
 
 	float r = m[0][0] + m[1][1] + m[2][2]; // The element w is easiest picked up as a sum of the diagonals.
-	// Above, r == 3 - 4(x^2+y^2+z^2) == 4(1-x^2-y^2-z^2) - 1 == 4*w^2 - 1. 
+	// Above, r == 3 - 4(x^2+y^2+z^2) == 4(1-x^2-y^2-z^2) - 1 == 4*w^2 - 1.
 	if (r > 0) // In this case, |w| > 1/2.
 	{
 		q.w = sqrtf(r + 1.f) * 0.5f; // We have two choices for the sign of w, arbitrarily pick the positive.
@@ -563,7 +563,7 @@ std::string Quat::ToString2() const
 }
 
 std::string Quat::SerializeToString() const
-{ 
+{
 	char str[256];
 	sprintf(str, "%f %f %f %f", x, y, z, w);
 	return std::string(str);
@@ -613,7 +613,7 @@ Quat Quat::operator *(float scalar) const
 }
 
 float3 Quat::operator *(const float3 &rhs) const
-{ 
+{
 	return Mul(rhs);
 }
 
@@ -646,8 +646,8 @@ std::ostream &operator <<(std::ostream &out, const Quat &rhs)
 }
 #endif
 
-Quat Quat::Mul(const Quat &rhs) const { return *this * rhs; } 
-Quat Quat::Mul(const float3x3 &rhs) const { return *this * Quat(rhs); } 
+Quat Quat::Mul(const Quat &rhs) const { return *this * rhs; }
+Quat Quat::Mul(const float3x3 &rhs) const { return *this * Quat(rhs); }
 float3 Quat::Mul(const float3 &vector) const { return this->Transform(vector); }
 float4 Quat::Mul(const float4 &vector) const { return this->Transform(vector); }
 

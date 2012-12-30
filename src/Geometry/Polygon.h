@@ -31,7 +31,7 @@ MATH_BEGIN_NAMESPACE
    at least 3 vertices (a triangle).
 
    Well-formed polygons are always planar, i.e. all the vertices lie on the same plane. It is possible
-   to store non-planar Polygons in this structure, but their representation is ambiguous, and for all practical 
+   to store non-planar Polygons in this structure, but their representation is ambiguous, and for all practical
    purposes, should be avoided. */
 class Polygon
 {
@@ -49,7 +49,7 @@ public:
 		@see Edge(), NumVertices(). */
 	int NumEdges() const;
 
-	/// Returns the number of vertices in this polygon. 
+	/// Returns the number of vertices in this polygon.
 	/** Since the polygon is always closed and connected, the number of edges is equal to the number of vertices.
 		@see p, Vertex(), NumVertices(). */
 	int NumVertices() const;
@@ -92,7 +92,7 @@ public:
 		this point is not necessarily unique.
 		@param direction The direction vector of the direction to find the extreme point. This vector may
 			be unnormalized, but may not be null.
-		@return An extreme point of this Polygon in the given direction. The returned point is always a 
+		@return An extreme point of this Polygon in the given direction. The returned point is always a
 			vertex of this Polygon.
 		@see Vertex(). */
 	float3 ExtremePoint(const float3 &direction) const;
@@ -127,7 +127,7 @@ public:
 		@param i Index of the first endpoint of the diagonal LineSegment, in the range [0, NumVertices-1].
 		@param j Index of the second endpoint of the diagonal LineSegment, in the range [0, NumVertices-1].
 		@note Whereas it is invalid to call DiagonalExists() with values |i-j|<=1, it is acceptable for this function. This is to
-			simplify generation of code that iterates over diagonal vertex pairs.	  
+			simplify generation of code that iterates over diagonal vertex pairs.	
 		@return LineSegment(Vertex(i), Vertex(j)) without checking if this actually is a valid diagonal of this polygon. If
 			indices outside the valid range are passed, LineSegment(nan, nan) is returned.
 		@see Vertex(), NumVertices(), DiagonalExists(). */
@@ -144,8 +144,8 @@ public:
 
 	/// Tests if this polygon is planar.
 	/** A polygon is planar if all its vertices lie on the same plane.
-		@note Almost all functions in this class require that the polygon is planar. While you can store vertices of 
-			non-planar polygons in this class, they are better avoided. Read the member function documentation carefully 
+		@note Almost all functions in this class require that the polygon is planar. While you can store vertices of
+			non-planar polygons in this class, they are better avoided. Read the member function documentation carefully
 			to avoid calling for non-planar polygons any functions which assume planarity.
 		@see IsConvex(), IsSimple(), IsNull(), IsFinite(), IsDegenerate(). */
 	bool IsPlanar(float epsilon = 1e-3f) const;
@@ -154,7 +154,7 @@ public:
 		A polygon is simple if no two nonconsecutive edges have a point in common.
 		In other words, a planar polygon is simple if its edges do not self-intersect, and if each vertex is joined by
 		exactly two edges.
-		@note This function assumes that the polygon is planar. 
+		@note This function assumes that the polygon is planar.
 		@see IsConvex(), IsPlanar(), IsNull(), IsFinite(), IsDegenerate(). */
 	bool IsSimple() const;
 
@@ -209,7 +209,7 @@ public:
 		@note Only call this function if this Polygon is planar. */
 	float3 NormalCCW() const;
 	/// Computes the normal of this polygon in clockwise direction. [similarOverload: NormalCCW]
-	/** @return The normal of this polygon in clockwise direction. This vector is normalized and points to the direction 
+	/** @return The normal of this polygon in clockwise direction. This vector is normalized and points to the direction
 		from which observed the vertices of this polygon wind in clockwise order.
 		@note Only call this function if this Polygon is planar.
 		@note These two functions follow the relation NormalCCW() == -NormalCW().
@@ -254,7 +254,7 @@ public:
 
 	/// Tests if the given object, expressed in global (world) space, is fully contained inside this polygon.
 	/** Only call this function if the polygon is planar.
-		This test is performed in global space of this polygon, i.e. by specifying the other object in global (world) 
+		This test is performed in global space of this polygon, i.e. by specifying the other object in global (world)
 		space coordinates.
 		@param point The point to test for containment.
 		@param polygonThickness Since a polygon is a 2D object in a 3D space, a threshold value is used to
@@ -267,7 +267,7 @@ public:
 	bool Contains(const LineSegment &lineSegment, float polygonThickness = 1e-3f) const;
 	bool Contains(const Triangle &triangle, float polygonThickness = 1e-3f) const;
 	bool Contains(const Polygon &polygon, float polygonThickness = 1e-3f) const;
-	//todo Add RTCD, p. 202. 
+	//todo Add RTCD, p. 202.
 	//bool ContainsConvex(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
 
 	/// Tests if the given object, expressed in the local space of this polygon, is fully contained inside this polyhedron.
@@ -277,7 +277,7 @@ public:
 	bool Contains2D(const LineSegment &localSpaceLineSegment) const;
 
 	/// Tests whether this polyhedron and the given object intersect.
-	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside 
+	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true.
 		This test is performed in the global (world) space of this polygon.
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.

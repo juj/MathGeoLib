@@ -114,7 +114,7 @@ public:
 	/// Traverses a ray through this kD-tree, and calls the given leafCallback function for each leaf of the tree.
 	/// Uses the "recursive B" method from Vlastimil Havran's thesis.
 	/** @param r The ray to query through this kD-tree.
-		@param leafCallback A function or a function object of prototype 
+		@param leafCallback A function or a function object of prototype
 			bool LeafCallbackFunction(KdTree<T> &tree, const KdTreeNode &leaf, const Ray &ray, float tNear, float tFar);
 			If the callback function returns true, the execution of the query is stopped and this function immediately
 			returns afterwards. If the callback function returns false, the execution of the query continues. */
@@ -132,10 +132,10 @@ public:
 	inline void AABBQuery(const AABB &aabb, Func &leafCallback);
 
 #if 0 ///\bug Doesn't work properly. Fix up!
-	/// Performs an intersection query of this kD-tree against a given kD-tree, and calls the given 
+	/// Performs an intersection query of this kD-tree against a given kD-tree, and calls the given
 	/// leafCallback function for each leaf pair that intersect each other.
 	/// @param leafCallback A function or a function object of prototype
-	///    bool LeafCallbackFunction(KdTree<T> &thisTree, KdTreeNode &thisLeaf, const AABB &thisLeafAABB, 
+	///    bool LeafCallbackFunction(KdTree<T> &thisTree, KdTreeNode &thisLeaf, const AABB &thisLeafAABB,
 	///                              KdTree<T> &tree2, KdTreeNode &tree2Leaf, const OBB &tree2LeafOBB);
 	///    If the callback function returns true, the execution of the query is stopped and this function immediately
 	///    returns afterwards. If the callback function returns false, the execution of the query continues.

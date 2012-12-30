@@ -25,7 +25,7 @@ typedef unsigned long long tick_t;
 
 /** @brief High-resolution timing and system time.
 
-	Gives out timing information in various forms. Use this rather than 
+	Gives out timing information in various forms. Use this rather than
 	any platform-dependent perf-counters or rdtsc or whatever.*/
 class Clock
 {
@@ -55,10 +55,10 @@ public:
 	static int Sec();
 
 	/// @return The current system time counter in milliseconds.
-	static unsigned long SystemTime(); 
+	static unsigned long SystemTime();
 
 	/// @return The number of milliseconds since application start.
-	static unsigned long Time(); 
+	static unsigned long Time();
 
 	/// @return The low part of the current tick-time (using whatever high-resolution counter available)
 	static unsigned long TickU32();
@@ -67,7 +67,7 @@ public:
 	static tick_t Tick();
 
 	/// @return How many ticks make up a second.
-	static tick_t TicksPerSec(); 
+	static tick_t TicksPerSec();
 
 	static inline tick_t TicksPerMillisecond() { return TicksPerSec() / 1000; }
 

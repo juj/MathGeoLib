@@ -247,7 +247,7 @@ std::vector<float3> Circle::IntersectsFaces(const OBB &obb) const
 std::string Circle::ToString() const
 {
 	char str[256];
-	sprintf(str, "Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)", 
+	sprintf(str, "Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)",
 		pos.x, pos.y, pos.z, normal.x, normal.y, normal.z, r);
 	return str;
 }

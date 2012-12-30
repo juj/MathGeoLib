@@ -166,8 +166,8 @@ Polyhedron OBB::ToPolyhedron() const
 		p.v.push_back(CornerPoint(i));
 
 	// Generate the 6 faces of this OBB.
-	const int faces[6][4] = 
-	{ 
+	const int faces[6][4] =
+	{
 		{ 0, 1, 3, 2 }, // X-
 		{ 4, 6, 7, 5 }, // X+
 		{ 0, 4, 5, 1 }, // Y-
@@ -849,7 +849,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 	{
 		float ra = r[i];
 		float rb = DOT3(b.r, AbsR[i]);
-		if (Abs(t[i]) > ra + rb) 
+		if (Abs(t[i]) > ra + rb)
 			return false;
 	}
 
@@ -1020,7 +1020,7 @@ bool OBB::Intersects(const Polyhedron &polyhedron) const
 std::string OBB::ToString() const
 {
 	char str[256];
-	sprintf(str, "OBB(Pos:(%.2f, %.2f, %.2f) Size:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))", 
+	sprintf(str, "OBB(Pos:(%.2f, %.2f, %.2f) Size:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))",
 		pos.x, pos.y, pos.z, r.x*2.f, r.y*2.f, r.z*2.f, axis[0].x, axis[0].y, axis[0].z, axis[1].x, axis[1].y, axis[1].z, axis[2].x, axis[2].y, axis[2].z);
 	return str;
 }

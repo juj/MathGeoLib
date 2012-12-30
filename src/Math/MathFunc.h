@@ -65,7 +65,7 @@ MATH_BEGIN_NAMESPACE
 /// @param v1 The first vector in the dot product. This can either be a C array or a float3.
 /// @param v2 The second vector in the dot product. As opposed to the DOT3() macro, which accesses the elements of this vector
 ///	 as v2[0], v2[1], v2[2], this function accesses the elements as v2[0], v2[stride], v2[2*stride].
-/// @param stride The distance between between the subsequent vector elements in the array v2. 
+/// @param stride The distance between between the subsequent vector elements in the array v2.
 /// @see DOT3(), ABSDOT3(), DOT3_xyz(), DOT4STRIDED().
 #define DOT3STRIDED(v1, v2, stride) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[stride] + (v1)[2] * (v2)[2*stride])
 
@@ -79,7 +79,7 @@ MATH_BEGIN_NAMESPACE
 /// @param v1 The first vector in the dot product. This can either be a C array or a float4.
 /// @param v2 The second vector in the dot product. As opposed to the DOT4() macro, which accesses the elements of this vector
 ///	 as v2[0], v2[1], v2[2], v2[3], this function accesses the elements as v2[0], v2[stride], v2[2*stride], v2[3*stride].
-/// @param stride The distance between between the subsequent vector elements in the array v2. 
+/// @param stride The distance between between the subsequent vector elements in the array v2.
 /// @see DOT4(), DOT4POS(), DOT4POS_xyz(), DOT4DIR(), DOT4DIR_xyz().
 #define DOT4STRIDED(v1, v2, stride) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[stride] + (v1)[2] * (v2)[2*stride] + (v1)[3] * (v2)[3*stride])
 
@@ -97,12 +97,12 @@ MATH_BEGIN_NAMESPACE
 /// @see DOT4(), DOT4STRIDED(), DOT4POS(), DOT4DIR(), DOT4DIR_xyz().
 #define DOT4POS_xyz(vec4D, x, y, z) ((vec4D)[0] * (x) + (vec4D)[1] * (y) + (vec4D)[2] * (z) + (vec4D)[3])
 
-/// Computes the dot product of a 4D vector and a direction vector (x,y,z,0). 
+/// Computes the dot product of a 4D vector and a direction vector (x,y,z,0).
 /// @note This function is only provided for convenience, since this is identical to DOT3.
 /// @see DOT3(), DOT4(), DOT4STRIDED(), DOT4POS(), DOT4POS_xyz().
 #define DOT4DIR(vec4D, vecDir) DOT3(vec4D, vecDir)
 
-/// Computes the dot product of a 4D vector and a direction vector (x,y,z,0). 
+/// Computes the dot product of a 4D vector and a direction vector (x,y,z,0).
 /// @note This function is only provided for convenience, since this is identical to DOT3_xyz.
 /// @see DOT3_xyz(), DOT4(), DOT4STRIDED(), DOT4POS(), DOT4POS_xyz(), DOT4DIR().
 #define DOT4DIR_xyz(vec4D, x, y, z) DOT3_xyz(vec4D, x, y, z)
@@ -215,7 +215,7 @@ float Sign(float f);
 float SignOrZero(float f, float epsilon = 1e-8f);
 
 /// Linearly interpolates between a and b.
-/** @param t A value between [0,1]. 
+/** @param t A value between [0,1].
 	@param a The first endpoint to lerp between.
 	@param b The second endpoint to lerp between.
 	@return This function computes a + t*(b-a). That is, if t==0, this function returns a. If t==1, this function returns b.
@@ -235,7 +235,7 @@ float Step(float y, float x);
 /// See http://msdn.microsoft.com/en-us/library/bb509658(v=vs.85).aspx
 /** @see Lerp(), LerpMod(), InvLerp(), Step(), PingPongMod(), Mod(), ModPos(), Frac(). */
 float SmoothStep(float min, float max, float x);
-/// Limits x to the range [0, mod], but instead of wrapping around from mod to 0, the result will move back 
+/// Limits x to the range [0, mod], but instead of wrapping around from mod to 0, the result will move back
 /// from mod to 0 as x goes from mod to 2*mod.
 /** @see Lerp(), LerpMod(), InvLerp(), Step(), SmoothStep(), Mod(), ModPos(), Frac(). */
 float PingPongMod(float x, float mod);
@@ -264,13 +264,13 @@ float Recip(float x);
 float RecipFast(float x);
 
 /// Calculates n! at runtime. Use class FactorialT<N> to evaluate factorials at compile-time.
-int Factorial(int n); 
+int Factorial(int n);
 
-/// Calculates (N nCr K) at runtime with recursion, running time is exponential to n. 
+/// Calculates (N nCr K) at runtime with recursion, running time is exponential to n.
 /// Use class Combinatorial<N, K> to evaluate combinatorials at compile-time.
 int CombinatorialRec(int n, int k);
 
-/// Calculates (N nCr K) at runtime, running time is proportional to n*k. 
+/// Calculates (N nCr K) at runtime, running time is proportional to n*k.
 /// Use class Combinatorial<N, K> to evaluate combinatorials at compile-time.
 int CombinatorialTab(int n, int k);
 
@@ -407,12 +407,12 @@ template<> bool inline Equal(const long double &a, const long double &b) { retur
 /** Compares the two values for equality, allowing the given amount of absolute error. */
 bool EqualAbs(float a, float b, float epsilon = 1e-4f);
 
-/** Compares the two values for equality, allowing the given amount of relative error. 
+/** Compares the two values for equality, allowing the given amount of relative error.
 	Beware that for values very near 0, the relative error is significant. */
 bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 
-/** Compares two floats interpreted as integers, see 
-	http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm 
+/** Compares two floats interpreted as integers, see
+	http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	Warning: This comparison is not safe with NANs or INFs. */
 bool EqualUlps(float a, float b, int maxUlps = 10000);
 
