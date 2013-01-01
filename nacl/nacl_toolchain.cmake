@@ -1,4 +1,4 @@
-if ($ENV{NACL_SDK_ROOT} STREQUAL "")
+if ("$ENV{NACL_SDK_ROOT}" STREQUAL "")
 	message(STATUS "Environment variable NACL_SDK_ROOT was not set! Assuming NaCl SDK is found from C:/nacl_sdk/pepper_19")
 	set(NACL_PATH "C:/nacl_sdk/pepper_19" CACHE STRING "Native Client SDK Root Path")
 else()
