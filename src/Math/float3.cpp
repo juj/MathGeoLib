@@ -206,7 +206,7 @@ bool float3::IsPerpendicular(const float3 &other, float epsilon) const
 	return fabs(Dot(other)) <= epsilon;
 }
 
-bool float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
+bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
 {
 	return (p2-p1).Cross(p3-p1).LengthSq() <= epsilon;
 }
@@ -227,7 +227,7 @@ std::string float3::SerializeToString() const
 }
 #endif
 
-float3 float3::FromString(const char *str)
+float3 MUST_USE_RESULT float3::FromString(const char *str)
 {
 	assume(str);
 	if (!str)
@@ -452,7 +452,7 @@ float3 float3::RandomPerpendicular(LCG &rng) const
 	return Perpendicular(RandomDir(rng));
 }
 
-float float3::ScalarTripleProduct(const float3 &u, const float3 &v, const float3 &w)
+float MUST_USE_RESULT float3::ScalarTripleProduct(const float3 &u, const float3 &v, const float3 &w)
 {
 	return u.Cross(v).Dot(w);
 }
@@ -524,7 +524,7 @@ float3 float3::Lerp(const float3 &b, float t) const
 	return (1.f - t) * *this + t * b;
 }
 
-float3 float3::Lerp(const float3 &a, const float3 &b, float t)
+float3 MUST_USE_RESULT float3::Lerp(const float3 &a, const float3 &b, float t)
 {
 	return a.Lerp(b, t);
 }
@@ -546,12 +546,12 @@ void float3::Orthogonalize(const float3 &a, float3 &b, float3 &c)
 		c -= c.ProjectTo(b);
 }
 
-bool float3::AreOrthogonal(const float3 &a, const float3 &b, float epsilon)
+bool MUST_USE_RESULT float3::AreOrthogonal(const float3 &a, const float3 &b, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon);
 }
 
-bool float3::AreOrthogonal(const float3 &a, const float3 &b, const float3 &c, float epsilon)
+bool MUST_USE_RESULT float3::AreOrthogonal(const float3 &a, const float3 &b, const float3 &c, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon) &&
 	       a.IsPerpendicular(c, epsilon) &&
@@ -580,12 +580,12 @@ void float3::Orthonormalize(float3 &a, float3 &b, float3 &c)
 	c.Normalize();
 }
 
-bool float3::AreOrthonormal(const float3 &a, const float3 &b, float epsilon)
+bool MUST_USE_RESULT float3::AreOrthonormal(const float3 &a, const float3 &b, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon) && a.IsNormalized(epsilon*epsilon) && b.IsNormalized(epsilon*epsilon);
 }
 
-bool float3::AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, float epsilon)
+bool MUST_USE_RESULT float3::AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon) &&
 	       a.IsPerpendicular(c, epsilon) &&
@@ -595,7 +595,7 @@ bool float3::AreOrthonormal(const float3 &a, const float3 &b, const float3 &c, f
 	       c.IsNormalized(epsilon*epsilon);
 }
 
-float3 float3::FromScalar(float scalar)
+float3 MUST_USE_RESULT float3::FromScalar(float scalar)
 {
 	return float3(scalar, scalar, scalar);
 }
@@ -622,7 +622,7 @@ void float3::SetFromSphericalCoordinates(float azimuth, float inclination, float
 	z = cx * Cos(azimuth) * radius;
 }
 
-float3 float3::FromSphericalCoordinates(float azimuth, float inclination, float radius)
+float3 MUST_USE_RESULT float3::FromSphericalCoordinates(float azimuth, float inclination, float radius)
 {
 	float3 v;
 	v.SetFromSphericalCoordinates(azimuth, inclination, radius);
@@ -637,7 +637,7 @@ void float3::SetFromSphericalCoordinates(float azimuth, float inclination)
 	z = cx * Cos(azimuth);
 }
 
-float3 float3::FromSphericalCoordinates(float azimuth, float inclination)
+float3 MUST_USE_RESULT float3::FromSphericalCoordinates(float azimuth, float inclination)
 {
 	float3 v;
 	v.SetFromSphericalCoordinates(azimuth, inclination);
@@ -688,22 +688,22 @@ float4 float3::ToDir4() const
 	return float4(*this, 0.f);
 }
 
-float3 float3::RandomDir(LCG &lcg, float length)
+float3 MUST_USE_RESULT float3::RandomDir(LCG &lcg, float length)
 {
 	return Sphere(float3(0,0,0), length).RandomPointOnSurface(lcg);
 }
 
-float3 float3::RandomSphere(LCG &lcg, const float3 &center, float radius)
+float3 MUST_USE_RESULT float3::RandomSphere(LCG &lcg, const float3 &center, float radius)
 {
 	return Sphere(center, radius).RandomPointInside(lcg);
 }
 
-float3 float3::RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
+float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
 {
 	return RandomBox(lcg, float3(xmin, ymin, zmin), float3(xmax, ymax, zmax));
 }
 
-float3 float3::RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues)
+float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues)
 {
 	return AABB(minValues, maxValues).RandomPointInside(lcg);
 }

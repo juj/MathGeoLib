@@ -283,32 +283,32 @@ public:
 			[2] or z specifies the rotation about the C axis (not necessarily the Z axis!). The
 			order of rotations follows the M*v convention, meaning that ToEulerXYZ returns the Euler
 			angles for rotating a vector v in the order X * (Y * (Z * v))), i.e. right-to-left. */
-	float3 ToEulerXYX() const;
-	float3 ToEulerXZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerYXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerYZY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerZXZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerZYZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerXYZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerXZY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerYXZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerYZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerZXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
-	float3 ToEulerZYX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerXYX() const;
+	float3 MUST_USE_RESULT ToEulerXZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerYXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerYZY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerZXZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerZYZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerXYZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerXZY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerYXZ() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerYZX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerZXY() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
+	float3 MUST_USE_RESULT ToEulerZYX() const; ///< [similarOverload: ToEulerXYX] [hideIndex]
 
-	float3x3 ToFloat3x3() const;
-	float3x4 ToFloat3x4() const;
-	float4x4 ToFloat4x4() const;
+	float3x3 MUST_USE_RESULT ToFloat3x3() const;
+	float3x4 MUST_USE_RESULT ToFloat3x4() const;
+	float4x4 MUST_USE_RESULT ToFloat4x4() const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x,y,z,w)".
-	std::string ToString() const;
+	std::string MUST_USE_RESULT ToString() const;
 
 	/// Returns "Quat(axis:(x,y,z) angle:degrees)".
-	std::string ToString2() const;
+	std::string MUST_USE_RESULT ToString2() const;
 
 	/// Returns "x y z w". This is the preferred format for the quaternion if it has to be serialized to a string for machine transfer.
-	std::string SerializeToString() const;
+	std::string MUST_USE_RESULT SerializeToString() const;
 #endif
 	/// Parses a string that is of form "x,y,z,w" or "(x,y,z,w)" or "(x;y;z;w)" or "x y z w" to a new quaternion.
 	static MUST_USE_RESULT Quat FromString(const char *str);
@@ -365,15 +365,15 @@ public:
 
 	/// Multiplies two quaternions in the order 'this * rhs'.
 	/// This corresponds to the concatenation of the two operations ('this * rhs * vector' applies the rotation 'rhs' first, followed by the rotation 'this'.
-	Quat Mul(const Quat &rhs) const;
+	Quat MUST_USE_RESULT Mul(const Quat &rhs) const;
 	/// Converts the given matrix to a quaternion and computes the concatenated transform 'this * rhs'.
-	Quat Mul(const float3x3 &rhs) const;
+	Quat MUST_USE_RESULT Mul(const float3x3 &rhs) const;
 	/// Transforms the given vector by this Quaternion.
 	/// @note Technically, this function does not perform a simple multiplication of 'q * v',
 	/// but instead performs a conjugation operation 'q*v*q^-1'. This corresponds to transforming
 	/// the given vector by this Quaternion.
-	float3 Mul(const float3 &vector) const;
-	float4 Mul(const float4 &vector) const;
+	float3 MUST_USE_RESULT Mul(const float3 &vector) const;
+	float4 MUST_USE_RESULT Mul(const float4 &vector) const;
 
 private: // Hide the unsafe operations from the user, so that he doesn't accidentally invoke an unintended operation.
 
