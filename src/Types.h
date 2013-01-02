@@ -83,6 +83,25 @@ typedef signed long long s64; ///< 8 bytes signed. 9,223,372,036,854,775,807 ~ 9
 
 #endif
 
+#ifdef _MSC_VER
+#define STATIC_ASSERT static_assert
+#else
+// From http://stackoverflow.com/questions/3385515/static-assert-in-c
+#define COMPILE_TIME_ASSERT4(COND,MSG) typedef char static_assertion_##MSG[(!!(COND))*2-1]
+#define COMPILE_TIME_ASSERT3(X,L) COMPILE_TIME_ASSERT4(X,static_assertion_at_line_##L)
+#define COMPILE_TIME_ASSERT2(X,L) COMPILE_TIME_ASSERT3(X,L)
+#define STATIC_ASSERT(X, msg)    COMPILE_TIME_ASSERT2(X,__LINE__)
+#endif
+
+STATIC_ASSERT(sizeof(u8) == 1, "Typedef for fixed-width type u8 is incorrect!");
+STATIC_ASSERT(sizeof(s8) == 1, "Typedef for fixed-width type s8 is incorrect!");
+STATIC_ASSERT(sizeof(u16) == 2, "Typedef for fixed-width type u16 is incorrect!");
+STATIC_ASSERT(sizeof(s16) == 2, "Typedef for fixed-width type s16 is incorrect!");
+STATIC_ASSERT(sizeof(u32) == 4, "Typedef for fixed-width type u32 is incorrect!");
+STATIC_ASSERT(sizeof(s32) == 4, "Typedef for fixed-width type s32 is incorrect!");
+STATIC_ASSERT(sizeof(u64) == 8, "Typedef for fixed-width type u64 is incorrect!");
+STATIC_ASSERT(sizeof(s64) == 8, "Typedef for fixed-width type s64 is incorrect!");
+
 // Functions annotated with MUST_USE_RESULT require that the user stores the return value, or otherwise
 // a warning is printed.
 #if _MSC_VER >= 1700
