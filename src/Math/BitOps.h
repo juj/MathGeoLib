@@ -98,7 +98,7 @@ inline u64 LSB64(u64 bits)
 {
 	assert(bits <= 64);
 	if (bits >= 64)
-		return 0xFFFFFFFFFFFFFFFF;
+		return 0xFFFFFFFFFFFFFFFFULL;
 	return (1 << bits) - 1;
 }
 
