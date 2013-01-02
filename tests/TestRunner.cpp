@@ -187,7 +187,7 @@ int main()
 	AddMathGeoLibTests();
 
 	int numFailures = RunTests(10000, 100);
-	LOGI("%d\n", globalPokedData);
+	LOGI("%d", globalPokedData);
 	return numFailures; // exit code of 0 denotes a successful run.
 }
 #endif
