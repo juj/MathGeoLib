@@ -413,12 +413,13 @@ void OBB::GetFacePlanes(Plane *outPlaneArray) const
 void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int &idxSmallest, int &idxLargest)
 {
 	assume(pointArray || numPoints == 0);
+
+	idxSmallest = idxLargest = 0;
+
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!pointArray)
 		return;
 #endif
-
-	idxSmallest = idxLargest = 0;
 
 	float smallestD = FLOAT_INF;
 	float largestD = -FLOAT_INF;
