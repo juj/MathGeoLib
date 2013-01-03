@@ -45,8 +45,8 @@ public:
 	{
 		TestResult result = TestInside;
 
-		float3 r = (aabb.maxPoint - aabb.minPoint) * 0.5f;
-		float3 c = aabb.minPoint + r;
+		//float3 r = (aabb.maxPoint - aabb.minPoint) * 0.5f;
+		//float3 c = aabb.minPoint + r;
 		for(int i = 0; i < N; ++i)
 		{
 			float3 nPoint;// = aabb.minPoint;
