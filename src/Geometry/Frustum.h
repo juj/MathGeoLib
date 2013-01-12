@@ -240,7 +240,7 @@ public:
 	Ray UnProject(const float2 &xy) const { return UnProject(xy.x, xy.y); }
 
 	///\todo Add float3 UnProject(const float3 &point) const;
-	/** Like LookAt, but if the frustum type is PerspectiveFrustum, the ray originates at the near plane,
+	/** Like UnProject, but if the frustum type is PerspectiveFrustum, the ray originates at the near plane,
 		and not at the camera eye point. For orthographic frustum, LookAt and LookAtFromNearPlane are identical
 		(always originates at near plane). */
 	Ray UnProjectFromNearPlane(float x, float y) const;
