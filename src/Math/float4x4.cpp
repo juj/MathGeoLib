@@ -1175,6 +1175,8 @@ float4x4 &float4x4::operator =(const TranslateOp &rhs)
 	      0, 1.f,   0, rhs.y,
 	      0,   0, 1.f, rhs.z,
 	      0,   0,   0,   1.f);
+	
+	return *this;
 }
 
 float float4x4::Determinant3() const
