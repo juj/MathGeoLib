@@ -1169,6 +1169,14 @@ float4x4 &float4x4::operator =(const Quat &rhs)
 	return *this;
 }
 
+float4x4 &float4x4::operator =(const TranslateOp &rhs)
+{
+	Set(1.f,   0,   0, rhs.x,
+	      0, 1.f,   0, rhs.y,
+	      0,   0, 1.f, rhs.z,
+	      0,   0,   0,   1.f);
+}
+
 float float4x4::Determinant3() const
 {
 	///\todo SSE

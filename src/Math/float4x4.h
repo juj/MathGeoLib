@@ -583,6 +583,8 @@ public:
 
 	float4x4 &operator =(const float4x4 &rhs);
 
+	float4x4 &operator =(const TranslateOp &rhs);
+
 	/// Sets this float4x4 to represent the same rotation as the given Quat.
 	/// @note The remaining entries of this matrix are set to identity.
 	float4x4 &operator =(const Quat &rhs);
