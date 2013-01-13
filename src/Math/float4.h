@@ -49,6 +49,8 @@ public:
 	};
 
 #ifdef MATH_SSE
+	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
+
 	union
 	{
 		struct
@@ -70,6 +72,8 @@ public:
 		};
 		__m128 v;
 	};
+
+	NAMELESS_UNION_END
 #endif
 
 	/// The default constructor does not initialize any members of this class.

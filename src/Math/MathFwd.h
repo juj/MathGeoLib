@@ -31,6 +31,21 @@
 #define CONST_WIN32
 #endif
 
+#ifdef _MSC_VER
+#define NAMELESS_UNION_BEGIN \
+	__pragma(warning(push)) \
+	__pragma(warning(disable:4201))
+
+#define NAMELESS_UNION_END \
+	__pragma(warning(pop))
+
+#else
+
+#define NAMELESS_UNION_BEGIN union {
+#define NAMELESS_UNION_END };
+
+#endif
+
 #if !defined(MATH_ENABLE_STL_SUPPORT) && !defined(assert)
 #include <stdio.h>
 #define assert(x) do { if (!(x)) { printf("Error: assert(%s) failed!\n", #x); } } while(0)
