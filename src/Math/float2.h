@@ -127,6 +127,8 @@ public:
 	/** This function is identical to the member function Div().
 		@return float2(x / scalar, y / scalar); */
 	float2 operator /(float scalar) const;
+	/// Unary operator + allows this structure to be used in an expression '+x'.
+	float2 operator +() const { return *this; }
 
 	/// Adds a vector to this vector, in-place. [indexTitle: operators +=,-=,*=,/=]
 	/** @return A reference to this. */

@@ -158,6 +158,9 @@ public:
 		@return float4(x / scalar, y / scalar, z / scalar, w * scalar); */
 	float4 operator /(float scalar) const;
 
+	/// Unary operator + allows this structure to be used in an expression '+x'.
+	float4 operator +() const { return *this; }
+
 	/// Adds a vector to this vector, in-place. [indexTitle: operators +=,-=,*=,/=]
 	/** @return A reference to this. */
 	float4 &operator +=(const float4 &v);

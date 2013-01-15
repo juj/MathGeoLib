@@ -759,6 +759,9 @@ public:
 	float4x4 operator -(const float4x4 &rhs) const;
 	float4x4 operator -() const;
 
+	/// Unary operator + allows this structure to be used in an expression '+x'.
+	float4x4 operator +() const { return *this; }
+
 	float4x4 &operator *=(float scalar);
 	float4x4 &operator /=(float scalar);
 	float4x4 &operator +=(const float4x4 &rhs);

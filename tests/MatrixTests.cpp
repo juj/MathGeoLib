@@ -171,6 +171,35 @@ void TestFloat3x4AddFloat3x4()
 	assert(m5.Equals(m4));
 }
 
+void TestFloat3x3AddUnary()
+{
+	float3x3 m(1,2,3, 4,5,6, 7,8,9);
+	float3x3 m2 = +m;
+	assert(m.Equals(m2));
+}
+
+void TestFloat3x4AddUnary()
+{
+	float3x4 m(1,2,3,4, 5,6,7,8, 9,10,11,12);
+	float3x4 m2 = +m;
+	assert(m.Equals(m2));
+}
+
+void TestFloat4x4AddUnary()
+{
+	float4x4 m(1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16);
+	float4x4 m2 = +m;
+	assert(m.Equals(m2));
+}
+
+///\todo Create and move to QuatTests.cpp
+void TestQuatAddUnary()
+{
+	Quat q(1,2,3,4);
+	Quat q2 = +q;
+	assert(q.Equals(q2));
+}
+
 void TestFloat3x4SubFloat3x4()
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
@@ -401,6 +430,10 @@ void AddMatrixTests()
 	AddRandomizedTest("float3x4::operator*(float3x4)", TestFloat3x4MulFloat3x4);
 	AddRandomizedTest("float3x4::operator*(scalar)", TestFloat3x4MulScalar);
 	AddRandomizedTest("float3x4::operator/(scalar)", TestFloat3x4DivScalar);
+	AddTest("float3x3::operator+()", TestFloat3x3AddUnary);
+	AddTest("float3x4::operator+()", TestFloat3x4AddUnary);
+	AddTest("float4x4::operator+()", TestFloat4x4AddUnary);
+	AddTest("Quat::operator+()", TestQuatAddUnary);
 	AddRandomizedTest("float3x4::operator+(float3x4)", TestFloat3x4AddFloat3x4);
 	AddRandomizedTest("float3x4::operator-(float3x4)", TestFloat3x4SubFloat3x4);
 	AddRandomizedTest("float3x4::operator-()", TestFloat3x4Neg);

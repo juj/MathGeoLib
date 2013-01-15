@@ -291,6 +291,27 @@ void TestFloat4OpAdd()
 	assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
 }
 
+void TestFloat2OpAddUnary()
+{
+	float2 f(1,2);
+	float2 g = +f;
+	assert(f.Equals(g));
+}
+
+void TestFloat3OpAddUnary()
+{
+	float3 f(1,2,3);
+	float3 g = +f;
+	assert(f.Equals(g));
+}
+
+void TestFloat4OpAddUnary()
+{
+	float4 f(1,2,3,4);
+	float4 g = +f;
+	assert(f.Equals(g));
+}
+
 void TestFloat4OpSub()
 {
 	float4 f = float4(1,2,3,4);
@@ -448,6 +469,9 @@ void AddVectorTests()
 	AddTest("float4::SetFromScalar", TestFloat4FromScalar);
 	AddTest("float4::Set", TestFloat4Set);
 	AddTest("float4::operator+", TestFloat4OpAdd);
+	AddTest("float2::operator+()", TestFloat2OpAddUnary);
+	AddTest("float3::operator+()", TestFloat3OpAddUnary);
+	AddTest("float4::operator+()", TestFloat4OpAddUnary);
 	AddTest("float4::operator-", TestFloat4OpSub);
 	AddTest("float4::operator-()", TestFloat4OpNeg);
 	AddTest("float4::operator*", TestFloat4OpMul);

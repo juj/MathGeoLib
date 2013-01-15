@@ -339,6 +339,9 @@ public:
 	/// Divides a quaternion by another. Division "a / b" results in a quaternion that rotates the orientation b to coincide with the orientation a.
 	Quat operator /(const Quat &rhs) const;
 
+	/// Unary operator + allows this structure to be used in an expression '+x'.
+	Quat operator +() const { return *this; }
+
 #ifdef MATH_OGRE_INTEROP
 	Quat(const Ogre::Quaternion &other) { w = other.w; x = other.x; y = other.y; z = other.z; }
 	operator Ogre::Quaternion() const { return Ogre::Quaternion(w, x, y, z); }
