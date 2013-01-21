@@ -1134,7 +1134,10 @@ void TestPolyhedronLineSegmentNoIntersect()
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-// TODO BROKEN	assert(a.Contains(a.ClosestPoint(b)));
+	assert(a.Distance(a.ClosestPoint(b)) < 1e-3f);
+//	TODO: The following is problematic due to numerical
+//	stability issues at the surface of the Polyhedron.
+//	assert(a.Contains(a.ClosestPoint(b)));
 	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
@@ -1264,7 +1267,10 @@ void TestPolygonLineSegmentNoIntersect()
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-// TODO BROKEN	assert(a.Contains(a.ClosestPoint(b)));
+	assert(a.Distance(a.ClosestPoint(b)) < 1e-3f);
+//	TODO: The following is problematic due to numerical
+//	stability issues at the surface of the Polygon.
+//	assert(a.Contains(a.ClosestPoint(b)));
 	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
