@@ -1299,6 +1299,20 @@ void TestPlanePlaneIntersect()
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+void TestPolygonContains2D()
+{
+	float xmin = 0.f, xmax = 10.f, ymin = 0.f, ymax = 10.f, z = 2.f;
+
+	float3 point = float3((xmax-xmin)/2,(ymax-ymin)/2,z);
+	Polygon pol;
+	pol.p.push_back(float3(xmin,ymin,z));
+	pol.p.push_back(float3(xmax,ymin,z));
+	pol.p.push_back(float3(xmax,ymax,z));
+	pol.p.push_back(float3(xmin,ymax,z));
+
+	assert(pol.Contains(point));
+}
+
 void AddPositiveIntersectionTests()
 {
 	AddRandomizedTest("AABB-Line positive intersection", TestAABBLineIntersect);
@@ -1381,4 +1395,6 @@ void AddPositiveIntersectionTests()
 	AddRandomizedTest("Plane-Ray positive intersection", TestPlaneRayIntersect);
 	AddRandomizedTest("Plane-LineSegment positive intersection", TestPlaneLineSegmentIntersect);
 	AddRandomizedTest("Plane-Plane positive intersection", TestPlanePlaneIntersect);
+
+	AddTest("Polygon::Contains2D", TestPolygonContains2D);
 }
