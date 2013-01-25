@@ -149,7 +149,7 @@ void Sphere::ProjectToAxis(const float3 &direction, float &outMin, float &outMax
 
 bool Sphere::IsFinite() const
 {
-	return pos.IsFinite() && isfinite(r);
+	return pos.IsFinite() && MATH_NS::IsFinite(r);
 }
 
 bool Sphere::IsDegenerate() const

@@ -142,7 +142,7 @@ bool Quat::IsInvertible(float epsilon) const
 
 bool Quat::IsFinite() const
 {
-	return isfinite(x) && isfinite(y) && isfinite(z) && isfinite(w);
+	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z) && MATH_NS::IsFinite(w);
 }
 
 bool Quat::Equals(const Quat &rhs, float epsilon) const
@@ -333,7 +333,7 @@ void Quat::ToAxisAngle(float3 &axis, float &angle) const
 void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 {
 	assume(axis.IsNormalized());
-	assume(isfinite(angle));
+	assume(MATH_NS::IsFinite(angle));
 	float cosz = Cos(angle/2.f);
 	float sinz = Sin(angle/2.f);
 	x = axis.x * sinz;

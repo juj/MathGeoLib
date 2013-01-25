@@ -357,8 +357,8 @@ float Frustum::Distance(const float3 &point) const
 
 bool Frustum::IsFinite() const
 {
-	return pos.IsFinite() && front.IsFinite() && up.IsFinite() && isfinite(nearPlaneDistance)
-		&& isfinite(farPlaneDistance) && isfinite(horizontalFov) && isfinite(verticalFov);
+	return pos.IsFinite() && front.IsFinite() && up.IsFinite() && MATH_NS::IsFinite(nearPlaneDistance)
+		&& MATH_NS::IsFinite(farPlaneDistance) && MATH_NS::IsFinite(horizontalFov) && MATH_NS::IsFinite(verticalFov);
 }
 
 Plane Frustum::GetPlane(int faceIndex) const

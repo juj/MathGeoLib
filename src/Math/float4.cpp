@@ -403,7 +403,7 @@ float4 float4::ScaledToLength3(float newLength) const
 
 bool float4::IsFinite() const
 {
-	return isfinite(x) && isfinite(y) && isfinite(z) && isfinite(w);
+	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z) && MATH_NS::IsFinite(w);
 }
 
 bool float4::IsPerpendicular3(const float4 &other, float epsilon) const

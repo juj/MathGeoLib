@@ -8,9 +8,11 @@ void AddVectorTests();
 void AddTransformTests();
 void AddSerializationTests();
 void AddClockTests();
+void AddMathFuncTests();
 
 void AddMathGeoLibTests()
 {
+	AddMathFuncTests();
 	AddClockTests();
 	AddLineTests();
 	AddPositiveIntersectionTests();

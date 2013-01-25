@@ -220,7 +220,7 @@ public:
 	/** A triangle is <b><i>finite</i></b> if its vertices a, b and c do not contain floating-point NaNs or +/-infs
 		in them.
 		@return True if each coordinate of each vertex of this triangle has a finite floating-point value.
-		@see a, b, c, IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), isfinite(), inf, negInf, nan, float3::nan, float3::inf. */
+		@see a, b, c, IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), IsFinite(), inf, negInf, nan, float3::nan, float3::inf. */
 	bool IsFinite() const;
 
 	/// Returns true if this triangle is degenerate.

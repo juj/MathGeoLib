@@ -81,7 +81,7 @@ Plane::Plane(const LineSegment &lineSegment, const float3 &normal)
 
 bool Plane::IsDegenerate() const
 {
-	return !normal.IsFinite() || normal.IsZero() || !isfinite(d);
+	return !normal.IsFinite() || normal.IsZero() || !IsFinite(d);
 }
 
 void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)

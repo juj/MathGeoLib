@@ -125,7 +125,7 @@ public:
 	/** A sphere is <b><i>finite</i></b> if its members pos and r do not contain floating-point NaNs or +/-infs
 		in them.
 		@return True if the members pos and r both have finite floating-point values.
-		@see pos, r, IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), isfinite(), inf, negInf, nan, float3::nan, float3::inf, SetNegativeInfinity(). */
+		@see pos, r, IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), IsFinite(), inf, negInf, nan, float3::nan, float3::inf, SetNegativeInfinity(). */
 	bool IsFinite() const;
 
 	/// Returns true if this Sphere is degenerate.

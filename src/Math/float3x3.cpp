@@ -252,8 +252,8 @@ float3 float3x3::GetScale() const
 
 float3x3 float3x3::ShearX(float yFactor, float zFactor)
 {
-	assume(isfinite(yFactor));
-	assume(isfinite(zFactor));
+	assume(MATH_NS::IsFinite(yFactor));
+	assume(MATH_NS::IsFinite(zFactor));
 	return float3x3(1.f, yFactor, zFactor,
 	                0.f,     1.f,     0.f,
 	                0.f,     0.f,     1.f);
@@ -261,8 +261,8 @@ float3x3 float3x3::ShearX(float yFactor, float zFactor)
 
 float3x3 float3x3::ShearY(float xFactor, float zFactor)
 {
-	assume(isfinite(xFactor));
-	assume(isfinite(zFactor));
+	assume(MATH_NS::IsFinite(xFactor));
+	assume(MATH_NS::IsFinite(zFactor));
 	return float3x3(1.f,     0.f,     0.f,
 	                xFactor, 1.f, zFactor,
 	                0.f,     0.f,     1.f);
@@ -270,8 +270,8 @@ float3x3 float3x3::ShearY(float xFactor, float zFactor)
 
 float3x3 float3x3::ShearZ(float xFactor, float yFactor)
 {
-	assume(isfinite(xFactor));
-	assume(isfinite(yFactor));
+	assume(MATH_NS::IsFinite(xFactor));
+	assume(MATH_NS::IsFinite(yFactor));
 	return float3x3(1.f,         0.f, 0.f,
 	                0.f,         1.f, 0.f,
 	                xFactor, yFactor, 1.f);
@@ -412,7 +412,7 @@ void float3x3::ScaleRow(int row, float scalar)
 	if (row < 0 || row >= Rows)
 		return;
 #endif
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	Row(row) *= scalar;
 }
 
@@ -462,9 +462,9 @@ void float3x3::SetRow(int row, float x, float y, float z)
 	if (row < 0 || row >= Rows)
 		return;
 #endif
-	assume(isfinite(x));
-	assume(isfinite(y));
-	assume(isfinite(z));
+	assume(MATH_NS::IsFinite(x));
+	assume(MATH_NS::IsFinite(y));
+	assume(MATH_NS::IsFinite(z));
 	v[row][0] = x;
 	v[row][1] = y;
 	v[row][2] = z;
@@ -493,9 +493,9 @@ void float3x3::SetCol(int column, float x, float y, float z)
 	if (column < 0 || column >= Cols)
 		return;
 #endif
-	assume(isfinite(x));
-	assume(isfinite(y));
-	assume(isfinite(z));
+	assume(MATH_NS::IsFinite(x));
+	assume(MATH_NS::IsFinite(y));
+	assume(MATH_NS::IsFinite(z));
 	v[0][column] = x;
 	v[1][column] = y;
 	v[2][column] = z;
@@ -1275,7 +1275,7 @@ float3x3 float3x3::operator -() const
 
 float3x3 &float3x3::operator *=(float scalar)
 {
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
 			v[y][x] *= scalar;
@@ -1285,7 +1285,7 @@ float3x3 &float3x3::operator *=(float scalar)
 
 float3x3 &float3x3::operator /=(float scalar)
 {
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	assume(!EqualAbs(scalar, 0));
 	float invScalar = 1.f / scalar;
 	for(int y = 0; y < Rows; ++y)
@@ -1319,7 +1319,7 @@ bool float3x3::IsFinite() const
 {
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
-			if (!isfinite(v[y][x]))
+			if (!MATH_NS::IsFinite(v[y][x]))
 				return false;
 	return true;
 }

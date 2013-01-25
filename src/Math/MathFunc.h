@@ -21,6 +21,7 @@
 #include "myassert.h"
 #endif
 #include <math.h>
+#include <cmath>
 #include <float.h>
 
 #include "Types.h"
@@ -416,16 +417,18 @@ bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 	Warning: This comparison is not safe with NANs or INFs. */
 bool EqualUlps(float a, float b, int maxUlps = 10000);
 
-#ifndef isfinite
-/// Returns true if the x is a finite floating-point value, and not a NaN or +/-inf.
-#define isfinite(x) _finite(x)
-#endif
-
 /// Returns true if the given value is not an inf or a nan.
-template<typename T> inline bool IsFinite(const T &value) { return true; }
-template<> inline bool IsFinite<float>(const float &value) { return isfinite(value) != 0; }
-template<> inline bool IsFinite<double>(const double &value) { return isfinite(value) != 0; }
-template<> inline bool IsFinite<long double>(const long double &value) { return isfinite((double)value) != 0; }
+template<typename T> inline bool IsFinite(const T & /*value*/) { return true; }
+
+#ifdef _MSC_VER
+template<> inline bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
+template<> inline bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
+template<> inline bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
+#else
+template<> inline bool IsFinite<float>(const float &value) { return std::isfinite(value) != 0; }
+template<> inline bool IsFinite<double>(const double &value) { return std::isfinite(value) != 0; }
+template<> inline bool IsFinite<long double>(const long double &value) { return std::isfinite(value) != 0; }
+#endif
 
 /// Returns true if the given value is +inf or -inf.
 float IsInf(float value);

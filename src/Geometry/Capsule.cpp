@@ -147,7 +147,7 @@ LineSegment Capsule::HeightLineSegment() const
 
 bool Capsule::IsFinite() const
 {
-	return l.IsFinite() && isfinite(r);
+	return l.IsFinite() && MATH_NS::IsFinite(r);
 }
 
 float3 Capsule::PointInside(float l, float a, float d) const

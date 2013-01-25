@@ -167,7 +167,7 @@ public:
 	/// Tests if this polygon is finite.
 	/** A polygon is finite if each of its vertices have finite floating point coordinates (no nans or infs).
 		@note The null polygon is finite.
-		@see p, IsConvex(), IsPlanar(), IsSimple(), IsNull(), IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), isfinite(), inf, negInf, nan, float3::nan, float3::inf. */
+		@see p, IsConvex(), IsPlanar(), IsSimple(), IsNull(), IsDegenerate(), ::IsFinite(), IsInf(), IsNan(), IsFinite(), inf, negInf, nan, float3::nan, float3::inf. */
 	bool IsFinite() const;
 
 	/// Tests if this polygon is degenerate.

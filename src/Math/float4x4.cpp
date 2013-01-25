@@ -190,8 +190,8 @@ float4x4 float4x4::RotateFromTo(const float3 &sourceDirection, const float3 &tar
 
 float4x4 float4x4::RandomGeneral(LCG &lcg, float minElem, float maxElem)
 {
-	assume(isfinite(minElem));
-	assume(isfinite(maxElem));
+	assume(MATH_NS::IsFinite(minElem));
+	assume(MATH_NS::IsFinite(maxElem));
 	float4x4 m;
 	for(int y = 0; y < 4; ++y)
 		for(int x = 0; x < 4; ++x)
@@ -673,19 +673,19 @@ CONST_WIN32 float3 float4x4::Diagonal3() const
 
 void float4x4::ScaleRow3(int row, float scalar)
 {
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	Row3(row) *= scalar;
 }
 
 void float4x4::ScaleRow(int row, float scalar)
 {
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	Row(row) *= scalar;
 }
 
 void float4x4::ScaleCol3(int col, float scalar)
 {
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	assume(col >= 0);
 	assume(col < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -699,7 +699,7 @@ void float4x4::ScaleCol3(int col, float scalar)
 
 void float4x4::ScaleCol(int col, float scalar)
 {
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 	assume(col >= 0);
 	assume(col < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -783,9 +783,9 @@ void float4x4::SetRow3(int row, float m_r0, float m_r1, float m_r2)
 {
 	assume(row >= 0);
 	assume(row < Rows);
-	assume(isfinite(m_r0));
-	assume(isfinite(m_r1));
-	assume(isfinite(m_r2));
+	assume(MATH_NS::IsFinite(m_r0));
+	assume(MATH_NS::IsFinite(m_r1));
+	assume(MATH_NS::IsFinite(m_r2));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (row < 0 || row >= Rows)
 		return; // Benign failure
@@ -819,10 +819,10 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 {
 	assume(row >= 0);
 	assume(row < Rows);
-	assume(isfinite(m_r0));
-	assume(isfinite(m_r1));
-	assume(isfinite(m_r2));
-	assume(isfinite(m_r3));
+	assume(MATH_NS::IsFinite(m_r0));
+	assume(MATH_NS::IsFinite(m_r1));
+	assume(MATH_NS::IsFinite(m_r2));
+	assume(MATH_NS::IsFinite(m_r3));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (row < 0 || row >= Rows)
 		return; // Benign failure
@@ -857,9 +857,9 @@ void float4x4::SetCol3(int column, float m_0c, float m_1c, float m_2c)
 {
 	assume(column >= 0);
 	assume(column < Cols);
-	assume(isfinite(m_0c));
-	assume(isfinite(m_1c));
-	assume(isfinite(m_2c));
+	assume(MATH_NS::IsFinite(m_0c));
+	assume(MATH_NS::IsFinite(m_1c));
+	assume(MATH_NS::IsFinite(m_2c));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (column < 0 || column >= Cols)
 		return; // Benign failure
@@ -893,10 +893,10 @@ void float4x4::SetCol(int column, float m_0c, float m_1c, float m_2c, float m_3c
 {
 	assume(column >= 0);
 	assume(column < Cols);
-	assume(isfinite(m_0c));
-	assume(isfinite(m_1c));
-	assume(isfinite(m_2c));
-	assume(isfinite(m_3c));
+	assume(MATH_NS::IsFinite(m_0c));
+	assume(MATH_NS::IsFinite(m_1c));
+	assume(MATH_NS::IsFinite(m_2c));
+	assume(MATH_NS::IsFinite(m_3c));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (column < 0 || column >= Cols)
 		return; // Benign failure
@@ -1079,7 +1079,7 @@ void float4x4::SetRotatePartZ(float angle)
 void float4x4::SetRotatePart(const float3 &a, float angle)
 {
 	assume(a.IsNormalized());
-	assume(isfinite(angle));
+	assume(MATH_NS::IsFinite(angle));
 
 	const float c = Cos(angle);
 	const float c1 = (1.f-c);
@@ -1829,7 +1829,7 @@ bool float4x4::IsFinite() const
 {
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
-			if (!isfinite(v[y][x]))
+			if (!MATH_NS::IsFinite(v[y][x]))
 				return false;
 	return true;
 }

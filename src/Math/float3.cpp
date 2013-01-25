@@ -198,7 +198,7 @@ bool float3::IsZero(float epsilonSq) const
 
 bool float3::IsFinite() const
 {
-	return isfinite(x) && isfinite(y) && isfinite(z);
+	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z);
 }
 
 bool float3::IsPerpendicular(const float3 &other, float epsilon) const

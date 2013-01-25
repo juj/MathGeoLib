@@ -200,7 +200,7 @@ bool float2::IsZero(float epsilonSq) const
 
 bool float2::IsFinite() const
 {
-	return isfinite(x) && isfinite(y);
+	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y);
 }
 
 bool float2::IsPerpendicular(const float2 &other, float epsilon) const

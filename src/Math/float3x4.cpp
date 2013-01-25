@@ -532,7 +532,7 @@ void float3x4::ScaleCol(int col, float scalar)
 {
 	assume(col >= 0);
 	assume(col < Cols);
-	assume(isfinite(scalar));
+	assume(MATH_NS::IsFinite(scalar));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (col < 0 || col >= Cols)
 		return; // Benign failure
@@ -589,10 +589,10 @@ void float3x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 {
 	assume(row >= 0);
 	assume(row < Rows);
-	assume(isfinite(m_r0));
-	assume(isfinite(m_r1));
-	assume(isfinite(m_r2));
-	assume(isfinite(m_r3));
+	assume(MATH_NS::IsFinite(m_r0));
+	assume(MATH_NS::IsFinite(m_r1));
+	assume(MATH_NS::IsFinite(m_r2));
+	assume(MATH_NS::IsFinite(m_r3));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (row < 0 || row >= Rows)
 		return; // Benign failure
@@ -651,9 +651,9 @@ void float3x4::SetCol(int column, float m_0c, float m_1c, float m_2c)
 {
 	assume(column >= 0);
 	assume(column < Cols);
-	assume(isfinite(m_0c));
-	assume(isfinite(m_1c));
-	assume(isfinite(m_2c));
+	assume(MATH_NS::IsFinite(m_0c));
+	assume(MATH_NS::IsFinite(m_1c));
+	assume(MATH_NS::IsFinite(m_2c));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (column < 0 || column >= Cols)
 		return; // Benign failure
@@ -1419,7 +1419,7 @@ bool float3x4::IsFinite() const
 {
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
-			if (!isfinite(v[y][x]))
+			if (!MATH_NS::IsFinite(v[y][x]))
 				return false;
 	return true;
 }
