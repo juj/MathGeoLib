@@ -420,14 +420,14 @@ bool EqualUlps(float a, float b, int maxUlps = 10000);
 /// Returns true if the given value is not an inf or a nan.
 template<typename T> inline bool IsFinite(const T & /*value*/) { return true; }
 
-#ifdef _MSC_VER
+#ifndef isfinite
 template<> inline bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
 template<> inline bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
 template<> inline bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
 #else
-template<> inline bool IsFinite<float>(const float &value) { return std::isfinite(value) != 0; }
-template<> inline bool IsFinite<double>(const double &value) { return std::isfinite(value) != 0; }
-template<> inline bool IsFinite<long double>(const long double &value) { return std::isfinite(value) != 0; }
+template<> inline bool IsFinite<float>(const float &value) { return isfinite(value) != 0; }
+template<> inline bool IsFinite<double>(const double &value) { return isfinite(value) != 0; }
+template<> inline bool IsFinite<long double>(const long double &value) { return isfinite((double)value) != 0; }
 #endif
 
 /// Returns true if the given value is +inf or -inf.
