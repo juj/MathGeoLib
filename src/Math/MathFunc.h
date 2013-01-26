@@ -420,11 +420,7 @@ bool EqualUlps(float a, float b, int maxUlps = 10000);
 /// Returns true if the given value is not an inf or a nan.
 template<typename T> inline bool IsFinite(const T & /*value*/) { return true; }
 
-#if defined(__APPLE__) && (!defined(TARGET_OS_IPHONE) || TARGET_OS_IPHONE == 0)
-template<> inline bool IsFinite<float>(const float &value) { return finite((double)value) != 0; }
-template<> inline bool IsFinite<double>(const double &value) { return finite(value) != 0; }
-template<> inline bool IsFinite<long double>(const long double &value) { return finite((double)value) != 0; }
-#elif defined(_MSC_VER)
+#ifdef _MSC_VER
 template<> inline bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
 template<> inline bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
 template<> inline bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
