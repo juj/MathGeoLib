@@ -6,7 +6,7 @@
 #include "TestRunner.h"
 #include <cmath>
 
-#ifndef _MSC_VER // MSVC compilers do not have std::isfinite
+#if __cplusplus >= 201103L
 void TestCXX11StdFinite()
 {
 	// When using MathGeoLib, users should still be able to invoke C++11 std::isfinite function.
