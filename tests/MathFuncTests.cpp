@@ -45,7 +45,7 @@ void TestIsFinite()
 
 void AddMathFuncTests()
 {
-#ifndef _MSC_VER
+#if __cplusplus >= 201103L
 	AddTest("C++11 std::isfinite", TestCXX11StdFinite);
 #endif
 	AddTest("IsFinite", TestIsFinite);
