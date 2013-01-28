@@ -403,7 +403,9 @@ bool Equal(const T &a, const T &b)
 /** Compares the two values for equality up to a small epsilon. */
 template<> bool inline Equal(const float &a, const float &b) { return Abs(a-b) <= eps; }
 template<> bool inline Equal(const double &a, const double &b) { return Abs(a-b) <= eps; }
+#ifndef EMSCRIPTEN // long double is not supported.
 template<> bool inline Equal(const long double &a, const long double &b) { return Abs(a-b) <= eps; }
+#endif
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */
 bool EqualAbs(float a, float b, float epsilon = 1e-4f);
@@ -423,11 +425,19 @@ template<typename T> inline bool IsFinite(const T & /*value*/) { return true; }
 #ifdef _MSC_VER
 template<> inline bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
 template<> inline bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
+
+#ifndef EMSCRIPTEN // long double is not supported.
 template<> inline bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
+#endif
+
 #else
 template<> inline bool IsFinite<float>(const float &value) { using namespace std; return isfinite(value) != 0; }
 template<> inline bool IsFinite<double>(const double &value) { using namespace std; return isfinite(value) != 0; }
+
+#ifndef EMSCRIPTEN // long double is not supported.
 template<> inline bool IsFinite<long double>(const long double &value) { using namespace std; return isfinite((double)value) != 0; }
+#endif
+
 #endif
 
 /// Returns true if the given value is +inf or -inf.

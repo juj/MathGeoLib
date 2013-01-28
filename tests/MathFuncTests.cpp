@@ -13,13 +13,18 @@ void TestCXX11StdFinite()
 	// http://en.cppreference.com/w/cpp/numeric/math/isfinite
 	assert(std::isfinite(5.f));
 	assert(std::isfinite(5.0));
-	assert(std::isfinite(5.0L));
 
 	using namespace std;
 
 	assert(isfinite(5.f));
 	assert(isfinite(5.0));
+
+
+#ifndef EMSCRIPTEN // long double is not supported.
+	assert(std::isfinite(5.0L));
 	assert(isfinite(5.0L));
+#endif
+
 }
 #endif
 
@@ -31,16 +36,18 @@ void TestIsFinite()
 	assert(IsFinite(5.0L));
 
 	assert(!IsFinite(FLOAT_NAN));
-	assert(!IsFinite((double)FLOAT_NAN));
-	assert(!IsFinite((long double)FLOAT_NAN));
-
 	assert(!IsFinite(FLOAT_INF));
-	assert(!IsFinite((double)FLOAT_INF));
-	assert(!IsFinite((long double)FLOAT_INF));
-
 	assert(IsFinite(FLT_MAX));
+
+	assert(!IsFinite((double)FLOAT_NAN));
+	assert(!IsFinite((double)FLOAT_INF));
 	assert(IsFinite((double)FLT_MAX));
+
+#ifndef EMSCRIPTEN // long double is not supported.
+	assert(!IsFinite((long double)FLOAT_NAN));
+	assert(!IsFinite((long double)FLOAT_INF));
 	assert(IsFinite((long double)FLT_MAX));
+#endif
 }
 
 void AddMathFuncTests()
