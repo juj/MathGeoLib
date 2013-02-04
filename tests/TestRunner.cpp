@@ -57,7 +57,7 @@ std::string FormatTime(tick_t ticks)
 }
 
 // Print text to log without appending a newline to the end, if possible.
-#ifdef ANDROID
+#if defined(ANDROID) || defined(NPAPI)
 #define LOGI_NL LOGI
 #else
 #define LOGI_NL printf
@@ -125,7 +125,7 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	}
 	else if (successRate >= 95.0f)
 	{
-		printf(" ok ");
+		LOGI_NL(" ok ");
 		LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
 //		++numTestsPassed;
 //		++numWarnings;
