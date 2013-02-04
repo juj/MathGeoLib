@@ -23,10 +23,11 @@
 #undef assert
 #endif
 
-#ifdef OPTIMIZED_RELEASE
+#if defined(OPTIMIZED_RELEASE) && !defined(FAIL_USING_EXCEPTIONS)
 
 #define assert(x)
 #define asserteq(x,y)
+#define assertcmp(x, cmp, y)
 
 #elif defined(FAIL_USING_EXCEPTIONS)
 
