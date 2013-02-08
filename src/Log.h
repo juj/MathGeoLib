@@ -197,7 +197,7 @@ void logmsg(const char *msg);
 		SetStdoutTextColor(ColorRed | ColorGreen | ColorBlue); \
 	MULTI_LINE_MACRO_END
 
-#elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN)) && !defined(LOGGING_SUPPORT_DISABLED)
+#elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)) && !defined(LOGGING_SUPPORT_DISABLED)
 
 #include <stdio.h>
 /// Prints out a variadic message to the given log channel.

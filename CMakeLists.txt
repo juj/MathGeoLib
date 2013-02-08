@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
 project(MathGeoLib)
 
+# Undef WIN32 when Windows is only used as a host system
+if (EMSCRIPTEN OR NACL OR ANDROID OR FLASCC)
+	SET(WIN32)
+endif()
+
 include(CommonOptions.cmake)
 
 # If requested from the command line, run Visual Studio 2012 static code analysis. Warning: this is very slow!
@@ -57,6 +62,10 @@ endif()
 if (LINUX)
 	# clock_gettime() is found from the library librt on linux. 
 	target_link_libraries(MathGeoLib rt)
+endif()
+
+if (FLASCC)
+	target_link_libraries(MathGeoLib CodeLib GraphicsEngine)
 endif()
 
 if (WIN8RT)
