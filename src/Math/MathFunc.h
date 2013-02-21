@@ -441,8 +441,15 @@ template<> inline bool IsFinite<long double>(const long double &value) { using n
 #endif
 
 /// Returns true if the given value is +inf or -inf.
-float IsInf(float value);
+inline float IsInf(float value) { return value == FLOAT_INF || value == -FLOAT_INF; }
+inline double IsInf(double value) { return value == (double)FLOAT_INF || value == (double)-FLOAT_INF; }
 /// Returns true if the given value is a not-a-number.
-float IsNan(float value);
+inline float IsNan(float value) { return !(value == value); }
+inline double IsNan(double value) { return !(value == value); }
+
+#ifndef EMSCRIPTEN // long double is not supported.
+inline long double IsInf(long double value) { return value == (long double)FLOAT_INF || value == (long double)-FLOAT_INF; }
+inline long double IsNan(long double value) { return !(value == value); }
+#endif
 
 MATH_END_NAMESPACE
