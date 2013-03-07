@@ -191,6 +191,14 @@ int main(int argc, char **argv)
 
 	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock);
 	LOGI("%d", globalPokedData);
+
+	// When --exit0 is passed, we forcibly return 0 and not the number of failed tests.
+	// Used by buildbot in valgrind runs to ignore any failures - the failures are detected
+	// in a "real" run instead that carry more randomized trial runs.
+	for(int i = 1; i < argc; ++i)
+		if (!strcmp(argv[i], "--exit0"))
+			return 0;
+
 	return numFailures; // exit code of 0 denotes a successful run.
 }
 #endif
