@@ -399,7 +399,6 @@ void Quat::Set(const float3x3 &m)
 
 #ifdef MATH_ASSERT_CORRECTNESS
 	// Test that the conversion float3x3->Quat->float3x3 is correct.
-	float3x3 f = this->ToFloat3x3();
 	mathassert(this->ToFloat3x3().Equals(m, 0.01f));
 #endif
 }
