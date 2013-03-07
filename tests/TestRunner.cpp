@@ -182,11 +182,14 @@ void PrintTestRunSummary()
 }
 
 #ifdef MATH_TESTS_EXECUTABLE
-int main()
+int main(int argc, char **argv)
 {
 	AddMathGeoLibTests();
 
-	int numFailures = RunTests(10000, 100);
+	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 10000;
+	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
+
+	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock);
 	LOGI("%d", globalPokedData);
 	return numFailures; // exit code of 0 denotes a successful run.
 }
