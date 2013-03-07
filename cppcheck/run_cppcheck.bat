@@ -6,7 +6,7 @@
 
 "C:\Program Files (x86)\Cppcheck\cppcheck" --version
 
-"C:\Program Files (x86)\Cppcheck\cppcheck" --template "{file}({line}): ({severity}) ({id}): {message}" -UMATH_QT_INTEROP -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=noConstructor --suppress=uninitMemberVar --suppress=ConfigurationNotChecked --suppress=incorrectStringBooleanError --error-exitcode=1 --force ../src
+"C:\Program Files (x86)\Cppcheck\cppcheck" --template "{file}({line}): ({severity}) ({id}): {message}" -UMATH_QT_INTEROP -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=noConstructor --suppress=uninitMemberVar --suppress=ConfigurationNotChecked --suppress=incorrectStringBooleanError --error-exitcode=1 --force --suppressions suppressions.txt ../src
 
 pause
 
