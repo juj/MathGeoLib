@@ -3,6 +3,7 @@
 #include "TestRunner.h"
 #include "Time/Clock.h"
 #include <algorithm>
+#include <cstring>
 #include "MathGeoLibTests.h"
 
 #include "myassert.h"
