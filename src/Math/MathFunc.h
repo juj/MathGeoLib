@@ -29,7 +29,9 @@
 #include "Math/float3.h"
 
 #ifdef WIN32
+#define Polygon Polygon_unused
 #include <Windows.h> // For DebugBreak();
+#undef Polygon
 #endif
 
 #include "assume.h"

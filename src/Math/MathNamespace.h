@@ -24,9 +24,9 @@
 #define MATH_BEGIN_NAMESPACE namespace MATH_NAMESPACE_NAME {
 #define MATH_END_NAMESPACE }
 
-#define MATH_NS math
+#define MATH_NS MATH_NAMESPACE_NAME
 
-#define USE_MATH_NAMESPACE using namespace math;
+#define USE_MATH_NAMESPACE using namespace MATH_NAMESPACE_NAME;
 
 #else
 

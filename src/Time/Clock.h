@@ -17,7 +17,9 @@
 	@brief The Clock class. Supplies timing facilities. */
 
 #ifdef WIN32
+#define Polygon Polygon_unused
 #include <Windows.h>
+#undef Polygon
 #endif
 
 /// A tick is the basic unit of the high-resolution timer.

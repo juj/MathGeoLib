@@ -18,7 +18,9 @@
 #pragma once
 
 #ifdef WIN32
-#include <windows.h>
+#define Polygon Polygon_unused
+#include <Windows.h> // For DebugBreak();
+#undef Polygon
 #endif
 
 MATH_BEGIN_NAMESPACE
