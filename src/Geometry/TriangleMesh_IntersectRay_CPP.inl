@@ -1,3 +1,22 @@
+/* Copyright Jukka Jylänki
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License. */
+
+/** @file TriangleMesh_IntersectRay_CPP.inl
+	@author Jukka Jylänki
+	@brief Non-SIMD implementation of ray-mesh intersection routines. */
+MATH_BEGIN_NAMESPACE
+
 float TriangleMesh::IntersectRay_CPP(const Ray &ray) const
 float TriangleMesh::IntersectRay_TriangleIndex_CPP(const Ray &ray, int &outIndex) const
 float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outIndex, float &outU, float &outV) const
@@ -52,3 +71,5 @@ float TriangleMesh::IntersectLineTriSSE(const float3 &linePos, const float3 &lin
 	// Output signed distance from ray to triangle.
 	return (vE2.x * vQ.x + vE2.y * vQ.y + vE2.z * vQ.z) * recipDet;
 }
+
+MATH_END_NAMESPACE

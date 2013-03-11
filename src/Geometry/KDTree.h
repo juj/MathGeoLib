@@ -24,6 +24,8 @@
 #include "Container/MaxHeap.h"
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 enum CardinalAxis
 {
 	AxisX = 0,
@@ -181,5 +183,7 @@ private:
 
 	int TreeHeight(int nodeIndex) const;
 };
+
+MATH_END_NAMESPACE
 
 #include "KDTree.inl"

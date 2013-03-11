@@ -22,6 +22,10 @@
 #undef Polygon
 #endif
 
+#include "Math/MathNamespace.h"
+
+MATH_BEGIN_NAMESPACE
+
 /// A tick is the basic unit of the high-resolution timer.
 typedef unsigned long long tick_t;
 
@@ -114,3 +118,5 @@ private:
 	static LARGE_INTEGER ddwTimer;          ///< Temporary storage for Win32 function calls.
 #endif
 };
+
+MATH_END_NAMESPACE

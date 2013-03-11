@@ -33,6 +33,8 @@
 #include "Time/Clock.h"
 #include "myassert.h"
 
+MATH_BEGIN_NAMESPACE
+
 #ifdef WIN32
 LARGE_INTEGER Clock::ddwTimerFrequency;
 #endif
@@ -251,3 +253,5 @@ tick_t Clock::TicksPerSec()
 	return CLOCKS_PER_SEC;
 #endif
 }
+
+MATH_END_NAMESPACE

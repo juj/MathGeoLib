@@ -30,6 +30,8 @@
 #include "Container/MaxHeap.h"
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 /// A fixed split rule for all QuadTrees: A QuadTree leaf node is only ever split if the leaf contains at least this many objects.
 /// Leaves containing fewer than this many objects are always kept as leaves until the object count is exceeded.
 static const int minQuadTreeNodeObjectCount = 16;
@@ -264,5 +266,7 @@ private:
 };
 
 inline void AssociateQuadTreeNode(const float3 &, QuadTree<float3>::Node *) {}
+
+MATH_END_NAMESPACE
 
 #include "QuadTree.inl"

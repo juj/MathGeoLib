@@ -17,6 +17,17 @@
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
 #pragma once
 
+#include "Math/MathNamespace.h"
+
+#include <stdio.h>
+
+#if defined(ANDROID)
+/// This will require you to pass '-llog' on the command line to link against the Android logging libraries.
+#include <android/log.h>
+#endif
+
+MATH_BEGIN_NAMESPACE
+
 // From http://cnicholson.net/2009/03/stupid-c-tricks-dowhile0-and-c4127/
 #ifdef _MSC_VER
 #define MULTI_LINE_MACRO_BEGIN do { \
@@ -98,7 +109,6 @@ void SetStdoutTextColor(int newColor);
 #define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " #desc)
 
 #if defined(NPAPI) && !defined(LOGGING_SUPPORT_DISABLED)
-#include <stdio.h>
 ///\todo Temporary. Implement logmsg as variadic directly instead of this kind of #define workaround.
 void logmsg(const char *msg);
 
@@ -142,9 +152,6 @@ void logmsg(const char *msg);
 
 #elif defined(ANDROID) && !defined(LOGGING_SUPPORT_DISABLED)
 
-/// This will require you to pass '-llog' on the command line to link against the Android logging libraries.
-#include <android/log.h>
-
 #ifndef LOG
 #define LOG(channel, ...) do { /*if (IsLogChannelActive(channel))*/ (void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__); } while(0)
 #endif
@@ -166,8 +173,6 @@ void logmsg(const char *msg);
 	} while(0)
 
 #elif defined(WIN32) && !defined(LOGGING_SUPPORT_DISABLED)
-
-#include <stdio.h>
 
 #ifndef LOG
 #define LOG(channel, ...) \
@@ -199,7 +204,6 @@ void logmsg(const char *msg);
 
 #elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)) && !defined(LOGGING_SUPPORT_DISABLED)
 
-#include <stdio.h>
 /// Prints out a variadic message to the given log channel.
 //#define LOG(channel, msg, ...)  ( IsLogChannelActive(channel) && (TimeOutputDebugStringVariadic(channel, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
 #define LOG(channel, ...) do { printf(__VA_ARGS__); printf("\n"); } while(0)
@@ -231,3 +235,5 @@ void logmsg(const char *msg);
 #else
 #define TRACE(...) ((void)0)
 #endif
+
+MATH_END_NAMESPACE

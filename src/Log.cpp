@@ -22,9 +22,13 @@
 #include <Windows.h>
 #endif
 
+MATH_BEGIN_NAMESPACE
+
 void SetStdoutTextColor(int newColor)
 {
 #if defined(WIN32) && !defined(WIN8RT) // Win8 metro apps don't have SetConsoleTextAttribute.
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)newColor);
 #endif
 }
+
+MATH_END_NAMESPACE

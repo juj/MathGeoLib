@@ -23,6 +23,8 @@
 #include "Math/float3.h"
 #include "Math/MathConstants.h"
 
+MATH_BEGIN_NAMESPACE
+
 struct AABB2D
 {
 	AABB2D() { }
@@ -120,3 +122,5 @@ inline bool Contains(const AABB2D &aabb, const float3 &pt)
 	       pt.x <= aabb.maxPoint.x &&
 	       pt.y <= aabb.maxPoint.y;
 }
+
+MATH_END_NAMESPACE

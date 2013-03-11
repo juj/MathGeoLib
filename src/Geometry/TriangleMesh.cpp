@@ -360,6 +360,8 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 	return nearestD;
 }
 
+MATH_END_NAMESPACE
+
 #ifdef MATH_SSE2
 #define MATH_GEN_SSE2
 #include "TriangleMesh_IntersectRay_SSE.inl"
@@ -401,7 +403,5 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 #define MATH_GEN_UV
 #include "TriangleMesh_IntersectRay_AVX.inl"
 #endif
-
-MATH_END_NAMESPACE
 
 #endif

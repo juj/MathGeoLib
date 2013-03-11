@@ -17,6 +17,8 @@
 	@brief Specifies a type identifier enum for distinguishing between different geometry object types. */
 #pragma once
 
+MATH_BEGIN_NAMESPACE
+
 enum GeomType
 {
 	GTPoint,
@@ -34,3 +36,5 @@ enum GeomType
 	GTSphere,
 	GTTriangle
 };
+
+MATH_END_NAMESPACE

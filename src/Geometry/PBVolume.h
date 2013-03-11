@@ -22,6 +22,8 @@
 #include "Geometry/AABB.h"
 #include "Plane.h"
 
+MATH_BEGIN_NAMESPACE
+
 enum TestResult
 {
 	TestOutside, // The tested objects don't touch.
@@ -95,3 +97,5 @@ public:
 		return result;
 	}
 };
+
+MATH_END_NAMESPACE
