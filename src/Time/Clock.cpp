@@ -64,7 +64,13 @@ void Clock::InitClockData()
 #if WINVER >= 0x0600 && !defined(MATH_ENABLE_WINXP_SUPPORT)
 		appStartTime = (tick_t)GetTickCount64();
 #else
+#pragma warning(push)
+// We are explicitly building with XP support, so GetTickCount() instead of GetTickCount64 is desired.
+#if _MSC_VER >= 1700 // VS2012
+#pragma warning(disable:28159) // warning C28159: Consider using 'GetTickCount64' instead of 'GetTickCount'. Reason: GetTickCount overflows roughly every 49 days.  Code that does not take that into account can loop indefinitely.  GetTickCount64 operates on 64 bit values and does not have that problem
+#endif
 		appStartTime = (tick_t)GetTickCount();
+#pragma warning(pop)
 #endif		
 	}
 
@@ -174,7 +180,13 @@ unsigned long Clock::SystemTime()
 #if WINVER >= 0x0600 && !defined(MATH_ENABLE_WINXP_SUPPORT)
 	return (unsigned long)GetTickCount64();
 #else
+#pragma warning(push)
+// We are explicitly building with XP support, so GetTickCount() instead of GetTickCount64 is desired.
+#if _MSC_VER >= 1700 // VS2012
+#pragma warning(disable:28159) // warning C28159: Consider using 'GetTickCount64' instead of 'GetTickCount'. Reason: GetTickCount overflows roughly every 49 days.  Code that does not take that into account can loop indefinitely.  GetTickCount64 operates on 64 bit values and does not have that problem
+#endif
 	return (unsigned long)GetTickCount();
+#pragma warning(pop)
 #endif		
 #else
 	return TickU32();
