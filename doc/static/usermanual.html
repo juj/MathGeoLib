@@ -79,7 +79,7 @@
                             <dt> No double-precision. </dt>
                             <dd> All computation is performed using the float type. If you need double-precision, have a look at one of the <a href="alternatives.html">alternatives</a>. There does not even exist a typedef for configuring single- or double-precision, but this might come in the future. </dd>
                             <dt> No C++11. </dt>
-                            <dd> This library does not use any language features from ISO/IEC 14882:2011 (C++11), and there are no plans to do so. </dd>
+                            <dd> This library does not use any language features from ISO/IEC 14882:2011 (C++11), and there are no plans to do so. The reason for this is that most of the library code is quite "basic" and there has not been a pressing need to use the new standard. If C++11 features come in, they will be conditionally enabled to retain full C++03 support as well. </dd>
                         </dl>
                         <h3><a name="features">Features</a></h3>
                         <p> This library consists of the following components: </p>
