@@ -133,20 +133,21 @@
                             <dt> Optional STL. </dt>
                             <dd> A current work-in-progress is to remove the dependency to any STL classes. At current stage the library does build without STL, but some classes (Polygon, Polyhedron) are severely crippled in features if you do so. </dd>
                             <dt> Re-entrancy safe. </dt>
-                            <dd> The classes are not thread-safe, meaning that you cannot access the same object simultanously from multiple threads. However, all code is re-entrant, meaning that you can operate on separate instances of any class of the math library in separate threads without problems. </dd>
+                            <dd> The classes are not thread-safe, meaning that you cannot access the same object simultaneusly from multiple threads. However, all code is re-entrant, meaning that you can operate on separate instances of any class of the math library in separate threads without problems. </dd>
                             <dt> Synthetic benchmarks. </dt>
                             <dd> As part of the documentation generation process, an automated profiler is run on each function of the library. This profiler measures the runtime performance and dynamic allocations performed by each function. These results are available on the documentation page for each function, but remember that the results need to be taken with great reservations. </dd>
                         </dl>
                         <h3><a name="platforms">Supported Platforms</a></h3>
                         <p> Supporting the following platforms/compilers is in the scope of this project: </p>
                         <ul>
-                            <li> Windows with Visual Studio 2008. </li>
-                            <li> Windows with Visual Studio 2010. </li>
+                            <li> Windows with Visual Studio 2008/2010/2012. </li>
+                            <li> Windows with MinGW or MinGW-64. </li>
                             <li> Linux with GCC 4.3.6 or newer. </li>
-                            <li> Max OS X. </li>
-                            <li> Android NDK r6b. </li>
+                            <li> Mac OS X with Clang 3.1 or newer, or GCC. </li>
+                            <li> Android NDK, iOS, Google NaCl. </li>
+                            <li> Emscripten C++ -> JS compiler. </li>
                         </ul>
-                        <p> I do not do active development on each of the abovementioned platforms, so the library might not build on all of them at any given time, but I am interested in hearing about any problems you might have on those systems. </p>
+                        <p> There is a continuous build architecture that immediately recompiles the library and runs tests on the different platforms at <a href="http://clb.demon.fi:8113/waterfall">MathGeoLib build report page</a>. If you encounter any issues building, use the <a href="https://github.com/juj/MathGeoLib/issues?state=open">Github bug tracker</a> to report them. </p>
                         <h3><a name="compileroptions">Compiler Options</a></h3>
                         <p> To configure the behavior of the library, the following options exists: </p>
                         <ul>
