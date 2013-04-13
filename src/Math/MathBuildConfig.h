@@ -29,8 +29,17 @@
 // This flag does not have any effect if MATH_ENABLE_NAMESPACE is not defined.
 #define MATH_AUTO_USE_NAMESPACE
 
+// Detect if we're building on Windows 8 and mark it in define WIN8 if so.
+#if defined(WINVER) && !defined(WIN8)
+#if WINVER >= 0x0602
+#define WIN8
+#endif
+#endif
+
 // If MATH_ENABLE_WINXP_SUPPORT is defined, we avoid using Windows symbols that require Vista or newer (e.g. GetTickCount64)
+#if !defined(WIN8) /* Win8 cannot build with XP support - GetTickCount() doesn't exist. */
 #define MATH_ENABLE_WINXP_SUPPORT
+#endif
 
 // If MATH_ASSERT_ON_ASSUME is defined, assume() resolves directly to assert().
 // When not defined, assume() prints out an error if the condition fails, but continues

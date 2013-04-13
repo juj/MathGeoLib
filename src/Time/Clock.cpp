@@ -61,7 +61,7 @@ void Clock::InitClockData()
 
 	if (appStartTime == 0)
 	{
-#if WINVER >= 0x0600 && !defined(MATH_ENABLE_WINXP_SUPPORT)
+#if WINVER >= 0x0600 /* Vista or newer */ && !defined(MATH_ENABLE_WINXP_SUPPORT)
 		appStartTime = (tick_t)GetTickCount64();
 #else
 #pragma warning(push)
@@ -177,7 +177,7 @@ int Clock::Sec()
 unsigned long Clock::SystemTime()
 {
 #ifdef WIN32
-#if WINVER >= 0x0600 && !defined(MATH_ENABLE_WINXP_SUPPORT)
+#if WINVER >= 0x0600 /* Vista or newer */ && !defined(MATH_ENABLE_WINXP_SUPPORT)
 	return (unsigned long)GetTickCount64();
 #else
 #pragma warning(push)
