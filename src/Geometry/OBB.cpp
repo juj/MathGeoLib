@@ -135,7 +135,7 @@ void OBB::SetFrom(const Sphere &sphere)
 #ifdef MATH_CONTAINERLIB_SUPPORT
 bool OBB::SetFrom(const Polyhedron &polyhedron)
 {
-	if (polyhedron.v.size() > 0)
+	if (!polyhedron.v.empty())
 	{
 		*this = OBB::OptimalEnclosingOBB(&polyhedron.v[0], (int)polyhedron.v.size());
 		return true;
