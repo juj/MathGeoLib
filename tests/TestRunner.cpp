@@ -58,7 +58,7 @@ std::string FormatTime(tick_t ticks)
 }
 
 // Print text to log without appending a newline to the end, if possible.
-#if defined(ANDROID) || defined(NPAPI)
+#if defined(ANDROID) || defined(NPAPI) || defined(WIN8PHONE)
 #define LOGI_NL LOGI
 #else
 #define LOGI_NL printf

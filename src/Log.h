@@ -26,6 +26,13 @@
 #include <android/log.h>
 #endif
 
+#ifdef WIN8PHONE
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <Windows.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 // From http://cnicholson.net/2009/03/stupid-c-tricks-dowhile0-and-c4127/
@@ -171,6 +178,46 @@ void logmsg(const char *msg);
 	sprintf(logfunc_str2, "Error: %s", logfunc_str); \
 	((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", logfunc_str2)); \
 	} while(0)
+
+#elif defined(WIN8PHONE) && !defined(LOGGING_SUPPORT_DISABLED)
+
+#define LOGI(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		sprintf(str____, __VA_ARGS__); \
+		OutputDebugStringA(str____); \
+		OutputDebugStringA("\r\n"); \
+	MULTI_LINE_MACRO_END
+
+#define LOGW(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		OutputDebugStringA("Warning: "); \
+		sprintf(str____, __VA_ARGS__); \
+		OutputDebugStringA(str____); \
+		OutputDebugStringA("\r\n"); \
+	MULTI_LINE_MACRO_END
+
+#define LOGE(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		OutputDebugStringA("Error: "); \
+		sprintf(str____, __VA_ARGS__); \
+		OutputDebugStringA(str____); \
+		OutputDebugStringA("\r\n"); \
+	MULTI_LINE_MACRO_END
+
+#define LOG(channel, ...) \
+	MULTI_LINE_MACRO_BEGIN \
+		/*if (IsLogChannelActive(channel))*/ \
+		{ \
+			char str____[16384]; \
+			OutputDebugStringA(#channel); \
+			sprintf(str____, __VA_ARGS__); \
+			OutputDebugStringA(str____); \
+			OutputDebugStringA("\r\n"); \
+		} \
+	MULTI_LINE_MACRO_END
 
 #elif defined(WIN32) && !defined(LOGGING_SUPPORT_DISABLED)
 
