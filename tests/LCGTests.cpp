@@ -78,6 +78,23 @@ RANDOMIZED_TEST(LCG_Float01Incl)
 	assert(!allEqual);
 }
 
+RANDOMIZED_TEST(LCG_FloatNeg1_1)
+{
+	LCG rng;
+	bool allEqual = true;
+	for(int i = 0; i < 1000; ++i)
+	{
+		float f = rng.FloatNeg1_1();
+		float f2 = rng.FloatNeg1_1();
+		assert(f < 1.f);
+		assert(f > -1.f);
+		assert(f != 0.f || f2 != 0.f);
+		if (f != f2)
+			allEqual = false;
+	}
+	assert(!allEqual);
+}
+
 RANDOMIZED_TEST(LCG_Float_A_B)
 {
 	LCG rng;

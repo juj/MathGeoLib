@@ -130,6 +130,16 @@ float LCG::Float01Incl()
 	return Float();
 }
 
+float LCG::FloatNeg1_1()
+{
+	u32 i = (u32)Int();
+	u32 one = ((i & 0x00800000) << 8) /* random sign bit */ | 0x3F800000 /* fixed exponent */;
+	i = one | (i & 0x007FFFFF) /* random mantissa */;
+	float f = *reinterpret_cast<float*>(&i); // f is now in range ]-2, -1[ union [1, 2].
+	float fone = *reinterpret_cast<float*>(&one); // +/- 1, of same sign as f.
+	return f - fone;
+}
+
 float LCG::Float(float a, float b)
 {
 	assume(a <= b && "LCG::Float(a,b): Error in range: b < a!");

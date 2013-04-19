@@ -98,6 +98,11 @@ public:
 	/// @note This is much slower than Float()! Prefer that function instead if possible.
 	float Float01Incl();
 
+	/// Returns a float in the range ]-1, 1[.
+	/// @note This function has one more bit of randomness compared to Float(), but has a theoretical bias
+	/// towards 0.0, since floating point has two representations for 0 (+0 and -0).
+	float FloatNeg1_1();
+
 	/// Returns a float in the range [a, b[.
 	/** @param a Lower bound, inclusive.
 	    @param b Upper bound, exclusive.
