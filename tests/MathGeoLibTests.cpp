@@ -9,6 +9,7 @@ void AddTransformTests();
 void AddSerializationTests();
 void AddClockTests();
 void AddMathFuncTests();
+void AddLCGTests();
 
 void AddMathGeoLibTests()
 {
@@ -21,4 +22,5 @@ void AddMathGeoLibTests()
 	AddVectorTests();
 	AddSerializationTests();
 	AddTransformTests();
+	AddLCGTests();
 }

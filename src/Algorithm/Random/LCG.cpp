@@ -37,7 +37,7 @@ LCG::LCG()
 	Most often you can leave increment = 0.
 
 	A list of widely used values:
-	- Park and Miller (Minimal standard): mul = 16807 (7^5)             mod = 2^31 - 1 (2147483647)
+	- Park and Miller (Minimal standard): mul = 16807 (7^5)             mod = 2^31 - 1 (2147483647 == 0x7FFFFFFF)
 	- Park and Miller #2:                 mul = 48271                   mod = 2^31 - 1
 	- Park and Miller #3:                 mul = 69621                   mod = 2^31 - 1
 	- SIMSCRIPT:                          mul = 630360016               mod = 2^31 - 1
@@ -48,7 +48,7 @@ LCG::LCG()
 	- RANDU                               mul = 65539                   mod = 2^31  */
 void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 {
-	assert((seed !=0 || inc != 0) && "Initializing LCG with seed=0 && inc=0 results in an infinite series of 0s!");
+	assume((seed != 0 || inc != 0) && "Initializing LCG with seed=0 && inc=0 results in an infinite series of 0s!");
 
 	lastNumber = seed;
 	multiplier = mul;
@@ -56,10 +56,11 @@ void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 	modulus = mod;
 }
 
-/** @return An integer in the range [0, modulus-1] */
 u32 LCG::IntFast()
 {
-	lastNumber = (lastNumber * multiplier) & 0x7FFFFFFFUL;
+// The configurable modulus and increment are not used by this function.
+	u32 mul = lastNumber * multiplier;
+	lastNumber = mul - (mul <= lastNumber?1:0); // Whenever we overflow, flip by one to avoid even multiplier always producing even results, since modulus is even.
 	return lastNumber;
 }
 

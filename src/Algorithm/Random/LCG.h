@@ -81,6 +81,8 @@ public:
 	/// Returns the biggest number the generator can yield. (Which is always modulus-1)
 	u32 MaxInt() const { return modulus - 1; }
 
+	/// Returns an integer in the range [0, 2^32-1].
+	/// @note The configurable modulus and increment are not used by this function, but are always increment == 0, modulus=2^32.
 	u32 IntFast();
 
 	/// Returns an integer in the range [a, b]
