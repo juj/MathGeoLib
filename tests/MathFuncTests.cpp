@@ -100,3 +100,22 @@ TEST(IsInf)
 	assert(!IsInf((long double)FLT_MAX));
 #endif
 }
+
+TEST(ReinterpretAsInt)
+{
+	assert(ReinterpretAsInt(0.0f) == 0x00000000);
+	assert(ReinterpretAsInt(1.0f) == 0x3F800000);
+	assert(ReinterpretAsInt(2.0f) == 0x40000000);
+	assert(ReinterpretAsInt(-1.0f) == 0xBF800000);
+	assert(ReinterpretAsInt(FLOAT_INF) == 0x7F800000);
+}
+
+TEST(ReinterpretAsFloat)
+{
+	assert(ReinterpretAsFloat(0x00000000) == 0.0f);
+	assert(ReinterpretAsFloat(0x3F800000) == 1.0f);
+	assert(ReinterpretAsFloat(0x40000000) == 2.0f);
+	assert(ReinterpretAsFloat(0xBF800000) == -1.0f);
+	assert(ReinterpretAsFloat(0x7F800000) == FLOAT_INF);
+	assert(IsNan(ReinterpretAsFloat(0x7F800001)));
+}

@@ -107,7 +107,7 @@ int LCG::Int(int a, int b)
 float LCG::Float()
 {
 	u32 i = ((u32)Int() & 0x007FFFFF /* random mantissa */) | 0x3F800000 /* fixed exponent */;
-	float f = *reinterpret_cast<float*>(&i); // f is now in range [1, 2[
+	float f = ReinterpretAsFloat(i); // f is now in range [1, 2[
 	f -= 1.f; // Map to range [0, 1[
 	return f;
 }
@@ -124,7 +124,7 @@ float LCG::Float01Incl()
 		else
 		{
 			val |= 0x3F800000;
-			return *reinterpret_cast<float*>(&val) - 1.f;
+			return ReinterpretAsFloat(val) - 1.f;
 		}
 	}
 	return Float();
@@ -135,8 +135,8 @@ float LCG::FloatNeg1_1()
 	u32 i = (u32)Int();
 	u32 one = ((i & 0x00800000) << 8) /* random sign bit */ | 0x3F800000 /* fixed exponent */;
 	i = one | (i & 0x007FFFFF) /* random mantissa */;
-	float f = *reinterpret_cast<float*>(&i); // f is now in range ]-2, -1[ union [1, 2].
-	float fone = *reinterpret_cast<float*>(&one); // +/- 1, of same sign as f.
+	float f = ReinterpretAsFloat(i); // f is now in range ]-2, -1[ union [1, 2].
+	float fone = ReinterpretAsFloat(one); // +/- 1, of same sign as f.
 	return f - fone;
 }
 

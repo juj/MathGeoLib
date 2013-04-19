@@ -454,4 +454,27 @@ inline bool IsInf(long double value) { return value == (long double)FLOAT_INF ||
 inline bool IsNan(long double value) { return !(value == value); }
 #endif
 
+/// As per C99, union-reinterpret should now be safe: http://stackoverflow.com/questions/8511676/portable-data-reinterpretation
+union FloatIntReinterpret
+{
+	float f;
+	u32 i;
+};
+
+/// Returns the bit pattern of the given float as a u32.
+inline u32 ReinterpretAsInt(float f)
+{
+	FloatIntReinterpret fi;
+	fi.f = f;
+	return fi.i;
+}
+
+/// Converts the bit pattern specified by the given integer to a floating point (this is a binary conversion, not numeral!).
+inline float ReinterpretAsFloat(u32 i)
+{
+	FloatIntReinterpret fi;
+	fi.i = i;
+	return fi.f;
+}
+
 MATH_END_NAMESPACE
