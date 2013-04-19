@@ -106,7 +106,28 @@ int LCG::Int(int a, int b)
 
 float LCG::Float()
 {
-	return (float)Int() / ((float)MaxInt() + 1.f);
+	u32 i = ((u32)Int() & 0x007FFFFF /* random mantissa */) | 0x3F800000 /* fixed exponent */;
+	float f = *reinterpret_cast<float*>(&i); // f is now in range [1, 2[
+	f -= 1.f; // Map to range [0, 1[
+	return f;
+}
+
+float LCG::Float01Incl()
+{
+	for(int i = 0; i < 100; ++i)
+	{
+		u32 val = (u32)Int() & 0x00FFFFFF;
+		if (val > 0x800000)
+			continue;
+		else if (val == 0x800000)
+			return 1.0f;
+		else
+		{
+			val |= 0x3F800000;
+			return *reinterpret_cast<float*>(&val) - 1.f;
+		}
+	}
+	return Float();
 }
 
 float LCG::Float(float a, float b)

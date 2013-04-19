@@ -94,6 +94,10 @@ public:
 	/// Returns a float in the range [0, 1[.
 	float Float();
 
+	/// Returns a float in the range [0, 1].
+	/// @note This is much slower than Float()! Prefer that function instead if possible.
+	float Float01Incl();
+
 	/// Returns a float in the range [a, b[.
 	/** @param a Lower bound, inclusive.
 	    @param b Upper bound, exclusive.
