@@ -5,7 +5,7 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-void TestFloat3x4ScaleRow()
+TEST(TestFloat3x4ScaleRow)
 {
 	float3x4 m2;
 	m2.Set(-1,-1,-1,-1,
@@ -24,7 +24,7 @@ void TestFloat3x4ScaleRow()
 	assert((m+float3x4::identity).IsIdentity());
 }
 
-void TestFloat3x4SetRow()
+TEST(TestFloat3x4SetRow)
 {
 	float3x4 m;
 	m.SetRow(0, 1,2,3,4);
@@ -35,7 +35,7 @@ void TestFloat3x4SetRow()
 	assert(m.Equals(float3x4(1,2,3,4, 5,6,7,8, 9,10,11,12)));
 }
 
-void TestFloat3x4SwapRows()
+TEST(TestFloat3x4SwapRows)
 {
 	float3x4 v;
 	v.SetIdentity();
@@ -57,7 +57,7 @@ void TestFloat3x4SwapRows()
 
 Line RandomLineContainingPoint(const float3 &pt);
 
-void TestFloat3x4TransformFloat4()
+RANDOMIZED_TEST(TestFloat3x4TransformFloat4)
 {
 	Line l = RandomLineContainingPoint(float3::zero);
 	l.pos = float3::zero;
@@ -76,7 +76,7 @@ void TestFloat3x4TransformFloat4()
 	assert(l.Contains(pt.xyz()));
 }
 
-void TestFloat3x4TransformPosDir()
+RANDOMIZED_TEST(TestFloat3x4TransformPosDir)
 {
 	Line l = RandomLineContainingPoint(float3::zero);
 	l.pos = float3::zero;
@@ -92,7 +92,7 @@ void TestFloat3x4TransformPosDir()
 	assert(l.Contains(pt.xyz()));
 }
 
-void TestFloat3x4TransformPosDirXyz()
+RANDOMIZED_TEST(TestFloat3x4TransformPosDirXyz)
 {
 	Line l = RandomLineContainingPoint(float3::zero);
 	l.pos = float3::zero;
@@ -108,7 +108,7 @@ void TestFloat3x4TransformPosDirXyz()
 	assert(l.Contains(pt.xyz()));
 }
 
-void TestFloat3x4MulFloat3x4()
+RANDOMIZED_TEST(TestFloat3x4MulFloat3x4)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
 	float3x4 m2 = float3x4::RandomGeneral(rng, -10.f, 10.f);
@@ -124,7 +124,7 @@ void TestFloat3x4MulFloat3x4()
 	assert(m3.Equals(m4));
 }
 
-void TestFloat3x4MulScalar()
+RANDOMIZED_TEST(TestFloat3x4MulScalar)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
 	float scalar = rng.Float(-10.f, 10.f);
@@ -140,7 +140,7 @@ void TestFloat3x4MulScalar()
 }
 
 
-void TestFloat3x4DivScalar()
+RANDOMIZED_TEST(TestFloat3x4DivScalar)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
 	float scalar = rng.Float(-10.f, -2.f);
@@ -155,7 +155,7 @@ void TestFloat3x4DivScalar()
 	assert(m3.Equals(m4));
 }
 
-void TestFloat3x4AddFloat3x4()
+RANDOMIZED_TEST(TestFloat3x4AddFloat3x4)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
 	float3x4 m2 = float3x4::RandomGeneral(rng, -10.f, 10.f);
@@ -171,21 +171,21 @@ void TestFloat3x4AddFloat3x4()
 	assert(m5.Equals(m4));
 }
 
-void TestFloat3x3AddUnary()
+TEST(TestFloat3x3AddUnary)
 {
 	float3x3 m(1,2,3, 4,5,6, 7,8,9);
 	float3x3 m2 = +m;
 	assert(m.Equals(m2));
 }
 
-void TestFloat3x4AddUnary()
+TEST(TestFloat3x4AddUnary)
 {
 	float3x4 m(1,2,3,4, 5,6,7,8, 9,10,11,12);
 	float3x4 m2 = +m;
 	assert(m.Equals(m2));
 }
 
-void TestFloat4x4AddUnary()
+TEST(TestFloat4x4AddUnary)
 {
 	float4x4 m(1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16);
 	float4x4 m2 = +m;
@@ -193,14 +193,14 @@ void TestFloat4x4AddUnary()
 }
 
 ///\todo Create and move to QuatTests.cpp
-void TestQuatAddUnary()
+TEST(TestQuatAddUnary)
 {
 	Quat q(1,2,3,4);
 	Quat q2 = +q;
 	assert(q.Equals(q2));
 }
 
-void TestFloat3x4SubFloat3x4()
+RANDOMIZED_TEST(TestFloat3x4SubFloat3x4)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
 	float3x4 m2 = float3x4::RandomGeneral(rng, -10.f, 10.f);
@@ -216,7 +216,7 @@ void TestFloat3x4SubFloat3x4()
 	assert(m5.Equals(m4));
 }
 
-void TestFloat3x4Neg()
+RANDOMIZED_TEST(TestFloat3x4Neg)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
 	float3x4 m2 = -m;
@@ -228,7 +228,7 @@ void TestFloat3x4Neg()
 	assert(m2.Equals(m3));
 }
 
-void TestFloat3x3SolveAxb()
+RANDOMIZED_TEST(TestFloat3x3SolveAxb)
 {
 	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);
 	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
@@ -245,7 +245,7 @@ void TestFloat3x3SolveAxb()
 	}
 }
 
-void TestFloat3x3Inverse()
+RANDOMIZED_TEST(TestFloat3x3Inverse)
 {
 	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);
 	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
@@ -262,7 +262,7 @@ void TestFloat3x3Inverse()
 	}
 }
 
-void TestFloat3x3InverseFast()
+RANDOMIZED_TEST(TestFloat3x3InverseFast)
 {
 	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);
 	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
@@ -279,7 +279,7 @@ void TestFloat3x3InverseFast()
 	}
 }
 
-void TestFloat4x4Ctor()
+RANDOMIZED_TEST(TestFloat4x4Ctor)
 {
 	float3x3 m = float3x3::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2(m);
@@ -306,7 +306,7 @@ void TestFloat4x4Ctor()
 	assert(EqualAbs(m2[3][3], 1.f));
 }
 
-void TestFloat4x4SetRow()
+TEST(TestFloat4x4SetRow)
 {
 	float4x4 m;
 	m.SetRow(0, 1,2,3,4);
@@ -321,7 +321,7 @@ void TestFloat4x4SetRow()
 	assert(m.Equals(m3));
 }
 
-void TestFloat4x4Set3x4Part()
+RANDOMIZED_TEST(TestFloat4x4Set3x4Part)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2 = m;
@@ -340,7 +340,7 @@ void TestFloat4x4Set3x4Part()
 	assert(EqualAbs(m2[3][3], m[3][3]));
 }
 
-void TestFloat4x4SwapRows()
+TEST(TestFloat4x4SwapRows)
 {
 	float4x4 m(1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16);
 	float4x4 m2(13,14,15,16, 9,10,11,12, 5,6,7,8, 1,2,3,4);
@@ -349,7 +349,7 @@ void TestFloat4x4SwapRows()
 	assert(m.Equals(m2));
 }
 
-void TestFloat4x4AssignFloat3x4()
+RANDOMIZED_TEST(TestFloat4x4AssignFloat3x4)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float3x4 m2 = float3x4::RandomGeneral(rng, -10.f, 10.f);
@@ -367,14 +367,14 @@ void TestFloat4x4AssignFloat3x4()
 
 }
 
-void TestFloat4x4CtorCols()
+TEST(TestFloat4x4CtorCols)
 {
 	float4x4 m(float4(1,2,3,4), float4(5,6,7,8), float4(9,10,11,12), float4(13,14,15,16));
 	float4x4 m2(1,5,9,13, 2,6,10,14, 3,7,11,15, 4,8,12,16);
 	assert(m.Equals(m2));
 }
 
-void TestFloat4x4CtorFromQuat()
+RANDOMIZED_TEST(TestFloat4x4CtorFromQuat)
 {
 	Quat q = Quat::RandomRotation(rng);
 	float4x4 m(q);
@@ -385,7 +385,7 @@ void TestFloat4x4CtorFromQuat()
 	assert(v1.Equals(v2));
 }
 
-void TestFloat4x4CtorFromQuatTrans()
+RANDOMIZED_TEST(TestFloat4x4CtorFromQuatTrans)
 {
 	float3 t = float3::RandomBox(rng, float3(-SCALE, -SCALE, -SCALE), float3(SCALE, SCALE, SCALE));
 	Quat q = Quat::RandomRotation(rng);
@@ -397,7 +397,7 @@ void TestFloat4x4CtorFromQuatTrans()
 	assert(v1.Equals(v2));
 }
 
-void TestFloat4x4Translate()
+RANDOMIZED_TEST(TestFloat4x4Translate)
 {
 	float3 t = float3::RandomBox(rng, float3(-SCALE, -SCALE, -SCALE), float3(SCALE, SCALE, SCALE));
 	float3 t2 = float3::RandomBox(rng, float3(-SCALE, -SCALE, -SCALE), float3(SCALE, SCALE, SCALE));
@@ -411,46 +411,9 @@ void TestFloat4x4Translate()
 	assert(v.Equals(v1));
 }
 
-void TestFloat4x4Scale()
+TEST(TestFloat4x4Scale)
 {
 	float4x4 m = float4x4::Scale(2,4,6);
 	float4x4 m2(2,0,0,0, 0,4,0,0, 0,0,6,0, 0,0,0,1);
 	assert(m.Equals(m2));
-}
-
-void AddMatrixTests()
-{
-	AddTest("float3x4::ScaleRow", TestFloat3x4ScaleRow);
-	AddTest("float3x4::SetRow", TestFloat3x4SetRow);
-	AddTest("float3x4::SwapRows", TestFloat3x4SwapRows);
-	AddRandomizedTest("float3x4::Transform", TestFloat3x4TransformFloat4);
-	AddRandomizedTest("float3x4::TransformPos/Dir", TestFloat3x4TransformPosDir);
-	AddRandomizedTest("float3x4::TransformPos(xyz)/Dir(xyz)", TestFloat3x4TransformPosDirXyz);
-	
-	AddRandomizedTest("float3x4::operator*(float3x4)", TestFloat3x4MulFloat3x4);
-	AddRandomizedTest("float3x4::operator*(scalar)", TestFloat3x4MulScalar);
-	AddRandomizedTest("float3x4::operator/(scalar)", TestFloat3x4DivScalar);
-	AddTest("float3x3::operator+()", TestFloat3x3AddUnary);
-	AddTest("float3x4::operator+()", TestFloat3x4AddUnary);
-	AddTest("float4x4::operator+()", TestFloat4x4AddUnary);
-	AddTest("Quat::operator+()", TestQuatAddUnary);
-	AddRandomizedTest("float3x4::operator+(float3x4)", TestFloat3x4AddFloat3x4);
-	AddRandomizedTest("float3x4::operator-(float3x4)", TestFloat3x4SubFloat3x4);
-	AddRandomizedTest("float3x4::operator-()", TestFloat3x4Neg);
-
-	AddRandomizedTest("float3x3::SolveAxb", TestFloat3x3SolveAxb);
-	AddRandomizedTest("float3x3::Inverse", TestFloat3x3InverseFast);
-	AddRandomizedTest("float3x3::InverseFast", TestFloat3x3InverseFast);
-	AddRandomizedTest("float4x4::float4x4", TestFloat4x4Ctor);
-	AddRandomizedTest("float4x4::SetRow", TestFloat4x4SetRow);
-	AddRandomizedTest("float4x4::Set3x4Part", TestFloat4x4Set3x4Part);
-	AddRandomizedTest("float4x4::SwapRows", TestFloat4x4SwapRows);
-	AddRandomizedTest("float4x4::operator=(float3x4)", TestFloat4x4AssignFloat3x4);
-
-	AddTest("float4x4(columns)", TestFloat4x4CtorCols);
-	AddRandomizedTest("float4x4(Quat)", TestFloat4x4CtorFromQuat);
-	AddRandomizedTest("float4x4(Quat, translate)", TestFloat4x4CtorFromQuatTrans);
-	AddRandomizedTest("float4x4::Translate", TestFloat4x4Translate);
-	AddTest("float4x4::Scale", TestFloat4x4Scale);
-
 }

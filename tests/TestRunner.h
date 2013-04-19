@@ -31,3 +31,41 @@ int RunTests(int numTimes);
 /// Returns -2: no tests left to run, -1: failed, 0: success, 1: success with warnings.
 int RunOneTest(int numTimes, int numTrials);
 void PrintTestRunSummary();
+
+class AddTestOp
+{
+public:
+	AddTestOp(const char *name, const char *description, bool isRandomized, bool runOnlyOnce, TestFunctionPtr function)
+	{
+		if (isRandomized)
+			AddRandomizedTest(name, function, description);
+		else
+			AddTest(name, function, description, runOnlyOnce);
+	}
+};
+
+#ifdef MATH_TESTS_EXECUTABLE
+
+#define TEST(name) \
+	void TestFunc_##name(); \
+	AddTestOp addtestop_##name(#name, "", false, false, TestFunc_##name); \
+	void TestFunc_##name()
+
+#define RANDOMIZED_TEST(name) \
+	void TestFunc_##name(); \
+	AddTestOp addtestop_##name(#name, "", true, false, TestFunc_##name); \
+	void TestFunc_##name()
+
+#define UNIQUE_TEST(name) \
+	void TestFunc_##name(); \
+	AddTestOp addtestop_##name(#name, "", false, true, TestFunc_##name); \
+	void TestFunc_##name()
+
+#else
+
+// Not running tests - specfiy the test functions, but don't add them at app startup time (they should be DCEd).
+#define TEST(name) void TestFunc_##name()
+#define RANDOMIZED_TEST(name) void TestFunc_##name()
+#define UNIQUE_TEST(name) void TestFunc_##name()
+
+#endif

@@ -2,7 +2,7 @@
 #include "MathGeoLib.h"
 #include "../tests/TestRunner.h"
 
-void TestIntFast()
+TEST(LCG_IntFast)
 {
 	LCG rng;
 	u32 prev = rng.IntFast();
@@ -14,7 +14,7 @@ void TestIntFast()
 	}
 }
 
-void TestInt()
+TEST(LCG_Int)
 {
 	LCG rng;
 	bool allEqual = true;
@@ -29,7 +29,7 @@ void TestInt()
 	assert(!allEqual);
 }
 
-void TestIntAB()
+TEST(LCG_Int_A_B)
 {
 	LCG rng;
 	for(int i = 0; i < 1000; ++i)
@@ -44,7 +44,7 @@ void TestIntAB()
 	}
 }
 
-void TestFloat()
+TEST(LCG_Float)
 {
 	LCG rng;
 	bool allEqual = true;
@@ -61,7 +61,7 @@ void TestFloat()
 	assert(!allEqual);
 }
 
-void TestFloatAB()
+TEST(LCG_Float_A_B)
 {
 	LCG rng;
 	for(int i = 0; i < 1000; ++i)
@@ -75,13 +75,4 @@ void TestFloatAB()
 		assert(a <= f);
 		assert(f <= b);
 	}
-}
-
-void AddLCGTests()
-{
-	AddRandomizedTest("LCG::IntFast", TestIntFast);
-	AddRandomizedTest("LCG::Int", TestInt);
-	AddRandomizedTest("LCG::Int(a,b)", TestIntAB);
-	AddRandomizedTest("LCG::Float", TestFloat);
-	AddRandomizedTest("LCG::Float(a,b)", TestFloatAB);
 }

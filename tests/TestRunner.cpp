@@ -4,13 +4,16 @@
 #include "Time/Clock.h"
 #include <algorithm>
 #include <cstring>
-#include "MathGeoLibTests.h"
 
 #include "myassert.h"
 
 LCG rng(Clock::TickU32());
 
-std::vector<Test> tests;
+std::vector<Test> &Tests()
+{
+	static std::vector<Test> tests;
+	return tests;
+}
 
 static int numTestsPassed = 0;
 static int numTestsFailed = 0;
@@ -26,7 +29,7 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 	t.function = function;
 	t.isRandomized = false;
 	t.runOnlyOnce = runOnlyOnce;
-	tests.push_back(t);
+	Tests().push_back(t);
 }
 
 void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string description)
@@ -37,7 +40,7 @@ void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string d
 	t.function = function;
 	t.isRandomized = true;
 	t.runOnlyOnce = false;
-	tests.push_back(t);
+	Tests().push_back(t);
 }
 
 std::string FormatTime(tick_t ticks)
@@ -151,9 +154,9 @@ static int nextTestToRun = 0;
 
 int RunOneTest(int numTimes, int numTrials)
 {
-	if (nextTestToRun >= (int)tests.size())
+	if (nextTestToRun >= (int)Tests().size())
 		return -2; // No tests left to run
-	int ret = RunTest(tests[nextTestToRun++], numTimes, numTrials);
+	int ret = RunTest(Tests()[nextTestToRun++], numTimes, numTrials);
 
 	if (ret == 0 || ret == 1)
 		++numTestsPassed;
@@ -170,7 +173,7 @@ int RunTests(int numTimes, int numTrials)
 {
 	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
-	for(size_t i = 0; i < tests.size(); ++i)
+	for(size_t i = 0; i < Tests().size(); ++i)
 		RunOneTest(numTimes, numTrials);
 
 	PrintTestRunSummary();
@@ -179,14 +182,12 @@ int RunTests(int numTimes, int numTrials)
 
 void PrintTestRunSummary()
 {
-	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)tests.size(), numTestsPassed, numTestsWarnings, numTestsFailed);
+	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)Tests().size(), numTestsPassed, numTestsWarnings, numTestsFailed);
 }
 
 #ifdef MATH_TESTS_EXECUTABLE
 int main(int argc, char **argv)
 {
-	AddMathGeoLibTests();
-
 	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 10000;
 	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
 

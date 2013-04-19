@@ -5,7 +5,7 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-void TestFloat2FromString()
+TEST(TestFloat2FromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -31,7 +31,7 @@ void TestFloat2FromString()
 	}
 }
 
-void TestFloat3FromString()
+TEST(TestFloat3FromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -56,7 +56,7 @@ void TestFloat3FromString()
 		assert(float3::FromString("(+2 3.1  -4)").Equals(float3(2,3.1f,-4)));
 	}
 }
-void TestFloat4FromString()
+TEST(TestFloat4FromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -82,7 +82,7 @@ void TestFloat4FromString()
 	}
 }
 
-void TestQuatFromString()
+TEST(TestQuatFromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -106,12 +106,4 @@ void TestQuatFromString()
 		assert(Quat::FromString("(1 +2 3.1  -4").Equals(Quat(1,2,3.1f,-4)));
 		assert(Quat::FromString("(1 +2 3.1  -4)").Equals(Quat(1,2,3.1f,-4)));
 	}
-}
-
-void AddSerializationTests()
-{
-	AddTest("Float2::FromString", TestFloat2FromString);
-	AddTest("Float3::FromString", TestFloat3FromString);
-	AddTest("Float4::FromString", TestFloat4FromString);
-	AddTest("Quat::FromString", TestQuatFromString);
 }
