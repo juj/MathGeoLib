@@ -10,7 +10,7 @@ void TestIntFast()
 	{
 		u32 next = rng.IntFast();
 		assert(next != prev);
-		next = prev;
+		prev = next;
 	}
 }
 
