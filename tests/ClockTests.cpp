@@ -2,7 +2,7 @@
 #include "MathGeoLib.h"
 #include "../tests/TestRunner.h"
 
-TEST(TestMonotonousClock)
+TEST(MonotonousClock)
 {
 	tick_t maxDiff = 0;
 	tick_t prev = Clock::Tick();
@@ -19,7 +19,7 @@ TEST(TestMonotonousClock)
 	assert(maxDiff > 0); // The clock must proceed at least some amount.
 }
 
-TEST(TestSubMillisecondPrecision)
+TEST(SubMillisecondPrecision)
 {
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
 	assert(ticksPerMillisecond > 1);

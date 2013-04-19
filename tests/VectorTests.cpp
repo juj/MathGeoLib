@@ -5,7 +5,7 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-TEST(TestFloat4Swizzled)
+TEST(Float4Swizzled)
 {
 	float4 f(float2(1,2),3,4);
 	float4 f2 = f.Swizzled(2,0,1,3);
@@ -13,31 +13,31 @@ TEST(TestFloat4Swizzled)
 	assert(f2.Equals(float4(f3)));
 }
 
-TEST(TestFloat4LengthSq3)
+TEST(Float4LengthSq3)
 {
 	float4 f(-1.f,2.f,3.f,1000000.f);
 	assert(EqualAbs(f.LengthSq3(), 14.f));
 }
 
-TEST(TestFloat4Length3)
+TEST(Float4Length3)
 {
 	float4 f(-1.f,2.f,3.f,1000000.f);
 	assert(EqualAbs(f.Length3(), Sqrt(14.f)));
 }
 
-TEST(TestFloat4LengthSq4)
+TEST(Float4LengthSq4)
 {
 	float4 f(-1.f,2.f,3.f,-4.f);
 	assert(EqualAbs(f.LengthSq4(), 30.f));
 }
 
-TEST(TestFloat4Length4)
+TEST(Float4Length4)
 {
 	float4 f(-1.f,2.f,3.f,-4.f);
 	assert(EqualAbs(f.Length4(), Sqrt(30.f)));
 }
 
-TEST(TestFloat4Normalize3)
+TEST(Float4Normalize3)
 {
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float oldLength = f.Normalize3();
@@ -56,7 +56,7 @@ TEST(TestFloat4Normalize3)
 	assert(f2.w == 1000.f);
 }
 
-TEST(TestFloat4Normalized3)
+TEST(Float4Normalized3)
 {
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float4 f2 = f.Normalized3();
@@ -66,7 +66,7 @@ TEST(TestFloat4Normalized3)
 	assert(EqualAbs(f2.w, 1000.f));
 }
 
-TEST(TestFloat4Normalize4)
+TEST(Float4Normalize4)
 {
 	float4 f(-1.f, 2.f, 3.f, 4.f);
 	float oldLength = f.Normalize4();
@@ -85,7 +85,7 @@ TEST(TestFloat4Normalize4)
 	assert(f2.w == 0.f);
 }
 
-TEST(TestFloat4Normalized4)
+TEST(Float4Normalized4)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2 = f.Normalized4();
@@ -95,21 +95,21 @@ TEST(TestFloat4Normalized4)
 	assert(EqualAbs(f2.w, -4.f / Sqrt(30.f)));
 }
 
-TEST(TestFloat4NormalizeW)
+TEST(Float4NormalizeW)
 {
 	float4 f(-2.f, -4.f, 8.f, 2.f);
 	f.NormalizeW();
 	assert(f.Equals(float4(-1.f, -2.f, 4.f, 1.f)));
 }
 
-TEST(TestFloat4Scale3)
+TEST(Float4Scale3)
 {
 	float4 f(-2.f, -4.f, 8.f, 1000.f);
 	f.Scale3(100.f);
 	assert(f.Equals(float4(-200.f, -400.f, 800.f, 1000.f)));
 }
 
-TEST(TestFloat4ScaleToLength3)
+TEST(Float4ScaleToLength3)
 {
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float4 f2 = f.ScaledToLength3(10.f);
@@ -122,116 +122,116 @@ TEST(TestFloat4ScaleToLength3)
 	assert(EqualAbs(f.w, 1000.f));
 }
 
-TEST(TestFloat4SumOfElements)
+TEST(Float4SumOfElements)
 {
 	float4 f(-1.f, 4.f, 20.f, -100.f);
 	assert(EqualAbs(f.SumOfElements(), -77.f));
 }
 
-TEST(TestFloat4ProductOfElements)
+TEST(Float4ProductOfElements)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(EqualAbs(f.ProductOfElements(), 64.f));
 }
 
-TEST(TestFloat4AverageOfElements)
+TEST(Float4AverageOfElements)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
 	assert(EqualAbs(f.AverageOfElements(), -1.f));
 }
 
-TEST(TestFloat4Abs)
+TEST(Float4Abs)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
 	assert(f.Abs().Equals(float4(2.f, 2.f, 4.f, 8.f)));
 }
 
-TEST(TestFloat4Neg3)
+TEST(Float4Neg3)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
 	assert(f.Neg3().Equals(float4(2.f, -2.f, -4.f, -8.f)));
 }
 
-TEST(TestFloat4Neg4)
+TEST(Float4Neg4)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
 	assert(f.Neg4().Equals(float4(2.f, -2.f, -4.f, 8.f)));
 }
 
-TEST(TestFloat4Recip3)
+TEST(Float4Recip3)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(f.Recip3().Equals(float4(-1.f, 0.5f, 0.25f, -8.f)));
 }
 
-TEST(TestFloat4Recip4)
+TEST(Float4Recip4)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(f.Recip4().Equals(float4(-1.f, 0.5f, 0.25f, -0.125f)));
 }
 
-TEST(TestFloat4RecipFast4)
+TEST(Float4RecipFast4)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(f.RecipFast4().Equals(float4(-1.f, 0.5f, 0.25f, -0.125f)));
 }
 
-TEST(TestFloat4Min)
+TEST(Float4Min)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(f.Min(-4.f).Equals(float4(-4.f, -4.f, -4.f, -8.f)));
 	assert(f.Min(float4(-3.f, 20.f, -2.f, 9.f)).Equals(-3.f, 2.f, -2.f, -8.f));
 }
 
-TEST(TestFloat4Max)
+TEST(Float4Max)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(f.Max(-4.f).Equals(float4(-1.f, 2.f, 4.f, -4.f)));
 	assert(f.Max(float4(-3.f, 20.f, -2.f, 9.f)).Equals(-1.f, 20.f, 4.f, 9.f));
 }
 
-TEST(TestFloat4Clamp)
+TEST(Float4Clamp)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
 	assert(f.Clamp(-2.f, 2.f).Equals(float4(-1.f, 2.f, 2.f, -2.f)));
 	assert(f.Clamp(float4(0.f, -1.f, -10.f, -8.f), float4(10.f, 0.f, 10.f, -8.f)).Equals(float4(0.f, 0.f, 4.f, -8.f)));
 }
 
-TEST(TestFloat4Clamp01)
+TEST(Float4Clamp01)
 {
 	float4 f(-1.f, 0.f, 0.5f, 2.f);
 	assert(f.Clamp01().Equals(float4(0.f, 0.f, 0.5f, 1.f)));
 }
 
-TEST(TestFloat4DistanceSq3)
+TEST(Float4DistanceSq3)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
 	assert(EqualAbs(f.Distance3Sq(f2), 56.f));
 }
 
-TEST(TestFloat4Distance3)
+TEST(Float4Distance3)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
 	assert(EqualAbs(f.Distance3(f2), Sqrt(56.f)));
 }
 
-TEST(TestFloat4DistanceSq4)
+TEST(Float4DistanceSq4)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
 	assert(EqualAbs(f.Distance4Sq(f2), 120.f));
 }
 
-TEST(TestFloat4Distance4)
+TEST(Float4Distance4)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
 	assert(EqualAbs(f.Distance4(f2), Sqrt(120.f)));
 }
 
-TEST(TestFloat4Dot3)
+TEST(Float4Dot3)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float3 f2(2.f, -1.f, -3.f);
@@ -240,14 +240,14 @@ TEST(TestFloat4Dot3)
 	assert(EqualAbs(f.Dot3(f3), -4.f));
 }
 
-TEST(TestFloat4Dot4)
+TEST(Float4Dot4)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2(2.f, -1.f, 0.f, 4.f);
 	assert(EqualAbs(f.Dot4(f2), -20.f));
 }
 
-TEST(TestFloat4Cross3)
+TEST(Float4Cross3)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2(2.f, -1.f, 0.f, 4.f);
@@ -264,7 +264,7 @@ TEST(TestFloat4Cross3)
 	assert(z.Equals(float4(0,0,1,0)));
 }
 
-TEST(TestFloat4FromScalar)
+TEST(Float4FromScalar)
 {
 	float4 f = float4::FromScalar(1.f);
 	assert(f.Equals(float4(1,1,1,1)));
@@ -276,14 +276,14 @@ TEST(TestFloat4FromScalar)
 	assert(f.Equals(f2));
 }
 
-TEST(TestFloat4Set)
+TEST(Float4Set)
 {
 	float4 f = float4(1,2,3,4);
 	f.Set(5,6,7,8);
 	assert(f.Equals(float4(5,6,7,8)));
 }
 
-TEST(TestFloat4OpAdd)
+TEST(Float4OpAdd)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
@@ -291,28 +291,28 @@ TEST(TestFloat4OpAdd)
 	assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
 }
 
-TEST(TestFloat2OpAddUnary)
+TEST(Float2OpAddUnary)
 {
 	float2 f(1,2);
 	float2 g = +f;
 	assert(f.Equals(g));
 }
 
-TEST(TestFloat3OpAddUnary)
+TEST(Float3OpAddUnary)
 {
 	float3 f(1,2,3);
 	float3 g = +f;
 	assert(f.Equals(g));
 }
 
-TEST(TestFloat4OpAddUnary)
+TEST(Float4OpAddUnary)
 {
 	float4 f(1,2,3,4);
 	float4 g = +f;
 	assert(f.Equals(g));
 }
 
-TEST(TestFloat4OpSub)
+TEST(Float4OpSub)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
@@ -320,14 +320,14 @@ TEST(TestFloat4OpSub)
 	assert(f3.Equals(float4(6.f, 8.f, 10.f, 12.f)));
 }
 
-TEST(TestFloat4OpNeg)
+TEST(Float4OpNeg)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f3 = -f;
 	assert(f3.Equals(float4(-1.f, -2.f, -3.f, -4.f)));
 }
 
-TEST(TestFloat4OpMul)
+TEST(Float4OpMul)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = -2.f;
@@ -339,7 +339,7 @@ TEST(TestFloat4OpMul)
 	assert(f2.Equals(float4(-2.f, -4.f, -6.f, -8.f)));
 }
 
-TEST(TestFloat4OpDiv)
+TEST(Float4OpDiv)
 {
 	float4 f = float4(1,2,4,8);
 	float scalar = -2.f;
@@ -348,7 +348,7 @@ TEST(TestFloat4OpDiv)
 	assert(f2.Equals(float4(-0.5f, -1.f, -2.f, -4.f)));
 }
 
-TEST(TestFloat4OpAddAssign)
+TEST(Float4OpAddAssign)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
@@ -357,7 +357,7 @@ TEST(TestFloat4OpAddAssign)
 	assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
 }
 
-TEST(TestFloat4OpSubAssign)
+TEST(Float4OpSubAssign)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
@@ -366,7 +366,7 @@ TEST(TestFloat4OpSubAssign)
 	assert(f3.Equals(float4(6.f, 8.f, 10.f, 12.f)));
 }
 
-TEST(TestFloat4OpMulAssign)
+TEST(Float4OpMulAssign)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = -2.f;
@@ -376,7 +376,7 @@ TEST(TestFloat4OpMulAssign)
 	assert(f2.Equals(float4(-2.f, -4.f, -6.f, -8.f)));
 }
 
-TEST(TestFloat4OpDivAssign)
+TEST(Float4OpDivAssign)
 {
 	float4 f = float4(1,2,4,8);
 	float scalar = -2.f;
@@ -386,7 +386,7 @@ TEST(TestFloat4OpDivAssign)
 	assert(f2.Equals(float4(-0.5f, -1.f, -2.f, -4.f)));
 }
 
-TEST(TestFloat4Add)
+TEST(Float4Add)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = 5.f;
@@ -394,7 +394,7 @@ TEST(TestFloat4Add)
 	assert(f2.Equals(float4(6.f, 7.f, 8.f, 9.f)));
 }
 
-TEST(TestFloat4Sub)
+TEST(Float4Sub)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = 5.f;
@@ -402,7 +402,7 @@ TEST(TestFloat4Sub)
 	assert(f2.Equals(float4(-4.f, -3.f, -2.f, -1.f)));
 }
 
-TEST(TestFloat4SubLeft)
+TEST(Float4SubLeft)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = 5.f;
@@ -410,7 +410,7 @@ TEST(TestFloat4SubLeft)
 	assert(f2.Equals(float4(4.f, 3.f, 2.f, 1.f)));
 }
 
-TEST(TestFloat4DivLeft)
+TEST(Float4DivLeft)
 {
 	float4 f = float4(-1,2,4,8);
 	float scalar = -8.f;
@@ -418,14 +418,14 @@ TEST(TestFloat4DivLeft)
 	assert(f2.Equals(float4(8.f, -4.f, -2.f, -1.f)));
 }
 
-TEST(TestFloat4Mul)
+TEST(Float4Mul)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-2.f, -4.f, 2.f, 1.f);
 	assert(f.Mul(f2).Equals(float4(-2.f, -8.f, 6.f, 4.f)));
 }
 
-TEST(TestFloat4Div)
+TEST(Float4Div)
 {
 	float4 f = float4(1,1,4,8);
 	float4 f2 = float4(-2.f, -4.f, 2.f, 1.f);

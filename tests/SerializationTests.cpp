@@ -5,7 +5,7 @@
 #include "myassert.h"
 #include "TestRunner.h"
 
-TEST(TestFloat2FromString)
+TEST(Float2FromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -31,7 +31,7 @@ TEST(TestFloat2FromString)
 	}
 }
 
-TEST(TestFloat3FromString)
+TEST(Float3FromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -56,7 +56,7 @@ TEST(TestFloat3FromString)
 		assert(float3::FromString("(+2 3.1  -4)").Equals(float3(2,3.1f,-4)));
 	}
 }
-TEST(TestFloat4FromString)
+TEST(Float4FromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
@@ -82,7 +82,7 @@ TEST(TestFloat4FromString)
 	}
 }
 
-TEST(TestQuatFromString)
+TEST(QuatFromString)
 {
 	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 

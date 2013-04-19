@@ -9,7 +9,7 @@ Line RandomLineContainingPoint(const float3 &pt);
 Ray RandomRayContainingPoint(const float3 &pt);
 LineSegment RandomLineSegmentContainingPoint(const float3 &pt);
 
-RANDOMIZED_TEST(TestLineLineClosestPoint)
+RANDOMIZED_TEST(LineLineClosestPoint)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -33,7 +33,7 @@ RANDOMIZED_TEST(TestLineLineClosestPoint)
 	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 }
 
-RANDOMIZED_TEST(TestLineRayClosestPoint)
+RANDOMIZED_TEST(LineRayClosestPoint)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -60,7 +60,7 @@ RANDOMIZED_TEST(TestLineRayClosestPoint)
 	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-3f);
 }
 
-RANDOMIZED_TEST(TestLineLineSegmentClosestPoint)
+RANDOMIZED_TEST(LineLineSegmentClosestPoint)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -89,7 +89,7 @@ RANDOMIZED_TEST(TestLineLineSegmentClosestPoint)
 	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
 }
 
-RANDOMIZED_TEST(TestRayRayClosestPoint)
+RANDOMIZED_TEST(RayRayClosestPoint)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -119,7 +119,7 @@ RANDOMIZED_TEST(TestRayRayClosestPoint)
 	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-3f);
 }
 
-RANDOMIZED_TEST(TestRayLineSegmentClosestPoint)
+RANDOMIZED_TEST(RayLineSegmentClosestPoint)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -151,7 +151,7 @@ RANDOMIZED_TEST(TestRayLineSegmentClosestPoint)
 	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-3f);
 }
 
-RANDOMIZED_TEST(TestLineSegmentLineSegmentClosestPoint)
+RANDOMIZED_TEST(LineSegmentLineSegmentClosestPoint)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));

@@ -191,7 +191,7 @@ Polygon RandomPolygonContainingPoint(const float3 &pt)
 	return poly;
 }
 
-RANDOMIZED_TEST(TestAABBAABBIntersect)
+RANDOMIZED_TEST(AABBAABBIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -206,7 +206,7 @@ RANDOMIZED_TEST(TestAABBAABBIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBOBBIntersect)
+RANDOMIZED_TEST(AABBOBBIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -221,7 +221,7 @@ RANDOMIZED_TEST(TestAABBOBBIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBLineIntersect)
+RANDOMIZED_TEST(AABBLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -236,7 +236,7 @@ RANDOMIZED_TEST(TestAABBLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBRayIntersect)
+RANDOMIZED_TEST(AABBRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -251,7 +251,7 @@ RANDOMIZED_TEST(TestAABBRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBLineSegmentIntersect)
+RANDOMIZED_TEST(AABBLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -266,7 +266,7 @@ RANDOMIZED_TEST(TestAABBLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBPlaneIntersect)
+RANDOMIZED_TEST(AABBPlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -281,7 +281,7 @@ RANDOMIZED_TEST(TestAABBPlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBSphereIntersect)
+RANDOMIZED_TEST(AABBSphereIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -296,7 +296,7 @@ RANDOMIZED_TEST(TestAABBSphereIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBCapsuleIntersect)
+RANDOMIZED_TEST(AABBCapsuleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -311,7 +311,7 @@ RANDOMIZED_TEST(TestAABBCapsuleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBTriangleIntersect)
+RANDOMIZED_TEST(AABBTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -326,7 +326,7 @@ RANDOMIZED_TEST(TestAABBTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBFrustumIntersect)
+RANDOMIZED_TEST(AABBFrustumIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -341,7 +341,7 @@ RANDOMIZED_TEST(TestAABBFrustumIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBPolyhedronIntersect)
+RANDOMIZED_TEST(AABBPolyhedronIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -356,7 +356,7 @@ RANDOMIZED_TEST(TestAABBPolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestAABBPolygonIntersect)
+RANDOMIZED_TEST(AABBPolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
@@ -374,7 +374,7 @@ RANDOMIZED_TEST(TestAABBPolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestOBBOBBIntersect)
+RANDOMIZED_TEST(OBBOBBIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -389,7 +389,7 @@ RANDOMIZED_TEST(TestOBBOBBIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBLineIntersect)
+RANDOMIZED_TEST(OBBLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -404,7 +404,7 @@ RANDOMIZED_TEST(TestOBBLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBRayIntersect)
+RANDOMIZED_TEST(OBBRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -419,7 +419,7 @@ RANDOMIZED_TEST(TestOBBRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBLineSegmentIntersect)
+RANDOMIZED_TEST(OBBLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -434,7 +434,7 @@ RANDOMIZED_TEST(TestOBBLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBPlaneIntersect)
+RANDOMIZED_TEST(OBBPlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -449,7 +449,7 @@ RANDOMIZED_TEST(TestOBBPlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBSphereIntersect)
+RANDOMIZED_TEST(OBBSphereIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -464,7 +464,7 @@ RANDOMIZED_TEST(TestOBBSphereIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBCapsuleIntersect)
+RANDOMIZED_TEST(OBBCapsuleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -479,7 +479,7 @@ RANDOMIZED_TEST(TestOBBCapsuleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBTriangleIntersect)
+RANDOMIZED_TEST(OBBTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -494,7 +494,7 @@ RANDOMIZED_TEST(TestOBBTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBFrustumIntersect)
+RANDOMIZED_TEST(OBBFrustumIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -509,7 +509,7 @@ RANDOMIZED_TEST(TestOBBFrustumIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBPolyhedronIntersect)
+RANDOMIZED_TEST(OBBPolyhedronIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -524,7 +524,7 @@ RANDOMIZED_TEST(TestOBBPolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestOBBPolygonIntersect)
+RANDOMIZED_TEST(OBBPolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -543,7 +543,7 @@ RANDOMIZED_TEST(TestOBBPolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestSphereSphereIntersect)
+RANDOMIZED_TEST(SphereSphereIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -558,7 +558,7 @@ RANDOMIZED_TEST(TestSphereSphereIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSphereLineIntersect)
+RANDOMIZED_TEST(SphereLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -573,7 +573,7 @@ RANDOMIZED_TEST(TestSphereLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSphereRayIntersect)
+RANDOMIZED_TEST(SphereRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -588,7 +588,7 @@ RANDOMIZED_TEST(TestSphereRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSphereLineSegmentIntersect)
+RANDOMIZED_TEST(SphereLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -603,7 +603,7 @@ RANDOMIZED_TEST(TestSphereLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSpherePlaneIntersect)
+RANDOMIZED_TEST(SpherePlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -618,7 +618,7 @@ RANDOMIZED_TEST(TestSpherePlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSphereCapsuleIntersect)
+RANDOMIZED_TEST(SphereCapsuleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -633,7 +633,7 @@ RANDOMIZED_TEST(TestSphereCapsuleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSphereTriangleIntersect)
+RANDOMIZED_TEST(SphereTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -648,7 +648,7 @@ RANDOMIZED_TEST(TestSphereTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSphereFrustumIntersect)
+RANDOMIZED_TEST(SphereFrustumIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -663,7 +663,7 @@ RANDOMIZED_TEST(TestSphereFrustumIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSpherePolyhedronIntersect)
+RANDOMIZED_TEST(SpherePolyhedronIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -678,7 +678,7 @@ RANDOMIZED_TEST(TestSpherePolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestSpherePolygonIntersect)
+RANDOMIZED_TEST(SpherePolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
@@ -696,7 +696,7 @@ RANDOMIZED_TEST(TestSpherePolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestFrustumLineIntersect)
+RANDOMIZED_TEST(FrustumLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -711,7 +711,7 @@ RANDOMIZED_TEST(TestFrustumLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumRayIntersect)
+RANDOMIZED_TEST(FrustumRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -726,7 +726,7 @@ RANDOMIZED_TEST(TestFrustumRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumLineSegmentIntersect)
+RANDOMIZED_TEST(FrustumLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -741,7 +741,7 @@ RANDOMIZED_TEST(TestFrustumLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumPlaneIntersect)
+RANDOMIZED_TEST(FrustumPlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -756,7 +756,7 @@ RANDOMIZED_TEST(TestFrustumPlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumCapsuleIntersect)
+RANDOMIZED_TEST(FrustumCapsuleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -771,7 +771,7 @@ RANDOMIZED_TEST(TestFrustumCapsuleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumTriangleIntersect)
+RANDOMIZED_TEST(FrustumTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -786,7 +786,7 @@ RANDOMIZED_TEST(TestFrustumTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumFrustumIntersect)
+RANDOMIZED_TEST(FrustumFrustumIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -801,7 +801,7 @@ RANDOMIZED_TEST(TestFrustumFrustumIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumPolyhedronIntersect)
+RANDOMIZED_TEST(FrustumPolyhedronIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -816,7 +816,7 @@ RANDOMIZED_TEST(TestFrustumPolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestFrustumPolygonIntersect)
+RANDOMIZED_TEST(FrustumPolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -834,7 +834,7 @@ RANDOMIZED_TEST(TestFrustumPolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestCapsuleLineIntersect)
+RANDOMIZED_TEST(CapsuleLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -849,7 +849,7 @@ RANDOMIZED_TEST(TestCapsuleLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsuleRayIntersect)
+RANDOMIZED_TEST(CapsuleRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -864,7 +864,7 @@ RANDOMIZED_TEST(TestCapsuleRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsuleLineSegmentIntersect)
+RANDOMIZED_TEST(CapsuleLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -879,7 +879,7 @@ RANDOMIZED_TEST(TestCapsuleLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsulePlaneIntersect)
+RANDOMIZED_TEST(CapsulePlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -894,7 +894,7 @@ RANDOMIZED_TEST(TestCapsulePlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsuleCapsuleIntersect)
+RANDOMIZED_TEST(CapsuleCapsuleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -909,7 +909,7 @@ RANDOMIZED_TEST(TestCapsuleCapsuleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsuleTriangleIntersect)
+RANDOMIZED_TEST(CapsuleTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -924,7 +924,7 @@ RANDOMIZED_TEST(TestCapsuleTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsulePolyhedronIntersect)
+RANDOMIZED_TEST(CapsulePolyhedronIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -939,7 +939,7 @@ RANDOMIZED_TEST(TestCapsulePolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestCapsulePolygonIntersect)
+RANDOMIZED_TEST(CapsulePolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
@@ -958,7 +958,7 @@ RANDOMIZED_TEST(TestCapsulePolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestPolyhedronLineIntersect)
+RANDOMIZED_TEST(PolyhedronLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -973,7 +973,7 @@ RANDOMIZED_TEST(TestPolyhedronLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolyhedronRayIntersect)
+RANDOMIZED_TEST(PolyhedronRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -988,7 +988,7 @@ RANDOMIZED_TEST(TestPolyhedronRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolyhedronLineSegmentIntersect)
+RANDOMIZED_TEST(PolyhedronLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -1006,7 +1006,7 @@ RANDOMIZED_TEST(TestPolyhedronLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolyhedronPlaneIntersect)
+RANDOMIZED_TEST(PolyhedronPlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -1021,7 +1021,7 @@ RANDOMIZED_TEST(TestPolyhedronPlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolyhedronTriangleIntersect)
+RANDOMIZED_TEST(PolyhedronTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -1036,7 +1036,7 @@ RANDOMIZED_TEST(TestPolyhedronTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolyhedronPolyhedronIntersect)
+RANDOMIZED_TEST(PolyhedronPolyhedronIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -1051,7 +1051,7 @@ RANDOMIZED_TEST(TestPolyhedronPolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolyhedronPolygonIntersect)
+RANDOMIZED_TEST(PolyhedronPolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
@@ -1068,7 +1068,7 @@ RANDOMIZED_TEST(TestPolyhedronPolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestPolygonLineIntersect)
+RANDOMIZED_TEST(PolygonLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
@@ -1083,7 +1083,7 @@ RANDOMIZED_TEST(TestPolygonLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolygonRayIntersect)
+RANDOMIZED_TEST(PolygonRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
@@ -1098,7 +1098,7 @@ RANDOMIZED_TEST(TestPolygonRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolygonLineSegmentIntersect)
+RANDOMIZED_TEST(PolygonLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
@@ -1113,7 +1113,7 @@ RANDOMIZED_TEST(TestPolygonLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolygonPlaneIntersect)
+RANDOMIZED_TEST(PolygonPlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
@@ -1128,7 +1128,7 @@ RANDOMIZED_TEST(TestPolygonPlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolygonTriangleIntersect)
+RANDOMIZED_TEST(PolygonTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
@@ -1143,7 +1143,7 @@ RANDOMIZED_TEST(TestPolygonTriangleIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPolygonPolygonIntersect)
+RANDOMIZED_TEST(PolygonPolygonIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
@@ -1160,7 +1160,7 @@ RANDOMIZED_TEST(TestPolygonPolygonIntersect)
 
 
 
-RANDOMIZED_TEST(TestTriangleLineIntersect)
+RANDOMIZED_TEST(TriangleLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
@@ -1175,7 +1175,7 @@ RANDOMIZED_TEST(TestTriangleLineIntersect)
 	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestTriangleRayIntersect)
+RANDOMIZED_TEST(TriangleRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
@@ -1190,7 +1190,7 @@ RANDOMIZED_TEST(TestTriangleRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestTriangleLineSegmentIntersect)
+RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
@@ -1205,7 +1205,7 @@ RANDOMIZED_TEST(TestTriangleLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestTrianglePlaneIntersect)
+RANDOMIZED_TEST(TrianglePlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
@@ -1220,7 +1220,7 @@ RANDOMIZED_TEST(TestTrianglePlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestTriangleTriangleIntersect)
+RANDOMIZED_TEST(TriangleTriangleIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
@@ -1238,7 +1238,7 @@ RANDOMIZED_TEST(TestTriangleTriangleIntersect)
 
 
 
-RANDOMIZED_TEST(TestPlaneLineIntersect)
+RANDOMIZED_TEST(PlaneLineIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
@@ -1253,7 +1253,7 @@ RANDOMIZED_TEST(TestPlaneLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPlaneRayIntersect)
+RANDOMIZED_TEST(PlaneRayIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
@@ -1268,7 +1268,7 @@ RANDOMIZED_TEST(TestPlaneRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPlaneLineSegmentIntersect)
+RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
@@ -1283,7 +1283,7 @@ RANDOMIZED_TEST(TestPlaneLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-RANDOMIZED_TEST(TestPlanePlaneIntersect)
+RANDOMIZED_TEST(PlanePlaneIntersect)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
@@ -1302,7 +1302,7 @@ RANDOMIZED_TEST(TestPlanePlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-TEST(TestPolygonContains2D)
+TEST(PolygonContains2D)
 {
 	float xmin = 0.f, xmax = 10.f, ymin = 0.f, ymax = 10.f, z = 2.f;
 

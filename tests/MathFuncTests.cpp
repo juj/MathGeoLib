@@ -7,7 +7,7 @@
 #include <cmath>
 
 #if __cplusplus >= 201103L
-TEST(TestCXX11StdFinite)
+TEST(CXX11StdFinite)
 {
 	// When using MathGeoLib, users should still be able to invoke C++11 std::isfinite function.
 	// http://en.cppreference.com/w/cpp/numeric/math/isfinite
@@ -28,7 +28,7 @@ TEST(TestCXX11StdFinite)
 }
 #endif
 
-TEST(TestIsFinite)
+TEST(IsFinite)
 {
 	assert(IsFinite(5));
 	assert(IsFinite(5.f));
@@ -52,7 +52,7 @@ TEST(TestIsFinite)
 #endif
 }
 
-TEST(TestIsNan)
+TEST(IsNan)
 {
 	assert(!IsNan(5.f));
 	assert(!IsNan(5.0));
@@ -75,7 +75,7 @@ TEST(TestIsNan)
 #endif
 }
 
-TEST(TestIsInf)
+TEST(IsInf)
 {
 	assert(!IsInf(5.f));
 	assert(!IsInf(5.0));

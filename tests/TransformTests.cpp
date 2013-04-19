@@ -2,7 +2,7 @@
 #include "MathGeoLib.h"
 #include "../tests/TestRunner.h"
 
-TEST(TestTranslateOp)
+TEST(TranslateOp)
 {
 	float3x4 tm = float3x4::Translate(1,2,3);
 	float3x4 tm2;
