@@ -88,7 +88,7 @@ const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
 
 inline __m128 _mm_abs_ps(__m128 x)
 {
-    return _mm_andnot_ps(sign_mask, x);
+	return _mm_andnot_ps(sign_mask, x);
 }
 
 inline __m128 _mm_dot3_ps(__m128 a, __m128 b)
@@ -243,6 +243,7 @@ inline float3 _mm_mat3x4_mul_ps_float3(const __m128 *matrix, __m128 vector)
 }
 
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.
+//inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, __m128 w) // VS2010 BUG! Can't use this signature!
 inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
 {
 	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]

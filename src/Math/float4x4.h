@@ -189,7 +189,7 @@ public:
 	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection, const float3 &centerPoint);
 	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
 
-	/// Returns a random 4x4 matrix with each entry randomized between the range[minElem, maxElem].
+	/// Returns a random 4x4 matrix with each entry randomized between the range [minElem, maxElem].
 	/** Warning: The matrices returned by this function do not represent well-formed 3D transformations.
 		This function is mostly used for testing and debugging purposes only. */
 	static float4x4 RandomGeneral(LCG &lcg, float minElem, float maxElem);
