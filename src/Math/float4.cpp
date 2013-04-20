@@ -953,6 +953,11 @@ float4 float4::RandomDir(LCG &lcg, float length)
 	return float4(Sphere(float3(0,0,0), length).RandomPointOnSurface(lcg), 0.f);
 }
 
+float4 float4::RandomGeneral(LCG &lcg, float minElem, float maxElem)
+{
+	return float4(lcg.Float(minElem, maxElem), lcg.Float(minElem, maxElem), lcg.Float(minElem, maxElem), lcg.Float(minElem, maxElem));
+}
+
 float4 float4::operator +(const float4 &rhs) const
 {
 #ifdef MATH_SSE

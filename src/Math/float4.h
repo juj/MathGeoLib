@@ -596,6 +596,12 @@ public:
 	/// The w-component for the returned vector is 0.
 	static float4 RandomDir(LCG &lcg, float length = 1.f);
 
+	/// Returns a random float4 with each entry randomized between the range [minElem, maxElem].
+	/** Warning: The vectors returned by this function generally have w != 0 or 1, so they don't do not represent
+		well-formed 3D points or direction vectors.
+		This function is mostly used for testing and debugging purposes only. */
+	static float4 RandomGeneral(LCG &lcg, float minElem, float maxElem);
+
 #ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
 	float4 operator *(const float4 &rhs) const { return this->Mul(rhs); }
 	float4 operator /(const float4 &rhs) const { return this->Div(rhs); }
