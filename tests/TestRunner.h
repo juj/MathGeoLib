@@ -29,7 +29,7 @@ void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string d
 void AddTest(std::string name, TestFunctionPtr function, std::string description = "", bool runOnlyOnce = false);
 int RunTests(int numTimes);
 /// Returns -2: no tests left to run, -1: failed, 0: success, 1: success with warnings.
-int RunOneTest(int numTimes, int numTrials);
+int RunOneTest(int numTimes, int numTrials, const char *prefix);
 void PrintTestRunSummary();
 
 class AddTestOp

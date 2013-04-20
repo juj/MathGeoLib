@@ -152,29 +152,38 @@ int RunTest(Test &t, int numTimes, int numTrials)
 
 static int nextTestToRun = 0;
 
-int RunOneTest(int numTimes, int numTrials)
+int RunOneTest(int numTimes, int numTrials, const char *prefix)
 {
-	if (nextTestToRun >= (int)Tests().size())
-		return -2; // No tests left to run
-	int ret = RunTest(Tests()[nextTestToRun++], numTimes, numTrials);
+	std::vector<Test> &tests = Tests();
+	while(nextTestToRun < (int)tests.size())
+	{
+		if (!strncmp(tests[nextTestToRun].name.c_str(), prefix, strlen(prefix)))
+		{
+			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials);
 
-	if (ret == 0 || ret == 1)
-		++numTestsPassed;
-	if (ret == 1)
-		++numTestsWarnings;
-	if (ret == -1)
-		++numTestsFailed;
+			if (ret == 0 || ret == 1)
+				++numTestsPassed;
+			if (ret == 1)
+				++numTestsWarnings;
+			if (ret == -1)
+				++numTestsFailed;
 
-	return ret;
+			++nextTestToRun;
+			return ret;
+		}
+		++nextTestToRun;
+	}
+
+	return -2; // No tests left to run
 }
 
 // Returns the number of failures.
-int RunTests(int numTimes, int numTrials)
+int RunTests(int numTimes, int numTrials, const char *prefix)
 {
 	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
 	for(size_t i = 0; i < Tests().size(); ++i)
-		RunOneTest(numTimes, numTrials);
+		RunOneTest(numTimes, numTrials, prefix);
 
 	PrintTestRunSummary();
 	return numTestsFailed;
@@ -190,8 +199,9 @@ int main(int argc, char **argv)
 {
 	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 10000;
 	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
+	const char *prefix = (argc >= 4) ? argv[3] : "";
 
-	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock);
+	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefix);
 	LOGI("%d", globalPokedData);
 
 	// When --exit0 is passed, we forcibly return 0 and not the number of failed tests.
