@@ -85,7 +85,7 @@ RANDOMIZED_TEST(sse41_mat_vec_mul)
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 #endif
-	if (*accum.ptr() == 0)
+	if (*accum.ptr() == 0) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", accum.ToString().c_str());
 }
 
@@ -105,7 +105,7 @@ RANDOMIZED_TEST(sse3_mat_vec_mul)
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 #endif
-	if (*accum.ptr() == 0)
+	if (*accum.ptr() == 0) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", accum.ToString().c_str());
 }
 
@@ -125,7 +125,7 @@ RANDOMIZED_TEST(sse1_mat_vec_mul)
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 #endif
-	if (*accum.ptr() == 0)
+	if (*accum.ptr() == 0) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", accum.ToString().c_str());
 }
 
@@ -146,7 +146,7 @@ RANDOMIZED_TEST(sse1_colmajor_mat_vec_mul)
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 #endif
-	if (*accum.ptr() == 0)
+	if (*accum.ptr() == 0) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", accum.ToString().c_str());
 }
 
@@ -167,7 +167,7 @@ RANDOMIZED_TEST(sse1_colmajor_mat_vec_mul_2)
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 #endif
-	if (*accum.ptr() == 0)
+	if (*accum.ptr() == 0) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", accum.ToString().c_str());
 }
 
@@ -182,7 +182,7 @@ RANDOMIZED_TEST(sse_scalar_mat_vec_mul)
 		float4 res = m[i] * v[i];
 		accum += res;
 	}
-	if (*accum.ptr() == 0)
+	if (*accum.ptr() == 0) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", accum.ToString().c_str());
 }
 
@@ -203,7 +203,7 @@ RANDOMIZED_TEST(sse_mat_mat_mul)
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 #endif
-	if (*(char*)m2 == 0)
+	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", m2[0].ToString().c_str());
 }
 
@@ -224,7 +224,7 @@ RANDOMIZED_TEST(sse_mat_mat_mul_2)
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 #endif
-	if (*(char*)m2 == 0)
+	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", m2[0].ToString().c_str());
 }
 
@@ -245,7 +245,7 @@ RANDOMIZED_TEST(sse_mat_mat_mul_3)
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 #endif
-	if (*(char*)m2 == 0)
+	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", m2[0].ToString().c_str());
 }
 
@@ -266,7 +266,7 @@ RANDOMIZED_TEST(sse_mat_mat_mul_ps)
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 #endif
-	if (*(char*)m2 == 0)
+	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", m2[0].ToString().c_str());
 }
 
@@ -287,7 +287,7 @@ RANDOMIZED_TEST(sse_mat_mat_mul_ps_2)
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 #endif
-	if (*(char*)m2 == 0)
+	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", m2[0].ToString().c_str());
 }
 
@@ -299,7 +299,7 @@ RANDOMIZED_TEST(sse_scalar_mat_mat_mul)
 	for(int i = 0; i < N; ++i)
 		m2[i] = m[0] * m[i];
 
-	if (*(char*)m2 == 0)
+	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
 		LOGI("%s", m2[0].ToString().c_str());
 }
 
