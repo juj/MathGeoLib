@@ -25,12 +25,12 @@
 
 MATH_BEGIN_NAMESPACE
 
-#ifdef MATH_SSE2 // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
+#if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
 
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
 #define _mm_shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
 
-#else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand (when AVX is not available)
+#else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
 
 #define _mm_shuffle1_ps(reg, shuffle) _mm_shuffle_ps((reg), (reg), (shuffle))
 
