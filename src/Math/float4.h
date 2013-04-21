@@ -244,6 +244,12 @@ public:
 	/// Returns the (x, y, z) part of this vector.
 	float3 xyz() const;
 
+	/// Reinterpret-casts the (x, y, z) part of this vector.
+	/** @note This aliases into this float4! Use xyz() to make a copy.
+		@see xyz() */
+	float3 &Float3Part() { return *reinterpret_cast<float3*>(this); }
+	const float3 &Float3Part() const { return *reinterpret_cast<const float3*>(this); }
+
 	/// Performs a swizzled access to this vector.
 	/** For example, Swizzled(2,1,0) return float3(z,y,x). Swizzled(3,3,3,3) returns float4(w,w,w,w).
 		@param i Chooses the element of this vector to pick for the x value of the returned vector, in the range [0, 3].
