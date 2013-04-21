@@ -284,18 +284,42 @@ inline __m128 _mm_colmajor_mat4x4_mul_ps_avx(const __m256 *matrix, __m128 vector
 
 inline __m128 _mm_colmajor_mat4x4_mul_ps_avx_2(const __m256 *matrix, __m128 vector)
 {
-	__m128 zwxy = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2,3,0,1));
-	__m256 v = _mm256_insertf128_ps(_mm256_castps128_ps256(vector), zwxy, 1); // [zwxywzyx]
-	__m256 yx = _mm256_shuffle_ps(v, v, _MM_SHUFFLE(0,0,0,0)); // [yyyyxxxx]
-	__m256 wz = _mm256_shuffle_ps(v, v, _MM_SHUFFLE(2,2,2,2)); // [wwwwzzzz]
+	__m128 zwxy = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2,3,0,1));						// Latency: 1, Throughput: 1
+	__m256 v = _mm256_insertf128_ps(_mm256_castps128_ps256(vector), zwxy, 1); // [zwxywzyx] // ?
+	__m256 yx = _mm256_shuffle_ps(v, v, _MM_SHUFFLE(0,0,0,0)); // [yyyyxxxx]				// Latency: 1, Throughput: 1
+	__m256 wz = _mm256_shuffle_ps(v, v, _MM_SHUFFLE(2,2,2,2)); // [wwwwzzzz]				// Latency: 1, Throughput: 1
 
-	yx = _mm256_mul_ps(matrix[0], yx);
+	yx = _mm256_mul_ps(matrix[0], yx); // Latency: 5, Throughput: 1
 	wz = _mm256_mul_ps(matrix[1], wz);
 
-	__m256 wzyx = _mm256_add_ps(wz, yx);
-	__m128 hi = _mm256_extractf128_ps(wzyx, 1);
-	__m128 lo = _mm256_castps256_ps128(wzyx);
-	return _mm_add_ps(hi, lo);
+	__m256 wzyx = _mm256_add_ps(wz, yx); // Latency: 3, Throughput: 1
+	__m128 hi = _mm256_extractf128_ps(wzyx, 1); // Latency: 3, Throughput: 1
+	__m128 lo = _mm256_castps256_ps128(wzyx); // -
+	return _mm_add_ps(hi, lo); // Latency: 3, Throughput: 1
+}
+
+RANDOMIZED_TEST(sse_float3_cross)
+{
+	float4 *v = VectorArray();
+	float4 *v2 = VectorArray2();
+
+	for(int i = 0; i < N; ++i)
+		v2[i].Float3Part() = v[i].Float3Part().Cross(v2[i].Float3Part());
+
+	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
+		LOGI("%s", v2[0].ToString().c_str());
+}
+
+RANDOMIZED_TEST(sse_float4_cross)
+{
+	float4 *v = VectorArray();
+	float4 *v2 = VectorArray2();
+
+	for(int i = 0; i < N; ++i)
+		v2[i] = v[i].Cross3(v2[i]);
+
+	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
+		LOGI("%s", v2[0].ToString().c_str());
 }
 
 RANDOMIZED_TEST(sse_avx_mat_vec_mul)
@@ -322,9 +346,20 @@ RANDOMIZED_TEST(sse_avx_2_mat_vec_mul)
 	float4 *v = VectorArray();
 	float4 *v2 = VectorArray2();
 
+//	static unsigned long long bestTicks = 0xFFFFFFFFFFULL;
+
+//	unsigned long long time = __rdtsc();
 	for(int i = 0; i < N; ++i)
 		v2[i] = _mm_mat4x4_mul_ps_avx_2((__m256*)&m[i].row, v[i]);
 
+//	unsigned long long time2 = __rdtsc() - time;
+
+//	if (time2 < bestTicks)
+//	{
+//		bestTicks = time2;
+//		double t = (double)time2 / N;
+//		printf("%g ticks.\n", t);
+//	}
 #ifdef TEST_SSE_CORRECTNESS
 	float4 res = _mm_mat4x4_mul_ps_avx_2((__m256*)&m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
