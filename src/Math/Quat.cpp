@@ -211,13 +211,13 @@ float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 	assume(vec.IsWZeroOrOne());
 
 #ifdef MATH_SSE
-	__m128 W = _mm_shuffle1_ps(q, _MM_SHUFFLE(3,3,3,3));
+	__m128 W = shuffle1_ps(q, _MM_SHUFFLE(3,3,3,3));
 
-//	__m128 qxv = _mm_cross_ps(q, vec.v);
-	__m128 a_xzy = _mm_shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
-	__m128 b_yxz = _mm_shuffle1_ps(vec.v, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-	__m128 a_yxz = _mm_shuffle1_ps(q, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
-	__m128 b_xzy = _mm_shuffle1_ps(vec.v, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
+//	__m128 qxv = cross_ps(q, vec.v);
+	__m128 a_xzy = shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
+	__m128 b_yxz = shuffle1_ps(vec.v, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
+	__m128 a_yxz = shuffle1_ps(q, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
+	__m128 b_xzy = shuffle1_ps(vec.v, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
 	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
 	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
 	__m128 qxv = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
@@ -225,9 +225,9 @@ float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 	__m128 Wv = _mm_mul_ps(W, vec.v);
 	__m128 s = _mm_add_ps(qxv, Wv);
 
-//	s = _mm_cross_ps(q, s);
-	__m128 s_yxz = _mm_shuffle1_ps(s, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-	__m128 s_xzy = _mm_shuffle1_ps(s, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
+//	s = cross_ps(q, s);
+	__m128 s_yxz = shuffle1_ps(s, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
+	__m128 s_xzy = shuffle1_ps(s, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
 	x = _mm_mul_ps(a_xzy, s_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
 	y = _mm_mul_ps(a_yxz, s_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
 	s = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]

@@ -31,6 +31,7 @@
 #include "Math/float4x4.h"
 #include "Math/MathFunc.h"
 #include "SSEMath.h"
+#include "float4_sse.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -144,25 +145,25 @@ __m128 float4::Swizzled_SSE(int i, int j, int k, int l) const
 /// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.
 __m128 float4::LengthSq3_SSE() const
 {
-	return _mm_dot3_ps(v, v);
+	return dot3_ps(v, v);
 }
 
 /// The returned vector contains the length of the float3 part in the lowest channel of the vector.
 __m128 float4::Length3_SSE() const
 {
-	return _mm_sqrt_ss(_mm_dot3_ps(v, v));
+	return _mm_sqrt_ss(dot3_ps(v, v));
 }
 
 /// The returned vector contains the squared length of the float4 in each channel of the vector.
 __m128 float4::LengthSq4_SSE() const
 {
-	return _mm_dot4_ps(v, v);
+	return dot4_ps(v, v);
 }
 
 /// The returned vector contains the length of the float4 in the lowest channel of the vector.
 __m128 float4::Length4_SSE() const
 {
-	return _mm_sqrt_ss(_mm_dot4_ps(v, v));
+	return _mm_sqrt_ss(dot4_ps(v, v));
 }
 
 __m128 float4::Normalize3_SSE()
@@ -179,7 +180,7 @@ void float4::Normalize3_Fast_SSE()
 {
 	__m128 len = Length3_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
+	len = shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
@@ -188,7 +189,7 @@ __m128 float4::Normalize4_SSE()
 {
 	__m128 len = Length4_SSE();
 	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
+	len = shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
@@ -197,13 +198,13 @@ __m128 float4::Normalize4_SSE()
 
 void float4::Normalize4_Fast_SSE()
 {
-	__m128 recipLen = _mm_rsqrt_ps(_mm_dot4_ps(v, v));
+	__m128 recipLen = _mm_rsqrt_ps(dot4_ps(v, v));
 	v = _mm_mul_ps(v, recipLen);
 }
 
 void float4::NormalizeW_SSE()
 {
-	__m128 div = _mm_shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
+	__m128 div = shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
 	v = _mm_div_ps(v, div);
 }
 
@@ -357,7 +358,7 @@ void float4::Scale3(float scalar)
 	__m128 scale = FLOAT_TO_M128(scalar);
 	__m128 one = _mm_set_ss(1.f);
 	scale = _mm_shuffle_ps(scale, one, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
-	scale = _mm_shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
+	scale = shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
 	v = _mm_mul_ps(v, scale);
 #else
 	x *= scalar;
@@ -447,7 +448,7 @@ float4 float4::FromString(const char *str)
 float float4::SumOfElements() const
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_sum_xyzw_ps(v));
+	return M128_TO_FLOAT(sum_xyzw_ps(v));
 #else
 	return x + y + z + w;
 #endif
@@ -456,7 +457,7 @@ float float4::SumOfElements() const
 float float4::ProductOfElements() const
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_mul_xyzw_ps(v));
+	return M128_TO_FLOAT(mul_xyzw_ps(v));
 #else
 	return x * y * z * w;
 #endif
@@ -692,7 +693,7 @@ float float4::Distance4(const float4 &rhs) const
 float float4::Dot3(const float3 &rhs) const
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_dot3_ps(v, float4(rhs, 0.f).v));
+	return M128_TO_FLOAT(dot3_ps(v, float4(rhs, 0.f).v));
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 #endif
@@ -701,7 +702,7 @@ float float4::Dot3(const float3 &rhs) const
 float float4::Dot3(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_dot3_ps(v, rhs.v));
+	return M128_TO_FLOAT(dot3_ps(v, rhs.v));
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 #endif
@@ -710,7 +711,7 @@ float float4::Dot3(const float4 &rhs) const
 float float4::Dot4(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_dot4_ps(v, rhs.v));
+	return M128_TO_FLOAT(dot4_ps(v, rhs.v));
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
 #endif
@@ -740,7 +741,7 @@ i x j == -(j x i) == k,
 float4 float4::Cross3(const float3 &rhs) const
 {
 #ifdef MATH_SSE
-	return float4(_mm_cross_ps(v, float4(rhs, 0.f).v));
+	return float4(cross_ps(v, float4(rhs, 0.f).v));
 #else
 	float4 dst;
 	dst.x = y * rhs.z - z * rhs.y;
@@ -754,7 +755,7 @@ float4 float4::Cross3(const float3 &rhs) const
 float4 float4::Cross3(const float4 &rhs) const
 {
 #ifdef MATH_SSE
-	return float4(_mm_cross_ps(v, rhs.v));
+	return float4(cross_ps(v, rhs.v));
 #else
 	return Cross3(rhs.xyz());
 #endif

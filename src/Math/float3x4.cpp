@@ -29,6 +29,7 @@
 #include "Geometry/Plane.h"
 #include "TransformOps.h"
 #include "SSEMath.h"
+#include "float4x4_sse.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
@@ -1069,7 +1070,7 @@ void float3x4::RemoveScale()
 float3 float3x4::TransformPos(const float3 &pointVector) const
 {
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
+	return mat3x4_mul_vec(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
 #else
 	return TransformPos(pointVector.x, pointVector.y, pointVector.z);
 #endif
@@ -1078,7 +1079,7 @@ float3 float3x4::TransformPos(const float3 &pointVector) const
 float3 float3x4::TransformPos(float x, float y, float z) const
 {
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1, z, y, x));
+	return mat3x4_mul_vec(row, _mm_set_ps(1, z, y, x));
 #else
 	return float3(DOT3_xyz(v[0], x,y,z) + v[0][3],
 				  DOT3_xyz(v[1], x,y,z) + v[1][3],
@@ -1089,7 +1090,7 @@ float3 float3x4::TransformPos(float x, float y, float z) const
 float3 float3x4::TransformDir(const float3 &directionVector) const
 {
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
+	return mat3x4_mul_vec(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
 #else
 	return TransformDir(directionVector.x, directionVector.y, directionVector.z);
 #endif
@@ -1098,7 +1099,7 @@ float3 float3x4::TransformDir(const float3 &directionVector) const
 float3 float3x4::TransformDir(float x, float y, float z) const
 {
 #ifdef MATH_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0, z, y, x));
+	return mat3x4_mul_vec(row, _mm_set_ps(0, z, y, x));
 #else
 	return float3(DOT3_xyz(v[0], x,y,z),
 				  DOT3_xyz(v[1], x,y,z),
@@ -1109,7 +1110,7 @@ float3 float3x4::TransformDir(float x, float y, float z) const
 float4 float3x4::Transform(const float4 &vector) const
 {
 #ifdef MATH_SSE
-	return float4(_mm_mat3x4_mul_ps(row, vector.v));
+	return float4(mat3x4_mul_sse(row, vector.v));
 #else
 	return float4(DOT4(v[0], vector),
 				  DOT4(v[1], vector),
@@ -1228,7 +1229,7 @@ float3x4 float3x4::operator *(const float3x4 &rhs) const
 {
 	float3x4 r;
 #ifdef MATH_SSE
-	_mm_mat3x4_mul_ps(r.row, row, rhs.row);
+	mat3x4_mul_sse(r.row, row, rhs.row);
 #else
 	const float *c0 = rhs.ptr();
 	const float *c1 = rhs.ptr() + 1;

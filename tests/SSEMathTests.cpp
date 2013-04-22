@@ -7,6 +7,7 @@
 #include "TestRunner.h"
 
 #include "Math/SSEMath.h"
+#include "Math/float4x4_sse.h"
 
 // In debug mode, we test the correctness of the SSE code. In release mode, we benchmark performance.
 #ifdef _DEBUG
@@ -368,11 +369,11 @@ BENCHMARK(sse41_mat_vec_mul)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_mat4x4_mul_ps_sse41(m[i].row, v[i]);
+		v2[i] = mat4x4_mul_sse41(m[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_mat4x4_mul_ps_sse41(m[0].row, v[0]);
+	float4 res = mat4x4_mul_sse41(m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -385,11 +386,11 @@ BENCHMARK(sse3_mat_vec_mul)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_mat4x4_mul_ps_sse3(m[i].row, v[i]);
+		v2[i] = mat4x4_mul_sse3(m[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_mat4x4_mul_ps_sse3(m[0].row, v[0]);
+	float4 res = mat4x4_mul_sse3(m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -402,11 +403,11 @@ BENCHMARK(sse1_mat_vec_mul)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_mat4x4_mul_ps_sse1(m[i].row, v[i]);
+		v2[i] = mat4x4_mul_sse1(m[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_mat4x4_mul_ps_sse1(m[0].row, v[0]);
+	float4 res = mat4x4_mul_sse1(m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -415,12 +416,12 @@ BENCHMARK(sse1_colmajor_mat_vec_mul)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_colmajor_mat4x4_mul_ps_sse1(tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_sse1(tm[i].row, v[i]);
 	}
 	TIMER_END;
 
 	float4x4 *m = MatrixArray();
-	float4 res = _mm_colmajor_mat4x4_mul_ps_sse1(tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_sse1(tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -429,11 +430,11 @@ BENCHMARK(sse1_colmajor_mat_vec_mul_2)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_colmajor_mat4x4_mul_ps_sse1_2(tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_sse1_2(tm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_colmajor_mat4x4_mul_ps_sse1_2(tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_sse1_2(tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -473,13 +474,13 @@ BENCHMARK(sse_mat_mat_mul)
 	TIMER_BEGIN
 	{
 		float4x4 res;
-		_mm_mat4x4_mul_ps_dpps(res.row, m[0].row, m[i].row);
+		mat4x4_mul_dpps(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
 	TIMER_END;
 
 	float4x4 res;
-	_mm_mat4x4_mul_ps_dpps(res.row, m[0].row, m[1].row);
+	mat4x4_mul_dpps(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 }
@@ -489,13 +490,13 @@ BENCHMARK(sse_mat_mat_mul_2)
 	TIMER_BEGIN
 	{
 		float4x4 res;
-		_mm_mat4x4_mul_ps_dpps_2(res.row, m[0].row, m[i].row);
+		mat4x4_mul_dpps_2(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
 	TIMER_END;
 
 	float4x4 res;
-	_mm_mat4x4_mul_ps_dpps_2(res.row, m[0].row, m[1].row);
+	mat4x4_mul_dpps_2(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 }
@@ -505,13 +506,13 @@ BENCHMARK(sse_mat_mat_mul_3)
 	TIMER_BEGIN
 	{
 		float4x4 res;
-		_mm_mat4x4_mul_ps_dpps_3(res.row, m[0].row, m[i].row);
+		mat4x4_mul_dpps_3(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
 	TIMER_END;
 
 	float4x4 res;
-	_mm_mat4x4_mul_ps_dpps_3(res.row, m[0].row, m[1].row);
+	mat4x4_mul_dpps_3(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 }
@@ -521,13 +522,13 @@ BENCHMARK(sse_mat_mat_mul_ps)
 	TIMER_BEGIN
 	{
 		float4x4 res;
-		_mm_mat4x4_mul_ps(res.row, m[0].row, m[i].row);
+		mat4x4_mul_sse(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
 	TIMER_END;
 
 	float4x4 res;
-	_mm_mat4x4_mul_ps(res.row, m[0].row, m[1].row);
+	mat4x4_mul_sse(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 }
@@ -537,13 +538,13 @@ BENCHMARK(sse_mat_mat_mul_ps_2)
 	TIMER_BEGIN
 	{
 		float4x4 res;
-		_mm_mat4x4_mul_ps_2(res.row, m[0].row, m[i].row);
+		mat4x4_mul_sse_2(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
 	TIMER_END;
 
 	float4x4 res;
-	_mm_mat4x4_mul_ps_2(res.row, m[0].row, m[1].row);
+	mat4x4_mul_sse_2(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
 }

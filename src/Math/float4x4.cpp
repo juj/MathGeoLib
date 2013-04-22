@@ -29,6 +29,7 @@
 #include "Geometry/Plane.h"
 #include "Algorithm/Random/LCG.h"
 #include "SSEMath.h"
+#include "float4x4_sse.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
@@ -1426,7 +1427,7 @@ float3 float4x4::TransformPos(const float3 &pointVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_AUTOMATIC_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
+	return mat3x4_mul_vec(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
 #else
 	return TransformPos(pointVector.x, pointVector.y, pointVector.z);
 #endif
@@ -1436,7 +1437,7 @@ float3 float4x4::TransformPos(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_AUTOMATIC_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(1.f, z, y, x));
+	return mat3x4_mul_vec(row, _mm_set_ps(1.f, z, y, x));
 #else
 	return float3(DOT4POS_xyz(Row(0), x,y,z),
 				  DOT4POS_xyz(Row(1), x,y,z),
@@ -1448,7 +1449,7 @@ float3 float4x4::TransformDir(const float3 &directionVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_AUTOMATIC_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
+	return mat3x4_mul_vec(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
 #else
 	return TransformDir(directionVector.x, directionVector.y, directionVector.z);
 #endif
@@ -1458,7 +1459,7 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #ifdef MATH_AUTOMATIC_SSE
-	return _mm_mat3x4_mul_ps_float3(row, _mm_set_ps(0.f, z, y, x));
+	return mat3x4_mul_vec(row, _mm_set_ps(0.f, z, y, x));
 #else
 	return float3(DOT4DIR_xyz(Row(0), x,y,z),
 				  DOT4DIR_xyz(Row(1), x,y,z),
@@ -1469,7 +1470,7 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 float4 float4x4::Transform(const float4 &vector) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return float4(_mm_mat4x4_mul_ps(row, vector.v));
+	return float4(mat4x4_mul_sse(row, vector.v));
 #else
 	return float4(DOT4(Row(0), vector),
 				  DOT4(Row(1), vector),
@@ -1624,7 +1625,7 @@ float4x4 float4x4::operator *(const float4x4 &rhs) const
 {
 	float4x4 r;
 #ifdef MATH_AUTOMATIC_SSE
-	_mm_mat4x4_mul_ps(r.row, this->row, rhs.row);
+	mat4x4_mul_sse(r.row, this->row, rhs.row);
 #else
 	const float *c0 = rhs.ptr();
 	const float *c1 = rhs.ptr() + 1;
@@ -2137,42 +2138,42 @@ float4 float4x4::Mul(const float4 &vector) const { return *this * vector; }
 #ifdef MATH_SSE41
 float4 float4x4::Mul_SSE41(const float4 &rhs) const
 {
-	return float4(_mm_mat4x4_mul_ps_sse41(row, rhs.v));
+	return float4(mat4x4_mul_sse41(row, rhs.v));
 }
 #endif
 
 #ifdef MATH_SSE3
 float4 float4x4::Mul_SSE3(const float4 &rhs) const
 {
-	return float4(_mm_mat4x4_mul_ps_sse3(row, rhs.v));
+	return float4(mat4x4_mul_sse3(row, rhs.v));
 }
 #endif
 
 #ifdef MATH_SSE
 float4 float4x4::Mul_SSE1(const float4 &rhs) const
 {
-	return float4(_mm_mat4x4_mul_ps_sse1(row, rhs.v));
+	return float4(mat4x4_mul_sse1(row, rhs.v));
 }
 
 float4 float4x4::Mul_SSE(const float4 &rhs) const
 {
-	return float4(_mm_mat4x4_mul_ps(row, rhs.v));
+	return float4(mat4x4_mul_sse(row, rhs.v));
 }
 
 float4 float4x4::Mul_ColMajor_SSE(const float4 &rhs) const
 {
-	return float4(_mm_colmajor_mat4x4_mul_ps_sse1(row, rhs.v));
+	return float4(colmajor_mat4x4_mul_sse1(row, rhs.v));
 }
 
 float4 float4x4::Mul_ColMajor_SSE_2(const float4 &rhs) const
 {
-	return float4(_mm_colmajor_mat4x4_mul_ps_sse1_2(row, rhs.v));
+	return float4(colmajor_mat4x4_mul_sse1_2(row, rhs.v));
 }
 
 float4x4 float4x4::Mul_SSE(const float4x4 &rhs) const
 {
 	float4x4 r;
-	_mm_mat4x4_mul_ps(r.row, row, rhs.row);
+	mat4x4_mul_sse(r.row, row, rhs.row);
 	return r;
 }
 
@@ -2180,21 +2181,21 @@ float4x4 float4x4::Mul_SSE(const float4x4 &rhs) const
 float4x4 float4x4::Mul_SSE1_2(const float4x4 &rhs) const
 {
 	float4x4 r;
-	_mm_mat4x4_mul_ps_2(r.row, row, rhs.row);
+	mat4x4_mul_sse_2(r.row, row, rhs.row);
 	return r;
 }
 
 float4x4 float4x4::Mul_SSE1_dpps(const float4x4 &rhs) const
 {
 	float4x4 r;
-	_mm_mat4x4_mul_ps_dpps(r.row, row, rhs.row);
+	mat4x4_mul_dpps(r.row, row, rhs.row);
 	return r;
 }
 
 float4x4 float4x4::Mul_SSE1_dpps_2(const float4x4 &rhs) const
 {
 	float4x4 r;
-	_mm_mat4x4_mul_ps_dpps_2(r.row, row, rhs.row);
+	mat4x4_mul_dpps_2(r.row, row, rhs.row);
 	return r;
 }
 */
