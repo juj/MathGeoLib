@@ -272,7 +272,8 @@ FORCE_INLINE float Sqrt(float x)
 FORCE_INLINE float SqrtFast(float x)
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_rcp_ss(_mm_rsqrt_ss(FLOAT_TO_M128(x))));
+	__m128 X = FLOAT_TO_M128(x);
+	return M128_TO_FLOAT(_mm_mul_ss(X, _mm_rsqrt_ss(X)));
 #else
 	return sqrtf(x);
 #endif

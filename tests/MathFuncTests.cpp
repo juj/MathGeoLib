@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "MathGeoLib.h"
 #include "myassert.h"
@@ -138,6 +139,34 @@ float NewtonRhapsonSSESqrt(float x)
 
 	return M128_TO_FLOAT(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
+
+float NewtonRhapsonSSESqrt2(float x)
+{
+	__m128 X = FLOAT_TO_M128(x);
+	__m128 estimate = _mm_rsqrt_ss(_mm_rcp_ss(X));
+	__m128 e2 = _mm_mul_ss(estimate,estimate);
+	__m128 half = _mm_set_ss(0.5f);
+	__m128 recipEst = _mm_rcp_ss(estimate);
+
+	return M128_TO_FLOAT(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
+}
+
+float NewtonRhapsonSSESqrt3(float x)
+{
+	__m128 X = FLOAT_TO_M128(x);
+	__m128 estimate = _mm_mul_ss(X, _mm_rsqrt_ss(X));
+	__m128 e2 = _mm_mul_ss(estimate,estimate);
+	__m128 half = _mm_set_ss(0.5f);
+	__m128 recipEst = _mm_rcp_ss(estimate);
+
+	return M128_TO_FLOAT(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
+}
+
+float Sqrt_Via_Rcp_RSqrt(float x)
+{
+	return M128_TO_FLOAT(_mm_rcp_ss(_mm_rsqrt_ss(FLOAT_TO_M128(x))));
+}
+
 #endif
 
 float *PosFloatArray()
@@ -161,41 +190,47 @@ extern float *f;
 
 UNIQUE_TEST(sqrt_precision)
 {
-	float maxRelError1 = 0.f;
-	float maxRelError2 = 0.f;
-	float maxRelError3 = 0.f;
-#ifdef MATH_SSE
-	float maxRelError4 = 0.f;
-#endif
+	const int C = 7;
+	float maxRelError[C] = {};
+
 	for(int i = 0; i < 1000000; ++i)
 	{
 		float f = rng.Float(0.f, 1e20f);
 		float x = (float)sqrt((double)f); // best precision of the sqrt.
 
-		float x1 = Sqrt(f);
-		maxRelError1 = Max(RelativeError(x, x1), maxRelError1);
-
-		float x2 = SqrtFast(f);
-		maxRelError2 = Max(RelativeError(x, x2), maxRelError2);
-
-		float x3 = NewtonRhapsonSqrt(f);
-		maxRelError3 = Max(RelativeError(x, x3), maxRelError3);
-
+		float X[C];
+		X[0] = Sqrt(f);
+		X[1] = SqrtFast(f);
+		X[2] = NewtonRhapsonSqrt(f);
 #ifdef MATH_SSE
-		float x4 = NewtonRhapsonSSESqrt(f);
-		maxRelError4 = Max(RelativeError(x, x4), maxRelError4);
+		X[3] = NewtonRhapsonSSESqrt(f);
+		X[4] = NewtonRhapsonSSESqrt2(f);
+		X[5] = NewtonRhapsonSSESqrt3(f);
+		X[6] = Sqrt_Via_Rcp_RSqrt(f);
 #endif
+
+		for(int j = 0; j < C; ++j)
+			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
 	}
 
-	LOGI("Max relative error with Sqrt: %e", maxRelError1);
-	assert(maxRelError1 < 1e-9f);
-	LOGI("Max relative error with SqrtFast: %e", maxRelError2);
-	assert(maxRelError2 < 1e-3f);
-	LOGI("Max relative error with NewtonRhapsonSqrt: %e", maxRelError3);
-	assert(maxRelError3 < 1e-6f);
+	LOGI("Max relative error with Sqrt: %e", maxRelError[0]);
+	assert(maxRelError[0] < 1e-9f);
+	LOGI("Max relative error with SqrtFast: %e", maxRelError[1]);
+	assert(maxRelError[1] < 1e-3f);
+	LOGI("Max relative error with NewtonRhapsonSqrt: %e", maxRelError[2]);
+	assert(maxRelError[2] < 1e-6f);
 #ifdef MATH_SSE
-	LOGI("Max relative error with NewtonRhapsonSSESqrt: %e", maxRelError4);
-	assert(maxRelError4 < 1e-6f);
+	LOGI("Max relative error with NewtonRhapsonSSESqrt: %e", maxRelError[3]);
+	assert(maxRelError[3] < 1e-6f);
+
+	LOGI("Max relative error with NewtonRhapsonSSESqrt2: %e", maxRelError[4]);
+	assert(maxRelError[4] < 1e-6f);
+
+	LOGI("Max relative error with NewtonRhapsonSSESqrt3: %e", maxRelError[5]);
+	assert(maxRelError[5] < 1e-6f);
+
+	LOGI("Max relative error with Sqrt_Via_Rcp_RSqrt: %e", maxRelError[6]);
+	assert(maxRelError[6] < 1e-3f);
 #endif
 }
 
@@ -241,6 +276,33 @@ BENCHMARK(sqrt_NewtonRhapsonSSESqrt)
 	TIMER_BEGIN
 	{
 		f[i] = NewtonRhapsonSSESqrt(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_NewtonRhapsonSSESqrt2)
+{
+	TIMER_BEGIN
+	{
+		f[i] = NewtonRhapsonSSESqrt2(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_NewtonRhapsonSSESqrt3)
+{
+	TIMER_BEGIN
+	{
+		f[i] = NewtonRhapsonSSESqrt3(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_Sqrt_Via_Rcp_RSqrt)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Sqrt_Via_Rcp_RSqrt(pf[i]);
 	}
 	TIMER_END
 }
