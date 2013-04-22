@@ -435,7 +435,7 @@ bool Triangle::Intersects(const LineSegment &l, float *d, float3 *intersectionPo
 	float length = l.LengthSq();
 	if (t < 0.f || t*t >= length)
 		return false;
-	length = sqrtf(length);
+	length = Sqrt(length);
 	if (d)
 	{
 		float len = t / length;

@@ -132,7 +132,7 @@ float float3::LengthSq() const
 
 float float3::Length() const
 {
-	return sqrtf(LengthSq());
+	return Sqrt(LengthSq());
 }
 
 float float3::Normalize()
@@ -169,7 +169,7 @@ float float3::ScaleToLength(float newLength)
 		return 0.f;
 	}
 
-	length = sqrtf(length);
+	length = Sqrt(length);
 	float scalar = newLength / length;
 	x *= scalar;
 	y *= scalar;
@@ -370,7 +370,7 @@ float float3::DistanceSq(const float3 &rhs) const
 
 float float3::Distance(const float3 &rhs) const
 {
-	return sqrtf(DistanceSq(rhs));
+	return Sqrt(DistanceSq(rhs));
 }
 
 float float3::Distance(const Line &rhs) const { return rhs.Distance(*this); }

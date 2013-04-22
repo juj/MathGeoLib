@@ -205,10 +205,8 @@ __m128 float4::Normalize4_SSE()
 
 void float4::Normalize4_Fast_SSE()
 {
-	__m128 len = Length4_SSE();
-	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
-	v = _mm_div_ps(v, len); // Normalize.
+	__m128 recipLen = _mm_rsqrt_ps(_mm_dot4_ps(v, v));
+	v = _mm_mul_ps(v, recipLen);
 }
 
 void float4::NormalizeW_SSE()
@@ -233,7 +231,7 @@ float float4::Length3() const
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(Length3_SSE());
 #else
-	return sqrtf(x*x + y*y + z*z);
+	return Sqrt(x*x + y*y + z*z);
 #endif
 }
 
@@ -251,7 +249,7 @@ float float4::Length4() const
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(Length4_SSE());
 #else
-	return sqrtf(x*x + y*y + z*z + w*w);
+	return Sqrt(x*x + y*y + z*z + w*w);
 #endif
 }
 
@@ -265,7 +263,7 @@ float float4::Normalize3()
 	float lengthSq = LengthSq3();
 	if (lengthSq > 1e-6f)
 	{
-		float length = sqrtf(lengthSq);
+		float length = Sqrt(lengthSq);
 		float invLength = 1.f / length;
 		x *= invLength;
 		y *= invLength;
@@ -299,7 +297,7 @@ float float4::Normalize4()
 	float lengthSq = LengthSq4();
 	if (lengthSq > 1e-6f)
 	{
-		float length = sqrtf(lengthSq);
+		float length = Sqrt(lengthSq);
 		*this *= 1.f / length;
 		return length;
 	}
@@ -384,7 +382,7 @@ float float4::ScaleToLength3(float newLength)
 	if (length < 1e-6f)
 		return 0.f;
 
-	length = sqrtf(length);
+	length = Sqrt(length);
 	float scalar = newLength / length;
 	x *= scalar;
 	y *= scalar;
@@ -671,7 +669,7 @@ float float4::Distance3(const float4 &rhs) const
 	__m128 v2 = _mm_sub_ps(v, rhs.v);
 	return M128_TO_FLOAT(float4(v2).Length3_SSE());
 #else
-	return sqrtf(Distance3Sq(rhs));
+	return Sqrt(Distance3Sq(rhs));
 #endif
 }
 
@@ -695,7 +693,7 @@ float float4::Distance4(const float4 &rhs) const
 	__m128 v2 = _mm_sub_ps(v, rhs.v);
 	return M128_TO_FLOAT(float4(v2).Length4_SSE());
 #else
-	return sqrtf(Distance4Sq(rhs));
+	return Sqrt(Distance4Sq(rhs));
 #endif
 }
 
@@ -725,22 +723,6 @@ float float4::Dot4(const float4 &rhs) const
 	return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
 #endif
 }
-
-#ifdef MATH_SSE
-__m128 _mm_cross_ps(__m128 a, __m128 b)
-{
-	__m128 a_xzy = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
-	__m128 b_yxz = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-
-	__m128 a_yxz = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
-	__m128 b_xzy = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
-
-	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-
-	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
-}
-#endif
 
 /** dst = A x B - Apply the diagonal rule to derive the standard cross product formula:
 \code

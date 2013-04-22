@@ -114,11 +114,22 @@ inline __m128 _mm_dot4_ps(__m128 a, __m128 b)
 #endif
 }
 
-inline float M128_TO_FLOAT(__m128 sse)
+/// Returns the lowest element of the given sse register as a float.
+/// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
+/// the resulting float is represented in an XMM register as well. Check the disassembly to confirm!
+FORCE_INLINE float M128_TO_FLOAT(__m128 sse)
 {
 	float ret;
 	_mm_store_ss(&ret, sse);
 	return ret;
+}
+
+/// Returns a SSE variable with the given float f in the lowest index. The three higher indices are undefined.
+/// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast" if the given 
+/// float is already in a register, since it will lie in an XMM register already. Check the disassembly to confirm!
+FORCE_INLINE __m128 FLOAT_TO_M128(float f)
+{
+	return _mm_load_ss(&f);
 }
 
 const __m128 epsilonFloat = _mm_set1_ps(1e-4f);
@@ -167,6 +178,21 @@ inline __m128 _mm_mat4x4_mul_ps_sse3(const __m128 *matrix, __m128 vector)
 #endif
 
 #ifdef MATH_SSE
+
+inline __m128 _mm_cross_ps(__m128 a, __m128 b)
+{
+	__m128 a_xzy = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
+	__m128 b_yxz = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
+
+	__m128 a_yxz = _mm_shuffle1_ps(a, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
+	__m128 b_xzy = _mm_shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
+
+	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
+	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+
+	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+}
+
 inline __m128 _mm_mat4x4_mul_ps_sse1(const __m128 *matrix, __m128 vector)
 {
 	__m128 x = _mm_mul_ps(matrix[0], vector);
@@ -262,7 +288,7 @@ inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
 	row2 = _mm_movelh_ps(tmp1, tmp3); \
 	row3 = _mm_movehl_ps(tmp3, tmp1);
 
-__forceinline void _mm_mat4x4_mul_ps_dpps(__m128 *out, const __m128 *m1, const __m128 *m2)
+FORCE_INLINE void _mm_mat4x4_mul_ps_dpps(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
 	// Transpose m2:
 	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
@@ -305,7 +331,7 @@ __forceinline void _mm_mat4x4_mul_ps_dpps(__m128 *out, const __m128 *m1, const _
 	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
-__forceinline void _mm_mat4x4_mul_ps_dpps_2(__m128 *out, const __m128 *m1, const __m128 *m2)
+FORCE_INLINE void _mm_mat4x4_mul_ps_dpps_2(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
 	// Transpose m2:
 	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
@@ -343,7 +369,7 @@ __forceinline void _mm_mat4x4_mul_ps_dpps_2(__m128 *out, const __m128 *m1, const
 	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
-__forceinline void _mm_mat4x4_mul_ps_dpps_3(__m128 *out, const __m128 *m1, const __m128 *m2)
+FORCE_INLINE void _mm_mat4x4_mul_ps_dpps_3(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
 	// Transpose m2:
 	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
@@ -406,7 +432,7 @@ __forceinline void _mm_mat4x4_mul_ps_dpps_3(__m128 *out, const __m128 *m1, const
 //	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
-__forceinline void _mm_mat4x4_mul_ps(__m128 *out, const __m128 *m1, const __m128 *m2)
+FORCE_INLINE void _mm_mat4x4_mul_ps(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
 	__m128 s0 = _mm_shuffle1_ps(m1[0], _MM_SHUFFLE(0,0,0,0));
 	__m128 s1 = _mm_shuffle1_ps(m1[0], _MM_SHUFFLE(1,1,1,1));
@@ -449,7 +475,7 @@ __forceinline void _mm_mat4x4_mul_ps(__m128 *out, const __m128 *m1, const __m128
 	out[3] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
 }
 
-__forceinline void _mm_mat4x4_mul_ps_2(__m128 *out, const __m128 *m1, const __m128 *m2)
+FORCE_INLINE void _mm_mat4x4_mul_ps_2(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
 	__m128 s0 = _mm_shuffle_ps(m1[0], m1[0], _MM_SHUFFLE(0,0,0,0));
 	__m128 s1 = _mm_shuffle_ps(m1[0], m1[0], _MM_SHUFFLE(1,1,1,1));

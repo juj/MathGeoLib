@@ -109,7 +109,7 @@ float float2::LengthSq() const
 
 float float2::Length() const
 {
-	return sqrtf(LengthSq());
+	return Sqrt(LengthSq());
 }
 
 void float2::SetFromPolarCoordinates(float theta, float length)
@@ -146,7 +146,7 @@ float float2::Normalize()
 	float lengthSq = LengthSq();
 	if (lengthSq > 1e-6f)
 	{
-		float length = sqrtf(lengthSq);
+		float length = Sqrt(lengthSq);
 		*this *= 1.f / length;
 		return length;
 	}
@@ -172,7 +172,7 @@ float float2::ScaleToLength(float newLength)
 	if (length < 1e-6f)
 		return 0.f;
 
-	length = sqrtf(length);
+	length = Sqrt(length);
 	float scalar = newLength / length;
 	x *= scalar;
 	y *= scalar;
@@ -345,7 +345,7 @@ float float2::DistanceSq(const float2 &rhs) const
 
 float float2::Distance(const float2 &rhs) const
 {
-	return sqrtf(DistanceSq(rhs));
+	return Sqrt(DistanceSq(rhs));
 }
 
 float float2::Dot(const float2 &rhs) const
