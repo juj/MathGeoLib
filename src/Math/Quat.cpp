@@ -167,7 +167,7 @@ void Quat::Inverse()
 	Conjugate();
 }
 
-Quat Quat::Inverted() const
+Quat MUST_USE_RESULT Quat::Inverted() const
 {
 	assume(IsNormalized());
 	assume(IsInvertible());
@@ -187,26 +187,26 @@ void Quat::Conjugate()
 	z = -z;
 }
 
-Quat Quat::Conjugated() const
+Quat MUST_USE_RESULT Quat::Conjugated() const
 {
 	Quat copy = *this;
 	copy.Conjugate();
 	return copy;
 }
 
-float3 Quat::Transform(const float3 &vec) const
+float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
 	assume(this->IsNormalized());
 	float3x3 mat = this->ToFloat3x3();
 	return mat * vec;
 }
 
-float3 Quat::Transform(float x, float y, float z) const
+float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
 {
 	return Transform(float3(x, y, z));
 }
 
-float4 Quat::Transform(const float4 &vec) const
+float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 {
 	assume(vec.IsWZeroOrOne());
 
@@ -240,7 +240,7 @@ float4 Quat::Transform(const float4 &vec) const
 #endif
 }
 
-Quat Quat::Lerp(const Quat &b, float t) const
+Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 {
 	assume(0.f <= t && t <= 1.f);
 	return *this * (1.f - t) + b * t;
@@ -252,7 +252,7 @@ Quat MUST_USE_RESULT Quat::Lerp(const Quat &a, const Quat &b, float t)
 }
 
 /** Implementation based on the math in the book Watt, Policarpo. 3D Games: Real-time rendering and Software Technology, pp. 383-386. */
-Quat Quat::Slerp(const Quat &q2, float t) const
+Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 {
 	assume(0.f <= t && t <= 1.f);
 	assume(IsNormalized());
@@ -325,14 +325,14 @@ float3 MUST_USE_RESULT Quat::SlerpVectorAbs(const float3 &from, const float3 &to
 	return q.Transform(from);
 }
 
-float Quat::AngleBetween(const Quat &target) const
+float MUST_USE_RESULT Quat::AngleBetween(const Quat &target) const
 {
 	assume(this->IsInvertible());
 	Quat q = target / *this;
 	return q.Angle();
 }
 
-float3 Quat::AxisFromTo(const Quat &target) const
+float3 MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 {
 	assume(this->IsInvertible());
 	Quat q = target / *this;
