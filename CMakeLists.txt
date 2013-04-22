@@ -19,6 +19,9 @@ endif()
 
 if (MATH_AVX)
 	add_definitions(-DMATH_AVX)
+        if (APPLE)
+                add_definitions(-mavx)
+        endif()
 endif()
 
 if (MATH_SSE41)

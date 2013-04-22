@@ -115,6 +115,9 @@
 
 // MATH_AVX implies MATH_SSE41, which implies MATH_SSE3, which implies MATH_SSE2, which implies MATH_SSE.
 #ifdef MATH_AVX
+#ifdef __APPLE__
+#include <immintrin.h>
+#endif
 #define MATH_SSE41
 #define MATH_SSE3
 #define MATH_SSE2
@@ -128,7 +131,11 @@
 #endif
 
 #ifdef MATH_SSE3
+#ifdef __APPLE__
+#include <pmmintrin.h>
+#else
 #include <intrin.h>
+#endif
 #define MATH_SSE2
 #define MATH_SSE
 #endif
