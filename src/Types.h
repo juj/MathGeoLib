@@ -120,5 +120,5 @@ STATIC_ASSERT(sizeof(s64) == 8, "Typedef for fixed-width type s64 is incorrect!"
 #elif defined(_MSC_VER)
 #define FORCE_INLINE __forceinline
 #else
-#define FORCE_INLINE __attribute__((always_inline))
+#define FORCE_INLINE inline __attribute__((always_inline))
 #endif
