@@ -18,6 +18,9 @@
 #pragma once
 
 #include "MathBuildConfig.h"
+
+#ifdef MATH_SSE
+
 #include "Types.h"
 #include "SSEMath.h"
 
@@ -93,3 +96,5 @@ FORCE_INLINE __m128 cross_ps(__m128 a, __m128 b)
 
 	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
+
+#endif
