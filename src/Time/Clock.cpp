@@ -30,6 +30,10 @@
 #include <emscripten.h>
 #endif
 
+#ifdef __APPLE__
+#include <mach/mach_time.h>
+#endif
+
 #include "Time/Clock.h"
 #include "myassert.h"
 
@@ -37,6 +41,10 @@ MATH_BEGIN_NAMESPACE
 
 #ifdef WIN32
 LARGE_INTEGER Clock::ddwTimerFrequency;
+#endif
+
+#ifdef __APPLE__
+tick_t Clock::ticksPerSecond = 0;
 #endif
 
 tick_t Clock::appStartTime = 0;
@@ -76,8 +84,13 @@ void Clock::InitClockData()
 
 #endif
 	}
+#endif
 
-	///\todo Test here that the return values of QueryPerformanceCounter is nondecreasing.
+#ifdef __APPLE__
+	mach_timebase_info_data_t timeBaseInfo;
+	mach_timebase_info(&timeBaseInfo);
+	ticksPerSecond = 1000000000ULL * timeBaseInfo.numer / timeBaseInfo.denom;
+	assert(ticksPerSecond > timeBaseInfo.numer/timeBaseInfo.denom); // Guard against overflow if OSX numer/denom change or similar.
 #endif
 }
 
@@ -225,9 +238,7 @@ tick_t Clock::Tick()
 	QueryPerformanceCounter(&ddwTimer);
 	return ddwTimer.QuadPart;
 #elif defined(__APPLE__)
-	timeval t;
-	gettimeofday(&t, NULL);
-	return (tick_t)t.tv_sec * 1000 * 1000 + (tick_t)t.tv_usec;
+	return mach_absolute_time();
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 	timespec t;
 	clock_gettime(CLOCK_MONOTONIC, &t);
@@ -262,7 +273,7 @@ tick_t Clock::TicksPerSec()
 #elif defined(WIN32)
 	return ddwTimerFrequency.QuadPart;
 #elif defined(__APPLE__)
-	return 1000 * 1000;
+	return ticksPerSecond;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
 	return 1000 * 1000 * 1000;
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
