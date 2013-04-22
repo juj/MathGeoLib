@@ -415,6 +415,7 @@ float OneOverX(float x)
 	return 1.0f / x;
 }
 
+#ifdef MATH_SSE
 float NewtonRhapsonRecip(float x)
 {
 	__m128 X = FLOAT_TO_M128(x);
@@ -454,6 +455,7 @@ float NewtonRhapsonRecip2(float x)
 	e2 = _mm_mul_ss(e,e);
 	return M128_TO_FLOAT(_mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2)));
 }
+#endif
 
 UNIQUE_TEST(sqrt_recip_precision)
 {
@@ -468,8 +470,10 @@ UNIQUE_TEST(sqrt_recip_precision)
 		float X[C];
 		X[0] = Recip(f);
 		X[1] = RecipFast(f);
+#ifdef MATH_SSE
 		X[2] = NewtonRhapsonRecip(f);
 		X[3] = NewtonRhapsonRecip2(f);
+#endif
 		X[4] = OneOverX(f);
 
 		for(int j = 0; j < C; ++j)
@@ -480,10 +484,12 @@ UNIQUE_TEST(sqrt_recip_precision)
 	assert(maxRelError[0] < 1e-5f);
 	LOGI("Max relative error with RecipFast: %e", maxRelError[1]);
 	assert(maxRelError[1] < 1e-3f);
+#ifdef MATH_SSE
 	LOGI("Max relative error with NewtonRhapsonRecip: %e", maxRelError[2]);
 	assert(maxRelError[2] < 1e-5f);
 	LOGI("Max relative error with NewtonRhapsonRecip2: %e", maxRelError[3]);
 	assert(maxRelError[3] < 1e-5f);
+#endif
 	LOGI("Max relative error with 1.f/x: %e", maxRelError[4]);
 	assert(maxRelError[4] < 1e-6f);
 }
@@ -506,6 +512,7 @@ BENCHMARK(sqrt_RecipFast)
 	TIMER_END
 }
 
+#ifdef MATH_SSE
 BENCHMARK(sqrt_NewtonRhapsonRecip)
 {
 	TIMER_BEGIN
@@ -523,6 +530,7 @@ BENCHMARK(sqrt_NewtonRhapsonRecip2)
 	}
 	TIMER_END
 }
+#endif
 
 BENCHMARK(sqrt_OneOverX)
 {
