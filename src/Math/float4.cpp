@@ -169,7 +169,7 @@ __m128 float4::Length4_SSE() const
 __m128 float4::Normalize3_SSE()
 {
 	__m128 len = Length3_SSE();
-	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero?
+	__m128 isZero = _mm_cmplt_ps(len, sseEpsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	normalized = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
 	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
@@ -179,8 +179,6 @@ __m128 float4::Normalize3_SSE()
 void float4::Normalize3_Fast_SSE()
 {
 	__m128 len = Length3_SSE();
-	// Broadcast the length from the lowest index to all indices.
-	len = shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
@@ -188,9 +186,7 @@ void float4::Normalize3_Fast_SSE()
 __m128 float4::Normalize4_SSE()
 {
 	__m128 len = Length4_SSE();
-	// Broadcast the length from the lowest index to all indices.
-	len = shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
-	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero?
+	__m128 isZero = _mm_cmplt_ps(len, sseEpsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	v = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
 	return len;
@@ -356,8 +352,7 @@ void float4::Scale3(float scalar)
 {
 #ifdef MATH_SSE
 	__m128 scale = FLOAT_TO_M128(scalar);
-	__m128 one = _mm_set_ss(1.f);
-	scale = _mm_shuffle_ps(scale, one, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
+	scale = _mm_shuffle_ps(scale, sseOne, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
 	scale = shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
 	v = _mm_mul_ps(v, scale);
 #else
@@ -518,7 +513,7 @@ int float4::MaxElementIndex() const
 float4 float4::Abs() const
 {
 #ifdef MATH_SSE
-	return float4(_mm_abs_ps(v));
+	return float4(abs_ps(v));
 #else
 	return float4(fabs(x), fabs(y), fabs(z), fabs(w));
 #endif
