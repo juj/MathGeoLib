@@ -19,6 +19,18 @@ TEST(MonotonousClock)
 	assert(maxDiff > 0); // The clock must proceed at least some amount.
 }
 
+UNIQUE_TEST(ClockPrecision)
+{
+	LOGI("Clock::Tick() runs at %llu ticks/second.", Clock::TicksPerSec());
+}
+
+UNIQUE_TEST(Clock_RdTsc)
+{
+	unsigned long long tsc = Clock::Rdtsc();
+	unsigned long long tsc2 = Clock::Rdtsc();
+	LOGI("Two subsequent calls to rdtsc report %llu and %llu. (delta: %llu)", tsc, tsc2, tsc2 - tsc);
+}
+
 TEST(SubMillisecondPrecision)
 {
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
