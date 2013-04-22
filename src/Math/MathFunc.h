@@ -283,6 +283,24 @@ FORCE_INLINE float SqrtFast(float x)
 FORCE_INLINE float RSqrt(float x)
 {
 #ifdef MATH_SSE
+	__m128 X = FLOAT_TO_M128(x);
+	__m128 e = _mm_rsqrt_ss(X);
+
+	// Do one iteration of Newton-Rhapson:
+	// e_n = e + 0.5 * (e - x * e^3)
+	__m128 e3 = _mm_mul_ss(_mm_mul_ss(e,e), e);
+	__m128 half = _mm_set_ss(0.5f);
+	
+	return M128_TO_FLOAT(_mm_add_ss(e, _mm_mul_ss(half, _mm_sub_ss(e, _mm_mul_ss(X, e3)))));
+#else
+	return 1.f / sqrtf(x);
+#endif
+}
+
+/// SSE implementation of reciprocal square root.
+FORCE_INLINE float RSqrtFast(float x)
+{
+#ifdef MATH_SSE
 	return M128_TO_FLOAT(_mm_rsqrt_ss(FLOAT_TO_M128(x)));
 #else
 	return 1.f / sqrtf(x);

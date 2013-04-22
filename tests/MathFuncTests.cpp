@@ -346,19 +346,22 @@ UNIQUE_TEST(sqrt_rsqrt_precision)
 		X[1] = recip_sqrtf(f);
 		X[2] = sqrtf_recip(f);
 		X[3] = QuakeInvSqrt(f);
+		X[4] = RSqrtFast(f);
 
 		for(int j = 0; j < C; ++j)
 			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
 	}
 
 	LOGI("Max relative error with RSqrt: %e", maxRelError[0]);
-	assert(maxRelError[0] < 1e-3f);
+	assert(maxRelError[0] < 1e-6f);
 	LOGI("Max relative error with 1.f/sqrtf: %e", maxRelError[1]);
 	assert(maxRelError[1] < 1e-6f);
 	LOGI("Max relative error with sqrtf(1.f/x): %e", maxRelError[2]);
 	assert(maxRelError[2] < 1e-6f);
 	LOGI("Max relative error with Quake InvSqrt: %e", maxRelError[3]);
 	assert(maxRelError[3] < 1e-2f);
+	LOGI("Max relative error with RSqrtFast: %e", maxRelError[4]);
+	assert(maxRelError[4] < 1e-3f);
 }
 
 BENCHMARK(sqrt_RSqrt)
@@ -396,5 +399,16 @@ BENCHMARK(sqrt_QuakeInvSqrt)
 	}
 	TIMER_END
 }
+
+#ifdef MATH_SSE
+BENCHMARK(sqrt_RSqrtFast)
+{
+	TIMER_BEGIN
+	{
+		f[i] = RSqrtFast(pf[i]);
+	}
+	TIMER_END
+}
+#endif
 
 #endif
