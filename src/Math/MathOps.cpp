@@ -26,6 +26,12 @@ bool EqualAbs(float a, float b, float epsilon)
 	return Abs(a-b) < epsilon;
 }
 
+float RelativeError(float a, float b)
+{
+	if (a == b) return 0.f; // Handles the special case where a and b are both zero.
+	return Abs((a-b)/Max(a, b));
+}
+
 bool EqualRel(float a, float b, float maxRelError)
 {
 	if (a == b) return true; // Handles the special case where a and b are both zero.

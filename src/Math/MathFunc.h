@@ -268,6 +268,16 @@ FORCE_INLINE float Sqrt(float x)
 #endif
 }
 
+/// Computes a fast approximation of the square root of x.
+FORCE_INLINE float SqrtFast(float x)
+{
+#ifdef MATH_SSE
+	return M128_TO_FLOAT(_mm_rcp_ss(_mm_rsqrt_ss(FLOAT_TO_M128(x))));
+#else
+	return sqrtf(x);
+#endif
+}
+
 /// Returns 1/sqrt(x). (The reciprocal of the square root of x)
 FORCE_INLINE float RSqrt(float x)
 {
@@ -439,6 +449,9 @@ template<> bool inline Equal(const long double &a, const long double &b) { retur
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */
 bool EqualAbs(float a, float b, float epsilon = 1e-4f);
+
+/// Computes the relative error of the two variables.
+float RelativeError(float a, float b);
 
 /** Compares the two values for equality, allowing the given amount of relative error.
 	Beware that for values very near 0, the relative error is significant. */
