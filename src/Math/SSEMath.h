@@ -45,25 +45,22 @@ MATH_BEGIN_NAMESPACE
 static const u32 andMaskOne = 0xFFFFFFFF;
 static const float andMaskOneF = *(float*)&andMaskOne;
 
-/// Returns a SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
-/// Warning: _mm_setr_ps is slow!
-inline __m128 SSEMaskXYZ()
-{
-	return _mm_setr_ps(andMaskOneF,andMaskOneF,andMaskOneF,0.f);
-}
+/// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
+const __m128 sseMaskXYZ = _mm_set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
 
+// Input: [w,z,y,x], Output: x+y+z in all four registers.
 inline __m128 _mm_sum_xyz_ps(__m128 m)
 {
 #ifdef MATH_SSE3 // If we have SSE 3, we can use the haddps (horizontal add) instruction, _mm_hadd_ps intrinsic.
-	m = _mm_and_ps(m, SSEMaskXYZ()); // Clear w to zero.
+	m = _mm_and_ps(m, sseMaskXYZ); // Clear w to zero.
 	m = _mm_hadd_ps(m, m); // m = (x+y, z+w, x+y, z+w).
 	m = _mm_hadd_ps(m, m); // m = (x+y+z+w, x+y+z+w, x+y+z+w, x+y+z+w).
 	return m; // Each index of the output will contain the sum x+y+z.
 #else // We only have SSE 1, and must individually shuffle.
 	__m128 Y = _mm_shuffle1_ps(m, _MM_SHUFFLE(1,1,1,1)); // Load Y to lowest index. (others don't matter)
 	__m128 Z = _mm_shuffle1_ps(m, _MM_SHUFFLE(2,2,2,2)); // Load Z to lowest index. (others don't matter)
-	__m128 XYZ = _mm_add_ss(m, _mm_add_ss(Y, Z));
-	return XYZ; // Only the lowest index of the output will contain x+y+z.
+	__m128 XYZ = _mm_add_ps(m, _mm_add_ps(Y, Z));
+	return XYZ; // Each index of the output will contain the sum x+y+z.
 #endif
 }
 
@@ -97,14 +94,13 @@ inline __m128 _mm_abs_ps(__m128 x)
 	return _mm_andnot_ps(sign_mask, x);
 }
 
+// Returns the dot-product of the x,y,z components in all channels of the output vector.
 inline __m128 _mm_dot3_ps(__m128 a, __m128 b)
 {
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
-	__m128 v2 = _mm_dp_ps(a, b, 0x70 | 0x0F); // Choose to multiply x, y and z (0x70 = 0111 0000), and store the output to all indices (0x0F == 0000 1111).
-	return v2;
+	return _mm_dp_ps(a, b, 0x7F); // Choose to multiply x, y and z (0x70 = 0111 0000), and store the output to all indices (0x0F == 0000 1111).
 #else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
-	__m128 v2 = _mm_mul_ps(a, b);
-	return _mm_sum_xyz_ps(v2);
+	__m128 v2 = _mm_sum_xyz_ps(_mm_mul_ps(a, b));
 #endif
 }
 
@@ -112,11 +108,9 @@ inline __m128 _mm_dot3_ps(__m128 a, __m128 b)
 inline __m128 _mm_dot4_ps(__m128 a, __m128 b)
 {
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
-	__m128 v2 = _mm_dp_ps(a, b, 0xF0 | 0x0F); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
-	return v2;
+	return _mm_dp_ps(a, b, 0xFF); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
 #else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
-	__m128 v2 = _mm_mul_ps(a, b);
-	return _mm_sum_xyzw_ps(v2);
+	return _mm_sum_xyzw_ps(_mm_mul_ps(a, b));
 #endif
 }
 

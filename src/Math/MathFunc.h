@@ -378,10 +378,7 @@ template<>
 inline const float Max(const float &a, const float &b)
 {
 #ifdef MATH_SSE
-	__m128 maxVal = _mm_max_ss(_mm_set_ss(a), _mm_set_ss(b));
-	float x;
-	_mm_store_ss(&x, maxVal);
-	return x;
+	return M128_TO_FLOAT(_mm_max_ss(FLOAT_TO_M128(a), FLOAT_TO_M128(b)));
 #else
 	return a >= b ? a : b;
 #endif
@@ -399,10 +396,7 @@ template<>
 inline const float Min(const float &a, const float &b)
 {
 #ifdef MATH_SSE
-	__m128 minVal = _mm_min_ss(_mm_set_ss(a), _mm_set_ss(b));
-	float x;
-	_mm_store_ss(&x, minVal);
-	return x;
+	return M128_TO_FLOAT(_mm_min_ss(FLOAT_TO_M128(a), FLOAT_TO_M128(b)));
 #else
 	return a <= b ? a : b;
 #endif

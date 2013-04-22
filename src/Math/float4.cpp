@@ -156,13 +156,7 @@ __m128 float4::Length3_SSE() const
 /// The returned vector contains the squared length of the float4 in each channel of the vector.
 __m128 float4::LengthSq4_SSE() const
 {
-#ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
-	__m128 v2 = _mm_dp_ps(v, v, 0xF0 | 0x0F); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
-	return v2;
-#else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
-	__m128 v2 = _mm_mul_ps(v, v);
-	return _mm_sum_xyzw_ps(v2);
-#endif
+	return _mm_dot4_ps(v, v);
 }
 
 /// The returned vector contains the length of the float4 in the lowest channel of the vector.
@@ -174,12 +168,10 @@ __m128 float4::Length4_SSE() const
 __m128 float4::Normalize3_SSE()
 {
 	__m128 len = Length3_SSE();
-	// Broadcast the length from the lowest index to all indices.
-	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	__m128 isZero = _mm_cmplt_ps(len, epsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
 	normalized = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
-	v = _mm_cmov_ps(v, normalized, SSEMaskXYZ()); // Return the original .w component to the vector (this function is supposed to preserve original .w).
+	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 	return len;
 }
 
@@ -189,7 +181,7 @@ void float4::Normalize3_Fast_SSE()
 	// Broadcast the length from the lowest index to all indices.
 	len = _mm_shuffle1_ps(len, _MM_SHUFFLE(0,0,0,0));
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
-	v = _mm_cmov_ps(v, normalized, SSEMaskXYZ()); // Return the original .w component to the vector (this function is supposed to preserve original .w).
+	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
 
 __m128 float4::Normalize4_SSE()
@@ -362,7 +354,7 @@ bool float4::IsNormalized3(float epsilonSq) const
 void float4::Scale3(float scalar)
 {
 #ifdef MATH_SSE
-	__m128 scale = _mm_load_ss(&scalar);
+	__m128 scale = FLOAT_TO_M128(scalar);
 	__m128 one = _mm_set_ss(1.f);
 	scale = _mm_shuffle_ps(scale, one, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
 	scale = _mm_shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
