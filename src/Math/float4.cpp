@@ -148,10 +148,10 @@ __m128 float4::LengthSq3_SSE() const
 	return dot3_ps(v, v);
 }
 
-/// The returned vector contains the length of the float3 part in the lowest channel of the vector.
+/// The returned vector contains the length of the float3 part in eacj channel of the vector.
 __m128 float4::Length3_SSE() const
 {
-	return _mm_sqrt_ss(dot3_ps(v, v));
+	return _mm_sqrt_ps(dot3_ps(v, v));
 }
 
 /// The returned vector contains the squared length of the float4 in each channel of the vector.
@@ -160,10 +160,10 @@ __m128 float4::LengthSq4_SSE() const
 	return dot4_ps(v, v);
 }
 
-/// The returned vector contains the length of the float4 in the lowest channel of the vector.
+/// The returned vector contains the length of the float4 in each channel of the vector.
 __m128 float4::Length4_SSE() const
 {
-	return _mm_sqrt_ss(dot4_ps(v, v));
+	return _mm_sqrt_ps(dot4_ps(v, v));
 }
 
 __m128 float4::Normalize3_SSE()
