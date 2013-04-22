@@ -112,7 +112,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 //			return FLOAT_INF;
 		__m256 recipDet = _mm256_rcp_ps(det);
 
-		__m256 absdet = abs_ps(det);
+		__m256 absdet = abs_ps256(det);
 		__m256 out = _mm256_cmp_ps(absdet, epsilon, _CMP_LT_OQ);
 
 		// Calculate distance from v0 to ray origin

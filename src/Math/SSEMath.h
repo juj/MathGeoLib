@@ -34,14 +34,10 @@ MATH_BEGIN_NAMESPACE
 inline float ReinterpretAsFloat(u32 i);
 
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
-
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
 #define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
-
 #else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
-
 #define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((reg), (reg), (shuffle))
-
 #endif
 
 const u32 andMaskOne = 0xFFFFFFFF;
@@ -56,18 +52,10 @@ const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 const __m128 sseEpsilonFloat = _mm_set1_ps(1e-4f);
 
 const __m128 sseZero = _mm_set1_ps(0.f);
-
 const __m128 sseOne = _mm_set1_ps(1.f);
 
-FORCE_INLINE __m128 abs_ps(__m128 x)
-{
-	return _mm_andnot_ps(sseSignMask, x);
-}
-
-FORCE_INLINE __m256 abs_ps(__m256 x)
-{
-	return _mm256_andnot_ps(sseSignMask256, x);
-}
+#define abs_ps(x) _mm_andnot_ps(sseSignMask, x)
+#define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)
 
 /// Returns the lowest element of the given sse register as a float.
 /// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
