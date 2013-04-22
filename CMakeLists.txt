@@ -19,7 +19,7 @@ endif()
 
 if (MATH_AVX)
 	add_definitions(-DMATH_AVX)
-        if (APPLE)
+        if (NOT MSVC)
                 add_definitions(-mavx)
         endif()
 endif()

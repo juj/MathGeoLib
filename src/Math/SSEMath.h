@@ -21,7 +21,13 @@
 
 #ifdef MATH_SSE // If SSE is not enabled, this whole file will not be included.
 
+#ifdef _MSC_VER
 #define ALIGN16 __declspec(align(16))
+#define ALIGN32 __declspec(align(32))
+#else
+#define ALIGN16 __attribute((aligned(16)))
+#define ALIGN32 __attribute((aligned(32)))
+#endif
 
 MATH_BEGIN_NAMESPACE
 
