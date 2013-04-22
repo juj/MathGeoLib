@@ -105,7 +105,7 @@ float Quat::LengthSq() const
 
 float Quat::Length() const
 {
-	return sqrtf(LengthSq());
+	return Sqrt(LengthSq());
 }
 
 float Quat::Normalize()
@@ -210,7 +210,34 @@ float4 Quat::Transform(const float4 &vec) const
 {
 	assume(vec.IsWZeroOrOne());
 
+#ifdef MATH_SSE
+	__m128 W = _mm_shuffle1_ps(q, _MM_SHUFFLE(3,3,3,3));
+
+//	__m128 qxv = _mm_cross_ps(q, vec.v);
+	__m128 a_xzy = _mm_shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
+	__m128 b_yxz = _mm_shuffle1_ps(vec.v, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
+	__m128 a_yxz = _mm_shuffle1_ps(q, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
+	__m128 b_xzy = _mm_shuffle1_ps(vec.v, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
+	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
+	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+	__m128 qxv = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+
+	__m128 Wv = _mm_mul_ps(W, vec.v);
+	__m128 s = _mm_add_ps(qxv, Wv);
+
+//	s = _mm_cross_ps(q, s);
+	__m128 s_yxz = _mm_shuffle1_ps(s, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
+	__m128 s_xzy = _mm_shuffle1_ps(s, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
+	x = _mm_mul_ps(a_xzy, s_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
+	y = _mm_mul_ps(a_yxz, s_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+	s = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+
+	s = _mm_add_ps(s, s);
+	s = _mm_add_ps(s, vec.v);
+	return s;
+#else
 	return float4(Transform(vec.x, vec.y, vec.z), vec.w);
+#endif
 }
 
 Quat Quat::Lerp(const Quat &b, float t) const
@@ -355,7 +382,7 @@ void SetQuatFrom(Quat &q, const M &m)
 	// Above, r == 3 - 4(x^2+y^2+z^2) == 4(1-x^2-y^2-z^2) - 1 == 4*w^2 - 1.
 	if (r > 0) // In this case, |w| > 1/2.
 	{
-		q.w = sqrtf(r + 1.f) * 0.5f; // We have two choices for the sign of w, arbitrarily pick the positive.
+		q.w = Sqrt(r + 1.f) * 0.5f; // We have two choices for the sign of w, arbitrarily pick the positive.
 		float inv4w = 1.f / (4.f * q.w);
 		q.x = (m[2][1] - m[1][2]) * inv4w;
 		q.y = (m[0][2] - m[2][0]) * inv4w;
@@ -363,7 +390,7 @@ void SetQuatFrom(Quat &q, const M &m)
 	}
 	else if (m[0][0] > m[1][1] && m[0][0] > m[2][2]) // If |q.x| is larger than |q.y| and |q.z|, extract it first. This gives
 	{                                                // best stability, and we know below x can't be zero.
-		q.x = sqrtf(1.f + m[0][0] - m[1][1] - m[2][2]) * 0.5f; // We have two choices for the sign of x, arbitrarily pick the positive.
+		q.x = Sqrt(1.f + m[0][0] - m[1][1] - m[2][2]) * 0.5f; // We have two choices for the sign of x, arbitrarily pick the positive.
 		const float x4 = 1.f / (4.f * q.x);
 		q.y = (m[0][1] + m[1][0]) * x4;
 		q.z = (m[0][2] + m[2][0]) * x4;
@@ -371,7 +398,7 @@ void SetQuatFrom(Quat &q, const M &m)
 	}
 	else if (m[1][1] > m[2][2]) // |q.y| is larger than |q.x| and |q.z|
 	{
-		q.y = sqrtf(1.f + m[1][1] - m[0][0] - m[2][2]) * 0.5f; // We have two choices for the sign of y, arbitrarily pick the positive.
+		q.y = Sqrt(1.f + m[1][1] - m[0][0] - m[2][2]) * 0.5f; // We have two choices for the sign of y, arbitrarily pick the positive.
 		const float y4 = 1.f / (4.f * q.y);
 		q.x = (m[0][1] + m[1][0]) * y4;
 		q.z = (m[1][2] + m[2][1]) * y4;
@@ -379,7 +406,7 @@ void SetQuatFrom(Quat &q, const M &m)
 	}
 	else // |q.z| is larger than |q.x| or |q.y|
 	{
-		q.z = sqrtf(1.f + m[2][2] - m[0][0] - m[1][1]) * 0.5f; // We have two choices for the sign of z, arbitrarily pick the positive.
+		q.z = Sqrt(1.f + m[2][2] - m[0][0] - m[1][1]) * 0.5f; // We have two choices for the sign of z, arbitrarily pick the positive.
 		const float z4 = 1.f / (4.f * q.z);
 		q.x = (m[0][2] + m[2][0]) * z4;
 		q.y = (m[1][2] + m[2][1]) * z4;
@@ -613,7 +640,12 @@ Quat Quat::operator *(float scalar) const
 
 float3 Quat::operator *(const float3 &rhs) const
 {
-	return Mul(rhs);
+	return Transform(rhs);
+}
+
+float4 Quat::operator *(const float4 &rhs) const
+{
+	return Transform(rhs);
 }
 
 Quat Quat::operator /(float scalar) const

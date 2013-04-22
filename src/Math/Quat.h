@@ -42,10 +42,27 @@ MATH_BEGIN_NAMESPACE
 class Quat
 {
 public:
-	float x; ///< The factor of i.
-	float y; ///< The factor of j.
-	float z; ///< The factor of k.
-	float w; ///< The scalar part. Sometimes also referred to as 'r'.
+
+#ifdef MATH_SSE
+	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
+
+	union
+	{
+		struct
+		{
+#endif
+			
+			float x; ///< The factor of i.
+			float y; ///< The factor of j. [similarOverload: x]
+			float z; ///< The factor of k. [similarOverload: x]
+			float w; ///< The scalar part. Sometimes also referred to as 'r'. [similarOverload: x]
+#ifdef MATH_SSE
+		};
+		__m128 q;
+	};
+
+	NAMELESS_UNION_END
+#endif
 
 	/// @note The default ctor does not initialize any member values.
 	Quat() {}
@@ -130,7 +147,7 @@ public:
 	void Inverse();
 
 	/// Returns an inverted copy of this quaternion.
-	Quat Inverted() const;
+	MUST_USE_RESULT Quat Inverted() const;
 
 	/// Inverses this quaternion in-place.
 	/// Call this function when the quaternion is not known beforehand to be normalized. This function
@@ -143,18 +160,18 @@ public:
 	void Conjugate();
 
 	/// Returns a conjugated copy of this quaternion.
-	Quat Conjugated() const;
+	MUST_USE_RESULT Quat Conjugated() const;
 
 	/// Rotates the given vector by this quaternion.
-	float3 Transform(float x, float y, float z) const;
-	float3 Transform(const float3 &vec) const;
+	MUST_USE_RESULT float3 Transform(float x, float y, float z) const;
+	MUST_USE_RESULT float3 Transform(const float3 &vec) const;
 
 	/// Rotates the given vector by this quaternion. The w component of the vector is assumed to be zero or one.
-	float4 Transform(const float4 &vec) const;
+	MUST_USE_RESULT float4 Transform(const float4 &vec) const;
 
-	Quat Lerp(const Quat &target, float t) const;
+	MUST_USE_RESULT Quat Lerp(const Quat &target, float t) const;
 	static MUST_USE_RESULT Quat Lerp(const Quat &source, const Quat &target, float t);
-	Quat Slerp(const Quat &target, float t) const;
+	MUST_USE_RESULT Quat Slerp(const Quat &target, float t) const;
 	static MUST_USE_RESULT Quat Slerp(const Quat &source, const Quat &target, float t);
 
 	/// Returns the 'from' vector rotated towards the 'to' vector by the given normalized time parameter.
@@ -177,9 +194,9 @@ public:
 	static MUST_USE_RESULT float3 SlerpVectorAbs(const float3 &from, const float3 &to, float angleRadians);
 
 	/// Returns the angle between this and the target orientation (the shortest route) in radians.
-	float AngleBetween(const Quat &target) const;
+	MUST_USE_RESULT float AngleBetween(const Quat &target) const;
 	/// Returns the axis of rotation to get from this orientation to target orientation (the shortest route).
-	float3 AxisFromTo(const Quat &target) const;
+	MUST_USE_RESULT float3 AxisFromTo(const Quat &target) const;
 
 	/// Returns the rotation axis and angle of this quaternion.
 	/// @param rotationAxis [out] Received the normalized axis of the rotation.
@@ -326,6 +343,7 @@ public:
 	/// but instead performs a conjugation operation 'q*v*q^-1'. This corresponds to transforming
 	/// the given vector by this Quaternion.
 	float3 operator *(const float3 &rhs) const;
+	float4 operator *(const float4 &rhs) const;
 
 	/// The identity quaternion performs no rotation when applied to a vector.
 	/// For quaternions, the identity has the value r = 1, i,j,k = 0.
