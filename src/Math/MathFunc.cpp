@@ -16,6 +16,7 @@
 	@author Jukka Jylänki
 	@brief Common mathematical functions. */
 #include "Math/MathFunc.h"
+#include "Math/SSEMath.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #include <algorithm>
@@ -283,32 +284,6 @@ float ModPos(float x, int mod)
 float Frac(float x)
 {
 	return x - Floor(x);
-}
-
-float Sqrt(float x)
-{
-	return sqrtf(x);
-}
-
-float RSqrt(float x)
-{
-	return 1.f / sqrtf(x);
-}
-
-float Recip(float x)
-{
-	return 1.f / x;
-}
-
-float RecipFast(float x)
-{
-#ifdef MATH_SSE
-	__m128 r = _mm_rcp_ss(_mm_set_ss(x));
-	_mm_store_ss(&x, r);
-	return x;
-#else
-	return 1.f / x;
-#endif
 }
 
 /** Uses a recursive approach, not the fastest/brightest method.

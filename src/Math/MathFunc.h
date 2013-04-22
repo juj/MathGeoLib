@@ -27,6 +27,7 @@
 #include "Types.h"
 #include "Math/MathConstants.h"
 #include "Math/float3.h"
+#include "Math/SSEMath.h"
 
 #ifdef WIN32
 #define Polygon Polygon_unused
@@ -258,13 +259,40 @@ float ModPos(float x, int mod);
 float Frac(float x);
 
 /// Returns the square root of x.
-float Sqrt(float x);
+FORCE_INLINE float Sqrt(float x)
+{
+#ifdef MATH_SSE
+	return M128_TO_FLOAT(_mm_sqrt_ss(FLOAT_TO_M128(x)));
+#else
+	return sqrtf(x);
+#endif
+}
+
 /// Returns 1/sqrt(x). (The reciprocal of the square root of x)
-float RSqrt(float x);
+FORCE_INLINE float RSqrt(float x)
+{
+#ifdef MATH_SSE
+	return M128_TO_FLOAT(_mm_rsqrt_ss(FLOAT_TO_M128(x)));
+#else
+	return 1.f / sqrtf(x);
+#endif
+}
+
 /// Returns 1/x, the reciprocal of x.
-float Recip(float x);
+FORCE_INLINE float Recip(float x)
+{
+	return 1.f / x;
+}
+
 /// Returns 1/x, the reciprocal of x, using a fast approximation (SSE rcp instruction).
-float RecipFast(float x);
+FORCE_INLINE float RecipFast(float x)
+{
+#ifdef MATH_SSE
+	return M128_TO_FLOAT(_mm_rcp_ss(FLOAT_TO_M128(x)));
+#else
+	return 1.f / x;
+#endif
+}
 
 /// Calculates n! at runtime. Use class FactorialT<N> to evaluate factorials at compile-time.
 int Factorial(int n);

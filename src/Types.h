@@ -113,3 +113,12 @@ STATIC_ASSERT(sizeof(s64) == 8, "Typedef for fixed-width type s64 is incorrect!"
 #else
 #define MUST_USE_RESULT
 #endif
+
+// Looking at disasm, compilers have been seen to be stupid about inlining some single-instruction SIMD intrinsics functions, so use this to force.
+#ifdef _DEBUG
+#define FORCE_INLINE inline
+#elif defined(_MSC_VER)
+#define FORCE_INLINE __forceinline
+#else
+#define FORCE_INLINE __attribute__((always_inline))
+#endif
