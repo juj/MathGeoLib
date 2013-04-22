@@ -31,6 +31,8 @@
 
 MATH_BEGIN_NAMESPACE
 
+inline float ReinterpretAsFloat(u32 i);
+
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
 
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
@@ -42,8 +44,8 @@ MATH_BEGIN_NAMESPACE
 
 #endif
 
-static const u32 andMaskOne = 0xFFFFFFFF;
-static const float andMaskOneF = *(float*)&andMaskOne;
+const u32 andMaskOne = 0xFFFFFFFF;
+const float andMaskOneF = ReinterpretAsFloat(andMaskOne);
 
 /// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
 const __m128 sseMaskXYZ = _mm_set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
