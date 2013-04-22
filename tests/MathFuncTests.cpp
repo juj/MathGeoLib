@@ -306,6 +306,7 @@ BENCHMARK(sqrt_Sqrt_Via_Rcp_RSqrt)
 	}
 	TIMER_END
 }
+#endif
 
 FORCE_INLINE float recip_sqrtf(float x)
 {
@@ -339,7 +340,7 @@ UNIQUE_TEST(sqrt_rsqrt_precision)
 	for(int i = 0; i < 1000000; ++i)
 	{
 		float f = rng.Float(1e-5f, 1e20f);
-		float x = (float)(1.0 / sqrt((double)f)); // best precision of the sqrt.
+		float x = (float)(1.0 / sqrt((double)f)); // best precision of the rsqrt.
 
 		float X[C];
 		X[0] = RSqrt(f);
@@ -400,7 +401,6 @@ BENCHMARK(sqrt_QuakeInvSqrt)
 	TIMER_END
 }
 
-#ifdef MATH_SSE
 BENCHMARK(sqrt_RSqrtFast)
 {
 	TIMER_BEGIN
@@ -409,6 +409,126 @@ BENCHMARK(sqrt_RSqrtFast)
 	}
 	TIMER_END
 }
-#endif
 
-#endif
+float OneOverX(float x)
+{
+	return 1.0f / x;
+}
+
+float NewtonRhapsonRecip(float x)
+{
+	__m128 X = FLOAT_TO_M128(x);
+	__m128 e = _mm_rcp_ss(X);
+	// 1/x = D
+	// f(e) = e^-1 - x
+	// f'(e) = -e^-2
+
+	// e_n = e + (e^-1 - x) / e^-2
+	// e_n = e + e - x*e^2
+	// e_n = 2*e - x*e^2
+
+	// Do one iteration of Newton-Rhapson:
+	__m128 e2 = _mm_mul_ss(e,e);
+	__m128 two = _mm_set_ss(2.f);
+	
+	return M128_TO_FLOAT(_mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2)));
+}
+
+float NewtonRhapsonRecip2(float x)
+{
+	__m128 X = FLOAT_TO_M128(x);
+	__m128 e = _mm_rcp_ss(X);
+	// 1/x = D
+	// f(e) = e^-1 - x
+	// f'(e) = -e^-2
+
+	// e_n = e + (e^-1 - x) / e^-2
+	// e_n = e + e - x*e^2
+	// e_n = 2*e - x*e^2
+
+	// Do one iteration of Newton-Rhapson:
+	__m128 e2 = _mm_mul_ss(e,e);
+	__m128 two = _mm_set_ss(2.f);
+
+	e = _mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2));
+	e2 = _mm_mul_ss(e,e);
+	return M128_TO_FLOAT(_mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2)));
+}
+
+UNIQUE_TEST(sqrt_recip_precision)
+{
+	const int C = 7;
+	float maxRelError[C] = {};
+
+	for(int i = 0; i < 1000000; ++i)
+	{
+		float f = rng.Float(1e-5f, 1e20f);
+		float x = (float)(1.0 / (double)f); // best precision of the reciprocal.
+
+		float X[C];
+		X[0] = Recip(f);
+		X[1] = RecipFast(f);
+		X[2] = NewtonRhapsonRecip(f);
+		X[3] = NewtonRhapsonRecip2(f);
+		X[4] = OneOverX(f);
+
+		for(int j = 0; j < C; ++j)
+			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
+	}
+
+	LOGI("Max relative error with Recip: %e", maxRelError[0]);
+	assert(maxRelError[0] < 1e-5f);
+	LOGI("Max relative error with RecipFast: %e", maxRelError[1]);
+	assert(maxRelError[1] < 1e-3f);
+	LOGI("Max relative error with NewtonRhapsonRecip: %e", maxRelError[2]);
+	assert(maxRelError[2] < 1e-5f);
+	LOGI("Max relative error with NewtonRhapsonRecip2: %e", maxRelError[3]);
+	assert(maxRelError[3] < 1e-5f);
+	LOGI("Max relative error with 1.f/x: %e", maxRelError[4]);
+	assert(maxRelError[4] < 1e-6f);
+}
+
+BENCHMARK(sqrt_Recip)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Recip(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_RecipFast)
+{
+	TIMER_BEGIN
+	{
+		f[i] = RecipFast(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_NewtonRhapsonRecip)
+{
+	TIMER_BEGIN
+	{
+		f[i] = NewtonRhapsonRecip(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_NewtonRhapsonRecip2)
+{
+	TIMER_BEGIN
+	{
+		f[i] = NewtonRhapsonRecip2(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_OneOverX)
+{
+	TIMER_BEGIN
+	{
+		f[i] = OneOverX(pf[i]);
+	}
+	TIMER_END
+}
