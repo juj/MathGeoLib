@@ -29,6 +29,7 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 	t.function = function;
 	t.isRandomized = false;
 	t.runOnlyOnce = runOnlyOnce;
+	t.isBenchmark = false;
 	Tests().push_back(t);
 }
 
@@ -40,12 +41,25 @@ void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string d
 	t.function = function;
 	t.isRandomized = true;
 	t.runOnlyOnce = false;
+	t.isBenchmark = false;
 	Tests().push_back(t);
 }
 
-std::string FormatTime(tick_t ticks)
+void AddBenchmark(std::string name, TestFunctionPtr function, std::string description)
 {
-	double msecs = Clock::TicksToMillisecondsD(ticks);
+	Test t;
+	t.name = name;
+	t.description = description;
+	t.function = function;
+	t.isRandomized = false;
+	t.runOnlyOnce = true;
+	t.isBenchmark = true;
+	Tests().push_back(t);
+}
+
+std::string FormatTime(double ticks)
+{
+	double msecs = ticks * 1000.0 / Clock::TicksPerSec();
 	double secs = msecs / 1000.0;
 	double usecs = msecs * 1000.0;
 	char str[256];
@@ -73,7 +87,10 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	if (t.runOnlyOnce)
 		numTimes = numTrials = 1;
 	int numTimes1 = numTimes / numTrials;
-	LOGI_NL("Testing '%s': ", t.name.c_str());
+	if (t.isBenchmark)
+		LOGI_NL("Benchmark '%s': ", t.name.c_str());
+	else
+		LOGI_NL("Testing '%s': ", t.name.c_str());
 
 	std::vector<tick_t> times;
 	times.reserve(numTimes);
@@ -117,6 +134,9 @@ int RunTest(Test &t, int numTimes, int numTrials)
 
 	float successRate = (float)numPasses * 100.f / numTimes;
 
+	if (t.isBenchmark) // Benchmarks print themselves.
+		return 0; // 0: Success
+
 	int ret = 0; // 0: Success
 
 	if (numFails == 0)
@@ -145,7 +165,12 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	}
 
 	if (!times.empty())
-		LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(times[0]).c_str(), FormatTime(total / times.size()).c_str(), FormatTime(times.back()).c_str());
+	{
+		if (t.runOnlyOnce)
+			LOGI("   Elapsed: %s", FormatTime(times[0]).c_str());
+		else
+			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(times[0]).c_str(), FormatTime(total / times.size()).c_str(), FormatTime(times.back()).c_str());
+	}
 
 	return ret;
 }

@@ -8,8 +8,6 @@
 
 #include "Math/SSEMath.h"
 
-const int N = 10000;
-
 // In debug mode, we test the correctness of the SSE code. In release mode, we benchmark performance.
 #ifdef _DEBUG
 #define TEST_SSE_CORRECTNESS
@@ -134,18 +132,37 @@ UNIQUE_TEST(sse_solve_shuffle)
 }
 #endif
 
+float *FloatArray()
+{
+	LCG lcg;
+	static float *arr;
+	static bool initialized = false;
+	if (!initialized)
+	{
+		arr = new float[testrunner_numItersPerTest+32];
+		uintptr_t a = (uintptr_t)arr;
+		a = (a + 31) & ~31;
+		arr = (float*)a;
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = lcg.Float(-10.f, 10.f);
+		initialized = true;
+	}
+	return arr;
+}
+
 float4x4 *MatrixArray()
 {
+	LCG lcg;
 	static float4x4 *arr;
 	static bool initialized = false;
 	if (!initialized)
 	{
-		arr = new float4x4[N+1];
+		arr = new float4x4[testrunner_numItersPerTest+1];
 		uintptr_t a = (uintptr_t)arr;
 		a = (a + 31) & ~31;
 		arr = (float4x4*)a;
-		for(int i = 0; i < N; ++i)
-			arr[i] = float4x4::RandomGeneral(rng, -10.f, 10.f);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4x4::RandomGeneral(lcg, -10.f, 10.f);
 		initialized = true;
 	}
 	return arr;
@@ -153,16 +170,17 @@ float4x4 *MatrixArray()
 
 float4x4 *MatrixArray2()
 {
+	LCG lcg;
 	static float4x4 *arr;
 	static bool initialized = false;
 	if (!initialized)
 	{
-		arr = new float4x4[N+1];
+		arr = new float4x4[testrunner_numItersPerTest+1];
 		uintptr_t a = (uintptr_t)arr;
 		a = (a + 31) & ~31;
 		arr = (float4x4*)a;
-		for(int i = 0; i < N; ++i)
-			arr[i] = float4x4::RandomGeneral(rng, -10.f, 10.f);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4x4::RandomGeneral(lcg, -10.f, 10.f);
 		initialized = true;
 	}
 	return arr;
@@ -174,12 +192,12 @@ float4x4 *TransposedMatrixArray()
 	static bool initialized = false;
 	if (!initialized)
 	{
-		arr = new float4x4[N+1];
+		arr = new float4x4[testrunner_numItersPerTest+1];
 		uintptr_t a = (uintptr_t)arr;
 		a = (a + 31) & ~31;
 		arr = (float4x4*)a;
 		float4x4 *m = MatrixArray();
-		for(int i = 0; i < N; ++i)
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
 			arr[i] = m[i].Transposed();
 		initialized = true;
 	}
@@ -188,12 +206,13 @@ float4x4 *TransposedMatrixArray()
 
 float4 *VectorArray()
 {
-	static float4 arr[N+1];
+	LCG lcg;
+	static float4 arr[testrunner_numItersPerTest];
 	static bool initialized = false;
 	if (!initialized)
 	{
-		for(int i = 0; i < N; ++i)
-			arr[i] = float4::RandomGeneral(rng, -10.f, 10.f);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
 		initialized = true;
 	}
 	return arr;
@@ -201,25 +220,24 @@ float4 *VectorArray()
 
 float4 *VectorArray2()
 {
-	static float4 arr[N+1];
+	LCG lcg;
+	static float4 arr[testrunner_numItersPerTest];
 	static bool initialized = false;
 	if (!initialized)
 	{
-		for(int i = 0; i < N; ++i)
-			arr[i] = float4::RandomGeneral(rng, -10.f, 10.f);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
 		initialized = true;
 	}
 	return arr;
 }
 
-TEST(sse_init_simd_test_arrays)
-{
-	MatrixArray();
-	MatrixArray2();
-	TransposedMatrixArray();
-	VectorArray();
-	VectorArray2();
-}
+float *f = FloatArray();
+float4x4 *m = MatrixArray();
+float4x4 *m2 = MatrixArray();
+float4x4 *tm = TransposedMatrixArray();
+float4 *v = VectorArray();
+float4 *v2 = VectorArray2();
 
 #ifdef MATH_AVX
 
@@ -298,351 +316,308 @@ inline __m128 _mm_colmajor_mat4x4_mul_ps_avx_2(const __m256 *matrix, __m128 vect
 	return _mm_add_ps(hi, lo); // Latency: 3, Throughput: 1
 }
 
-RANDOMIZED_TEST(sse_float3_cross)
+BENCHMARK(sse_float3_cross)
 {
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i].Float3Part() = v[i].Float3Part().Cross(v2[i].Float3Part());
-
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
+	}
+	TIMER_END;
 }
 
-RANDOMIZED_TEST(sse_float4_cross)
+BENCHMARK(sse_float4_cross)
 {
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = v[i].Cross3(v2[i]);
-
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
+	}
+	TIMER_END;
 }
 
-RANDOMIZED_TEST(sse_avx_mat_vec_mul)
+BENCHMARK(sse_avx_mat_vec_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_mat4x4_mul_ps_avx((__m256*)&m[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
 	float4 res = _mm_mat4x4_mul_ps_avx((__m256*)&m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse_avx_2_mat_vec_mul)
+BENCHMARK(sse_avx_2_mat_vec_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-//	static unsigned long long bestTicks = 0xFFFFFFFFFFULL;
-
-//	unsigned long long time = __rdtsc();
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_mat4x4_mul_ps_avx_2((__m256*)&m[i].row, v[i]);
+	}
+	TIMER_END;
 
-//	unsigned long long time2 = __rdtsc() - time;
-
-//	if (time2 < bestTicks)
-//	{
-//		bestTicks = time2;
-//		double t = (double)time2 / N;
-//		printf("%g ticks.\n", t);
-//	}
-#ifdef TEST_SSE_CORRECTNESS
 	float4 res = _mm_mat4x4_mul_ps_avx_2((__m256*)&m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
 #endif // ~AVX
 
 #ifdef MATH_SSE41
 
-RANDOMIZED_TEST(sse41_mat_vec_mul)
+BENCHMARK(sse41_mat_vec_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_mat4x4_mul_ps_sse41(m[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
 	float4 res = _mm_mat4x4_mul_ps_sse41(m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
 #endif
 
 #ifdef MATH_SSE3
 
-RANDOMIZED_TEST(sse3_mat_vec_mul)
+BENCHMARK(sse3_mat_vec_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_mat4x4_mul_ps_sse3(m[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
 	float4 res = _mm_mat4x4_mul_ps_sse3(m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
 #endif
 
 #ifdef MATH_SSE
 
-RANDOMIZED_TEST(sse1_mat_vec_mul)
+BENCHMARK(sse1_mat_vec_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_mat4x4_mul_ps_sse1(m[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
 	float4 res = _mm_mat4x4_mul_ps_sse1(m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse1_colmajor_mat_vec_mul)
+BENCHMARK(sse1_colmajor_mat_vec_mul)
 {
-	float4x4 *tm = TransposedMatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_colmajor_mat4x4_mul_ps_sse1(tm[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
 	float4x4 *m = MatrixArray();
 	float4 res = _mm_colmajor_mat4x4_mul_ps_sse1(tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse1_colmajor_mat_vec_mul_2)
+BENCHMARK(sse1_colmajor_mat_vec_mul_2)
 {
-	float4x4 *tm = TransposedMatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_colmajor_mat4x4_mul_ps_sse1_2(tm[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
-	float4x4 *m = MatrixArray();
 	float4 res = _mm_colmajor_mat4x4_mul_ps_sse1_2(tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
 #ifdef MATH_AVX
 
-RANDOMIZED_TEST(sse_colmajor_mat_vec_mul_avx)
+BENCHMARK(sse_colmajor_mat_vec_mul_avx)
 {
-	float4x4 *tm = TransposedMatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_colmajor_mat4x4_mul_ps_avx((__m256*)tm[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
-	float4x4 *m = MatrixArray();
 	float4 res = _mm_colmajor_mat4x4_mul_ps_avx((__m256*)tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse_colmajor_mat_vec_mul_avx_2)
+BENCHMARK(sse_colmajor_mat_vec_mul_avx_2)
 {
-	float4x4 *tm = TransposedMatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = _mm_colmajor_mat4x4_mul_ps_avx_2((__m256*)tm[i].row, v[i]);
+	}
+	TIMER_END;
 
-#ifdef TEST_SSE_CORRECTNESS
-	float4x4 *m = MatrixArray();
 	float4 res = _mm_colmajor_mat4x4_mul_ps_avx_2((__m256*)tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
 }
 
 #endif
 
-RANDOMIZED_TEST(sse_mat_mat_mul)
+BENCHMARK(sse_mat_mat_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4x4 *m2 = MatrixArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
 	{
 		float4x4 res;
 		_mm_mat4x4_mul_ps_dpps(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
-#ifdef TEST_SSE_CORRECTNESS
+	TIMER_END;
+
 	float4x4 res;
 	_mm_mat4x4_mul_ps_dpps(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", m2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse_mat_mat_mul_2)
+BENCHMARK(sse_mat_mat_mul_2)
 {
-	float4x4 *m = MatrixArray();
-	float4x4 *m2 = MatrixArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
 	{
 		float4x4 res;
 		_mm_mat4x4_mul_ps_dpps_2(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
-#ifdef TEST_SSE_CORRECTNESS
+	TIMER_END;
+
 	float4x4 res;
 	_mm_mat4x4_mul_ps_dpps_2(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", m2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse_mat_mat_mul_3)
+BENCHMARK(sse_mat_mat_mul_3)
 {
-	float4x4 *m = MatrixArray();
-	float4x4 *m2 = MatrixArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
 	{
 		float4x4 res;
 		_mm_mat4x4_mul_ps_dpps_3(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
-#ifdef TEST_SSE_CORRECTNESS
+	TIMER_END;
+
 	float4x4 res;
 	_mm_mat4x4_mul_ps_dpps_3(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", m2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse_mat_mat_mul_ps)
+BENCHMARK(sse_mat_mat_mul_ps)
 {
-	float4x4 *m = MatrixArray();
-	float4x4 *m2 = MatrixArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
 	{
 		float4x4 res;
 		_mm_mat4x4_mul_ps(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
-#ifdef TEST_SSE_CORRECTNESS
+	TIMER_END;
+
 	float4x4 res;
 	_mm_mat4x4_mul_ps(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", m2[0].ToString().c_str());
 }
 
-RANDOMIZED_TEST(sse_mat_mat_mul_ps_2)
+BENCHMARK(sse_mat_mat_mul_ps_2)
 {
-	float4x4 *m = MatrixArray();
-	float4x4 *m2 = MatrixArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
 	{
 		float4x4 res;
 		_mm_mat4x4_mul_ps_2(res.row, m[0].row, m[i].row);
 		m2[i] = res;
 	}
-#ifdef TEST_SSE_CORRECTNESS
+	TIMER_END;
+
 	float4x4 res;
 	_mm_mat4x4_mul_ps_2(res.row, m[0].row, m[1].row);
 	float4x4 res2 = m[0]*m[1];
 	assert(res.Equals(res2));
-#endif
-	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", m2[0].ToString().c_str());
 }
 
 #endif
 
-RANDOMIZED_TEST(sse_scalar_mat_vec_mul)
+BENCHMARK(sse_scalar_mat_vec_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4 *v = VectorArray();
-	float4 *v2 = VectorArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		v2[i] = m[i] * v[i];
-
-	if (*(char*)v2 == 0xFF && *((char*)v2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", v2[0].ToString().c_str());
+	}
+	TIMER_END;
 }
 
-RANDOMIZED_TEST(sse_scalar_mat_mat_mul)
+BENCHMARK(sse_scalar_mat_mat_mul)
 {
-	float4x4 *m = MatrixArray();
-	float4x4 *m2 = MatrixArray2();
-
-	for(int i = 0; i < N; ++i)
+	TIMER_BEGIN
+	{
 		m2[i] = m[0] * m[i];
+	}
+	TIMER_END;
+}
 
-	if (*(char*)m2 == 0xFF && *((char*)m2+1) == 0xEE) // Random condition to confuse compiler not to do dead code elimination.
-		LOGI("%s", m2[0].ToString().c_str());
+BENCHMARK(sse_float3_LengthSq)
+{
+	TIMER_BEGIN
+	{
+		f[i] = v[i].Float3Part().LengthSq();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(sse_float3_Length)
+{
+	TIMER_BEGIN
+	{
+		f[i] = v[i].Float3Part().Length();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(sse_float3_Normalize)
+{
+	TIMER_BEGIN
+	{
+		v[i].Float3Part().Normalize();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(sse_float4_Normalize3)
+{
+	TIMER_BEGIN
+	{
+		v[i].Normalize3();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(sse_float4_Normalize4)
+{
+	TIMER_BEGIN
+	{
+		v[i].Normalize4();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(sse_float4_Normalize4_Fast_SSE)
+{
+	TIMER_BEGIN
+	{
+		v[i].Normalize4_Fast_SSE();
+	}
+	TIMER_END;
 }
