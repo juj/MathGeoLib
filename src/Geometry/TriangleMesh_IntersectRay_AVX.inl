@@ -15,6 +15,9 @@
 /** @file TriangleMesh_IntersectRay_AVX.inl
 	@author Jukka Jylänki
 	@brief AVX implementation of ray-mesh intersection routines. */
+
+#include "Math/SSEMath.h"
+
 MATH_BEGIN_NAMESPACE
 
 #if !defined(MATH_GEN_TRIANGLEINDEX)
@@ -57,8 +60,6 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 	const __m256 epsilon = _mm256_set1_ps(1e-4f);
 	const __m256 zero = _mm256_setzero_ps();
 	const __m256 one = _mm256_set1_ps(1.f);
-
-    const __m256 sign_mask = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 
 	assert(((uintptr_t)data & 0x1F) == 0);
 
@@ -111,7 +112,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 //			return FLOAT_INF;
 		__m256 recipDet = _mm256_rcp_ps(det);
 
-		__m256 absdet = _mm256_andnot_ps(sign_mask, det);
+		__m256 absdet = abs_ps(det);
 		__m256 out = _mm256_cmp_ps(absdet, epsilon, _CMP_LT_OQ);
 
 		// Calculate distance from v0 to ray origin

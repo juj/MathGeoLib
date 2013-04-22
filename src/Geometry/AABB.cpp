@@ -741,7 +741,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 
 	// Check if the ray direction is parallel to any of the cardinal axes, and if so,
 	// mask those [near, far] ranges away from the hit test computations.
-	__m128 rayDirAbs = _mm_abs_ps(rayDir.v);
+	__m128 rayDirAbs = abs_ps(rayDir.v);
 
 	const __m128 epsilon = _mm_set1_ps(1e-4f);
 	// zeroDirections[i] will be nonzero for each axis i the ray is parallel to.

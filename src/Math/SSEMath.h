@@ -48,11 +48,23 @@ static const float andMaskOneF = *(float*)&andMaskOne;
 /// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
 const __m128 sseMaskXYZ = _mm_set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
 
-const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+const __m128 sseSignMask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 
-inline __m128 _mm_abs_ps(__m128 x)
+const __m128 sseEpsilonFloat = _mm_set1_ps(1e-4f);
+
+const __m128 sseZero = _mm_set1_ps(0.f);
+
+const __m128 sseOne = _mm_set1_ps(1.f);
+
+FORCE_INLINE __m128 abs_ps(__m128 x)
 {
-	return _mm_andnot_ps(sign_mask, x);
+	return _mm_andnot_ps(sseSignMask, x);
+}
+
+FORCE_INLINE __m256 abs_ps(__m256 x)
+{
+	return _mm256_andnot_ps(sseSignMask256, x);
 }
 
 /// Returns the lowest element of the given sse register as a float.
@@ -72,8 +84,6 @@ FORCE_INLINE __m128 FLOAT_TO_M128(float f)
 {
 	return _mm_load_ss(&f);
 }
-
-const __m128 epsilonFloat = _mm_set1_ps(1e-4f);
 
 // If mask[i] == 0, then output index i from a, otherwise mask[i] must be 0xFFFFFFFF, and output index i from b.
 inline __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
