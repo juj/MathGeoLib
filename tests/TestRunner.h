@@ -82,7 +82,7 @@ public:
 
 #endif
 
-const int testrunner_numTimerTests = 100000;
+const int testrunner_numTimerTests = 10000;
 const int testrunner_numItersPerTest = 1000;
 
 #define TIMER_BEGIN \
