@@ -306,4 +306,94 @@ BENCHMARK(sqrt_Sqrt_Via_Rcp_RSqrt)
 	}
 	TIMER_END
 }
+
+FORCE_INLINE float recip_sqrtf(float x)
+{
+	return 1.f / sqrtf(x);
+}
+
+FORCE_INLINE float sqrtf_recip(float x)
+{
+	return sqrtf(1.f / x);
+}
+
+// Quake Inverse Sqrt, from http://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
+// Benchmarked and tested for reference, DON'T USE THIS! It's twice as slow, and a magnitude of 1e3 worse in precision
+// compared to the function RSqrt!
+float QuakeInvSqrt(float x)
+{
+	float xhalf = 0.5f * x;
+	int i = *(int*)&x; // store floating-point bits in integer
+	i = 0x5f3759d5 - (i >> 1); // initial guess for Newton's method
+	x = *(float*)&i; // convert new bits into float
+	x = x*(1.5f - xhalf*x*x); // One round of Newton's method
+	return x;
+}
+
+UNIQUE_TEST(sqrt_rsqrt_precision)
+{
+	const int C = 7;
+	float maxRelError[C] = {};
+
+	for(int i = 0; i < 1000000; ++i)
+	{
+		float f = rng.Float(1e-5f, 1e20f);
+		float x = (float)(1.0 / sqrt((double)f)); // best precision of the sqrt.
+
+		float X[C];
+		X[0] = RSqrt(f);
+		X[1] = recip_sqrtf(f);
+		X[2] = sqrtf_recip(f);
+		X[3] = QuakeInvSqrt(f);
+
+		for(int j = 0; j < C; ++j)
+			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
+	}
+
+	LOGI("Max relative error with RSqrt: %e", maxRelError[0]);
+	assert(maxRelError[0] < 1e-3f);
+	LOGI("Max relative error with 1.f/sqrtf: %e", maxRelError[1]);
+	assert(maxRelError[1] < 1e-6f);
+	LOGI("Max relative error with sqrtf(1.f/x): %e", maxRelError[2]);
+	assert(maxRelError[2] < 1e-6f);
+	LOGI("Max relative error with Quake InvSqrt: %e", maxRelError[3]);
+	assert(maxRelError[3] < 1e-2f);
+}
+
+BENCHMARK(sqrt_RSqrt)
+{
+	TIMER_BEGIN
+	{
+		f[i] = RSqrt(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_recip_sqrtf)
+{
+	TIMER_BEGIN
+	{
+		f[i] = recip_sqrtf(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_sqrtf_recip)
+{
+	TIMER_BEGIN
+	{
+		f[i] = sqrtf_recip(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sqrt_QuakeInvSqrt)
+{
+	TIMER_BEGIN
+	{
+		f[i] = QuakeInvSqrt(pf[i]);
+	}
+	TIMER_END
+}
+
 #endif
