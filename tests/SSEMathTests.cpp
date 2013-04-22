@@ -613,6 +613,7 @@ BENCHMARK(sse_float4_Normalize4)
 	TIMER_END;
 }
 
+#ifdef MATH_SSE
 BENCHMARK(sse_float4_Normalize4_Fast_SSE)
 {
 	TIMER_BEGIN
@@ -621,3 +622,4 @@ BENCHMARK(sse_float4_Normalize4_Fast_SSE)
 	}
 	TIMER_END;
 }
+#endif

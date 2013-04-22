@@ -107,6 +107,8 @@ public:
 	static inline float TimespanToSecondsF(tick_t oldTick, tick_t newTick) { return TicksToSecondsF(TicksInBetween(newTick, oldTick)); }
 	static inline double TimespanToSecondsD(tick_t oldTick, tick_t newTick) { return TicksToSecondsD(TicksInBetween(newTick, oldTick)); }
 
+	static unsigned long long Rdtsc();
+
 private:
 	static tick_t appStartTime;      ///< Application startup time in ticks.
 

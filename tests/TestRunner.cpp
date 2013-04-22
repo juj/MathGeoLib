@@ -167,9 +167,9 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	if (!times.empty())
 	{
 		if (t.runOnlyOnce)
-			LOGI("   Elapsed: %s", FormatTime(times[0]).c_str());
+			LOGI("   Elapsed: %s", FormatTime((double)times[0]).c_str());
 		else
-			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(times[0]).c_str(), FormatTime(total / times.size()).c_str(), FormatTime(times.back()).c_str());
+			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime((double)times[0]).c_str(), FormatTime((double)total / times.size()).c_str(), FormatTime((double)times.back()).c_str());
 	}
 
 	return ret;

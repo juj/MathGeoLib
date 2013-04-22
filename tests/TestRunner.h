@@ -94,13 +94,13 @@ const int testrunner_numItersPerTest = 1000;
 	for(int xx = 0; xx < testrunner_numTimerTests; ++xx) \
 	{ \
 		tick_t start = Clock::Tick(); \
-		unsigned long long startTsc = __rdtsc(); \
+		unsigned long long startTsc = Clock::Rdtsc(); \
 		for(int i = 0; i < testrunner_numItersPerTest; ++i) \
 		{
 
 #define TIMER_END \
 		} \
-		unsigned long long endTsc = __rdtsc(); \
+		unsigned long long endTsc = Clock::Rdtsc(); \
 		tick_t end = Clock::Tick(); \
 		tick_t elapsedTicks = end - start; \
 		tick_t elapsedTsc = endTsc - startTsc; \
