@@ -192,13 +192,13 @@ UNIQUE_TEST(sqrt_precision)
 {
 	const int C = 7;
 	float maxRelError[C] = {};
+	float X[C] = {};
 
 	for(int i = 0; i < 1000000; ++i)
 	{
 		float f = rng.Float(0.f, 1e20f);
 		float x = (float)sqrt((double)f); // best precision of the sqrt.
 
-		float X[C];
 		X[0] = Sqrt(f);
 		X[1] = SqrtFast(f);
 		X[2] = NewtonRhapsonSqrt(f);
@@ -324,10 +324,10 @@ FORCE_INLINE float sqrtf_recip(float x)
 float QuakeInvSqrt(float x)
 {
 	float xhalf = 0.5f * x;
-	int i = *(int*)&x; // store floating-point bits in integer
+	u32 i = ReinterpretAsInt(x);//*(int*)&x; // store floating-point bits in integer
 	i = 0x5f375a86 - (i >> 1); // A better initial value: http://en.wikipedia.org/wiki/Fast_inverse_square_root#History_and_investigation
 	//i = 0x5f3759d5 - (i >> 1); // initial guess for Newton's method
-	x = *(float*)&i; // convert new bits into float
+	x = ReinterpretAsFloat(i);//*(float*)&i; // convert new bits into float
 	x = x*(1.5f - xhalf*x*x); // One round of Newton's method
 	return x;
 }
@@ -461,13 +461,13 @@ UNIQUE_TEST(sqrt_recip_precision)
 {
 	const int C = 7;
 	float maxRelError[C] = {};
+	float X[C] = {};
 
 	for(int i = 0; i < 1000000; ++i)
 	{
 		float f = rng.Float(1e-5f, 1e20f);
 		float x = (float)(1.0 / (double)f); // best precision of the reciprocal.
 
-		float X[C];
 		X[0] = Recip(f);
 		X[1] = RecipFast(f);
 #ifdef MATH_SSE

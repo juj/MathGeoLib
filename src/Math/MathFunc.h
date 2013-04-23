@@ -464,10 +464,10 @@ bool Equal(const T &a, const T &b)
 }
 
 /** Compares the two values for equality up to a small epsilon. */
-template<> bool inline Equal(const float &a, const float &b) { return Abs(a-b) <= eps; }
-template<> bool inline Equal(const double &a, const double &b) { return Abs(a-b) <= eps; }
+template<> bool FORCE_INLINE Equal(const float &a, const float &b) { return Abs(a-b) <= eps; }
+template<> bool FORCE_INLINE Equal(const double &a, const double &b) { return Abs(a-b) <= eps; }
 #ifndef EMSCRIPTEN // long double is not supported.
-template<> bool inline Equal(const long double &a, const long double &b) { return Abs(a-b) <= eps; }
+template<> bool FORCE_INLINE Equal(const long double &a, const long double &b) { return Abs(a-b) <= eps; }
 #endif
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */
@@ -489,33 +489,33 @@ bool EqualUlps(float a, float b, int maxUlps = 10000);
 template<typename T> inline bool IsFinite(const T & /*value*/) { return true; }
 
 #ifdef _MSC_VER
-template<> inline bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
-template<> inline bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
+template<> FORCE_INLINE bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
+template<> FORCE_INLINE bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
 
 #ifndef EMSCRIPTEN // long double is not supported.
-template<> inline bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
+template<> FORCE_INLINE bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
 #endif
 
 #else
-template<> inline bool IsFinite<float>(const float &value) { using namespace std; return isfinite(value) != 0; }
-template<> inline bool IsFinite<double>(const double &value) { using namespace std; return isfinite(value) != 0; }
+template<> FORCE_INLINE bool IsFinite<float>(const float &value) { using namespace std; return isfinite(value) != 0; }
+template<> FORCE_INLINE bool IsFinite<double>(const double &value) { using namespace std; return isfinite(value) != 0; }
 
 #ifndef EMSCRIPTEN // long double is not supported.
-template<> inline bool IsFinite<long double>(const long double &value) { using namespace std; return isfinite((double)value) != 0; }
+template<> FORCE_INLINE bool IsFinite<long double>(const long double &value) { using namespace std; return isfinite((double)value) != 0; }
 #endif
 
 #endif
 
 /// Returns true if the given value is +inf or -inf.
-inline bool IsInf(float value) { return value == FLOAT_INF || value == -FLOAT_INF; }
-inline bool IsInf(double value) { return value == (double)FLOAT_INF || value == (double)-FLOAT_INF; }
+FORCE_INLINE bool IsInf(float value) { return value == FLOAT_INF || value == -FLOAT_INF; }
+FORCE_INLINE bool IsInf(double value) { return value == (double)FLOAT_INF || value == (double)-FLOAT_INF; }
 /// Returns true if the given value is a not-a-number.
-inline bool IsNan(float value) { return !(value == value); }
-inline bool IsNan(double value) { return !(value == value); }
+FORCE_INLINE bool IsNan(float value) { return !(value == value); }
+FORCE_INLINE bool IsNan(double value) { return !(value == value); }
 
 #ifndef EMSCRIPTEN // long double is not supported.
-inline bool IsInf(long double value) { return value == (long double)FLOAT_INF || value == (long double)-FLOAT_INF; }
-inline bool IsNan(long double value) { return !(value == value); }
+FORCE_INLINE bool IsInf(long double value) { return value == (long double)FLOAT_INF || value == (long double)-FLOAT_INF; }
+FORCE_INLINE bool IsNan(long double value) { return !(value == value); }
 #endif
 
 /// As per C99, union-reinterpret should now be safe: http://stackoverflow.com/questions/8511676/portable-data-reinterpretation
@@ -526,7 +526,7 @@ union FloatIntReinterpret
 };
 
 /// Returns the bit pattern of the given float as a u32.
-inline u32 ReinterpretAsInt(float f)
+FORCE_INLINE u32 ReinterpretAsInt(float f)
 {
 	FloatIntReinterpret fi;
 	fi.f = f;
@@ -534,7 +534,7 @@ inline u32 ReinterpretAsInt(float f)
 }
 
 /// Converts the bit pattern specified by the given integer to a floating point (this is a binary conversion, not numeral!).
-inline float ReinterpretAsFloat(u32 i)
+FORCE_INLINE float ReinterpretAsFloat(u32 i)
 {
 	FloatIntReinterpret fi;
 	fi.i = i;
