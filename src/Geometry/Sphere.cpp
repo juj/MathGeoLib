@@ -15,7 +15,7 @@
 /** @file Sphere.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Sphere geometry object. */
-#include "Geometry/Sphere.h"
+#include "Sphere.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #include <vector>
@@ -24,26 +24,26 @@
 #include "Container/Array.h"
 #endif
 
-#include "Log.h"
-#include "Math/MathFunc.h"
-#include "Geometry/OBB.h"
-#include "Geometry/AABB.h"
-#include "Geometry/Capsule.h"
-#include "Geometry/Frustum.h"
-#include "Algorithm/Random/LCG.h"
-#include "Geometry/LineSegment.h"
-#include "Geometry/Line.h"
-#include "Geometry/Ray.h"
-#include "Geometry/Polygon.h"
-#include "Geometry/Polyhedron.h"
-#include "Geometry/Plane.h"
-#include "Math/float2.h"
-#include "Math/float3x3.h"
-#include "Math/float3x4.h"
-#include "Math/float4.h"
-#include "Math/float4x4.h"
-#include "Math/Quat.h"
-#include "Geometry/Triangle.h"
+#include "../Math/MathLog.h"
+#include "../Math/MathFunc.h"
+#include "OBB.h"
+#include "AABB.h"
+#include "Capsule.h"
+#include "Frustum.h"
+#include "../Algorithm/Random/LCG.h"
+#include "LineSegment.h"
+#include "Line.h"
+#include "Ray.h"
+#include "Polygon.h"
+#include "Polyhedron.h"
+#include "Plane.h"
+#include "../Math/float2.h"
+#include "../Math/float3x3.h"
+#include "../Math/float3x4.h"
+#include "../Math/float4.h"
+#include "../Math/float4x4.h"
+#include "../Math/Quat.h"
+#include "Triangle.h"
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"

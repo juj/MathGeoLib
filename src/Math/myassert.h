@@ -15,7 +15,7 @@
 /** @file myassert.h
 	@author Jukka Jylänki
 	@brief Control over assert() macro for MathGeoLib. */
-#include "Log.h"
+#include "MathLog.h"
 
 #include <sstream>
 

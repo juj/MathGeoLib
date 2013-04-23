@@ -17,10 +17,10 @@
 	@brief The Frustum geometry object. */
 #pragma once
 
-#include "Math/MathFwd.h"
-#include "Math/float2.h"
-#include "Math/float3.h"
-#include "Geometry/Ray.h"
+#include "../MathGeoLibFwd.h"
+#include "../Math/float2.h"
+#include "../Math/float3.h"
+#include "Ray.h"
 
 #ifdef MATH_TINYXML_INTEROP
 #include "Config/tinyxml/tinyxml.h"

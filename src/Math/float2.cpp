@@ -15,12 +15,12 @@
 /** @file float2.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/float2.h"
+#include "float2.h"
 #include <stdlib.h>
-#include "Math/float3.h"
-#include "Math/float4.h"
-#include "Math/MathFunc.h"
-#include "Algorithm/Random/LCG.h"
+#include "float3.h"
+#include "float4.h"
+#include "MathFunc.h"
+#include "../Algorithm/Random/LCG.h"
 #include "assume.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT

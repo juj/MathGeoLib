@@ -34,8 +34,8 @@
 #include <mach/mach_time.h>
 #endif
 
-#include "Time/Clock.h"
-#include "myassert.h"
+#include "Clock.h"
+#include "../Math/myassert.h"
 
 MATH_BEGIN_NAMESPACE
 

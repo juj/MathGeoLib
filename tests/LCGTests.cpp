@@ -1,5 +1,5 @@
-#include "myassert.h"
-#include "MathGeoLib.h"
+#include "../src/Math/myassert.h"
+#include "../src/MathGeoLib.h"
 #include "../tests/TestRunner.h"
 
 RANDOMIZED_TEST(LCG_IntFast)

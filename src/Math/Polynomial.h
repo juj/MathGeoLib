@@ -17,7 +17,7 @@
 	@brief */
 #pragma once
 
-#include "Math/MathNamespace.h"
+#include "MathNamespace.h"
 
 MATH_BEGIN_NAMESPACE
 

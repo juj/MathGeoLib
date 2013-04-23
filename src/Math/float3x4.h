@@ -21,10 +21,10 @@
 #include "myassert.h"
 #endif
 
-#include "Math/MathFwd.h"
+#include "../MathGeoLibFwd.h"
 #include "MatrixProxy.h"
 #include "CoordinateAxisConvention.h"
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 MATH_BEGIN_NAMESPACE
 

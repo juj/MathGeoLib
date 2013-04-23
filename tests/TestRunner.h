@@ -3,8 +3,8 @@
 #include <vector>
 #include <string>
 
-#include "Algorithm/Random/LCG.h"
-#include "Time/Clock.h"
+#include "../src/Algorithm/Random/LCG.h"
+#include "../src/Time/Clock.h"
 
 #define SCALE 1e2f
 

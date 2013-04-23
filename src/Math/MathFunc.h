@@ -24,10 +24,10 @@
 #include <cmath>
 #include <float.h>
 
-#include "Math/MathTypes.h"
-#include "Math/MathConstants.h"
-#include "Math/float3.h"
-#include "Math/SSEMath.h"
+#include "MathTypes.h"
+#include "MathConstants.h"
+#include "float3.h"
+#include "SSEMath.h"
 
 #ifdef WIN32
 #define Polygon Polygon_unused

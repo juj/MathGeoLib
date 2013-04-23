@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "MathGeoLib.h"
-#include "myassert.h"
+#include "../src/MathGeoLib.h"
+#include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
-#include "Math/SSEMath.h"
+#include "../src/Math/SSEMath.h"
 
 extern float *f;
 extern float4x4 *m;

@@ -15,16 +15,16 @@
 /** @file Quat.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/Quat.h"
+#include "Quat.h"
 #include <stdlib.h>
-#include "Math/float3.h"
-#include "Math/float4.h"
-#include "Math/float3x3.h"
-#include "Math/float3x4.h"
-#include "Math/float4x4.h"
-#include "Algorithm/Random/LCG.h"
+#include "float3.h"
+#include "float4.h"
+#include "float3x3.h"
+#include "float3x4.h"
+#include "float4x4.h"
+#include "../Algorithm/Random/LCG.h"
 #include "assume.h"
-#include "Math/MathFunc.h"
+#include "MathFunc.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>

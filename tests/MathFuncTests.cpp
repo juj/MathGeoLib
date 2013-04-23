@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "MathGeoLib.h"
-#include "myassert.h"
+#include "../src/MathGeoLib.h"
+#include "../src/Math/myassert.h"
 #include "TestRunner.h"
 #include <cmath>
 

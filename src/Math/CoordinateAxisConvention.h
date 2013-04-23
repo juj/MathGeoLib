@@ -17,10 +17,10 @@
 	@brief */
 #pragma once
 
-#include "Math/float3x3.h"
-#include "Math/float3x4.h"
-#include "Math/float4x4.h"
-#include "Math/float3.h"
+#include "float3x3.h"
+#include "float3x4.h"
+#include "float4x4.h"
+#include "float3.h"
 /*
 struct PositiveX
 {

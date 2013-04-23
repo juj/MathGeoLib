@@ -15,30 +15,30 @@
 /** @file Polygon.cpp
 	@author Jukka Jyl�nki
 	@brief Implementation for the Polygon geometry object. */
-#include "Geometry/Polygon.h"
+#include "Polygon.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
-#include "myassert.h"
+#include "../Math/myassert.h"
 #include <utility>
 #include <list>
 #endif
 
-#include "Geometry/AABB.h"
-#include "Geometry/OBB.h"
-#include "Geometry/Frustum.h"
-#include "Geometry/Polyhedron.h"
-#include "Geometry/Plane.h"
-#include "Geometry/Line.h"
-#include "Geometry/Ray.h"
-#include "Geometry/LineSegment.h"
-#include "Geometry/Triangle.h"
-#include "Geometry/Sphere.h"
-#include "Algorithm/Random/LCG.h"
-#include "Math/MathFunc.h"
-#include "Math/float3x3.h"
-#include "Math/float3x4.h"
-#include "Math/float4x4.h"
-#include "Math/Quat.h"
-#include "Math/float2.h"
+#include "AABB.h"
+#include "OBB.h"
+#include "Frustum.h"
+#include "Polyhedron.h"
+#include "Plane.h"
+#include "Line.h"
+#include "Ray.h"
+#include "LineSegment.h"
+#include "Triangle.h"
+#include "Sphere.h"
+#include "../Algorithm/Random/LCG.h"
+#include "../Math/MathFunc.h"
+#include "../Math/float3x3.h"
+#include "../Math/float3x4.h"
+#include "../Math/float4x4.h"
+#include "../Math/Quat.h"
+#include "../Math/float2.h"
 
 MATH_BEGIN_NAMESPACE
 

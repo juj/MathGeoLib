@@ -15,27 +15,27 @@
 /** @file Polyhedron.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the Polyhedron geometry object. */
-#include "Geometry/Polyhedron.h"
+#include "Polyhedron.h"
 #include <set>
 #include <map>
 #include <utility>
 #include <list>
 #include <sstream>
-#include "assume.h"
-#include "Math/MathFunc.h"
-#include "Math/float3x4.h"
-#include "Math/Quat.h"
-#include "Geometry/AABB.h"
-#include "Geometry/OBB.h"
-#include "Geometry/Frustum.h"
-#include "Geometry/Plane.h"
-#include "Geometry/Polygon.h"
-#include "Geometry/Line.h"
-#include "Geometry/Ray.h"
-#include "Geometry/LineSegment.h"
-#include "Geometry/Triangle.h"
-#include "Geometry/Sphere.h"
-#include "Geometry/Capsule.h"
+#include "../Math/assume.h"
+#include "../Math/MathFunc.h"
+#include "../Math/float3x4.h"
+#include "../Math/Quat.h"
+#include "AABB.h"
+#include "OBB.h"
+#include "Frustum.h"
+#include "Plane.h"
+#include "Polygon.h"
+#include "Line.h"
+#include "Ray.h"
+#include "LineSegment.h"
+#include "Triangle.h"
+#include "Sphere.h"
+#include "Capsule.h"
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"

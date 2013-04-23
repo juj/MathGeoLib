@@ -16,10 +16,10 @@
 	@author Jukka Jylänki
 	@brief */
 #include "TransformOps.h"
-#include "Math/MathFunc.h"
-#include "Math/float4.h"
-#include "Math/float3x4.h"
-#include "Math/float4x4.h"
+#include "MathFunc.h"
+#include "float4.h"
+#include "float3x4.h"
+#include "float4x4.h"
 
 MATH_BEGIN_NAMESPACE
 

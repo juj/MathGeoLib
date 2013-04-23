@@ -16,15 +16,15 @@
 	@author Jukka Jylänki
 	@brief Implementation for the Circle geometry object. */
 #include "Circle.h"
-#include "Geometry/Plane.h"
-#include "Math/MathFunc.h"
-#include "Math/float3x3.h"
-#include "Math/Quat.h"
-#include "Geometry/Ray.h"
-#include "Geometry/AABB.h"
-#include "Geometry/OBB.h"
-#include "Geometry/LineSegment.h"
-#include "Geometry/Line.h"
+#include "Plane.h"
+#include "../Math/MathFunc.h"
+#include "../Math/float3x3.h"
+#include "../Math/Quat.h"
+#include "Ray.h"
+#include "AABB.h"
+#include "OBB.h"
+#include "LineSegment.h"
+#include "Line.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>

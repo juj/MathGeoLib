@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "TestRunner.h"
-#include "Time/Clock.h"
+#include "../src/Time/Clock.h"
 #include <algorithm>
 #include <cstring>
 
-#include "myassert.h"
+#include "../src/Math/myassert.h"
 
 LCG rng(Clock::TickU32());
 

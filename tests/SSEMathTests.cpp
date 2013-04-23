@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "MathGeoLib.h"
-#include "myassert.h"
+#include "../src/MathGeoLib.h"
+#include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
-#include "Math/SSEMath.h"
-#include "Math/float4x4_sse.h"
+#include "../src/Math/SSEMath.h"
+#include "../src/Math/float4x4_sse.h"
 
 // In debug mode, we test the correctness of the SSE code. In release mode, we benchmark performance.
 #ifdef _DEBUG

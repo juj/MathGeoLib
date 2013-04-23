@@ -17,7 +17,7 @@
 	@brief The TriangleMesh geometry object. */
 #pragma once
 
-#include "Math/MathFwd.h"
+#include "../MathGeoLibFwd.h"
 
 MATH_BEGIN_NAMESPACE
 

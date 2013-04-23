@@ -17,8 +17,8 @@
 	@brief The Capsule geometry object. */
 #pragma once
 
-#include "Math/MathFwd.h"
-#include "Geometry/LineSegment.h"
+#include "../MathGeoLibFwd.h"
+#include "LineSegment.h"
 
 MATH_BEGIN_NAMESPACE
 

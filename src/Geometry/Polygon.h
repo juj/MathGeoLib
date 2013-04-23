@@ -17,8 +17,8 @@
 	@brief The Polygon geometry object. */
 #pragma once
 
-#include "Math/MathFwd.h"
-#include "Math/float3.h"
+#include "../MathGeoLibFwd.h"
+#include "../Math/float3.h"
 
 //#ifdef MATH_ENABLE_STL_SUPPORT
 #include <vector>

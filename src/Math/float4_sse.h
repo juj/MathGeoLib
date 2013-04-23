@@ -17,11 +17,11 @@
 	@brief SSE code for float4-related computations. */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_SSE
 
-#include "Math/MathTypes.h"
+#include "MathTypes.h"
 #include "SSEMath.h"
 
 // Input: [w,z,y,x], Output: x+y+z in all four registers.

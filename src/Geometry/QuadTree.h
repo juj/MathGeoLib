@@ -22,9 +22,9 @@
 #else
 #define PROFILE(x)
 #endif
-#include "Math/float2.h"
-#include "Geometry/AABB2D.h"
-#include "Math/MathTypes.h"
+#include "../Math/float2.h"
+#include "AABB2D.h"
+#include "../Math/MathTypes.h"
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Container/MaxHeap.h"

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "MathGeoLib.h"
-#include "myassert.h"
+#include "../src/MathGeoLib.h"
+#include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
 Line RandomLineContainingPoint(const float3 &pt);

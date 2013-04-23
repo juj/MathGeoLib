@@ -22,7 +22,7 @@
 #undef Polygon
 #endif
 
-#include "Math/MathNamespace.h"
+#include "../Math/MathNamespace.h"
 
 MATH_BEGIN_NAMESPACE
 

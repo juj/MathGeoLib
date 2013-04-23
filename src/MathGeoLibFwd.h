@@ -17,7 +17,7 @@
 	@brief */
 #pragma once
 
-#include "Math/MathBuildConfig.h"
+#include "MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 
 // The CONST_WIN32 is a #define which resolves to 'const' on Windows, and null on other

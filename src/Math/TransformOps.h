@@ -17,8 +17,8 @@
 	@brief */
 #pragma once
 
-#include "Math/MathFwd.h"
-#include "Math/float3.h"
+#include "../MathGeoLibFwd.h"
+#include "float3.h"
 
 MATH_BEGIN_NAMESPACE
 

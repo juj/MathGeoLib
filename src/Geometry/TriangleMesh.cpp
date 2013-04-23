@@ -19,12 +19,12 @@
 #include "TriangleMesh.h"
 #include <malloc.h>
 #include <string.h>
-#include "Math/float3.h"
-#include "Geometry/Triangle.h"
-#include "Geometry/Ray.h"
-#include "Math/MathFwd.h"
-#include "Math/MathConstants.h"
-#include "myassert.h"
+#include "../Math/float3.h"
+#include "Triangle.h"
+#include "Ray.h"
+#include "../MathGeoLibFwd.h"
+#include "../Math/MathConstants.h"
+#include "../Math/myassert.h"
 
 #ifdef MATH_SSE
 #include <intrin.h>

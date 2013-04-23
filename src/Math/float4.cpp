@@ -15,7 +15,7 @@
 /** @file float4.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/float4.h"
+#include "float4.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #include <utility>
@@ -24,12 +24,12 @@
 
 #include <stdlib.h>
 
-#include "Math/float2.h"
-#include "Math/float3.h"
-#include "Geometry/Sphere.h"
-#include "Algorithm/Random/LCG.h"
-#include "Math/float4x4.h"
-#include "Math/MathFunc.h"
+#include "float2.h"
+#include "float3.h"
+#include "../Geometry/Sphere.h"
+#include "../Algorithm/Random/LCG.h"
+#include "float4x4.h"
+#include "MathFunc.h"
 #include "SSEMath.h"
 #include "float4_sse.h"
 

@@ -17,8 +17,8 @@
 	@brief A KD-tree acceleration structure for static geometry. */
 #pragma once
 
-#include "Math/MathTypes.h"
-#include "myassert.h"
+#include "../Math/MathTypes.h"
+#include "../Math/myassert.h"
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Container/MaxHeap.h"

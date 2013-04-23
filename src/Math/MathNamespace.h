@@ -17,7 +17,7 @@
 	@brief Defines a C++ namespace for all Math objects (optional). */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_ENABLE_NAMESPACE
 

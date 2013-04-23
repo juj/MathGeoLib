@@ -15,7 +15,7 @@
 /** @file MathOps.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/MathFunc.h"
+#include "MathFunc.h"
 #include "myassert.h"
 
 MATH_BEGIN_NAMESPACE

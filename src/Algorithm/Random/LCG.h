@@ -17,10 +17,10 @@
 	@brief A linear congruential random number generator. */
 #pragma once
 
-#include "Math/MathBuildConfig.h"
-#include "Math/MathNamespace.h"
+#include "../../MathBuildConfig.h"
+#include "../../Math/MathNamespace.h"
 
-#include "Math/MathTypes.h"
+#include "../../Math/MathTypes.h"
 
 /** @brief A linear congruential random number generator.
 

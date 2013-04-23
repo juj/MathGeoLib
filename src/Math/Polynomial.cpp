@@ -15,8 +15,8 @@
 /** @file Polynomial.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/Polynomial.h"
-#include "Math/MathFunc.h"
+#include "Polynomial.h"
+#include "MathFunc.h"
 
 MATH_BEGIN_NAMESPACE
 

@@ -20,7 +20,7 @@
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #endif
-#include "Math/MathFwd.h"
+#include "../MathGeoLibFwd.h"
 #include "MatrixProxy.h"
 #include "CoordinateAxisConvention.h"
 
@@ -32,7 +32,7 @@
 #include <QMatrix4x4>
 #endif
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 #include "SSEMath.h"
 
 MATH_BEGIN_NAMESPACE

@@ -17,13 +17,13 @@
 	@brief Global compilation defines. */
 #pragma once
 
-#include "Math/MathBuildConfig.h"
-#include "Math/MathNamespace.h"
+#include "../MathBuildConfig.h"
+#include "MathNamespace.h"
 #include <stdio.h>
 #ifdef WIN32
 #include "myassert.h"
 #endif
-#include "Log.h"
+#include "MathLog.h"
 
 #ifndef MARK_UNUSED
 /// If a variable is labelled with this directive, the compiler should not emit a warning even if it is unused in the code.

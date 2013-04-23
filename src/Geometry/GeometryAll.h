@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "Math/MathBuildConfig.h"
-#include "Math/MathNamespace.h"
+#include "../MathBuildConfig.h"
+#include "../Math/MathNamespace.h"
 #ifdef WIN32
 // Windows GDI has a global function named Polygon. I am not renaming my Polygon object just for its sake, especially since
 // I'm not expecting anyone to co-use this library with GDI. Kill the Polygon function from Windows. and force-include

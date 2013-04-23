@@ -17,14 +17,14 @@
 	@brief A 2D (x,y) ordered pair. */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #include <vector>
 #endif
 
-#include "Math/MathFwd.h"
+#include "../MathGeoLibFwd.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector2D>

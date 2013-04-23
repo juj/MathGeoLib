@@ -15,7 +15,7 @@
 /** @file Log.cpp
 	@author Jukka Jylänki
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
-#include "Log.h"
+#include "MathLog.h"
 
 #if defined(WIN32) && !defined(WIN8RT)
 #define WIN32_LEAN_AND_MEAN

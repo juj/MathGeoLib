@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "Math/float3.h"
-#include "Geometry/AABB.h"
+#include "../Math/float3.h"
+#include "AABB.h"
 #include "Plane.h"
 
 MATH_BEGIN_NAMESPACE

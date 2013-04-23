@@ -17,7 +17,7 @@
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
 #pragma once
 
-#include "Math/MathNamespace.h"
+#include "MathNamespace.h"
 
 #include <stdio.h>
 

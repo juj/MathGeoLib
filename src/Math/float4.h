@@ -20,8 +20,8 @@
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #endif
-#include "Math/MathFwd.h"
-#include "Math/float3.h"
+#include "../MathGeoLibFwd.h"
+#include "float3.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector4D>
@@ -31,7 +31,7 @@
 #include <OgreVector4.h>
 #endif
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 MATH_BEGIN_NAMESPACE
 

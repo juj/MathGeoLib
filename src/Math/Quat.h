@@ -17,12 +17,12 @@
 	@brief Quaternions represent rotations and orientations of 3D objects. */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #endif
-#include "Math/MathFwd.h"
+#include "../MathGeoLibFwd.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QQuaternion>

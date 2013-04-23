@@ -18,8 +18,8 @@
 #pragma once
 
 #include "myassert.h"
-#include "Math/MathFwd.h"
-#include "Math/MathTypes.h"
+#include "../MathGeoLibFwd.h"
+#include "MathTypes.h"
 
 MATH_BEGIN_NAMESPACE
 

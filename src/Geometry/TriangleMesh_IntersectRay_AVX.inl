@@ -16,7 +16,7 @@
 	@author Jukka Jylänki
 	@brief AVX implementation of ray-mesh intersection routines. */
 
-#include "Math/SSEMath.h"
+#include "../Math/SSEMath.h"
 
 MATH_BEGIN_NAMESPACE
 

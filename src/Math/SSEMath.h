@@ -17,7 +17,7 @@
 	@brief SIMD-enabled math helper utilities. */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_SSE // If SSE is not enabled, this whole file will not be included.
 

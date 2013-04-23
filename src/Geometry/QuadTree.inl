@@ -17,7 +17,7 @@
 	@brief Implementation for the QuadTree object. */
 #pragma once
 
-#include "Math/MathFunc.h"
+#include "../Math/MathFunc.h"
 
 MATH_BEGIN_NAMESPACE
 

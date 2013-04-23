@@ -18,7 +18,7 @@
 #pragma once
 
 #include <utility>
-#include "Math/Quat.h"
+#include "Quat.h"
 
 MATH_BEGIN_NAMESPACE
 

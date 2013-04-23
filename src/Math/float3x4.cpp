@@ -15,18 +15,18 @@
 /** @file float3x4.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/float3x4.h"
+#include "float3x4.h"
 #include <string.h>
 
-#include "Math/MathFunc.h"
-#include "Math/float3.h"
-#include "Math/float4.h"
-#include "Math/float3x3.h"
-#include "Math/float4x4.h"
+#include "MathFunc.h"
+#include "float3.h"
+#include "float4.h"
+#include "float3x3.h"
+#include "float4x4.h"
 #include "Matrix.inl"
-#include "Math/Quat.h"
-#include "Algorithm/Random/LCG.h"
-#include "Geometry/Plane.h"
+#include "Quat.h"
+#include "../Algorithm/Random/LCG.h"
+#include "../Geometry/Plane.h"
 #include "TransformOps.h"
 #include "SSEMath.h"
 #include "float4x4_sse.h"

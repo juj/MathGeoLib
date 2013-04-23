@@ -17,20 +17,20 @@
 	@brief A 3D (x,y,z) ordered tuple. */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #endif
 
-#include "Math/MathFwd.h"
+#include "../MathGeoLibFwd.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector3D>
 #endif
 /*
 #ifdef MATH_IRRLICHT_INTEROP
-#include "Math/float3.h"
+#include "float3.h"
 #endif
 */
 #ifdef MATH_OGRE_INTEROP

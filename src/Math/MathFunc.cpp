@@ -15,15 +15,15 @@
 /** @file MathFunc.cpp
 	@author Jukka Jylänki
 	@brief Common mathematical functions. */
-#include "Math/MathFunc.h"
-#include "Math/SSEMath.h"
+#include "MathFunc.h"
+#include "SSEMath.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>
 #include <algorithm>
 #endif
 
 #include "myassert.h"
-#include "Math/float2.h"
+#include "float2.h"
 
 #ifdef WIN32
 #include <Windows.h>

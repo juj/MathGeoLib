@@ -15,7 +15,7 @@
 /** @file float3.cpp
 	@author Jukka Jylänki
 	@brief */
-#include "Math/float3.h"
+#include "float3.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
 #include "myassert.h"
@@ -23,19 +23,19 @@
 #endif
 #include <stdlib.h>
 
-#include "Math/float2.h"
-#include "Math/float4.h"
-#include "Math/float3x3.h"
-#include "Geometry/Line.h"
-#include "Geometry/Ray.h"
-#include "Geometry/LineSegment.h"
-#include "Geometry/Sphere.h"
-#include "Geometry/AABB.h"
-#include "Geometry/OBB.h"
-#include "Geometry/Plane.h"
-#include "Geometry/Triangle.h"
-#include "Geometry/Capsule.h"
-#include "Math/MathFunc.h"
+#include "float2.h"
+#include "float4.h"
+#include "float3x3.h"
+#include "../Geometry/Line.h"
+#include "../Geometry/Ray.h"
+#include "../Geometry/LineSegment.h"
+#include "../Geometry/Sphere.h"
+#include "../Geometry/AABB.h"
+#include "../Geometry/OBB.h"
+#include "../Geometry/Plane.h"
+#include "../Geometry/Triangle.h"
+#include "../Geometry/Capsule.h"
+#include "MathFunc.h"
 
 MATH_BEGIN_NAMESPACE
 

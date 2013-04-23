@@ -118,7 +118,9 @@
 #if defined(__GNUC__) || defined(__clang__)
 #include <immintrin.h>
 #endif
+#ifndef MATH_SSE41
 #define MATH_SSE41
+#endif
 #define MATH_SSE3
 #define MATH_SSE2
 #define MATH_SSE

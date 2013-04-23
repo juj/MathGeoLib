@@ -17,7 +17,7 @@
 	@brief SSE code for float4x4-related computations. */
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 
 #ifdef MATH_SSE
 

@@ -34,7 +34,7 @@
 #include "FloatCmp.h"
 #include "MathConstants.h"
 #include "MathFunc.h"
-#include "MathFwd.h"
+#include "MathGeoLibFwd.h"
 #include "MatrixProxy.h"
 #include "Polynomial.h"
 #include "Quat.h"

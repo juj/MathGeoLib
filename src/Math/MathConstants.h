@@ -21,8 +21,8 @@
 */
 #pragma once
 
-#include "Math/MathTypes.h"
-#include "Math/MathNamespace.h"
+#include "MathTypes.h"
+#include "MathNamespace.h"
 
 #include <limits>
 #include <math.h>
