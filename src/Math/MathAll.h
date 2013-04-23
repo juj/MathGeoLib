@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "MathBuildConfig.h"
+#include "../MathBuildConfig.h"
 #include "MathNamespace.h"
 
 #include "BitOps.h"
@@ -34,7 +34,7 @@
 #include "FloatCmp.h"
 #include "MathConstants.h"
 #include "MathFunc.h"
-#include "MathGeoLibFwd.h"
+#include "../MathGeoLibFwd.h"
 #include "MatrixProxy.h"
 #include "Polynomial.h"
 #include "Quat.h"
