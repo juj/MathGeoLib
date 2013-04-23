@@ -430,9 +430,8 @@ float NewtonRhapsonRecip(float x)
 
 	// Do one iteration of Newton-Rhapson:
 	__m128 e2 = _mm_mul_ss(e,e);
-	__m128 two = _mm_set_ss(2.f);
 	
-	return M128_TO_FLOAT(_mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2)));
+	return M128_TO_FLOAT(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 
 float NewtonRhapsonRecip2(float x)
@@ -449,11 +448,10 @@ float NewtonRhapsonRecip2(float x)
 
 	// Do one iteration of Newton-Rhapson:
 	__m128 e2 = _mm_mul_ss(e,e);
-	__m128 two = _mm_set_ss(2.f);
 
-	e = _mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2));
+	e = _mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2));
 	e2 = _mm_mul_ss(e,e);
-	return M128_TO_FLOAT(_mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2)));
+	return M128_TO_FLOAT(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 #endif
 

@@ -316,8 +316,7 @@ FORCE_INLINE float Recip(float x)
 	// Do one iteration of Newton-Rhapson:
 	// e_n = 2*e - x*e^2
 	__m128 e2 = _mm_mul_ss(e,e);
-	__m128 two = _mm_set_ss(2.f);
-	return M128_TO_FLOAT(_mm_sub_ss(_mm_mul_ss(two, e), _mm_mul_ss(X, e2)));
+	return M128_TO_FLOAT(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 #else
 	return 1.f / x;
 #endif
