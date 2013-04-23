@@ -24,7 +24,7 @@
 #include <cmath>
 #include <float.h>
 
-#include "Types.h"
+#include "Math/MathTypes.h"
 #include "Math/MathConstants.h"
 #include "Math/float3.h"
 #include "Math/SSEMath.h"

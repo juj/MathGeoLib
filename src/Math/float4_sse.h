@@ -21,7 +21,7 @@
 
 #ifdef MATH_SSE
 
-#include "Types.h"
+#include "Math/MathTypes.h"
 #include "SSEMath.h"
 
 // Input: [w,z,y,x], Output: x+y+z in all four registers.

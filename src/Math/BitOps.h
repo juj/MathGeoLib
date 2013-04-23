@@ -19,7 +19,7 @@
 
 #include "myassert.h"
 #include "Math/MathFwd.h"
-#include "Types.h"
+#include "Math/MathTypes.h"
 
 MATH_BEGIN_NAMESPACE
 

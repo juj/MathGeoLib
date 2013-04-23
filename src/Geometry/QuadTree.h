@@ -24,7 +24,7 @@
 #endif
 #include "Math/float2.h"
 #include "Geometry/AABB2D.h"
-#include "Types.h"
+#include "Math/MathTypes.h"
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Container/MaxHeap.h"

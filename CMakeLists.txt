@@ -43,6 +43,8 @@ endif()
 
 include_directories(./src)
 
+# N.B. These exist for inter-opping to other libraries written by the author.
+# Feel free to remove. 
 include_directories(../CodeLib/src)
 include_directories(../GraphicsEngine/src)
 

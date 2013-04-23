@@ -20,7 +20,7 @@
 #include "Math/MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 
-#include "Types.h"
+#include "Math/MathTypes.h"
 
 /** @brief A linear congruential random number generator.
 

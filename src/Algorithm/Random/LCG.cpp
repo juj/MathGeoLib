@@ -19,7 +19,7 @@
 #include "Algorithm/Random/LCG.h"
 #include "Math/MathFunc.h"
 #include "Time/Clock.h"
-#include "Types.h"
+#include "Math/MathTypes.h"
 #include "myassert.h"
 
 MATH_BEGIN_NAMESPACE
