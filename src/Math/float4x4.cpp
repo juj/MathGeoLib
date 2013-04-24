@@ -1470,7 +1470,13 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 float4 float4x4::Transform(const float4 &vector) const
 {
 #ifdef MATH_AUTOMATIC_SSE
+
+#ifdef MATH_SSE3
+	return float4(mat4x4_mul_sse3(row, vector.v));
+#else
 	return float4(mat4x4_mul_sse(row, vector.v));
+#endif
+
 #else
 	return float4(DOT4(Row(0), vector),
 				  DOT4(Row(1), vector),

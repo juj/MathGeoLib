@@ -51,6 +51,15 @@ BENCHMARK(Quat_Transform_float4)
 	TIMER_END;
 }
 
+BENCHMARK(Quat_to_float4x4)
+{
+	TIMER_BEGIN
+	{
+		m[i] = q[i].ToFloat4x4();
+	}
+	TIMER_END;
+}
+
 RANDOMIZED_TEST(Quat_Transform)
 {
 	Quat q = Quat::RandomRotation(rng);
@@ -70,3 +79,4 @@ RANDOMIZED_TEST(Quat_Transform)
 	assert(MV.Equals(qV));
 	assert(MV.Equals(qV2));
 }
+

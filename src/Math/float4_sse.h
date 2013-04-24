@@ -29,8 +29,8 @@ FORCE_INLINE __m128 sum_xyz_ps(__m128 m)
 {
 #ifdef MATH_SSE3 // If we have SSE 3, we can use the haddps (horizontal add) instruction, _mm_hadd_ps intrinsic.
 	m = _mm_and_ps(m, sseMaskXYZ); // Clear w to zero.
-	m = _mm_hadd_ps(m, m); // m = (x+y, z+w, x+y, z+w).
-	m = _mm_hadd_ps(m, m); // m = (x+y+z+w, x+y+z+w, x+y+z+w, x+y+z+w).
+	m = _mm_hadd_ps(m, m); // m = (x+y, z, x+y, z).
+	m = _mm_hadd_ps(m, m); // m = (x+y+z, x+y+z, x+y+z, x+y+z).
 	return m; // Each index of the output will contain the sum x+y+z.
 #else // We only have SSE 1, and must individually shuffle.
 	__m128 Y = shuffle1_ps(m, _MM_SHUFFLE(1,1,1,1)); // Load Y to lowest index. (others don't matter)

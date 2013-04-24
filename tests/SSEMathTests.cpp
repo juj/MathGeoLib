@@ -244,7 +244,7 @@ float4 *v2 = VectorArray2();
 
 // Experimental test to use AVX 8-wide registers for matrix*vector
 // Assumes matrix is stored in row-major.
-inline __m128 _mm_mat4x4_mul_ps_avx(const __m256 *matrix, __m128 vector)
+inline __m128 mat4x4_mul_avx(const __m256 *matrix, __m128 vector)
 {
 	__m256 r01 = matrix[0]; // [ row1, row0 ]
 	__m256 r23 = matrix[1]; // [ row3, row2 ]
@@ -264,7 +264,7 @@ inline __m128 _mm_mat4x4_mul_ps_avx(const __m256 *matrix, __m128 vector)
 	return ret;
 }
 
-inline __m128 _mm_mat4x4_mul_ps_avx_2(const __m256 *matrix, __m128 vector)
+inline __m128 mat4x4_mul_avx_2(const __m256 *matrix, __m128 vector)
 {
 	__m256 r01 = matrix[0]; // [ row1, row0 ]
 	__m256 r23 = matrix[1]; // [ row3, row2 ]
@@ -282,7 +282,7 @@ inline __m128 _mm_mat4x4_mul_ps_avx_2(const __m256 *matrix, __m128 vector)
 	return _mm_unpacklo_ps(xz, wy); // [ W, Z, Y, X]
 }
 
-inline __m128 _mm_colmajor_mat4x4_mul_ps_avx(const __m256 *matrix, __m128 vector)
+inline __m128 colmajor_mat4x4_mul_avx(const __m256 *matrix, __m128 vector)
 {
 	__m256 x = _mm256_castps128_ps256(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(0,0,0,0)));
 	__m128 y = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(1,1,1,1));
@@ -301,7 +301,7 @@ inline __m128 _mm_colmajor_mat4x4_mul_ps_avx(const __m256 *matrix, __m128 vector
 	return _mm_add_ps(hi, lo);
 }
 
-inline __m128 _mm_colmajor_mat4x4_mul_ps_avx_2(const __m256 *matrix, __m128 vector)
+inline __m128 colmajor_mat4x4_mul_avx_2(const __m256 *matrix, __m128 vector)
 {
 	__m128 zwxy = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2,3,0,1));						// Latency: 1, Throughput: 1
 	__m256 v = _mm256_insertf128_ps(_mm256_castps128_ps256(vector), zwxy, 1); // [zwxywzyx] // ?
@@ -317,7 +317,7 @@ inline __m128 _mm_colmajor_mat4x4_mul_ps_avx_2(const __m256 *matrix, __m128 vect
 	return _mm_add_ps(hi, lo); // Latency: 3, Throughput: 1
 }
 
-BENCHMARK(sse_float3_cross)
+BENCHMARK(float3_cross)
 {
 	TIMER_BEGIN
 	{
@@ -326,7 +326,7 @@ BENCHMARK(sse_float3_cross)
 	TIMER_END;
 }
 
-BENCHMARK(sse_float4_cross)
+BENCHMARK(float4_cross)
 {
 	TIMER_BEGIN
 	{
@@ -335,28 +335,28 @@ BENCHMARK(sse_float4_cross)
 	TIMER_END;
 }
 
-BENCHMARK(sse_avx_mat_vec_mul)
+BENCHMARK(mat4x4_mul_avx)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_mat4x4_mul_ps_avx((__m256*)&m[i].row, v[i]);
+		v2[i] = mat4x4_mul_avx((__m256*)&m[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_mat4x4_mul_ps_avx((__m256*)&m[0].row, v[0]);
+	float4 res = mat4x4_mul_avx((__m256*)&m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse_avx_2_mat_vec_mul)
+BENCHMARK(mat4x4_mul_avx_2)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_mat4x4_mul_ps_avx_2((__m256*)&m[i].row, v[i]);
+		v2[i] = mat4x4_mul_avx_2((__m256*)&m[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_mat4x4_mul_ps_avx_2((__m256*)&m[0].row, v[0]);
+	float4 res = mat4x4_mul_avx_2((__m256*)&m[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -365,7 +365,7 @@ BENCHMARK(sse_avx_2_mat_vec_mul)
 
 #ifdef MATH_SSE41
 
-BENCHMARK(sse41_mat_vec_mul)
+BENCHMARK(mat4x4_mul_sse41)
 {
 	TIMER_BEGIN
 	{
@@ -382,7 +382,7 @@ BENCHMARK(sse41_mat_vec_mul)
 
 #ifdef MATH_SSE3
 
-BENCHMARK(sse3_mat_vec_mul)
+BENCHMARK(mat4x4_mul_sse3)
 {
 	TIMER_BEGIN
 	{
@@ -399,7 +399,7 @@ BENCHMARK(sse3_mat_vec_mul)
 
 #ifdef MATH_SSE
 
-BENCHMARK(sse1_mat_vec_mul)
+BENCHMARK(mat4x4_mul_sse1)
 {
 	TIMER_BEGIN
 	{
@@ -412,7 +412,7 @@ BENCHMARK(sse1_mat_vec_mul)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse1_colmajor_mat_vec_mul)
+BENCHMARK(colmajor_mat4x4_mul_sse1)
 {
 	TIMER_BEGIN
 	{
@@ -426,7 +426,7 @@ BENCHMARK(sse1_colmajor_mat_vec_mul)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse1_colmajor_mat_vec_mul_2)
+BENCHMARK(colmajor_mat4x4_mul_sse1_2)
 {
 	TIMER_BEGIN
 	{
@@ -441,35 +441,35 @@ BENCHMARK(sse1_colmajor_mat_vec_mul_2)
 
 #ifdef MATH_AVX
 
-BENCHMARK(sse_colmajor_mat_vec_mul_avx)
+BENCHMARK(colmajor_mat4x4_mul_avx)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_colmajor_mat4x4_mul_ps_avx((__m256*)tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_avx((__m256*)tm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_colmajor_mat4x4_mul_ps_avx((__m256*)tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_avx((__m256*)tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse_colmajor_mat_vec_mul_avx_2)
+BENCHMARK(colmajor_mat4x4_mul_avx_2)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = _mm_colmajor_mat4x4_mul_ps_avx_2((__m256*)tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_avx_2((__m256*)tm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = _mm_colmajor_mat4x4_mul_ps_avx_2((__m256*)tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_avx_2((__m256*)tm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
 
 #endif
 
-BENCHMARK(sse_mat_mat_mul)
+BENCHMARK(mat4x4_mul_dpps)
 {
 	TIMER_BEGIN
 	{
@@ -485,7 +485,7 @@ BENCHMARK(sse_mat_mat_mul)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse_mat_mat_mul_2)
+BENCHMARK(mat4x4_mul_dpps_2)
 {
 	TIMER_BEGIN
 	{
@@ -501,7 +501,7 @@ BENCHMARK(sse_mat_mat_mul_2)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse_mat_mat_mul_3)
+BENCHMARK(mat4x4_mul_dpps_3)
 {
 	TIMER_BEGIN
 	{
@@ -517,7 +517,7 @@ BENCHMARK(sse_mat_mat_mul_3)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse_mat_mat_mul_ps)
+BENCHMARK(mat4x4_mul_sse)
 {
 	TIMER_BEGIN
 	{
@@ -533,7 +533,7 @@ BENCHMARK(sse_mat_mat_mul_ps)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(sse_mat_mat_mul_ps_2)
+BENCHMARK(mat4x4_mul_sse_2)
 {
 	TIMER_BEGIN
 	{
@@ -551,7 +551,7 @@ BENCHMARK(sse_mat_mat_mul_ps_2)
 
 #endif
 
-BENCHMARK(sse_scalar_mat_vec_mul)
+BENCHMARK(scalar_mat_vec_mul)
 {
 	TIMER_BEGIN
 	{
@@ -560,7 +560,7 @@ BENCHMARK(sse_scalar_mat_vec_mul)
 	TIMER_END;
 }
 
-BENCHMARK(sse_scalar_mat_mat_mul)
+BENCHMARK(scalar_mat_mat_mul)
 {
 	TIMER_BEGIN
 	{
@@ -569,7 +569,7 @@ BENCHMARK(sse_scalar_mat_mat_mul)
 	TIMER_END;
 }
 
-BENCHMARK(sse_float3_LengthSq)
+BENCHMARK(float3_LengthSq)
 {
 	TIMER_BEGIN
 	{
@@ -578,7 +578,7 @@ BENCHMARK(sse_float3_LengthSq)
 	TIMER_END;
 }
 
-BENCHMARK(sse_float3_Length)
+BENCHMARK(float3_Length)
 {
 	TIMER_BEGIN
 	{
@@ -587,7 +587,7 @@ BENCHMARK(sse_float3_Length)
 	TIMER_END;
 }
 
-BENCHMARK(sse_float3_Normalize)
+BENCHMARK(float3_Normalize)
 {
 	TIMER_BEGIN
 	{
@@ -596,7 +596,7 @@ BENCHMARK(sse_float3_Normalize)
 	TIMER_END;
 }
 
-BENCHMARK(sse_float4_Normalize3)
+BENCHMARK(float4_Normalize3)
 {
 	TIMER_BEGIN
 	{
@@ -605,7 +605,7 @@ BENCHMARK(sse_float4_Normalize3)
 	TIMER_END;
 }
 
-BENCHMARK(sse_float4_Normalize4)
+BENCHMARK(float4_Normalize4)
 {
 	TIMER_BEGIN
 	{
@@ -614,8 +614,17 @@ BENCHMARK(sse_float4_Normalize4)
 	TIMER_END;
 }
 
+BENCHMARK(float4x4_mul_float4)
+{
+	TIMER_BEGIN
+	{
+		v2[i] = m[i]*v[i];
+	}
+	TIMER_END;
+}
+
 #ifdef MATH_SSE
-BENCHMARK(sse_float4_Normalize4_Fast_SSE)
+BENCHMARK(float4_Normalize4_Fast_SSE)
 {
 	TIMER_BEGIN
 	{
