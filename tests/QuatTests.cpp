@@ -87,7 +87,6 @@ RANDOMIZED_TEST(Quat_float4x4_conv)
 {
 	Quat q = Quat::RandomRotation(rng);
 	float4x4 m = q.ToFloat4x4();
-	float3x3 m2 = q.ToFloat3x3();
 	assert(m.TranslatePart().Equals(0,0,0));
 	assert(!m.ContainsProjection());
 	Quat q2 = m.Float3x3Part().ToQuat();
