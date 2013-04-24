@@ -25,6 +25,7 @@
 #include "../Algorithm/Random/LCG.h"
 #include "assume.h"
 #include "MathFunc.h"
+#include "float4x4_sse.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
@@ -208,9 +209,9 @@ float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
 
 float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 {
+#ifdef MATH_SSE
 	assume(vec.IsWZeroOrOne());
 
-#ifdef MATH_SSE
 	__m128 W = shuffle1_ps(q, _MM_SHUFFLE(3,3,3,3));
 
 //	__m128 qxv = cross_ps(q, vec.v);
@@ -565,9 +566,121 @@ float3x4 MUST_USE_RESULT Quat::ToFloat3x4() const
 	return float3x4(*this);
 }
 
+/// From http://renderfeather.googlecode.com/hg-history/034a1900d6e8b6c92440382658d2b01fc732c5de/Doc/optimized%20Matrix%20quaternion%20conversion.pdf
+void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m)
+{
+	// Constants:
+	const u32 sign = 0x80000000UL;
+	const __m128 sseX0 = _mm_castsi128_ps(_mm_setr_epi32(   0, sign, sign, sign));
+	const __m128 sseX1 = _mm_castsi128_ps(_mm_setr_epi32(sign,    0, sign, sign));
+	__m128 one = _mm_set_ps(0, 0, 0, 1);
+
+#if 0 // Original code
+	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
+	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
+	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
+	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
+	
+	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
+	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
+	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
+
+	__m128 xx2 = _mm_mul_ss(q, q2);                               // [2xx]
+
+	// Calculate last two elements of the third row.
+	__m128 one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
+	__m128 one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
+	__m128 one_m_xx_yy_2_0_tz_tw = _mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
+
+	// Calculate first row
+	__m128 m_yy_xy_xz_yz_2 = _mm_xor_ps(yy_xy_xz_yz_2, sseX0);     // [-2yz -2xz -2xy   2yy]
+	__m128 m_zz_wz_wy_wx_2 = _mm_xor_ps(zz_wz_wy_wx_2, sseX1);     // [-2xw -2yw  2zw  -2zz]
+	__m128 m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
+	__m128 first_row = _mm_sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
+	m[0] = first_row;
+	_mm_store_ss((float*)m+3, t);
+
+	// Calculate second row
+	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
+	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
+	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
+	__m128 t_yzwx = shuffle1_ps(t, _MM_SHUFFLE(0, 3, 2, 1));      // [tx tw tz ty]
+	__m128 second_row = shuffle1_ps(s3, _MM_SHUFFLE(2, 3, 0, 1)); // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
+	m[1] = second_row;
+	_mm_store_ss((float*)m+7, t_yzwx);
+
+	// Calculate third row
+	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
+	__m128 t2 = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [tz 1-2xx-2yy 2yz-2xw 2yw+2xz]
+	m[2] = t2;
+	m[3] = _mm_set_ps(1, 0, 0, 0);
+#else
+
+	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
+	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
+	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
+	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
+	
+	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
+	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
+	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
+
+	__m128 xx2 = _mm_mul_ss(q, q2);                               // [2xx]
+
+	// Calculate last two elements of the third row.
+	__m128 one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
+	__m128 one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
+	__m128 one_m_xx_yy_2_0_tz_tw = one_m_xx_yy_2;//_mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
+
+	// Calculate first row
+	__m128 m_yy_xy_xz_yz_2 = _mm_xor_ps(yy_xy_xz_yz_2, sseX0);     // [-2yz -2xz -2xy   2yy]
+	__m128 m_zz_wz_wy_wx_2 = _mm_xor_ps(zz_wz_wy_wx_2, sseX1);     // [-2xw -2yw  2zw  -2zz]
+	__m128 m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
+	__m128 first_row = _mm_sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
+
+	// Calculate second row
+	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
+	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
+	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
+	__m128 second_row = shuffle1_ps(s3, _MM_SHUFFLE(2, 3, 0, 1)); // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
+
+	// Calculate third row
+	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
+	__m128 third_row = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [0 1-2xx-2yy 2yz-2xw 2yw+2xz]
+
+	__m128 tmp0 = _mm_unpacklo_ps(first_row, second_row);
+	__m128 tmp2 = _mm_unpacklo_ps(third_row, t);
+	__m128 tmp1 = _mm_unpackhi_ps(first_row, second_row);
+	__m128 tmp3 = _mm_unpackhi_ps(third_row, t);
+	m[0] = _mm_movelh_ps(tmp0, tmp2);
+	m[1] = _mm_movehl_ps(tmp2, tmp0);
+	m[2] = _mm_movelh_ps(tmp1, tmp3);
+	m[3] = _mm_set_ps(1, 0, 0, 0);
+#endif
+}
+
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 {
+	assume(IsNormalized());
+#ifdef MATH_SSE
+	float4x4 m;
+	quat_to_mat4x4_sse(q, _mm_set_ps(1,0,0,0), m.row);
+	return m;
+#else
 	return float4x4(*this);
+#endif
+}
+
+float4x4 MUST_USE_RESULT Quat::ToFloat4x4(const float4 &translation) const
+{
+	assume(IsNormalized());
+#ifdef MATH_SSE
+	float4x4 m;
+	quat_to_mat4x4_sse(q, translation.v, m.row);
+	return m;
+#else
+	return float4x4(*this, translation.xyz());
+#endif
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -631,6 +744,11 @@ Quat Quat::operator +(const Quat &rhs) const
 Quat Quat::operator -(const Quat &rhs) const
 {
 	return Quat(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
+}
+
+Quat Quat::operator -() const
+{
+	return Quat(-x, -y, -z, -w);
 }
 
 Quat Quat::operator *(float scalar) const

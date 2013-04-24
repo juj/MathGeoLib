@@ -316,6 +316,7 @@ public:
 	float3x3 MUST_USE_RESULT ToFloat3x3() const;
 	float3x4 MUST_USE_RESULT ToFloat3x4() const;
 	float4x4 MUST_USE_RESULT ToFloat4x4() const;
+	float4x4 MUST_USE_RESULT ToFloat4x4(const float4 &translation) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x,y,z,w)".
@@ -395,6 +396,10 @@ public:
 	/// the given vector by this Quaternion.
 	float3 MUST_USE_RESULT Mul(const float3 &vector) const;
 	float4 MUST_USE_RESULT Mul(const float4 &vector) const;
+
+	/// Negates the quaternion.
+	/// @note Negating a quaternion will not produce the inverse rotation. Call Quat::Inverse() to generate the inverse rotation.
+	Quat Neg() const { return -*this; }
 
 private: // Hide the unsafe operations from the user, so that he doesn't accidentally invoke an unintended operation.
 

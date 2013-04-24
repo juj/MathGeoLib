@@ -42,10 +42,17 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
+#ifdef MATH_SSE
+	row[0] = _mm_set_ps(_03, _02, _01, _00);
+	row[1] = _mm_set_ps(_13, _12, _11, _10);
+	row[2] = _mm_set_ps(_23, _22, _21, _20);
+	row[3] = _mm_set_ps(_33, _32, _31, _30);
+#else
 	Set(_00, _01, _02, _03,
 		_10, _11, _12, _13,
 		_20, _21, _22, _23,
 		_30, _31, _32, _33);
+#endif
 }
 
 float4x4::float4x4(const float3x3 &other)
@@ -81,24 +88,43 @@ float4x4::float4x4(const float3x4 &other)
 
 float4x4::float4x4(const float4 &col0, const float4 &col1, const float4 &col2, const float4 &col3)
 {
+#ifdef MATH_SSE
+	__m128 tmp0 = _mm_unpacklo_ps(col0.v, col1.v);
+	__m128 tmp2 = _mm_unpacklo_ps(col2.v, col3.v);
+	__m128 tmp1 = _mm_unpackhi_ps(col0.v, col1.v);
+	__m128 tmp3 = _mm_unpackhi_ps(col2.v, col3.v);
+	row[0] = _mm_movelh_ps(tmp0, tmp2);
+	row[1] = _mm_movehl_ps(tmp2, tmp0);
+	row[2] = _mm_movelh_ps(tmp1, tmp3);
+	row[3] = _mm_movehl_ps(tmp3, tmp1);
+#else
 	SetCol(0, col0);
 	SetCol(1, col1);
 	SetCol(2, col2);
 	SetCol(3, col3);
+#endif
 }
 
 float4x4::float4x4(const Quat &orientation)
 {
+#ifdef MATH_SSE
+	quat_to_mat4x4_sse(orientation.q, _mm_set_ps(1, 0, 0, 0), row);
+#else
 	SetRotatePart(orientation);
 	SetRow(3, 0, 0, 0, 1);
 	SetCol3(3, 0, 0, 0);
+#endif
 }
 
 float4x4::float4x4(const Quat &orientation, const float3 &translation)
 {
+#ifdef MATH_SSE
+	quat_to_mat4x4_sse(orientation.q, float4(translation, 1.f), row);
+#else
 	SetRotatePart(orientation);
 	SetTranslatePart(translation);
 	SetRow(3, 0, 0, 0, 1);
+#endif
 }
 
 TranslateOp float4x4::Translate(float tx, float ty, float tz)
@@ -1306,13 +1332,16 @@ void float4x4::InverseOrthonormal()
 
 void float4x4::Transpose()
 {
-	///\todo SSE
+#ifdef MATH_SSE
+	_MM_TRANSPOSE4_PS(row[0], row[1], row[2], row[3]);
+#else
 	Swap(v[0][1], v[1][0]);
 	Swap(v[0][2], v[2][0]);
 	Swap(v[0][3], v[3][0]);
 	Swap(v[1][2], v[2][1]);
 	Swap(v[1][3], v[3][1]);
 	Swap(v[2][3], v[3][2]);
+#endif
 }
 
 float4x4 float4x4::Transposed() const
@@ -1969,7 +1998,7 @@ std::string float4x4::ToString() const
 std::string float4x4::ToString2() const
 {
 	char str[256];
-	sprintf(str, "float3x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
+	sprintf(str, "float4x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
 		v[0][0], v[1][0], v[2][0], v[3][0],
 		v[0][1], v[1][1], v[2][1], v[3][1],
 		v[0][2], v[1][2], v[2][2], v[3][2],

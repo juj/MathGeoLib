@@ -44,6 +44,9 @@ BENCHMARK(Quat_Transform_float3)
 
 BENCHMARK(Quat_Transform_float4)
 {
+	for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		v[i].w = (float)rng.Int(0, 1); // To transform a vector by a Quat, one must have w=0/1.
+
 	TIMER_BEGIN
 	{
 		v2[i] = q[i].Transform(v[i]);
@@ -80,3 +83,21 @@ RANDOMIZED_TEST(Quat_Transform)
 	assert(MV.Equals(qV2));
 }
 
+RANDOMIZED_TEST(Quat_float4x4_conv)
+{
+	Quat q = Quat::RandomRotation(rng);
+	float4x4 m = q.ToFloat4x4();
+	float3x3 m2 = q.ToFloat3x3();
+	assert(m.TranslatePart().Equals(0,0,0));
+	assert(!m.ContainsProjection());
+	Quat q2 = m.Float3x3Part().ToQuat();
+	assert(q.Equals(q2) || q.Equals(q2.Neg()));
+
+	float4 v = float4::RandomGeneral(rng, -1000.f, 1000.f);
+	v.w = (float)rng.Int(0,1);
+	m = q.ToFloat4x4(v);
+	assert(m.TranslatePart().Equals(v.xyz()));
+	assert(!m.ContainsProjection());
+	q2 = m.Float3x3Part().ToQuat();
+	assert(q.Equals(q2) || q.Equals(q2.Neg()));
+}
