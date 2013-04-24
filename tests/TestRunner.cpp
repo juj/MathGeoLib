@@ -177,25 +177,25 @@ int RunTest(Test &t, int numTimes, int numTrials)
 
 static int nextTestToRun = 0;
 
-bool StringBeginsWithOneOf(const char *str, const char **prefixes)
+bool StringBeginsWithOneOf(const char *str, const char * const *prefixes)
 {
-	for(const char **prefix = prefixes; *prefix; ++prefix)
+	for(const char * const *prefix = prefixes; *prefix; ++prefix)
 		if (!strncmp(str, *prefix, strlen(*prefix)))
 			return true;
 
 	return false;
 }
 
-bool StringContainsOneOf(const char *str, const char **prefixes)
+bool StringContainsOneOf(const char *str, const char * const *prefixes)
 {
-	for(const char **prefix = prefixes; *prefix; ++prefix)
+	for(const char * const *prefix = prefixes; *prefix; ++prefix)
 		if (strstr(str, *prefix) != 0)
 			return true;
 
 	return false;
 }
 
-int RunOneTest(int numTimes, int numTrials, const char **prefixes)
+int RunOneTest(int numTimes, int numTrials, const char * const *prefixes)
 {
 	std::vector<Test> &tests = Tests();
 	while(nextTestToRun < (int)tests.size())
@@ -221,7 +221,7 @@ int RunOneTest(int numTimes, int numTrials, const char **prefixes)
 }
 
 // Returns the number of failures.
-int RunTests(int numTimes, int numTrials, const char **prefixes)
+int RunTests(int numTimes, int numTrials, const char * const *prefixes)
 {
 	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
@@ -243,7 +243,7 @@ int main(int argc, char **argv)
 	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 10000;
 	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
 	const char *noPrefixes[] = { "", 0 };
-	const char **prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
+	const char * const *prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
 
 	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefixes);
 	LOGI("%d", globalPokedData);
