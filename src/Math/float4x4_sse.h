@@ -24,6 +24,10 @@
 #include "SSEMath.h"
 #include "float4_sse.h"
 
+MATH_BEGIN_NAMESPACE
+
+void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m);
+
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
 inline __m128 mat4x4_mul_sse41(const __m128 *matrix, __m128 vector)
@@ -403,5 +407,7 @@ inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 	r3 = _mm_mul_ps(s3, m2_3);
 	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
 }
+
+MATH_END_NAMESPACE
 
 #endif // ~MATH_SSE

@@ -566,6 +566,8 @@ float3x4 MUST_USE_RESULT Quat::ToFloat3x4() const
 	return float3x4(*this);
 }
 
+#ifdef MATH_SSE
+
 /// From http://renderfeather.googlecode.com/hg-history/034a1900d6e8b6c92440382658d2b01fc732c5de/Doc/optimized%20Matrix%20quaternion%20conversion.pdf
 void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m)
 {
@@ -658,6 +660,7 @@ void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m)
 	m[3] = _mm_set_ps(1, 0, 0, 0);
 #endif
 }
+#endif
 
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 {
