@@ -177,12 +177,30 @@ int RunTest(Test &t, int numTimes, int numTrials)
 
 static int nextTestToRun = 0;
 
-int RunOneTest(int numTimes, int numTrials, const char *prefix)
+bool StringBeginsWithOneOf(const char *str, const char **prefixes)
+{
+	for(const char **prefix = prefixes; *prefix; ++prefix)
+		if (!strncmp(str, *prefix, strlen(*prefix)))
+			return true;
+
+	return false;
+}
+
+bool StringContainsOneOf(const char *str, const char **prefixes)
+{
+	for(const char **prefix = prefixes; *prefix; ++prefix)
+		if (strstr(str, *prefix) != 0)
+			return true;
+
+	return false;
+}
+
+int RunOneTest(int numTimes, int numTrials, const char **prefixes)
 {
 	std::vector<Test> &tests = Tests();
 	while(nextTestToRun < (int)tests.size())
 	{
-		if (!strncmp(tests[nextTestToRun].name.c_str(), prefix, strlen(prefix)))
+		if (StringBeginsWithOneOf(tests[nextTestToRun].name.c_str(), prefixes) || StringContainsOneOf(tests[nextTestToRun].description.c_str(), prefixes))
 		{
 			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials);
 
@@ -203,12 +221,12 @@ int RunOneTest(int numTimes, int numTrials, const char *prefix)
 }
 
 // Returns the number of failures.
-int RunTests(int numTimes, int numTrials, const char *prefix)
+int RunTests(int numTimes, int numTrials, const char **prefixes)
 {
 	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
 	for(size_t i = 0; i < Tests().size(); ++i)
-		RunOneTest(numTimes, numTrials, prefix);
+		RunOneTest(numTimes, numTrials, prefixes);
 
 	PrintTestRunSummary();
 	return numTestsFailed;
@@ -224,9 +242,10 @@ int main(int argc, char **argv)
 {
 	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 10000;
 	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
-	const char *prefix = (argc >= 4) ? argv[3] : "";
+	const char *noPrefixes[] = { "", 0 };
+	const char **prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
 
-	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefix);
+	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefixes);
 	LOGI("%d", globalPokedData);
 
 	// When --exit0 is passed, we forcibly return 0 and not the number of failed tests.

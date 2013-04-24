@@ -32,7 +32,7 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 void AddBenchmark(std::string name, TestFunctionPtr function, std::string description = "");
 int RunTests(int numTimes);
 /// Returns -2: no tests left to run, -1: failed, 0: success, 1: success with warnings.
-int RunOneTest(int numTimes, int numTrials, const char *prefix);
+int RunOneTest(int numTimes, int numTrials, const char **prefixes);
 void PrintTestRunSummary();
 std::string FormatTime(double ticks);
 
@@ -54,22 +54,22 @@ public:
 
 #define TEST(name) \
 	void TestFunc_##name(); \
-	AddTestOp addtestop_##name(#name, "", false, false, false, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, false, false, false, TestFunc_##name); \
 	void TestFunc_##name()
 
 #define RANDOMIZED_TEST(name) \
 	void TestFunc_##name(); \
-	AddTestOp addtestop_##name(#name, "", true, false, false, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, true, false, false, TestFunc_##name); \
 	void TestFunc_##name()
 
 #define UNIQUE_TEST(name) \
 	void TestFunc_##name(); \
-	AddTestOp addtestop_##name(#name, "", false, true, false, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, false, true, false, TestFunc_##name); \
 	void TestFunc_##name()
 
 #define BENCHMARK(name) \
 	void TestFunc_##name(); \
-	AddTestOp addtestop_##name(#name, "", false, false, true, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, false, false, true, TestFunc_##name); \
 	void TestFunc_##name()
 
 #else
