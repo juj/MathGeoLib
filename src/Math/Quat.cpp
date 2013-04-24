@@ -25,6 +25,7 @@
 #include "../Algorithm/Random/LCG.h"
 #include "assume.h"
 #include "MathFunc.h"
+#include "SSEMath.h"
 #include "float4x4_sse.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
