@@ -633,6 +633,7 @@ float4 &float4x4::Row(int row)
 	if (row < 0 || row >= Rows)
 		row = 0; // Benign failure, just give the first row.
 #endif
+
 	return reinterpret_cast<float4 &>(v[row]);
 }
 
@@ -945,7 +946,10 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AVX
+	row2[0] = _mm256_set_ps(_13, _12, _11, _10, _03, _02, _01, _00);
+	row2[1] = _mm256_set_ps(_33, _32, _31, _30, _23, _22, _21, _20);
+#elif defined(MATH_SSE)
 	row[0] = _mm_set_ps(_03, _02, _01, _00);
 	row[1] = _mm_set_ps(_13, _12, _11, _10);
 	row[2] = _mm_set_ps(_23, _22, _21, _20);
@@ -960,7 +964,17 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 
 void float4x4::Set(const float4x4 &rhs)
 {
+#ifdef MATH_AVX
+	row2[0] = rhs.row2[0];
+	row2[1] = rhs.row2[1];
+#elif defined MATH_SSE
+	row[0] = rhs.row[0];
+	row[1] = rhs.row[1];
+	row[2] = rhs.row[2];
+	row[3] = rhs.row[3];
+#else
 	Set(rhs.ptr());
+#endif
 }
 
 void float4x4::Set(const float *values)
@@ -1704,8 +1718,13 @@ float4x4 float4x4::operator *(const float4x4 &rhs) const
 
 float4x4 float4x4::operator *(const Quat &rhs) const
 {
+#ifdef MATH_SSE
+	float4x4 rot(rhs);
+	return *this * rot;
+#else
 	float3x3 rot(rhs);
 	return *this * rot;
+#endif
 }
 
 float4 float4x4::operator *(const float4 &rhs) const
@@ -1717,11 +1736,19 @@ float4x4 float4x4::operator *(float scalar) const
 {
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
+
+#ifdef MATH_AVX
+	__m256 s = _mm256_set1_ps(scalar);
+	r.row2[0] = _mm256_mul_ps(row2[0], s);
+	r.row2[1] = _mm256_mul_ps(row2[1], s);
+#else
 	__m128 s = _mm_set1_ps(scalar);
 	r.row[0] = _mm_mul_ps(row[0], s);
 	r.row[1] = _mm_mul_ps(row[1], s);
 	r.row[2] = _mm_mul_ps(row[2], s);
 	r.row[3] = _mm_mul_ps(row[3], s);
+#endif
+
 #else
 	float4x4 r = *this;
 	r *= scalar;
@@ -1736,6 +1763,14 @@ float4x4 float4x4::operator /(float scalar) const
 
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
+
+#ifdef MATH_AVX
+	__m256 s = _mm256_set1_ps(scalar);
+	__m256 one = _mm256_set1_ps(1.f);
+	s = _mm256_div_ps(one, s);
+	r.row2[0] = _mm256_mul_ps(row2[0], s);
+	r.row2[1] = _mm256_mul_ps(row2[1], s);
+#else
 	__m128 s = _mm_set1_ps(scalar);
 	__m128 one = _mm_set1_ps(1.f);
 	s = _mm_div_ps(one, s);
@@ -1743,6 +1778,8 @@ float4x4 float4x4::operator /(float scalar) const
 	r.row[1] = _mm_mul_ps(row[1], s);
 	r.row[2] = _mm_mul_ps(row[2], s);
 	r.row[3] = _mm_mul_ps(row[3], s);
+#endif
+
 #else
 	float4x4 r = *this;
 	r /= scalar;
@@ -1755,10 +1792,17 @@ float4x4 float4x4::operator +(const float4x4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
+
+#ifdef MATH_AVX
+	r.row2[0] = _mm256_add_ps(row2[0], rhs.row2[0]);
+	r.row2[1] = _mm256_add_ps(row2[1], rhs.row2[1]);
+#else
 	r.row[0] = _mm_add_ps(row[0], rhs.row[0]);
 	r.row[1] = _mm_add_ps(row[1], rhs.row[1]);
 	r.row[2] = _mm_add_ps(row[2], rhs.row[2]);
 	r.row[3] = _mm_add_ps(row[3], rhs.row[3]);
+#endif
+
 #else
 	float4x4 r = *this;
 	r += rhs;
@@ -1771,10 +1815,17 @@ float4x4 float4x4::operator -(const float4x4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
+
+#ifdef MATH_AVX
+	r.row2[0] = _mm256_sub_ps(row2[0], rhs.row2[0]);
+	r.row2[1] = _mm256_sub_ps(row2[1], rhs.row2[1]);
+#else
 	r.row[0] = _mm_sub_ps(row[0], rhs.row[0]);
 	r.row[1] = _mm_sub_ps(row[1], rhs.row[1]);
 	r.row[2] = _mm_sub_ps(row[2], rhs.row[2]);
 	r.row[3] = _mm_sub_ps(row[3], rhs.row[3]);
+#endif
+
 #else
 	float4x4 r = *this;
 	r -= rhs;
@@ -1788,11 +1839,19 @@ float4x4 float4x4::operator -() const
 	float4x4 r;
 
 #ifdef MATH_AUTOMATIC_SSE
+
+#ifdef MATH_AVX
+	__m256 zero = _mm256_setzero_ps();
+	r.row2[0] = _mm256_sub_ps(zero, row2[0]);
+	r.row2[1] = _mm256_sub_ps(zero, row2[1]);
+#else
 	__m128 zero = _mm_setzero_ps();
 	r.row[0] = _mm_sub_ps(zero, row[0]);
 	r.row[1] = _mm_sub_ps(zero, row[1]);
 	r.row[2] = _mm_sub_ps(zero, row[2]);
 	r.row[3] = _mm_sub_ps(zero, row[3]);
+#endif
+
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -1805,11 +1864,18 @@ float4x4 float4x4::operator -() const
 float4x4 &float4x4::operator *=(float scalar)
 {
 #ifdef MATH_AUTOMATIC_SSE
+
+#ifdef MATH_AVX
+	__m256 s = _mm256_set1_ps(scalar);
+	row2[0] = _mm256_mul_ps(row2[0], s);
+	row2[1] = _mm256_mul_ps(row2[1], s);
+#else
 	__m128 s = _mm_set1_ps(scalar);
 	row[0] = _mm_mul_ps(row[0], s);
 	row[1] = _mm_mul_ps(row[1], s);
 	row[2] = _mm_mul_ps(row[2], s);
 	row[3] = _mm_mul_ps(row[3], s);
+#endif
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -1824,6 +1890,14 @@ float4x4 &float4x4::operator /=(float scalar)
 	assume(!EqualAbs(scalar, 0));
 
 #ifdef MATH_AUTOMATIC_SSE
+
+#ifdef MATH_AVX
+	__m256 s = _mm256_set1_ps(scalar);
+	__m256 one = _mm256_set1_ps(1.f);
+	s = _mm256_div_ps(one, s);
+	row2[0] = _mm256_mul_ps(row2[0], s);
+	row2[1] = _mm256_mul_ps(row2[1], s);
+#else
 	__m128 s = _mm_set1_ps(scalar);
 	__m128 one = _mm_set1_ps(1.f);
 	s = _mm_div_ps(one, s);
@@ -1831,6 +1905,8 @@ float4x4 &float4x4::operator /=(float scalar)
 	row[1] = _mm_mul_ps(row[1], s);
 	row[2] = _mm_mul_ps(row[2], s);
 	row[3] = _mm_mul_ps(row[3], s);
+#endif
+
 #else
 	float invScalar = 1.f / scalar;
 	for(int y = 0; y < Rows; ++y)
@@ -1844,10 +1920,17 @@ float4x4 &float4x4::operator /=(float scalar)
 float4x4 &float4x4::operator +=(const float4x4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
+
+#ifdef MATH_AVX
+	row2[0] = _mm256_add_ps(row2[0], rhs.row2[0]);
+	row2[1] = _mm256_add_ps(row2[1], rhs.row2[1]);
+#else
 	row[0] = _mm_add_ps(row[0], rhs.row[0]);
 	row[1] = _mm_add_ps(row[1], rhs.row[1]);
 	row[2] = _mm_add_ps(row[2], rhs.row[2]);
 	row[3] = _mm_add_ps(row[3], rhs.row[3]);
+#endif
+
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -1860,10 +1943,17 @@ float4x4 &float4x4::operator +=(const float4x4 &rhs)
 float4x4 &float4x4::operator -=(const float4x4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
+
+#ifdef MATH_AVX
+	row2[0] = _mm256_sub_ps(row2[0], rhs.row2[0]);
+	row2[1] = _mm256_sub_ps(row2[1], rhs.row2[1]);
+#else
 	row[0] = _mm_sub_ps(row[0], rhs.row[0]);
 	row[1] = _mm_sub_ps(row[1], rhs.row[1]);
 	row[2] = _mm_sub_ps(row[2], rhs.row[2]);
 	row[3] = _mm_sub_ps(row[3], rhs.row[3]);
+#endif
+
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -2167,11 +2257,14 @@ float4x4 operator *(const float3x4 &lhs, const float4x4 &rhs)
 
 float4 operator *(const float4 &lhs, const float4x4 &rhs)
 {
-	///\todo SSE.
+#ifdef MATH_SSE
+	return float4(colmajor_mat4x4_mul_sse1(rhs.row, lhs.v));
+#else
 	return float4(DOT4STRIDED(lhs, rhs.ptr(), 4),
 				  DOT4STRIDED(lhs, rhs.ptr()+1, 4),
 				  DOT4STRIDED(lhs, rhs.ptr()+2, 4),
 				  DOT4STRIDED(lhs, rhs.ptr()+3, 4));
+#endif
 }
 
 float4x4 float4x4::Mul(const float3x3 &rhs) const { return *this * rhs; }
