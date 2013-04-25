@@ -574,8 +574,8 @@ void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m)
 {
 	// Constants:
 	const u32 sign = 0x80000000UL;
-	const __m128 sseX0 = _mm_castsi128_ps(_mm_setr_epi32(   0, sign, sign, sign));
-	const __m128 sseX1 = _mm_castsi128_ps(_mm_setr_epi32(sign,    0, sign, sign));
+	const __m128 sseX0 = set_ps_hex(sign, sign, sign, 0);
+	const __m128 sseX1 = set_ps_hex(sign, sign, 0, sign);
 	__m128 one = _mm_set_ps(0, 0, 0, 1);
 
 #if 0 // Original code
