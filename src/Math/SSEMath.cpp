@@ -1,6 +1,7 @@
 #include "SSEMath.h"
 #include "MathFunc.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 MATH_BEGIN_NAMESPACE
 
