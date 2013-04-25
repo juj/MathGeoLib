@@ -32,6 +32,48 @@ TEST(CXX11StdFinite)
 }
 #endif
 
+#if !defined(EMSCRIPTEN)
+struct U80
+{
+	u8 data[10];
+
+	explicit U80(long double d)
+	{
+		assert(sizeof(long double) <= 10);
+		memcpy(data, &d, sizeof(d));
+	}
+
+	std::string ToString() const
+	{
+		char str[256] = "0x";
+		for(int i = sizeof(long double)-1; i >= 0; --i)
+		{
+			char str2[16];
+			sprintf(str2, "%02X", data[i]);
+			strcat(str, str2);
+		}
+		return str;
+	}
+};
+#endif
+
+UNIQUE_TEST(FloatRepresentation)
+{
+	LOGI("sizeof(float): %d", sizeof(float));
+	LOGI("FLOAT_NAN: %f, or 0x%X", FLOAT_NAN, ReinterpretAsU32(FLOAT_NAN));
+	LOGI("FLOAT_INF: %f, or 0x%X", FLOAT_INF, ReinterpretAsU32(FLOAT_INF));
+
+	LOGI("sizeof(double): %d", sizeof(double));
+	LOGI("FLOAT_NAN as double: %f, or 0x%llX", FLOAT_NAN, ReinterpretAsU64((double)FLOAT_NAN));
+	LOGI("FLOAT_INF as double: %f, or 0x%llX", FLOAT_INF, ReinterpretAsU64((double)FLOAT_INF));
+
+#if !defined(EMSCRIPTEN)
+	LOGI("sizeof(long double): %d", sizeof(long double));
+	LOGI("FLOAT_NAN as long double: %Lf, or %s", (long double)FLOAT_NAN, U80((long double)FLOAT_NAN).ToString().c_str());
+	LOGI("FLOAT_INF as long double: %Lf, or %s", (long double)FLOAT_INF, U80((long double)FLOAT_INF).ToString().c_str());
+#endif
+}
+
 TEST(IsFinite)
 {
 	assert(IsFinite(5));
@@ -105,13 +147,13 @@ TEST(IsInf)
 #endif
 }
 
-TEST(ReinterpretAsInt)
+TEST(ReinterpretAsU32)
 {
-	assert(ReinterpretAsInt(0.0f) == 0x00000000);
-	assert(ReinterpretAsInt(1.0f) == 0x3F800000);
-	assert(ReinterpretAsInt(2.0f) == 0x40000000);
-	assert(ReinterpretAsInt(-1.0f) == 0xBF800000);
-	assert(ReinterpretAsInt(FLOAT_INF) == 0x7F800000);
+	assert(ReinterpretAsU32(0.0f) == 0x00000000);
+	assert(ReinterpretAsU32(1.0f) == 0x3F800000);
+	assert(ReinterpretAsU32(2.0f) == 0x40000000);
+	assert(ReinterpretAsU32(-1.0f) == 0xBF800000);
+	assert(ReinterpretAsU32(FLOAT_INF) == 0x7F800000);
 }
 
 TEST(ReinterpretAsFloat)
@@ -308,7 +350,7 @@ FORCE_INLINE float sqrtf_recip(float x)
 float QuakeInvSqrt(float x)
 {
 	float xhalf = 0.5f * x;
-	u32 i = ReinterpretAsInt(x);//*(int*)&x; // store floating-point bits in integer
+	u32 i = ReinterpretAsU32(x);//*(int*)&x; // store floating-point bits in integer
 	i = 0x5f375a86 - (i >> 1); // A better initial value: http://en.wikipedia.org/wiki/Fast_inverse_square_root#History_and_investigation
 	//i = 0x5f3759d5 - (i >> 1); // initial guess for Newton's method
 	x = ReinterpretAsFloat(i);//*(float*)&i; // convert new bits into float
