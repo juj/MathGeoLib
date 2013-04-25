@@ -9,6 +9,10 @@
 #include "TestData.h"
 #include <cmath>
 
+#ifdef MATH_SSE2
+#include "../src/math/sse_mathfun.h"
+#endif
+
 using namespace TestData;
 
 #if __cplusplus >= 201103L
@@ -574,6 +578,75 @@ BENCHMARK(Sin)
 	}
 	TIMER_END
 }
+
+BENCHMARK(sin)
+{
+	TIMER_BEGIN
+	{
+		f[i] = sin(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(sinf)
+{
+	TIMER_BEGIN
+	{
+		f[i] = sinf(pf[i]);
+	}
+	TIMER_END
+}
+
+#ifdef MATH_SSE2
+
+BENCHMARK(sin_ps)
+{
+	TIMER_BEGIN
+	{
+		f[i] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(pf[i])));
+	}
+	TIMER_END
+}
+
+UNIQUE_TEST(sin_ps_precision)
+{
+	const int C = 3;
+	float maxRelError[C] = {};
+	float maxAbsError[C] = {};
+	float X[C] = {};
+
+	for(int l = 0; l < 2; ++l)
+	{
+		float maxVal = (l == 0 ? 4.f*pi : 1e8f);
+		for(int i = 0; i < 1000000; ++i)
+		{
+			float f = rng.Float(-maxVal, maxVal);//3.141592654f);
+			float x = (float)sin((double)f); // best precision of the sqrt.
+
+			X[0] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(f)));
+			X[1] = sinf(f);
+			X[2] = Sin(f);
+
+			for(int j = 0; j < C; ++j)
+			{
+				maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
+				maxAbsError[j] = Abs(x - X[j]);
+			}
+		}
+
+		LOGI("With |x| < %f:", maxVal);
+		LOGI("Max absolute error with sin_ps(x): %e",  maxAbsError[0]);
+		LOGI("Max absolute error with sinf(x): %e",  maxAbsError[1]);
+		LOGI("Max absolute error with Sin(x): %e",  maxAbsError[2]);
+		LOGI(" ");
+
+		LOGI("Max relative error with sin_ps(x): %e",  maxRelError[0]);
+		LOGI("Max relative error with sinf(x): %e",  maxRelError[1]);
+		LOGI("Max relative error with Sin(x): %e",  maxRelError[2]);
+	}
+}
+
+#endif
 
 BENCHMARK(Cos)
 {
