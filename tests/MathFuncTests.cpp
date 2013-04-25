@@ -60,16 +60,16 @@ struct U80
 
 UNIQUE_TEST(FloatRepresentation)
 {
-	LOGI("sizeof(float): %d", sizeof(float));
+	LOGI("sizeof(float): %d", (int)sizeof(float));
 	LOGI("FLOAT_NAN: %f, or 0x%X", FLOAT_NAN, ReinterpretAsU32(FLOAT_NAN));
 	LOGI("FLOAT_INF: %f, or 0x%X", FLOAT_INF, ReinterpretAsU32(FLOAT_INF));
 
-	LOGI("sizeof(double): %d", sizeof(double));
+	LOGI("sizeof(double): %d", (int)sizeof(double));
 	LOGI("FLOAT_NAN as double: %f, or 0x%llX", FLOAT_NAN, ReinterpretAsU64((double)FLOAT_NAN));
 	LOGI("FLOAT_INF as double: %f, or 0x%llX", FLOAT_INF, ReinterpretAsU64((double)FLOAT_INF));
 
 #if !defined(EMSCRIPTEN)
-	LOGI("sizeof(long double): %d", sizeof(long double));
+	LOGI("sizeof(long double): %d", (int)sizeof(long double));
 	LOGI("FLOAT_NAN as long double: %Lf, or %s", (long double)FLOAT_NAN, U80((long double)FLOAT_NAN).ToString().c_str());
 	LOGI("FLOAT_INF as long double: %Lf, or %s", (long double)FLOAT_INF, U80((long double)FLOAT_INF).ToString().c_str());
 #endif
