@@ -42,7 +42,10 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AVX
+	row2[0] = _mm256_set_ps(_13, _12, _11, _10, _03, _02, _01, _00);
+	row2[1] = _mm256_set_ps(_33, _32, _31, _30, _23, _22, _21, _20);
+#elif defined(MATH_SSE)
 	row[0] = _mm_set_ps(_03, _02, _01, _00);
 	row[1] = _mm_set_ps(_13, _12, _11, _10);
 	row[2] = _mm_set_ps(_23, _22, _21, _20);
@@ -57,7 +60,10 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
 
 float4x4::float4x4(const float3x3 &other)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AVX
+	row2[0] = _mm256_set_ps(0.f, other.v[1][2], other.v[1][1], other.v[1][0], 0.f, other.v[0][2], other.v[0][1], other.v[0][0]);
+	row2[1] = _mm256_set_ps(1.f, 0.f, 0.f, 0.f, 0.f, other.v[2][2], other.v[2][1], other.v[2][0]);
+#elif defined(MATH_SSE)
 	row[0] = _mm_set_ps(0.f, other.v[0][2], other.v[0][1], other.v[0][0]);
 	row[1] = _mm_set_ps(0.f, other.v[1][2], other.v[1][1], other.v[1][0]);
 	row[2] = _mm_set_ps(0.f, other.v[2][2], other.v[2][1], other.v[2][0]);
@@ -1178,8 +1184,12 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 	// But note that when assigning through a conversion above (float3x3 -> float4x4 or float3x4 -> float4x4),
 	// we do assume the input matrix is finite.
 //	assume(rhs.IsFinite());
-
-#ifdef MATH_SSE
+#ifdef MATH_AVX
+	assert(IS32ALIGNED(this));
+	assert(IS32ALIGNED(&rhs));
+	row2[0] = rhs.row2[0];
+	row2[1] = rhs.row2[1];
+#elif defined(MATH_SSE)
 	assert(IS16ALIGNED(this));
 	assert(IS16ALIGNED(&rhs));
 	row[0] = rhs.row[0];
