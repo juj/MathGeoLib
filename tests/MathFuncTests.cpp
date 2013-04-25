@@ -36,11 +36,11 @@ TEST(CXX11StdFinite)
 #if !defined(EMSCRIPTEN)
 struct U80
 {
-	u8 data[10];
+	u8 data[16];
 
 	explicit U80(long double d)
 	{
-		assert(sizeof(long double) <= 10);
+		assert(sizeof(long double) <= 16);
 		memcpy(data, &d, sizeof(d));
 	}
 
