@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+using namespace std;
+
 MATH_BEGIN_NAMESPACE
 
 void *AlignedMalloc(size_t size, size_t alignment)
