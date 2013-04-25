@@ -28,14 +28,14 @@ bool EqualAbs(float a, float b, float epsilon)
 
 float RelativeError(float a, float b)
 {
-	if (a == b) return 0.f; // Handles the special case where a and b are both zero.
-	return Abs((a-b)/Max(a, b));
+	if (a == b) return 0.f; // Handles the special case where approximation and real are both zero.
+	return Abs((a-b)/Max(Abs(a), Abs(b)));
 }
 
 bool EqualRel(float a, float b, float maxRelError)
 {
 	if (a == b) return true; // Handles the special case where a and b are both zero.
-	float relativeError = Abs((a-b)/Max(a, b));
+	float relativeError = Abs((a-b)/Max(Abs(a), Abs(b)));
 	return relativeError <= maxRelError;
 }
 
