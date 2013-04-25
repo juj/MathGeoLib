@@ -21,6 +21,7 @@
 #include "MathNamespace.h"
 #include "../MathGeoLibFwd.h"
 #include "float4x4.h"
+#include <stdint.h>
 
 MATH_BEGIN_NAMESPACE
 
