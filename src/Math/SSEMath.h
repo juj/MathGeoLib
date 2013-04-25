@@ -67,6 +67,14 @@ inline float4x4 *AlignedNew<float4x4>(size_t numElements) { return AlignedNew<fl
 
 inline float ReinterpretAsFloat(u32 i);
 
+#ifdef MATH_SSE2
+#define set_ps_hex(w, z, y, x) _mm_castsi128_ps(_mm_set_epi32(w, z, y, x))
+#define set1_ps_hex(x) _mm_castsi128_ps(_mm_set1_epi32(x))
+#else
+#define set_ps_hex(w, z, y, x) _mm_set_ps(ReinterpretAsFloat(w), ReinterpretAsFloat(z), ReinterpretAsFloat(y), ReinterpretAsFloat(x)))
+#define set1_ps_hex(x) _mm_set1_ps(ReinterpretAsFloat(x))
+#endif
+
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
 #define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
@@ -114,7 +122,7 @@ FORCE_INLINE __m128 FLOAT_TO_M128(float f)
 }
 
 // If mask[i] == 0, then output index i from a, otherwise mask[i] must be 0xFFFFFFFF, and output index i from b.
-inline __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
+FORCE_INLINE __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
 {
 #ifdef MATH_SSE41 // SSE 4.1 offers conditional copying between registers with the blendvps instruction.
 	return _mm_blendv_ps(a, b, mask);
@@ -127,11 +135,20 @@ inline __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
 
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.
 //inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, __m128 w) // VS2010 BUG! Can't use this signature!
-inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
+FORCE_INLINE __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
 {
 	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]
 	__m128 zw = _mm_movelh_ps(z, w); // zw = [ _, w, _, z]
 	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
+}
+
+FORCE_INLINE __m128 modf_ps(__m128 x, __m128 mod)
+{
+	// x % mod == x - floor(x/mod)*mod
+	// floor(x/mod) = integerpart(x/mod)
+	__m128 ints = _mm_div_ps(x, mod);
+	__m128 integerpart = _mm_round_ps(ints, _MM_FROUND_TO_ZERO);
+	return _mm_sub_ps(x, _mm_mul_ps(integerpart, mod));
 }
 
 #else // ~MATH_SSE
