@@ -559,6 +559,9 @@ public:
 	/// Generates a direction vector of the given length pointing at a uniformly random direction.
 	static float2 RandomDir(LCG &lcg, float length = 1.f);
 
+	/// Returns a random float3 with each entry randomized between the range [minElem, maxElem].
+	static MUST_USE_RESULT float2 RandomBox(LCG &lcg, float minElem, float maxElem);
+
 #ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
 	float2 operator *(const float2 &rhs) const { return this->Mul(rhs); }
 	float2 operator /(const float2 &rhs) const { return this->Div(rhs); }

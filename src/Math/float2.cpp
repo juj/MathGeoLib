@@ -668,6 +668,13 @@ float2 float2::RandomDir(LCG &lcg, float r)
 	return float2(r, 0);
 }
 
+MUST_USE_RESULT float2 float2::RandomBox(LCG &lcg, float minElem, float maxElem)
+{
+	float x = lcg.Float(minElem, maxElem);
+	float y = lcg.Float(minElem, maxElem);
+	return float2(x, y);
+}
+
 float2 float2::operator +(const float2 &rhs) const
 {
 	return float2(x + rhs.x, y + rhs.y);

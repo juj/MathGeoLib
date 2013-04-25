@@ -703,6 +703,11 @@ float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, float xmin, float xmax, float
 	return RandomBox(lcg, float3(xmin, ymin, zmin), float3(xmax, ymax, zmax));
 }
 
+float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, float minElem, float maxElem)
+{
+	return RandomBox(lcg, float3(minElem, minElem, minElem), float3(maxElem, maxElem, maxElem));
+}
+
 float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues)
 {
 	return AABB(minValues, maxValues).RandomPointInside(lcg);

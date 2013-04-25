@@ -633,6 +633,9 @@ public:
 	static MUST_USE_RESULT float3 RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax);
 	static MUST_USE_RESULT float3 RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues);
 
+	/// Returns a random float3 with each entry randomized between the range [minElem, maxElem].
+	static MUST_USE_RESULT float3 RandomBox(LCG &lcg, float minElem, float maxElem);
+
 	/// Specifies a compile-time constant float3 with value (0, 0, 0).
 	/** @note Due to static data initialization order being undefined in C++, do NOT use this
 			member to initialize other static data in other compilation units! */
