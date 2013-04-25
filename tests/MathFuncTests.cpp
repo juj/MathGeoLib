@@ -10,7 +10,7 @@
 #include <cmath>
 
 #ifdef MATH_SSE2
-#include "../src/math/sse_mathfun.h"
+#include "../src/Math/sse_mathfun.h"
 #endif
 
 using namespace TestData;
