@@ -485,7 +485,7 @@ bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 bool EqualUlps(float a, float b, int maxUlps = 10000);
 
 /// Returns true if the given value is not an inf or a nan.
-template<typename T> inline bool IsFinite(T /*value*/) { return true; }
+template<typename T> FORCE_INLINE bool IsFinite(T /*value*/) { return true; }
 
 #ifdef _MSC_VER
 template<> FORCE_INLINE bool IsFinite<float>(float value) { return _finite((double)value) != 0; }

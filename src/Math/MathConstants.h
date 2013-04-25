@@ -35,11 +35,11 @@
 #endif
 
 #if defined(_MSC_VER) || defined(EMSCRIPTEN)
-#define FLOAT_NAN std::numeric_limits<float>::quiet_NaN()
-#define FLOAT_INF std::numeric_limits<float>::infinity()
+#define FLOAT_NAN ((float)std::numeric_limits<float>::quiet_NaN())
+#define FLOAT_INF ((float)std::numeric_limits<float>::infinity())
 #else
-#define FLOAT_NAN NAN
-#define FLOAT_INF INFINITY
+#define FLOAT_NAN ((float)NAN)
+#define FLOAT_INF ((float)INFINITY)
 #endif
 
 MATH_BEGIN_NAMESPACE
