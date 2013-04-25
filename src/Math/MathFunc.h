@@ -485,22 +485,22 @@ bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 bool EqualUlps(float a, float b, int maxUlps = 10000);
 
 /// Returns true if the given value is not an inf or a nan.
-template<typename T> inline bool IsFinite(const T & /*value*/) { return true; }
+template<typename T> inline bool IsFinite(T /*value*/) { return true; }
 
 #ifdef _MSC_VER
-template<> FORCE_INLINE bool IsFinite<float>(const float &value) { return _finite((double)value) != 0; }
-template<> FORCE_INLINE bool IsFinite<double>(const double &value) { return _finite(value) != 0; }
+template<> FORCE_INLINE bool IsFinite<float>(float value) { return _finite((double)value) != 0; }
+template<> FORCE_INLINE bool IsFinite<double>(double value) { return _finite(value) != 0; }
 
 #ifndef EMSCRIPTEN // long double is not supported.
-template<> FORCE_INLINE bool IsFinite<long double>(const long double &value) { return _finite((double)value) != 0; }
+template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return _finite((double)value) != 0; }
 #endif
 
 #else
-template<> FORCE_INLINE bool IsFinite<float>(const float &value) { using namespace std; return isfinite(value) != 0; }
-template<> FORCE_INLINE bool IsFinite<double>(const double &value) { using namespace std; return isfinite(value) != 0; }
+template<> FORCE_INLINE bool IsFinite<float>(float value) { using namespace std; return isfinite(value) != 0; }
+template<> FORCE_INLINE bool IsFinite<double>(double value) { using namespace std; return isfinite(value) != 0; }
 
 #ifndef EMSCRIPTEN // long double is not supported.
-template<> FORCE_INLINE bool IsFinite<long double>(const long double &value) { using namespace std; return isfinite((double)value) != 0; }
+template<> FORCE_INLINE bool IsFinite<long double>(long double value) { using namespace std; return isfinite((double)value) != 0; }
 #endif
 
 #endif
