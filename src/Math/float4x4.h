@@ -82,6 +82,9 @@ public:
 	{
 #endif
 		float v[Rows][Cols];
+#ifdef MATH_AVX
+		__m256 row2[2];
+#endif
 #ifdef MATH_SSE
 		__m128 row[4];
 	};
