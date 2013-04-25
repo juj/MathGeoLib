@@ -18,6 +18,25 @@
 #pragma once
 
 #include "../MathBuildConfig.h"
+#include "MathNamespace.h"
+#include "../MathGeoLibFwd.h"
+#include "float4x4.h"
+
+MATH_BEGIN_NAMESPACE
+
+/// Allocates the given amount of memory at the given alignment.
+void *AlignedMalloc(size_t size, size_t alignment);
+
+/// \todo This is not really placement-new.
+template<typename T>
+inline T *AlignedNew(size_t numElements, size_t alignment) { return reinterpret_cast<T*>(AlignedMalloc(numElements*sizeof(T), alignment)); }
+
+/// \todo This is not really placement-new.
+template<typename T>
+inline T *AlignedNew(size_t numElements) { return AlignedNew<T>(numElements, 16); }
+
+/// Frees memory allocated by AlignedMalloc.
+void AlignedFree(void *ptr);
 
 #ifdef MATH_SSE // If SSE is not enabled, this whole file will not be included.
 
@@ -29,7 +48,21 @@
 #define ALIGN32 __attribute((aligned(32)))
 #endif
 
-MATH_BEGIN_NAMESPACE
+#define IS16ALIGNED(x) ((((uintptr_t)(x)) & 0xF) == 0)
+#define IS32ALIGNED(x) ((((uintptr_t)(x)) & 0x1F) == 0)
+
+#ifdef MATH_AVX
+#define ALIGN_MAT ALIGN32
+#define MAT_ALIGNMENT 32
+#define IS_MAT_ALIGNED(x) IS32ALIGNED(X)
+#else
+#define ALIGN_MAT ALIGN16
+#define MAT_ALIGNMENT 16
+#define IS_MAT_ALIGNED(x) IS16ALIGNED(X)
+#endif
+
+template<>
+inline float4x4 *AlignedNew<float4x4>(size_t numElements) { return AlignedNew<float4x4>(numElements, MAT_ALIGNMENT); }
 
 inline float ReinterpretAsFloat(u32 i);
 
@@ -100,10 +133,13 @@ inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
 	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 }
 
-MATH_END_NAMESPACE
-
 #else // ~MATH_SSE
 
 #define ALIGN16
+#define ALIGN32
+#define ALIGN_MAT
+#define IS_MAT_ALIGNED(x) true
 
 #endif // ~MATH_SSE
+
+MATH_END_NAMESPACE

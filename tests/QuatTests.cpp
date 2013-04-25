@@ -5,33 +5,11 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "TestData.h"
 
 #include "../src/Math/SSEMath.h"
 
-extern float *f;
-extern float4x4 *m;
-extern float4x4 *m2;
-extern float4x4 *tm;
-extern float4 *v;
-extern float4 *v2;
-
-Quat *QuatArray()
-{
-	LCG lcg;
-	static Quat *arr;
-	if (!arr)
-	{
-		arr = new Quat[testrunner_numItersPerTest+32];
-		uintptr_t a = (uintptr_t)arr;
-		a = (a + 31) & ~31;
-		arr = (Quat*)a;
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = Quat::RandomRotation(lcg);
-	}
-	return arr;
-}
-
-Quat *q = QuatArray();
+using namespace TestData;
 
 BENCHMARK(Quat_Transform_float3)
 {

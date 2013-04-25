@@ -5,7 +5,10 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "TestData.h"
 #include <cmath>
+
+using namespace TestData;
 
 #if __cplusplus >= 201103L
 TEST(CXX11StdFinite)
@@ -168,25 +171,6 @@ float Sqrt_Via_Rcp_RSqrt(float x)
 }
 
 #endif
-
-float *PosFloatArray()
-{
-	LCG lcg;
-	static float *arr;
-	if (!arr)
-	{
-		arr = new float[testrunner_numItersPerTest+32];
-		uintptr_t a = (uintptr_t)arr;
-		a = (a + 31) & ~31;
-		arr = (float*)a;
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = lcg.Float(0.f, 100000.f);
-	}
-	return arr;
-}
-
-float *pf = PosFloatArray();
-extern float *f;
 
 UNIQUE_TEST(sqrt_precision)
 {

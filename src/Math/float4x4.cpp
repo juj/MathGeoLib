@@ -1180,6 +1180,8 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 //	assume(rhs.IsFinite());
 
 #ifdef MATH_SSE
+	assert(IS16ALIGNED(this));
+	assert(IS16ALIGNED(&rhs));
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];

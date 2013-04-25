@@ -5,9 +5,11 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
-
+#include "TestData.h"
 #include "../src/Math/SSEMath.h"
 #include "../src/Math/float4x4_sse.h"
+
+using namespace MATH_NS::TestData;
 
 // In debug mode, we test the correctness of the SSE code. In release mode, we benchmark performance.
 #ifdef _DEBUG
@@ -132,113 +134,6 @@ UNIQUE_TEST(sse_solve_shuffle)
 	SolveShuffles();
 }
 #endif
-
-float *FloatArray()
-{
-	LCG lcg;
-	static float *arr;
-	static bool initialized = false;
-	if (!initialized)
-	{
-		arr = new float[testrunner_numItersPerTest+32];
-		uintptr_t a = (uintptr_t)arr;
-		a = (a + 31) & ~31;
-		arr = (float*)a;
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = lcg.Float(-10.f, 10.f);
-		initialized = true;
-	}
-	return arr;
-}
-
-float4x4 *MatrixArray()
-{
-	LCG lcg;
-	static float4x4 *arr;
-	static bool initialized = false;
-	if (!initialized)
-	{
-		arr = new float4x4[testrunner_numItersPerTest+1];
-		uintptr_t a = (uintptr_t)arr;
-		a = (a + 31) & ~31;
-		arr = (float4x4*)a;
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = float4x4::RandomGeneral(lcg, -10.f, 10.f);
-		initialized = true;
-	}
-	return arr;
-}
-
-float4x4 *MatrixArray2()
-{
-	LCG lcg;
-	static float4x4 *arr;
-	static bool initialized = false;
-	if (!initialized)
-	{
-		arr = new float4x4[testrunner_numItersPerTest+1];
-		uintptr_t a = (uintptr_t)arr;
-		a = (a + 31) & ~31;
-		arr = (float4x4*)a;
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = float4x4::RandomGeneral(lcg, -10.f, 10.f);
-		initialized = true;
-	}
-	return arr;
-}
-
-float4x4 *TransposedMatrixArray()
-{
-	static float4x4 *arr;
-	static bool initialized = false;
-	if (!initialized)
-	{
-		arr = new float4x4[testrunner_numItersPerTest+1];
-		uintptr_t a = (uintptr_t)arr;
-		a = (a + 31) & ~31;
-		arr = (float4x4*)a;
-		float4x4 *m = MatrixArray();
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = m[i].Transposed();
-		initialized = true;
-	}
-	return arr;
-}
-
-float4 *VectorArray()
-{
-	LCG lcg;
-	static float4 arr[testrunner_numItersPerTest];
-	static bool initialized = false;
-	if (!initialized)
-	{
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
-		initialized = true;
-	}
-	return arr;
-}
-
-float4 *VectorArray2()
-{
-	LCG lcg;
-	static float4 arr[testrunner_numItersPerTest];
-	static bool initialized = false;
-	if (!initialized)
-	{
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
-			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
-		initialized = true;
-	}
-	return arr;
-}
-
-float *f = FloatArray();
-float4x4 *m = MatrixArray();
-float4x4 *m2 = MatrixArray();
-float4x4 *tm = TransposedMatrixArray();
-float4 *v = VectorArray();
-float4 *v2 = VectorArray2();
 
 #ifdef MATH_AVX
 
@@ -416,12 +311,11 @@ BENCHMARK(colmajor_mat4x4_mul_sse1)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = colmajor_mat4x4_mul_sse1(tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_sse1(tpm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4x4 *m = MatrixArray();
-	float4 res = colmajor_mat4x4_mul_sse1(tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_sse1(tpm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -430,11 +324,11 @@ BENCHMARK(colmajor_mat4x4_mul_sse1_2)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = colmajor_mat4x4_mul_sse1_2(tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_sse1_2(tpm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = colmajor_mat4x4_mul_sse1_2(tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_sse1_2(tpm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -445,11 +339,11 @@ BENCHMARK(colmajor_mat4x4_mul_avx)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = colmajor_mat4x4_mul_avx((__m256*)tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_avx((__m256*)tpm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = colmajor_mat4x4_mul_avx((__m256*)tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_avx((__m256*)tpm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
@@ -458,11 +352,11 @@ BENCHMARK(colmajor_mat4x4_mul_avx_2)
 {
 	TIMER_BEGIN
 	{
-		v2[i] = colmajor_mat4x4_mul_avx_2((__m256*)tm[i].row, v[i]);
+		v2[i] = colmajor_mat4x4_mul_avx_2((__m256*)tpm[i].row, v[i]);
 	}
 	TIMER_END;
 
-	float4 res = colmajor_mat4x4_mul_avx_2((__m256*)tm[0].row, v[0]);
+	float4 res = colmajor_mat4x4_mul_avx_2((__m256*)tpm[0].row, v[0]);
 	float4 res2 = m[0]*v[0];
 	assert(res.Equals(res2));
 }
