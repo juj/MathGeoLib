@@ -246,6 +246,14 @@ int main(int argc, char **argv)
 	const char * const noPrefixes[] = { "", 0 };
 	const char * const *prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
 
+	if (numTotalRuns == 0 || numTrialsPerTimedBlock == 0)
+	{
+		LOGI("Usage: %s <numTotalRuns> <numTrialsPerTimedBlock>", argv[0]); 
+		LOGI("   Runs all tests.");
+		LOGI("       %s <numTotalRuns> <numTrialsPerTimedBlock> prefix1 prefix2 prefix3...", argv[0]); 
+		LOGI("   Runs all tests starting with one of the given prefixes, or residing in one of the named code files.");
+		return 0;
+	}
 	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefixes);
 	LOGI("%d", globalPokedData);
 
