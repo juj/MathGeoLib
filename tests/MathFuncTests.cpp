@@ -565,3 +565,102 @@ BENCHMARK(sqrt_OneOverX)
 	}
 	TIMER_END
 }
+
+BENCHMARK(Sin)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Sin(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Cos)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Cos(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(SinCos)
+{
+	TIMER_BEGIN
+	{
+		fl_2[i] = SinCos(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Tan)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Tan(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Asin)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Asin(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Acos)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Acos(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Atan)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Atan(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Atan2)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Atan2(f[i], pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Sinh)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Sinh(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Cosh)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Cosh(pf[i]);
+	}
+	TIMER_END
+}
+
+BENCHMARK(Tanh)
+{
+	TIMER_BEGIN
+	{
+		f[i] = Tanh(pf[i]);
+	}
+	TIMER_END
+}

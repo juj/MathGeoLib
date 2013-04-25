@@ -85,6 +85,19 @@ float4x4 *TransposedMatrixArray()
 	return arr;
 }
 
+float2 *Float2Array()
+{
+	LCG lcg;
+	static float2 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float2>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float2::RandomBox(lcg, -10.f, 10.f);
+	}
+	return arr;
+}
+
 float4 *VectorArray()
 {
 	LCG lcg;
@@ -120,6 +133,7 @@ public:
 		AlignedFree(PosFloatArray());
 		AlignedFree(MatrixArray());
 		AlignedFree(MatrixArray2());
+		AlignedFree(Float2Array());
 		AlignedFree(VectorArray());
 		AlignedFree(VectorArray2());
 		AlignedFree(TransposedMatrixArray());
