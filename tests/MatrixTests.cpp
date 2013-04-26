@@ -4,6 +4,12 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "TestData.h"
+#include "../src/Math/SSEMath.h"
+#include "../src/Math/float4_sse.h"
+#include "../src/Math/float4x4_sse.h"
+
+using namespace TestData;
 
 TEST(Float3x4ScaleRow)
 {
@@ -416,4 +422,117 @@ TEST(Float4x4Scale)
 	float4x4 m = float4x4::Scale(2,4,6);
 	float4x4 m2(2,0,0,0, 0,4,0,0, 0,0,6,0, 0,0,0,1);
 	assert(m.Equals(m2));
+}
+
+BENCHMARK(Float4x4Inverse)
+{
+	TIMER_BEGIN
+	{
+		m[i].Inverse();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(inverse_ps)
+{
+	TIMER_BEGIN
+	{
+		mat_inverse(m[i].row, m[i].row);
+	}
+	TIMER_END;
+}
+
+BENCHMARK(float4x4_InverseOrthogonalUniformScale)
+{
+	TIMER_BEGIN
+	{
+		m[i].InverseOrthogonalUniformScale();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(float4x4_InverseOrthonormal)
+{
+	TIMER_BEGIN
+	{
+		m[i].InverseOrthonormal();
+	}
+	TIMER_END;
+}
+
+BENCHMARK(float3x4_InverseOrthonormal)
+{
+	TIMER_BEGIN
+	{
+		m[i].Float3x4Part().InverseOrthonormal();
+	}
+	TIMER_END;
+}
+
+RANDOMIZED_TEST(mat_inverse_orthonormal_correctness)
+{
+	float4x4 m = float4x4(Quat::RandomRotation(rng), float3::RandomDir(rng));
+	float4x4 m2 = m;
+	float4x4 m3 = m;
+	m2.InverseOrthonormal();
+	mat_inverse_orthonormal(m3.row, m3.row);
+	assert(m2.Equals(m3));
+}
+
+BENCHMARK(mat_inverse_orthonormal)
+{
+	TIMER_BEGIN
+	{
+		mat_inverse_orthonormal(m[i].row, m[i].row);
+	}
+	TIMER_END;
+}
+
+float RelError(const float4x4 &m1, const float4x4 &m2)
+{
+	float relError = 0.f;
+	for(int y = 0; y < 4; ++y)
+		for(int x = 0; x < 4; ++x)
+			relError = Max(relError, m1[y][x], m2[y][x]);
+	return relError;
+}
+
+float AbsError(const float4x4 &m1, const float4x4 &m2)
+{
+	float absError = 0.f;
+	for(int y = 0; y < 4; ++y)
+		for(int x = 0; x < 4; ++x)
+			absError = Max(absError, Abs(m1[y][x] - m2[y][x]));
+	return absError;
+}
+
+UNIQUE_TEST(mat_inverse_correctness)
+{
+	float maxRelError = 0.f;
+	float maxAbsError = 0.f;
+
+	for(int k = 0; k < 2; ++k)
+	{
+		for(int i = 0; i < 10000; ++i)
+		{
+			float4x4 m;
+			if (k == 0)
+				m = float3x4::RandomRotation(rng);
+			else
+				m = float4x4::RandomGeneral(rng, -1.f, 1.f);
+
+			if (m.IsInvertible())
+			{
+				float4x4 m2 = m.Inverted();
+				float4x4 m3 = m;
+				mat_inverse(m3.row, m3.row);
+				maxRelError = Max(maxRelError, RelError(m2, m3));
+				maxAbsError = Max(maxAbsError, AbsError(m2, m3));
+			}
+		}
+		if (k == 0)
+			LOGI("mat_inverse max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+		else
+			LOGI("mat_inverse max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+	}
 }

@@ -84,6 +84,19 @@ inline __m128 colmajor_mat4x4_mul_sse1(const __m128 *matrix, __m128 vector)
 	return _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
 }
 
+/// Transforms a direction vector (w == 0) by the given matrix in column-major format.
+inline __m128 colmajor_mat4x4_muldir_sse1(const __m128 *matrix, __m128 vector)
+{
+	__m128 x = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(0,0,0,0));
+	__m128 y = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(1,1,1,1));
+	__m128 z = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2,2,2,2));
+	x = _mm_mul_ps(x, matrix[0]);
+	y = _mm_mul_ps(y, matrix[1]);
+	z = _mm_mul_ps(z, matrix[2]);
+
+	return _mm_add_ps(_mm_add_ps(x, y), z);
+}
+
 inline __m128 colmajor_mat4x4_mul_sse1_2(const __m128 *matrix, __m128 vector)
 {
 	__m128 x = shuffle1_ps(vector, _MM_SHUFFLE(0,0,0,0));
@@ -406,6 +419,63 @@ inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 	r2 = _mm_mul_ps(s2, m2[2]);
 	r3 = _mm_mul_ps(s3, m2_3);
 	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+}
+
+// Computes the inverse of a 4x4 matrix via direct cofactor expansion.
+#define MAT_COFACTOR(mat, i, j) \
+	_mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
+	           shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0))), \
+	           _mm_mul_ps(shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
+	           _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
+FORCE_INLINE void mat_inverse(const __m128 *mat, __m128 *out)
+{
+	__m128 f1 = MAT_COFACTOR(mat, 3, 2);
+	__m128 f2 = MAT_COFACTOR(mat, 3, 1);
+	__m128 f3 = MAT_COFACTOR(mat, 2, 1);
+	__m128 f4 = MAT_COFACTOR(mat, 3, 0);
+	__m128 f5 = MAT_COFACTOR(mat, 2, 0);
+	__m128 f6 = MAT_COFACTOR(mat, 1, 0);
+	__m128 v1 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(0,0,0,0)), _MM_SHUFFLE(2,2,2,0));
+	__m128 v2 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(1,1,1,1)), _MM_SHUFFLE(2,2,2,0));
+	__m128 v3 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(2,2,2,2)), _MM_SHUFFLE(2,2,2,0));
+	__m128 v4 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(3,3,3,3)), _MM_SHUFFLE(2,2,2,0));
+	const __m128 s1 = _mm_set_ps(-0.0f,  0.0f, -0.0f,  0.0f);
+	const __m128 s2 = _mm_set_ps( 0.0f, -0.0f,  0.0f, -0.0f);
+	__m128 r1 = _mm_xor_ps(s1, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v2, f1), _mm_mul_ps(v3, f2)), _mm_mul_ps(v4, f3)));
+	__m128 r2 = _mm_xor_ps(s2, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f1), _mm_mul_ps(v3, f4)), _mm_mul_ps(v4, f5)));
+	__m128 r3 = _mm_xor_ps(s1, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f2), _mm_mul_ps(v2, f4)), _mm_mul_ps(v4, f6)));
+	__m128 r4 = _mm_xor_ps(s2, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f3), _mm_mul_ps(v2, f5)), _mm_mul_ps(v3, f6)));
+	__m128 det = dot4_ps(mat[0], _mm_movelh_ps(_mm_unpacklo_ps(r1, r2), _mm_unpacklo_ps(r3, r4)));
+	det = _mm_rcp_ps(det);
+	out[0] = _mm_mul_ps(r1, det);
+	out[1] = _mm_mul_ps(r2, det);
+	out[2] = _mm_mul_ps(r3, det);
+	out[3] = _mm_mul_ps(r4, det);
+}
+
+/// Inverts a 3x4 affine transformation matrix (in row-major format) that only consists of rotation (+possibly mirroring) and translation.
+FORCE_INLINE void mat_inverse_orthonormal(__m128 *mat, __m128 *out)
+{
+	// mat[0]: [tx,02,01,00]
+	// mat[1]: [ty,12,11,10]
+	// mat[2]: [tz,22,21,20]
+	// mat[3]: assumed to be [1,0,0,0] - not read.
+
+	// First get the translation part (tx,ty,tz) from the original matrix,
+	// and compute T=-M^(-1).
+	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]);                      // [ty,tx,12,02]
+	__m128 xyz = _mm_shuffle_ps(tmp1, mat[2], _MM_SHUFFLE(3, 3, 3, 2)); // [ _,tz,ty,tx]
+	__m128 vec = negate_ps(colmajor_mat4x4_muldir_sse1(mat, xyz));      // [ _,Tz,Ty,Tx]
+
+	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]); // [11,01,10,00]
+	//     tmp1 = computed already above              [ty,tx,12,02]
+	__m128 tmp2 = _mm_unpacklo_ps(mat[2], vec);    // [Ty,21,Tx,20]
+	__m128 tmp3 = _mm_unpackhi_ps(mat[2], vec);    // [ _,23,Tz,22]
+
+	out[0] = _mm_movelh_ps(tmp0, tmp2);            // [Tx,20,10,00]
+	out[1] = _mm_movehl_ps(tmp2, tmp0);            // [Ty,21,11,01]
+	out[2] = _mm_movelh_ps(tmp1, tmp3);            // [Tz,22 12,02]
+ // out[3] = assumed to be [1,0,0,0] - no need to write back.
 }
 
 MATH_END_NAMESPACE

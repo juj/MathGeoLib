@@ -956,6 +956,9 @@ void float3x4::InverseOrthonormal()
 
 	assume(IsOrthonormal());
 
+#ifdef MATH_SSE
+	mat_inverse_orthonormal(row, row);
+#else
 	/* In this function, we seek to optimize the matrix inverse in the case this
 	   matrix is orthonormal, i.e. it can be written in the following form:
 
@@ -989,6 +992,7 @@ void float3x4::InverseOrthonormal()
 
 	// b) Replace the top-right 3x1 part by computing R^t(-T).
 	SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
+#endif
 
 	mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
 }

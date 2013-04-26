@@ -1351,9 +1351,12 @@ bool float4x4::InverseOrthogonalUniformScale()
 
 void float4x4::InverseOrthonormal()
 {
-	///\todo SSE
 	assume(!ContainsProjection());
+#ifdef MATH_SSE
+	mat_inverse_orthonormal(row, row);
+#else
 	return Float3x4Part().InverseOrthonormal();
+#endif
 }
 
 void float4x4::Transpose()
