@@ -98,6 +98,8 @@ const __m128 sseEpsilonFloat = _mm_set1_ps(1e-4f);
 const __m128 sseZero = _mm_set1_ps(0.f);
 const __m128 sseOne = _mm_set1_ps(1.f);
 
+#define negate_ps(x) _mm_xor_ps(x, sseSignMask)
+
 #define abs_ps(x) _mm_andnot_ps(sseSignMask, x)
 #ifdef MATH_AVX
 #define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)
