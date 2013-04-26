@@ -442,6 +442,7 @@ BENCHMARK(Float4x4Inverse)
 	TIMER_END;
 }
 
+#ifdef MATH_SSE
 BENCHMARK(inverse_ps)
 {
 	TIMER_BEGIN
@@ -450,6 +451,7 @@ BENCHMARK(inverse_ps)
 	}
 	TIMER_END;
 }
+#endif
 
 BENCHMARK(float4x4_InverseOrthogonalUniformScale)
 {
@@ -478,6 +480,7 @@ BENCHMARK(float3x4_InverseOrthonormal)
 	TIMER_END;
 }
 
+#ifdef MATH_SSE
 RANDOMIZED_TEST(mat_inverse_orthonormal_correctness)
 {
 	float4x4 m = float4x4(Quat::RandomRotation(rng), float3::RandomDir(rng));
@@ -496,6 +499,7 @@ BENCHMARK(mat_inverse_orthonormal)
 	}
 	TIMER_END;
 }
+#endif
 
 float RelError(const float4x4 &m1, const float4x4 &m2)
 {
@@ -514,6 +518,8 @@ float AbsError(const float4x4 &m1, const float4x4 &m2)
 			absError = Max(absError, Abs(m1[y][x] - m2[y][x]));
 	return absError;
 }
+
+#ifdef MATH_SSE
 
 UNIQUE_TEST(mat_inverse_correctness)
 {
@@ -545,3 +551,6 @@ UNIQUE_TEST(mat_inverse_correctness)
 			LOGI("mat_inverse max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 	}
 }
+
+#endif
+
