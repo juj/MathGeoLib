@@ -424,6 +424,15 @@ TEST(Float4x4Scale)
 	assert(m.Equals(m2));
 }
 
+BENCHMARK(Float3x4Inverse)
+{
+	TIMER_BEGIN
+	{
+		m[i].Float3x4Part().Inverse();
+	}
+	TIMER_END;
+}
+
 BENCHMARK(Float4x4Inverse)
 {
 	TIMER_BEGIN
