@@ -50,8 +50,6 @@ public:
 	}
 };
 
-#ifdef MATH_TESTS_EXECUTABLE
-
 #define TEST(name) \
 	void TestFunc_##name(); \
 	AddTestOp addtestop_##name(#name, __FILE__, false, false, false, TestFunc_##name); \
@@ -83,19 +81,6 @@ public:
 			for(int i = 0; i < testrunner_numItersPerTest; ++i) \
 			{
 
-#else
-
-// Not running tests - specfiy the test functions, but don't add them at app startup time (they should be DCEd).
-#define TEST(name) void TestFunc_##name()
-#define RANDOMIZED_TEST(name) void TestFunc_##name()
-#define UNIQUE_TEST(name) void TestFunc_##name()
-#define BENCHMARK(name) void BenchmarkFunc_##name()
-
-#endif
-
-const int testrunner_numTimerTests = 10000;
-const int testrunner_numItersPerTest = 1000;
-
 #define BENCHMARK_END \
 		} \
 		unsigned long long endTsc = Clock::Rdtsc(); \
@@ -111,3 +96,6 @@ const int testrunner_numItersPerTest = 1000;
 	LOGI("\n   Best: %s / %g ticks, Avg: %s, Worst: %s", FormatTime((double)bestTicks / testrunner_numItersPerTest).c_str(), bestCycles, \
 		FormatTime((double)accumTicks / (testrunner_numTimerTests * testrunner_numItersPerTest)).c_str(), FormatTime((double)worstTicks / testrunner_numItersPerTest).c_str()); \
 }
+
+const int testrunner_numTimerTests = 10000;
+const int testrunner_numItersPerTest = 1000;
