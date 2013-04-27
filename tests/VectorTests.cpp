@@ -6,6 +6,7 @@
 #include "TestRunner.h"
 #include "TestData.h"
 #include "../src/Math/float4_sse.h"
+#include "../src/Math/float4_neon.h"
 
 using namespace TestData;
 
@@ -555,6 +556,14 @@ BENCHMARK(Float4_Add)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Add_simd)
+{
+	v3[i] = vec4_add_vec4(v[i], v2[i]);
+}
+BENCHMARK_END;
+#endif
+
 BENCHMARK(Float4_AddEq)
 {
 	v3[i] += v2[i];
@@ -567,6 +576,14 @@ BENCHMARK(Float4_Sub)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Sub_simd)
+{
+	v3[i] = vec4_sub_vec4(v[i], v2[i]);
+}
+BENCHMARK_END;
+#endif
+
 BENCHMARK(Float4_SubEq)
 {
 	v3[i] -= v2[i];
@@ -578,6 +595,14 @@ BENCHMARK(Float4_Mul)
 	v3[i] = v[i] * f[i];
 }
 BENCHMARK_END;
+
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Mul_simd)
+{
+	v3[i] = vec4_mul_float(v[i], f[i]);
+}
+BENCHMARK_END;
+#endif
 
 // Temp: Testing random seen cache(?) behavior, where running the identical code
 //       again produces *slower* results.
@@ -610,7 +635,7 @@ BENCHMARK(Float4_Mul_scalar)
 }
 BENCHMARK_END;
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 BENCHMARK(Float4_Mul_sse)
 {
 	v3[i].v = vec4_mul_float(v[i].v, f[i]);
@@ -624,11 +649,27 @@ BENCHMARK(Float4_Mul_float4)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Mul_float4_simd)
+{
+	v3[i] = vec4_mul_vec4(v[i], v2[i]);
+}
+BENCHMARK_END;
+#endif
+
 BENCHMARK(Float4_Div)
 {
 	v3[i] = v[i] / f[i];
 }
 BENCHMARK_END;
+
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Div_simd)
+{
+	v3[i] = vec4_div_float(v[i], f[i]);
+}
+BENCHMARK_END;
+#endif
 
 BENCHMARK(Float4_DivEq)
 {
@@ -642,6 +683,14 @@ BENCHMARK(Float4_Div_float4)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Div_float4_simd)
+{
+	v3[i] = vec4_div_vec4(v[i], v2[i]);
+}
+BENCHMARK_END;
+#endif
+
 BENCHMARK(Float4_Abs)
 {
 	v3[i] = v[i].Abs();
@@ -653,6 +702,14 @@ BENCHMARK(Float4_Neg)
 	v3[i] = -v[i];
 }
 BENCHMARK_END;
+
+#ifdef MATH_SIMD
+BENCHMARK(Float4_Neg_simd)
+{
+	v3[i] = negate_ps(v[i]);
+}
+BENCHMARK_END;
+#endif
 
 BENCHMARK(Float4_Length3)
 {

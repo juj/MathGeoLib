@@ -110,9 +110,11 @@
 //#define MATH_SSE2
 //#define MATH_SSE // SSE1.
 
-#ifdef ANDROID
-//#define MATH_NEON
-//#include <arm_neon.h>
+///\todo Test iOS support.
+///\todo Enable NEON only on ARMv7, not older.
+#if defined(ANDROID) || (defined(WIN8RT) && defined(_M_ARM))
+#define MATH_NEON
+#include <arm_neon.h>
 #endif
 
 // MATH_AVX implies MATH_SSE41, which implies MATH_SSE3, which implies MATH_SSE2, which implies MATH_SSE.
@@ -155,7 +157,11 @@
 #if defined(MATH_SSE) && !defined(MATH_AUTOMATIC_SSE)
 // Automatically use the SSE-optimized operations for all code.
 // This should only be disabled for benchmarking purposes.
-#define MATH_AUTOMATIC_SSE
+//#define MATH_AUTOMATIC_SSE
+#endif
+
+#if defined(MATH_SSE) || defined(MATH_NEON)
+#define MATH_SIMD // A common #define to signal the simd4f type is available.
 #endif
 
 #include "Math/MathTypes.h"

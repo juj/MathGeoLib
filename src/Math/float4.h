@@ -48,7 +48,7 @@ public:
 		Size = 4
 	};
 
-#ifdef MATH_SSE
+#if defined(MATH_SSE) || defined(MATH_NEON)
 	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
 
 	union
@@ -68,11 +68,14 @@ public:
 			/// The w component. [similarOverload: x]
 			/** This element is packed to the memory offsets 12-15 of this class. */
 			float w;
-#ifdef MATH_SSE
+#if defined(MATH_SSE) || defined(MATH_NEON)
 		};
+#ifdef MATH_SSE
 		__m128 v;
+#else
+		float32x4_t v;
+#endif
 	};
-
 	NAMELESS_UNION_END
 #endif
 
@@ -693,9 +696,13 @@ public:
 	void NormalizeW_SSE();
 	__m128 SumOfElements_SSE() const;
 
-	inline float4 &operator =(const __m128 vec) { v = vec; return *this; }
+	inline float4 &operator =(__m128 vec) { v = vec; return *this; }
 
 	inline operator __m128() const { return v; }
+#elif defined(MATH_NEON)
+	float4(float32x4_t vec):v(vec) {}
+	inline float4 &operator =(float32x4_t vec) { v = vec; return *this; }
+	inline operator float32x4_t() const { return v; }
 #endif
 };
 

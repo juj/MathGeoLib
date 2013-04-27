@@ -32,6 +32,7 @@
 #include "MathFunc.h"
 #include "SSEMath.h"
 #include "float4_sse.h"
+#include "float4_neon.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -930,8 +931,8 @@ float4 float4::RandomGeneral(LCG &lcg, float minElem, float maxElem)
 
 float4 float4::operator +(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	return float4(_mm_add_ps(v, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_add_vec4(v, rhs.v));
 #else
 	return float4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 #endif
@@ -939,8 +940,8 @@ float4 float4::operator +(const float4 &rhs) const
 
 float4 float4::operator -(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	return float4(_mm_sub_ps(v, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_sub_vec4(v, rhs.v));
 #else
 	return float4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
 #endif
@@ -948,9 +949,8 @@ float4 float4::operator -(const float4 &rhs) const
 
 float4 float4::operator -() const
 {
-#ifdef MATH_SSE
-	__m128 zero = _mm_setzero_ps();
-	return float4(_mm_sub_ps(zero, v));
+#ifdef MATH_AUTOMATIC_SSE
+	return negate_ps(v);
 #else
 	return float4(-x, -y, -z, -w);
 #endif
@@ -958,9 +958,8 @@ float4 float4::operator -() const
 
 float4 float4::operator *(float scalar) const
 {
-#ifdef MATH_SSE
-	__m128 scale = _mm_set1_ps(scalar);
-	return float4(_mm_mul_ps(v, scale));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_mul_float(v, scalar);
 #else
 	return float4(x * scalar, y * scalar, z * scalar, w * scalar);
 #endif
@@ -968,9 +967,8 @@ float4 float4::operator *(float scalar) const
 
 float4 operator *(float scalar, const float4 &rhs)
 {
-#ifdef MATH_SSE
-	__m128 scale = _mm_set1_ps(scalar);
-	return float4(_mm_mul_ps(scale, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_mul_float(rhs.v, scalar);
 #else
 	return float4(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z, scalar * rhs.w);
 #endif
@@ -978,9 +976,8 @@ float4 operator *(float scalar, const float4 &rhs)
 
 float4 float4::operator /(float scalar) const
 {
-#ifdef MATH_SSE
-	__m128 scale = _mm_set1_ps(scalar);
-	return float4(_mm_div_ps(v, scale));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_div_float(scalar);
 #else
 	float invScalar = 1.f / scalar;
 	return float4(x * invScalar, y * invScalar, z * invScalar, w * invScalar);
@@ -989,8 +986,8 @@ float4 float4::operator /(float scalar) const
 
 float4 &float4::operator +=(const float4 &rhs)
 {
-#ifdef MATH_SSE
-	v = _mm_add_ps(v, rhs.v);
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec4_add_vec4(v, rhs.v);
 #else
 	x += rhs.x;
 	y += rhs.y;
@@ -1003,8 +1000,8 @@ float4 &float4::operator +=(const float4 &rhs)
 
 float4 &float4::operator -=(const float4 &rhs)
 {
-#ifdef MATH_SSE
-	v = _mm_sub_ps(v, rhs.v);
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec4_sub_vec4(v, rhs.v);
 #else
 	x -= rhs.x;
 	y -= rhs.y;
@@ -1017,9 +1014,8 @@ float4 &float4::operator -=(const float4 &rhs)
 
 float4 &float4::operator *=(float scalar)
 {
-#ifdef MATH_SSE
-	__m128 scale = _mm_set1_ps(scalar);
-	v = _mm_mul_ps(v, scale);
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec4_mul_float(v, scalar);
 #else
 	x *= scalar;
 	y *= scalar;
@@ -1032,9 +1028,8 @@ float4 &float4::operator *=(float scalar)
 
 float4 &float4::operator /=(float scalar)
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_set1_ps(scalar);
-	v = _mm_div_ps(v, v2);
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec4_div_float(v, scalar);
 #else
 	float invScalar = 1.f / scalar;
 	x *= invScalar;
@@ -1048,9 +1043,8 @@ float4 &float4::operator /=(float scalar)
 
 float4 float4::Add(float s) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_set1_ps(s);
-	return float4(_mm_add_ps(v, v2));
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec4_add_float(v, s);
 #else
 	return float4(x + s, y + s, z + s, w + s);
 #endif
@@ -1058,9 +1052,8 @@ float4 float4::Add(float s) const
 
 float4 float4::Sub(float s) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_set1_ps(s);
-	return float4(_mm_sub_ps(v, v2));
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec4_sub_float(v, s);
 #else
 	return float4(x - s, y - s, z - s, w - s);
 #endif
@@ -1068,9 +1061,8 @@ float4 float4::Sub(float s) const
 
 float4 float4::SubLeft(float s) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_set1_ps(s);
-	return float4(_mm_sub_ps(v2, v));
+#ifdef MATH_AUTOMATIC_SSE
+	v = float_sub_vec4(s, v);
 #else
 	return float4(s - x, s - y, s - z, s - w);
 #endif
@@ -1078,9 +1070,8 @@ float4 float4::SubLeft(float s) const
 
 float4 float4::DivLeft(float s) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_set1_ps(s);
-	return float4(_mm_div_ps(v2, v));
+#ifdef MATH_AUTOMATIC_SSE
+	v = float_div_vec4(s, v);
 #else
 	return float4(s / x, s / y, s / z, s / w);
 #endif
@@ -1088,8 +1079,8 @@ float4 float4::DivLeft(float s) const
 
 float4 float4::Mul(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	return float4(_mm_mul_ps(v, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	v = ve4_mul_vec4(v, rhs.v);
 #else
 	return float4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
 #endif
@@ -1097,8 +1088,8 @@ float4 float4::Mul(const float4 &rhs) const
 
 float4 float4::Div(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	return float4(_mm_div_ps(v, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	v = ve4_div_vec4(v, rhs.v);
 #else
 	return float4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
 #endif
