@@ -18,6 +18,8 @@
 
 #pragma once
 
+#ifdef MATH_SIMD
+
 #ifdef MATH_NEON
 typedef float32x4_t simd4f;
 #elif defined(MATH_SSE)
@@ -130,3 +132,5 @@ FORCE_INLINE simd4f vec4_div_vec4(simd4f vec, simd4f vec2)
 	return vmulq_f32(vec, rcp);
 #endif
 }
+
+#endif // ~MATH_SIMD
