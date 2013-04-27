@@ -390,7 +390,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps)
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_dpps(res.row, m.row, m.row);
+	mat4x4_mul_dpps(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
@@ -406,7 +406,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_2)
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_dpps_2(res.row, m.row, m.row);
+	mat4x4_mul_dpps_2(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
@@ -422,7 +422,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_3)
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_dpps_3(res.row, m.row, m.row);
+	mat4x4_mul_dpps_3(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
@@ -438,7 +438,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse)
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_sse(res.row, m.row, m.row);
+	mat4x4_mul_sse(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
@@ -454,7 +454,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse_2)
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_sse_2(res.row, m.row, m.row);
+	mat4x4_mul_sse_2(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
