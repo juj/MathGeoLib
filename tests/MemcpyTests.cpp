@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
