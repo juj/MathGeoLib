@@ -97,4 +97,10 @@ FORCE_INLINE __m128 cross_ps(__m128 a, __m128 b)
 	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
+FORCE_INLINE __m128 vec4_mul_float(__m128 vec, float f)
+{
+	__m128 v = shuffle1_ps(FLOAT_TO_M128(f), _MM_SHUFFLE(0,0,0,0));
+	return _mm_mul_ps(vec, v);
+}
+
 #endif

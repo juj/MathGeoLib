@@ -16,6 +16,7 @@ float4x4 *TransposedMatrixArray();
 float2 *Float2Array();
 float4 *VectorArray();
 float4 *VectorArray2();
+float4 *VectorArray3();
 
 // N.B. These must be static and not extern to not generate UDB with initialization order between compilation units!
 static DONT_WARN_UNUSED float *f = FloatArray();
@@ -26,6 +27,7 @@ static DONT_WARN_UNUSED float4x4 *tpm = TransposedMatrixArray();
 static DONT_WARN_UNUSED float2 *fl_2 = Float2Array();
 static DONT_WARN_UNUSED float4 *v = VectorArray();
 static DONT_WARN_UNUSED float4 *v2 = VectorArray2();
+static DONT_WARN_UNUSED float4 *v3 = VectorArray();
 static DONT_WARN_UNUSED Quat *q = QuatArray();
 
 } // ~TestData

@@ -124,6 +124,19 @@ float4 *VectorArray2()
 	return arr;
 }
 
+float4 *VectorArray3()
+{
+	LCG lcg;
+	static float4 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float4>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
+	}
+	return arr;
+}
+
 class FreeTestData
 {
 public:
@@ -136,6 +149,7 @@ public:
 		AlignedFree(Float2Array());
 		AlignedFree(VectorArray());
 		AlignedFree(VectorArray2());
+		AlignedFree(VectorArray3());
 		AlignedFree(TransposedMatrixArray());
 		AlignedFree(QuatArray());
 	}

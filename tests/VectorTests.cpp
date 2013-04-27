@@ -4,6 +4,9 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "TestData.h"
+
+using namespace TestData;
 
 TEST(Float4Swizzled)
 {
@@ -431,3 +434,155 @@ TEST(Float4Div)
 	float4 f2 = float4(-2.f, -4.f, 2.f, 1.f);
 	assert(f.Div(f2).Equals(float4(-0.5f, -0.25f, 2.f, 8.f)));
 }
+
+#ifdef MATH_SSE
+/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+	vshufps	xmm0, xmm0, xmm0, 0 */
+BENCHMARK(float_to_Float4_set1)
+{
+	__m128 scale = _mm_set1_ps(f[i]);
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+	vshufps	xmm0, xmm0, xmm0, 0 */
+BENCHMARK(float_to_Float4_load1)
+{
+	__m128 scale = _mm_load1_ps(&f[i]);
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+	vxorps	xmm1, xmm1, xmm1
+	vmovss	xmm0, xmm1, xmm0
+	vshufps	xmm0, xmm0, xmm0, 0 */
+BENCHMARK(float_to_Float4_load_swizzle)
+{
+	__m128 scale = shuffle1_ps(_mm_load_ss(&f[i]), _MM_SHUFFLE(0,0,0,0));
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+	vxorps	xmm1, xmm1, xmm1
+	vmovss	xmm0, xmm1, xmm0
+	vshufps	xmm0, xmm0, xmm0, 0 */
+BENCHMARK(float_to_Float4_macro_swizzle)
+{
+	__m128 scale = shuffle1_ps(FLOAT_TO_M128(f[i]), _MM_SHUFFLE(0,0,0,0));
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+BENCHMARK(sse_shuffle1)
+{
+	__m128 scale = shuffle1_ps(v[i].v, _MM_SHUFFLE(0,1,2,3));
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+BENCHMARK(sse_shuffle_ps)
+{
+	__m128 scale = _mm_shuffle_ps(v[i].v, v[i].v, _MM_SHUFFLE(0,1,2,3));
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+BENCHMARK(sse_shuffle_epi32)
+{
+	__m128 scale = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((v[i].v)), _MM_SHUFFLE(0,1,2,3)));
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+#endif
+
+BENCHMARK(Float4_Add)
+{
+	v3[i] = v[i] + v2[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_AddEq)
+{
+	v3[i] += v2[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Sub)
+{
+	v3[i] = v[i] - v2[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_SubEq)
+{
+	v3[i] -= v2[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Mul)
+{
+	v3[i] = v[i] * f[i];
+}
+BENCHMARK_END;
+
+// Temp: Testing random seen cache(?) behavior, where running the identical code
+//       again produces *slower* results.
+BENCHMARK(Float4_Mul_Again)
+{
+	v3[i] = v[i] * f[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_MulEq)
+{
+	v3[i] *= f[i];
+}
+BENCHMARK_END;
+
+// Temp: Testing random seen cache(?) behavior, where running the identical code
+//       again produces *slower* results.
+BENCHMARK(Float4_MulEq_Again)
+{
+	v3[i] *= f[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Mul_float4)
+{
+	v3[i] = v[i].Mul(v2[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Div)
+{
+	v3[i] = v[i] / f[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_DivEq)
+{
+	v3[i] /= f[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Div_float4)
+{
+	v3[i] = v[i].Div(v2[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Abs)
+{
+	v3[i] = v[i].Abs();
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Neg)
+{
+	v3[i] = -v[i];
+}
+BENCHMARK_END;
