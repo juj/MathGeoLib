@@ -695,6 +695,15 @@ BENCHMARK(float4x4_Determinant4)
 	TIMER_END;
 }
 
+UNIQUE_TEST(float4x4_Determinant_Correctness)
+{
+	float4x4 m(1,0,0,0, 2,2,0,0, 3,3,3,0, 4,4,4,4);
+	asserteq(m.Determinant3(), 6.f);
+	asserteq(m.Determinant4(), 24.f);
+	asserteq(m.Float3x3Part().Determinant(), 6.f);
+	asserteq(m.Float3x4Part().Determinant(), 6.f);
+}
+
 #ifdef MATH_SSE
 BENCHMARK(mat_determinant)
 {
