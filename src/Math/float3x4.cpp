@@ -712,7 +712,20 @@ void float3x4::Set(const float *values)
 	if (!values)
 		return;
 #endif
-	memcpy(ptr(), values, sizeof(float) * Rows * Cols);
+	v[0][0] = values[0];
+	v[0][1] = values[1];
+	v[0][2] = values[2];
+	v[0][3] = values[3];
+
+	v[1][0] = values[4];
+	v[1][1] = values[5];
+	v[1][2] = values[6];
+	v[1][3] = values[7];
+
+	v[2][0] = values[8];
+	v[2][1] = values[9];
+	v[2][2] = values[10];
+	v[2][3] = values[11];
 }
 
 void float3x4::Set(int row, int col, float value)
@@ -840,7 +853,25 @@ float3x4 &float3x4::operator =(const float3x4 &rhs)
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
 #else
-	memcpy(this, &rhs, sizeof(rhs));
+	v[0][0] = rhs.v[0][0];
+	v[0][1] = rhs.v[0][1];
+	v[0][2] = rhs.v[0][2];
+	v[0][3] = rhs.v[0][3];
+
+	v[1][0] = rhs.v[1][0];
+	v[1][1] = rhs.v[1][1];
+	v[1][2] = rhs.v[1][2];
+	v[1][3] = rhs.v[1][3];
+
+	v[2][0] = rhs.v[2][0];
+	v[2][1] = rhs.v[2][1];
+	v[2][2] = rhs.v[2][2];
+	v[2][3] = rhs.v[2][3];
+
+	v[3][0] = rhs.v[3][0];
+	v[3][1] = rhs.v[3][1];
+	v[3][2] = rhs.v[3][2];
+	v[3][3] = rhs.v[3][3];
 #endif
 
 	return *this;

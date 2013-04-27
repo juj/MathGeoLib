@@ -537,7 +537,17 @@ void float3x3::Set(const float *values)
 	if (!values)
 		return;
 #endif
-	memcpy(ptr(), values, sizeof(float) * Rows * Cols);
+	v[0][0] = values[0];
+	v[0][1] = values[1];
+	v[0][2] = values[2];
+
+	v[1][0] = values[3];
+	v[1][1] = values[4];
+	v[1][2] = values[5];
+
+	v[2][0] = values[6];
+	v[2][1] = values[7];
+	v[2][2] = values[8];
 }
 
 void float3x3::Set(int row, int col, float value)
@@ -681,7 +691,18 @@ float3x3 &float3x3::operator =(const Quat &rhs)
 
 float3x3 &float3x3::operator =(const float3x3 &rhs)
 {
-	memcpy(this, &rhs, sizeof(rhs));
+	v[0][0] = rhs.v[0][0];
+	v[0][1] = rhs.v[0][1];
+	v[0][2] = rhs.v[0][2];
+
+	v[1][0] = rhs.v[1][0];
+	v[1][1] = rhs.v[1][1];
+	v[1][2] = rhs.v[1][2];
+
+	v[2][0] = rhs.v[2][0];
+	v[2][1] = rhs.v[2][1];
+	v[2][2] = rhs.v[2][2];
+
 	return *this;
 }
 

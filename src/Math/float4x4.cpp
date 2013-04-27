@@ -984,7 +984,25 @@ void float4x4::Set(const float *values)
 	if (!values)
 		return;
 #endif
-	memcpy(ptr(), values, sizeof(float) * Rows * Cols);
+	v[0][0] = values[0];
+	v[0][1] = values[1];
+	v[0][2] = values[2];
+	v[0][3] = values[3];
+
+	v[1][0] = values[4];
+	v[1][1] = values[5];
+	v[1][2] = values[6];
+	v[1][3] = values[7];
+
+	v[2][0] = values[8];
+	v[2][1] = values[9];
+	v[2][2] = values[10];
+	v[2][3] = values[11];
+
+	v[3][0] = values[12];
+	v[3][1] = values[13];
+	v[3][2] = values[14];
+	v[3][3] = values[15];
 }
 
 void float4x4::Set(int row, int col, float value)
@@ -1198,12 +1216,16 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 	// But note that when assigning through a conversion above (float3x3 -> float4x4 or float3x4 -> float4x4),
 	// we do assume the input matrix is finite.
 //	assume(rhs.IsFinite());
+
+/* // AVX path determined to be one clock cycle slower than SSE path: (6 clock cycles on AVX, 5 on SSE)
 #ifdef MATH_AVX
 	assert(IS32ALIGNED(this));
 	assert(IS32ALIGNED(&rhs));
 	row2[0] = rhs.row2[0];
 	row2[1] = rhs.row2[1];
-#elif defined(MATH_SSE)
+#elif defined(MATH_SSE) */
+
+#if defined(MATH_SSE)
 	assert(IS16ALIGNED(this));
 	assert(IS16ALIGNED(&rhs));
 	row[0] = rhs.row[0];
@@ -1211,7 +1233,25 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 	row[2] = rhs.row[2];
 	row[3] = rhs.row[3];
 #else
-	memcpy(this, &rhs, sizeof(rhs));
+	v[0][0] = rhs.v[0][0];
+	v[0][1] = rhs.v[0][1];
+	v[0][2] = rhs.v[0][2];
+	v[0][3] = rhs.v[0][3];
+
+	v[1][0] = rhs.v[1][0];
+	v[1][1] = rhs.v[1][1];
+	v[1][2] = rhs.v[1][2];
+	v[1][3] = rhs.v[1][3];
+
+	v[2][0] = rhs.v[2][0];
+	v[2][1] = rhs.v[2][1];
+	v[2][2] = rhs.v[2][2];
+	v[2][3] = rhs.v[2][3];
+
+	v[3][0] = rhs.v[3][0];
+	v[3][1] = rhs.v[3][1];
+	v[3][2] = rhs.v[3][2];
+	v[3][3] = rhs.v[3][3];
 #endif
 	return *this;
 }
