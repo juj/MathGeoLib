@@ -13,12 +13,14 @@ void *AlignedMalloc(size_t size, size_t alignment)
 	size += alignment;
 
 	uintptr_t ptr = (uintptr_t)malloc(size);
+#ifndef __clang_analyzer__ // Hide clang analyzer false positive: Memory is never released; potential leak of memory pointed to by 'ptr'
 	if (!ptr)
 		return 0;
 	++ptr; // Must make room for storing the offset info.
 	ptrdiff_t incr = (alignment - (ptr & (alignment-1))) & (alignment-1);
 	ptr += incr;
 	((u8*)ptr)[-1] = (u8)(incr+1);
+#endif
 	return (void*)ptr;
 }
 
