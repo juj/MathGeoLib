@@ -13,33 +13,21 @@ using namespace TestData;
 
 BENCHMARK(Quat_Transform_float3)
 {
-	TIMER_BEGIN
-	{
-		v2[i].Float3Part() = q[i].Transform(v[i].Float3Part());
-	}
-	TIMER_END;
+	v2[i].Float3Part() = q[i].Transform(v[i].Float3Part());
 }
+BENCHMARK_END;
 
 BENCHMARK(Quat_Transform_float4)
 {
-	for(int i = 0; i < testrunner_numItersPerTest; ++i)
-		v[i].w = (float)rng.Int(0, 1); // To transform a vector by a Quat, one must have w=0/1.
-
-	TIMER_BEGIN
-	{
-		v2[i] = q[i].Transform(v[i]);
-	}
-	TIMER_END;
+	v2[i] = q[i].Transform(v[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Quat_to_float4x4)
 {
-	TIMER_BEGIN
-	{
-		m[i] = q[i].ToFloat4x4();
-	}
-	TIMER_END;
+	m[i] = q[i].ToFloat4x4();
 }
+BENCHMARK_END;
 
 RANDOMIZED_TEST(Quat_Transform)
 {

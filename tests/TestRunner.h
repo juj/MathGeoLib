@@ -68,9 +68,20 @@ public:
 	void TestFunc_##name()
 
 #define BENCHMARK(name) \
-	void TestFunc_##name(); \
-	AddTestOp addtestop_##name(#name, __FILE__, false, false, true, TestFunc_##name); \
-	void TestFunc_##name()
+	void BenchmarkFunc_##name(); \
+	AddTestOp addbenchmarkop_##name(#name, __FILE__, false, false, true, BenchmarkFunc_##name); \
+	void BenchmarkFunc_##name() \
+	{ \
+		unsigned long long bestTsc = (unsigned long long)-1; \
+		tick_t bestTicks = (tick_t)-1; \
+		tick_t accumTicks = 0; \
+		tick_t worstTicks = 0; \
+		for(int xx = 0; xx < testrunner_numTimerTests; ++xx) \
+		{ \
+			tick_t start = Clock::Tick(); \
+			unsigned long long startTsc = Clock::Rdtsc(); \
+			for(int i = 0; i < testrunner_numItersPerTest; ++i) \
+			{
 
 #else
 
@@ -78,27 +89,14 @@ public:
 #define TEST(name) void TestFunc_##name()
 #define RANDOMIZED_TEST(name) void TestFunc_##name()
 #define UNIQUE_TEST(name) void TestFunc_##name()
-#define BENCHMARK(name) void TestFunc_##name()
+#define BENCHMARK(name) void BenchmarkFunc_##name()
 
 #endif
 
 const int testrunner_numTimerTests = 10000;
 const int testrunner_numItersPerTest = 1000;
 
-#define TIMER_BEGIN \
-{ \
-	unsigned long long bestTsc = (unsigned long long)-1; \
-	tick_t bestTicks = (tick_t)-1; \
-	tick_t accumTicks = 0; \
-	tick_t worstTicks = 0; \
-	for(int xx = 0; xx < testrunner_numTimerTests; ++xx) \
-	{ \
-		tick_t start = Clock::Tick(); \
-		unsigned long long startTsc = Clock::Rdtsc(); \
-		for(int i = 0; i < testrunner_numItersPerTest; ++i) \
-		{
-
-#define TIMER_END \
+#define BENCHMARK_END \
 		} \
 		unsigned long long endTsc = Clock::Rdtsc(); \
 		tick_t end = Clock::Tick(); \

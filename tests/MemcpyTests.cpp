@@ -110,102 +110,78 @@ void aligned_avx_memcpy(void *dst_, void *src_, size_t size)
 
 BENCHMARK(memcpy)
 {
-	TIMER_BEGIN
-	{
-		memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
-	}
-	TIMER_END
+	memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE2
 BENCHMARK(aligned_sse_memcpy)
 {
-	TIMER_BEGIN
-	{
-		aligned_sse_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
-	}
-	TIMER_END
+	aligned_sse_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
 }
+BENCHMARK_END;
 #endif
 
 #ifdef MATH_AVX
 BENCHMARK(aligned_avx_memcpy)
 {
-	TIMER_BEGIN
-	{
-		aligned_avx_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
-	}
-	TIMER_END
+	aligned_avx_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
 }
+BENCHMARK_END;
 #endif
 
 BENCHMARK(copy_float4x4_opequals)
 {
-	TIMER_BEGIN
-	{
-		m2[i] = m[i];
-	}
-	TIMER_END
+	m2[i] = m[i];
 }
+BENCHMARK_END;
 
 BENCHMARK(copy_float4x4_memcpy)
 {
-	TIMER_BEGIN
-	{
-		memcpy(&m2[i], &m[i], sizeof(m[i]));
-	}
-	TIMER_END
+	memcpy(&m2[i], &m[i], sizeof(m[i]));
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE
 BENCHMARK(copy_float4x4_sse)
 {
-	TIMER_BEGIN
-	{
-		m2[i].row[0] = m[i].row[0];
-		m2[i].row[1] = m[i].row[1];
-		m2[i].row[2] = m[i].row[2];
-		m2[i].row[3] = m[i].row[3];
-	}
-	TIMER_END
+	m2[i].row[0] = m[i].row[0];
+	m2[i].row[1] = m[i].row[1];
+	m2[i].row[2] = m[i].row[2];
+	m2[i].row[3] = m[i].row[3];
 }
+BENCHMARK_END;
 #endif
 
 #ifdef MATH_AVX
 BENCHMARK(copy_float4x4_avx)
 {
-	TIMER_BEGIN
-	{
-		m2[i].row2[0] = m[i].row2[0];
-		m2[i].row2[1] = m[i].row2[1];
-	}
-	TIMER_END
+	m2[i].row2[0] = m[i].row2[0];
+	m2[i].row2[1] = m[i].row2[1];
 }
+BENCHMARK_END;
 #endif
 
 BENCHMARK(copy_float4x4_scalar)
 {
-	TIMER_BEGIN
-	{
-		m2[i].v[0][0] = m[i].v[0][0];
-		m2[i].v[0][1] = m[i].v[0][1];
-		m2[i].v[0][2] = m[i].v[0][2];
-		m2[i].v[0][3] = m[i].v[0][3];
+	m2[i].v[0][0] = m[i].v[0][0];
+	m2[i].v[0][1] = m[i].v[0][1];
+	m2[i].v[0][2] = m[i].v[0][2];
+	m2[i].v[0][3] = m[i].v[0][3];
 
-		m2[i].v[1][0] = m[i].v[1][0];
-		m2[i].v[1][1] = m[i].v[1][1];
-		m2[i].v[1][2] = m[i].v[1][2];
-		m2[i].v[1][3] = m[i].v[1][3];
+	m2[i].v[1][0] = m[i].v[1][0];
+	m2[i].v[1][1] = m[i].v[1][1];
+	m2[i].v[1][2] = m[i].v[1][2];
+	m2[i].v[1][3] = m[i].v[1][3];
 
-		m2[i].v[2][0] = m[i].v[2][0];
-		m2[i].v[2][1] = m[i].v[2][1];
-		m2[i].v[2][2] = m[i].v[2][2];
-		m2[i].v[2][3] = m[i].v[2][3];
+	m2[i].v[2][0] = m[i].v[2][0];
+	m2[i].v[2][1] = m[i].v[2][1];
+	m2[i].v[2][2] = m[i].v[2][2];
+	m2[i].v[2][3] = m[i].v[2][3];
 
-		m2[i].v[3][0] = m[i].v[3][0];
-		m2[i].v[3][1] = m[i].v[3][1];
-		m2[i].v[3][2] = m[i].v[3][2];
-		m2[i].v[3][3] = m[i].v[3][3];
-	}
-	TIMER_END
+	m2[i].v[3][0] = m[i].v[3][0];
+	m2[i].v[3][1] = m[i].v[3][1];
+	m2[i].v[3][2] = m[i].v[3][2];
+	m2[i].v[3][3] = m[i].v[3][3];
 }
+BENCHMARK_END;

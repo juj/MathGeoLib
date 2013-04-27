@@ -267,76 +267,52 @@ UNIQUE_TEST(sqrt_precision)
 
 BENCHMARK(sqrt_sqrtf)
 {
-	TIMER_BEGIN
-	{
-		f[i] = sqrtf(pf[i]);
-	}
-	TIMER_END
+	f[i] = sqrtf(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_Sqrt)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Sqrt(pf[i]);
-	}
-	TIMER_END
+	f[i] = Sqrt(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_SqrtFast)
 {
-	TIMER_BEGIN
-	{
-		f[i] = SqrtFast(pf[i]);
-	}
-	TIMER_END
+	f[i] = SqrtFast(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_NewtonRhapsonSqrt)
 {
-	TIMER_BEGIN
-	{
-		f[i] = NewtonRhapsonSqrt(pf[i]);
-	}
-	TIMER_END
+	f[i] = NewtonRhapsonSqrt(pf[i]);
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE
 BENCHMARK(sqrt_NewtonRhapsonSSESqrt)
 {
-	TIMER_BEGIN
-	{
-		f[i] = NewtonRhapsonSSESqrt(pf[i]);
-	}
-	TIMER_END
+	f[i] = NewtonRhapsonSSESqrt(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_NewtonRhapsonSSESqrt2)
 {
-	TIMER_BEGIN
-	{
-		f[i] = NewtonRhapsonSSESqrt2(pf[i]);
-	}
-	TIMER_END
+	f[i] = NewtonRhapsonSSESqrt2(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_NewtonRhapsonSSESqrt3)
 {
-	TIMER_BEGIN
-	{
-		f[i] = NewtonRhapsonSSESqrt3(pf[i]);
-	}
-	TIMER_END
+	f[i] = NewtonRhapsonSSESqrt3(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_Sqrt_Via_Rcp_RSqrt)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Sqrt_Via_Rcp_RSqrt(pf[i]);
-	}
-	TIMER_END
+	f[i] = Sqrt_Via_Rcp_RSqrt(pf[i]);
 }
+BENCHMARK_END;
 #endif
 
 FORCE_INLINE float recip_sqrtf(float x)
@@ -398,48 +374,33 @@ UNIQUE_TEST(sqrt_rsqrt_precision)
 
 BENCHMARK(sqrt_RSqrt)
 {
-	TIMER_BEGIN
-	{
-		f[i] = RSqrt(pf[i]);
-	}
-	TIMER_END
+	f[i] = RSqrt(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_recip_sqrtf)
 {
-	TIMER_BEGIN
-	{
-		f[i] = recip_sqrtf(pf[i]);
-	}
-	TIMER_END
+	f[i] = recip_sqrtf(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_sqrtf_recip)
 {
-	TIMER_BEGIN
-	{
-		f[i] = sqrtf_recip(pf[i]);
-	}
-	TIMER_END
+	f[i] = sqrtf_recip(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_QuakeInvSqrt)
 {
-	TIMER_BEGIN
-	{
-		f[i] = QuakeInvSqrt(pf[i]);
-	}
-	TIMER_END
+	f[i] = QuakeInvSqrt(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_RSqrtFast)
 {
-	TIMER_BEGIN
-	{
-		f[i] = RSqrtFast(pf[i]);
-	}
-	TIMER_END
+	f[i] = RSqrtFast(pf[i]);
 }
+BENCHMARK_END;
 
 float OneOverX(float x)
 {
@@ -525,88 +486,61 @@ UNIQUE_TEST(sqrt_recip_precision)
 
 BENCHMARK(sqrt_Recip)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Recip(pf[i]);
-	}
-	TIMER_END
+	f[i] = Recip(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_RecipFast)
 {
-	TIMER_BEGIN
-	{
-		f[i] = RecipFast(pf[i]);
-	}
-	TIMER_END
+	f[i] = RecipFast(pf[i]);
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE
 BENCHMARK(sqrt_NewtonRhapsonRecip)
 {
-	TIMER_BEGIN
-	{
-		f[i] = NewtonRhapsonRecip(pf[i]);
-	}
-	TIMER_END
+	f[i] = NewtonRhapsonRecip(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sqrt_NewtonRhapsonRecip2)
 {
-	TIMER_BEGIN
-	{
-		f[i] = NewtonRhapsonRecip2(pf[i]);
-	}
-	TIMER_END
+	f[i] = NewtonRhapsonRecip2(pf[i]);
 }
+BENCHMARK_END;
 #endif
 
 BENCHMARK(sqrt_OneOverX)
 {
-	TIMER_BEGIN
-	{
-		f[i] = OneOverX(pf[i]);
-	}
-	TIMER_END
+	f[i] = OneOverX(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Sin)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Sin(pf[i]);
-	}
-	TIMER_END
+	f[i] = Sin(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sin)
 {
-	TIMER_BEGIN
-	{
-		f[i] = sin(pf[i]);
-	}
-	TIMER_END
+	f[i] = sin(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(sinf)
 {
-	TIMER_BEGIN
-	{
-		f[i] = sinf(pf[i]);
-	}
-	TIMER_END
+	f[i] = sinf(pf[i]);
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE2
 
 BENCHMARK(sin_ps)
 {
-	TIMER_BEGIN
-	{
-		f[i] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(pf[i])));
-	}
-	TIMER_END
+	f[i] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(pf[i])));
 }
+BENCHMARK_END;
 
 UNIQUE_TEST(sin_ps_precision)
 {
@@ -650,90 +584,60 @@ UNIQUE_TEST(sin_ps_precision)
 
 BENCHMARK(Cos)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Cos(pf[i]);
-	}
-	TIMER_END
+	f[i] = Cos(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(SinCos)
 {
-	TIMER_BEGIN
-	{
-		fl_2[i] = SinCos(pf[i]);
-	}
-	TIMER_END
+	fl_2[i] = SinCos(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Tan)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Tan(pf[i]);
-	}
-	TIMER_END
+	f[i] = Tan(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Asin)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Asin(pf[i]);
-	}
-	TIMER_END
+	f[i] = Asin(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Acos)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Acos(pf[i]);
-	}
-	TIMER_END
+	f[i] = Acos(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Atan)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Atan(pf[i]);
-	}
-	TIMER_END
+	f[i] = Atan(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Atan2)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Atan2(f[i], pf[i]);
-	}
-	TIMER_END
+	f[i] = Atan2(f[i], pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Sinh)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Sinh(pf[i]);
-	}
-	TIMER_END
+	f[i] = Sinh(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Cosh)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Cosh(pf[i]);
-	}
-	TIMER_END
+	f[i] = Cosh(pf[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(Tanh)
 {
-	TIMER_BEGIN
-	{
-		f[i] = Tanh(pf[i]);
-	}
-	TIMER_END
+	f[i] = Tanh(pf[i]);
 }
+BENCHMARK_END;

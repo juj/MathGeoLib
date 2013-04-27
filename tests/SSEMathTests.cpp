@@ -214,45 +214,43 @@ inline __m128 colmajor_mat4x4_mul_avx_2(const __m256 *matrix, __m128 vector)
 
 BENCHMARK(float3_cross)
 {
-	TIMER_BEGIN
-	{
-		v2[i].Float3Part() = v[i].Float3Part().Cross(v2[i].Float3Part());
-	}
-	TIMER_END;
+	v2[i].Float3Part() = v[i].Float3Part().Cross(v2[i].Float3Part());
 }
+BENCHMARK_END;
 
 BENCHMARK(float4_cross)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = v[i].Cross3(v2[i]);
-	}
-	TIMER_END;
+	v2[i] = v[i].Cross3(v2[i]);
 }
+BENCHMARK_END;
 
 BENCHMARK(mat4x4_mul_avx)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = mat4x4_mul_avx((__m256*)&m[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = mat4x4_mul_avx((__m256*)&m[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = mat4x4_mul_avx((__m256*)&m[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(mat4x4_mul_avx)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = mat4x4_mul_avx((__m256*)&m, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_avx_2)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = mat4x4_mul_avx_2((__m256*)&m[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = mat4x4_mul_avx_2((__m256*)&m[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = mat4x4_mul_avx_2((__m256*)&m[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(mat4x4_mul_avx_2)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = mat4x4_mul_avx_2((__m256*)&m, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
@@ -262,14 +260,16 @@ BENCHMARK(mat4x4_mul_avx_2)
 
 BENCHMARK(mat4x4_mul_sse41)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = mat4x4_mul_sse41(m[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = mat4x4_mul_sse41(m[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = mat4x4_mul_sse41(m[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(mat4x4_mul_sse41)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = mat4x4_mul_sse41(m.row, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
@@ -279,14 +279,16 @@ BENCHMARK(mat4x4_mul_sse41)
 
 BENCHMARK(mat4x4_mul_sse3)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = mat4x4_mul_sse3(m[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = mat4x4_mul_sse3(m[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = mat4x4_mul_sse3(m[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(mat4x4_mul_sse3)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = mat4x4_mul_sse3(m.row, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
@@ -296,40 +298,48 @@ BENCHMARK(mat4x4_mul_sse3)
 
 BENCHMARK(mat4x4_mul_sse1)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = mat4x4_mul_sse1(m[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = mat4x4_mul_sse1(m[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = mat4x4_mul_sse1(m[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(mat4x4_mul_sse1)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = mat4x4_mul_sse1(m.row, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(colmajor_mat4x4_mul_sse1)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = colmajor_mat4x4_mul_sse1(tpm[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = colmajor_mat4x4_mul_sse1(tpm[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = colmajor_mat4x4_mul_sse1(tpm[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 tpm = m.Transposed();
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = colmajor_mat4x4_mul_sse1(tpm.row, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(colmajor_mat4x4_mul_sse1_2)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = colmajor_mat4x4_mul_sse1_2(tpm[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = colmajor_mat4x4_mul_sse1_2(tpm[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = colmajor_mat4x4_mul_sse1_2(tpm[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1_2)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 tpm = m.Transposed();
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = colmajor_mat4x4_mul_sse1_2(tpm.row, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
@@ -337,27 +347,33 @@ BENCHMARK(colmajor_mat4x4_mul_sse1_2)
 
 BENCHMARK(colmajor_mat4x4_mul_avx)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = colmajor_mat4x4_mul_avx((__m256*)tpm[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = colmajor_mat4x4_mul_avx((__m256*)tpm[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = colmajor_mat4x4_mul_avx((__m256*)tpm[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(colmajor_mat4x4_mul_avx)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 tpm = m.Transposed();
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = colmajor_mat4x4_mul_avx(tpm.row2, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(colmajor_mat4x4_mul_avx_2)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = colmajor_mat4x4_mul_avx_2((__m256*)tpm[i].row, v[i]);
-	}
-	TIMER_END;
+	v2[i] = colmajor_mat4x4_mul_avx_2((__m256*)tpm[i].row, v[i]);
+}
+BENCHMARK_END;
 
-	float4 res = colmajor_mat4x4_mul_avx_2((__m256*)tpm[0].row, v[0]);
-	float4 res2 = m[0]*v[0];
+RANDOMIZED_TEST(colmajor_mat4x4_mul_avx_2)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 tpm = m.Transposed();
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 res = colmajor_mat4x4_mul_avx_2(tpm.row2, v);
+	float4 res2 = m*v;
 	assert(res.Equals(res2));
 }
 
@@ -365,81 +381,81 @@ BENCHMARK(colmajor_mat4x4_mul_avx_2)
 
 BENCHMARK(mat4x4_mul_dpps)
 {
-	TIMER_BEGIN
-	{
-		float4x4 res;
-		mat4x4_mul_dpps(res.row, m[0].row, m[i].row);
-		m2[i] = res;
-	}
-	TIMER_END;
+	mat4x4_mul_dpps(m2[i].row, m[0].row, m[i].row);
+}
+BENCHMARK_END;
 
+RANDOMIZED_TEST(mat4x4_mul_dpps)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_dpps(res.row, m[0].row, m[1].row);
-	float4x4 res2 = m[0]*m[1];
+	mat4x4_mul_dpps(res.row, m.row, m.row);
+	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_dpps_2)
 {
-	TIMER_BEGIN
-	{
-		float4x4 res;
-		mat4x4_mul_dpps_2(res.row, m[0].row, m[i].row);
-		m2[i] = res;
-	}
-	TIMER_END;
+	mat4x4_mul_dpps(m2[i].row, m[0].row, m[i].row);
+}
+BENCHMARK_END;
 
+RANDOMIZED_TEST(mat4x4_mul_dpps_2)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_dpps_2(res.row, m[0].row, m[1].row);
-	float4x4 res2 = m[0]*m[1];
+	mat4x4_mul_dpps_2(res.row, m.row, m.row);
+	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_dpps_3)
 {
-	TIMER_BEGIN
-	{
-		float4x4 res;
-		mat4x4_mul_dpps_3(res.row, m[0].row, m[i].row);
-		m2[i] = res;
-	}
-	TIMER_END;
+	mat4x4_mul_dpps(m2[i].row, m[0].row, m[i].row);
+}
+BENCHMARK_END;
 
+RANDOMIZED_TEST(mat4x4_mul_dpps_3)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_dpps_3(res.row, m[0].row, m[1].row);
-	float4x4 res2 = m[0]*m[1];
+	mat4x4_mul_dpps_3(res.row, m.row, m.row);
+	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_sse)
 {
-	TIMER_BEGIN
-	{
-		float4x4 res;
-		mat4x4_mul_sse(res.row, m[0].row, m[i].row);
-		m2[i] = res;
-	}
-	TIMER_END;
+	mat4x4_mul_sse(m2[i].row, m[0].row, m[i].row);
+}
+BENCHMARK_END;
 
+RANDOMIZED_TEST(mat4x4_mul_sse)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_sse(res.row, m[0].row, m[1].row);
-	float4x4 res2 = m[0]*m[1];
+	mat4x4_mul_sse(res.row, m.row, m.row);
+	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_sse_2)
 {
-	TIMER_BEGIN
-	{
-		float4x4 res;
-		mat4x4_mul_sse_2(res.row, m[0].row, m[i].row);
-		m2[i] = res;
-	}
-	TIMER_END;
+	mat4x4_mul_sse_2(m2[i].row, m[0].row, m[i].row);
+}
+BENCHMARK_END;
 
+RANDOMIZED_TEST(mat4x4_mul_sse_2)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
 	float4x4 res;
-	mat4x4_mul_sse_2(res.row, m[0].row, m[1].row);
-	float4x4 res2 = m[0]*m[1];
+	mat4x4_mul_sse_2(res.row, m.row, m.row);
+	float4x4 res2 = m*m2;
 	assert(res.Equals(res2));
 }
 
@@ -447,83 +463,57 @@ BENCHMARK(mat4x4_mul_sse_2)
 
 BENCHMARK(scalar_mat_vec_mul)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = m[i] * v[i];
-	}
-	TIMER_END;
+	v2[i] = m[i] * v[i];
 }
+BENCHMARK_END;
 
 BENCHMARK(scalar_mat_mat_mul)
 {
-	TIMER_BEGIN
-	{
-		m2[i] = m[0] * m[i];
-	}
-	TIMER_END;
+	m2[i] = m[0] * m[i];
 }
+BENCHMARK_END;
 
 BENCHMARK(float3_LengthSq)
 {
-	TIMER_BEGIN
-	{
-		f[i] = v[i].Float3Part().LengthSq();
-	}
-	TIMER_END;
+	f[i] = v[i].Float3Part().LengthSq();
 }
+BENCHMARK_END;
 
 BENCHMARK(float3_Length)
 {
-	TIMER_BEGIN
-	{
-		f[i] = v[i].Float3Part().Length();
-	}
-	TIMER_END;
+	f[i] = v[i].Float3Part().Length();
 }
+BENCHMARK_END;
 
 BENCHMARK(float3_Normalize)
 {
-	TIMER_BEGIN
-	{
-		v[i].Float3Part().Normalize();
-	}
-	TIMER_END;
+	v[i].Float3Part().Normalize();
 }
+BENCHMARK_END;
 
 BENCHMARK(float4_Normalize3)
 {
-	TIMER_BEGIN
-	{
-		v[i].Normalize3();
-	}
-	TIMER_END;
+	v[i].Normalize3();
 }
+BENCHMARK_END;
 
 BENCHMARK(float4_Normalize4)
 {
-	TIMER_BEGIN
-	{
-		v[i].Normalize4();
-	}
-	TIMER_END;
+	v[i].Normalize4();
 }
+BENCHMARK_END;
 
 BENCHMARK(float4x4_mul_float4)
 {
-	TIMER_BEGIN
-	{
-		v2[i] = m[i]*v[i];
-	}
-	TIMER_END;
+	v2[i] = m[i]*v[i];
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE
 BENCHMARK(float4_Normalize4_Fast_SSE)
 {
-	TIMER_BEGIN
-	{
-		v[i].Normalize4_Fast_SSE();
-	}
-	TIMER_END;
+	v[i].Normalize4_Fast_SSE();
 }
+BENCHMARK_END;
+
 #endif

@@ -426,59 +426,41 @@ TEST(Float4x4Scale)
 
 BENCHMARK(Float3x4Inverse)
 {
-	TIMER_BEGIN
-	{
-		m[i].Float3x4Part().Inverse();
-	}
-	TIMER_END;
+	m[i].Float3x4Part().Inverse();
 }
+BENCHMARK_END;
 
 BENCHMARK(Float4x4Inverse)
 {
-	TIMER_BEGIN
-	{
-		m[i].Inverse();
-	}
-	TIMER_END;
+	m[i].Inverse();
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE
 BENCHMARK(inverse_ps)
 {
-	TIMER_BEGIN
-	{
-		mat_inverse(m[i].row, m[i].row);
-	}
-	TIMER_END;
+	mat_inverse(m[i].row, m[i].row);
 }
+BENCHMARK_END;
 #endif
 
 BENCHMARK(float4x4_InverseOrthogonalUniformScale)
 {
-	TIMER_BEGIN
-	{
-		m[i].InverseOrthogonalUniformScale();
-	}
-	TIMER_END;
+	m[i].InverseOrthogonalUniformScale();
 }
+BENCHMARK_END;
 
 BENCHMARK(float4x4_InverseOrthonormal)
 {
-	TIMER_BEGIN
-	{
-		m[i].InverseOrthonormal();
-	}
-	TIMER_END;
+	m[i].InverseOrthonormal();
 }
+BENCHMARK_END;
 
 BENCHMARK(float3x4_InverseOrthonormal)
 {
-	TIMER_BEGIN
-	{
-		m[i].Float3x4Part().InverseOrthonormal();
-	}
-	TIMER_END;
+	m[i].Float3x4Part().InverseOrthonormal();
 }
+BENCHMARK_END;
 
 #ifdef MATH_SSE
 RANDOMIZED_TEST(mat_inverse_orthonormal_correctness)
@@ -493,12 +475,9 @@ RANDOMIZED_TEST(mat_inverse_orthonormal_correctness)
 
 BENCHMARK(mat_inverse_orthonormal)
 {
-	TIMER_BEGIN
-	{
-		mat_inverse_orthonormal(m[i].row, m[i].row);
-	}
-	TIMER_END;
+	mat_inverse_orthonormal(m[i].row, m[i].row);
 }
+BENCHMARK_END;
 #endif
 
 float RelError(const float4x4 &m1, const float4x4 &m2)
@@ -679,21 +658,15 @@ UNIQUE_TEST(mat_determinant3_correctness)
 
 BENCHMARK(float4x4_Determinant3)
 {
-	TIMER_BEGIN
-	{
-		f[i] = m[i].Determinant3();
-	}
-	TIMER_END;
+	f[i] = m[i].Determinant3();
 }
+BENCHMARK_END;
 
 BENCHMARK(float4x4_Determinant4)
 {
-	TIMER_BEGIN
-	{
-		f[i] = m[i].Determinant4();
-	}
-	TIMER_END;
+	f[i] = m[i].Determinant4();
 }
+BENCHMARK_END;
 
 UNIQUE_TEST(float4x4_Determinant_Correctness)
 {
@@ -707,19 +680,13 @@ UNIQUE_TEST(float4x4_Determinant_Correctness)
 #ifdef MATH_SSE
 BENCHMARK(mat_determinant)
 {
-	TIMER_BEGIN
-	{
-		f[i] = mat_determinant(m[i].row);
-	}
-	TIMER_END;
+	f[i] = mat_determinant(m[i].row);
 }
+BENCHMARK_END;
 
 BENCHMARK(mat_determinant3)
 {
-	TIMER_BEGIN
-	{
-		f[i] = mat_determinant3(m[i].row);
-	}
-	TIMER_END;
+	f[i] = mat_determinant3(m[i].row);
 }
+BENCHMARK_END;
 #endif
