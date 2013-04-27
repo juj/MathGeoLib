@@ -867,11 +867,6 @@ float3x4 &float3x4::operator =(const float3x4 &rhs)
 	v[2][1] = rhs.v[2][1];
 	v[2][2] = rhs.v[2][2];
 	v[2][3] = rhs.v[2][3];
-
-	v[3][0] = rhs.v[3][0];
-	v[3][1] = rhs.v[3][1];
-	v[3][2] = rhs.v[3][2];
-	v[3][3] = rhs.v[3][3];
 #endif
 
 	return *this;
