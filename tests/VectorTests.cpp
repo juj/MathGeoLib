@@ -653,3 +653,27 @@ BENCHMARK(Float4_Neg)
 	v3[i] = -v[i];
 }
 BENCHMARK_END;
+
+BENCHMARK(Float4_Length3)
+{
+	f[i] = v[i].Length3();
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Length4)
+{
+	f[i] = v[i].Length4();
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Normalize3)
+{
+	f[i] = v[i].Normalize3();
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Normalize4)
+{
+	f[i] = v[i].Normalize4();
+}
+BENCHMARK_END;
