@@ -752,8 +752,8 @@ float float3x3::DeterminantSymmetric() const
 	return a * (d*f - e*e) + b * (2.f * c * e - b * f) - c*c*d;
 }
 
-#define SKIPNUM(val, skip) (val < skip ? val : skip + 1)
 /* ///@todo Enable when float2x2 is implemented.
+#define SKIPNUM(val, skip) (val >= skip ? (val+1) : val)
 float2x2 float3x3::SubMatrix(int i, int j) const
 {
 	int r0 = SKIPNUM(0, i);
