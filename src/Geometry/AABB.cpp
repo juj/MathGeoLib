@@ -752,8 +752,8 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 
 	// If the ray is parallel to one of the axes, replace the slab range for that axis
 	// with [-inf, inf] range instead. (which is a no-op in the comparisons below)
-	nearD = _mm_cmov_ps(nearD, floatNegInf, zeroDirections);
-	farD = _mm_cmov_ps(farD , floatInf, zeroDirections);
+	nearD = cmov_ps(nearD, floatNegInf, zeroDirections);
+	farD = cmov_ps(farD , floatInf, zeroDirections);
 
 	// Next, we need to compute horizontally max(nearD[0], nearD[1], nearD[2]) and min(farD[0], farD[1], farD[2])
 	// to see if there is an overlap in the hit ranges.

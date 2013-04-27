@@ -171,8 +171,8 @@ __m128 float4::Normalize3_SSE()
 	__m128 len = Length3_SSE();
 	__m128 isZero = _mm_cmplt_ps(len, sseEpsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
-	normalized = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
-	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
+	normalized = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
+	v = cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 	return len;
 }
 
@@ -180,7 +180,7 @@ void float4::Normalize3_Fast_SSE()
 {
 	__m128 len = Length3_SSE();
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
-	v = _mm_cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
+	v = cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
 
 __m128 float4::Normalize4_SSE()
@@ -188,7 +188,7 @@ __m128 float4::Normalize4_SSE()
 	__m128 len = Length4_SSE();
 	__m128 isZero = _mm_cmplt_ps(len, sseEpsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(v, len); // Normalize.
-	v = _mm_cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
+	v = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
 	return len;
 }
 

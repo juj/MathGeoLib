@@ -127,7 +127,7 @@ FORCE_INLINE __m128 FLOAT_TO_M128(float f)
 }
 
 // If mask[i] == 0, then output index i from a, otherwise mask[i] must be 0xFFFFFFFF, and output index i from b.
-FORCE_INLINE __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
+FORCE_INLINE __m128 cmov_ps(__m128 a, __m128 b, __m128 mask)
 {
 #ifdef MATH_SSE41 // SSE 4.1 offers conditional copying between registers with the blendvps instruction.
 	return _mm_blendv_ps(a, b, mask);
@@ -139,8 +139,8 @@ FORCE_INLINE __m128 _mm_cmov_ps(__m128 a, __m128 b, __m128 mask)
 }
 
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.
-//inline __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, __m128 w) // VS2010 BUG! Can't use this signature!
-FORCE_INLINE __m128 _mm_pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
+//inline __m128 pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, __m128 w) // VS2010 BUG! Can't use this signature!
+FORCE_INLINE __m128 pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w)
 {
 	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]
 	__m128 zw = _mm_movelh_ps(z, w); // zw = [ _, w, _, z]

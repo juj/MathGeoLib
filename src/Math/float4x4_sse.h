@@ -178,25 +178,25 @@ FORCE_INLINE void mat4x4_mul_dpps(__m128 *out, const __m128 *m1, const __m128 *m
 	__m128 _01 = dot4_ps(m1[0], row2);
 	__m128 _02 = dot4_ps(m1[0], row3);
 	__m128 _03 = dot4_ps(m1[0], row4);
-	out[0] = _mm_pack_4ss_to_ps(_00, _01, _02, _03);
+	out[0] = pack_4ss_to_ps(_00, _01, _02, _03);
 
 	__m128 _10 = dot4_ps(m1[1], row1);
 	__m128 _11 = dot4_ps(m1[1], row2);
 	__m128 _12 = dot4_ps(m1[1], row3);
 	__m128 _13 = dot4_ps(m1[1], row4);
-	out[1] = _mm_pack_4ss_to_ps(_10, _11, _12, _13);
+	out[1] = pack_4ss_to_ps(_10, _11, _12, _13);
 
 	__m128 _20 = dot4_ps(m1[2], row1);
 	__m128 _21 = dot4_ps(m1[2], row2);
 	__m128 _22 = dot4_ps(m1[2], row3);
 	__m128 _23 = dot4_ps(m1[2], row4);
-	out[2] = _mm_pack_4ss_to_ps(_20, _21, _22, _23);
+	out[2] = pack_4ss_to_ps(_20, _21, _22, _23);
 
 	__m128 _30 = dot4_ps(m1[3], row1);
 	__m128 _31 = dot4_ps(m1[3], row2);
 	__m128 _32 = dot4_ps(m1[3], row3);
 	__m128 _33 = dot4_ps(m1[3], row4);
-	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
+	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
 FORCE_INLINE void mat4x4_mul_dpps_2(__m128 *out, const __m128 *m1, const __m128 *m2)
@@ -216,25 +216,25 @@ FORCE_INLINE void mat4x4_mul_dpps_2(__m128 *out, const __m128 *m1, const __m128 
 	__m128 _01 = dot4_ps(m1[0], row2);
 	__m128 _02 = dot4_ps(m1[0], row3);
 	__m128 _03 = dot4_ps(m1[0], row4);
-	out[0] = _mm_pack_4ss_to_ps(_00, _01, _02, _03);
+	out[0] = pack_4ss_to_ps(_00, _01, _02, _03);
 
 	__m128 _10 = dot4_ps(m1[1], row1);
 	__m128 _11 = dot4_ps(m1[1], row2);
 	__m128 _12 = dot4_ps(m1[1], row3);
 	__m128 _13 = dot4_ps(m1[1], row4);
-	out[1] = _mm_pack_4ss_to_ps(_10, _11, _12, _13);
+	out[1] = pack_4ss_to_ps(_10, _11, _12, _13);
 
 	__m128 _20 = dot4_ps(m1[2], row1);
 	__m128 _21 = dot4_ps(m1[2], row2);
 	__m128 _22 = dot4_ps(m1[2], row3);
 	__m128 _23 = dot4_ps(m1[2], row4);
-	out[2] = _mm_pack_4ss_to_ps(_20, _21, _22, _23);
+	out[2] = pack_4ss_to_ps(_20, _21, _22, _23);
 
 	__m128 _30 = dot4_ps(m1[3], row1);
 	__m128 _31 = dot4_ps(m1[3], row2);
 	__m128 _32 = dot4_ps(m1[3], row3);
 	__m128 _33 = dot4_ps(m1[3], row4);
-	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
+	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
 FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 *m2)
@@ -264,7 +264,7 @@ FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 
 	__m128 zw = _mm_movelh_ps(_02, _03); // zw = [ _, w, _, z]
 	out[0] = _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 
-//	out[0] = _mm_pack_4ss_to_ps(_00, _01, _02, _03);
+//	out[0] = pack_4ss_to_ps(_00, _01, _02, _03);
 
 	__m128 _10 = dot4_ps(m1[1], row1);
 	__m128 _11 = dot4_ps(m1[1], row2);
@@ -275,7 +275,7 @@ FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 
 	__m128 zw2 = _mm_movelh_ps(_12, _13); // zw = [ _, w, _, z]
 	out[1] = _mm_shuffle_ps(xy2, zw2, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 
-//	out[1] = _mm_pack_4ss_to_ps(_10, _11, _12, _13);
+//	out[1] = pack_4ss_to_ps(_10, _11, _12, _13);
 
 	__m128 _20 = dot4_ps(m1[2], row1);
 	__m128 _21 = dot4_ps(m1[2], row2);
@@ -286,7 +286,7 @@ FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 
 	__m128 zw3 = _mm_movelh_ps(_22, _23); // zw = [ _, w, _, z]
 	out[2] = _mm_shuffle_ps(xy3, zw3, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 
-//	out[2] = _mm_pack_4ss_to_ps(_20, _21, _22, _23);
+//	out[2] = pack_4ss_to_ps(_20, _21, _22, _23);
 
 	__m128 _30 = dot4_ps(m1[3], row1);
 	__m128 _31 = dot4_ps(m1[3], row2);
@@ -297,7 +297,7 @@ FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 
 	__m128 zw4 = _mm_movelh_ps(_32, _33); // zw = [ _, w, _, z]
 	out[3] = _mm_shuffle_ps(xy4, zw4, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 
-//	out[3] = _mm_pack_4ss_to_ps(_30, _31, _32, _33);
+//	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
 FORCE_INLINE void mat4x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
