@@ -1,8 +1,22 @@
-if (WIN32 AND NOT MINGW)
+if (MSVC)
 	add_definitions(/EHsc -D_CRT_SECURE_NO_WARNINGS)
 	if (NOT MSVC11) # Visual Studio 2012 always has SSE2 enabled, so the command line option no longer exists.
 		add_definitions(/arch:SSE2)
 	endif()
+
+	# Perform extremely aggressive optimization on Release builds:
+	# Optimization: Full Optimization (/Ox)
+	# Inline Function Expansion: Any Suitable (/Ob2)
+	# Enable Intrinsic Functions: Yes (/Oi)
+	# Favor Size Or Speed: Favor fast code (/Ot)
+	# Omit Frame Pointers: Yes (/Oy)
+	# Enable Fiber-Safe Optimizations: Yes (/GT)
+	# Whole Program Optimization: Yes (/GL)
+	# Enable String Pooling: Yes (/GF)
+	# Buffer Security Check: No (/GS-)
+	# Floating Point Model: Fast (/fp:fast)
+	# Enable Floating Point Exceptions: No (/fp:except-)
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_RELEASE} /Ox /Ob2 /Oi /Ot /Oy /GT /GL /GF /GS- /fp:fast /fp:except-")
 endif()
 
 if (EMSCRIPTEN)
