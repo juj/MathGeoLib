@@ -502,7 +502,8 @@ BENCHMARK(float_to_Float4_macro1)
 }
 BENCHMARK_END;
 
-/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+/* VS2010 with AVX enabled generates this BAD code(!):
+	vmovss	xmm0, DWORD PTR [edx+eax*4]
 	vxorps	xmm1, xmm1, xmm1
 	vmovss	xmm0, xmm1, xmm0
 	vshufps	xmm0, xmm0, xmm0, 0 */
@@ -513,7 +514,8 @@ BENCHMARK(float_to_Float4_load_swizzle)
 }
 BENCHMARK_END;
 
-/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+/* VS2010 with AVX enabled generates this BAD code(!):
+	vmovss	xmm0, DWORD PTR [edx+eax*4]
 	vxorps	xmm1, xmm1, xmm1
 	vmovss	xmm0, xmm1, xmm0
 	vshufps	xmm0, xmm0, xmm0, 0 */
