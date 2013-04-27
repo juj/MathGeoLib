@@ -1360,7 +1360,7 @@ bool float4x4::Inverse(float epsilon)
 #ifdef MATH_ASSERT_CORRECTNESS
 	float4x4 copy = *this;
 	bool success = InverseMatrix(*this, epsilon);
-	mathassert(!(success == false && Abs(Determinant4()) > epsilon));
+	mathassert(!(success == false && Determinant4() == 0.f));
 	mathassert(!success || (copy * *this).IsIdentity());
 	return success;
 #else
