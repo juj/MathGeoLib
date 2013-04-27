@@ -5,6 +5,7 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 #include "TestData.h"
+#include "../src/Math/float4_sse.h"
 
 using namespace TestData;
 
@@ -436,8 +437,28 @@ TEST(Float4Div)
 }
 
 #ifdef MATH_SSE
-/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
-	vshufps	xmm0, xmm0, xmm0, 0 */
+
+// Testing various strategies for loading a single 'float' scalar to a __m128.
+
+/* 	VS2010 with AVX generates, BAD! 
+	vmovss	xmm1, DWORD PTR [edx+eax*4]
+	vxorps	xmm0, xmm0, xmm0
+	vmovss	xmm0, xmm0, xmm1
+	Without AVX: GOOD
+	movss	xmm0, DWORD PTR [edx+eax*4] */
+BENCHMARK(float_to_Float4_ss)
+{
+	__m128 scale = _mm_set_ss(f[i]);
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+/* 	VS2010 with AVX generates the following: GOOD if want a 4-vector [x,x,x,x].
+		vmovss	xmm0, DWORD PTR [edx+eax*4]
+		vshufps	xmm0, xmm0, xmm0, 0
+	without AVX:
+		movss	xmm0, DWORD PTR [edx+eax*4]
+		shufps	xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_set1)
 {
 	__m128 scale = _mm_set1_ps(f[i]);
@@ -445,11 +466,36 @@ BENCHMARK(float_to_Float4_set1)
 }
 BENCHMARK_END;
 
-/* 	vmovss	xmm0, DWORD PTR [edx+eax*4]
+/* 	VS2010 generates: vshufps is/should be unneeded, if not interested in higher channels!
+	vmovss	xmm0, DWORD PTR [edx+eax*4]
 	vshufps	xmm0, xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_load1)
 {
 	__m128 scale = _mm_load1_ps(&f[i]);
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+// Manually trying to generate only 'vmovss', but this is not working out too well!
+BENCHMARK(float_to_Float4_inline_asm)
+{
+	__m128 scale;
+	float *f_addr = &f[i];
+	__asm {
+		movss xmm0, f_addr
+		movss scale, xmm0
+	}
+	v[i] = scale;
+}
+BENCHMARK_END;
+
+// Test what FLOAT_TO_M128 produces:
+/* 	vmovss	xmm1, DWORD PTR [edx+eax*4]
+	vxorps	xmm0, xmm0, xmm0
+	vmovss	xmm1, xmm0, xmm1 */
+BENCHMARK(float_to_Float4_macro1)
+{
+	__m128 scale = FLOAT_TO_M128(f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;
@@ -550,6 +596,23 @@ BENCHMARK(Float4_MulEq_Again)
 	v3[i] *= f[i];
 }
 BENCHMARK_END;
+
+BENCHMARK(Float4_Mul_scalar)
+{
+	v3[i].x = v[i].x * f[i];
+	v3[i].y = v[i].y * f[i];
+	v3[i].z = v[i].z * f[i];
+	v3[i].w = v[i].w * f[i];
+}
+BENCHMARK_END;
+
+#ifdef MATH_SSE
+BENCHMARK(Float4_Mul_sse)
+{
+	v3[i].v = vec4_mul_float(v[i].v, f[i]);
+}
+BENCHMARK_END;
+#endif
 
 BENCHMARK(Float4_Mul_float4)
 {

@@ -115,9 +115,12 @@ FORCE_INLINE float M128_TO_FLOAT(__m128 sse)
 	return ret;
 }
 
-/// Returns a SSE variable with the given float f in the lowest index. The three higher indices are undefined.
-/// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast" if the given 
-/// float is already in a register, since it will lie in an XMM register already. Check the disassembly to confirm!
+/// Returns a SSE variable with the given float f in the lowest index. The three higher indices are set to zero.
+/** @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast" if the given 
+	float is already in a register, since it will lie in an XMM register already. Check the disassembly to confirm!
+	@note Detected on VS2010 32-bit + AVX that this generates a vmovss+vxorps+vmovss instruction triple!
+	@note Never use this function if you need to generate a 4-vector [f,f,f,f]. Instead, use _mm_set1_ps(&f), which
+		generates a vmovss+vhufps and no redundant vxorps+vmovss! */
 FORCE_INLINE __m128 FLOAT_TO_M128(float f)
 {
 	return _mm_load_ss(&f);
