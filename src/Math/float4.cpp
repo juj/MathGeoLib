@@ -198,8 +198,8 @@ void float4::NormalizeW_SSE()
 
 float float4::LengthSq3() const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(LengthSq3_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec3_length_sq_float(v);
 #else
 	return x*x + y*y + z*z;
 #endif
@@ -207,8 +207,8 @@ float float4::LengthSq3() const
 
 float float4::Length3() const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(Length3_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec3_length_float(v);
 #else
 	return Sqrt(x*x + y*y + z*z);
 #endif
@@ -216,8 +216,8 @@ float float4::Length3() const
 
 float float4::LengthSq4() const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(LengthSq4_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_length_sq_float(v);
 #else
 	return x*x + y*y + z*z + w*w;
 #endif
@@ -225,8 +225,8 @@ float float4::LengthSq4() const
 
 float float4::Length4() const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(Length4_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_length_float(v);
 #else
 	return Sqrt(x*x + y*y + z*z + w*w);
 #endif
@@ -432,8 +432,8 @@ float4 float4::FromString(const char *str)
 
 float float4::SumOfElements() const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(sum_xyzw_ps(v));
+#ifdef MATH_AUTOMATIC_SSE
+	return sum_xyzw_float(v);
 #else
 	return x + y + z + w;
 #endif
@@ -441,8 +441,8 @@ float float4::SumOfElements() const
 
 float float4::ProductOfElements() const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(mul_xyzw_ps(v));
+#ifdef MATH_AUTOMATIC_SSE
+	return mul_xyzw_float(v);
 #else
 	return x * y * z * w;
 #endif
@@ -450,8 +450,7 @@ float float4::ProductOfElements() const
 
 float float4::AverageOfElements() const
 {
-	///\todo SSE.
-	return (x + y + z + w) / 4.f;
+	return 0.25f * SumOfElements();
 }
 
 float float4::MinElement() const
@@ -502,24 +501,26 @@ int float4::MaxElementIndex() const
 
 float4 float4::Abs() const
 {
-#ifdef MATH_SSE
-	return float4(abs_ps(v));
+#ifdef MATH_AUTOMATIC_SSE
+	return abs_ps(v);
 #else
-	return float4(fabs(x), fabs(y), fabs(z), fabs(w));
+	return float4(MATH_NS::Abs(x), MATH_NS::Abs(y), MATH_NS::Abs(z), MATH_NS::Abs(w));
 #endif
 }
 
 float4 float4::Neg3() const
 {
-	///\todo SSE.
+#ifdef MATH_AUTOMATIC_SSE
+	return negate3_ps(v);
+#else
 	return float4(-x, -y, -z, w);
+#endif
 }
 
 float4 float4::Neg4() const
 {
-#ifdef MATH_SSE
-	const __m128 zero = _mm_setzero_ps();
-	return float4(_mm_sub_ps(zero, v));
+#ifdef MATH_AUTOMATIC_SSE
+	return negate_ps(v);
 #else
 	return float4(-x, -y, -z, -w);
 #endif
@@ -533,9 +534,8 @@ float4 float4::Recip3() const
 
 float4 float4::Recip4() const
 {
-#ifdef MATH_SSE
-	const __m128 one = _mm_set1_ps(1.f);
-	return float4(_mm_div_ps(one, v));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_recip(v);
 #else
 	return float4(1.f/x, 1.f/y, 1.f/z, 1.f/w);
 #endif
@@ -630,9 +630,8 @@ float4 float4::Clamp(float floor, float ceil) const
 
 float float4::Distance3Sq(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v2).LengthSq3_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec3_length_sq_float(sub_ps(v, rhs.v));
 #else
 	float dx = x - rhs.x;
 	float dy = y - rhs.y;
@@ -643,9 +642,8 @@ float float4::Distance3Sq(const float4 &rhs) const
 
 float float4::Distance3(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v2).Length3_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec3_length_float(sub_ps(v, rhs.v));
 #else
 	return Sqrt(Distance3Sq(rhs));
 #endif
@@ -653,9 +651,8 @@ float float4::Distance3(const float4 &rhs) const
 
 float float4::Distance4Sq(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v2).LengthSq4_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_length_sq_float(sub_ps(v, rhs.v));
 #else
 	float dx = x - rhs.x;
 	float dy = y - rhs.y;
@@ -667,9 +664,8 @@ float float4::Distance4Sq(const float4 &rhs) const
 
 float float4::Distance4(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	__m128 v2 = _mm_sub_ps(v, rhs.v);
-	return M128_TO_FLOAT(float4(v2).Length4_SSE());
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_length_float(sub_ps(v, rhs.v));
 #else
 	return Sqrt(Distance4Sq(rhs));
 #endif
@@ -677,8 +673,8 @@ float float4::Distance4(const float4 &rhs) const
 
 float float4::Dot3(const float3 &rhs) const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(dot3_ps(v, float4(rhs, 0.f).v));
+#ifdef MATH_AUTOMATIC_SSE
+	return dot3_float(v, float4(rhs, 0.f));
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 #endif
@@ -686,8 +682,8 @@ float float4::Dot3(const float3 &rhs) const
 
 float float4::Dot3(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(dot3_ps(v, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	return dot3_float(v, rhs.v);
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
 #endif
@@ -695,8 +691,8 @@ float float4::Dot3(const float4 &rhs) const
 
 float float4::Dot4(const float4 &rhs) const
 {
-#ifdef MATH_SSE
-	return M128_TO_FLOAT(dot4_ps(v, rhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	return dot4_float(v, rhs.v);
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
 #endif
@@ -921,7 +917,7 @@ float4 float4::RandomGeneral(LCG &lcg, float minElem, float maxElem)
 float4 float4::operator +(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_add_vec4(v, rhs.v));
+	return vec4_add_vec4(v, rhs.v);
 #else
 	return float4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 #endif
@@ -930,7 +926,7 @@ float4 float4::operator +(const float4 &rhs) const
 float4 float4::operator -(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_sub_vec4(v, rhs.v));
+	return vec4_sub_vec4(v, rhs.v);
 #else
 	return float4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
 #endif
@@ -966,7 +962,7 @@ float4 operator *(float scalar, const float4 &rhs)
 float4 float4::operator /(float scalar) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_div_float(scalar);
+	return vec4_div_float(v, scalar);
 #else
 	float invScalar = 1.f / scalar;
 	return float4(x * invScalar, y * invScalar, z * invScalar, w * invScalar);
@@ -1033,7 +1029,7 @@ float4 &float4::operator /=(float scalar)
 float4 float4::Add(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec4_add_float(v, s);
+	return vec4_add_float(v, s);
 #else
 	return float4(x + s, y + s, z + s, w + s);
 #endif
@@ -1042,7 +1038,7 @@ float4 float4::Add(float s) const
 float4 float4::Sub(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec4_sub_float(v, s);
+	return vec4_sub_float(v, s);
 #else
 	return float4(x - s, y - s, z - s, w - s);
 #endif
@@ -1051,7 +1047,7 @@ float4 float4::Sub(float s) const
 float4 float4::SubLeft(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = float_sub_vec4(s, v);
+	return float_sub_vec4(s, v);
 #else
 	return float4(s - x, s - y, s - z, s - w);
 #endif
@@ -1060,7 +1056,7 @@ float4 float4::SubLeft(float s) const
 float4 float4::DivLeft(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = float_div_vec4(s, v);
+	return float_div_vec4(s, v);
 #else
 	return float4(s / x, s / y, s / z, s / w);
 #endif
@@ -1069,7 +1065,7 @@ float4 float4::DivLeft(float s) const
 float4 float4::Mul(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = ve4_mul_vec4(v, rhs.v);
+	return vec4_mul_vec4(v, rhs.v);
 #else
 	return float4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
 #endif
@@ -1078,7 +1074,7 @@ float4 float4::Mul(const float4 &rhs) const
 float4 float4::Div(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = ve4_div_vec4(v, rhs.v);
+	return vec4_div_vec4(v, rhs.v);
 #else
 	return float4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
 #endif

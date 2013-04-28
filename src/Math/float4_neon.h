@@ -115,6 +115,19 @@ FORCE_INLINE simd4f float_div_vec4(float f, simd4f vec)
 #endif
 }
 
+FORCE_INLINE simd4f vec4_recip(simd4f vec)
+{
+#ifdef MATH_SSE
+	__m128 e = _mm_rcp_ps(vec); // Do one iteration of Newton-Rhapson: e_n = 2*e - x*e^2
+	return _mm_sub_ps(_mm_add_ps(e, e), _mm_mul_ps(vec, _mm_mul_ps(e,e)));
+#elif defined(MATH_NEON)
+	simd4f rcp = vrecpeq_f32(vec2);
+	rcp = vmulq_f32(vrecpsq_f32(vec2, rcp), rcp);
+	rcp = vmulq_f32(vrecpsq_f32(vec2, rcp), rcp);
+	return rcp;
+#endif
+}
+
 FORCE_INLINE simd4f vec4_div_vec4(simd4f vec, simd4f vec2)
 {
 #ifdef MATH_SSE
@@ -221,9 +234,11 @@ FORCE_INLINE simd4f vec3_length_sq_ps(simd4f vec)
 #ifdef MATH_NEON
 #define SIMD4F_TO_FLOAT(vec) vget_lane_f32(vget_low_f32(vec), 0)
 #define mul_ps(vec, vec2) vmulq_f32(vec, vec2)
+#define sub_ps(vec, vec2) vsubq_f32(vec, vec2)
 #elif defined (MATH_SSE)
 #define SIMD4F_TO_FLOAT(vec) M128_TO_FLOAT(vec)
 #define mul_ps(vec, vec2) _mm_mul_ps(vec, vec2)
+#define sub_ps(vec, vec2) _mm_sub_ps(vec, vec2)
 #endif
 
 FORCE_INLINE simd4f vec4_rsqrt(simd4f vec)

@@ -157,7 +157,7 @@
 #if defined(MATH_SSE) && !defined(MATH_AUTOMATIC_SSE)
 // Automatically use the SSE-optimized operations for all code.
 // This should only be disabled for benchmarking purposes.
-//#define MATH_AUTOMATIC_SSE
+#define MATH_AUTOMATIC_SSE
 #endif
 
 #if defined(MATH_SSE) || defined(MATH_NEON)

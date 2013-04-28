@@ -40,6 +40,11 @@ FORCE_INLINE __m128 sum_xyz_ps(__m128 m)
 #endif
 }
 
+FORCE_INLINE float sum_xyz_float(__m128 m)
+{
+	return M128_TO_FLOAT(sum_xyz_ps(m));
+}
+
 /// The returned SP FP contains x+y+z+w in all channels of the vector.
 FORCE_INLINE __m128 sum_xyzw_ps(__m128 m)
 {
@@ -55,12 +60,22 @@ FORCE_INLINE __m128 sum_xyzw_ps(__m128 m)
 #endif
 }
 
+FORCE_INLINE float sum_xyzw_float(__m128 m)
+{
+	return M128_TO_FLOAT(sum_xyzw_ps(m));
+}
+
 FORCE_INLINE __m128 mul_xyzw_ps(__m128 v)
 {
 	__m128 v2 = shuffle1_ps(v, _MM_SHUFFLE(1, 0, 3, 2)); // v2 = [y, x, w, z]
 	v2 = _mm_mul_ps(v, v2); // v2 = [w*y, z*x, y*w, x*z]
 	__m128 v3 = shuffle1_ps(v2, _MM_SHUFFLE(2, 1, 0, 3)); // v3 = [z*x, y*w, x*z, w*y]
 	return _mm_mul_ps(v2, v3); // v3 = [w*y*z*x, z*x*y*w, y*w*x*z, x*z*w*y]
+}
+
+FORCE_INLINE float mul_xyzw_float(__m128 m)
+{
+	return M128_TO_FLOAT(mul_xyzw_ps(m));
 }
 
 // Returns the dot-product of the x,y,z components in all channels of the output vector.

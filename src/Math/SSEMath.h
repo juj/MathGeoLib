@@ -97,6 +97,7 @@ const float andMaskOneF = ReinterpretAsFloat(andMaskOne);
 const __m128 sseMaskXYZ = _mm_set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
 
 const __m128 sseSignMask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+const __m128 sseSignMask3 = _mm_set_ps(0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
 #ifdef MATH_AVX
 const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 #endif
@@ -107,6 +108,7 @@ const __m128 sseZero = _mm_set1_ps(0.f);
 const __m128 sseOne = _mm_set1_ps(1.f);
 
 #define negate_ps(x) _mm_xor_ps(x, sseSignMask)
+#define negate3_ps(x) _mm_xor_ps(x, sseSignMask3)
 
 #define abs_ps(x) _mm_andnot_ps(sseSignMask, x)
 #ifdef MATH_AVX
