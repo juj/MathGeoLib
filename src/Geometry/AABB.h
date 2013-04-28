@@ -37,19 +37,19 @@ MATH_BEGIN_NAMESPACE
 	be arbitrarily oriented in the space with respect to each other.
 
 	If you need to represent a box in 3D space with arbitrary orientation, see the class OBB. */
-class AABB
+class ALIGN16 AABB
 {
 public:
 
 	/// Specifies the minimum extent of this AABB in the world space x, y and z axes.
 	ALIGN16 float3 minPoint;
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	float padding;
 #endif
 
 	/// Specifies the maximum extent of this AABB in the world space x, y and z axes. [similarOverload: minPoint]
-	ALIGN16	float3 maxPoint;
-#ifdef MATH_SSE
+	ALIGN16 float3 maxPoint;
+#ifdef MATH_SIMD
 	float padding2;
 #endif
 

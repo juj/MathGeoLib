@@ -24,6 +24,7 @@
 #endif
 #include "../MathGeoLibFwd.h"
 #include "float3.h"
+#include "SSEMath.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector4D>
@@ -39,7 +40,7 @@ MATH_BEGIN_NAMESPACE
 /** This class has two sets of member functions. The functions ending in a suffix '3' operate only on the
 	(x, y, z) part, ignoring the w component (or assuming a value of 0 or 1, where expectable). The functions
 	without the '3' suffix operate on all four elements of the vector. */
-class float4
+class ALIGN16 float4
 {
 public:
 	enum

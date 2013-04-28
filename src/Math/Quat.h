@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../MathBuildConfig.h"
+#include "SSEMath.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
@@ -39,7 +40,7 @@
 MATH_BEGIN_NAMESPACE
 
 /// Represents a rotation or an orientation of a 3D object.
-class Quat
+class ALIGN16 Quat
 {
 public:
 

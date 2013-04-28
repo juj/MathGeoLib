@@ -1489,7 +1489,7 @@ void float4x4::Pivot()
 float3 float4x4::TransformPos(const float3 &pointVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return mat3x4_mul_vec(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
 #else
 	return TransformPos(pointVector.x, pointVector.y, pointVector.z);
@@ -1499,7 +1499,7 @@ float3 float4x4::TransformPos(const float3 &pointVector) const
 float3 float4x4::TransformPos(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return mat3x4_mul_vec(row, _mm_set_ps(1.f, z, y, x));
 #else
 	return float3(DOT4POS_xyz(Row(0), x,y,z),
@@ -1511,7 +1511,7 @@ float3 float4x4::TransformPos(float x, float y, float z) const
 float3 float4x4::TransformDir(const float3 &directionVector) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return mat3x4_mul_vec(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
 #else
 	return TransformDir(directionVector.x, directionVector.y, directionVector.z);
@@ -1521,7 +1521,7 @@ float3 float4x4::TransformDir(const float3 &directionVector) const
 float3 float4x4::TransformDir(float x, float y, float z) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return mat3x4_mul_vec(row, _mm_set_ps(0.f, z, y, x));
 #else
 	return float3(DOT4DIR_xyz(Row(0), x,y,z),

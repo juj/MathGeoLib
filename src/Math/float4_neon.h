@@ -180,7 +180,7 @@ FORCE_INLINE simd4f vec4_permute(simd4f vec, int i, int j, int k, int l)
 	indices.val[1] = vld1_u8(indexData+8);
 	uint8x8x2_t src = *(uint8x8x2_t*)&vec;//vreinterpretq_s8_f32(vec);
 	uint8x8x2_t dst;
-	dst.val[0] = vtbl2_u8(src, indices.val[0]);  
+	dst.val[0] = vtbl2_u8(src, indices.val[0]);
 	dst.val[1] = vtbl2_u8(src, indices.val[1]);
 	return *(simd4f*)&dst;
 #endif
@@ -193,6 +193,24 @@ FORCE_INLINE float sum_xyzw_float(simd4f vec)
 {
 	float32x2_t r = vadd_f32(vget_high_f32(vec), vget_low_f32(vec));
 	return vget_lane_f32(vpadd_f32(r, r), 0);
+}
+
+FORCE_INLINE float mul_xyzw_float(simd4f vec)
+{
+	float32x2_t hi = vget_high_f32(vec);
+	float32x2_t lo = vget_high_f32(vec);
+	float32x2_t mul = vmul_f32(lo, hi);
+	return vget_lane_f32(mul, 0) * vget_lane_f32(mul, 1); ///\todo Can this be optimized somehow?
+}
+
+FORCE_INLINE simd4f negate3_ps(simd4f vec)
+{
+	///\todo This does not look very optimal.
+	const ALIGN16 uint32_t indexData[4] = { 0x80000000UL, 0x80000000UL, 0x80000000UL, 0 };
+	uint64x2_t mask = vld1q_u64((const uint64_t*)indexData);
+	uint64x2_t v = *(uint64x2_t*)&vec;
+	simd4f ret = *(simd4f*)&veorq_u64(v, mask);
+	return ret;
 }
 
 FORCE_INLINE float sum_xyz_float(simd4f vec)
@@ -249,6 +267,7 @@ FORCE_INLINE simd4f vec3_length_sq_ps(simd4f vec)
 #define add_ps(vec, vec2) vaddq_f32(vec, vec2)
 #define sub_ps(vec, vec2) vsubq_f32(vec, vec2)
 #define set1_ps(vec) vdupq_n_f32(vec)
+#define abs_ps(vec) vabsq_f32(vec)
 #elif defined (MATH_SSE)
 #define SIMD4F_TO_FLOAT(vec) M128_TO_FLOAT(vec)
 #define mul_ps(vec, vec2) _mm_mul_ps(vec, vec2)
