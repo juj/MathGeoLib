@@ -54,6 +54,7 @@ void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 	multiplier = mul;
 	increment = inc;
 	modulus = mod;
+	assert(modulus != 0);
 }
 
 u32 LCG::IntFast()
@@ -66,6 +67,7 @@ u32 LCG::IntFast()
 
 u32 LCG::Int()
 {
+	assert(modulus != 0);
 	/// \todo Convert to using Schrage's method for approximate factorization. (Numerical Recipes in C)
 
 	// Currently we cast everything to 64-bit to avoid overflow, which is quite dumb.
