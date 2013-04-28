@@ -18,6 +18,29 @@ TEST(Float4Swizzled)
 	assert(f2.Equals(float4(f3)));
 }
 
+#if defined(MATH_AVX) || defined(MATH_NEON)
+TEST(vec4_permute)
+{
+	float4 f(float2(1,2),3,4);
+	float4 f2 = vec4_permute(f, 2, 0, 1, 3);
+	float f3[4] = { 3, 1, 2, 4 };
+	assert(f2.Equals(float4(f3)));
+}
+
+BENCHMARK(Float4Swizzle)
+{
+	v3[i] = v[i].Swizzled(2, 0, 1, 3);
+}
+BENCHMARK_END
+
+BENCHMARK(vec4_permute)
+{
+	v3[i] = vec4_permute(v[i], 2, 0, 1, 3);
+}
+BENCHMARK_END
+
+#endif
+
 TEST(Float4LengthSq3)
 {
 	float4 f(-1.f,2.f,3.f,1000000.f);
@@ -723,6 +746,36 @@ BENCHMARK(Float4_Length4)
 }
 BENCHMARK_END;
 
+BENCHMARK(vec4_length_float)
+{
+	f[i] = vec4_length_float(v[i].v);
+}
+BENCHMARK_END;
+
+BENCHMARK(vec4_length_ps)
+{
+	v3[i] = vec4_length_ps(v[i].v);
+}
+BENCHMARK_END;
+
+BENCHMARK(Float4_Length4Sq)
+{
+	f[i] = v[i].LengthSq4();
+}
+BENCHMARK_END;
+
+BENCHMARK(vec4_length_sq_float)
+{
+	f[i] = vec4_length_sq_float(v[i].v);
+}
+BENCHMARK_END;
+
+BENCHMARK(vec4_length_sq_ps)
+{
+	v3[i] = vec4_length_sq_ps(v[i].v);
+}
+BENCHMARK_END;
+
 BENCHMARK(Float4_Normalize3)
 {
 	f[i] = v[i].Normalize3();
@@ -732,5 +785,11 @@ BENCHMARK_END;
 BENCHMARK(Float4_Normalize4)
 {
 	f[i] = v[i].Normalize4();
+}
+BENCHMARK_END;
+
+BENCHMARK(vec4_normalize)
+{
+	v3[i] = vec4_normalize(v[i]);
 }
 BENCHMARK_END;

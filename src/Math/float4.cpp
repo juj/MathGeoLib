@@ -120,28 +120,17 @@ float3 float4::Swizzled(int i, int j, int k) const
 
 float4 float4::Swizzled(int i, int j, int k, int l) const
 {
-#ifdef MATH_SSE
-	return float4(Swizzled_SSE(i,j,k,l));
+#if defined(MATH_AVX) && defined MATH_AUTOMATIC_SSE
+	return vec4_permute(v, i, j, k, l);
+	///\todo How to perform an efficient swizzle if AVX is not available?
+	///      We need a dynamic runtime shuffle operation, so _mm_shuffle_ps
+	///      cannot be used.
 #else
 	return float4(At(i), At(j), At(k), At(l));
 #endif
 }
 
 #ifdef MATH_SSE
-
-__m128 float4::Swizzled_SSE(int i, int j, int k, int l) const
-{
-#ifdef MATH_AVX
-	__m128i permute = _mm_set_epi32(l, k, j, i);
-	return _mm_permutevar_ps(v, permute);
-#else
-	///\todo How to perform an efficient swizzle if AVX is not available?
-	///      We need a dynamic runtime shuffle operation, so _mm_shuffle_ps
-	///      cannot be used. The following does a slow SSE->memory->SSE shuffle.
-	float4 v(At(i), At(j), At(k), At(l));
-	return v.v;
-#endif
-}
 
 /// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.
 __m128 float4::LengthSq3_SSE() const
