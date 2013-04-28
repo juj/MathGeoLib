@@ -30,6 +30,7 @@
 #include "../Algorithm/Random/LCG.h"
 #include "SSEMath.h"
 #include "float4x4_sse.h"
+#include "float4x4_neon.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
