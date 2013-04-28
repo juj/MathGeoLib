@@ -23,6 +23,36 @@
 #include "SSEMath.h"
 #include "float4_neon.h"
 
+// Multiplies mat * vec, where mat is a matrix in row-major format.
+FORCE_INLINE simd4f mat4x4_mul_vec4(const simd4f *mat, simd4f vec)
+{
+#ifdef MATH_NEON
+	// Transpose matrix at load time to get in registers in column-major format.
+	float32x4x4_t m = vld4q_f32((const float32_t*)mat);
+	simd4f ret = vmulq_lane_f32(m.val[0], vget_low_f32(vec), 0);
+	ret = vmlaq_lane_f32(ret, m.val[1], vget_low_f32(vec), 1);
+	ret = vmlaq_lane_f32(ret, m.val[2], vget_high_f32(vec), 0);
+	return vmlaq_lane_f32(ret, m.val[3], vget_high_f32(vec), 1);
+#elif defined(MATH_SSE3)
+	return mat4x4_mul_sse3(mat, vec);
+#else
+	return mat4x4_mul_sse(mat, vec);
+#endif
+}
+
+// Multiplies vec * mat, where mat is a matrix in row-major format.
+FORCE_INLINE simd4f vec4_mul_mat4x4(simd4f vec, const simd4f *mat)
+{
+#ifdef MATH_NEON
+	simd4f ret = vmulq_lane_f32(mat[0], vget_low_f32(vec), 0);
+	ret = vmlaq_lane_f32(ret, mat[1], vget_low_f32(vec), 1);
+	ret = vmlaq_lane_f32(ret, mat[2], vget_high_f32(vec), 0);
+	return vmlaq_lane_f32(ret, mat[3], vget_high_f32(vec), 1);
+#else
+	return colmajor_mat4x4_mul_sse1(mat, vec);
+#endif
+}
+
 // Multiplies m1 * m2, where m1 and m2 are stored in row-major format.
 FORCE_INLINE void mat4x4_mul_mat4x4(simd4f *out, const simd4f *m1, const simd4f *m2)
 {

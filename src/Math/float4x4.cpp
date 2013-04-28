@@ -1525,31 +1525,26 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 	return mat3x4_mul_vec(row, _mm_set_ps(0.f, z, y, x));
 #else
 	return float3(DOT4DIR_xyz(Row(0), x,y,z),
-				  DOT4DIR_xyz(Row(1), x,y,z),
-				  DOT4DIR_xyz(Row(2), x,y,z));
+	              DOT4DIR_xyz(Row(1), x,y,z),
+	              DOT4DIR_xyz(Row(2), x,y,z));
 #endif
 }
 
 float4 float4x4::Transform(const float4 &vector) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-
-#ifdef MATH_SSE3
-	return float4(mat4x4_mul_sse3(row, vector.v));
-#else
-	return float4(mat4x4_mul_sse(row, vector.v));
-#endif
-
+	return mat4x4_mul_vec4(row, vector.v);
 #else
 	return float4(DOT4(Row(0), vector),
-				  DOT4(Row(1), vector),
-				  DOT4(Row(2), vector),
-				  DOT4(Row(3), vector));
+	              DOT4(Row(1), vector),
+	              DOT4(Row(2), vector),
+	              DOT4(Row(3), vector));
 #endif
 }
 
 void float4x4::TransformPos(float3 *pointArray, int numPoints) const
 {
+	///\todo SSE.
 	assume(pointArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!pointArray)
@@ -1561,6 +1556,7 @@ void float4x4::TransformPos(float3 *pointArray, int numPoints) const
 
 void float4x4::TransformPos(float3 *pointArray, int numPoints, int strideBytes) const
 {
+	///\todo SSE.
 	assume(pointArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!pointArray)
@@ -1577,6 +1573,7 @@ void float4x4::TransformPos(float3 *pointArray, int numPoints, int strideBytes) 
 
 void float4x4::TransformDir(float3 *dirArray, int numVectors) const
 {
+	///\todo SSE.
 	assume(dirArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!dirArray)
@@ -1588,6 +1585,7 @@ void float4x4::TransformDir(float3 *dirArray, int numVectors) const
 
 void float4x4::TransformDir(float3 *dirArray, int numVectors, int strideBytes) const
 {
+	///\todo SSE.
 	assume(dirArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!dirArray)
@@ -1604,6 +1602,7 @@ void float4x4::TransformDir(float3 *dirArray, int numVectors, int strideBytes) c
 
 void float4x4::Transform(float4 *vectorArray, int numVectors) const
 {
+	///\todo SSE.
 	assume(vectorArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!vectorArray)
@@ -1615,6 +1614,7 @@ void float4x4::Transform(float4 *vectorArray, int numVectors) const
 
 void float4x4::Transform(float4 *vectorArray, int numVectors, int strideBytes) const
 {
+	///\todo SSE.
 	assume(vectorArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!vectorArray)
@@ -2143,13 +2143,13 @@ float4x4 operator *(const float3x4 &lhs, const float4x4 &rhs)
 
 float4 operator *(const float4 &lhs, const float4x4 &rhs)
 {
-#ifdef MATH_SSE
-	return float4(colmajor_mat4x4_mul_sse1(rhs.row, lhs.v));
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_mul_mat4x4(lhs.v, rhs.row);
 #else
 	return float4(DOT4STRIDED(lhs, rhs.ptr(), 4),
-				  DOT4STRIDED(lhs, rhs.ptr()+1, 4),
-				  DOT4STRIDED(lhs, rhs.ptr()+2, 4),
-				  DOT4STRIDED(lhs, rhs.ptr()+3, 4));
+	              DOT4STRIDED(lhs, rhs.ptr()+1, 4),
+	              DOT4STRIDED(lhs, rhs.ptr()+2, 4),
+	              DOT4STRIDED(lhs, rhs.ptr()+3, 4));
 #endif
 }
 

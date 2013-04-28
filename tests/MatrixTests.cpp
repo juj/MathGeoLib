@@ -732,6 +732,48 @@ RANDOMIZED_TEST(mat4x4_transpose)
 	assert(m.Equals(correct));
 	assert(m2.Equals(correct));
 }
+
+BENCHMARK(mat4x4_mul_vec4)
+{
+	v2[i] = mat4x4_mul_vec4(m[i].row, v[i].v);
+}
+BENCHMARK_END;
+
+BENCHMARK(vec4_mul_mat4x4)
+{
+	v2[i] = vec4_mul_mat4x4(v[i].v, m[i].row);
+}
+BENCHMARK_END;
+
+BENCHMARK(float4x4_mul_float4)
+{
+	v2[i] = m[i] * v[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(float4_mul_float4x4)
+{
+	v2[i] = v[i] * m[i];
+}
+BENCHMARK_END;
+
+RANDOMIZED_TEST(mat4x4_mul_vec4)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 correct = m*v;
+	float4 v2 = mat4x4_mul_vec4(m.row, v.v);
+	assert(v2.Equals(correct));
+}
+
+RANDOMIZED_TEST(vec4_mul_mat4x4)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
+	float4 correct = v*m;
+	float4 v2 = vec4_mul_mat4x4(v.v, m.row);
+	assert(v2.Equals(correct));
+}
 #endif
 
 BENCHMARK(float4x4_Transposed)

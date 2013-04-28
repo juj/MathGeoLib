@@ -503,12 +503,6 @@ BENCHMARK(float4_Normalize4)
 }
 BENCHMARK_END;
 
-BENCHMARK(float4x4_mul_float4)
-{
-	v2[i] = m[i]*v[i];
-}
-BENCHMARK_END;
-
 #ifdef MATH_SSE
 BENCHMARK(float4_Normalize4_Fast_SSE)
 {
