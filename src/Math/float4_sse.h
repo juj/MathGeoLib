@@ -73,6 +73,11 @@ FORCE_INLINE __m128 dot3_ps(__m128 a, __m128 b)
 #endif
 }
 
+FORCE_INLINE float dot3_float(__m128 a, __m128 b)
+{
+	return M128_TO_FLOAT(dot3_ps(a, b));
+}
+
 /// The dot product is stored in each channel of the returned vector.
 FORCE_INLINE __m128 dot4_ps(__m128 a, __m128 b)
 {
