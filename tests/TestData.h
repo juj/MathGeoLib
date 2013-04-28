@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../src/MathBuildConfig.h"
 #include "../src/MathGeoLibFwd.h"
 #include "../src/Math/assume.h"
