@@ -197,8 +197,8 @@ FORCE_INLINE float sum_xyzw_float(simd4f vec)
 
 FORCE_INLINE float mul_xyzw_float(simd4f vec)
 {
+	float32x2_t lo = vget_low_f32(vec);
 	float32x2_t hi = vget_high_f32(vec);
-	float32x2_t lo = vget_high_f32(vec);
 	float32x2_t mul = vmul_f32(lo, hi);
 	return vget_lane_f32(mul, 0) * vget_lane_f32(mul, 1); ///\todo Can this be optimized somehow?
 }
