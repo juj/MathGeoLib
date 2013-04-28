@@ -203,7 +203,7 @@ bool float3::IsFinite() const
 
 bool float3::IsPerpendicular(const float3 &other, float epsilon) const
 {
-	return fabs(Dot(other)) <= epsilon;
+	return fabs(Dot(other)) <= epsilon * Length() * other.Length();
 }
 
 bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)

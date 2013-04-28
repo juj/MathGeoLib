@@ -952,13 +952,13 @@ bool float3x4::InverseOrthogonalUniformScale()
 #ifdef MATH_ASSERT_CORRECTNESS
 	float3x4 orig = *this;
 #endif
-	assume(IsColOrthogonal());
+	assume(IsColOrthogonal(1e-3f));
 	assume(HasUniformScale());
 	Swap(v[0][1], v[1][0]);
 	Swap(v[0][2], v[2][0]);
 	Swap(v[1][2], v[2][1]);
 	float scale = float3(v[0][0], v[1][0], v[2][0]).LengthSq();
-	if (scale < 1e-4f)
+	if (scale == 0.f)
 		return false;
 	scale = 1.f / scale;
 
@@ -967,8 +967,6 @@ bool float3x4::InverseOrthogonalUniformScale()
 	v[2][0] *= scale; v[2][1] *= scale; v[2][2] *= scale;
 
 	SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
-
-	mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
 
 	return true;
 }
