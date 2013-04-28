@@ -387,6 +387,8 @@ bool float4::IsPerpendicular3(const float4 &other, float epsilon) const
 	return fabs(this->Dot3(other)) < epsilon;
 }
 
+bool IsNeutralCLocale();
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float4::ToString() const
 {
@@ -397,6 +399,7 @@ std::string float4::ToString() const
 
 std::string float4::SerializeToString() const
 {
+	assert(IsNeutralCLocale());
 	char str[256];
 	sprintf(str, "%f %f %f %f", x, y, z, w);
 	return std::string(str);
@@ -405,6 +408,7 @@ std::string float4::SerializeToString() const
 
 float4 float4::FromString(const char *str)
 {
+	assert(IsNeutralCLocale());
 	assume(str);
 	if (!str)
 		return float4::nan;

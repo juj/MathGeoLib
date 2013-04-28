@@ -211,6 +211,8 @@ bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, co
 	return (p2-p1).Cross(p3-p1).LengthSq() <= epsilon;
 }
 
+bool IsNeutralCLocale();
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float3::ToString() const
 {
@@ -221,6 +223,7 @@ std::string float3::ToString() const
 
 std::string float3::SerializeToString() const
 {
+	assert(IsNeutralCLocale());
 	char str[256];
 	sprintf(str, "%f %f %f", x, y, z);
 	return std::string(str);
@@ -229,6 +232,7 @@ std::string float3::SerializeToString() const
 
 float3 MUST_USE_RESULT float3::FromString(const char *str)
 {
+	assert(IsNeutralCLocale());
 	assume(str);
 	if (!str)
 		return float3::nan;

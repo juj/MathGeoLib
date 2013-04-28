@@ -8,7 +8,7 @@
 
 TEST(Float2FromString)
 {
-	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
+	const char *locales[] = { "C", "en" /*, "fi" */ }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
 	for(int i = -1; i < (int)(sizeof(locales)/sizeof(locales[0])); ++i)
 	{
@@ -34,7 +34,7 @@ TEST(Float2FromString)
 
 TEST(Float3FromString)
 {
-	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
+	const char *locales[] = { "C", "en" /*, "fi" */ }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
 	for(int i = -1; i < (int)(sizeof(locales)/sizeof(locales[0])); ++i)
 	{
@@ -59,7 +59,7 @@ TEST(Float3FromString)
 }
 TEST(Float4FromString)
 {
-	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
+	const char *locales[] = { "C", "en" /*, "fi" */ }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
 	for(int i = -1; i < (int)(sizeof(locales)/sizeof(locales[0])); ++i)
 	{
@@ -85,7 +85,7 @@ TEST(Float4FromString)
 
 TEST(QuatFromString)
 {
-	const char *locales[] = { "C", "en", "fi" }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
+	const char *locales[] = { "C", "en" /*, "fi" */ }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
 
 	for(int i = -1; i < (int)(sizeof(locales)/sizeof(locales[0])); ++i)
 	{

@@ -218,6 +218,16 @@ bool float2::Equals(float x_, float y_, float epsilon) const
 	return EqualAbs(x, x_, epsilon) && EqualAbs(y, y_, epsilon);
 }
 
+/// It is too performance-heavy to set the locale in each serialization and deserialization function call.
+/// Therefore expect the user to has a proper locale set up for the application at startup. This is assert()ed
+/// at debug runs.
+bool IsNeutralCLocale()
+{
+	lconv *lc = localeconv();
+	if (strcmp(lc->decimal_point, "."))
+		return false;
+}
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string float2::ToString() const
 {
@@ -228,6 +238,7 @@ std::string float2::ToString() const
 
 std::string float2::SerializeToString() const
 {
+	assert(IsNeutralCLocale());
 	char str[256];
 	sprintf(str, "%f %f", x, y);
 	return std::string(str);
@@ -236,6 +247,7 @@ std::string float2::SerializeToString() const
 
 float2 float2::FromString(const char *str)
 {
+	assert(IsNeutralCLocale());
 	assume(str);
 	if (!str)
 		return float2::nan;
