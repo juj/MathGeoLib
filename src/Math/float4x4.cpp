@@ -1169,7 +1169,7 @@ float4x4 &float4x4::operator =(const float3x4 &rhs)
 	v[3][0] = 0.f;
 	v[3][1] = 0.f;
 	v[3][2] = 0.f;
-	v[3][3] = 0.f;
+	v[3][3] = 1.f;
 #endif
 	return *this;
 }
