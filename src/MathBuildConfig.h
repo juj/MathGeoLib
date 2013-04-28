@@ -112,7 +112,7 @@
 
 ///\todo Test iOS support.
 ///\todo Enable NEON only on ARMv7, not older.
-#if defined(ANDROID) || (defined(WIN8RT) && defined(_M_ARM))
+#if (defined(ANDROID) && defined(__ARM_ARCH_7A__)) || (defined(WIN8RT) && defined(_M_ARM))
 #define MATH_NEON
 #include <arm_neon.h>
 #endif

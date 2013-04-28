@@ -17,19 +17,6 @@ if (BUILD_FOR_GCOV)
 	add_definitions(-DFAIL_USING_EXCEPTIONS)
 endif()
 
-if (MATH_AVX)
-	add_definitions(-DMATH_AVX)
-	if (MSVC)
-		add_definitions(/arch:AVX)
-	else()
-                add_definitions(-mavx)
-        endif()
-endif()
-
-if (MATH_SSE41)
-	add_definitions(-DMATH_SSE41)
-endif()
-
 if (MATH_TESTS_EXECUTABLE)
 	add_definitions(-DMATH_TESTS_EXECUTABLE)
 
@@ -51,7 +38,7 @@ file(GLOB_RECURSE headerFiles ./src/*.h)
 
 if (BUILD_FOR_GCOV)
 	file(REMOVE "MathGeoLib_code_files.txt")
-	foreach(filename ${sourceFiles})	
+	foreach(filename ${sourceFiles})
 		get_filename_component(filebasename ${filename} NAME)
 		file(APPEND "MathGeoLib_code_files.txt" "${filebasename} ")
 	endforeach()
