@@ -72,6 +72,32 @@ float4x4 *MatrixArray2()
 	return arr;
 }
 
+float4x4 *OrthonormalMatrixArray()
+{
+	LCG lcg;
+	static float4x4 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4x4(Quat::RandomRotation(lcg), float3::RandomBox(lcg, -10000.f, 10000.f));
+	}
+	return arr;
+}
+
+float4x4 *OrthogonalMatrixArray()
+{
+	LCG lcg;
+	static float4x4 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4x4(Quat::RandomRotation(lcg), float3::RandomBox(lcg, -10000.f, 10000.f)) * float4x4::UniformScale(lcg.Float(0.01f, 1e3f));
+	}
+	return arr;
+}
+
 float4x4 *TransposedMatrixArray()
 {
 	static float4x4 *arr;
@@ -94,6 +120,19 @@ float2 *Float2Array()
 		arr = AlignedNew<float2>(testrunner_numItersPerTest);
 		for(int i = 0; i < testrunner_numItersPerTest; ++i)
 			arr[i] = float2::RandomBox(lcg, -10.f, 10.f);
+	}
+	return arr;
+}
+
+float4 *NormalizedVectorArray()
+{
+	LCG lcg;
+	static float4 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float4>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4::RandomDir(lcg);
 	}
 	return arr;
 }
@@ -147,10 +186,13 @@ public:
 		AlignedFree(MatrixArray());
 		AlignedFree(MatrixArray2());
 		AlignedFree(Float2Array());
+		AlignedFree(NormalizedVectorArray());
 		AlignedFree(VectorArray());
 		AlignedFree(VectorArray2());
 		AlignedFree(VectorArray3());
 		AlignedFree(TransposedMatrixArray());
+		AlignedFree(OrthonormalMatrixArray());
+		AlignedFree(OrthogonalMatrixArray());
 		AlignedFree(QuatArray());
 	}
 };

@@ -447,18 +447,21 @@ BENCHMARK_END;
 
 BENCHMARK(float4x4_InverseOrthogonalUniformScale)
 {
+	m[i] = ogm[i];
 	m[i].InverseOrthogonalUniformScale();
 }
 BENCHMARK_END;
 
 BENCHMARK(float4x4_InverseOrthonormal)
 {
+	m[i] = om[i];
 	m[i].InverseOrthonormal();
 }
 BENCHMARK_END;
 
 BENCHMARK(float3x4_InverseOrthonormal)
 {
+	m[i].Float3x4Part() = om[i].Float3x4Part();
 	m[i].Float3x4Part().InverseOrthonormal();
 }
 BENCHMARK_END;

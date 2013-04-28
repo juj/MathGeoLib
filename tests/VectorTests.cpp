@@ -806,12 +806,14 @@ BENCHMARK_END;
 
 BENCHMARK(Float4_Normalize3)
 {
+	v[i] = nv[i];
 	f[i] = v[i].Normalize3();
 }
 BENCHMARK_END;
 
 BENCHMARK(Float4_Normalize4)
 {
+	v[i] = nv[i];
 	f[i] = v[i].Normalize4();
 }
 BENCHMARK_END;
