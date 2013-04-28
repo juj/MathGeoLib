@@ -22,6 +22,7 @@
 #include "MathFunc.h"
 #include "../Algorithm/Random/LCG.h"
 #include "assume.h"
+#include <string.h>
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
