@@ -83,6 +83,11 @@ FORCE_INLINE __m128 dot4_ps(__m128 a, __m128 b)
 #endif
 }
 
+FORCE_INLINE float dot4_float(__m128 a, __m128 b)
+{
+	return M128_TO_FLOAT(dot4_ps(a, b));
+}
+
 FORCE_INLINE __m128 cross_ps(__m128 a, __m128 b)
 {
 	__m128 a_xzy = shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]

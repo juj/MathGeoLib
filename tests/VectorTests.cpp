@@ -746,6 +746,7 @@ BENCHMARK(Float4_Length4)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
 BENCHMARK(vec4_length_float)
 {
 	f[i] = vec4_length_float(v[i].v);
@@ -757,6 +758,7 @@ BENCHMARK(vec4_length_ps)
 	v3[i] = vec4_length_ps(v[i].v);
 }
 BENCHMARK_END;
+#endif
 
 BENCHMARK(Float4_Length4Sq)
 {
@@ -764,6 +766,7 @@ BENCHMARK(Float4_Length4Sq)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
 BENCHMARK(vec4_length_sq_float)
 {
 	f[i] = vec4_length_sq_float(v[i].v);
@@ -775,6 +778,7 @@ BENCHMARK(vec4_length_sq_ps)
 	v3[i] = vec4_length_sq_ps(v[i].v);
 }
 BENCHMARK_END;
+#endif
 
 BENCHMARK(Float4_Normalize3)
 {
@@ -788,8 +792,10 @@ BENCHMARK(Float4_Normalize4)
 }
 BENCHMARK_END;
 
+#ifdef MATH_SIMD
 BENCHMARK(vec4_normalize)
 {
 	v3[i] = vec4_normalize(v[i]);
 }
 BENCHMARK_END;
+#endif

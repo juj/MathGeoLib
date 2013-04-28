@@ -39,7 +39,13 @@ inline T *AlignedNew(size_t numElements) { return AlignedNew<T>(numElements, 16)
 /// Frees memory allocated by AlignedMalloc.
 void AlignedFree(void *ptr);
 
-#ifdef MATH_SSE // If SSE is not enabled, this whole file will not be included.
+#ifdef MATH_SIMD // If SSE is not enabled, this whole file will not be included.
+
+#ifdef MATH_NEON
+typedef float32x4_t simd4f;
+#elif defined(MATH_SSE)
+typedef __m128 simd4f;
+#endif
 
 #ifdef _MSC_VER
 #define ALIGN16 __declspec(align(16))
@@ -66,6 +72,8 @@ template<>
 inline float4x4 *AlignedNew<float4x4>(size_t numElements) { return AlignedNew<float4x4>(numElements, MAT_ALIGNMENT); }
 
 inline float ReinterpretAsFloat(u32 i);
+
+#ifdef MATH_SSE
 
 #ifdef MATH_SSE2
 #define set_ps_hex(w, z, y, x) _mm_castsi128_ps(_mm_set_epi32(w, z, y, x))
@@ -156,13 +164,23 @@ FORCE_INLINE __m128 modf_ps(__m128 x, __m128 mod)
 	return _mm_sub_ps(x, _mm_mul_ps(integerpart, mod));
 }
 
-#else // ~MATH_SSE
+#endif // ~MATH_SSE
+
+inline std::string ToString(simd4f vec)
+{
+	float *v = (float*)&vec;
+	char str[256];
+	sprintf(str, "[%f, %f, %f, %f]", v[3], v[2], v[1], v[0]);
+	return str;
+}
+
+#else // ~MATH_SIMD
 
 #define ALIGN16
 #define ALIGN32
 #define ALIGN_MAT
 #define IS_MAT_ALIGNED(x) true
 
-#endif // ~MATH_SSE
+#endif // ~MATH_SIMD
 
 MATH_END_NAMESPACE
