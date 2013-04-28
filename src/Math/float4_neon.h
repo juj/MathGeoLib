@@ -121,9 +121,9 @@ FORCE_INLINE simd4f vec4_recip(simd4f vec)
 	__m128 e = _mm_rcp_ps(vec); // Do one iteration of Newton-Rhapson: e_n = 2*e - x*e^2
 	return _mm_sub_ps(_mm_add_ps(e, e), _mm_mul_ps(vec, _mm_mul_ps(e,e)));
 #elif defined(MATH_NEON)
-	simd4f rcp = vrecpeq_f32(vec2);
-	rcp = vmulq_f32(vrecpsq_f32(vec2, rcp), rcp);
-	rcp = vmulq_f32(vrecpsq_f32(vec2, rcp), rcp);
+	simd4f rcp = vrecpeq_f32(vec);
+	rcp = vmulq_f32(vrecpsq_f32(vec, rcp), rcp);
+	rcp = vmulq_f32(vrecpsq_f32(vec, rcp), rcp);
 	return rcp;
 #endif
 }
