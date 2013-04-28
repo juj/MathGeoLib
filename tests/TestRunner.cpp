@@ -137,7 +137,7 @@ int RunTest(Test &t, int numTimes, int numTrials)
 
 	float successRate = (float)numPasses * 100.f / numTimes;
 
-	if (t.isBenchmark) // Benchmarks print themselves.
+	if (t.isBenchmark && numFails == 0) // Benchmarks print themselves.
 		return 0; // 0: Success
 
 	int ret = 0; // 0: Success

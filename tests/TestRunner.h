@@ -97,5 +97,10 @@ public:
 		FormatTime((double)accumTicks / (testrunner_numTimerTests * testrunner_numItersPerTest)).c_str(), FormatTime((double)worstTicks / testrunner_numItersPerTest).c_str()); \
 }
 
+#if defined(_DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
+const int testrunner_numTimerTests = 10;
+const int testrunner_numItersPerTest = 100;
+#else
 const int testrunner_numTimerTests = 10000;
 const int testrunner_numItersPerTest = 1000;
+#endif
