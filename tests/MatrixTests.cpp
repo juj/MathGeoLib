@@ -715,4 +715,27 @@ RANDOMIZED_TEST(mat4x4_mul_mat4x4)
 	float4x4 correct = m*m2;
 	assert(m3.Equals(correct));
 }
+
+BENCHMARK(mat4x4_transpose)
+{
+	mat4x4_transpose(m2[i].row, m[i].row);
+}
+BENCHMARK_END;
+
+RANDOMIZED_TEST(mat4x4_transpose)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 correct = m.Transposed();
+	float4x4 m2;
+	mat4x4_transpose(m2.row, m.row);
+	mat4x4_transpose(m.row, m.row);
+	assert(m.Equals(correct));
+	assert(m2.Equals(correct));
+}
 #endif
+
+BENCHMARK(float4x4_Transposed)
+{
+	m2[i] = m[i].Transposed();
+}
+BENCHMARK_END;

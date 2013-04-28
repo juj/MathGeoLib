@@ -1402,8 +1402,8 @@ void float4x4::InverseOrthonormal()
 
 void float4x4::Transpose()
 {
-#ifdef MATH_SSE
-	_MM_TRANSPOSE4_PS(row[0], row[1], row[2], row[3]);
+#ifdef MATH_AUTOMATIC_SSE
+	mat4x4_transpose(row, row);
 #else
 	Swap(v[0][1], v[1][0]);
 	Swap(v[0][2], v[2][0]);

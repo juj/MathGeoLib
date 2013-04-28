@@ -53,4 +53,24 @@ FORCE_INLINE void mat4x4_mul_mat4x4(simd4f *out, const simd4f *m1, const simd4f 
 #endif
 }
 
+FORCE_INLINE void mat4x4_transpose(simd4f *out, const simd4f *mat)
+{
+#ifdef MATH_NEON
+	float32x4x4_t m = vld4q_f32((const float32_t*)mat);
+	vst1q_f32((float32_t*)out, m.val[0]);
+	vst1q_f32((float32_t*)out+4, m.val[1]);
+	vst1q_f32((float32_t*)out+8, m.val[2]);
+	vst1q_f32((float32_t*)out+12, m.val[3]);
+#else
+	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]);
+	__m128 tmp2 = _mm_unpacklo_ps(mat[2], mat[3]);
+	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]);
+	__m128 tmp3 = _mm_unpackhi_ps(mat[2], mat[3]);
+	out[0] = _mm_movelh_ps(tmp0, tmp2);
+	out[1] = _mm_movehl_ps(tmp2, tmp0);
+	out[2] = _mm_movelh_ps(tmp1, tmp3);
+	out[3] = _mm_movehl_ps(tmp3, tmp1);
+#endif
+}
+
 #endif
