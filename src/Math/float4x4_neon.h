@@ -93,7 +93,7 @@ FORCE_INLINE void mat4x4_set(simd4f *mat, float _00, float _01, float _02, float
 #endif
 }
 
-FORCE_INLINE void mat4x4_mul_float(simd4f *out, simd4f *mat, float scalar)
+FORCE_INLINE void mat4x4_mul_float(simd4f *out, const simd4f *mat, float scalar)
 {
 #ifdef MATH_AVX
 	__m256 s = _mm256_set1_ps(scalar);
@@ -110,7 +110,7 @@ FORCE_INLINE void mat4x4_mul_float(simd4f *out, simd4f *mat, float scalar)
 #endif
 }
 
-FORCE_INLINE void mat4x4_div_float(simd4f *out, simd4f *mat, float scalar)
+FORCE_INLINE void mat4x4_div_float(simd4f *out, const simd4f *mat, float scalar)
 {
 #ifdef MATH_AVX
 	__m256 *o = (__m256*)out;
@@ -131,7 +131,7 @@ FORCE_INLINE void mat4x4_div_float(simd4f *out, simd4f *mat, float scalar)
 #endif
 }
 
-FORCE_INLINE void mat4x4_add_mat4x4(simd4f *out, simd4f *m1, simd4f *m2)
+FORCE_INLINE void mat4x4_add_mat4x4(simd4f *out, const simd4f *m1, const simd4f *m2)
 {
 #ifdef MATH_AVX
 	__m256 *o = (__m256*)out;
@@ -147,7 +147,7 @@ FORCE_INLINE void mat4x4_add_mat4x4(simd4f *out, simd4f *m1, simd4f *m2)
 #endif
 }
 
-FORCE_INLINE void mat4x4_sub_mat4x4(simd4f *out, simd4f *m1, simd4f *m2)
+FORCE_INLINE void mat4x4_sub_mat4x4(simd4f *out, const simd4f *m1, const simd4f *m2)
 {
 #ifdef MATH_AVX
 	__m256 *o = (__m256*)out;
@@ -163,7 +163,7 @@ FORCE_INLINE void mat4x4_sub_mat4x4(simd4f *out, simd4f *m1, simd4f *m2)
 #endif
 }
 
-FORCE_INLINE void mat4x4_negate(simd4f *out, simd4f *mat)
+FORCE_INLINE void mat4x4_negate(simd4f *out, const simd4f *mat)
 {
 #ifdef MATH_AVX
 	__m256 zero = _mm256_setzero_ps();
