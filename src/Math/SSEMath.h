@@ -20,7 +20,6 @@
 #include "../MathBuildConfig.h"
 #include "MathNamespace.h"
 #include "../MathGeoLibFwd.h"
-#include "float4x4.h"
 #include <stdint.h>
 
 MATH_BEGIN_NAMESPACE
@@ -62,9 +61,6 @@ void AlignedFree(void *ptr);
 #define IS_MAT_ALIGNED(x) IS16ALIGNED(X)
 #endif
 
-template<>
-inline float4x4 *AlignedNew<float4x4>(size_t numElements) { return AlignedNew<float4x4>(numElements, MAT_ALIGNMENT); }
-
 inline float ReinterpretAsFloat(u32 i);
 
 #ifdef MATH_SSE
@@ -101,7 +97,10 @@ const __m128 sseEpsilonFloat = _mm_set1_ps(1e-4f);
 const __m128 sseZero = _mm_set1_ps(0.f);
 const __m128 sseOne = _mm_set1_ps(1.f);
 
-#define negate_ps(x) _mm_xor_ps(x, sseSignMask)
+///\todo Benchmark which one is better!
+//#define negate_ps(x) _mm_xor_ps(x, sseSignMask)
+#define negate_ps(x) _mm_sub_ps(_mm_setzero_ps(), x)
+
 #define negate3_ps(x) _mm_xor_ps(x, sseSignMask3)
 
 #define abs_ps(x) _mm_andnot_ps(sseSignMask, x)

@@ -20,6 +20,16 @@
 
 #ifdef MATH_SIMD
 
+#ifdef MATH_NEON
+FORCE_INLINE simd4f set_ps(float w, float z, float y, float x)
+{
+	const float32_t d[4] = { x, y, z, w };
+	return vld1q_f32(d);
+}
+#else
+#define set_ps _mm_set_ps
+#endif
+
 FORCE_INLINE simd4f vec4_add_float(simd4f vec, float f)
 {
 #ifdef MATH_SSE
@@ -68,6 +78,7 @@ FORCE_INLINE simd4f vec4_sub_vec4(simd4f vec, simd4f vec2)
 #ifdef MATH_NEON
 FORCE_INLINE simd4f negate_ps(simd4f vec)
 {
+	///\todo Can this be improved?
 	return float_sub_vec4(0.f, vec);
 }
 #endif
@@ -139,6 +150,7 @@ FORCE_INLINE simd4f vec4_div_vec4(simd4f vec, simd4f vec2)
 	return vmulq_f32(vec, rcp);
 #endif
 }
+#define div_ps vec4_div_vec4
 
 #ifdef MATH_NEON
 inline std::string ToString(uint8x8x2_t vec)
@@ -234,11 +246,15 @@ FORCE_INLINE simd4f vec3_length_sq_ps(simd4f vec)
 #ifdef MATH_NEON
 #define SIMD4F_TO_FLOAT(vec) vget_lane_f32(vget_low_f32(vec), 0)
 #define mul_ps(vec, vec2) vmulq_f32(vec, vec2)
+#define add_ps(vec, vec2) vaddq_f32(vec, vec2)
 #define sub_ps(vec, vec2) vsubq_f32(vec, vec2)
+#define set1_ps(vec) vdupq_n_f32(vec)
 #elif defined (MATH_SSE)
 #define SIMD4F_TO_FLOAT(vec) M128_TO_FLOAT(vec)
 #define mul_ps(vec, vec2) _mm_mul_ps(vec, vec2)
+#define add_ps(vec, vec2) _mm_add_ps(vec, vec2)
 #define sub_ps(vec, vec2) _mm_sub_ps(vec, vec2)
+#define set1_ps(vec) _mm_set1_ps(vec)
 #endif
 
 FORCE_INLINE simd4f vec4_rsqrt(simd4f vec)

@@ -16,8 +16,8 @@ TEST(Float3x4ScaleRow)
 {
 	float3x4 m2;
 	m2.Set(-1,-1,-1,-1,
-	      2,2,2,2,
-	      4,4,4,4);
+	        2, 2, 2, 2,
+	        4, 4, 4, 4);
 
 	float3x4 m = float3x4::nan;
 	m.Set(m2); // Test float3x4::Set() to properly copy data.

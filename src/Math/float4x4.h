@@ -958,4 +958,9 @@ Q_DECLARE_METATYPE(float4x4)
 Q_DECLARE_METATYPE(float4x4*)
 #endif
 
+#ifdef MATH_SIMD
+template<>
+inline float4x4 *AlignedNew<float4x4>(size_t numElements) { return AlignedNew<float4x4>(numElements, MAT_ALIGNMENT); }
+#endif
+
 MATH_END_NAMESPACE

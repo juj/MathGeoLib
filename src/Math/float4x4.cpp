@@ -39,57 +39,36 @@
 MATH_BEGIN_NAMESPACE
 
 float4x4::float4x4(float _00, float _01, float _02, float _03,
-				   float _10, float _11, float _12, float _13,
-				   float _20, float _21, float _22, float _23,
-				   float _30, float _31, float _32, float _33)
+                   float _10, float _11, float _12, float _13,
+                   float _20, float _21, float _22, float _23,
+                   float _30, float _31, float _32, float _33)
 {
-#ifdef MATH_AVX
-	row2[0] = _mm256_set_ps(_13, _12, _11, _10, _03, _02, _01, _00);
-	row2[1] = _mm256_set_ps(_33, _32, _31, _30, _23, _22, _21, _20);
-#elif defined(MATH_SSE)
-	row[0] = _mm_set_ps(_03, _02, _01, _00);
-	row[1] = _mm_set_ps(_13, _12, _11, _10);
-	row[2] = _mm_set_ps(_23, _22, _21, _20);
-	row[3] = _mm_set_ps(_33, _32, _31, _30);
-#else
 	Set(_00, _01, _02, _03,
 		_10, _11, _12, _13,
 		_20, _21, _22, _23,
 		_30, _31, _32, _33);
-#endif
 }
 
-float4x4::float4x4(const float3x3 &other)
+float4x4::float4x4(const float3x3 &m)
 {
-#ifdef MATH_AVX
-	row2[0] = _mm256_set_ps(0.f, other.v[1][2], other.v[1][1], other.v[1][0], 0.f, other.v[0][2], other.v[0][1], other.v[0][0]);
-	row2[1] = _mm256_set_ps(1.f, 0.f, 0.f, 0.f, 0.f, other.v[2][2], other.v[2][1], other.v[2][0]);
-#elif defined(MATH_SSE)
-	row[0] = _mm_set_ps(0.f, other.v[0][2], other.v[0][1], other.v[0][0]);
-	row[1] = _mm_set_ps(0.f, other.v[1][2], other.v[1][1], other.v[1][0]);
-	row[2] = _mm_set_ps(0.f, other.v[2][2], other.v[2][1], other.v[2][0]);
-	row[3] = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
-#else
-	SetRow3(0, other.Row(0));
-	SetRow3(1, other.Row(1));
-	SetRow3(2, other.Row(2));
-	SetRow(3, 0, 0, 0, 1);
-	SetCol3(3, 0, 0, 0);
-#endif
+	Set(m.v[0][0], m.v[0][1], m.v[0][2], 0.f,
+		m.v[1][0], m.v[1][1], m.v[1][2], 0.f,
+		m.v[2][0], m.v[2][1], m.v[2][2], 0.f,
+		      0.f,       0.f,       0.f, 1.f);
 }
 
-float4x4::float4x4(const float3x4 &other)
+float4x4::float4x4(const float3x4 &m)
 {
-#ifdef MATH_SSE
-	row[0] = other.row[0];
-	row[1] = other.row[1];
-	row[2] = other.row[2];
-	row[3] = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+#ifdef MATH_AUTOMATIC_SSE
+	row[0] = m.row[0];
+	row[1] = m.row[1];
+	row[2] = m.row[2];
+	row[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 #else
-	SetRow(0, other.Row(0));
-	SetRow(1, other.Row(1));
-	SetRow(2, other.Row(2));
-	SetRow(3, 0, 0, 0, 1);
+	Set(m.v[0][0], m.v[0][1], m.v[0][2], m[0][3],
+		m.v[1][0], m.v[1][1], m.v[1][2], m[1][3],
+		m.v[2][0], m.v[2][1], m.v[2][2], m[2][3],
+		      0.f,       0.f,       0.f,     1.f);
 #endif
 }
 
@@ -863,8 +842,8 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 		return; // Benign failure
 #endif
 
-#ifdef MATH_SSE
-	this->row[row] = _mm_set_ps(m_r3, m_r2, m_r1, m_r0);
+#ifdef MATH_AUTOMATIC_SSE
+	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
 	v[row][0] = m_r0;
 	v[row][1] = m_r1;
@@ -947,14 +926,11 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
-#ifdef MATH_AVX
-	row2[0] = _mm256_set_ps(_13, _12, _11, _10, _03, _02, _01, _00);
-	row2[1] = _mm256_set_ps(_33, _32, _31, _30, _23, _22, _21, _20);
-#elif defined(MATH_SSE)
-	row[0] = _mm_set_ps(_03, _02, _01, _00);
-	row[1] = _mm_set_ps(_13, _12, _11, _10);
-	row[2] = _mm_set_ps(_23, _22, _21, _20);
-	row[3] = _mm_set_ps(_33, _32, _31, _30);
+#ifdef MATH_AUTOMATIC_SSE
+	mat4x4_set(row, _00, _01, _02, _03,
+	                _10, _11, _12, _13,
+	                _20, _21, _22, _23,
+	                _30, _31, _32, _33);
 #else
 	v[0][0] = _00; v[0][1] = _01; v[0][2] = _02; v[0][3] = _03;
 	v[1][0] = _10; v[1][1] = _11; v[1][2] = _12; v[1][3] = _13;
@@ -968,7 +944,7 @@ void float4x4::Set(const float4x4 &rhs)
 #ifdef MATH_AVX
 	row2[0] = rhs.row2[0];
 	row2[1] = rhs.row2[1];
-#elif defined MATH_SSE
+#elif defined(MATH_AUTOMATIC_SSE)
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -978,32 +954,17 @@ void float4x4::Set(const float4x4 &rhs)
 #endif
 }
 
-void float4x4::Set(const float *values)
+void float4x4::Set(const float *v)
 {
-	assume(values);
+	assume(v);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!values)
+	if (!v)
 		return;
 #endif
-	v[0][0] = values[0];
-	v[0][1] = values[1];
-	v[0][2] = values[2];
-	v[0][3] = values[3];
-
-	v[1][0] = values[4];
-	v[1][1] = values[5];
-	v[1][2] = values[6];
-	v[1][3] = values[7];
-
-	v[2][0] = values[8];
-	v[2][1] = values[9];
-	v[2][2] = values[10];
-	v[2][3] = values[11];
-
-	v[3][0] = values[12];
-	v[3][1] = values[13];
-	v[3][2] = values[14];
-	v[3][3] = values[15];
+	Set( v[0],  v[1],  v[2],  v[3],
+	     v[4],  v[5],  v[6],  v[7],
+	     v[8],  v[9], v[10], v[11],
+	    v[12], v[13], v[14], v[15]);
 }
 
 void float4x4::Set(int row, int col, float value)
@@ -1039,7 +1000,7 @@ void float4x4::Set3x4Part(const float3x4 &r)
 {
 	assume(r.IsFinite());
 
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	row[0] = r.row[0];
 	row[1] = r.row[1];
 	row[2] = r.row[2];
@@ -1092,7 +1053,7 @@ void float4x4::SwapRows(int row1, int row2)
 		return; // Benign failure
 #endif
 
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	Swap(row[row1], row[row2]);
 #else
 	Swap(v[row1][0], v[row2][0]);
@@ -1198,14 +1159,17 @@ float4x4 &float4x4::operator =(const float3x3 &rhs)
 
 float4x4 &float4x4::operator =(const float3x4 &rhs)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
-	row[3] = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+	row[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 #else
 	Float3x4Part() = rhs;
-	SetRow(3, 0,0,0,1);
+	v[3][0] = 0.f;
+	v[3][1] = 0.f;
+	v[3][2] = 0.f;
+	v[3][3] = 0.f;
 #endif
 	return *this;
 }
@@ -1226,7 +1190,7 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 	row2[1] = rhs.row2[1];
 #elif defined(MATH_SSE) */
 
-#if defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE)
 	assert(IS16ALIGNED(this));
 	assert(IS16ALIGNED(&rhs));
 	row[0] = rhs.row[0];
@@ -1780,24 +1744,11 @@ float4x4 float4x4::operator *(float scalar) const
 {
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
-
-#ifdef MATH_AVX
-	__m256 s = _mm256_set1_ps(scalar);
-	r.row2[0] = _mm256_mul_ps(row2[0], s);
-	r.row2[1] = _mm256_mul_ps(row2[1], s);
-#else
-	__m128 s = _mm_set1_ps(scalar);
-	r.row[0] = _mm_mul_ps(row[0], s);
-	r.row[1] = _mm_mul_ps(row[1], s);
-	r.row[2] = _mm_mul_ps(row[2], s);
-	r.row[3] = _mm_mul_ps(row[3], s);
-#endif
-
+	mat4x4_mul_float(r.row, row, scalar);
 #else
 	float4x4 r = *this;
 	r *= scalar;
 #endif
-
 	return r;
 }
 
@@ -1807,28 +1758,11 @@ float4x4 float4x4::operator /(float scalar) const
 
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
-
-#ifdef MATH_AVX
-	__m256 s = _mm256_set1_ps(scalar);
-	__m256 one = _mm256_set1_ps(1.f);
-	s = _mm256_div_ps(one, s);
-	r.row2[0] = _mm256_mul_ps(row2[0], s);
-	r.row2[1] = _mm256_mul_ps(row2[1], s);
-#else
-	__m128 s = _mm_set1_ps(scalar);
-	__m128 one = _mm_set1_ps(1.f);
-	s = _mm_div_ps(one, s);
-	r.row[0] = _mm_mul_ps(row[0], s);
-	r.row[1] = _mm_mul_ps(row[1], s);
-	r.row[2] = _mm_mul_ps(row[2], s);
-	r.row[3] = _mm_mul_ps(row[3], s);
-#endif
-
+	mat4x4_div_float(r.row, row, scalar);
 #else
 	float4x4 r = *this;
 	r /= scalar;
 #endif
-
 	return r;
 }
 
@@ -1836,22 +1770,11 @@ float4x4 float4x4::operator +(const float4x4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
-
-#ifdef MATH_AVX
-	r.row2[0] = _mm256_add_ps(row2[0], rhs.row2[0]);
-	r.row2[1] = _mm256_add_ps(row2[1], rhs.row2[1]);
-#else
-	r.row[0] = _mm_add_ps(row[0], rhs.row[0]);
-	r.row[1] = _mm_add_ps(row[1], rhs.row[1]);
-	r.row[2] = _mm_add_ps(row[2], rhs.row[2]);
-	r.row[3] = _mm_add_ps(row[3], rhs.row[3]);
-#endif
-
+	mat4x4_add_mat4x4(r.row, row, rhs.row);
 #else
 	float4x4 r = *this;
 	r += rhs;
 #endif
-
 	return r;
 }
 
@@ -1859,151 +1782,70 @@ float4x4 float4x4::operator -(const float4x4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
 	float4x4 r;
-
-#ifdef MATH_AVX
-	r.row2[0] = _mm256_sub_ps(row2[0], rhs.row2[0]);
-	r.row2[1] = _mm256_sub_ps(row2[1], rhs.row2[1]);
-#else
-	r.row[0] = _mm_sub_ps(row[0], rhs.row[0]);
-	r.row[1] = _mm_sub_ps(row[1], rhs.row[1]);
-	r.row[2] = _mm_sub_ps(row[2], rhs.row[2]);
-	r.row[3] = _mm_sub_ps(row[3], rhs.row[3]);
-#endif
-
+	mat4x4_sub_mat4x4(r.row, row, rhs.row);
 #else
 	float4x4 r = *this;
 	r -= rhs;
 #endif
-
 	return r;
 }
 
 float4x4 float4x4::operator -() const
 {
-	float4x4 r;
-
 #ifdef MATH_AUTOMATIC_SSE
-
-#ifdef MATH_AVX
-	__m256 zero = _mm256_setzero_ps();
-	r.row2[0] = _mm256_sub_ps(zero, row2[0]);
-	r.row2[1] = _mm256_sub_ps(zero, row2[1]);
-#else
-	__m128 zero = _mm_setzero_ps();
-	r.row[0] = _mm_sub_ps(zero, row[0]);
-	r.row[1] = _mm_sub_ps(zero, row[1]);
-	r.row[2] = _mm_sub_ps(zero, row[2]);
-	r.row[3] = _mm_sub_ps(zero, row[3]);
-#endif
-
-#else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			r[y][x] = -v[y][x];
-#endif
-
+	float4x4 r;
+	mat4x4_negate(r.row, row);
 	return r;
+#else
+	return float4x4(-v[0][0], -v[0][1], -v[0][2], -v[0][3],
+	                -v[1][0], -v[1][1], -v[1][2], -v[1][3],
+	                -v[2][0], -v[2][1], -v[2][2], -v[2][3],
+	                -v[3][0], -v[3][1], -v[3][2], -v[3][3]);
+#endif
 }
 
-float4x4 &float4x4::operator *=(float scalar)
+float4x4 &float4x4::operator *=(float s)
 {
 #ifdef MATH_AUTOMATIC_SSE
-
-#ifdef MATH_AVX
-	__m256 s = _mm256_set1_ps(scalar);
-	row2[0] = _mm256_mul_ps(row2[0], s);
-	row2[1] = _mm256_mul_ps(row2[1], s);
+	mat4x4_mul_float(row, row, s);
 #else
-	__m128 s = _mm_set1_ps(scalar);
-	row[0] = _mm_mul_ps(row[0], s);
-	row[1] = _mm_mul_ps(row[1], s);
-	row[2] = _mm_mul_ps(row[2], s);
-	row[3] = _mm_mul_ps(row[3], s);
+	v[0][0] *= s; v[0][1] *= s; v[0][2] *= s; v[0][3] *= s;
+	v[1][0] *= s; v[1][1] *= s; v[1][2] *= s; v[1][3] *= s;
+	v[2][0] *= s; v[2][1] *= s; v[2][2] *= s; v[2][3] *= s;
+	v[3][0] *= s; v[3][1] *= s; v[3][2] *= s; v[3][3] *= s;
 #endif
-#else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] *= scalar;
-#endif
-
 	return *this;
 }
 
 float4x4 &float4x4::operator /=(float scalar)
 {
 	assume(!EqualAbs(scalar, 0));
-
-#ifdef MATH_AUTOMATIC_SSE
-
-#ifdef MATH_AVX
-	__m256 s = _mm256_set1_ps(scalar);
-	__m256 one = _mm256_set1_ps(1.f);
-	s = _mm256_div_ps(one, s);
-	row2[0] = _mm256_mul_ps(row2[0], s);
-	row2[1] = _mm256_mul_ps(row2[1], s);
-#else
-	__m128 s = _mm_set1_ps(scalar);
-	__m128 one = _mm_set1_ps(1.f);
-	s = _mm_div_ps(one, s);
-	row[0] = _mm_mul_ps(row[0], s);
-	row[1] = _mm_mul_ps(row[1], s);
-	row[2] = _mm_mul_ps(row[2], s);
-	row[3] = _mm_mul_ps(row[3], s);
-#endif
-
-#else
-	float invScalar = 1.f / scalar;
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] *= invScalar;
-#endif
-
-	return *this;
+	return *this *= (1.f / scalar);
 }
 
 float4x4 &float4x4::operator +=(const float4x4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
-
-#ifdef MATH_AVX
-	row2[0] = _mm256_add_ps(row2[0], rhs.row2[0]);
-	row2[1] = _mm256_add_ps(row2[1], rhs.row2[1]);
+	mat4x4_add_mat4x4(row, row, rhs.row);
 #else
-	row[0] = _mm_add_ps(row[0], rhs.row[0]);
-	row[1] = _mm_add_ps(row[1], rhs.row[1]);
-	row[2] = _mm_add_ps(row[2], rhs.row[2]);
-	row[3] = _mm_add_ps(row[3], rhs.row[3]);
+	v[0][0] += rhs.v[0][0]; v[0][1] += rhs.v[0][1]; v[0][2] += rhs.v[0][2]; v[0][3] += rhs.v[0][3];
+	v[1][0] += rhs.v[1][0]; v[1][1] += rhs.v[1][1]; v[1][2] += rhs.v[1][2]; v[1][3] += rhs.v[1][3];
+	v[2][0] += rhs.v[2][0]; v[2][1] += rhs.v[2][1]; v[2][2] += rhs.v[2][2]; v[2][3] += rhs.v[2][3];
+	v[3][0] += rhs.v[3][0]; v[3][1] += rhs.v[3][1]; v[3][2] += rhs.v[3][2]; v[3][3] += rhs.v[3][3];
 #endif
-
-#else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] += rhs[y][x];
-#endif
-
 	return *this;
 }
 
 float4x4 &float4x4::operator -=(const float4x4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
-
-#ifdef MATH_AVX
-	row2[0] = _mm256_sub_ps(row2[0], rhs.row2[0]);
-	row2[1] = _mm256_sub_ps(row2[1], rhs.row2[1]);
+	mat4x4_sub_mat4x4(row, row, rhs.row);
 #else
-	row[0] = _mm_sub_ps(row[0], rhs.row[0]);
-	row[1] = _mm_sub_ps(row[1], rhs.row[1]);
-	row[2] = _mm_sub_ps(row[2], rhs.row[2]);
-	row[3] = _mm_sub_ps(row[3], rhs.row[3]);
+	v[0][0] -= rhs.v[0][0]; v[0][1] -= rhs.v[0][1]; v[0][2] -= rhs.v[0][2]; v[0][3] -= rhs.v[0][3];
+	v[1][0] -= rhs.v[1][0]; v[1][1] -= rhs.v[1][1]; v[1][2] -= rhs.v[1][2]; v[1][3] -= rhs.v[1][3];
+	v[2][0] -= rhs.v[2][0]; v[2][1] -= rhs.v[2][1]; v[2][2] -= rhs.v[2][2]; v[2][3] -= rhs.v[2][3];
+	v[3][0] -= rhs.v[3][0]; v[3][1] -= rhs.v[3][1]; v[3][2] -= rhs.v[3][2]; v[3][3] -= rhs.v[3][3];
 #endif
-
-#else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] -= rhs[y][x];
-#endif
-
 	return *this;
 }
 

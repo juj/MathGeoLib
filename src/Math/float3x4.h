@@ -68,13 +68,13 @@ public:
 
 	/// Stores the data in this matrix in row-major format.
 	/** [noscript] */
-#ifdef MATH_SSE
+#if defined(MATH_SIMD)
 	union
 	{
 #endif
 		float v[Rows][Cols];
-#ifdef MATH_SSE
-		__m128 row[3];
+#if defined(MATH_SIMD)
+		simd4f row[3];
 	};
 #endif
 
