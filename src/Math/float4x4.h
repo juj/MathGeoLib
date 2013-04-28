@@ -916,26 +916,6 @@ public:
 	float3 MulPos(const float3 &pointVector) const;
 	float3 MulDir(const float3 &directionVector) const;
 	float4 Mul(const float4 &vector) const;
-
-#ifdef MATH_SSE41
-	float4 Mul_SSE41(const float4 &rhs) const;
-#endif
-#ifdef MATH_SSE3
-	float4 Mul_SSE3(const float4 &rhs) const;
-#endif
-#ifdef MATH_SSE
-	float4 Mul_SSE1(const float4 &rhs) const;
-	float4 Mul_SSE(const float4 &rhs) const;
-	float4 Mul_ColMajor_SSE(const float4 &rhs) const;
-	float4 Mul_ColMajor_SSE_2(const float4 &rhs) const;
-
-	float4x4 Mul_SSE(const float4x4 &rhs) const;
-	/* Temporary alternative implementations: Profiled the Mul_SSE version above to be the fastest.
-	float4x4 Mul_SSE1_2(const float4x4 &rhs) const;
-	float4x4 Mul_SSE1_dpps(const float4x4 &rhs) const;
-	float4x4 Mul_SSE1_dpps_2(const float4x4 &rhs) const;
-	*/
-#endif
 };
 
 #ifdef MATH_ENABLE_STL_SUPPORT
