@@ -484,39 +484,6 @@ bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 	Warning: This comparison is not safe with NANs or INFs. */
 bool EqualUlps(float a, float b, int maxUlps = 10000);
 
-/// Returns true if the given value is not an inf or a nan.
-template<typename T> FORCE_INLINE bool IsFinite(T /*value*/) { return true; }
-
-#ifdef _MSC_VER
-template<> FORCE_INLINE bool IsFinite<float>(float value) { return _finite((double)value) != 0; }
-template<> FORCE_INLINE bool IsFinite<double>(double value) { return _finite(value) != 0; }
-
-#ifndef EMSCRIPTEN // long double is not supported.
-template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return _finite((double)value) != 0; }
-#endif
-
-#else
-template<> FORCE_INLINE bool IsFinite<float>(float value) { using namespace std; return isfinite(value) != 0; }
-template<> FORCE_INLINE bool IsFinite<double>(double value) { using namespace std; return isfinite(value) != 0; }
-
-#ifndef EMSCRIPTEN // long double is not supported.
-template<> FORCE_INLINE bool IsFinite<long double>(long double value) { using namespace std; return isfinite((double)value) != 0; }
-#endif
-
-#endif
-
-/// Returns true if the given value is +inf or -inf.
-FORCE_INLINE bool IsInf(float value) { return value == FLOAT_INF || value == -FLOAT_INF; }
-FORCE_INLINE bool IsInf(double value) { return value == (double)FLOAT_INF || value == (double)-FLOAT_INF; }
-/// Returns true if the given value is a not-a-number.
-FORCE_INLINE bool IsNan(float value) { return !(value == value); }
-FORCE_INLINE bool IsNan(double value) { return !(value == value); }
-
-#ifndef EMSCRIPTEN // long double is not supported.
-FORCE_INLINE bool IsInf(long double value) { return value == (long double)FLOAT_INF || value == (long double)-FLOAT_INF; }
-FORCE_INLINE bool IsNan(long double value) { return !(value == value); }
-#endif
-
 /// As per C99, union-reinterpret should now be safe: http://stackoverflow.com/questions/8511676/portable-data-reinterpretation
 union FloatIntReinterpret
 {
@@ -559,5 +526,30 @@ FORCE_INLINE double ReinterpretAsDouble(u64 i)
 	di.i = i;
 	return di.d;
 }
+
+/// Returns true if the given value is not an inf or a nan.
+template<typename T> FORCE_INLINE bool IsFinite(T /*value*/) { return true; }
+
+template<> FORCE_INLINE bool IsFinite<float>(float f) { return (ReinterpretAsU32(f) << 1) < 0xFF000000u; }
+template<> FORCE_INLINE bool IsFinite<double>(double d) { return (ReinterpretAsU64(d) << 1) < 0xFFE0000000000000ULL; }
+
+#ifdef _MSC_VER
+template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return _finite((double)value) != 0; }
+#elif !defined(EMSCRIPTEN) // long double is not supported.
+template<> FORCE_INLINE bool IsFinite<long double>(long double value) { using namespace std; return isfinite((double)value) != 0; }
+#endif
+
+#ifndef EMSCRIPTEN // long double is not supported.
+FORCE_INLINE bool IsInf(long double value) { return value == (long double)FLOAT_INF || value == (long double)-FLOAT_INF; }
+FORCE_INLINE bool IsNan(long double value) { return !(value == value); }
+#endif
+
+/// Returns true if the given value is a not-a-number.
+FORCE_INLINE bool IsNan(float f) { return (ReinterpretAsU32(f) << 1) > 0xFF000000u; }
+FORCE_INLINE bool IsNan(double d) { return (ReinterpretAsU64(d) << 1) > 0xFFE0000000000000ULL; }
+
+/// Returns true if the given value is +inf or -inf.
+FORCE_INLINE bool IsInf(float f) { return (ReinterpretAsU32(f) << 1) == 0xFF000000u; }
+FORCE_INLINE bool IsInf(double d) { return (ReinterpretAsU64(d) << 1) == 0xFFE0000000000000ULL; }
 
 MATH_END_NAMESPACE
