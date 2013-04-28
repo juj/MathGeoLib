@@ -16,7 +16,20 @@ if (MSVC)
 	# Buffer Security Check: No (/GS-)
 	# Floating Point Model: Fast (/fp:fast)
 	# Enable Floating Point Exceptions: No (/fp:except-)
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_RELEASE} /Ox /Ob2 /Oi /Ot /Oy /GT /GL /GF /GS- /fp:fast /fp:except-")
+	set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} /Ox /Ob2 /Oi /Ot /Oy /GT /GL /GF /GS- /fp:fast /fp:except-")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Ob2 /Oi /Ot /Oy /GT /GL /GF /GS- /fp:fast /fp:except-")
+
+	# Don't omit frame pointers, but add Debug database (/Zi).
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} /Zi /GS- /Ox /Ob2 /Oi /Ot /GT /GL /GF /GS- /fp:fast /fp:except-")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /Zi /GS- /Ox /Ob2 /Oi /Ot /GT /GL /GF /GS- /fp:fast /fp:except-")
+
+	if (MSVC11)
+		# SDL checks: No (/sdl-)
+		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} /sdl-")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /sdl-")
+		set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} /sdl-")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /sdl-")
+	endif()
 endif()
 
 if (EMSCRIPTEN)
