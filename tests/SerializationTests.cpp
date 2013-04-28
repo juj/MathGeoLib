@@ -6,6 +6,22 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
+MATH_BEGIN_NAMESPACE
+bool IsNeutralCLocale();
+MATH_END_NAMESPACE
+
+UNIQUE_TEST(StartupLocale)
+{
+	LOGI("Startup locale for LC_ALL is %s", setlocale(LC_ALL, NULL));
+	LOGI("Startup locale for LC_NUMERIC is %s", setlocale(LC_NUMERIC, NULL));
+	bool isGoodLocale = MATH_NS::IsNeutralCLocale();
+	if (isGoodLocale)
+		LOGI("This locale setup is appropriate for string serialization.");
+	else
+		LOGI("This locale setup is NOT appropriate for string serialization!");
+	assert(isGoodLocale);
+}
+
 TEST(Float2FromString)
 {
 	const char *locales[] = { "C", "en" /*, "fi" */ }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php

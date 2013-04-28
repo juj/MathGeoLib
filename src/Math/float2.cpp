@@ -226,6 +226,7 @@ bool IsNeutralCLocale()
 	lconv *lc = localeconv();
 	if (strcmp(lc->decimal_point, "."))
 		return false;
+	return true;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
