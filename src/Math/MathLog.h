@@ -189,6 +189,13 @@ void logmsg(const char *msg);
 		OutputDebugStringA("\r\n"); \
 	MULTI_LINE_MACRO_END
 
+#define LOGI_NL(...) \
+	MULTI_LINE_MACRO_BEGIN \
+		char str____[16384]; \
+		sprintf(str____, __VA_ARGS__); \
+		OutputDebugStringA(str____); \
+	MULTI_LINE_MACRO_END
+
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[16384]; \

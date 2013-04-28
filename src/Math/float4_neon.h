@@ -20,6 +20,12 @@
 
 #ifdef MATH_SIMD
 
+#ifdef MATH_NEON
+typedef float32x4_t simd4f;
+#elif defined(MATH_SSE)
+typedef __m128 simd4f;
+#endif
+
 FORCE_INLINE simd4f vec4_add_float(simd4f vec, float f)
 {
 #ifdef MATH_SSE
@@ -127,7 +133,14 @@ FORCE_INLINE simd4f vec4_div_vec4(simd4f vec, simd4f vec2)
 #endif
 }
 
-#ifdef MATH_NEON
+inline std::string ToString(simd4f vec)
+{
+	float *v = (float*)&vec;
+	char str[256];
+	sprintf(str, "[%f, %f, %f, %f]", v[3], v[2], v[1], v[0]);
+	return str;
+}
+
 inline std::string ToString(uint8x8x2_t vec)
 {
 	uint8_t *v = (uint8_t*)&vec;
@@ -136,13 +149,12 @@ inline std::string ToString(uint8x8x2_t vec)
 		(int)v[15], (int)v[14], (int)v[13], (int)v[12], (int)v[11], (int)v[10], (int)v[9], (int)v[8], (int)v[7], (int)v[6], (int)v[5], (int)v[4], (int)v[3], (int)v[2], (int)v[1], (int)v[0]);
 	return str;
 }
-#endif
 
 #if defined(MATH_AVX) || defined(MATH_NEON)
 FORCE_INLINE simd4f vec4_permute(simd4f vec, int i, int j, int k, int l)
 {
 #ifdef MATH_AVX
-	return _mm_permutevar_ps(vec, _mm_set_epi32(l, k, j, i));
+	return _mm_permutevar_ps(v, _mm_set_epi32(l, k, j, i));
 #elif defined(MATH_NEON)
 	// N.B. Don't use: This has been benchmarked to be 3x slower than scalar CPU version!
 	const uint8_t I = (uint8_t)i << 2;
@@ -196,11 +208,7 @@ FORCE_INLINE simd4f vec4_length_sq_ps(simd4f vec)
 
 FORCE_INLINE simd4f vec4_rsqrt(simd4f vec)
 {
-#ifdef MATH_SSE
-	__m128 e = _mm_rsqrt_ps(vec); // Initial estimate
-	__m128 e3 = _mm_mul_ps(_mm_mul_ps(e,e), e); // Do one iteration of Newton-Rhapson: e_n = e + 0.5 * (e - x * e^3)
-	return _mm_add_ps(e, _mm_mul_ps(_mm_set1_ps(0.5f), _mm_sub_ps(e, _mm_mul_ps(vec, e3))));
-#elif defined(MATH_NEON)
+#ifdef MATH_NEON
 	float32x4_t r = vrsqrteq_f32(vec);
 	return vmulq_f32(vrsqrtsq_f32(vmulq_f32(r, r), vec), r);
 #endif

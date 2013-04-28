@@ -76,10 +76,12 @@ std::string FormatTime(double ticks)
 }
 
 // Print text to log without appending a newline to the end, if possible.
-#if defined(ANDROID) || defined(NPAPI) || defined(WIN8PHONE)
+#if !defined(LOGI_NL)
+#if defined(ANDROID) || defined(NPAPI)
 #define LOGI_NL LOGI
 #else
 #define LOGI_NL printf
+#endif
 #endif
 
 /// Returns 0: passed, 1: passed with warnings, -1: failed.
