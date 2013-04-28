@@ -154,14 +154,21 @@
 #include <xmmintrin.h>
 #endif
 
+#if defined(MATH_SSE) || defined(MATH_NEON)
+#define MATH_SIMD // A common #define to signal the simd4f type is available.
+
+#ifdef MATH_NEON
+typedef float32x4_t simd4f;
+#elif defined(MATH_SSE)
+typedef __m128 simd4f;
+#endif
+
+#endif
+
 #if defined(MATH_SSE) && !defined(MATH_AUTOMATIC_SSE)
 // Automatically use the SSE-optimized operations for all code.
 // This should only be disabled for benchmarking purposes.
 #define MATH_AUTOMATIC_SSE
-#endif
-
-#if defined(MATH_SSE) || defined(MATH_NEON)
-#define MATH_SIMD // A common #define to signal the simd4f type is available.
 #endif
 
 #include "Math/MathTypes.h"

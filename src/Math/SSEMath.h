@@ -41,12 +41,6 @@ void AlignedFree(void *ptr);
 
 #ifdef MATH_SIMD // If SSE is not enabled, this whole file will not be included.
 
-#ifdef MATH_NEON
-typedef float32x4_t simd4f;
-#elif defined(MATH_SSE)
-typedef __m128 simd4f;
-#endif
-
 #ifdef _MSC_VER
 #define ALIGN16 __declspec(align(16))
 #define ALIGN32 __declspec(align(32))
@@ -168,6 +162,7 @@ FORCE_INLINE __m128 modf_ps(__m128 x, __m128 mod)
 
 #endif // ~MATH_SSE
 
+/*
 inline std::string ToString(simd4f vec)
 {
 	float *v = (float*)&vec;
@@ -175,7 +170,7 @@ inline std::string ToString(simd4f vec)
 	sprintf(str, "[%f, %f, %f, %f]", v[3], v[2], v[1], v[0]);
 	return str;
 }
-
+*/
 #else // ~MATH_SIMD
 
 #define ALIGN16

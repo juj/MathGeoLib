@@ -1729,7 +1729,7 @@ float4x4 float4x4::operator *(const float4x4 &rhs) const
 {
 	float4x4 r;
 #ifdef MATH_AUTOMATIC_SSE
-	mat4x4_mul_sse(r.row, this->row, rhs.row);
+	mat4x4_mul_mat4x4(r.row, this->row, rhs.row);
 #else
 	const float *c0 = rhs.ptr();
 	const float *c1 = rhs.ptr() + 1;

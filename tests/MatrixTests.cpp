@@ -8,6 +8,7 @@
 #include "../src/Math/SSEMath.h"
 #include "../src/Math/float4_sse.h"
 #include "../src/Math/float4x4_sse.h"
+#include "../src/Math/float4x4_neon.h"
 
 using namespace TestData;
 
@@ -689,4 +690,29 @@ BENCHMARK(mat_determinant3)
 	f[i] = mat_determinant3(m[i].row);
 }
 BENCHMARK_END;
+#endif
+
+BENCHMARK(float4x4_op_mul)
+{
+	m2[i] = m[i] * m2[i];
+}
+BENCHMARK_END;
+
+#ifdef MATH_SIMD
+BENCHMARK(mat4x4_mul_mat4x4)
+{
+	mat4x4_mul_mat4x4(m2[i].row, m[i].row, m2[i].row);
+}
+BENCHMARK_END;
+
+RANDOMIZED_TEST(mat4x4_mul_mat4x4)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m3;
+
+	mat4x4_mul_mat4x4(m3.row, m.row, m2.row);
+	float4x4 correct = m*m2;
+	assert(m3.Equals(correct));
+}
 #endif

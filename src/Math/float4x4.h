@@ -17,6 +17,9 @@
 	@brief A 4-by-4 matrix for affine and perspective projection operations in 3D space. */
 #pragma once
 
+#include "../MathBuildConfig.h"
+#include "SSEMath.h"
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
 #endif
@@ -31,9 +34,6 @@
 #ifdef MATH_QT_INTEROP
 #include <QMatrix4x4>
 #endif
-
-#include "../MathBuildConfig.h"
-#include "SSEMath.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -77,7 +77,7 @@ public:
 
 	/// Stores the data in this matrix in row-major format.
 	/** [noscript] */
-#ifdef MATH_SSE
+#if defined(MATH_SIMD)
 	union
 	{
 #endif
@@ -85,8 +85,8 @@ public:
 #ifdef MATH_AVX
 		__m256 row2[2];
 #endif
-#ifdef MATH_SSE
-		__m128 row[4];
+#if defined(MATH_SIMD)
+		simd4f row[4];
 	};
 #endif
 

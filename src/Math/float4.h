@@ -17,6 +17,8 @@
 	@brief A 4D (x,y,z,w) homogeneous vector. */
 #pragma once
 
+#include "../MathBuildConfig.h"
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #endif
@@ -30,8 +32,6 @@
 #ifdef MATH_OGRE_INTEROP
 #include <OgreVector4.h>
 #endif
-
-#include "../MathBuildConfig.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -48,7 +48,7 @@ public:
 		Size = 4
 	};
 
-#if defined(MATH_SSE) || defined(MATH_NEON)
+#if defined(MATH_SIMD)
 	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
 
 	union
@@ -68,13 +68,9 @@ public:
 			/// The w component. [similarOverload: x]
 			/** This element is packed to the memory offsets 12-15 of this class. */
 			float w;
-#if defined(MATH_SSE) || defined(MATH_NEON)
+#if defined(MATH_SIMD)
 		};
-#ifdef MATH_SSE
-		__m128 v;
-#else
-		float32x4_t v;
-#endif
+		simd4f v;
 	};
 	NAMELESS_UNION_END
 #endif
