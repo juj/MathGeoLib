@@ -732,11 +732,14 @@ Quat Quat::operator /(float scalar) const
 
 Quat Quat::operator *(const Quat &r) const
 {
-	///\todo SSE-optimize!
-	return Quat(w*r.x + x*r.w + y*r.z - z*r.y,
-	            w*r.y - x*r.z + y*r.w + z*r.x,
-	            w*r.z + x*r.y - y*r.x + z*r.w,
-	            w*r.w - x*r.x - y*r.y - z*r.z);
+#ifdef MATH_SSE
+	return quat_mul_quat(q, r.q);
+#else
+	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
+	           -x*r.z + y*r.w + z*r.x + w*r.y,
+	            x*r.y - y*r.x + z*r.w + w*r.z,
+	           -x*r.x - y*r.y - z*r.z + w*r.w);
+#endif
 }
 
 Quat Quat::operator /(const Quat &rhs) const

@@ -8,6 +8,7 @@
 #include "TestData.h"
 
 #include "../src/Math/SSEMath.h"
+#include "../src/Math/quat_simd.h"
 
 using namespace TestData;
 
@@ -66,3 +67,26 @@ RANDOMIZED_TEST(Quat_float4x4_conv)
 	q2 = m.Float3x3Part().ToQuat();
 	assert(q.Equals(q2) || q.Equals(q2.Neg()));
 }
+
+BENCHMARK(Quat_op_mul_Quat)
+{
+	q2[i] = q[i] * q2[i];
+}
+BENCHMARK_END
+
+#ifdef MATH_SSE
+BENCHMARK(quat_mul_quat)
+{
+	q2[i].q = quat_mul_quat(q[i].q, q2[i].q);
+}
+BENCHMARK_END
+
+RANDOMIZED_TEST(quat_mul_quat)
+{
+	Quat q = Quat::RandomRotation(rng);
+	Quat q2 = Quat::RandomRotation(rng);
+	Quat correct = q * q2;
+	Quat q3 = quat_mul_quat(q.q, q2.q);
+	assert(q3.Equals(correct));
+}
+#endif

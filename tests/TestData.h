@@ -11,6 +11,7 @@ namespace TestData
 
 float *PosFloatArray();
 Quat *QuatArray();
+Quat *QuatArray2();
 float *FloatArray();
 float4x4 *MatrixArray();
 float4x4 *MatrixArray2();
@@ -39,6 +40,7 @@ static DONT_WARN_UNUSED float4 *v2 = VectorArray2();
 static DONT_WARN_UNUSED float4 *v3 = VectorArray3();
 static DONT_WARN_UNUSED float4 *v01 = VectorArrayWithW0Or1();
 static DONT_WARN_UNUSED Quat *q = QuatArray();
+static DONT_WARN_UNUSED Quat *q2 = QuatArray2();
 
 } // ~TestData
 

@@ -33,6 +33,19 @@ Quat *QuatArray()
 	return arr;
 }
 
+Quat *QuatArray2()
+{
+	LCG lcg;
+	static Quat *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<Quat>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = Quat::RandomRotation(lcg);
+	}
+	return arr;
+}
+
 float *FloatArray()
 {
 	LCG lcg;
