@@ -16,13 +16,14 @@
 	@author Jukka Jylänki
 	@brief */
 #include "float2.h"
-#include <stdlib.h>
 #include "float3.h"
 #include "float4.h"
 #include "MathFunc.h"
 #include "../Algorithm/Random/LCG.h"
 #include "assume.h"
 #include <string.h>
+#include <stdlib.h>
+#include <locale.h>
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
