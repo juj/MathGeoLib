@@ -31,6 +31,7 @@
 #include "SSEMath.h"
 #include "float4x4_sse.h"
 #include "float4x4_neon.h"
+#include "quat_simd.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
