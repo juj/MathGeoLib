@@ -17,12 +17,11 @@
 	@brief Common mathematical functions. */
 #pragma once
 
-#ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
-#endif
 #include <math.h>
 #include <cmath>
 #include <float.h>
+#include <string.h>
 
 #include "MathTypes.h"
 #include "MathConstants.h"
@@ -535,13 +534,12 @@ template<> FORCE_INLINE bool IsFinite<double>(double d) { return (ReinterpretAsU
 
 #ifdef _MSC_VER
 template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return _finite((double)value) != 0; }
+FORCE_INLINE bool IsInf(long double value) { return IsInf((double)value); }
+FORCE_INLINE bool IsNan(long double value) { return IsNan((double)value); }
 #elif !defined(EMSCRIPTEN) // long double is not supported.
-template<> FORCE_INLINE bool IsFinite<long double>(long double value) { using namespace std; return isfinite((double)value) != 0; }
-#endif
-
-#ifndef EMSCRIPTEN // long double is not supported.
-FORCE_INLINE bool IsInf(long double value) { return value == (long double)FLOAT_INF || value == (long double)-FLOAT_INF; }
-FORCE_INLINE bool IsNan(long double value) { return !(value == value); }
+template<> FORCE_INLINE bool IsFinite<long double>(long double value) { assert(sizeof(long double) == 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) != 0x7FFF || val[0] < 0x8000000000000000ULL; }
+FORCE_INLINE bool IsInf(long double value) { assert(sizeof(long double) == 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] == 0x8000000000000000ULL; }
+FORCE_INLINE bool IsNan(long double value) { assert(sizeof(long double) == 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] >  0x8000000000000000ULL; }
 #endif
 
 /// Returns true if the given value is a not-a-number.
