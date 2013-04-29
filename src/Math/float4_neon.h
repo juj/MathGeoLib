@@ -20,6 +20,8 @@
 
 #ifdef MATH_SIMD
 
+#include "float4_sse.h"
+
 #ifdef MATH_NEON
 FORCE_INLINE simd4f set_ps(float w, float z, float y, float x)
 {
