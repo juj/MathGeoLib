@@ -223,6 +223,7 @@ public:
 		AlignedFree(OrthonormalMatrixArray());
 		AlignedFree(OrthogonalMatrixArray());
 		AlignedFree(QuatArray());
+		AlignedFree(QuatArray2());
 		AlignedFree(VectorArrayWithW0Or1());
 	}
 };
