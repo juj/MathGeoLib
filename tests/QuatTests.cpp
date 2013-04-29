@@ -19,7 +19,7 @@ BENCHMARK_END;
 
 BENCHMARK(Quat_Transform_float4)
 {
-	v2[i] = q[i].Transform(v[i]);
+	v2[i] = q[i].Transform(v01[i]);
 }
 BENCHMARK_END;
 

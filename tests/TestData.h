@@ -22,6 +22,7 @@ float4 *NormalizedVectorArray();
 float4 *VectorArray();
 float4 *VectorArray2();
 float4 *VectorArray3();
+float4 *VectorArrayWithW0Or1();
 
 // N.B. These must be static and not extern to not generate UDB with initialization order between compilation units!
 static DONT_WARN_UNUSED float *f = FloatArray();
@@ -35,7 +36,8 @@ static DONT_WARN_UNUSED float2 *fl_2 = Float2Array();
 static DONT_WARN_UNUSED const float4 *nv = NormalizedVectorArray();
 static DONT_WARN_UNUSED float4 *v = VectorArray();
 static DONT_WARN_UNUSED float4 *v2 = VectorArray2();
-static DONT_WARN_UNUSED float4 *v3 = VectorArray();
+static DONT_WARN_UNUSED float4 *v3 = VectorArray3();
+static DONT_WARN_UNUSED float4 *v01 = VectorArrayWithW0Or1();
 static DONT_WARN_UNUSED Quat *q = QuatArray();
 
 } // ~TestData

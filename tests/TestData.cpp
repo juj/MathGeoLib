@@ -176,6 +176,22 @@ float4 *VectorArray3()
 	return arr;
 }
 
+float4 *VectorArrayWithW0Or1()
+{
+	LCG lcg;
+	static float4 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float4>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		{
+			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
+			arr[i].w = (float)lcg.Int(0, 1);
+		}
+	}
+	return arr;
+}
+
 class FreeTestData
 {
 public:
@@ -194,6 +210,7 @@ public:
 		AlignedFree(OrthonormalMatrixArray());
 		AlignedFree(OrthogonalMatrixArray());
 		AlignedFree(QuatArray());
+		AlignedFree(VectorArrayWithW0Or1());
 	}
 };
 
