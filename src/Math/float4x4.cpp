@@ -94,7 +94,7 @@ float4x4::float4x4(const float4 &col0, const float4 &col1, const float4 &col2, c
 float4x4::float4x4(const Quat &orientation)
 {
 #ifdef MATH_SSE
-	quat_to_mat4x4_sse(orientation.q, _mm_set_ps(1, 0, 0, 0), row);
+	quat_to_mat4x4(orientation.q, _mm_set_ps(1, 0, 0, 0), row);
 #else
 	SetRotatePart(orientation);
 	SetRow(3, 0, 0, 0, 1);
@@ -105,7 +105,7 @@ float4x4::float4x4(const Quat &orientation)
 float4x4::float4x4(const Quat &orientation, const float3 &translation)
 {
 #ifdef MATH_SSE
-	quat_to_mat4x4_sse(orientation.q, float4(translation, 1.f), row);
+	quat_to_mat4x4(orientation.q, float4(translation, 1.f), row);
 #else
 	SetRotatePart(orientation);
 	SetTranslatePart(translation);

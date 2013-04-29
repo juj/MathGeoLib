@@ -26,7 +26,7 @@
 
 MATH_BEGIN_NAMESPACE
 
-void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m);
+void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m);
 
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.

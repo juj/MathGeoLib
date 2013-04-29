@@ -44,7 +44,7 @@ class ALIGN16 Quat
 {
 public:
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
 
 	union
@@ -57,12 +57,16 @@ public:
 			float y; ///< The factor of j. [similarOverload: x]
 			float z; ///< The factor of k. [similarOverload: x]
 			float w; ///< The scalar part. Sometimes also referred to as 'r'. [similarOverload: x]
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 		};
-		__m128 q;
+		simd4f q;
 	};
 
 	NAMELESS_UNION_END
+
+	Quat(simd4f quat):q(quat) {}
+	inline Quat &operator =(simd4f quat) { q = quat; return *this; }
+	inline operator simd4f() const { return q; }
 #endif
 
 	/// @note The default ctor does not initialize any member values.

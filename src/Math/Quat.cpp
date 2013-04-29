@@ -27,6 +27,8 @@
 #include "MathFunc.h"
 #include "SSEMath.h"
 #include "float4x4_sse.h"
+#include "quat_simd.h"
+#include "float4_neon.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
@@ -69,17 +71,29 @@ Quat::Quat(const float3 &rotationAxis, float rotationAngle)
 
 float3 Quat::WorldX() const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return float4(quat_transform_vec4(q, float4::unitX)).xyz();
+#else
 	return this->Transform(1.f, 0.f, 0.f);
+#endif
 }
 
 float3 Quat::WorldY() const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return float4(quat_transform_vec4(q, float4::unitY)).xyz();
+#else
 	return this->Transform(0.f, 1.f, 0.f);
+#endif
 }
 
 float3 Quat::WorldZ() const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return float4(quat_transform_vec4(q, float4::unitZ)).xyz();
+#else
 	return this->Transform(0.f, 0.f, 1.f);
+#endif
 }
 
 float3 Quat::Axis() const
@@ -97,12 +111,20 @@ float Quat::Angle() const
 
 float Quat::Dot(const Quat &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return dot4_float(q, rhs.q);
+#else
 	return x*rhs.x + y*rhs.y + z*rhs.z + w*rhs.w;
+#endif
 }
 
 float Quat::LengthSq() const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_length_sq_float(q);
+#else
 	return x*x + y*y + z*z + w*w;
+#endif
 }
 
 float Quat::Length() const
@@ -112,6 +134,7 @@ float Quat::Length() const
 
 float Quat::Normalize()
 {
+	///\todo SSE.
 	float length = Length();
 	if (length < 1e-4f)
 		return 0.f;
@@ -184,9 +207,13 @@ float Quat::InverseAndNormalize()
 
 void Quat::Conjugate()
 {
+#ifdef MATH_AUTOMATIC_SSE
+	q = negate3_ps(q);
+#else
 	x = -x;
 	y = -y;
 	z = -z;
+#endif
 }
 
 Quat MUST_USE_RESULT Quat::Conjugated() const
@@ -199,44 +226,32 @@ Quat MUST_USE_RESULT Quat::Conjugated() const
 float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
 	assume(this->IsNormalized());
+#ifdef MATH_AUTOMATIC_SSE
+	///\todo Check the generation of temporaries here!
+	return float4(quat_transform_vec4(q, float4(vec,0.f).v)).xyz();
+#else
+	///\todo Optimize/benchmark the scalar path not to generate a matrix!
 	float3x3 mat = this->ToFloat3x3();
 	return mat * vec;
+#endif
 }
 
 float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	///\todo Check the generation of temporaries here!
+	return float4(quat_transform_vec4(q, float4(x,y,z,0.f).v)).xyz();
+#else
 	return Transform(float3(x, y, z));
+#endif
 }
 
 float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 {
-#ifdef MATH_SSE
 	assume(vec.IsWZeroOrOne());
 
-	__m128 W = shuffle1_ps(q, _MM_SHUFFLE(3,3,3,3));
-
-//	__m128 qxv = cross_ps(q, vec.v);
-	__m128 a_xzy = shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
-	__m128 b_yxz = shuffle1_ps(vec.v, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-	__m128 a_yxz = shuffle1_ps(q, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
-	__m128 b_xzy = shuffle1_ps(vec.v, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
-	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-	__m128 qxv = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
-
-	__m128 Wv = _mm_mul_ps(W, vec.v);
-	__m128 s = _mm_add_ps(qxv, Wv);
-
-//	s = cross_ps(q, s);
-	__m128 s_yxz = shuffle1_ps(s, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-	__m128 s_xzy = shuffle1_ps(s, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
-	x = _mm_mul_ps(a_xzy, s_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	y = _mm_mul_ps(a_yxz, s_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-	s = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
-
-	s = _mm_add_ps(s, s);
-	s = _mm_add_ps(s, vec.v);
-	return s;
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return quat_transform_vec4(q, vec);
 #else
 	return float4(Transform(vec.x, vec.y, vec.z), vec.w);
 #endif
@@ -244,6 +259,7 @@ float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 
 Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 {
+	///\todo SSE.
 	assume(0.f <= t && t <= 1.f);
 	return *this * (1.f - t) + b * t;
 }
@@ -256,6 +272,7 @@ Quat MUST_USE_RESULT Quat::Lerp(const Quat &a, const Quat &b, float t)
 /** Implementation based on the math in the book Watt, Policarpo. 3D Games: Real-time rendering and Software Technology, pp. 383-386. */
 Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 {
+	///\todo SSE.
 	assume(0.f <= t && t <= 1.f);
 	assume(IsNormalized());
 	assume(q2.IsNormalized());
@@ -567,108 +584,12 @@ float3x4 MUST_USE_RESULT Quat::ToFloat3x4() const
 	return float3x4(*this);
 }
 
-#ifdef MATH_SSE
-
-/// From http://renderfeather.googlecode.com/hg-history/034a1900d6e8b6c92440382658d2b01fc732c5de/Doc/optimized%20Matrix%20quaternion%20conversion.pdf
-void quat_to_mat4x4_sse(__m128 q, __m128 t, __m128 *m)
-{
-	// Constants:
-	const u32 sign = 0x80000000UL;
-	const __m128 sseX0 = set_ps_hex(sign, sign, sign, 0);
-	const __m128 sseX1 = set_ps_hex(sign, sign, 0, sign);
-	__m128 one = _mm_set_ps(0, 0, 0, 1);
-
-#if 0 // Original code
-	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
-	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
-	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
-	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
-	
-	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
-	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
-	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
-
-	__m128 xx2 = _mm_mul_ss(q, q2);                               // [2xx]
-
-	// Calculate last two elements of the third row.
-	__m128 one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
-	__m128 one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
-	__m128 one_m_xx_yy_2_0_tz_tw = _mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
-
-	// Calculate first row
-	__m128 m_yy_xy_xz_yz_2 = _mm_xor_ps(yy_xy_xz_yz_2, sseX0);     // [-2yz -2xz -2xy   2yy]
-	__m128 m_zz_wz_wy_wx_2 = _mm_xor_ps(zz_wz_wy_wx_2, sseX1);     // [-2xw -2yw  2zw  -2zz]
-	__m128 m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
-	__m128 first_row = _mm_sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
-	m[0] = first_row;
-	_mm_store_ss((float*)m+3, t);
-
-	// Calculate second row
-	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
-	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
-	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
-	__m128 t_yzwx = shuffle1_ps(t, _MM_SHUFFLE(0, 3, 2, 1));      // [tx tw tz ty]
-	__m128 second_row = shuffle1_ps(s3, _MM_SHUFFLE(2, 3, 0, 1)); // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
-	m[1] = second_row;
-	_mm_store_ss((float*)m+7, t_yzwx);
-
-	// Calculate third row
-	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
-	__m128 t2 = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [tz 1-2xx-2yy 2yz-2xw 2yw+2xz]
-	m[2] = t2;
-	m[3] = _mm_set_ps(1, 0, 0, 0);
-#else
-
-	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
-	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
-	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
-	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
-	
-	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
-	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
-	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
-
-	__m128 xx2 = _mm_mul_ss(q, q2);                               // [2xx]
-
-	// Calculate last two elements of the third row.
-	__m128 one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
-	__m128 one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
-	__m128 one_m_xx_yy_2_0_tz_tw = one_m_xx_yy_2;//_mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
-
-	// Calculate first row
-	__m128 m_yy_xy_xz_yz_2 = _mm_xor_ps(yy_xy_xz_yz_2, sseX0);     // [-2yz -2xz -2xy   2yy]
-	__m128 m_zz_wz_wy_wx_2 = _mm_xor_ps(zz_wz_wy_wx_2, sseX1);     // [-2xw -2yw  2zw  -2zz]
-	__m128 m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
-	__m128 first_row = _mm_sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
-
-	// Calculate second row
-	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
-	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
-	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
-	__m128 second_row = shuffle1_ps(s3, _MM_SHUFFLE(2, 3, 0, 1)); // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
-
-	// Calculate third row
-	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
-	__m128 third_row = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [0 1-2xx-2yy 2yz-2xw 2yw+2xz]
-
-	__m128 tmp0 = _mm_unpacklo_ps(first_row, second_row);
-	__m128 tmp2 = _mm_unpacklo_ps(third_row, t);
-	__m128 tmp1 = _mm_unpackhi_ps(first_row, second_row);
-	__m128 tmp3 = _mm_unpackhi_ps(third_row, t);
-	m[0] = _mm_movelh_ps(tmp0, tmp2);
-	m[1] = _mm_movehl_ps(tmp2, tmp0);
-	m[2] = _mm_movelh_ps(tmp1, tmp3);
-	m[3] = _mm_set_ps(1, 0, 0, 0);
-#endif
-}
-#endif
-
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 {
 	assume(IsNormalized());
 #ifdef MATH_SSE
 	float4x4 m;
-	quat_to_mat4x4_sse(q, _mm_set_ps(1,0,0,0), m.row);
+	quat_to_mat4x4(q, _mm_set_ps(1,0,0,0), m.row);
 	return m;
 #else
 	return float4x4(*this);
@@ -680,12 +601,14 @@ float4x4 MUST_USE_RESULT Quat::ToFloat4x4(const float4 &translation) const
 	assume(IsNormalized());
 #ifdef MATH_SSE
 	float4x4 m;
-	quat_to_mat4x4_sse(q, translation.v, m.row);
+	quat_to_mat4x4(q, translation.v, m.row);
 	return m;
 #else
 	return float4x4(*this, translation.xyz());
 #endif
 }
+
+bool IsNeutralCLocale();
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::string MUST_USE_RESULT Quat::ToString() const
@@ -707,6 +630,7 @@ std::string MUST_USE_RESULT Quat::ToString2() const
 
 std::string MUST_USE_RESULT Quat::SerializeToString() const
 {
+	assert(IsNeutralCLocale());
 	char str[256];
 	sprintf(str, "%f %f %f %f", x, y, z, w);
 	return std::string(str);
@@ -715,6 +639,7 @@ std::string MUST_USE_RESULT Quat::SerializeToString() const
 
 Quat MUST_USE_RESULT Quat::FromString(const char *str)
 {
+	assert(IsNeutralCLocale());
 	assume(str);
 	if (!str)
 		return Quat();
@@ -742,43 +667,72 @@ Quat MUST_USE_RESULT Quat::FromString(const char *str)
 
 Quat Quat::operator +(const Quat &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return add_ps(q, rhs.q);
+#else
 	return Quat(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
+#endif
 }
 
 Quat Quat::operator -(const Quat &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return sub_ps(q, rhs.q);
+#else
 	return Quat(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
+#endif
 }
 
 Quat Quat::operator -() const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return negate_ps(q);
+#else
 	return Quat(-x, -y, -z, -w);
+#endif
 }
 
 Quat Quat::operator *(float scalar) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_mul_float(q, scalar);
+#else
 	return Quat(x * scalar, y * scalar, z * scalar, w * scalar);
+#endif
 }
 
 float3 Quat::operator *(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return float4(quat_transform_vec4(q, float4(rhs, 0.f).v)).xyz();
+#else
 	return Transform(rhs);
+#endif
 }
 
 float4 Quat::operator *(const float4 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return quat_transform_vec4(q, rhs);
+#else
 	return Transform(rhs);
+#endif
 }
 
 Quat Quat::operator /(float scalar) const
 {
 	assume(!EqualAbs(scalar, 0.f));
 
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_div_float(q, scalar);
+#else
 	return *this * (1.f / scalar);
+#endif
 }
 
 Quat Quat::operator *(const Quat &r) const
 {
+	///\todo SSE-optimize!
 	return Quat(w*r.x + x*r.w + y*r.z - z*r.y,
 	            w*r.y - x*r.z + y*r.w + z*r.x,
 	            w*r.z + x*r.y - y*r.x + z*r.w,
@@ -787,6 +741,7 @@ Quat Quat::operator *(const Quat &r) const
 
 Quat Quat::operator /(const Quat &rhs) const
 {
+	///\todo SSE-optimize!
 	Quat inverse = rhs.Inverted();
 	return *this * inverse;
 }
