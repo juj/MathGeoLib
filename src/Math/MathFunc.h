@@ -532,6 +532,14 @@ template<typename T> FORCE_INLINE bool IsFinite(T /*value*/) { return true; }
 template<> FORCE_INLINE bool IsFinite<float>(float f) { return (ReinterpretAsU32(f) << 1) < 0xFF000000u; }
 template<> FORCE_INLINE bool IsFinite<double>(double d) { return (ReinterpretAsU64(d) << 1) < 0xFFE0000000000000ULL; }
 
+/// Returns true if the given value is a not-a-number.
+FORCE_INLINE bool IsNan(float f) { return (ReinterpretAsU32(f) << 1) > 0xFF000000u; }
+FORCE_INLINE bool IsNan(double d) { return (ReinterpretAsU64(d) << 1) > 0xFFE0000000000000ULL; }
+
+/// Returns true if the given value is +inf or -inf.
+FORCE_INLINE bool IsInf(float f) { return (ReinterpretAsU32(f) << 1) == 0xFF000000u; }
+FORCE_INLINE bool IsInf(double d) { return (ReinterpretAsU64(d) << 1) == 0xFFE0000000000000ULL; }
+
 #ifdef _MSC_VER
 template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return _finite((double)value) != 0; }
 FORCE_INLINE bool IsInf(long double value) { return IsInf((double)value); }
@@ -541,13 +549,5 @@ template<> FORCE_INLINE bool IsFinite<long double>(long double value) { assert(s
 FORCE_INLINE bool IsInf(long double value) { assert(sizeof(long double) == 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] == 0x8000000000000000ULL; }
 FORCE_INLINE bool IsNan(long double value) { assert(sizeof(long double) == 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] >  0x8000000000000000ULL; }
 #endif
-
-/// Returns true if the given value is a not-a-number.
-FORCE_INLINE bool IsNan(float f) { return (ReinterpretAsU32(f) << 1) > 0xFF000000u; }
-FORCE_INLINE bool IsNan(double d) { return (ReinterpretAsU64(d) << 1) > 0xFFE0000000000000ULL; }
-
-/// Returns true if the given value is +inf or -inf.
-FORCE_INLINE bool IsInf(float f) { return (ReinterpretAsU32(f) << 1) == 0xFF000000u; }
-FORCE_INLINE bool IsInf(double d) { return (ReinterpretAsU64(d) << 1) == 0xFFE0000000000000ULL; }
 
 MATH_END_NAMESPACE
