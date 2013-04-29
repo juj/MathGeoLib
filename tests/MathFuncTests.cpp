@@ -72,10 +72,14 @@ UNIQUE_TEST(FloatRepresentation)
 	LOGI("FLOAT_NAN as double: %f, or 0x%llX", FLOAT_NAN, ReinterpretAsU64((double)FLOAT_NAN));
 	LOGI("FLOAT_INF as double: %f, or 0x%llX", FLOAT_INF, ReinterpretAsU64((double)FLOAT_INF));
 
-#if !defined(EMSCRIPTEN) && !defined(__MINGW32__) // MinGW doesn't support printing out long doubles
+#if !defined(EMSCRIPTEN)
 	LOGI("sizeof(long double): %d", (int)sizeof(long double));
+	LOGI("LDBL_DIG: %d, LDBL_MANT_DIG: %d", (int)LDBL_DIG, (int)LDBL_MANT_DIG);
+#if !defined(__MINGW32__) // MinGW doesn't support printing out long doubles
 	LOGI("FLOAT_NAN as long double: %Lf, or %s", (long double)FLOAT_NAN, U80((long double)FLOAT_NAN).ToString().c_str());
 	LOGI("FLOAT_INF as long double: %Lf, or %s", (long double)FLOAT_INF, U80((long double)FLOAT_INF).ToString().c_str());
+#endif
+
 #endif
 }
 
