@@ -116,7 +116,6 @@ FORCE_INLINE simd4f vec4_div_float(simd4f vec, float f)
 	simd4f v = vdupq_n_f32(f);
 	simd4f rcp = vrecpeq_f32(v);
 	rcp = vmulq_f32(vrecpsq_f32(v, rcp), rcp);
-	rcp = vmulq_f32(vrecpsq_f32(v, rcp), rcp);
 	return vmulq_f32(vec, rcp);
 #endif
 }
@@ -127,7 +126,6 @@ FORCE_INLINE simd4f float_div_vec4(float f, simd4f vec)
 	return _mm_div_ps(_mm_set1_ps(f), vec);
 #elif defined(MATH_NEON)
 	simd4f rcp = vrecpeq_f32(vec);
-	rcp = vmulq_f32(vrecpsq_f32(vec, rcp), rcp);
 	rcp = vmulq_f32(vrecpsq_f32(vec, rcp), rcp);
 	return vmulq_f32(vdupq_n_f32(f), rcp);
 #endif
@@ -141,7 +139,6 @@ FORCE_INLINE simd4f vec4_recip(simd4f vec)
 #elif defined(MATH_NEON)
 	simd4f rcp = vrecpeq_f32(vec);
 	rcp = vmulq_f32(vrecpsq_f32(vec, rcp), rcp);
-	rcp = vmulq_f32(vrecpsq_f32(vec, rcp), rcp);
 	return rcp;
 #endif
 }
@@ -152,7 +149,6 @@ FORCE_INLINE simd4f vec4_div_vec4(simd4f vec, simd4f vec2)
 	return _mm_div_ps(vec, vec2);
 #elif defined(MATH_NEON)
 	simd4f rcp = vrecpeq_f32(vec2);
-	rcp = vmulq_f32(vrecpsq_f32(vec2, rcp), rcp);
 	rcp = vmulq_f32(vrecpsq_f32(vec2, rcp), rcp);
 	return vmulq_f32(vec, rcp);
 #endif
