@@ -23,8 +23,13 @@
 #ifdef MATH_NEON
 FORCE_INLINE simd4f set_ps(float w, float z, float y, float x)
 {
-	const float32_t d[4] = { x, y, z, w };
+	const ALIGN16 float32_t d[4] = { x, y, z, w };
 	return vld1q_f32(d);
+}
+FORCE_INLINE simd4f set_ps_hex(u32 w, u32 z, u32 y, u32 x)
+{
+	const ALIGN16 u32 d[4] = { x, y, z, w };
+	return vld1q_f32((const float*)d);
 }
 #else
 #define set_ps _mm_set_ps

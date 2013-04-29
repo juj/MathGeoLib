@@ -3,6 +3,7 @@
 #include "../MathBuildConfig.h"
 
 #include "SSEMath.h"
+#include "float4_neon.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -130,25 +131,30 @@ FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 	return s;
 }
 
-FORCE_INLINE __m128 quat_mul_quat(simd4f q1, simd4f q2)
+#endif // ~MATH_SSE
+
+#define xor_ps(a,b) *(float32x4_t*)&veorq_u32(*(uint32x4_t*)&a, *(uint32x4_t*)&b)
+
+FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 {
 /*	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
 	           -x*r.z + y*r.w + z*r.x + w*r.y,
 	            x*r.y - y*r.x + z*r.w + w*r.z,
 	           -x*r.x - y*r.y - z*r.z + w*r.w); */
 
-	const __m128 signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0);
-	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));
-	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));
+#ifdef MATH_SSE
+	const __m128 signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
+	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));   // [- - + +]
+	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));   // [- + + -]
 
 	__m128 X = _mm_xor_ps(signx, shuffle1_ps(q1, _MM_SHUFFLE(0,0,0,0)));
 	__m128 Y = _mm_xor_ps(signy, shuffle1_ps(q1, _MM_SHUFFLE(1,1,1,1)));
 	__m128 Z = _mm_xor_ps(signz, shuffle1_ps(q1, _MM_SHUFFLE(2,2,2,2)));
 	__m128 W = shuffle1_ps(q1, _MM_SHUFFLE(3,3,3,3));
 
-	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3));
-	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2));
-	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1));
+	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
+	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2)); // [y,x,w,z]
+	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1)); // [z,w,x,y]
 	// __m128 r4 = q2;
 
 	__m128 ret1 = _mm_mul_ps(X, r1);
@@ -156,8 +162,28 @@ FORCE_INLINE __m128 quat_mul_quat(simd4f q1, simd4f q2)
 	__m128 ret3 = _mm_mul_ps(Z, r3);
 	__m128 ret4 = _mm_mul_ps(W, q2);
 	return _mm_add_ps(_mm_add_ps(ret1, ret2), _mm_add_ps(ret3, ret4));
-}
+#else // NEON
+	float32x4_t signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0);
+	float32x4_t signy = set_ps_hex(0x80000000u, 0x80000000u, 0, 0);
+	float32x4_t signz = set_ps_hex(0x80000000u, 0, 0, 0x80000000u);
 
-#endif // ~MATH_SSE
+	const float32_t *q1f = (const float32_t *)&q1;
+	float32x4_t X = xor_ps(signx, vdupq_n_f32(q1f[0]));
+	float32x4_t Y = xor_ps(signy, vdupq_n_f32(q1f[1]));
+	float32x4_t Z = xor_ps(signz, vdupq_n_f32(q1f[2]));
+	float32x4_t W = vdupq_n_f32(q1f[3]);
+
+	float32x4_t r3 = vrev64q_f32(q2); // [z,w,x,y]
+	float32x4_t r1 = vcombine_f32(vget_high_f32(r3), vget_low_f32(r3)); // [x,y,z,w]
+	float32x4_t r2 = vrev64q_f32(r1); // [y,x,w,z]
+
+	float32x4_t ret = mul_ps(X, r1);
+	ret = vmlaq_f32(ret, Y, r2);
+	ret = vmlaq_f32(ret, Z, r3);
+	ret = vmlaq_f32(ret, W, q2);
+
+	return ret;
+#endif
+}
 
 MATH_END_NAMESPACE

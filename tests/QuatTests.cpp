@@ -74,7 +74,7 @@ BENCHMARK(Quat_op_mul_Quat)
 }
 BENCHMARK_END
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 BENCHMARK(quat_mul_quat)
 {
 	q2[i].q = quat_mul_quat(q[i].q, q2[i].q);
