@@ -226,7 +226,7 @@ Quat MUST_USE_RESULT Quat::Conjugated() const
 float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
 	assume(this->IsNormalized());
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	///\todo Check the generation of temporaries here!
 	return float4(quat_transform_vec4(q, float4(vec,0.f).v)).xyz();
 #else
@@ -238,7 +238,7 @@ float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 
 float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	///\todo Check the generation of temporaries here!
 	return float4(quat_transform_vec4(q, float4(x,y,z,0.f).v)).xyz();
 #else
@@ -703,7 +703,7 @@ Quat Quat::operator *(float scalar) const
 
 float3 Quat::operator *(const float3 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return float4(quat_transform_vec4(q, float4(rhs, 0.f).v)).xyz();
 #else
 	return Transform(rhs);
@@ -712,7 +712,7 @@ float3 Quat::operator *(const float3 &rhs) const
 
 float4 Quat::operator *(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return quat_transform_vec4(q, rhs);
 #else
 	return Transform(rhs);
