@@ -98,7 +98,7 @@ TEST(Float4Normalize4)
 {
 	float4 f(-1.f, 2.f, 3.f, 4.f);
 	float oldLength = f.Normalize4();
-	assert(oldLength > 0);
+	assertcmp(oldLength, >, 0);
 	assert(EqualAbs(f.x, -1.f / Sqrt(30.f)));
 	assert(EqualAbs(f.y, 2.f / Sqrt(30.f)));
 	assert(EqualAbs(f.z, 3.f / Sqrt(30.f)));
