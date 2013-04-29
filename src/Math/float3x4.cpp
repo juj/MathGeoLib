@@ -1017,8 +1017,6 @@ void float3x4::InverseOrthonormal()
 	// b) Replace the top-right 3x1 part by computing R^t(-T).
 	SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 #endif
-
-	mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
 }
 
 void float3x4::Transpose3()
