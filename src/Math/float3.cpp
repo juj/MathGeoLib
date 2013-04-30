@@ -493,7 +493,7 @@ float3 float3::ProjectToNorm(const float3 &direction) const
 
 float float3::AngleBetween(const float3 &other) const
 {
-	float cosa = Dot(other) / sqrt(LengthSq() * other.LengthSq());
+	float cosa = Dot(other) / Sqrt(LengthSq() * other.LengthSq());
 	if (cosa >= 1.f)
 		return 0.f;
 	else if (cosa <= -1.f)

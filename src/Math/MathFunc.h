@@ -278,7 +278,7 @@ FORCE_INLINE float SqrtFast(float x)
 #endif
 }
 
-/// Returns 1/sqrt(x). (The reciprocal of the square root of x)
+/// Returns 1/Sqrt(x). (The reciprocal of the square root of x)
 FORCE_INLINE float RSqrt(float x)
 {
 #ifdef MATH_SSE

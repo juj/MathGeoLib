@@ -410,7 +410,7 @@ float2 float2::ProjectToNorm(const float2 &direction) const
 
 float float2::AngleBetween(const float2 &other) const
 {
-	return acos(Dot(other)) / sqrt(LengthSq() * other.LengthSq());
+	return acos(Dot(other)) / Sqrt(LengthSq() * other.LengthSq());
 }
 
 float float2::AngleBetweenNorm(const float2 &other) const
@@ -561,11 +561,11 @@ int float2::ConvexHullInPlace(float2 *points, int nPoints)
 		float lineBLen = lineB.LengthSq();
 		bool dropLastPointFromHull = false;
 		if (lineALen >= 1e-5f)
-			lineA /= sqrt(lineALen);
+			lineA /= Sqrt(lineALen);
 		else
 			dropLastPointFromHull = true;
 		if (lineBLen >= 1e-5f)
-			lineB /= sqrt(lineBLen);
+			lineB /= Sqrt(lineBLen);
 		float2 normal = float2(-lineA.y, lineA.x);
 		if (dropLastPointFromHull ||  MATH_NS::Dot(normal, lineB) > 0.f || (MATH_NS::Dot(normal,lineB) > -1e-4f && lineBLen >= lineALen))// || (Length2(points[i] - points[nPointsInHull-1]) <= 1e-5f)) // lineB is to the left of lineA?
 		{
@@ -677,7 +677,7 @@ float2 float2::RandomDir(LCG &lcg, float r)
 		float y = lcg.Float(-r, r);
 		float lenSq = x*x + y*y;
 		if (lenSq >= 1e-6f && lenSq <= r*r)
-			return r / sqrt(lenSq) * float2(x,y);
+			return r / Sqrt(lenSq) * float2(x,y);
 	}
 	assume(false && "Failed to generate a random float2 direction vector!");
 	return float2(r, 0);

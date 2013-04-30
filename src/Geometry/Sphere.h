@@ -75,7 +75,7 @@ public:
 	AABB MinimalEnclosingAABB() const;
 
 	/// Returns the largest AABB that fits inside this sphere.
-	/** The returned AABB is a cube, with a center position coincident with this sphere, and a side length of 2*r/sqrt(3).
+	/** The returned AABB is a cube, with a center position coincident with this sphere, and a side length of 2*r/Sqrt(3).
 		@see MinimalEnclosingAABB(). */
 	AABB MaximalContainedAABB() const;
 

@@ -22,7 +22,7 @@ MATH_BEGIN_NAMESPACE
 
 int Polynomial::SolveQuadratic(float a, float b, float c, float &root1, float &root2)
 {
-	// ax^2 + bx + c == 0 => x = [ -b +/- sqrt(b^2 - 4ac) ] / 2a.
+	// ax^2 + bx + c == 0 => x = [ -b +/- Sqrt(b^2 - 4ac) ] / 2a.
 
 	///@todo numerical float issues: catastrophic cancellation can occur in the subtraction.
 	float radicand = b*b - 4.f * a * c;

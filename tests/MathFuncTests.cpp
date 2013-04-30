@@ -175,7 +175,7 @@ TEST(ReinterpretAsFloat)
 	assert(IsNan(ReinterpretAsFloat(0x7F800001)));
 }
 
-// Idea: Since approx sqrt is so fast, run through that and do one manual Newton-Rhapson iteration to improve.
+// Idea: Since approx Sqrt is so fast, run through that and do one manual Newton-Rhapson iteration to improve.
 float NewtonRhapsonSqrt(float x)
 {
 	float estimate = SqrtFast(x);
@@ -232,7 +232,7 @@ UNIQUE_TEST(sqrt_precision)
 	for(int i = 0; i < 1000000; ++i)
 	{
 		float f = rng.Float(0.f, 1e20f);
-		float x = (float)sqrt((double)f); // best precision of the sqrt.
+		float x = (float)sqrt((double)f); // best precision of the Sqrt.
 
 		X[0] = Sqrt(f);
 		X[1] = SqrtFast(f);
@@ -559,7 +559,7 @@ UNIQUE_TEST(sin_ps_precision)
 		for(int i = 0; i < 1000000; ++i)
 		{
 			float f = rng.Float(-maxVal, maxVal);//3.141592654f);
-			float x = (float)sin((double)f); // best precision of the sqrt.
+			float x = (float)sin((double)f); // best precision of the Sin.
 
 			X[0] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(f)));
 			X[1] = sinf(f);

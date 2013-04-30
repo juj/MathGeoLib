@@ -331,7 +331,7 @@ public:
 	/** The points are distributed uniformly.
 		The implementation of this function is based on Graphics Gems 1, p. 25:
 		"1.5 Generating random points in triangles. Method 2." The Method 1 presented in the book
-		uses a sqrt() instead of the if().
+		uses a Sqrt() instead of the if().
 		@param rng A pre-seeded random number generator object that is to be used by this function to generate random values.
 		@see class LCG, RandomPointOnEdge(), RandomVertex(), Point(). */
 	float3 RandomPointInside(LCG &rng) const;

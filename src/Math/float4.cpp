@@ -786,7 +786,7 @@ float4 float4::Reflect3(const float3 &normal) const
 
 float float4::AngleBetween3(const float4 &other) const
 {
-	float cosa = Dot3(other) / sqrt(LengthSq3() * other.LengthSq3());
+	float cosa = Dot3(other) / Sqrt(LengthSq3() * other.LengthSq3());
 	if (cosa >= 1.f)
 		return 0.f;
 	else if (cosa <= -1.f)
@@ -804,7 +804,7 @@ float float4::AngleBetweenNorm3(const float4 &other) const
 
 float float4::AngleBetween4(const float4 &other) const
 {
-	float cosa = Dot4(other) / sqrt(LengthSq4() * other.LengthSq4());
+	float cosa = Dot4(other) / Sqrt(LengthSq4() * other.LengthSq4());
 	if (cosa >= 1.f)
 		return 0.f;
 	else if (cosa <= -1.f)
