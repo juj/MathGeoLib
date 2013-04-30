@@ -104,7 +104,7 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 
 FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 {
-	quat_to_mat4x4(q, t, m);
+	quat_to_mat3x4(q, t, m);
 	m[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 }
 
