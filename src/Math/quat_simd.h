@@ -2,6 +2,8 @@
 
 #include "../MathBuildConfig.h"
 
+#ifdef MATH_SIMD
+
 #include "SSEMath.h"
 #include "float4_neon.h"
 
@@ -187,3 +189,5 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 }
 
 MATH_END_NAMESPACE
+
+#endif // ~MATH_SIMD
