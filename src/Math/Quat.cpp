@@ -259,9 +259,13 @@ float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 
 Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 {
-	///\todo SSE.
 	assume(0.f <= t && t <= 1.f);
+
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_lerp(q, b.q, t);
+#else
 	return *this * (1.f - t) + b * t;
+#endif
 }
 
 Quat MUST_USE_RESULT Quat::Lerp(const Quat &a, const Quat &b, float t)

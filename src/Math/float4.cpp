@@ -838,7 +838,11 @@ float4 float4::Lerp(const float4 &b, float t) const
 {
 	assume(EqualAbs(this->w, b.w));
 	assume(0.f <= t && t <= 1.f);
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_lerp(v, b.v, t);
+#else
 	return (1.f - t) * *this + t * b;
+#endif
 }
 
 float4 float4::Lerp(const float4 &a, const float4 &b, float t)

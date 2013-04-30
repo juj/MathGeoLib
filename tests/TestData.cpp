@@ -20,6 +20,19 @@ float *PosFloatArray()
 	return arr;
 }
 
+float *UnitFloatArray()
+{
+	LCG lcg;
+	static float *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = lcg.Float();
+	}
+	return arr;
+}
+
 Quat *QuatArray()
 {
 	LCG lcg;
@@ -212,6 +225,7 @@ public:
 	{
 		AlignedFree(FloatArray());
 		AlignedFree(PosFloatArray());
+		AlignedFree(UnitFloatArray());
 		AlignedFree(MatrixArray());
 		AlignedFree(MatrixArray2());
 		AlignedFree(Float2Array());

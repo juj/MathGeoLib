@@ -326,4 +326,16 @@ FORCE_INLINE simd4f vec3_normalize(simd4f vec)
 	return mul_ps(vec, vec4_rsqrt(vec3_length_sq_ps(vec)));
 }
 
+// T should be a 4-vector containing the lerp weight [w,w,w,w] in all channels.
+FORCE_INLINE simd4f vec4_lerp(simd4f a, simd4f b, simd4f t)
+{
+	// a*(1-t) + b*t = a - t*a + t*b = a + t*(b-a)
+	return add_ps(a, mul_ps(t, sub_ps(b, a)));
+}
+
+FORCE_INLINE simd4f vec4_lerp(simd4f a, simd4f b, float t)
+{
+	return vec4_lerp(a, b, set1_ps(t));
+}
+
 #endif // ~MATH_SIMD

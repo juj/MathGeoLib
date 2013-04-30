@@ -80,6 +80,12 @@ BENCHMARK(Quat_op_div_Quat)
 }
 BENCHMARK_END
 
+BENCHMARK(Quat_Lerp)
+{
+	q2[i] = q[i].Lerp(q2[i], uf[i]);
+}
+BENCHMARK_END
+
 #ifdef MATH_SIMD
 BENCHMARK(quat_mul_quat)
 {
@@ -108,6 +114,22 @@ RANDOMIZED_TEST(quat_div_quat)
 	Quat q2 = Quat::RandomRotation(rng);
 	Quat correct = q / q2;
 	Quat q3 = quat_div_quat(q.q, q2.q);
+	assert(q3.Equals(correct));
+}
+
+BENCHMARK(quat_lerp_simd)
+{
+	q2[i].q = vec4_lerp(q[i].q, q2[i].q, uf[i]);
+}
+BENCHMARK_END
+
+RANDOMIZED_TEST(quat_lerp)
+{
+	Quat q = Quat::RandomRotation(rng);
+	Quat q2 = Quat::RandomRotation(rng);
+	float t = rng.Float();
+	Quat correct = q.Lerp(q2, t);
+	Quat q3 = vec4_lerp(q.q, q2.q, t);
 	assert(q3.Equals(correct));
 }
 #endif

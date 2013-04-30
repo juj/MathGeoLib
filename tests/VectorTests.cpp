@@ -830,4 +830,30 @@ BENCHMARK(vec3_normalize)
 	v3[i] = vec3_normalize(v[i]);
 }
 BENCHMARK_END;
+
+BENCHMARK(vec4_lerp)
+{
+	v3[i] = vec4_lerp(v[i], v2[i], uf[i]);
+}
+BENCHMARK_END
+
+RANDOMIZED_TEST(vec4_lerp)
+{
+	float4 f = float4::RandomGeneral(rng, -100.f, 100.f);
+	float4 f2 = float4::RandomGeneral(rng, -100.f, 100.f);
+	float t = rng.Float();
+	float4 correct = f.Lerp(f2, t);
+	float4 f3 = vec4_lerp(f, f2, t);
+	assert(f3.Equals(correct));
+}
+
 #endif
+
+TEST(float4_Lerp)
+{
+	float4 a(2,2,2,2);
+	float4 b(10,10,10,10);
+	assert(a.Lerp(b, 0.f).Equals(2,2,2,2));
+	assert(a.Lerp(b, 1.f).Equals(10,10,10,10));
+	assert(a.Lerp(b, 0.5f).Equals(6,6,6,6));
+}

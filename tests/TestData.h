@@ -13,6 +13,7 @@ float *PosFloatArray();
 Quat *QuatArray();
 Quat *QuatArray2();
 float *FloatArray();
+float *UnitFloatArray();
 float4x4 *MatrixArray();
 float4x4 *MatrixArray2();
 float4x4 *OrthogonalMatrixArray();
@@ -27,7 +28,8 @@ float4 *VectorArrayWithW0Or1();
 
 // N.B. These must be static and not extern to not generate UDB with initialization order between compilation units!
 static DONT_WARN_UNUSED float *f = FloatArray();
-static DONT_WARN_UNUSED float *pf = PosFloatArray();
+static DONT_WARN_UNUSED float *pf = PosFloatArray(); // > 0
+static DONT_WARN_UNUSED float *uf = UnitFloatArray(); // [0,1]
 static DONT_WARN_UNUSED float4x4 *m = MatrixArray();
 static DONT_WARN_UNUSED float4x4 *m2 = MatrixArray2();
 static DONT_WARN_UNUSED const float4x4 *om = OrthonormalMatrixArray();
