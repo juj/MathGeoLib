@@ -165,9 +165,9 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	return _mm_add_ps(_mm_add_ps(_mm_mul_ps(X, r1), _mm_mul_ps(Y, r2)), 
 	                  _mm_add_ps(_mm_mul_ps(Z, r3), _mm_mul_ps(W, q2)));
 #else // NEON
-	float32x4_t signx = set_ps_hex_const(0x80000000u, 0, 0x80000000u, 0);
-	float32x4_t signy = set_ps_hex_const(0x80000000u, 0x80000000u, 0, 0);
-	float32x4_t signz = set_ps_hex_const(0x80000000u, 0, 0, 0x80000000u);
+	static const float32x4_t signx = set_ps_hex_const(0x80000000u, 0, 0x80000000u, 0);
+	static const float32x4_t signy = set_ps_hex_const(0x80000000u, 0x80000000u, 0, 0);
+	static const float32x4_t signz = set_ps_hex_const(0x80000000u, 0, 0, 0x80000000u);
 
 	const float32_t *q1f = (const float32_t *)&q1;
 	float32x4_t X = xor_ps(signx, vdupq_n_f32(q1f[0]));

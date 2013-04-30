@@ -102,6 +102,7 @@ RANDOMIZED_TEST(quat_mul_quat)
 	assert(q3.Equals(correct));
 }
 
+#ifdef MATH_SSE
 BENCHMARK(quat_div_quat)
 {
 	q2[i].q = quat_div_quat(q[i].q, q2[i].q);
@@ -116,7 +117,7 @@ RANDOMIZED_TEST(quat_div_quat)
 	Quat q3 = quat_div_quat(q.q, q2.q);
 	assert(q3.Equals(correct));
 }
-
+#endif
 BENCHMARK(quat_lerp_simd)
 {
 	q2[i].q = vec4_lerp(q[i].q, q2[i].q, uf[i]);
