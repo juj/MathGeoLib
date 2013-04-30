@@ -74,9 +74,9 @@ public:
 	/** @see class Sphere. */
 	explicit AABB(const Sphere &s);
 
-	FORCE_INLINE int NumFaces() const { return 6; }
-	FORCE_INLINE int NumEdges() const { return 12; }
-	FORCE_INLINE int NumVertices() const { return 8; }
+	FORCE_INLINE static int NumFaces() const { return 6; }
+	FORCE_INLINE static int NumEdges() const { return 12; }
+	FORCE_INLINE static int NumVertices() const { return 8; }
 
 	/// Returns the minimum world-space coordinate along the given axis.
 	float MinX() const { return minPoint.x; }
