@@ -106,7 +106,7 @@ float3 Quat::Axis() const
 
 float Quat::Angle() const
 {
-	return acos(w) * 2.f;
+	return Acos(w) * 2.f;
 }
 
 float Quat::Dot(const Quat &rhs) const
@@ -129,7 +129,11 @@ float Quat::LengthSq() const
 
 float Quat::Length() const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return vec4_length_float(q);
+#else
 	return Sqrt(LengthSq());
+#endif
 }
 
 float Quat::Normalize()
@@ -218,9 +222,11 @@ void Quat::Conjugate()
 
 Quat MUST_USE_RESULT Quat::Conjugated() const
 {
-	Quat copy = *this;
-	copy.Conjugate();
-	return copy;
+#ifdef MATH_AUTOMATIC_SSE
+	return negate3_ps(q);
+#else
+	return Quat(-x, -y, -z, w);
+#endif
 }
 
 float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
@@ -293,11 +299,11 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 	float b;
 	if (angle <= 0.97f) // perform spherical linear interpolation.
 	{
-		angle = acos(angle); // After this, angle is in the range pi/2 -> 0 as the original angle variable ranged from 0 -> 1.
+		angle = Acos(angle); // After this, angle is in the range pi/2 -> 0 as the original angle variable ranged from 0 -> 1.
 
-		float c = 1.f / sin(angle);
-		a = sin((1.f - t) * angle) * c;
-		b = sin(angle * t) * c;
+		float c = 1.f / Sin(angle);
+		a = Sin((1.f - t) * angle) * c;
+		b = Sin(angle * t) * c;
 	}
 	else // If angle is close to taking the denominator to zero, resort to linear interpolation (and normalization).
 	{
@@ -364,7 +370,7 @@ float3 MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 
 void Quat::ToAxisAngle(float3 &axis, float &angle) const
 {
-	angle = acos(w) * 2.f;
+	angle = Acos(w) * 2.f;
 	float sinz = Sin(angle/2.f);
 	if (fabs(sinz) > 1e-4f)
 	{
@@ -590,7 +596,7 @@ float3x4 MUST_USE_RESULT Quat::ToFloat3x4() const
 	quat_to_mat3x4(q, _mm_set_ps(1,0,0,0), m.row);
 	return m;
 #else
-	return float4x4(*this);
+	return float3x4(*this);
 #endif
 }
 
