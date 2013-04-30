@@ -851,9 +851,9 @@ RANDOMIZED_TEST(vec4_lerp)
 
 TEST(float4_Lerp)
 {
-	float4 a(2,2,2,2);
-	float4 b(10,10,10,10);
-	assert(a.Lerp(b, 0.f).Equals(2,2,2,2));
-	assert(a.Lerp(b, 1.f).Equals(10,10,10,10));
-	assert(a.Lerp(b, 0.5f).Equals(6,6,6,6));
+	float4 a(2,2,2,1);
+	float4 b(10,10,10,1);
+	assert(a.Lerp(b, 0.f).Equals(2,2,2,1));
+	assert(a.Lerp(b, 1.f).Equals(10,10,10,1));
+	assert(a.Lerp(b, 0.5f).Equals(6,6,6,1));
 }
