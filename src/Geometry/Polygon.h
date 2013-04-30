@@ -44,6 +44,8 @@ public:
 	/// Stores the vertices of this polygon.
 	std::vector<float3> p;
 
+	FORCE_INLINE int NumFaces() const { return 1; }
+
 	/// Returns the number of edges in this polygon.
 	/** Since the polygon is always closed and connected, the number of edges is equal to the number of vertices.
 		@see Edge(), NumVertices(). */

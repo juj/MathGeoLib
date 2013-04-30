@@ -51,7 +51,9 @@ public:
 		@see a, b, c. */
 	Triangle(const float3 &a, const float3 &b, const float3 &c);
 
-	int NumEdges() const { return 3; }
+	FORCE_INLINE int NumFaces() const { return 1; }
+	FORCE_INLINE int NumEdges() const { return 3; }
+	FORCE_INLINE int NumVertices() const { return 3; }
 
 	/// Translates this Triangle in world space.
 	/** @param offset The amount of displacement to apply to this Triangle, in world space coordinates.

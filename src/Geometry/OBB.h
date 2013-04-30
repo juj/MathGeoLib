@@ -63,7 +63,9 @@ public:
 		@see class AABB, SetFrom(), MinimalEnclosingAABB(). */
 	OBB(const AABB &aabb);
 
-	int NumEdges() const { return 12; }
+	FORCE_INLINE int NumFaces() const { return 6; }
+	FORCE_INLINE int NumEdges() const { return 12; }
+	FORCE_INLINE int NumVertices() const { return 8; }
 
 	/// Sets this structure to a degenerate OBB that does not have any volume.
 	/** This function sets pos=(0,0,0), r = (-inf,-inf,-inf) and axis=float3x3::identity for this OBB.
