@@ -841,6 +841,7 @@ RANDOMIZED_TEST(vec4_lerp)
 {
 	float4 f = float4::RandomGeneral(rng, -100.f, 100.f);
 	float4 f2 = float4::RandomGeneral(rng, -100.f, 100.f);
+	f.w = f2.w;
 	float t = rng.Float();
 	float4 correct = f.Lerp(f2, t);
 	float4 f3 = vec4_lerp(f, f2, t);
