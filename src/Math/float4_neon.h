@@ -23,15 +23,23 @@
 #include "float4_sse.h"
 
 #ifdef MATH_NEON
+
+#define set_ps_const(w,z,y,x) {{ (u64)ReinterpretAsU32(x) | (((u64)ReinterpretAsU32(y)) << 32), (u64)ReinterpretAsU32(z) | (((u64)ReinterpretAsU32(w)) << 32) }}
+#define set_ps_hex_const(w,z,y,x) {{ (u64)(x) | (((u64)(y)) << 32), (u64)(z) | (((u64)(w)) << 32) }}
+
 FORCE_INLINE simd4f set_ps(float w, float z, float y, float x)
 {
-	const ALIGN16 float32_t d[4] = { x, y, z, w };
-	return vld1q_f32(d);
+//	const ALIGN16 float32_t d[4] = { x, y, z, w };
+//	return vld1q_f32(d);
+	float32x4_t c = set_ps_const(w,z,y,x);
+	return c;
 }
 FORCE_INLINE simd4f set_ps_hex(u32 w, u32 z, u32 y, u32 x)
 {
-	const ALIGN16 u32 d[4] = { x, y, z, w };
-	return vld1q_f32((const float*)d);
+//	const ALIGN16 u32 d[4] = { x, y, z, w };
+//	return vld1q_f32((const float*)d);
+	float32x4_t c = set_ps_hex_const(w,z,y,x);
+	return c;
 }
 #else
 #define set_ps _mm_set_ps
