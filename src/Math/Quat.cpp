@@ -581,13 +581,19 @@ float3x3 MUST_USE_RESULT Quat::ToFloat3x3() const
 
 float3x4 MUST_USE_RESULT Quat::ToFloat3x4() const
 {
-	return float3x4(*this);
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	float3x4 m;
+	quat_to_mat3x4(q, _mm_set_ps(1,0,0,0), m.row);
+	return m;
+#else
+	return float4x4(*this);
+#endif
 }
 
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 {
 	assume(IsNormalized());
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	float4x4 m;
 	quat_to_mat4x4(q, _mm_set_ps(1,0,0,0), m.row);
 	return m;
@@ -599,7 +605,7 @@ float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4(const float4 &translation) const
 {
 	assume(IsNormalized());
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	float4x4 m;
 	quat_to_mat4x4(q, translation.v, m.row);
 	return m;

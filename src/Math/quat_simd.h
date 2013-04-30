@@ -13,7 +13,7 @@ MATH_BEGIN_NAMESPACE
 
 /// Converts a quaternion to a row-major matrix.
 /// From http://renderfeather.googlecode.com/hg-history/034a1900d6e8b6c92440382658d2b01fc732c5de/Doc/optimized%20Matrix%20quaternion%20conversion.pdf
-inline void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
+inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 {
 	// Constants:
 	const u32 sign = 0x80000000UL;
@@ -59,9 +59,7 @@ inline void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
 	__m128 t2 = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [tz 1-2xx-2yy 2yz-2xw 2yw+2xz]
 	m[2] = t2;
-	m[3] = _mm_set_ps(1, 0, 0, 0);
 #else
-
 	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
 	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
 	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
@@ -101,8 +99,13 @@ inline void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 	m[0] = _mm_movelh_ps(tmp0, tmp2);
 	m[1] = _mm_movehl_ps(tmp2, tmp0);
 	m[2] = _mm_movelh_ps(tmp1, tmp3);
-	m[3] = _mm_set_ps(1, 0, 0, 0);
 #endif
+}
+
+FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
+{
+	quat_to_mat4x4(q, t, m);
+	m[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 }
 
 FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
