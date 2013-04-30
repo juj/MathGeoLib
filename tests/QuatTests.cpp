@@ -74,6 +74,12 @@ BENCHMARK(Quat_op_mul_Quat)
 }
 BENCHMARK_END
 
+BENCHMARK(Quat_op_div_Quat)
+{
+	q2[i] = q[i] / q2[i];
+}
+BENCHMARK_END
+
 #ifdef MATH_SIMD
 BENCHMARK(quat_mul_quat)
 {
@@ -87,6 +93,21 @@ RANDOMIZED_TEST(quat_mul_quat)
 	Quat q2 = Quat::RandomRotation(rng);
 	Quat correct = q * q2;
 	Quat q3 = quat_mul_quat(q.q, q2.q);
+	assert(q3.Equals(correct));
+}
+
+BENCHMARK(quat_div_quat)
+{
+	q2[i].q = quat_div_quat(q[i].q, q2[i].q);
+}
+BENCHMARK_END
+
+RANDOMIZED_TEST(quat_div_quat)
+{
+	Quat q = Quat::RandomRotation(rng);
+	Quat q2 = Quat::RandomRotation(rng);
+	Quat correct = q / q2;
+	Quat q3 = quat_div_quat(q.q, q2.q);
 	assert(q3.Equals(correct));
 }
 #endif

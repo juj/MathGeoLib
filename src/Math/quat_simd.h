@@ -159,11 +159,8 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1)); // [z,w,x,y]
 	// __m128 r4 = q2;
 
-	__m128 ret1 = _mm_mul_ps(X, r1);
-	__m128 ret2 = _mm_mul_ps(Y, r2);
-	__m128 ret3 = _mm_mul_ps(Z, r3);
-	__m128 ret4 = _mm_mul_ps(W, q2);
-	return _mm_add_ps(_mm_add_ps(ret1, ret2), _mm_add_ps(ret3, ret4));
+	return _mm_add_ps(_mm_add_ps(_mm_mul_ps(X, r1), _mm_mul_ps(Y, r2)), 
+	                  _mm_add_ps(_mm_mul_ps(Z, r3), _mm_mul_ps(W, q2)));
 #else // NEON
 	float32x4_t signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0);
 	float32x4_t signy = set_ps_hex(0x80000000u, 0x80000000u, 0, 0);
@@ -187,6 +184,34 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	return ret;
 #endif
 }
+
+#ifdef MATH_SSE
+FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
+{
+/*	return Quat(x*r.w - y*r.z + z*r.y - w*r.x,
+	            x*r.z + y*r.w - z*r.x - w*r.y,
+	           -x*r.y + y*r.x + z*r.w - w*r.z,
+	            x*r.x + y*r.y + z*r.z + w*r.w); */
+
+	const __m128 signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
+	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));   // [- - + +]
+	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));   // [- + + -]
+
+	__m128 X = _mm_xor_ps(signx, shuffle1_ps(q1, _MM_SHUFFLE(0,0,0,0)));
+	__m128 Y = _mm_xor_ps(signy, shuffle1_ps(q1, _MM_SHUFFLE(1,1,1,1)));
+	__m128 Z = _mm_xor_ps(signz, shuffle1_ps(q1, _MM_SHUFFLE(2,2,2,2)));
+	__m128 W = shuffle1_ps(q1, _MM_SHUFFLE(3,3,3,3));
+
+	q2 = negate3_ps(q2);
+	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
+	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2)); // [y,x,w,z]
+	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1)); // [z,w,x,y]
+	// __m128 r4 = q2;
+
+	return _mm_add_ps(_mm_add_ps(_mm_mul_ps(X, r1), _mm_mul_ps(Y, r2)), 
+	                  _mm_add_ps(_mm_mul_ps(Z, r3), _mm_mul_ps(W, q2)));
+}
+#endif
 
 MATH_END_NAMESPACE
 

@@ -732,7 +732,7 @@ Quat Quat::operator /(float scalar) const
 
 Quat Quat::operator *(const Quat &r) const
 {
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return quat_mul_quat(q, r.q);
 #else
 	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
@@ -742,11 +742,16 @@ Quat Quat::operator *(const Quat &r) const
 #endif
 }
 
-Quat Quat::operator /(const Quat &rhs) const
+Quat Quat::operator /(const Quat &r) const
 {
-	///\todo SSE-optimize!
-	Quat inverse = rhs.Inverted();
-	return *this * inverse;
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return quat_div_quat(q, r.q);
+#else
+	return Quat(x*r.w - y*r.z + z*r.y - w*r.x,
+	            x*r.z + y*r.w - z*r.x - w*r.y,
+	           -x*r.y + y*r.x + z*r.w - w*r.z,
+	            x*r.x + y*r.y + z*r.z + w*r.w);
+#endif
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
