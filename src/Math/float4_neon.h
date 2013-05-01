@@ -46,18 +46,18 @@ FORCE_INLINE simd4f set_ps_hex(u32 w, u32 z, u32 y, u32 x)
 	float32x4_t c = set_ps_hex_const(w,z,y,x);
 	return c;
 }
-#else
+#else // MATH_SSE
 #define set_ps _mm_set_ps
-#endif
+#endif // ~MATH_NEON|MATH_SSE
 
 #ifdef ANDROID
 FORCE_INLINE void vec4_add_float_asm(const void *vec, float f, void *out)
 {
 	asm(
-		"\t vld1.32 {d0, d1} [%1]\n"
-		"\t vdup.32 q1, [%2]\n"
-		"\t vadd.f32 q0, q0, q1\n"
-		"\t vst1.32 {d0, d1}, [%0]\n"
+		"\t vld1.32 {d0, d1} [%1] \n"
+		"\t vdup.32 q1, [%2] \n"
+		"\t vadd.f32 q0, q0, q1 \n"
+		"\t vst1.32 {d0, d1}, [%0] \n"
 		: /* no outputs by value */
 		:"r"(out), "r"(vec), "r"(f)
 		:"q0", "q1");
@@ -266,7 +266,7 @@ FORCE_INLINE simd4f dot3_ps(simd4f a, simd4f b)
 {
 	return vdupq_n_f32(dot3_float(a, b));
 }
-#endif
+#endif // ~MATH_NEON
 
 FORCE_INLINE float vec4_length_sq_float(simd4f vec)
 {

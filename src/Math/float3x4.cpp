@@ -981,7 +981,7 @@ void float3x4::InverseOrthonormal()
 	assume(IsOrthonormal());
 
 #ifdef MATH_SSE
-	mat_inverse_orthonormal(row, row);
+	mat3x4_inverse_orthonormal(row, row);
 #else
 	/* In this function, we seek to optimize the matrix inverse in the case this
 	   matrix is orthonormal, i.e. it can be written in the following form:

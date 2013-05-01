@@ -1359,7 +1359,7 @@ void float4x4::InverseOrthonormal()
 {
 	assume(!ContainsProjection());
 #ifdef MATH_SSE
-	mat_inverse_orthonormal(row, row);
+	mat3x4_inverse_orthonormal(row, row);
 #else
 	return Float3x4Part().InverseOrthonormal();
 #endif

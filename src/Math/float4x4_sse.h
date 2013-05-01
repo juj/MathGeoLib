@@ -427,7 +427,7 @@ inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 	           shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0))), \
 	           _mm_mul_ps(shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
 	           _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
-FORCE_INLINE void mat_inverse(const __m128 *mat, __m128 *out)
+FORCE_INLINE void mat4x4_inverse(const __m128 *mat, __m128 *out)
 {
 	__m128 f1 = MAT_COFACTOR(mat, 3, 2);
 	__m128 f2 = MAT_COFACTOR(mat, 3, 1);
@@ -454,7 +454,7 @@ FORCE_INLINE void mat_inverse(const __m128 *mat, __m128 *out)
 }
 
 /// Inverts a 3x4 affine transformation matrix (in row-major format) that only consists of rotation (+possibly mirroring) and translation.
-FORCE_INLINE void mat_inverse_orthonormal(__m128 *mat, __m128 *out)
+FORCE_INLINE void mat3x4_inverse_orthonormal(__m128 *mat, __m128 *out)
 {
 	// mat[0]: [tx,02,01,00]
 	// mat[1]: [ty,12,11,10]
@@ -476,6 +476,77 @@ FORCE_INLINE void mat_inverse_orthonormal(__m128 *mat, __m128 *out)
 	out[1] = _mm_movehl_ps(tmp2, tmp0);            // [Ty,21,11,01]
 	out[2] = _mm_movelh_ps(tmp1, tmp3);            // [Tz,22 12,02]
  // out[3] = assumed to be [1,0,0,0] - no need to write back.
+}
+
+FORCE_INLINE __m128 NewtonRhapsonRecipStep(__m128 recip, __m128 estimate)
+{
+	// Do one iteration of Newton-Rhapson:
+	// e_n = 2*e - x*e^2
+	__m128 e2 = _mm_mul_ps(estimate, estimate);
+	return _mm_sub_ps(_mm_add_ps(estimate, estimate), _mm_mul_ps(recip, e2));
+}
+
+FORCE_INLINE __m128 NewtonRhapsonRecip(__m128 recip)
+{
+	__m128 estimate = _mm_rcp_ps(recip);
+	return NewtonRhapsonRecipStep(recip, estimate);
+}
+
+/// Computes the determinant of a 4x4 matrix. 
+inline float mat4x4_determinant(__m128 *row)
+{
+	__m128 s = shuffle1_ps(NewtonRhapsonRecip(row[0]), _MM_SHUFFLE(0,0,0,0));
+	// row[0].x has a factor of the final determinant.
+	__m128 row0 = _mm_mul_ps(s, row[0]);
+	s = shuffle1_ps(row[1], _MM_SHUFFLE(0,0,0,0));
+	__m128 row1 = _mm_sub_ps(row[1], _mm_mul_ps(s, row0));
+	s = shuffle1_ps(row[2], _MM_SHUFFLE(0,0,0,0));
+	__m128 row2 = _mm_sub_ps(row[2], _mm_mul_ps(s, row0));
+	s = shuffle1_ps(row[3], _MM_SHUFFLE(0,0,0,0));
+	__m128 row3 = _mm_sub_ps(row[3], _mm_mul_ps(s, row0));
+
+	// row1.y has a factor of the final determinant.
+	s = shuffle1_ps(NewtonRhapsonRecip(row1), _MM_SHUFFLE(1,1,1,1));
+	__m128 row1_1 = _mm_mul_ps(s, row1);
+	s = shuffle1_ps(row2, _MM_SHUFFLE(1,1,1,1));
+	__m128 row2_1 = _mm_sub_ps(row2, _mm_mul_ps(s, row1_1));
+	s = shuffle1_ps(row3, _MM_SHUFFLE(1,1,1,1));
+	__m128 row3_1 = _mm_sub_ps(row3, _mm_mul_ps(s, row1_1));
+
+	// Now we are left with a 2x2 matrix in row2_1.zw and row3_1.zw.
+	// D = row2_1.z * row3_1.w - row2_1.w * row3_1.z.
+	__m128 r1 = shuffle1_ps(row2_1, _MM_SHUFFLE(2,3,1,0));
+	__m128 r = _mm_mul_ps(r1, row3_1);
+	__m128 a = shuffle1_ps(r, _MM_SHUFFLE(3,3,3,3));
+	__m128 b = shuffle1_ps(r, _MM_SHUFFLE(2,2,2,2));
+	__m128 d1 = _mm_sub_ss(a, b);
+	__m128 d2 = row[0];
+	__m128 d3 = shuffle1_ps(row1, _MM_SHUFFLE(1,1,1,1));
+	__m128 d = _mm_mul_ss(d1, _mm_mul_ss(d2, d3));
+	return M128_TO_FLOAT(d);
+}
+
+/// Computes the determinant of a 3x4 matrix stored in row-major format. (Treated as a square matrix with last row [0,0,0,1])
+inline float mat3x4_determinant(__m128 *row)
+{
+	__m128 s = shuffle1_ps(NewtonRhapsonRecip(row[0]), _MM_SHUFFLE(0,0,0,0));
+	// row[0].x has a factor of the final determinant.
+	__m128 row0 = _mm_mul_ps(s, row[0]);
+	s = shuffle1_ps(row[1], _MM_SHUFFLE(0,0,0,0));
+	__m128 row1 = _mm_sub_ps(row[1], _mm_mul_ps(s, row0));
+	s = shuffle1_ps(row[2], _MM_SHUFFLE(0,0,0,0));
+	__m128 row2 = _mm_sub_ps(row[2], _mm_mul_ps(s, row0));
+
+	// Now we are left with a 2x2 matrix in row1.yz and row2.yz.
+	// D = row1.y * row2.z - row2.y * row1.z.
+	__m128 r1 = shuffle1_ps(row1, _MM_SHUFFLE(3,1,2,0));
+	__m128 r = _mm_mul_ps(r1, row2);
+	__m128 a = shuffle1_ps(r, _MM_SHUFFLE(2,2,2,2));
+	__m128 b = shuffle1_ps(r, _MM_SHUFFLE(1,1,1,1));
+	__m128 d1 = _mm_sub_ss(a, b);
+	__m128 d2 = row[0];
+	__m128 d = _mm_mul_ss(d1, d2);
+	return M128_TO_FLOAT(d);
 }
 
 MATH_END_NAMESPACE

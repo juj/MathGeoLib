@@ -440,7 +440,7 @@ BENCHMARK_END;
 #ifdef MATH_SSE
 BENCHMARK(inverse_ps)
 {
-	mat_inverse(m[i].row, m[i].row);
+	mat4x4_inverse(m[i].row, m[i].row);
 }
 BENCHMARK_END;
 #endif
@@ -473,13 +473,13 @@ RANDOMIZED_TEST(mat_inverse_orthonormal_correctness)
 	float4x4 m2 = m;
 	float4x4 m3 = m;
 	m2.InverseOrthonormal();
-	mat_inverse_orthonormal(m3.row, m3.row);
+	mat3x4_inverse_orthonormal(m3.row, m3.row);
 	assert(m2.Equals(m3));
 }
 
-BENCHMARK(mat_inverse_orthonormal)
+BENCHMARK(mat3x4_inverse_orthonormal)
 {
-	mat_inverse_orthonormal(m[i].row, m[i].row);
+	mat3x4_inverse_orthonormal(m[i].row, m[i].row);
 }
 BENCHMARK_END;
 #endif
@@ -523,85 +523,16 @@ UNIQUE_TEST(mat_inverse_correctness)
 			{
 				float4x4 m2 = m.Inverted();
 				float4x4 m3 = m;
-				mat_inverse(m3.row, m3.row);
+				mat4x4_inverse(m3.row, m3.row);
 				maxRelError = Max(maxRelError, RelError(m2, m3));
 				maxAbsError = Max(maxAbsError, AbsError(m2, m3));
 			}
 		}
 		if (k == 0)
-			LOGI("mat_inverse max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+			LOGI("mat4x4_inverse max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 		else
-			LOGI("mat_inverse max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+			LOGI("mat4x4_inverse max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 	}
-}
-
-FORCE_INLINE __m128 NewtonRhapsonRecipStep(__m128 recip, __m128 estimate)
-{
-	// Do one iteration of Newton-Rhapson:
-	// e_n = 2*e - x*e^2
-	__m128 e2 = _mm_mul_ps(estimate, estimate);
-	return _mm_sub_ps(_mm_add_ps(estimate, estimate), _mm_mul_ps(recip, e2));
-}
-
-FORCE_INLINE __m128 NewtonRhapsonRecip(__m128 recip)
-{
-	__m128 estimate = _mm_rcp_ps(recip);
-	return NewtonRhapsonRecipStep(recip, estimate);
-}
-
-float mat_determinant(__m128 *row)
-{
-	__m128 s = shuffle1_ps(NewtonRhapsonRecip(row[0]), _MM_SHUFFLE(0,0,0,0));
-	// row[0].x has a factor of the final determinant.
-	__m128 row0 = _mm_mul_ps(s, row[0]);
-	s = shuffle1_ps(row[1], _MM_SHUFFLE(0,0,0,0));
-	__m128 row1 = _mm_sub_ps(row[1], _mm_mul_ps(s, row0));
-	s = shuffle1_ps(row[2], _MM_SHUFFLE(0,0,0,0));
-	__m128 row2 = _mm_sub_ps(row[2], _mm_mul_ps(s, row0));
-	s = shuffle1_ps(row[3], _MM_SHUFFLE(0,0,0,0));
-	__m128 row3 = _mm_sub_ps(row[3], _mm_mul_ps(s, row0));
-
-	// row1.y has a factor of the final determinant.
-	s = shuffle1_ps(NewtonRhapsonRecip(row1), _MM_SHUFFLE(1,1,1,1));
-	__m128 row1_1 = _mm_mul_ps(s, row1);
-	s = shuffle1_ps(row2, _MM_SHUFFLE(1,1,1,1));
-	__m128 row2_1 = _mm_sub_ps(row2, _mm_mul_ps(s, row1_1));
-	s = shuffle1_ps(row3, _MM_SHUFFLE(1,1,1,1));
-	__m128 row3_1 = _mm_sub_ps(row3, _mm_mul_ps(s, row1_1));
-
-	// Now we are left with a 2x2 matrix in row2_1.zw and row3_1.zw.
-	// D = row2_1.z * row3_1.w - row2_1.w * row3_1.z.
-	__m128 r1 = shuffle1_ps(row2_1, _MM_SHUFFLE(2,3,1,0));
-	__m128 r = _mm_mul_ps(r1, row3_1);
-	__m128 a = shuffle1_ps(r, _MM_SHUFFLE(3,3,3,3));
-	__m128 b = shuffle1_ps(r, _MM_SHUFFLE(2,2,2,2));
-	__m128 d1 = _mm_sub_ss(a, b);
-	__m128 d2 = row[0];
-	__m128 d3 = shuffle1_ps(row1, _MM_SHUFFLE(1,1,1,1));
-	__m128 d = _mm_mul_ss(d1, _mm_mul_ss(d2, d3));
-	return M128_TO_FLOAT(d);
-}
-
-float mat_determinant3(__m128 *row)
-{
-	__m128 s = shuffle1_ps(NewtonRhapsonRecip(row[0]), _MM_SHUFFLE(0,0,0,0));
-	// row[0].x has a factor of the final determinant.
-	__m128 row0 = _mm_mul_ps(s, row[0]);
-	s = shuffle1_ps(row[1], _MM_SHUFFLE(0,0,0,0));
-	__m128 row1 = _mm_sub_ps(row[1], _mm_mul_ps(s, row0));
-	s = shuffle1_ps(row[2], _MM_SHUFFLE(0,0,0,0));
-	__m128 row2 = _mm_sub_ps(row[2], _mm_mul_ps(s, row0));
-
-	// Now we are left with a 2x2 matrix in row1.yz and row2.yz.
-	// D = row1.y * row2.z - row2.y * row1.z.
-	__m128 r1 = shuffle1_ps(row1, _MM_SHUFFLE(3,1,2,0));
-	__m128 r = _mm_mul_ps(r1, row2);
-	__m128 a = shuffle1_ps(r, _MM_SHUFFLE(2,2,2,2));
-	__m128 b = shuffle1_ps(r, _MM_SHUFFLE(1,1,1,1));
-	__m128 d1 = _mm_sub_ss(a, b);
-	__m128 d2 = row[0];
-	__m128 d = _mm_mul_ss(d1, d2);
-	return M128_TO_FLOAT(d);
 }
 
 UNIQUE_TEST(mat_determinant_correctness)
@@ -620,14 +551,14 @@ UNIQUE_TEST(mat_determinant_correctness)
 				m = float4x4::RandomGeneral(rng, -1.f, 1.f);
 
 			float d = m.Determinant4();
-			float d2 = mat_determinant(m.row);
+			float d2 = mat4x4_determinant(m.row);
 			maxRelError = Max(maxRelError, RelativeError(d, d2));
 			maxAbsError = Max(maxAbsError, Abs(d - d2));
 		}
 		if (k == 0)
-			LOGI("mat_determinant max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+			LOGI("mat4x4_determinant max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 		else
-			LOGI("mat_determinant max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+			LOGI("mat4x4_determinant max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 	}
 }
 
@@ -647,14 +578,14 @@ UNIQUE_TEST(mat_determinant3_correctness)
 				m = float4x4::RandomGeneral(rng, -1.f, 1.f);
 
 			float d = m.Determinant3();
-			float d2 = mat_determinant3(m.row);
+			float d2 = mat3x4_determinant(m.row);
 			maxRelError = Max(maxRelError, RelativeError(d, d2));
 			maxAbsError = Max(maxAbsError, Abs(d - d2));
 		}
 		if (k == 0)
-			LOGI("mat_determinant3 max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+			LOGI("mat3x4_determinant max. relative error with rotation matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 		else
-			LOGI("mat_determinant3 max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
+			LOGI("mat3x4_determinant max. relative error with general [0,1] matrices: %f, Max abs error: %f", maxRelError, maxAbsError);
 	}
 }
 
@@ -682,15 +613,15 @@ UNIQUE_TEST(float4x4_Determinant_Correctness)
 }
 
 #ifdef MATH_SSE
-BENCHMARK(mat_determinant)
+BENCHMARK(mat4x4_determinant)
 {
-	f[i] = mat_determinant(m[i].row);
+	f[i] = mat4x4_determinant(m[i].row);
 }
 BENCHMARK_END;
 
-BENCHMARK(mat_determinant3)
+BENCHMARK(mat3x4_determinant)
 {
-	f[i] = mat_determinant3(m[i].row);
+	f[i] = mat3x4_determinant(m[i].row);
 }
 BENCHMARK_END;
 #endif
