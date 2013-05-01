@@ -55,4 +55,47 @@ UNIQUE_TEST(set_ps_const_hex)
 	asserteq(arr[3], -0.0f);
 }
 
+#ifdef ANDROID
+void inline_asm_add(void *v1, void *v2, void *out)
+{
+	asm(
+		"\t vld1.32 {d0, d1}, [%1]\n"
+		"\t vld1.32 {d2, d3}, [%2]\n"
+		"\t vadd.f32 q0, q0, q1\n"
+		"\t vst1.32 {d0, d1}, [%0]\n"
+		: /* no outputs by value */
+		:"r"(out), "r"(v1), "r"(v2)
+		:"memory", "q0", "q1");
+}
+
+simd4f inline_asm_add_nice(simd4f v1, simd4f v2)
+{
+	simd4f temp;
+	inline_asm_add(&v1, &v2, &temp);
+	return temp;
+}
+
+UNIQUE_TEST(inline_asm_add)
+{
+	float4 v = float4::RandomGeneral(rng, -100.f, 100.f);
+	float4 v2 = float4::RandomGeneral(rng, -100.f, 100.f);
+	float4 v3;
+	inline_asm_add(v.ptr(), v2.ptr(), v3.ptr());
+	float4 correct = v + v2;
+	assert(v3.Equals(correct));
+}
+
+BENCHMARK(inline_asm_add)
+{
+	inline_asm_add(v[i].ptr(), v2[i].ptr(), v3[i].ptr());
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_nice)
+{
+	v3[i] = inline_asm_add_nice(v[i], v2[i]);
+}
+BENCHMARK_END;
+#endif
+
 #endif
