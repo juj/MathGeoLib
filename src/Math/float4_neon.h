@@ -24,8 +24,13 @@
 
 #ifdef MATH_NEON
 
+#ifdef WIN8PHONE
 #define set_ps_const(w,z,y,x) {{ (u64)ReinterpretAsU32(x) | (((u64)ReinterpretAsU32(y)) << 32), (u64)ReinterpretAsU32(z) | (((u64)ReinterpretAsU32(w)) << 32) }}
 #define set_ps_hex_const(w,z,y,x) {{ (u64)(x) | (((u64)(y)) << 32), (u64)(z) | (((u64)(w)) << 32) }}
+#else
+#define set_ps_const(w,z,y,x) { x, y, z, w }
+#define set_ps_hex_const(w,z,y,x) { ReinterpretAsFloat(x), ReinterpretAsFloat(y), ReinterpretAsFloat(z), ReinterpretAsFloat(w) }
+#endif
 
 FORCE_INLINE simd4f set_ps(float w, float z, float y, float x)
 {
@@ -220,7 +225,8 @@ FORCE_INLINE simd4f negate3_ps(simd4f vec)
 	const ALIGN16 uint32_t indexData[4] = { 0x80000000UL, 0x80000000UL, 0x80000000UL, 0 };
 	uint64x2_t mask = vld1q_u64((const uint64_t*)indexData);
 	uint64x2_t v = *(uint64x2_t*)&vec;
-	simd4f ret = *(simd4f*)&veorq_u64(v, mask);
+	uint64x2_t v2 = veorq_u64(v, mask);
+	simd4f ret = *(simd4f*)&v2;
 	return ret;
 }
 
