@@ -93,6 +93,14 @@ BENCHMARK(quat_mul_quat)
 }
 BENCHMARK_END
 
+#ifdef ANDROID
+BENCHMARK(quat_mul_quat_asm)
+{
+	quat_mul_quat_asm(q[i].ptr(), q2[i].ptr(), q2[i].ptr());
+}
+BENCHMARK_END
+#endif
+
 RANDOMIZED_TEST(quat_mul_quat)
 {
 	Quat q = Quat::RandomRotation(rng);
@@ -101,6 +109,18 @@ RANDOMIZED_TEST(quat_mul_quat)
 	Quat q3 = quat_mul_quat(q.q, q2.q);
 	assert(q3.Equals(correct));
 }
+
+#ifdef ANDROID
+RANDOMIZED_TEST(quat_mul_quat_asm)
+{
+	Quat q = Quat::RandomRotation(rng);
+	Quat q2 = Quat::RandomRotation(rng);
+	Quat correct = q * q2;
+	Quat q3;
+	quat_mul_quat_asm(q.ptr(), q2.ptr(), q3.ptr());
+	assert(q3.Equals(correct));
+}
+#endif
 
 #ifdef MATH_SSE
 BENCHMARK(quat_div_quat)
