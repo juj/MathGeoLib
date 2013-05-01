@@ -725,6 +725,7 @@ BENCHMARK(mat4x4_transpose)
 }
 BENCHMARK_END;
 
+#if !defined(ANDROID) /// \bug GCC internal error
 RANDOMIZED_TEST(mat4x4_transpose)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
@@ -735,6 +736,7 @@ RANDOMIZED_TEST(mat4x4_transpose)
 	assert(m.Equals(correct));
 	assert(m2.Equals(correct));
 }
+#endif
 
 BENCHMARK(mat4x4_mul_vec4)
 {
@@ -760,6 +762,7 @@ BENCHMARK(float4_mul_float4x4)
 }
 BENCHMARK_END;
 
+#if !defined(ANDROID) /// \bug GCC internal error
 RANDOMIZED_TEST(mat4x4_mul_vec4)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
@@ -768,6 +771,7 @@ RANDOMIZED_TEST(mat4x4_mul_vec4)
 	float4 v2 = mat4x4_mul_vec4(m.row, v.v);
 	assert(v2.Equals(correct));
 }
+#endif
 
 RANDOMIZED_TEST(vec4_mul_mat4x4)
 {

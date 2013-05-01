@@ -1191,7 +1191,7 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 	row2[1] = rhs.row2[1];
 #elif defined(MATH_SSE) */
 
-#if defined(MATH_AUTOMATIC_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) ///\todo Re-enable this!
 	assert(IS16ALIGNED(this));
 	assert(IS16ALIGNED(&rhs));
 	row[0] = rhs.row[0];
@@ -1367,7 +1367,7 @@ void float4x4::InverseOrthonormal()
 
 void float4x4::Transpose()
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) // GCC internal error
 	mat4x4_transpose(row, row);
 #else
 	Swap(v[0][1], v[1][0]);
@@ -1533,7 +1533,7 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 
 float4 float4x4::Transform(const float4 &vector) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && (!defined(MATH_NEON) || !defined(ANDROID)) // GCC internal error
 	return mat4x4_mul_vec4(row, vector.v);
 #else
 	return float4(DOT4(Row(0), vector),

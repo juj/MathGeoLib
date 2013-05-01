@@ -27,12 +27,16 @@
 FORCE_INLINE simd4f mat4x4_mul_vec4(const simd4f *mat, simd4f vec)
 {
 #ifdef MATH_NEON
+#if !defined(ANDROID) ///\bug Skip past Android internal compiler error!
 	// Transpose matrix at load time to get in registers in column-major format.
 	float32x4x4_t m = vld4q_f32((const float32_t*)mat);
 	simd4f ret = vmulq_lane_f32(m.val[0], vget_low_f32(vec), 0);
 	ret = vmlaq_lane_f32(ret, m.val[1], vget_low_f32(vec), 1);
 	ret = vmlaq_lane_f32(ret, m.val[2], vget_high_f32(vec), 0);
 	return vmlaq_lane_f32(ret, m.val[3], vget_high_f32(vec), 1);
+#else
+	return vec;
+#endif
 #elif defined(MATH_SSE3)
 	return mat4x4_mul_sse3(mat, vec);
 #else
@@ -89,11 +93,13 @@ FORCE_INLINE void mat4x4_mul_mat4x4(simd4f *out, const simd4f *m1, const simd4f 
 FORCE_INLINE void mat4x4_transpose(simd4f *out, const simd4f *mat)
 {
 #ifdef MATH_NEON
+#if !defined(ANDROID) ///\bug Skip past Android compiler internal error!
 	float32x4x4_t m = vld4q_f32((const float32_t*)mat);
 	vst1q_f32((float32_t*)out, m.val[0]);
 	vst1q_f32((float32_t*)out+4, m.val[1]);
 	vst1q_f32((float32_t*)out+8, m.val[2]);
 	vst1q_f32((float32_t*)out+12, m.val[3]);
+#endif
 #else
 	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]);
 	__m128 tmp2 = _mm_unpacklo_ps(mat[2], mat[3]);
