@@ -57,8 +57,7 @@ UNIQUE_TEST(set_ps_const_hex)
 
 #ifdef ANDROID
 
-
-void inline_asm_add(void *v1, void *v2, void *out)
+FORCE_INLINE void inline_asm_add(void *v1, void *v2, void *out)
 {
 	asm(
 		"\t vld1.32 {d0, d1}, [%1]\n"
@@ -70,7 +69,7 @@ void inline_asm_add(void *v1, void *v2, void *out)
 		:"memory", "q0", "q1");
 }
 
-simd4f inline_asm_add_nice(simd4f v1, simd4f v2)
+FORCE_INLINE simd4f inline_asm_add_nice(simd4f v1, simd4f v2)
 {
 	simd4f temp;
 	inline_asm_add(&v1, &v2, &temp);

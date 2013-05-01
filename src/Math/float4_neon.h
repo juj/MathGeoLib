@@ -50,6 +50,20 @@ FORCE_INLINE simd4f set_ps_hex(u32 w, u32 z, u32 y, u32 x)
 #define set_ps _mm_set_ps
 #endif
 
+#ifdef ANDROID
+FORCE_INLINE void vec4_add_float_asm(const void *vec, float f, void *out)
+{
+	asm(
+		"\t vld1.32 {d0, d1} [%1]\n"
+		"\t vdup.32 q1, [%2]\n"
+		"\t vadd.f32 q0, q0, q1\n"
+		"\t vst1.32 {d0, d1}, [%0]\n"
+		: /* no outputs by value */
+		:"r"(out), "r"(vec), "r"(f)
+		:"q0", "q1");
+}
+#endif
+
 FORCE_INLINE simd4f vec4_add_float(simd4f vec, float f)
 {
 #ifdef MATH_SSE
@@ -221,13 +235,9 @@ FORCE_INLINE float mul_xyzw_float(simd4f vec)
 
 FORCE_INLINE simd4f negate3_ps(simd4f vec)
 {
-	///\todo This does not look very optimal.
 	const ALIGN16 uint32_t indexData[4] = { 0x80000000UL, 0x80000000UL, 0x80000000UL, 0 };
 	uint64x2_t mask = vld1q_u64((const uint64_t*)indexData);
-	uint64x2_t v = *(uint64x2_t*)&vec;
-	uint64x2_t v2 = veorq_u64(v, mask);
-	simd4f ret = *(simd4f*)&v2;
-	return ret;
+	return vreinterpretq_f32_u64(veorq_u64(vreinterpretq_u64_f32(vec), mask));
 }
 
 FORCE_INLINE float sum_xyz_float(simd4f vec)

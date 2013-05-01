@@ -1367,7 +1367,7 @@ void float4x4::InverseOrthonormal()
 
 void float4x4::Transpose()
 {
-#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) // GCC internal error
+#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 	mat4x4_transpose(row, row);
 #else
 	Swap(v[0][1], v[1][0]);
@@ -1533,7 +1533,7 @@ float3 float4x4::TransformDir(float x, float y, float z) const
 
 float4 float4x4::Transform(const float4 &vector) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && (!defined(MATH_NEON) || !defined(ANDROID)) // GCC internal error
+#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 	return mat4x4_mul_vec4(row, vector.v);
 #else
 	return float4(DOT4(Row(0), vector),

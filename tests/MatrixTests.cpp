@@ -708,6 +708,14 @@ BENCHMARK(mat4x4_mul_mat4x4)
 }
 BENCHMARK_END;
 
+#ifdef ANDROID
+BENCHMARK(mat4x4_mul_mat4x4_asm)
+{
+	mat4x4_mul_mat4x4_asm(m2[i].row, m[i].row, m2[i].row);
+}
+BENCHMARK_END;
+#endif
+
 RANDOMIZED_TEST(mat4x4_mul_mat4x4)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
@@ -719,13 +727,28 @@ RANDOMIZED_TEST(mat4x4_mul_mat4x4)
 	assert(m3.Equals(correct));
 }
 
+#ifdef ANDROID
+RANDOMIZED_TEST(mat4x4_mul_mat4x4_asm)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m3;
+
+	mat4x4_mul_mat4x4_asm(m3.row, m.row, m2.row);
+	float4x4 correct = m*m2;
+	assert(m3.Equals(correct));
+}
+#endif
+
+#if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 BENCHMARK(mat4x4_transpose)
 {
 	mat4x4_transpose(m2[i].row, m[i].row);
 }
 BENCHMARK_END;
+#endif
 
-#if !defined(ANDROID) /// \bug GCC internal error
+#if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 RANDOMIZED_TEST(mat4x4_transpose)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
@@ -738,11 +761,13 @@ RANDOMIZED_TEST(mat4x4_transpose)
 }
 #endif
 
+#if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 BENCHMARK(mat4x4_mul_vec4)
 {
 	v2[i] = mat4x4_mul_vec4(m[i].row, v[i].v);
 }
 BENCHMARK_END;
+#endif
 
 BENCHMARK(vec4_mul_mat4x4)
 {
@@ -762,7 +787,7 @@ BENCHMARK(float4_mul_float4x4)
 }
 BENCHMARK_END;
 
-#if !defined(ANDROID) /// \bug GCC internal error
+#if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 RANDOMIZED_TEST(mat4x4_mul_vec4)
 {
 	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);

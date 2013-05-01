@@ -23,26 +23,24 @@
 #include "SSEMath.h"
 #include "float4_neon.h"
 
+#if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 // Multiplies mat * vec, where mat is a matrix in row-major format.
 FORCE_INLINE simd4f mat4x4_mul_vec4(const simd4f *mat, simd4f vec)
 {
 #ifdef MATH_NEON
-#if !defined(ANDROID) ///\bug Skip past Android internal compiler error!
 	// Transpose matrix at load time to get in registers in column-major format.
 	float32x4x4_t m = vld4q_f32((const float32_t*)mat);
 	simd4f ret = vmulq_lane_f32(m.val[0], vget_low_f32(vec), 0);
 	ret = vmlaq_lane_f32(ret, m.val[1], vget_low_f32(vec), 1);
 	ret = vmlaq_lane_f32(ret, m.val[2], vget_high_f32(vec), 0);
 	return vmlaq_lane_f32(ret, m.val[3], vget_high_f32(vec), 1);
-#else
-	return vec;
-#endif
 #elif defined(MATH_SSE3)
 	return mat4x4_mul_sse3(mat, vec);
 #else
 	return mat4x4_mul_sse(mat, vec);
 #endif
 }
+#endif
 
 // Multiplies vec * mat, where mat is a matrix in row-major format.
 FORCE_INLINE simd4f vec4_mul_mat4x4(simd4f vec, const simd4f *mat)
@@ -90,16 +88,44 @@ FORCE_INLINE void mat4x4_mul_mat4x4(simd4f *out, const simd4f *m1, const simd4f 
 #endif
 }
 
+#ifdef ANDROID
+FORCE_INLINE void mat4x4_mul_mat4x4_asm(simd4f *out, const simd4f *m1, const simd4f *m2)
+{
+	asm(
+		"\t vldmia %1, {q4-q7} \n"
+		"\t vldmia %2, {q8-q11} \n"
+		"\t vmul.f32 q0, q8, d8[0] \n"
+		"\t vmul.f32 q1, q8, d10[0] \n"
+		"\t vmul.f32 q2, q8, d12[0] \n"
+		"\t vmul.f32 q3, q8, d14[0] \n"
+		"\t vmla.f32 q0, q9, d8[1] \n"
+		"\t vmla.f32 q1, q9, d10[1] \n"
+		"\t vmla.f32 q2, q9, d12[1] \n"
+		"\t vmla.f32 q3, q9, d14[1] \n"
+		"\t vmla.f32 q0, q10, d9[0] \n"
+		"\t vmla.f32 q1, q10, d11[0] \n"
+		"\t vmla.f32 q2, q10, d13[0] \n"
+		"\t vmla.f32 q3, q10, d15[0] \n"
+		"\t vmla.f32 q0, q11, d9[1] \n"
+		"\t vmla.f32 q1, q11, d11[1] \n"
+		"\t vmla.f32 q2, q11, d13[1] \n"
+		"\t vmla.f32 q3, q11, d15[1] \n"
+		"\t vstmia %0, {q0-q3} \n"
+	: /* no outputs by value */
+	: "r"(out), "r"(m1), "r"(m2)
+	: "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q11");
+}
+#endif
+
+#if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 FORCE_INLINE void mat4x4_transpose(simd4f *out, const simd4f *mat)
 {
 #ifdef MATH_NEON
-#if !defined(ANDROID) ///\bug Skip past Android compiler internal error!
 	float32x4x4_t m = vld4q_f32((const float32_t*)mat);
 	vst1q_f32((float32_t*)out, m.val[0]);
 	vst1q_f32((float32_t*)out+4, m.val[1]);
 	vst1q_f32((float32_t*)out+8, m.val[2]);
 	vst1q_f32((float32_t*)out+12, m.val[3]);
-#endif
 #else
 	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]);
 	__m128 tmp2 = _mm_unpacklo_ps(mat[2], mat[3]);
@@ -111,6 +137,7 @@ FORCE_INLINE void mat4x4_transpose(simd4f *out, const simd4f *mat)
 	out[3] = _mm_movehl_ps(tmp3, tmp1);
 #endif
 }
+#endif
 
 FORCE_INLINE void mat4x4_set(simd4f *mat, float _00, float _01, float _02, float _03,
                                           float _10, float _11, float _12, float _13,

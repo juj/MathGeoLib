@@ -141,11 +141,7 @@ FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 #ifdef MATH_NEON
 FORCE_INLINE simd4f xor_ps(simd4f a, simd4f b)
 {
-	uint32x4_t A = *(uint32x4_t*)&a;
-	uint32x4_t B = *(uint32x4_t*)&b;
-	uint32x4_t ret = veorq_u32(A, B);
-	simd4f retf = *(float32x4_t*)&ret;
-	return retf;
+	return vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(a), vreinterpretq_u32_f32(b)));
 }
 #endif
 
