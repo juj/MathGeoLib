@@ -225,9 +225,11 @@ bool float2::Equals(float x_, float y_, float epsilon) const
 /// at debug runs.
 bool IsNeutralCLocale()
 {
+#ifndef ANDROID ///\todo error: 'struct lconv' has no member named 'decimal_point'
 	lconv *lc = localeconv();
 	if (strcmp(lc->decimal_point, "."))
 		return false;
+#endif
 	return true;
 }
 
