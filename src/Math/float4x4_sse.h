@@ -493,7 +493,7 @@ FORCE_INLINE __m128 NewtonRhapsonRecip(__m128 recip)
 }
 
 /// Computes the determinant of a 4x4 matrix. 
-inline float mat4x4_determinant(__m128 *row)
+inline float mat4x4_determinant(const __m128 *row)
 {
 	__m128 s = shuffle1_ps(NewtonRhapsonRecip(row[0]), _MM_SHUFFLE(0,0,0,0));
 	// row[0].x has a factor of the final determinant.
@@ -527,7 +527,7 @@ inline float mat4x4_determinant(__m128 *row)
 }
 
 /// Computes the determinant of a 3x4 matrix stored in row-major format. (Treated as a square matrix with last row [0,0,0,1])
-inline float mat3x4_determinant(__m128 *row)
+inline float mat3x4_determinant(const __m128 *row)
 {
 	__m128 s = shuffle1_ps(NewtonRhapsonRecip(row[0]), _MM_SHUFFLE(0,0,0,0));
 	// row[0].x has a factor of the final determinant.
@@ -547,6 +547,18 @@ inline float mat3x4_determinant(__m128 *row)
 	__m128 d2 = row[0];
 	__m128 d = _mm_mul_ss(d1, d2);
 	return M128_TO_FLOAT(d);
+}
+
+inline void mat3x4_transpose(const __m128 *src, __m128 *dst)
+{
+	__m128 src3 = _mm_setzero_ps(); // w component should be 1, but since it won't get stored, it doesn't matter, so we can just create zeros.
+	__m128 tmp0 = _mm_unpacklo_ps(src[0], src[1]);
+	__m128 tmp2 = _mm_unpacklo_ps(src[2], src3);
+	__m128 tmp1 = _mm_unpackhi_ps(src[0], src[1]);
+	__m128 tmp3 = _mm_unpackhi_ps(src[2], src3);
+	dst[0] = _mm_movelh_ps(tmp0, tmp2);
+	dst[1] = _mm_movehl_ps(tmp2, tmp0);
+	dst[2] = _mm_movelh_ps(tmp1, tmp3);
 }
 
 MATH_END_NAMESPACE

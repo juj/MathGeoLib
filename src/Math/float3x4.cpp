@@ -880,8 +880,10 @@ float3x4 &float3x4::operator =(const Quat &rhs)
 
 float float3x4::Determinant() const
 {
-	///\todo SSE.
 	assume(Float3x3Part().IsFinite());
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return mat3x4_determinant(row);
+#else
 	const float a = v[0][0];
 	const float b = v[0][1];
 	const float c = v[0][2];
@@ -893,6 +895,7 @@ float float3x4::Determinant() const
 	const float i = v[2][2];
 
 	return a*e*i + b*f*g + c*d*h - a*f*h - b*d*i - c*e*g;
+#endif
 }
 
 bool float3x4::Inverse(float epsilon)
@@ -973,14 +976,13 @@ bool float3x4::InverseOrthogonalUniformScale()
 
 void float3x4::InverseOrthonormal()
 {
-	///\todo SSE.
 #ifdef MATH_ASSERT_CORRECTNESS
 	float3x4 orig = *this;
 #endif
 
 	assume(IsOrthonormal());
 
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	mat3x4_inverse_orthonormal(row, row);
 #else
 	/* In this function, we seek to optimize the matrix inverse in the case this

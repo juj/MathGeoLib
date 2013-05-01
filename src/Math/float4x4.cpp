@@ -75,7 +75,7 @@ float4x4::float4x4(const float3x4 &m)
 
 float4x4::float4x4(const float4 &col0, const float4 &col1, const float4 &col2, const float4 &col3)
 {
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	__m128 tmp0 = _mm_unpacklo_ps(col0.v, col1.v);
 	__m128 tmp2 = _mm_unpacklo_ps(col2.v, col3.v);
 	__m128 tmp1 = _mm_unpackhi_ps(col0.v, col1.v);
@@ -94,7 +94,7 @@ float4x4::float4x4(const float4 &col0, const float4 &col1, const float4 &col2, c
 
 float4x4::float4x4(const Quat &orientation)
 {
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	quat_to_mat4x4(orientation.q, _mm_set_ps(1, 0, 0, 0), row);
 #else
 	SetRotatePart(orientation);
@@ -105,7 +105,7 @@ float4x4::float4x4(const Quat &orientation)
 
 float4x4::float4x4(const Quat &orientation, const float3 &translation)
 {
-#ifdef MATH_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	quat_to_mat4x4(orientation.q, float4(translation, 1.f), row);
 #else
 	SetRotatePart(orientation);
@@ -843,7 +843,7 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 		return; // Benign failure
 #endif
 
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
 	v[row][0] = m_r0;
@@ -927,7 +927,7 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	mat4x4_set(row, _00, _01, _02, _03,
 	                _10, _11, _12, _13,
 	                _20, _21, _22, _23,
@@ -945,7 +945,7 @@ void float4x4::Set(const float4x4 &rhs)
 #ifdef MATH_AVX
 	row2[0] = rhs.row2[0];
 	row2[1] = rhs.row2[1];
-#elif defined(MATH_AUTOMATIC_SSE)
+#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -1001,7 +1001,7 @@ void float4x4::Set3x4Part(const float3x4 &r)
 {
 	assume(r.IsFinite());
 
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	row[0] = r.row[0];
 	row[1] = r.row[1];
 	row[2] = r.row[2];
@@ -1054,7 +1054,7 @@ void float4x4::SwapRows(int row1, int row2)
 		return; // Benign failure
 #endif
 
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	Swap(row[row1], row[row2]);
 #else
 	Swap(v[row1][0], v[row2][0]);
@@ -1160,7 +1160,7 @@ float4x4 &float4x4::operator =(const float3x3 &rhs)
 
 float4x4 &float4x4::operator =(const float3x4 &rhs)
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -1184,16 +1184,19 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 //	assume(rhs.IsFinite());
 
 /* // AVX path determined to be one clock cycle slower than SSE path: (6 clock cycles on AVX, 5 on SSE)
-#ifdef MATH_AVX
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_AVX)
 	assert(IS32ALIGNED(this));
 	assert(IS32ALIGNED(&rhs));
 	row2[0] = rhs.row2[0];
 	row2[1] = rhs.row2[1];
 #elif defined(MATH_SSE) */
 
-#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) ///\todo Re-enable this!
+#if defined(MATH_AUTOMATIC_SSE)
+	
+#if !defined(ANDROID) // Android NEON doesn't currently use aligned loads.
 	assert(IS16ALIGNED(this));
 	assert(IS16ALIGNED(&rhs));
+#endif
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -1240,7 +1243,9 @@ float4x4 &float4x4::operator =(const TranslateOp &rhs)
 
 float float4x4::Determinant3() const
 {
-	///\todo SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return mat3x4_determinant(row);
+#else
 	assume(Float3x3Part().IsFinite());
 	const float a = v[0][0];
 	const float b = v[0][1];
@@ -1253,13 +1258,17 @@ float float4x4::Determinant3() const
 	const float i = v[2][2];
 
 	return a*e*i + b*f*g + c*d*h - a*f*h - b*d*i - c*e*g;
+#endif
 }
 
 float float4x4::Determinant4() const
 {
-	///\todo SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return mat4x4_determinant(row);
+#else
 	assume(IsFinite());
 	return v[0][0] * Minor(0,0) - v[0][1] * Minor(0,1) + v[0][2] * Minor(0,2) - v[0][3] * Minor(0,3);
+#endif
 }
 
 #define SKIPNUM(val, skip) (val >= skip ? (val+1) : val)
