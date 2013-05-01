@@ -268,6 +268,37 @@ FORCE_INLINE simd4f dot3_ps(simd4f a, simd4f b)
 }
 #endif // ~MATH_NEON
 
+#ifdef ANDROID
+FORCE_INLINE float vec4_length_sq_float_asm(const simd4f *vec)
+{
+	float len;
+	asm(
+		"\t vld1.32 {d0, d1}, [%1] \n"
+		"\t vmul.f32 q0, q0, q0 \n"    // q0 = [ww zz yy xx]
+		"\t vpadd.f32 d0, d0, d1 \n"   // d0 = [ww+zz yy+xx]
+		"\t vadd.f32 %0, s0, s1 \n"    // s0 = [xx+yy+zz+ww]   ///\todo Doesn't work?
+		:"=w"(len)
+		:"r"(vec)
+		:"q0");
+	return len;
+}
+
+FORCE_INLINE void vec4_length_sq_ps_asm(const simd4f *vec, simd4f *out)
+{
+	asm(
+		"\t vld1.32 {d0, d1}, [%1] \n"
+		"\t vmul.f32 q0, q0, q0 \n"    // q0 = [ww zz yy xx]
+		"\t vpadd.f32 d0, d0, d1 \n"   // d0 = [ww+zz yy+xx]
+		"\t vrev64.32 d1, d0 \n"       // d1 = [yy+xx ww+zz]
+		"\t vadd.f32 d0, d0, d1 \n"    // d0 = [xx+yy+ww+zz xx+yy+ww+zz]
+		"\t vmov.f32 d1, d0 \n"
+		"\t vst1.32 {d0, d1}, [%0] \n"
+		:
+		:"r"(out), "r"(vec)
+		:"memory", "q0");
+}
+#endif
+
 FORCE_INLINE float vec4_length_sq_float(simd4f vec)
 {
 	return dot4_float(vec, vec);

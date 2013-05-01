@@ -244,6 +244,37 @@ BENCHMARK(inline_asm_add_3_threetimes)
 }
 BENCHMARK_END;
 
+UNIQUE_TEST(vec4_length_sq_float_asm)
+{
+	float4 f(1,2,3,4);
+	float len = vec4_length_sq_float_asm(&f.v);
+	asserteq(len, 30.f);
+}
+
+BENCHMARK(vec4_length_sq_float_asm)
+{
+	f[i] = vec4_length_sq_float_asm(&v[i].v);
+}
+BENCHMARK_END;
+
+UNIQUE_TEST(vec4_length_sq_ps_asm)
+{
+	float4 f(1,2,3,4);
+	float4 lensq;
+	vec4_length_sq_ps_asm(&f.v, &lensq.v);
+	LOGI("%s", lensq.ToString().c_str());
+	asserteq(lensq.x, 30.f);
+	asserteq(lensq.y, 30.f);
+	asserteq(lensq.z, 30.f);
+	asserteq(lensq.w, 30.f);
+}
+
+BENCHMARK(vec4_length_sq_ps_asm)
+{
+	vec4_length_sq_ps_asm(&v[i].v, &v3[i].v);
+}
+BENCHMARK_END;
+
 #endif // ~ANDROID
 
 #endif
