@@ -165,38 +165,39 @@ inline void quat_mul_quat_asm(const void *q1, const void *q2, void *out)
 	assert(IS16ALIGNED(sz));
 #endif
 	asm(
-		"\t vld1.32 {d0, d1}, [%1]\n" // q0 = quat1.xyzw [%1]
-		"\t vld1.32 {d8, d9}, [%2]\n" // q4 = quat2.xyzw [%2]
-		"\t vmov.i32 d12, #0\n"
-		"\t vmov.i32 d13, #0x80000000\n" // q6 = [- - + +]
-		"\t vdup.32 q1, d0[1]\n"      // q1 = quat1.yyyy
-		"\t vdup.32 q2, d1[0]\n"      // q2 = quat1.zzzz
-		"\t vdup.32 q3, d1[1]\n"      // q3 = quat1.wwww
-		"\t vdup.32 q0, d0[0]\n"      // q0 = quat1.xxxx
-		"\t vshl.i64 d10, d13, #32\n"
-		"\t vmov d11, d10\n"          // q5 = [- + - +]
-		"\t vmov d15, d10\n"
-		"\t vshr.u64 d14, d10, #32\n" // q7 = [- + + -]
+		"\t vld1.32 {d0, d1}, [%1]\n"    // q0 = quat1.xyzw [%1]
+		"\t vmov.i32 d12, #0\n"          // q6.lo = 0
+		"\t vmov.i32 d13, #0x80000000\n" // q6.hi = [- - + +] = 'signy'
+		"\t vld1.32 {d8, d9}, [%2]\n"    // q4 = quat2.xyzw [%2]
+		"\t vdup.32 q1, d0[1]\n"         // q1 = q0[1] = quat1.yyyy = 'Y'
+		"\t vdup.32 q2, d1[0]\n"         // q2 = q0[2] = quat1.zzzz = 'Z'
+		"\t vshl.i64 d10, d13, #32\n"    // q5.lo = q6.hi = [- +]
+		"\t vdup.32 q3, d1[1]\n"         // q3 = q0[3] = quat1.wwww = 'W'
+		"\t vdup.32 q0, d0[0]\n"         // q0 = q0[0] = quat1.xxxx = 'X'
+		"\t vmov d11, d10\n"             // q5.hi = q5.lo = [- + - +] = 'signx'
+		"\t vmov d15, d10\n"             // q7.hi = q5.lo = [- +]
+		"\t vshr.u64 d14, d10, #32\n"    // q7.lo = q5.lo = [- + + -] = 'signz'
 
-		"\t vmov d18, d9\n"             
-		"\t vmov d19, d8\n"             // q9 = quat2.zwxy
+		"\t vmov d18, d9\n"              // q9.lo = q4.hi
+		"\t vmov d19, d8\n"              // q9.hi = q4.lo, q9 = quat2.zwxy = 'q2 for Y'
 
-		"\t veor q0, q0, q5\n"          // [-x x -x x]
-		"\t veor q1, q1, q6\n"          // [-y -y y y]
-		"\t veor q2, q2, q7\n"          // [-z z z -z]
+		"\t veor q0, q0, q5\n"           // q0 = X*signx = [-x x -x x]
+		"\t veor q1, q1, q6\n"           // q1 = Y*signy = [-y -y y y]
+		"\t veor q2, q2, q7\n"           // q2 = Z*signz = [-z z z -z]
 
-		"\t vrev64.32 q10, q9\n"        // q10 = quat2.wzyx
-		"\t vrev64.32 q8, q4\n"         // q8 = quat2.yxwz
+		"\t vrev64.32 q10, q9\n"         // q10 = quat2.wzyx = 'q2 for X'
 
-		"\t vmul.f32 q0, q0, q10\n"
-		"\t vmla.f32 q0, q1, q9\n"
-		"\t vmla.f32 q0, q2, q8\n"
-		"\t vmla.f32 q0, q3, q4\n"
+		"\t vmul.f32 q0, q0, q10\n"      // q0 = X*signx * quat2
+		"\t vmul.f32 q11, q1, q9\n"       // q0 += Y*signy * quat2
+		"\t vrev64.32 q8, q4\n"          // q8 = quat2.yxwz  = 'q2 for Z'
+		"\t vmla.f32 q0, q2, q8\n"       // q0 += Z*signz * quat2
+		"\t vmla.f32 q11, q3, q4\n"       // q0 += W       * quat2
 
-		"\t vst1.32	{d0, d1}, [%0]\n"
+		"\t vadd.f32 q0, q0, q11\n"
+		"\t vst1.32	{d0, d1}, [%0]\n"    // store output
 	: /* no outputs by value */
 	: [out]"r"(out), [quat1]"r"(q1), [quat2]"r"(q2)
-	: "memory", "q10", "q9", "q8", "q7", "q6", "q5", "q4", "q3", "q2", "q1", "q0");
+	: "memory", "q11", "q10", "q9", "q8", "q7", "q6", "q5", "q4", "q3", "q2", "q1", "q0");
 }
 #endif
 
