@@ -160,8 +160,9 @@ inline void quat_mul_quat_asm(const void *q1, const void *q2, void *out)
 	assert(IS16ALIGNED(sy));
 	assert(IS16ALIGNED(sz));
 #endif
+	///\todo 128-bit aligned loads: [%1,:128]
 	asm(
-		"\t vld1.32 {d0, d1}, [%1]\n"    // q0 = quat1.xyzw [%1]
+		"\t vld1.32 {d0, d1}, [%1]\n"    // q0 = quat1.xyzw
 		"\t vmov.i32 d12, #0\n"          // q6.lo = 0
 		"\t vmov.i32 d13, #0x80000000\n" // q6.hi = [- - + +] = 'signy'
 		"\t vld1.32 {d8, d9}, [%2]\n"    // q4 = quat2.xyzw [%2]
