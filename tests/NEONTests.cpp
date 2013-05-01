@@ -57,20 +57,6 @@ UNIQUE_TEST(set_ps_const_hex)
 
 #ifdef ANDROID
 
-BENCHMARK(float4_add_scalar)
-{
-	v3[i] = v[i] + v2[i];
-	v3[i] = v2[i] + v3[i];
-}
-BENCHMARK_END;
-
-BENCHMARK(float4_add_neon_intrinsics)
-{
-	v3[i] = vec4_add_vec4(v[i], v2[i]);
-	v3[i] = vec4_add_vec4(v2[i], v3[i]);
-}
-BENCHMARK_END;
-
 
 void inline_asm_add(void *v1, void *v2, void *out)
 {
@@ -101,20 +87,6 @@ UNIQUE_TEST(inline_asm_add)
 	assert(v3.Equals(correct));
 }
 
-BENCHMARK(inline_asm_add)
-{
-	inline_asm_add(v[i].ptr(), v2[i].ptr(), v3[i].ptr());
-	inline_asm_add(v2[i].ptr(), v3[i].ptr(), v3[i].ptr());
-}
-BENCHMARK_END;
-
-BENCHMARK(inline_asm_add_nice)
-{
-	v3[i] = inline_asm_add_nice(v[i], v2[i]);
-	v3[i] = inline_asm_add_nice(v2[i], v3[i]);
-}
-BENCHMARK_END;
-
 simd4f inline_asm_add_2(simd4f v1, simd4f v2)
 {
 	simd4f ret;
@@ -134,13 +106,6 @@ UNIQUE_TEST(inline_asm_add_2)
 	float4 correct = v + v2;
 	assert(v3.Equals(correct));
 }
-
-BENCHMARK(inline_asm_add_2)
-{
-	v3[i] = inline_asm_add_2(v[i], v2[i]);
-	v3[i] = inline_asm_add_2(v2[i], v3[i]);
-}
-BENCHMARK_END;
 
 simd4f inline_asm_add_3(simd4f v1, simd4f v2)
 {
@@ -166,10 +131,117 @@ UNIQUE_TEST(inline_asm_add_3)
 	assert(v3.Equals(correct));
 }
 
-BENCHMARK(inline_asm_add_3)
+BENCHMARK(float4_add_scalar_once)
+{
+	v3[i] = v[i] + v2[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(float4_add_neon_intrinsics_once)
+{
+	v3[i] = vec4_add_vec4(v[i], v2[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_once)
+{
+	inline_asm_add(v[i].ptr(), v2[i].ptr(), v3[i].ptr());
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_byaddr_once)
+{
+	inline_asm_add(&v[i], &v2[i], &v3[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_byaddr2_once)
+{
+	inline_asm_add(&v[i].v, &v2[i].v, &v3[i].v);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_nice_once)
+{
+	v3[i] = inline_asm_add_nice(v[i], v2[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_2_once)
+{
+	v3[i] = inline_asm_add_2(v[i], v2[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_3_once)
+{
+	v3[i] = inline_asm_add_3(v[i], v2[i]);
+}
+BENCHMARK_END;
+
+
+
+BENCHMARK(float4_add_scalar_threetimes)
+{
+	v3[i] = v[i] + v2[i];
+	v3[i] = v2[i] + v3[i];
+	v3[i] = v[i] + v3[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(float4_add_neon_intrinsics_threetimes)
+{
+	v3[i] = vec4_add_vec4(v[i], v2[i]);
+	v3[i] = vec4_add_vec4(v2[i], v3[i]);
+	v3[i] = vec4_add_vec4(v[i], v3[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_threetimes)
+{
+	inline_asm_add(v[i].ptr(), v2[i].ptr(), v3[i].ptr());
+	inline_asm_add(v2[i].ptr(), v3[i].ptr(), v3[i].ptr());
+	inline_asm_add(v[i].ptr(), v3[i].ptr(), v3[i].ptr());
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_byaddr_threetimes)
+{
+	inline_asm_add(&v[i], &v2[i], &v3[i]);
+	inline_asm_add(&v2[i], &v3[i], &v3[i]);
+	inline_asm_add(&v[i], &v3[i], &v3[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_byaddr2_threetimes)
+{
+	inline_asm_add(&v[i].v, &v2[i].v, &v3[i].v);
+	inline_asm_add(&v2[i].v, &v3[i].v, &v3[i].v);
+	inline_asm_add(&v[i].v, &v3[i].v, &v3[i].v);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_nice_threetimes)
+{
+	v3[i] = inline_asm_add_nice(v[i], v2[i]);
+	v3[i] = inline_asm_add_nice(v2[i], v3[i]);
+	v3[i] = inline_asm_add_nice(v[i], v3[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_2_threetimes)
+{
+	v3[i] = inline_asm_add_2(v[i], v2[i]);
+	v3[i] = inline_asm_add_2(v2[i], v3[i]);
+	v3[i] = inline_asm_add_2(v[i], v3[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(inline_asm_add_3_threetimes)
 {
 	v3[i] = inline_asm_add_3(v[i], v2[i]);
 	v3[i] = inline_asm_add_3(v2[i], v3[i]);
+	v3[i] = inline_asm_add_3(v[i], v3[i]);
 }
 BENCHMARK_END;
 
