@@ -1,3 +1,5 @@
+#include <string>
+
 #ifdef WIN32
 
 #include <windows.h>
@@ -8,7 +10,6 @@
 #include <stdio.h>
 #include <strsafe.h>
 
-#include <string>
 #include <sstream>
 #include <iostream>
 
