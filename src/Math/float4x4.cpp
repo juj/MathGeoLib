@@ -1390,9 +1390,18 @@ void float4x4::Transpose()
 
 float4x4 float4x4::Transposed() const
 {
-	float4x4 copy = *this;
-	copy.Transpose();
+#if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
+	float4x4 copy;
+	mat4x4_transpose(copy.row, row);
 	return copy;
+#else
+	float4x4 copy;
+	copy.v[0][0] = v[0][0]; copy.v[0][1] = v[1][0]; copy.v[0][2] = v[2][0]; copy.v[0][3] = v[3][0];
+	copy.v[1][0] = v[0][1]; copy.v[1][1] = v[1][1]; copy.v[1][2] = v[2][1]; copy.v[1][3] = v[3][1];
+	copy.v[2][0] = v[0][2]; copy.v[2][1] = v[1][2]; copy.v[2][2] = v[2][2]; copy.v[2][3] = v[3][2];
+	copy.v[3][0] = v[0][3]; copy.v[3][1] = v[1][3]; copy.v[3][2] = v[2][3]; copy.v[3][3] = v[3][3];
+	return copy;
+#endif
 }
 
 bool float4x4::InverseTranspose()
