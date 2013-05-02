@@ -110,14 +110,14 @@ void aligned_avx_memcpy(void *dst_, void *src_, size_t size)
 
 BENCHMARK(memcpy)
 {
-	memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
+	memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE2
 BENCHMARK(aligned_sse_memcpy)
 {
-	aligned_sse_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
+	aligned_sse_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
 }
 BENCHMARK_END;
 #endif
@@ -125,7 +125,7 @@ BENCHMARK_END;
 #ifdef MATH_AVX
 BENCHMARK(aligned_avx_memcpy)
 {
-	aligned_avx_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/10);
+	aligned_avx_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
 }
 BENCHMARK_END;
 #endif
