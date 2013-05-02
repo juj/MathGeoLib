@@ -86,7 +86,7 @@ public:
 		return "OSX";
 #elif defined(__unix__)
 		return "Unix";
-#elif defined(_WIN32)
+#elif defined(WIN32)
 #ifdef WIN8PHONE
 		return "Win8Phone";
 #elif defined(WIN8)
