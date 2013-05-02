@@ -1,4 +1,5 @@
 #include "SystemInfo.h"
+#include "../src/Math/myassert.h"
 
 class JSONReport
 {
@@ -104,7 +105,7 @@ public:
 		return "Emscripten";
 #else
 		return "unknown OS";
-#endif;
+#endif
 	}
 	
 	static std::string SIMDIdentifier()
