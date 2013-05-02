@@ -500,6 +500,7 @@ BENCHMARK(float_to_Float4_load1)
 }
 BENCHMARK_END;
 
+/*
 #ifdef _MSC_VER
 // Manually trying to generate only 'vmovss', but this is not working out too well!
 BENCHMARK(float_to_Float4_inline_asm)
@@ -514,7 +515,7 @@ BENCHMARK(float_to_Float4_inline_asm)
 }
 BENCHMARK_END;
 #endif
-
+*/
 // Test what FLOAT_TO_M128 produces:
 /* 	vmovss	xmm1, DWORD PTR [edx+eax*4]
 	vxorps	xmm0, xmm0, xmm0
