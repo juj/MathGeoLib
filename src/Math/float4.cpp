@@ -234,7 +234,7 @@ float float4::Length4() const
 
 float float4::Normalize3()
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 len = Normalize3_SSE();
 	return M128_TO_FLOAT(len);
 #else
@@ -268,7 +268,7 @@ float4 float4::Normalized3() const
 
 float float4::Normalize4()
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 len = Normalize4_SSE();
 	return M128_TO_FLOAT(len);
 #else
@@ -299,7 +299,7 @@ float4 float4::Normalized4() const
 
 void float4::NormalizeW()
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	NormalizeW_SSE();
 #else
 	if (fabs(w) > 1e-6f)
@@ -340,7 +340,7 @@ bool float4::IsNormalized3(float epsilonSq) const
 
 void float4::Scale3(float scalar)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 scale = FLOAT_TO_M128(scalar);
 	scale = _mm_shuffle_ps(scale, sseOne, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
 	scale = shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
@@ -547,7 +547,7 @@ float4 float4::Recip4() const
 
 float4 float4::RecipFast4() const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(_mm_rcp_ps(v));
 #else
 	return float4(1.f/x, 1.f/y, 1.f/z, 1.f/w);
@@ -556,7 +556,7 @@ float4 float4::RecipFast4() const
 
 float4 float4::Min(float ceil) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 v2 = _mm_set1_ps(ceil);
 	return float4(_mm_min_ps(v, v2));
 #else
@@ -566,7 +566,7 @@ float4 float4::Min(float ceil) const
 
 float4 float4::Min(const float4 &ceil) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(_mm_min_ps(v, ceil.v));
 #else
 	return float4(MATH_NS::Min(x, ceil.x), MATH_NS::Min(y, ceil.y), MATH_NS::Min(z, ceil.z), MATH_NS::Min(w, ceil.w));
@@ -575,7 +575,7 @@ float4 float4::Min(const float4 &ceil) const
 
 float4 float4::Max(float floor) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 v2 = _mm_set1_ps(floor);
 	return float4(_mm_max_ps(v, v2));
 #else
@@ -585,7 +585,7 @@ float4 float4::Max(float floor) const
 
 float4 float4::Max(const float4 &floor) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(_mm_max_ps(v, floor.v));
 #else
 	return float4(MATH_NS::Max(x, floor.x), MATH_NS::Max(y, floor.y), MATH_NS::Max(z, floor.z), MATH_NS::Max(w, floor.w));
@@ -594,7 +594,7 @@ float4 float4::Max(const float4 &floor) const
 
 float4 float4::Clamp(const float4 &floor, const float4 &ceil) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(_mm_max_ps(_mm_min_ps(v, ceil.v), floor.v));
 #else
 	return float4(MATH_NS::Clamp(x, floor.x, ceil.x),
@@ -606,7 +606,7 @@ float4 float4::Clamp(const float4 &floor, const float4 &ceil) const
 
 float4 float4::Clamp01() const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 floor = _mm_setzero_ps();
 	__m128 ceil = _mm_set1_ps(1.f);
 	return float4(_mm_max_ps(_mm_min_ps(v, ceil), floor));
@@ -620,7 +620,7 @@ float4 float4::Clamp01() const
 
 float4 float4::Clamp(float floor, float ceil) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	__m128 vfloor = _mm_set1_ps(floor);
 	__m128 vceil = _mm_set1_ps(ceil);
 	return float4(_mm_max_ps(_mm_min_ps(v, vceil), vfloor));
@@ -725,7 +725,7 @@ i x j == -(j x i) == k,
 (k x i) == -(i x k) == j. */
 float4 float4::Cross3(const float3 &rhs) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(cross_ps(v, float4(rhs, 0.f).v));
 #else
 	float4 dst;
@@ -739,7 +739,7 @@ float4 float4::Cross3(const float3 &rhs) const
 
 float4 float4::Cross3(const float4 &rhs) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	return float4(cross_ps(v, rhs.v));
 #else
 	return Cross3(rhs.xyz());
@@ -862,7 +862,7 @@ float4 float4::FromScalar(float scalar, float w)
 
 void float4::SetFromScalar(float scalar)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	v = _mm_set1_ps(scalar);
 #else
 	x = scalar;
@@ -874,7 +874,7 @@ void float4::SetFromScalar(float scalar)
 
 void float4::Set(float x_, float y_, float z_, float w_)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	v = _mm_set_ps(w_, z_, y_, x_);
 #else
 	x = x_;
@@ -886,7 +886,7 @@ void float4::Set(float x_, float y_, float z_, float w_)
 
 void float4::SetFromScalar(float scalar, float w_)
 {
-#ifdef MATH_SSE
+#ifdef MATH_AUTOMATIC_SSE
 	v = _mm_set_ps(w_, scalar, scalar, scalar);
 #else
 	x = scalar;
