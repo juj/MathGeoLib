@@ -52,9 +52,17 @@ public:
 
 		return fullVer;
 #endif*/
+#elif defined(EMSCRIPTEN)
+		char str[256];
+		sprintf(str, "Emscripten Clang %s", __clang_version__);
+		return str;
+#elif defined(__clang__)
+		char str[256];
+		sprintf(str, "Clang %s", __clang_version__);
+		return str;
 #elif defined(__GNUC__)
 		char str[256];
-		sprintf(str, "%d.%d.%d", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+		sprintf(str, "GCC %d.%d.%d", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 		return str;
 #else
 		return "unknown compiler";
