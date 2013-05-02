@@ -412,4 +412,13 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 	RegCloseKey(hKey);
 	return dwSpeed;
 }
+#else
+///\todo
+std::string GetOSDisplayString() { return ""; }
+unsigned long long GetTotalSystemPhysicalMemory() { return 0; }
+std::string GetProcessorBrandName() { return ""; } 
+std::string GetProcessorCPUIDString() { return ""; }
+std::string GetProcessorExtendedCPUIDInfo() { return ""; }
+unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 0; }
+
 #endif
