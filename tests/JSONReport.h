@@ -132,7 +132,7 @@ public:
 #elif defined(MATH_NEON)
 		simd = "NEON";
 #else
-		return "Scalar";
+		return "No SIMD";
 #endif
 
 #ifdef MATH_AUTOMATIC_SSE
