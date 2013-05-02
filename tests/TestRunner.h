@@ -12,9 +12,18 @@
 
 extern LCG rng;
 
-typedef void (*TestFunctionPtr)();
+// The test function can read test info and write test result to t.
+struct Test;
+typedef void (*TestFunctionPtr)(Test &t);
 struct Test
 {
+	Test()
+	{
+		isBenchmark = isRandomized = runOnlyOnce = false;
+		function = 0;
+		numTimesRun = numTrialsPerRun = numPasses = numFails = 0;
+		fastestTime = averageTime = worstTime = fastestCycles = 0.0;
+	}
 	std::string name;
 	std::string description;
 	bool isBenchmark;
@@ -23,7 +32,20 @@ struct Test
 	/// be called only exactly once. Used mostly for very slow tests that would take too long to run multiple times.
 	bool runOnlyOnce;
 	TestFunctionPtr function;
+
+	// Results:
+	int numTimesRun; ///< The total number of times this test was executed.
+	int numTrialsPerRun; ///< Each time this test was run, how many trials of it were performed (for benchmarking).
+	int numPasses;
+	int numFails;
+	double fastestTime;
+	double averageTime;
+	double worstTime;
+
+	double fastestCycles; ///< Raw clock cycles/high-resolution counter times.
 };
+
+class JSONReport;
 
 extern volatile int globalPokedData;
 
@@ -32,7 +54,7 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 void AddBenchmark(std::string name, TestFunctionPtr function, std::string description = "");
 int RunTests(int numTimes);
 /// Returns -2: no tests left to run, -1: failed, 0: success, 1: success with warnings.
-int RunOneTest(int numTimes, int numTrials, const char * const *prefixes);
+int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONReport &jsonReport);
 void PrintTestRunSummary();
 std::string FormatTime(double ticks);
 
@@ -51,24 +73,24 @@ public:
 };
 
 #define TEST(name) \
-	void TestFunc_##name(); \
+	void TestFunc_##name(Test &test); \
 	AddTestOp addtestop_##name(#name, __FILE__, false, false, false, TestFunc_##name); \
-	void TestFunc_##name()
+	void TestFunc_##name(Test & /*test*/)
 
 #define RANDOMIZED_TEST(name) \
-	void TestFunc_##name(); \
+	void TestFunc_##name(Test &test); \
 	AddTestOp addtestop_##name(#name, __FILE__, true, false, false, TestFunc_##name); \
-	void TestFunc_##name()
+	void TestFunc_##name(Test & /*test*/)
 
 #define UNIQUE_TEST(name) \
-	void TestFunc_##name(); \
+	void TestFunc_##name(Test &test); \
 	AddTestOp addtestop_##name(#name, __FILE__, false, true, false, TestFunc_##name); \
-	void TestFunc_##name()
+	void TestFunc_##name(Test & /*test*/)
 
 #define BENCHMARK(name) \
-	void BenchmarkFunc_##name(); \
+	void BenchmarkFunc_##name(Test &test); \
 	AddTestOp addbenchmarkop_##name(#name, __FILE__, false, false, true, BenchmarkFunc_##name); \
-	void BenchmarkFunc_##name() \
+	void BenchmarkFunc_##name(Test &test) \
 	{ \
 		unsigned long long bestTsc = (unsigned long long)-1; \
 		tick_t bestTicks = (tick_t)-1; \
@@ -92,15 +114,20 @@ public:
 		worstTicks = Max(worstTicks, elapsedTicks); \
 		accumTicks += elapsedTicks; \
 	} \
-	double bestCycles = (double)bestTsc / testrunner_numItersPerTest; \
-	LOGI("\n   Best: %s / %g ticks, Avg: %s, Worst: %s", FormatTime((double)bestTicks / testrunner_numItersPerTest).c_str(), bestCycles, \
-		FormatTime((double)accumTicks / (testrunner_numTimerTests * testrunner_numItersPerTest)).c_str(), FormatTime((double)worstTicks / testrunner_numItersPerTest).c_str()); \
+	test.numTimesRun = testrunner_numTimerTests; \
+	test.numTrialsPerRun = testrunner_numItersPerTest; \
+	test.fastestCycles = (double)bestTsc / testrunner_numItersPerTest; \
+	test.fastestTime = (double)bestTicks / testrunner_numItersPerTest; \
+	test.averageTime = (double)accumTicks / (testrunner_numTimerTests * testrunner_numItersPerTest); \
+	test.worstTime = (double)worstTicks / testrunner_numItersPerTest; \
+	LOGI("\n   Best: %s / %g ticks, Avg: %s, Worst: %s", FormatTime(test.fastestTime).c_str(), test.fastestCycles, \
+		FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
 }
 
 #if defined(_DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
 const int testrunner_numTimerTests = 10;
 const int testrunner_numItersPerTest = 100;
 #else
-const int testrunner_numTimerTests = 10000;
-const int testrunner_numItersPerTest = 1000;
+const int testrunner_numTimerTests = 1000;
+const int testrunner_numItersPerTest = 10000;
 #endif

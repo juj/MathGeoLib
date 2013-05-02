@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstring>
 #include "TestData.h"
+#include "JSONReport.h"
 
 #include "../src/Math/myassert.h"
 
@@ -85,45 +86,49 @@ std::string FormatTime(double ticks)
 #endif
 
 /// Returns 0: passed, 1: passed with warnings, -1: failed.
-int RunTest(Test &t, int numTimes, int numTrials)
+int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonReport)
 {
 	if (t.runOnlyOnce)
-		numTimes = numTrials = 1;
-	int numTimes1 = numTimes / numTrials;
+		numTimesToRun = numTrialsPerRun = 1;
+	if (!t.isRandomized)
+		numTimesToRun = 1;
 	if (t.isBenchmark)
+	{
+		numTimesToRun = numTrialsPerRun = 1;
 		LOGI_NL("Benchmark '%s': ", t.name.c_str());
+	}
 	else
 		LOGI_NL("Testing '%s': ", t.name.c_str());
 
 	std::vector<tick_t> times;
-	times.reserve(numTimes);
+	times.reserve(numTimesToRun);
 
-	int numFails = 0;
-	int numPasses = 0;
+	t.numFails = 0;
+	t.numPasses = 0;
 	std::string failReason; // Stores the failure reason of the first failure.
 	std::vector<std::string> failReasons;
-	for(int j = 0; j < (t.isRandomized ? numTimes1 : 1); ++j)
+	for(int j = 0; j < numTimesToRun; ++j)
 	{
 		tick_t start = Clock::Tick();
-		for(int k = 0; k < numTrials; ++k)
+		for(int k = 0; k < numTrialsPerRun; ++k)
 //			for(int k = 0; k < (t.isRandomized ? numTrials : 1); ++k)
 		{
 			try
 			{
-				t.function();
+				t.function(t);
 			}
 			catch(const std::exception &e)
 			{
 				if (failReason.empty())
 					failReason = e.what();
-				++numFails;
+				++t.numFails;
 			}
 		}
 		tick_t end = Clock::Tick();
 		times.push_back(end - start);
 	}
 
-	numPasses = (t.isRandomized ? numTimes : 1) - numFails;
+	t.numPasses = numTimesToRun*numTrialsPerRun - t.numFails;
 	std::sort(times.begin(), times.end());
 
 	// Erase outliers. (x% slowest)
@@ -135,17 +140,27 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	for(size_t j = 0; j < times.size(); ++j)
 		total += times[j];
 
-	float successRate = (float)numPasses * 100.f / numTimes;
+	if (!t.isBenchmark)
+	{
+		t.fastestTime = (double)times[0];
+		t.averageTime = (double)total / times.size();
+		t.worstTime = (double)times.back();
+		t.numTimesRun = numTimesToRun;
+		t.numTrialsPerRun = numTrialsPerRun;
+	}
+	float successRate = (float)t.numPasses * 100.f / (t.numPasses + t.numFails);
 
-	if (t.isBenchmark && numFails == 0) // Benchmarks print themselves.
+	jsonReport.Report(t);
+
+	if (t.isBenchmark && t.numFails == 0) // Benchmarks print themselves.
 		return 0; // 0: Success
 
 	int ret = 0; // 0: Success
 
-	if (numFails == 0)
+	if (t.numFails == 0)
 	{
 		if (t.isRandomized)
-			LOGI(" ok (%d passes, 100%%)", numPasses);
+			LOGI(" ok (%d passes, 100%%)", t.numPasses);
 		else
 			LOGI(" ok ");
 //		++numTestsPassed;
@@ -153,7 +168,7 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	else if (successRate >= 95.0f)
 	{
 		LOGI_NL(" ok ");
-		LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+		LOGW("Some failures with '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), t.numPasses, successRate);
 //		++numTestsPassed;
 //		++numWarnings;
 		ret = 1; // Success with warnings
@@ -161,7 +176,7 @@ int RunTest(Test &t, int numTimes, int numTrials)
 	else
 	{
 		if (t.isRandomized)
-			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), numPasses, successRate);
+			LOGE("FAILED: '%s' (%d passes, %.2f%% of all tries)", failReason.c_str(), t.numPasses, successRate);
 		else
 			LOGE("FAILED: '%s'", failReason.c_str());
 		ret = -1; // Failed
@@ -172,7 +187,7 @@ int RunTest(Test &t, int numTimes, int numTrials)
 		if (t.runOnlyOnce)
 			LOGI("   Elapsed: %s", FormatTime((double)times[0]).c_str());
 		else
-			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime((double)times[0]).c_str(), FormatTime((double)total / times.size()).c_str(), FormatTime((double)times.back()).c_str());
+			LOGI("   Fastest: %s, Average: %s, Slowest: %s", FormatTime(t.fastestTime).c_str(), FormatTime(t.averageTime).c_str(), FormatTime(t.worstTime).c_str());
 	}
 
 	return ret;
@@ -198,14 +213,14 @@ bool StringContainsOneOf(const char *str, const char * const *prefixes)
 	return false;
 }
 
-int RunOneTest(int numTimes, int numTrials, const char * const *prefixes)
+int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONReport &jsonReport)
 {
 	std::vector<Test> &tests = Tests();
 	while(nextTestToRun < (int)tests.size())
 	{
 		if (StringBeginsWithOneOf(tests[nextTestToRun].name.c_str(), prefixes) || StringContainsOneOf(tests[nextTestToRun].description.c_str(), prefixes))
 		{
-			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials);
+			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials, jsonReport);
 
 			if (ret == 0 || ret == 1)
 				++numTestsPassed;
@@ -224,12 +239,12 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes)
 }
 
 // Returns the number of failures.
-int RunTests(int numTimes, int numTrials, const char * const *prefixes)
+int RunTests(int numTimes, int numTrials, const char * const *prefixes, JSONReport &jsonReport)
 {
 	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
 	for(size_t i = 0; i < Tests().size(); ++i)
-		RunOneTest(numTimes, numTrials, prefixes);
+		RunOneTest(numTimes, numTrials, prefixes, jsonReport);
 
 	PrintTestRunSummary();
 	return numTestsFailed;
@@ -243,7 +258,7 @@ void PrintTestRunSummary()
 #ifdef MATH_TESTS_EXECUTABLE
 int main(int argc, char **argv)
 {
-	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 10000;
+	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
 	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
 	const char * const noPrefixes[] = { "", 0 };
 	const char * const *prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
@@ -256,7 +271,15 @@ int main(int argc, char **argv)
 		LOGI("   Runs all tests starting with one of the given prefixes, or residing in one of the named code files.");
 		return 0;
 	}
-	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefixes);
+
+	JSONReport jsonReport;
+	std::string jsonFilename = "test_results.json";
+	for(int i = 1; i+1 < argc; ++i)
+		if (!strcmp(argv[i], "--json"))
+			jsonFilename = argv[i+1]; // Allow overriding the output file name from command line.
+	jsonReport.Create(jsonFilename.c_str());
+
+	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefixes, jsonReport);
 	LOGI("%d", globalPokedData);
 
 	// When --exit0 is passed, we forcibly return 0 and not the number of failed tests.
