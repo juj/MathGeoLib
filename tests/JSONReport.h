@@ -62,7 +62,11 @@ public:
 		return str;
 #elif defined(__GNUC__)
 		char str[256];
-		sprintf(str, "GCC %d.%d.%d", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+		const char *prefix = "";
+#if defined(__MINGW32__)
+		prefix = "MinGW ";
+#endif
+		sprintf(str, "%sGCC %d.%d.%d", prefix, __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 		return str;
 #else
 		return "unknown compiler";
