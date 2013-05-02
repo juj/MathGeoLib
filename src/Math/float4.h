@@ -681,12 +681,12 @@ public:
 #ifdef MATH_SSE
 	float4(__m128 vec):v(vec) {}
 
+	///\todo All the _SSE() functions will be deleted in favor of C SSE API.
 	__m128 Swizzled_SSE(int i, int j, int k, int l) const;
 	__m128 LengthSq3_SSE() const;
 	__m128 Length3_SSE() const;
 	__m128 LengthSq4_SSE() const;
 	__m128 Length4_SSE() const;
-	__m128 Normalize3_SSE();
 	__m128 Normalize4_SSE();
 	void Normalize3_Fast_SSE();
 	void Normalize4_Fast_SSE();

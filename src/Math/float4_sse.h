@@ -122,4 +122,16 @@ FORCE_INLINE __m128 cross_ps(__m128 a, __m128 b)
 	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
+FORCE_INLINE simd4f vec3_length_ps(simd4f vec);
+
+/// Returns a normalized copy of the given vector. Returns the length of the original vector in outLength.
+FORCE_INLINE __m128 vec4_safe_normalize3(__m128 vec, __m128 &outLength)
+{
+	outLength = vec3_length_ps(vec);
+	__m128 isZero = _mm_cmplt_ps(outLength, sseEpsilonFloat); // Was the length zero?
+	__m128 normalized = _mm_div_ps(vec, outLength); // Normalize.
+	normalized = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
+	return cmov_ps(vec, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
+}
+
 #endif

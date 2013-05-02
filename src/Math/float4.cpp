@@ -156,15 +156,6 @@ __m128 float4::Length4_SSE() const
 	return _mm_sqrt_ps(dot4_ps(v, v));
 }
 
-__m128 float4::Normalize3_SSE()
-{
-	__m128 len = Length3_SSE();
-	__m128 isZero = _mm_cmplt_ps(len, sseEpsilonFloat); // Was the length zero?
-	__m128 normalized = _mm_div_ps(v, len); // Normalize.
-	normalized = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).
-	v = cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
-	return len;
-}
 
 void float4::Normalize3_Fast_SSE()
 {
@@ -234,9 +225,10 @@ float float4::Length4() const
 
 float float4::Normalize3()
 {
-#ifdef MATH_AUTOMATIC_SSE
-	__m128 len = Normalize3_SSE();
-	return M128_TO_FLOAT(len);
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	__m128 origLength;
+	vec4_safe_normalize3(v, origLength);
+	return M128_TO_FLOAT(origLength);
 #else
 	assume(IsFinite());
 	float lengthSq = LengthSq3();
