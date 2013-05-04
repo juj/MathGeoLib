@@ -45,6 +45,7 @@ struct U80
 	explicit U80(long double d)
 	{
 		assert(sizeof(long double) <= 16);
+		memset(data, 0, sizeof(data));
 		memcpy(data, &d, sizeof(d));
 	}
 
