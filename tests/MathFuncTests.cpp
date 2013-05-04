@@ -348,13 +348,13 @@ UNIQUE_TEST(sqrt_rsqrt_precision)
 {
 	const int C = 7;
 	float maxRelError[C] = {};
+	float X[C] = {};
 
 	for(int i = 0; i < 1000000; ++i)
 	{
 		float f = rng.Float(1e-5f, 1e20f);
 		float x = (float)(1.0 / sqrt((double)f)); // best precision of the rsqrt.
 
-		float X[C];
 		X[0] = RSqrt(f);
 		X[1] = recip_sqrtf(f);
 		X[2] = sqrtf_recip(f);
