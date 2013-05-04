@@ -22,6 +22,7 @@
 #include "../MathGeoLibFwd.h"
 #include <stdint.h>
 #include <cstddef>
+#include "Reinterpret.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -62,7 +63,7 @@ void AlignedFree(void *ptr);
 #define IS_MAT_ALIGNED(x) IS16ALIGNED(X)
 #endif
 
-inline float ReinterpretAsFloat(u32 i);
+//inline float ReinterpretAsFloat(u32 i);
 
 #ifdef MATH_SSE
 

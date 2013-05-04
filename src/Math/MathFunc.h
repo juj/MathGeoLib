@@ -26,6 +26,7 @@
 #include "MathTypes.h"
 #include "MathConstants.h"
 #include "float3.h"
+#include "Reinterpret.h"
 #include "SSEMath.h"
 
 #ifdef WIN32
@@ -482,49 +483,6 @@ bool EqualRel(float a, float b, float maxRelError = 1e-4f);
 	http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 	Warning: This comparison is not safe with NANs or INFs. */
 bool EqualUlps(float a, float b, int maxUlps = 10000);
-
-/// As per C99, union-reinterpret should now be safe: http://stackoverflow.com/questions/8511676/portable-data-reinterpretation
-union FloatIntReinterpret
-{
-	float f;
-	u32 i;
-};
-
-union DoubleU64Reinterpret
-{
-	double d;
-	u64 i;
-};
-
-/// Returns the bit pattern of the given float as a u32.
-FORCE_INLINE u32 ReinterpretAsU32(float f)
-{
-	FloatIntReinterpret fi;
-	fi.f = f;
-	return fi.i;
-}
-
-FORCE_INLINE u64 ReinterpretAsU64(double d)
-{
-	DoubleU64Reinterpret di;
-	di.d = d;
-	return di.i;
-}
-
-/// Converts the bit pattern specified by the given integer to a floating point (this is a binary conversion, not numeral!).
-FORCE_INLINE float ReinterpretAsFloat(u32 i)
-{
-	FloatIntReinterpret fi;
-	fi.i = i;
-	return fi.f;
-}
-
-FORCE_INLINE double ReinterpretAsDouble(u64 i)
-{
-	DoubleU64Reinterpret di;
-	di.i = i;
-	return di.d;
-}
 
 /// Returns true if the given value is not an inf or a nan.
 template<typename T> FORCE_INLINE bool IsFinite(T /*value*/) { return true; }
