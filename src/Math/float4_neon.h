@@ -348,7 +348,13 @@ FORCE_INLINE simd4f vec4_rsqrt(simd4f vec)
 
 FORCE_INLINE simd4f vec4_sqrt(simd4f vec)
 {
+#ifdef MATH_SSE
+	return _mm_sqrt_ps(vec);
+#else
+	// Fast version, but does not work when x == 0!
+	///\todo Exact sqrt for NEON!
 	return mul_ps(vec, vec4_rsqrt(vec));
+#endif
 }
 
 FORCE_INLINE float vec4_length_float(simd4f vec)
