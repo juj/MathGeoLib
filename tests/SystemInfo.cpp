@@ -1,6 +1,6 @@
 #include <string>
 
-#if defined(WIN32) && !defined(__MINGW32__)
+#if defined(WIN32) && !defined(__MINGW32__) && !defined(WIN8RT)
 
 #include <windows.h>
 #include <intrin.h>
