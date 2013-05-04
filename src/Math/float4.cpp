@@ -227,7 +227,7 @@ float float4::Normalize3()
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	__m128 origLength;
-	vec4_safe_normalize3(v, origLength);
+	v = vec4_safe_normalize3(v, origLength);
 	return M128_TO_FLOAT(origLength);
 #else
 	assume(IsFinite());
@@ -251,11 +251,16 @@ float float4::Normalize3()
 
 float4 float4::Normalized3() const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	__m128 origLength;
+	return vec4_safe_normalize3(v, origLength);
+#else
 	float4 copy = *this;
 	float length = copy.Normalize3();
 	assume(length > 0);
 	MARK_UNUSED(length);
 	return copy;
+#endif
 }
 
 float float4::Normalize4()
