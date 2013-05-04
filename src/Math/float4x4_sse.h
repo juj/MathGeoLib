@@ -422,12 +422,13 @@ inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 }
 
 // Computes the inverse of a 4x4 matrix via direct cofactor expansion.
+/// Returns the determinant of the original matrix, and zero on failure.
 #define MAT_COFACTOR(mat, i, j) \
 	_mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
 	           shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0))), \
 	           _mm_mul_ps(shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
 	           _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
-FORCE_INLINE void mat4x4_inverse(const __m128 *mat, __m128 *out)
+FORCE_INLINE float mat4x4_inverse(const __m128 *mat, __m128 *out)
 {
 	__m128 f1 = MAT_COFACTOR(mat, 3, 2);
 	__m128 f2 = MAT_COFACTOR(mat, 3, 1);
@@ -446,11 +447,12 @@ FORCE_INLINE void mat4x4_inverse(const __m128 *mat, __m128 *out)
 	__m128 r3 = _mm_xor_ps(s1, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f2), _mm_mul_ps(v2, f4)), _mm_mul_ps(v4, f6)));
 	__m128 r4 = _mm_xor_ps(s2, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f3), _mm_mul_ps(v2, f5)), _mm_mul_ps(v3, f6)));
 	__m128 det = dot4_ps(mat[0], _mm_movelh_ps(_mm_unpacklo_ps(r1, r2), _mm_unpacklo_ps(r3, r4)));
-	det = _mm_rcp_ps(det);
-	out[0] = _mm_mul_ps(r1, det);
-	out[1] = _mm_mul_ps(r2, det);
-	out[2] = _mm_mul_ps(r3, det);
-	out[3] = _mm_mul_ps(r4, det);
+	__m128 rcp = _mm_rcp_ps(det);
+	out[0] = _mm_mul_ps(r1, rcp);
+	out[1] = _mm_mul_ps(r2, rcp);
+	out[2] = _mm_mul_ps(r3, rcp);
+	out[3] = _mm_mul_ps(r4, rcp);
+	return M128_TO_FLOAT(det);
 }
 
 /// Inverts a 3x4 affine transformation matrix (in row-major format) that only consists of rotation (+possibly mirroring) and translation.

@@ -1331,7 +1331,10 @@ bool float4x4::LUDecompose(float4x4 &outLower, float4x4 &outUpper) const
 
 bool float4x4::Inverse(float epsilon)
 {
-	///\todo SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	float det = mat4x4_inverse(row, row);
+	return det > 1e-5f;
+#else
 #ifdef MATH_ASSERT_CORRECTNESS
 	float4x4 copy = *this;
 	bool success = InverseMatrix(*this, epsilon);
@@ -1340,6 +1343,7 @@ bool float4x4::Inverse(float epsilon)
 	return success;
 #else
 	return InverseMatrix(*this, epsilon);
+#endif
 #endif
 }
 
