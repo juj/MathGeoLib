@@ -15,6 +15,25 @@
 
 using namespace TestData;
 
+UNIQUE_TEST(ExceptionCatchingWorks)
+{
+	bool gotException = false;
+	try
+	{
+		throw std::runtime_error("testing exceptions");
+	}
+	catch(const std::runtime_error &e)
+	{
+		gotException = true;
+		LOGI("Exception catching works.");
+	}
+	if (!gotException)
+	{
+		LOGE("Exception catching does not work!");
+	}
+	assert(gotException);
+}
+
 #if __cplusplus >= 201103L
 TEST(CXX11StdFinite)
 {
