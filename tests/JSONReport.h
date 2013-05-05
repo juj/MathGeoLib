@@ -313,7 +313,7 @@ public:
 		{
 			LOGI("***** BEGIN FILE test_report.json *****");
 			for(std::list<std::string>::iterator iter = reports.begin(); iter != reports.end(); ++iter)
-				LOGI(iter->c_str());
+				LOGI("%s", iter->c_str());
 			LOGI("***** END FILE test_report.json *****");
 		}
 		handle = 0;
