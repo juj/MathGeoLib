@@ -128,6 +128,6 @@ public:
 const int testrunner_numTimerTests = 10;
 const int testrunner_numItersPerTest = 100;
 #else
-const int testrunner_numTimerTests = 1000;
-const int testrunner_numItersPerTest = 10000;
+const int testrunner_numTimerTests = 100;
+const int testrunner_numItersPerTest = 1000;
 #endif
