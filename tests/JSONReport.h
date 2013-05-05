@@ -98,6 +98,8 @@ public:
 		return "OSX";
 #elif defined(__unix__)
 		return "Unix";
+#elif defined(EMSCRIPTEN)
+		return "Emscripten";
 #elif defined(WIN32)
 #ifdef WIN8PHONE
 		return "Win8Phone";
@@ -113,8 +115,6 @@ public:
 			return "Windows XP";
 		return os;
 #endif
-#elif defined(EMSCRIPTEN)
-		return "Emscripten";
 #else
 		return "unknown OS";
 #endif
@@ -271,7 +271,6 @@ public:
 
 	void Report(const Test &t)
 	{
-		assert(handle);
 		if (!handle)
 			return;
 
