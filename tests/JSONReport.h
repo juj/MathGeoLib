@@ -16,8 +16,8 @@ private:
 
 public:
 	JSONReport()
-	:handle(0)
-	,isOpen(false)
+	:isOpen(false),
+	handle(0)
 	{
 	}
 

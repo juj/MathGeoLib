@@ -258,8 +258,11 @@ void PrintTestRunSummary()
 #ifdef MATH_TESTS_EXECUTABLE
 int main(int argc, char **argv)
 {
-	const int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
-	const int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
+	int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
+	int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
+#ifdef EMSCRIPTEN
+	numTotalRuns = numTrialsPerTimedBlock = 10;
+#endif
 	const char * const noPrefixes[] = { "", 0 };
 	const char * const *prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
 
