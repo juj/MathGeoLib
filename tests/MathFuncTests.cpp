@@ -15,14 +15,51 @@
 
 using namespace TestData;
 
+bool TrueCondition() // This is a function that always returns true, but it is impossible for compiler to know that.
+{
+	tick_t t1 = Clock::Tick();
+	tick_t t2 = Clock::Tick();
+	return t1 != 0 || t2 != 10000000;
+}
+
+UNIQUE_TEST(ExceptionGoesThrough)
+{
+	LOGI("Testing exception throwing.");
+	if (TrueCondition())
+		throw std::runtime_error("expect failure");
+}
+
 UNIQUE_TEST(ExceptionCatchingWorks)
 {
 	bool gotException = false;
 	try
 	{
-		throw std::runtime_error("testing exceptions");
+		LOGI("Testing exception throwing.");
+		if (TrueCondition())
+			throw std::runtime_error("testing exceptions");
 	}
 	catch(const std::runtime_error &e)
+	{
+		gotException = true;
+		LOGI("Exception catching works.");
+	}
+	if (!gotException)
+	{
+		LOGE("Exception catching does not work!");
+	}
+	assert(gotException);
+}
+
+UNIQUE_TEST(BaseDerivedExceptionCatchingWorks)
+{
+	bool gotException = false;
+	try
+	{
+		LOGI("Testing exception throwing.");
+		if (TrueCondition())
+			throw std::runtime_error("testing exceptions");
+	}
+	catch(const std::exception &e)
 	{
 		gotException = true;
 		LOGI("Exception catching works.");

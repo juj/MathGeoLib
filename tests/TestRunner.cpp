@@ -117,11 +117,37 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 			{
 				t.function(t);
 			}
+			catch(const std::runtime_error &e)
+			{
+				LOGI("Caught std::runtime_error.");
+				if (!!strcmp(e.what(), "expect failure"))
+				{
+					if (failReason.empty())
+						failReason = e.what();
+					++t.numFails;
+				}
+				else
+				{
+					LOGI("Caught std::runtime_error thrown from another file as expected.");
+				}
+			}
 			catch(const std::exception &e)
 			{
-				if (failReason.empty())
-					failReason = e.what();
-				++t.numFails;
+				LOGI("Caught std::exception.");
+				if (!!strcmp(e.what(), "expect failure"))
+				{
+					if (failReason.empty())
+						failReason = e.what();
+					++t.numFails;
+				}
+				else
+				{
+					LOGI("Caught std::runtime_error as std::exception thrown from another file as expected.");
+				}
+			}
+			catch(...)
+			{
+				LOGE("Error: Received an unknown exception type that is _not_ derived from std::exception!");
 			}
 		}
 		tick_t end = Clock::Tick();

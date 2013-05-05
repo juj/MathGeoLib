@@ -124,9 +124,14 @@ public:
 		FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
 }
 
-#if defined(_DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
+#if defined(_DEBUG) || defined(DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
+#if defined(EMSCRIPTEN)
+const int testrunner_numTimerTests = 1;
+const int testrunner_numItersPerTest = 1;
+#else
 const int testrunner_numTimerTests = 10;
 const int testrunner_numItersPerTest = 100;
+#endif
 #else
 const int testrunner_numTimerTests = 100;
 const int testrunner_numItersPerTest = 1000;
