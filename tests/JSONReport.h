@@ -12,10 +12,12 @@ private:
 	// to a report file.
 	std::list<std::string> reports;
 	char temp_str[512];
+	bool isOpen;
 
 public:
 	JSONReport()
 	:handle(0)
+	,isOpen(false)
 	{
 	}
 
@@ -191,7 +193,7 @@ public:
 	{
 		Finish(); // If we happened to have an old one..
 
-#if !defined(ANDROID) && !defined(EMSCRIPTEN) && !defined(WIN8PHONE) && !defined(APPLE_IOS) && !defined(NACL) // Virtual FS archs output to screen.
+#if !defined(ANDROID) && !defined(EMSCRIPTEN) && !defined(WIN8PHONE) && !defined(APPLE_IOS) && !defined(NACL) && !defined(NPAPI) // Virtual FS archs output to screen.
 		handle = fopen(filename, "w");
 		if (!handle)
 			LOGE("Failed to open file '%s'!", filename);
@@ -285,6 +287,8 @@ public:
 		LOG_WRITE("\t\t},\n");
 
 		LOG_WRITE("\t\"results\": [\n");
+
+		isOpen = true;
 	}
 
 	static double TicksToMicroseconds(double ticks)
@@ -303,20 +307,23 @@ public:
 
 	void Finish()
 	{
-		if (handle)
+		if (isOpen)
 		{
 			LOG_WRITE("\t\t{ \"dummy_commaswallow\": true }\n");
 			LOG_WRITE("\t]\n}\n");
-			fclose(handle);
 		}
+		if (handle)
+			fclose(handle);
 		else if (!reports.empty())// Output everything to stdout, since we don't have a file to store the results to.
 		{
 			LOGI("***** BEGIN FILE test_report.json *****");
 			for(std::list<std::string>::iterator iter = reports.begin(); iter != reports.end(); ++iter)
 				LOGI("%s", iter->c_str());
 			LOGI("***** END FILE test_report.json *****");
+			reports.clear();
 		}
 		handle = 0;
+		isOpen = false;
 	}
 
 private:
