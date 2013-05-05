@@ -1,8 +1,18 @@
+#include <list>
+#include <string>
+
 #include "SystemInfo.h"
 #include "../src/Math/myassert.h"
 
 class JSONReport
 {
+private:
+	// If a file output has not been opened, all reports are queued to this structure instead,
+	// and logged to screen at quit time. This allows extracting the results from stdout
+	// to a report file.
+	std::list<std::string> reports;
+	char temp_str[512];
+
 public:
 	JSONReport()
 	:handle(0)
@@ -164,104 +174,117 @@ public:
 		return OSIdentifier() + " " + CompilerIdentifier() + " " + ArchitectureIdentifier() + " " + SIMDIdentifier() + " " + ConfigIdentifier();
 	}
 
+#define LOG_WRITE(str, ...) \
+	MULTI_LINE_MACRO_BEGIN \
+		sprintf(temp_str, str, __VA_ARGS__); \
+		if (handle) \
+			fputs(temp_str, handle); \
+		else \
+		{ \
+			std::string s = temp_str; \
+			s.erase(s.find_last_not_of(" \n\r\t")+1); \
+			reports.push_back(s); \
+		} \
+	MULTI_LINE_MACRO_END
+
 	void Create(const char *filename)
 	{
 		Finish(); // If we happened to have an old one..
 
+#if !defined(ANDROID) && !defined(EMSCRIPTEN) && !defined(WIN8PHONE) && !defined(APPLE_IOS) && !defined(NACL) // Virtual FS archs output to screen.
 		handle = fopen(filename, "w");
 		if (!handle)
-		{
 			LOGE("Failed to open file '%s'!", filename);
-			return;
-		}
-		fputs("{\n", handle);
-		fprintf(handle, "\t\"build\": \"%s\",\n", BuildDescription().c_str());
-		fprintf(handle, "\t\"os\": \"%s\",\n", GetOSDisplayString().c_str());
-		fprintf(handle, "\t\"ram\": %d,\n", (int)(GetTotalSystemPhysicalMemory()/1024/1024));
-		fprintf(handle, "\t\"cpuBrandName\": \"%s\",\n", GetProcessorBrandName().c_str());
-		fprintf(handle, "\t\"cpuid\": \"%s\",\n",GetProcessorCPUIDString().c_str());
-		fprintf(handle, "\t\"cpuidInfo\": \"%s\",\n",GetProcessorExtendedCPUIDInfo().c_str());
-		///\todo This doesn't work on Core i3/i5/i7, so leave it out.
-//		fprintf(handle, "\t\"numCores\": %d,\n", GetNumberOfLogicalCPUCores());
-		fprintf(handle, "\t\"cpuSpeed\": %d,\n", (int)GetCPUSpeedFromRegistry(0));
+#endif
 
-		fprintf(handle, "\t\"defines\": {\n");
+		LOG_WRITE("{\n");
+		LOG_WRITE("\t\"build\": \"%s\",\n", BuildDescription().c_str());
+		LOG_WRITE("\t\"os\": \"%s\",\n", GetOSDisplayString().c_str());
+		LOG_WRITE("\t\"ram\": %d,\n", (int)(GetTotalSystemPhysicalMemory()/1024/1024));
+		LOG_WRITE("\t\"cpuBrandName\": \"%s\",\n", GetProcessorBrandName().c_str());
+		LOG_WRITE("\t\"cpuid\": \"%s\",\n",GetProcessorCPUIDString().c_str());
+		LOG_WRITE("\t\"cpuidInfo\": \"%s\",\n",GetProcessorExtendedCPUIDInfo().c_str());
+		///\todo This doesn't work on Core i3/i5/i7, so leave it out.
+//		LOG_WRITE("\t\"numCores\": %d,\n", GetNumberOfLogicalCPUCores());
+		LOG_WRITE("\t\"cpuSpeed\": %d,\n", (int)GetCPUSpeedFromRegistry(0));
+
+		LOG_WRITE("\t\"defines\": {\n");
 #ifdef WINVER
-		fprintf(handle, "\t\t\"WINVER\": \"0x%X\",\n", WINVER);
+		LOG_WRITE("\t\t\"WINVER\": \"0x%X\",\n", WINVER);
 #endif
 #ifdef WIN8
-		fprintf(handle, "\t\t\"WIN8\": true,\n");
+		LOG_WRITE( "\t\t\"WIN8\": true,\n");
 #endif
 #ifdef MATH_ENABLE_WINXP_SUPPORT
-		fprintf(handle, "\t\t\"MATH_ENABLE_WINXP_SUPPORT\": true,\n");
+		LOG_WRITE("\t\t\"MATH_ENABLE_WINXP_SUPPORT\": true,\n");
 #endif
 #ifdef _DEBUG
-		fprintf(handle, "\t\t\"_DEBUG\": true,\n");
+		LOG_WRITE("\t\t\"_DEBUG\": true,\n");
 #endif
 #ifdef MATH_SILENT_ASSUME
-		fprintf(handle, "\t\t\"MATH_SILENT_ASSUME\": true,\n");
+		LOG_WRITE("\t\t\"MATH_SILENT_ASSUME\": true,\n");
 #endif
 #ifdef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-		fprintf(handle, "\t\t\"MATH_ENABLE_INSECURE_OPTIMIZATIONS\": true,\n");
+		LOG_WRITE("\t\t\"MATH_ENABLE_INSECURE_OPTIMIZATIONS\": true,\n");
 #endif
 #ifdef MATH_ASSERT_CORRECTNESS
-		fprintf(handle, "\t\t\"MATH_ASSERT_CORRECTNESS\": true,\n");
+		LOG_WRITE("\t\t\"MATH_ASSERT_CORRECTNESS\": true,\n");
 #endif
 #ifdef FAIL_USING_EXCEPTIONS
-		fprintf(handle, "\t\t\"FAIL_USING_EXCEPTIONS\": true,\n");
+		LOG_WRITE("\t\t\"FAIL_USING_EXCEPTIONS\": true,\n");
 #endif
 #ifdef MATH_ENABLE_STL_SUPPORT
-		fprintf(handle, "\t\t\"MATH_ENABLE_STL_SUPPORT\": true,\n");
+		LOG_WRITE("\t\t\"MATH_ENABLE_STL_SUPPORT\": true,\n");
 #endif
 #ifdef ANDROID
-		fprintf(handle, "\t\t\"ANDROID\": true,\n");
+		LOG_WRITE("\t\t\"ANDROID\": true,\n");
 #endif
 #ifdef __ARM_ARCH_7A__
-		fprintf(handle, "\t\t\"__ARM_ARCH_7A__\": true,\n");
+		LOG_WRITE("\t\t\"__ARM_ARCH_7A__\": true,\n");
 #endif
 #ifdef WIN8RT
-		fprintf(handle, "\t\t\"WIN8RT\": true,\n");
+		LOG_WRITE("\t\t\"WIN8RT\": true,\n");
 #endif
 #ifdef _M_ARM
-		fprintf(handle, "\t\t\"_M_ARM\": true,\n");
+		LOG_WRITE("\t\t\"_M_ARM\": true,\n");
 #endif
 #ifdef MATH_AVX
-		fprintf(handle, "\t\t\"MATH_AVX\": true,\n");
+		LOG_WRITE("\t\t\"MATH_AVX\": true,\n");
 #endif
 #ifdef MATH_SSE41
-		fprintf(handle, "\t\t\"MATH_SSE41\": true,\n");
+		LOG_WRITE("\t\t\"MATH_SSE41\": true,\n");
 #endif
 #ifdef MATH_SSE3
-		fprintf(handle, "\t\t\"MATH_SSE3\": true,\n");
+		LOG_WRITE("\t\t\"MATH_SSE3\": true,\n");
 #endif
 #ifdef MATH_SSE2
-		fprintf(handle, "\t\t\"MATH_SSE2\": true,\n");
+		LOG_WRITE("\t\t\"MATH_SSE2\": true,\n");
 #endif
 #ifdef MATH_SSE
-		fprintf(handle, "\t\t\"MATH_SSE\": true,\n");
+		LOG_WRITE("\t\t\"MATH_SSE\": true,\n");
 #endif
 #ifdef MATH_NEON
-		fprintf(handle, "\t\t\"MATH_NEON\": true,\n");
+		LOG_WRITE("\t\t\"MATH_NEON\": true,\n");
 #endif
 #ifdef _MSC_VER
-		fprintf(handle, "\t\t\"_MSC_VER\": %d,\n", _MSC_VER);
+		LOG_WRITE("\t\t\"_MSC_VER\": %d,\n", _MSC_VER);
 #endif
 #ifdef __clang__
-		fprintf(handle, "\t\t\"__clang__\": true,\n");
+		LOG_WRITE("\t\t\"__clang__\": true,\n");
 #endif
 #ifdef __GNUC__
-		fprintf(handle, "\t\t\"__GNUC__\": true,\n");
+		LOG_WRITE("\t\t\"__GNUC__\": true,\n");
 #endif
 #ifdef MATH_SIMD
-		fprintf(handle, "\t\t\"MATH_SIMD\": true,\n");
+		LOG_WRITE("\t\t\"MATH_SIMD\": true,\n");
 #endif
 #ifdef MATH_AUTOMATIC_SSE
-		fprintf(handle, "\t\t\"MATH_AUTOMATIC_SSE\": true,\n");
+		LOG_WRITE("\t\t\"MATH_AUTOMATIC_SSE\": true,\n");
 #endif
-		fprintf(handle, "\t\t\"dummy_swallowcomma\": true\n");
-		fprintf(handle, "\t\t},\n");
+		LOG_WRITE("\t\t\"dummy_swallowcomma\": true\n");
+		LOG_WRITE("\t\t},\n");
 
-		fputs("\t\"results\": [\n", handle);
+		LOG_WRITE("\t\"results\": [\n");
 	}
 
 	static double TicksToMicroseconds(double ticks)
@@ -271,22 +294,27 @@ public:
 
 	void Report(const Test &t)
 	{
-		if (!handle)
-			return;
-
-		fprintf(handle, "\t\t{ \"type\": \"%s\", \"name\": \"%s\", \"numTimesRun\": %d, \"numTrialsPerRun\": %d, \"numPasses\": %d, \"numFails\": %d, \"fastestTime\": %f, \"averageTime\": %f, \"slowestTime\": %f, \"fastestCycles\": %f },\n", 
+		LOG_WRITE("\t\t{ \"type\": \"%s\", \"name\": \"%s\", \"numTimesRun\": %d, \"numTrialsPerRun\": %d, \"numPasses\": %d, \"numFails\": %d, \"fastestTime\": %f, \"averageTime\": %f, \"slowestTime\": %f, \"fastestCycles\": %f },\n", 
 			t.isBenchmark ? "benchmark" : "test", t.name.c_str(), t.numTimesRun, t.numTrialsPerRun, t.numPasses, t.numFails, 
 			TicksToMicroseconds(t.fastestTime), TicksToMicroseconds(t.averageTime), TicksToMicroseconds(t.worstTime), t.fastestCycles);
-		fflush(handle);
+		if (handle)
+			fflush(handle);
 	}
 
 	void Finish()
 	{
 		if (handle)
 		{
-			fputs("\t\t{ \"dummy_commaswallow\": true }\n", handle);
-			fputs("\t]\n}\n", handle);
+			LOG_WRITE("\t\t{ \"dummy_commaswallow\": true }\n");
+			LOG_WRITE("\t]\n}\n");
 			fclose(handle);
+		}
+		else if (!reports.empty())// Output everything to stdout, since we don't have a file to store the results to.
+		{
+			LOGI("***** BEGIN FILE test_report.json *****");
+			for(std::list<std::string>::iterator iter = reports.begin(); iter != reports.end(); ++iter)
+				LOGI(iter->c_str());
+			LOGI("***** END FILE test_report.json *****");
 		}
 		handle = 0;
 	}
@@ -297,3 +325,5 @@ private:
 	void operator =(const JSONReport &);
 	JSONReport(const JSONReport &);
 };
+
+#undef LOG_WRITE
