@@ -174,9 +174,9 @@ public:
 		return OSIdentifier() + " " + CompilerIdentifier() + " " + ArchitectureIdentifier() + " " + SIMDIdentifier() + " " + ConfigIdentifier();
 	}
 
-#define LOG_WRITE(str, ...) \
+#define LOG_WRITE(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		sprintf(temp_str, str, __VA_ARGS__); \
+		sprintf(temp_str, __VA_ARGS__); \
 		if (handle) \
 			fputs(temp_str, handle); \
 		else \
