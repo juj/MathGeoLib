@@ -22,12 +22,14 @@ bool TrueCondition() // This is a function that always returns true, but it is i
 	return t1 != 0 || t2 != 10000000;
 }
 
+#ifndef EMSCRIPTEN ///\todo This breaks on Emscripten!
 UNIQUE_TEST(ExceptionGoesThrough)
 {
 	LOGI("Testing exception throwing.");
 	if (TrueCondition())
 		throw std::runtime_error("expect failure");
 }
+#endif
 
 UNIQUE_TEST(ExceptionCatchingWorks)
 {

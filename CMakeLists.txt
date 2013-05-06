@@ -13,7 +13,7 @@ if (MSVC11 AND RUN_VS2012_ANALYZE)
 	add_definitions(/analyze)
 endif()
 
-if (BUILD_FOR_GCOV)
+if (BUILD_FOR_GCOV AND NOT EMSCRIPTEN) # TODO: Enable exceptions in Emscripten after they are working again!
 	add_definitions(-DFAIL_USING_EXCEPTIONS)
 endif()
 
