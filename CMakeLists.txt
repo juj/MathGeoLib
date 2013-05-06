@@ -48,7 +48,9 @@ if (BUILD_FOR_GCOV)
 		get_filename_component(filebasename ${filename} NAME)
 		file(APPEND "MathGeoLib_code_files.txt" "${filebasename} ")
 	endforeach()
+endif()
 
+if (BUILD_FOR_GCOV OR MATH_TESTS_EXECUTABLE OR FAIL_USING_EXCEPTIONS) # TODO: Use a separate MATH_INCLUDE_TESTS?
 	file(GLOB_RECURSE testSourceFiles ./tests/*.cpp)
 	file(GLOB_RECURSE testHeaderFiles ./tests/*.h)
 	set(sourceFiles ${sourceFiles} ${testSourceFiles})
