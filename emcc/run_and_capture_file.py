@@ -11,15 +11,18 @@ def main():
   lines = stdout.split('\n')
   file = None
   for line in lines:
-    matchObj = re.match(r'\*\*\*\*\* BEGIN FILE (.*) \*\*\*\*\*', line.strip(), re.M|re.I)
+    matchObj = re.search(r'\*\*\*\*\* BEGIN FILE (.*) \*\*\*\*\*', line.strip(), re.M|re.I)
     if matchObj:
       file = open(matchObj.group(1).strip(), 'w')
     else:
-      matchObj = re.match(r'\*\*\*\*\* END FILE (.*) \*\*\*\*\*', line.strip(), re.M|re.I)
+      matchObj = re.search(r'\*\*\*\*\* END FILE (.*) \*\*\*\*\*', line.strip(), re.M|re.I)
       if matchObj:
+        file.close()
         file = None
-      if file:
+      elif file:
         file.write(line)
+      else:
+        print >> sys.stdout, line
 
 if __name__ == '__main__':
   sys.exit(main())
