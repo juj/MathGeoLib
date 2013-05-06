@@ -316,10 +316,10 @@ public:
 			fclose(handle);
 		else if (!reports.empty())// Output everything to stdout, since we don't have a file to store the results to.
 		{
-			LOGI("***** BEGIN FILE test_report.json *****");
+			LOGI("***** BEGIN FILE test_results.json *****");
 			for(std::list<std::string>::iterator iter = reports.begin(); iter != reports.end(); ++iter)
 				LOGI("%s", iter->c_str());
-			LOGI("***** END FILE test_report.json *****");
+			LOGI("***** END FILE test_results.json *****");
 			reports.clear();
 		}
 		handle = 0;
