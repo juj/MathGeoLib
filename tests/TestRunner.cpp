@@ -168,9 +168,9 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 
 	if (!t.isBenchmark)
 	{
-		t.fastestTime = (double)times[0];
-		t.averageTime = (double)total / times.size();
-		t.worstTime = (double)times.back();
+		t.fastestTime = (double)times[0] / numTrialsPerRun;
+		t.averageTime = (double)total / times.size() / numTrialsPerRun;
+		t.worstTime = (double)times.back() / numTrialsPerRun;
 		t.numTimesRun = numTimesToRun;
 		t.numTrialsPerRun = numTrialsPerRun;
 	}
