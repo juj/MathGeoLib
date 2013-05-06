@@ -13,24 +13,24 @@ if (MSVC11 AND RUN_VS2012_ANALYZE)
 	add_definitions(/analyze)
 endif()
 
-if (BUILD_FOR_GCOV AND NOT EMSCRIPTEN) # TODO: Enable exceptions in Emscripten after they are working again!
+if (FAIL_USING_EXCEPTIONS)
 	add_definitions(-DFAIL_USING_EXCEPTIONS)
-endif()
-
-if (MATH_TESTS_EXECUTABLE)
-	add_definitions(-DMATH_TESTS_EXECUTABLE)
-
-	if (MINGW AND BUILD_FOR_GCOV)
-		add_definitions(-fprofile-arcs -ftest-coverage -DFAIL_USING_EXCEPTIONS=1)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs")
-		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fprofile-arcs")
-	endif()
 
 	if (EMSCRIPTEN)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
 		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
 		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
+	endif()
+endif()
+
+if (MATH_TESTS_EXECUTABLE)
+	add_definitions(-DMATH_TESTS_EXECUTABLE)
+
+	if (BUILD_FOR_GCOV)
+		add_definitions(-fprofile-arcs -ftest-coverage)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs")
+		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fprofile-arcs")
 	endif()
 endif()
 
