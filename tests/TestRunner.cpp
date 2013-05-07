@@ -119,7 +119,6 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 			}
 			catch(const std::runtime_error &e)
 			{
-				LOGI("Caught std::runtime_error.");
 				if (!!strcmp(e.what(), "expect failure"))
 				{
 					if (failReason.empty())
@@ -133,7 +132,6 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 			}
 			catch(const std::exception &e)
 			{
-				LOGI("Caught std::exception.");
 				if (!!strcmp(e.what(), "expect failure"))
 				{
 					if (failReason.empty())
