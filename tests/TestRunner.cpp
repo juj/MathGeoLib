@@ -113,9 +113,12 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 		for(int k = 0; k < numTrialsPerRun; ++k)
 //			for(int k = 0; k < (t.isRandomized ? numTrials : 1); ++k)
 		{
+#ifdef FAIL_USING_EXCEPTIONS
 			try
 			{
+#endif
 				t.function(t);
+#ifdef FAIL_USING_EXCEPTIONS
 			}
 			catch(const std::runtime_error &e)
 			{
@@ -147,6 +150,7 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 			{
 				LOGE("Error: Received an unknown exception type that is _not_ derived from std::exception!");
 			}
+#endif
 		}
 		tick_t end = Clock::Tick();
 		times.push_back(end - start);

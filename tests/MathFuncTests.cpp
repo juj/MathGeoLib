@@ -22,6 +22,8 @@ bool TrueCondition() // This is a function that always returns true, but it is i
 	return t1 != 0 || t2 != 10000000;
 }
 
+#ifdef FAIL_USING_EXCEPTIONS
+
 #ifndef EMSCRIPTEN ///\todo This breaks on Emscripten!
 UNIQUE_TEST(ExceptionGoesThrough)
 {
@@ -72,6 +74,7 @@ UNIQUE_TEST(BaseDerivedExceptionCatchingWorks)
 	}
 	assert(gotException);
 }
+#endif
 
 #if __cplusplus >= 201103L
 TEST(CXX11StdFinite)
