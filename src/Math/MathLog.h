@@ -33,6 +33,10 @@
 #include <Windows.h>
 #endif
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 // From http://cnicholson.net/2009/03/stupid-c-tricks-dowhile0-and-c4127/
@@ -124,6 +128,7 @@ void logmsg(const char *msg);
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str___[MAX_LOG_LINE_LENGTH-1] = 0; \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
 		logmsg("\n"); \
@@ -132,6 +137,7 @@ void logmsg(const char *msg);
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str___[MAX_LOG_LINE_LENGTH-1] = 0; \
 		logmsg("Warning: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
@@ -141,6 +147,7 @@ void logmsg(const char *msg);
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str___[MAX_LOG_LINE_LENGTH-1] = 0; \
 		logmsg("Error: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
@@ -152,6 +159,7 @@ void logmsg(const char *msg);
 		/*if (IsLogChannelActive(channel))*/ \
 		{ \
 			char str____[MAX_LOG_LINE_LENGTH]; \
+			str___[MAX_LOG_LINE_LENGTH-1] = 0; \
 			logmsg(#channel); \
 			snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 			logmsg(str____); \
@@ -167,16 +175,20 @@ void logmsg(const char *msg);
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) do { \
 	char logfunc_str[MAX_LOG_LINE_LENGTH]; \
+	logfunc_str[MAX_LOG_LINE_LENGTH-1] = 0; \
 	snprintf(logfunc_str, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 	char logfunc_str2[MAX_LOG_LINE_LENGTH]; \
+	logfunc_str2[MAX_LOG_LINE_LENGTH-1] = 0; \
 	snprintf(logfunc_str2, MAX_LOG_LINE_LENGTH-1, "Warning: %s", logfunc_str); \
 	((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", logfunc_str2)); \
 	} while(0)
 
 #define LOGE(...) do { \
 	char logfunc_str[MAX_LOG_LINE_LENGTH]; \
+	logfunc_str[MAX_LOG_LINE_LENGTH-1] = 0; \
 	snprintf(logfunc_str, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 	char logfunc_str2[MAX_LOG_LINE_LENGTH]; \
+	logfunc_str2[MAX_LOG_LINE_LENGTH-1] = 0; \
 	snprintf(logfunc_str2, MAX_LOG_LINE_LENGTH-1, "Error: %s", logfunc_str); \
 	((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", logfunc_str2)); \
 	} while(0)
@@ -186,6 +198,7 @@ void logmsg(const char *msg);
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
 		OutputDebugStringA("\r\n"); \
@@ -194,6 +207,7 @@ void logmsg(const char *msg);
 #define LOGI_NL(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
 	MULTI_LINE_MACRO_END
@@ -201,6 +215,7 @@ void logmsg(const char *msg);
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		OutputDebugStringA("Warning: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
@@ -210,6 +225,7 @@ void logmsg(const char *msg);
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		OutputDebugStringA("Error: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
@@ -221,6 +237,7 @@ void logmsg(const char *msg);
 		/*if (IsLogChannelActive(channel))*/ \
 		{ \
 			char str____[MAX_LOG_LINE_LENGTH]; \
+			str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 			OutputDebugStringA(#channel); \
 			snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 			OutputDebugStringA(str____); \
