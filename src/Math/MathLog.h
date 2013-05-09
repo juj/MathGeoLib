@@ -115,32 +115,34 @@ void SetStdoutTextColor(int newColor);
 #define STRINGIZE(x) STRINGIZE_HELPER(x)
 #define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " #desc)
 
+#define MAX_LOG_LINE_LENGTH 512
+
 #if defined(NPAPI) && !defined(LOGGING_SUPPORT_DISABLED)
 ///\todo Temporary. Implement logmsg as variadic directly instead of this kind of #define workaround.
 void logmsg(const char *msg);
 
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
-		sprintf(str____, __VA_ARGS__); \
+		char str____[MAX_LOG_LINE_LENGTH]; \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
 		logmsg("\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
+		char str____[MAX_LOG_LINE_LENGTH]; \
 		logmsg("Warning: "); \
-		sprintf(str____, __VA_ARGS__); \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
 		logmsg("\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
+		char str____[MAX_LOG_LINE_LENGTH]; \
 		logmsg("Error: "); \
-		sprintf(str____, __VA_ARGS__); \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
 		logmsg("\n"); \
 	MULTI_LINE_MACRO_END
@@ -149,9 +151,9 @@ void logmsg(const char *msg);
 	MULTI_LINE_MACRO_BEGIN \
 		/*if (IsLogChannelActive(channel))*/ \
 		{ \
-			char str____[16384]; \
+			char str____[MAX_LOG_LINE_LENGTH]; \
 			logmsg(#channel); \
-			sprintf(str____, __VA_ARGS__); \
+			snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 			logmsg(str____); \
 			logmsg("\n"); \
 		} \
@@ -164,18 +166,18 @@ void logmsg(const char *msg);
 #endif
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) do { \
-	char logfunc_str[512]; \
-	sprintf(logfunc_str, __VA_ARGS__); \
-	char logfunc_str2[512]; \
-	sprintf(logfunc_str2, "Warning: %s", logfunc_str); \
+	char logfunc_str[MAX_LOG_LINE_LENGTH]; \
+	snprintf(logfunc_str, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
+	char logfunc_str2[MAX_LOG_LINE_LENGTH]; \
+	snprintf(logfunc_str2, MAX_LOG_LINE_LENGTH-1, "Warning: %s", logfunc_str); \
 	((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", logfunc_str2)); \
 	} while(0)
 
 #define LOGE(...) do { \
-	char logfunc_str[512]; \
-	sprintf(logfunc_str, __VA_ARGS__); \
-	char logfunc_str2[512]; \
-	sprintf(logfunc_str2, "Error: %s", logfunc_str); \
+	char logfunc_str[MAX_LOG_LINE_LENGTH]; \
+	snprintf(logfunc_str, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
+	char logfunc_str2[MAX_LOG_LINE_LENGTH]; \
+	snprintf(logfunc_str2, MAX_LOG_LINE_LENGTH-1, "Error: %s", logfunc_str); \
 	((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", logfunc_str2)); \
 	} while(0)
 
@@ -183,33 +185,33 @@ void logmsg(const char *msg);
 
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
-		sprintf(str____, __VA_ARGS__); \
+		char str____[MAX_LOG_LINE_LENGTH]; \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
 		OutputDebugStringA("\r\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOGI_NL(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
-		sprintf(str____, __VA_ARGS__); \
+		char str____[MAX_LOG_LINE_LENGTH]; \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
 	MULTI_LINE_MACRO_END
 
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
+		char str____[MAX_LOG_LINE_LENGTH]; \
 		OutputDebugStringA("Warning: "); \
-		sprintf(str____, __VA_ARGS__); \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
 		OutputDebugStringA("\r\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
-		char str____[16384]; \
+		char str____[MAX_LOG_LINE_LENGTH]; \
 		OutputDebugStringA("Error: "); \
-		sprintf(str____, __VA_ARGS__); \
+		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		OutputDebugStringA(str____); \
 		OutputDebugStringA("\r\n"); \
 	MULTI_LINE_MACRO_END
@@ -218,9 +220,9 @@ void logmsg(const char *msg);
 	MULTI_LINE_MACRO_BEGIN \
 		/*if (IsLogChannelActive(channel))*/ \
 		{ \
-			char str____[16384]; \
+			char str____[MAX_LOG_LINE_LENGTH]; \
 			OutputDebugStringA(#channel); \
-			sprintf(str____, __VA_ARGS__); \
+			snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 			OutputDebugStringA(str____); \
 			OutputDebugStringA("\r\n"); \
 		} \
