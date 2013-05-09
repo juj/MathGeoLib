@@ -68,10 +68,6 @@ if (LINUX)
 	target_link_libraries(MathGeoLib rt)
 endif()
 
-if (FLASCC)
-	target_link_libraries(MathGeoLib CodeLib GraphicsEngine)
-endif()
-
 if (WIN8RT)
 	set_target_properties(MathGeoLib PROPERTIES VS_WINRT_EXTENSIONS TRUE)
 	# Ignore warning LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata

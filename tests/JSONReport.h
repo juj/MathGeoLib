@@ -94,7 +94,7 @@ public:
 #elif defined(__i386__) || defined(_X86_) || defined(_M_IX86)
 		return "x86-32bit";
 #else
-		return "unknown arch";
+		return "";
 #endif
 	}
 	
@@ -102,16 +102,20 @@ public:
 	{
 #ifdef __ANDROID__
 		return "Android";
+#elif defined(PEPPER)
+		return "Native Client";
 #elif defined(__linux__) || defined(LINUX)
 		return "Linux";
 #elif defined(APPLE_IOS)
 		return "iOS";
 #elif defined(APPLE_OSX) || defined(__APPLE__)
 		return "OSX";
-#elif defined(__unix__)
-		return "Unix";
 #elif defined(EMSCRIPTEN)
 		return "Emscripten";
+#elif defined(__FLASHPLAYER__)
+		return "Flash";
+#elif defined(__unix__)
+		return "Unix";
 #elif defined(WIN32)
 #ifdef WIN8PHONE
 		return "Win8Phone";
@@ -147,6 +151,8 @@ public:
 		simd = "SSE1";
 #elif defined(MATH_NEON)
 		simd = "NEON";
+#elif defined(PEPPER) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)
+		return ""; // These platforms don't have SIMD option, so don't report the absence of it either.
 #else
 		return "No SIMD";
 #endif
