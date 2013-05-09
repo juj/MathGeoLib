@@ -165,11 +165,15 @@ public:
 			specified worldUp direction (as closely as possible). The worldUp and targetDirection vectors cannot be
 			collinear, but they do not need to be perpendicular either.
 		@return A matrix that maps the given local space forward direction vector to point towards the given target
-			direction, and the given local up direction towards the given target world up direction. The returned
-			matrix M is orthonormal with a determinant of +1. For the matrix M it holds that
-			M * localForward = targetDirection, and M * localUp lies in the plane spanned by the vectors targetDirection
-			and worldUp.
-		@see RotateFromTo(). */
+			direction, and the given local up direction towards the given target world up direction. This matrix can be
+			used as the 'world transform' of an object. The returned matrix M is orthonormal with a determinant of +1. 
+			For the matrix M it holds that M * localForward = targetDirection, and M * localUp lies in the plane spanned by 
+			the vectors targetDirection and worldUp.
+		@see RotateFromTo().
+		@note Be aware that the convention of a 'LookAt' matrix in MathGeoLib differs from e.g. GLM. In MathGeoLib, the returned
+			matrix is a mapping from local space to world space, meaning that the returned matrix can be used as the 'world transform'
+			for any 3D object (camera or not). The view space is the local space of the camera, so this function returns the mapping
+			view->world. In GLM, the LookAt function is tied to cameras only, and it returns the inverse mapping world->view. */
 	static float3x3 LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp);
 
 	/// Returns a uniformly random 3x3 matrix that performs only rotation.

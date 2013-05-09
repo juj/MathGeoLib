@@ -503,7 +503,11 @@ public:
 			and worldUp.
 		@note The position of (the translation performed by) the resulting matrix will be set to eyePos, i.e. the object
 			will be placed to the given eye position.
-		@see RotateFromTo(). */
+		@see RotateFromTo().
+		@note Be aware that the convention of a 'LookAt' matrix in MathGeoLib differs from e.g. GLM. In MathGeoLib, the returned
+			matrix is a mapping from local space to world space, meaning that the returned matrix can be used as the 'world transform'
+			for any 3D object (camera or not). The view space is the local space of the camera, so this function returns the mapping
+			view->world. In GLM, the LookAt function is tied to cameras only, and it returns the inverse mapping world->view. */
 	static float3x4 LookAt(const float3 &eyePos, const float3 &targetPos, const float3 &localForward,
 	                       const float3 &localUp, const float3 &worldUp);
 
