@@ -128,7 +128,7 @@ void logmsg(const char *msg);
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
-		str___[MAX_LOG_LINE_LENGTH-1] = 0; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
 		logmsg("\n"); \
@@ -137,7 +137,7 @@ void logmsg(const char *msg);
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
-		str___[MAX_LOG_LINE_LENGTH-1] = 0; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		logmsg("Warning: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
@@ -147,7 +147,7 @@ void logmsg(const char *msg);
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
-		str___[MAX_LOG_LINE_LENGTH-1] = 0; \
+		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		logmsg("Error: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 		logmsg(str____); \
@@ -159,7 +159,7 @@ void logmsg(const char *msg);
 		/*if (IsLogChannelActive(channel))*/ \
 		{ \
 			char str____[MAX_LOG_LINE_LENGTH]; \
-			str___[MAX_LOG_LINE_LENGTH-1] = 0; \
+			str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 			logmsg(#channel); \
 			snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
 			logmsg(str____); \
