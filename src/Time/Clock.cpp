@@ -89,8 +89,8 @@ void Clock::InitClockData()
 #ifdef __APPLE__
 	mach_timebase_info_data_t timeBaseInfo;
 	mach_timebase_info(&timeBaseInfo);
-	ticksPerSecond = 1000000000ULL * timeBaseInfo.numer / timeBaseInfo.denom;
-	assert(ticksPerSecond > timeBaseInfo.numer/timeBaseInfo.denom); // Guard against overflow if OSX numer/denom change or similar.
+	ticksPerSecond = 1000000000ULL * (uint64_t)timeBaseInfo.denom / (uint64_t)timeBaseInfo.numer;
+	assert(ticksPerSecond > (uint64_t)timeBaseInfo.denom/timeBaseInfo.numer); // Guard against overflow if OSX numer/denom change or similar.
 #endif
 }
 
