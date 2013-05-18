@@ -71,8 +71,8 @@ public:
 	KdTree()
 #ifdef _DEBUG
 	:needsBuilding(false)
-	{}
 #endif
+	{}
 
 	~KdTree();
 	

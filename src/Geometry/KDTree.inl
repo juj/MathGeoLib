@@ -320,7 +320,7 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	if (!rootAABB.IntersectLineAABB(r.pos, r.dir, tNear, tFar))
 		return; // The ray doesn't intersect the root, therefore no collision.
 
-	tNear = Max(tNear, 0.f); // // We are performing a ray query - ignore any hits behind the ray starting position.
+	tNear = Max(tNear, 0.f); // We are performing a ray query - ignore any hits behind the ray starting position.
 
 	static const CardinalAxis axes[] = { AxisX, AxisY, AxisZ, AxisX, AxisY };
 
