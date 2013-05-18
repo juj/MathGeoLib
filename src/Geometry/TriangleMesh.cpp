@@ -16,7 +16,7 @@
 	@author Jukka Jylänki
 	@brief Implementation for the TriangleMesh geometry object. */
 #include "TriangleMesh.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include "../Math/float3.h"
 #include "Triangle.h"
