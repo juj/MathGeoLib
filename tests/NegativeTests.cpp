@@ -1472,3 +1472,34 @@ RANDOMIZED_TEST(PlanePlaneNoIntersect)
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
+
+RANDOMIZED_TEST(RayTriangleMeshNoIntersect)
+{
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	TriangleMesh tm;
+	tm.Set(a);
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
+	float d = tm.IntersectRay(b);
+	assert(d == FLOAT_INF);
+}
+
+RANDOMIZED_TEST(RayKdTreeNoIntersect)
+{
+	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Polyhedron a = RandomPolyhedronInHalfspace(p);
+	KdTree<Triangle> t;
+	std::vector<Triangle> tris = a.Triangulate();
+	if (!tris.empty())
+		t.AddObjects(&tris[0], tris.size());
+	t.Build();
+	p.ReverseNormal();
+	Ray b = RandomRayInHalfspace(p);
+	TriangleKdTreeRayQueryNearestHitVisitor result;
+	t.RayQuery(b, result);
+	assert(result.rayT == FLOAT_INF);
+	assert(result.triangleIndex == KdTree<Triangle>::BUCKET_SENTINEL);
+	assert(!result.pos.IsFinite());
+	assert(!result.barycentricUV.IsFinite());
+}

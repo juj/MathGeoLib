@@ -42,7 +42,7 @@ UNIQUE_TEST(ExceptionCatchingWorks)
 		if (TrueCondition())
 			throw std::runtime_error("testing exceptions");
 	}
-	catch(const std::runtime_error &e)
+	catch(const std::runtime_error &)
 	{
 		gotException = true;
 		LOGI("Exception catching works.");
@@ -63,7 +63,7 @@ UNIQUE_TEST(BaseDerivedExceptionCatchingWorks)
 		if (TrueCondition())
 			throw std::runtime_error("testing exceptions");
 	}
-	catch(const std::exception &e)
+	catch(const std::exception &)
 	{
 		gotException = true;
 		LOGI("Exception catching works.");

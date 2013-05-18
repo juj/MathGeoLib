@@ -1302,6 +1302,37 @@ RANDOMIZED_TEST(PlanePlaneIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+RANDOMIZED_TEST(RayTriangleMeshIntersect)
+{
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	Polyhedron a = RandomPolyhedronContainingPoint(pt);
+	TriangleMesh tm;
+	tm.Set(a);
+	Ray b = RandomRayContainingPoint(pt);
+	float d = tm.IntersectRay(b);
+	assert(d >= 0.f);
+	assert(IsFinite(d));
+}
+
+RANDOMIZED_TEST(RayKdTreeIntersect)
+{
+	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	Polyhedron a = RandomPolyhedronContainingPoint(pt);
+	KdTree<Triangle> t;
+	std::vector<Triangle> tris = a.Triangulate();
+	if (!tris.empty())
+		t.AddObjects(&tris[0], tris.size());
+	t.Build();
+	Ray b = RandomRayContainingPoint(pt);
+	TriangleKdTreeRayQueryNearestHitVisitor result;
+	t.RayQuery(b, result);
+	assert(result.rayT >= 0.f);
+	assert(result.rayT < FLOAT_INF);
+	assert(result.triangleIndex != KdTree<Triangle>::BUCKET_SENTINEL);
+	assert(result.pos.IsFinite());
+	assert(result.barycentricUV.IsFinite());
+}
+
 TEST(PolygonContains2D)
 {
 	float xmin = 0.f, xmax = 10.f, ymin = 0.f, ymax = 10.f, z = 2.f;
