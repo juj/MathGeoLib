@@ -87,7 +87,7 @@
 
 #elif defined(_DEBUG)
 
-#define assert(x) do { if (!(x)) LOGW("Assertion failed: " #x); } while(0)
+#define assert(x) do { if (!(x)) LOGW("Assertion failed: %s",  #x); } while(0)
 #define asserteq(x,y) \
 	MULTI_LINE_MACRO_BEGIN \
 		if ((x) != (y)) \
