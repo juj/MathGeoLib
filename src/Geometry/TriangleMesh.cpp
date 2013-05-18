@@ -15,7 +15,6 @@
 /** @file TriangleMesh.cpp
 	@author Jukka Jylänki
 	@brief Implementation for the TriangleMesh geometry object. */
-#ifdef WIN32
 #include "TriangleMesh.h"
 #include <malloc.h>
 #include <string.h>
@@ -57,6 +56,8 @@ enum SIMDCapability
 
 SIMDCapability DetectSIMDCapability()
 {
+#ifdef WIN32 ///\todo SIMD detection for other x86 platforms.
+
 #ifdef MATH_SSE
 	int CPUInfo[4] = {-1};
 
@@ -164,6 +165,7 @@ SIMDCapability DetectSIMDCapability()
 #endif
 
 #endif // ~ MATH_SSE not defined.
+#endif
 	return SIMD_NONE;
 }
 
@@ -430,6 +432,4 @@ MATH_END_NAMESPACE
 #define MATH_GEN_TRIANGLEINDEX
 #define MATH_GEN_UV
 #include "TriangleMesh_IntersectRay_AVX.inl"
-#endif
-
 #endif
