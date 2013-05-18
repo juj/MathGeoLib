@@ -91,9 +91,11 @@ public:
 	int NumNodes() const;
 
 	/// Returns the total number of leaf nodes in the tree.
+	/// Warning: This function iterates over the whole tree, so the running time is linear to the number of nodes, and not constant.
 	int NumLeaves() const;
 
 	/// Returns the total number of inner nodes in the tree.
+	/// Warning: This function iterates over the whole tree, so the running time is linear to the number of nodes, and not constant.
 	int NumInnerNodes() const;
 
 	/// Returns the maximum height of the tree (the path from the root to the farthest leaf node).

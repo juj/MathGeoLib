@@ -88,13 +88,17 @@ void KdTree<T>::SplitLeaf(int nodeIndex, const AABB &nodeAABB, int numObjectsInB
 	int numObjectsRight = 0;
 	while(*curObject != BUCKET_SENTINEL)
 	{
+		bool left = leftAABB.Intersects(aabb);
+		bool right = rightAABB.Intersects(aabb);
+		if (!left && !right)
+			left = right = true; // Numerical precision issues: bounding box doesn't intersect either anymore, so place into both children.
 		AABB aabb = objects[*curObject].BoundingAABB();
-		if (leftAABB.Intersects(aabb))
+		if (left)
 		{
 			*l++ = *curObject;
 			++numObjectsLeft;
 		}
-		if (rightAABB.Intersects(aabb))
+		if (right)
 		{
 			*r++ = *curObject;
 			++numObjectsRight;
@@ -302,6 +306,8 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	if (!rootAABB.IntersectLineAABB(r.pos, r.dir, tNear, tFar))
 		return; // The ray doesn't intersect the root, therefore no collision.
 
+	tNear = Max(tNear, 0.f); // // We are performing a ray query - ignore any hits behind the ray starting position.
+
 	static const CardinalAxis axes[] = { AxisX, AxisY, AxisZ, AxisX, AxisY };
 
 	typedef int StackPtr; // Pointer to the traversal stack.
@@ -321,13 +327,10 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	StackPtr entryPoint = 0;
 	stack[entryPoint].t = tNear;
 
-    const float travelEpsilon = 1e-4f;
+	const float travelEpsilon = 1e-4f;
 
 	// Check if the ray has internal or external origin relative to the scene root node.
-	if (tNear >= 0.f)
-		stack[entryPoint].pos = r.pos + (tNear + travelEpsilon) * r.dir;
-	else
-		stack[entryPoint].pos = r.pos;
+	stack[entryPoint].pos = r.pos + Max(tNear, 0.f) * r.dir;
 
 	StackPtr exitPoint = 1; // ==entryPoint+1;
 	stack[exitPoint].t = tFar;
