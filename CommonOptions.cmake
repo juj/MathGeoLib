@@ -40,7 +40,6 @@ else()
 endif()
 
 if (EMSCRIPTEN)
-	add_definitions(-emit-llvm)
 	SET(CMAKE_LINK_LIBRARY_SUFFIX "")
 
 	SET(CMAKE_STATIC_LIBRARY_PREFIX "")
