@@ -20,6 +20,7 @@
 #include "AABB.h"
 #include "OBB.h"
 #include "Ray.h"
+#include "../Math/assume.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -88,11 +89,11 @@ void KdTree<T>::SplitLeaf(int nodeIndex, const AABB &nodeAABB, int numObjectsInB
 	int numObjectsRight = 0;
 	while(*curObject != BUCKET_SENTINEL)
 	{
+		AABB aabb = objects[*curObject].BoundingAABB();
 		bool left = leftAABB.Intersects(aabb);
 		bool right = rightAABB.Intersects(aabb);
 		if (!left && !right)
 			left = right = true; // Numerical precision issues: bounding box doesn't intersect either anymore, so place into both children.
-		AABB aabb = objects[*curObject].BoundingAABB();
 		if (left)
 		{
 			*l++ = *curObject;
@@ -229,6 +230,9 @@ template<typename T>
 void KdTree<T>::AddObjects(const T *objects_, int numObjects)
 {
 	objects.insert(objects.end(), objects_, objects_ + numObjects);
+#ifdef _DEBUG
+	needsBuilding = true;
+#endif
 }
 
 template<typename T>
@@ -258,7 +262,7 @@ void KdTree<T>::Build()
 	u32 *rootBucket = new u32[objects.size()+1];
 	for(size_t i = 0; i < objects.size(); ++i)
 		rootBucket[i] = i;
-	rootBucket[objects.size()] = -1; // The value -1 acts as a terminating sentinel index value.
+	rootBucket[objects.size()] = BUCKET_SENTINEL;
 	buckets.push_back(rootBucket);
 
 	rootAABB = BoundingAABB(rootBucket);
@@ -266,6 +270,10 @@ void KdTree<T>::Build()
 	// We now have a single root leaf node which is unsplit and contains all the objects
 	// in the kD-tree. Now recursively subdivide until the whole tree is built.
 	SplitLeaf(1, rootAABB, objects.size(), 1);
+
+#ifdef _DEBUG
+	needsBuilding = false;
+#endif
 }
 
 template<typename T>
@@ -303,6 +311,12 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 {
 	float tNear = 0.f, tFar = FLOAT_INF;
 
+	assume(rootAABB.IsFinite());
+	assume(!rootAABB.IsDegenerate());
+#ifdef _DEBUG
+	assume(!needsBuilding);
+#endif
+
 	if (!rootAABB.IntersectLineAABB(r.pos, r.dir, tNear, tFar))
 		return; // The ray doesn't intersect the root, therefore no collision.
 
@@ -326,8 +340,6 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	KdTreeNode *currentNode = Root();
 	StackPtr entryPoint = 0;
 	stack[entryPoint].t = tNear;
-
-	const float travelEpsilon = 1e-4f;
 
 	// Check if the ray has internal or external origin relative to the scene root node.
 	stack[entryPoint].pos = r.pos + Max(tNear, 0.f) * r.dir;

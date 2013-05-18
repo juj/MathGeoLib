@@ -19,6 +19,7 @@
 
 #include "../Math/MathTypes.h"
 #include "../Math/myassert.h"
+#include "Triangle.h"
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Container/MaxHeap.h"
@@ -63,11 +64,18 @@ template<typename T>
 class KdTree
 {
 public:
+	/// Represents the end of list in the index list of a bucket.
+	static const u32 BUCKET_SENTINEL = 0xFFFFFFFF;
+
 	/// Constructs an empty kD-tree.
-	KdTree() {}
+	KdTree()
+#ifdef _DEBUG
+	:needsBuilding(false)
+	{}
+#endif
 
 	~KdTree();
-
+	
 	/// Adds a given number of objects to this kD-tree.
 	/// Call this function repeatedly as many times as necessary to prepare the data. Then
 	/// call Build() to create the tree data structure.
@@ -163,8 +171,6 @@ private:
 	static const int maxNodes = 256 * 1024;
 	static const int maxTreeDepth = 30;
 
-	static const u32 BUCKET_SENTINEL = 0xFFFFFFFF;
-
 	std::vector<KdTreeNode> nodes;
 	std::vector<T> objects;
 	std::vector<u32*> buckets;
@@ -183,7 +189,49 @@ private:
 
 	AABB rootAABB;
 
+#ifdef _DEBUG
+	bool needsBuilding; ///< If true, new objects have been added to this tree, but it has not yet been rebuilt with Build();
+#endif
+
 	int TreeHeight(int nodeIndex) const;
+};
+
+/// Finds the nearestray hit to a KdTree<Triangle>.
+struct TriangleKdTreeRayQueryNearestHitVisitor
+{
+	float rayT;
+	float3 pos;
+	int triangleIndex;
+	float2 barycentricUV;
+
+	TriangleKdTreeRayQueryNearestHitVisitor()
+	{
+		rayT = FLOAT_INF;
+		triangleIndex = KdTree<Triangle>::BUCKET_SENTINEL;
+		pos = float3::nan;
+		barycentricUV = float2::nan;
+	}
+	bool operator()(KdTree<Triangle> &tree, const KdTreeNode &leaf, const Ray &ray, float tNear, float tFar)
+	{
+		u32 *bucket = tree.Bucket(leaf.bucketIndex);
+		assert(bucket);
+		while(*bucket != KdTree<Triangle>::BUCKET_SENTINEL)
+		{
+			const Triangle &tri = tree.Object(*bucket);
+			float u, v, t;
+			t = Triangle::IntersectLineTri(ray.pos, ray.dir, tri.a, tri.b, tri.c, u, v);
+			bool intersects = t < std::numeric_limits<float>::infinity();
+			if (intersects && t >= tNear && t <= tFar && t < rayT)
+			{
+				rayT = t;
+				pos = ray.GetPoint(t);
+				barycentricUV = float2(u,v);
+				triangleIndex = *bucket;
+			}
+			++bucket;
+		}
+		return rayT < FLOAT_INF; // If we hit a triangle, no need to visit any farther nodes, since we are only interested in the nearest hit.
+	}
 };
 
 MATH_END_NAMESPACE
