@@ -26,11 +26,15 @@ MATH_BEGIN_NAMESPACE
 class TriangleMesh
 {
 public:
+	TriangleMesh();
+
 	/// Specifies the vertex data of this triangle mesh. Replaces any old
 	/// specified geometry.
 	void Set(const float *triangleMesh, int numTriangles);
 	void Set(const float3 *triangleMesh, int numTriangles) { Set(reinterpret_cast<const float *>(triangleMesh), numTriangles); }
 	void Set(const Triangle *triangleMesh, int numTriangles) { Set(reinterpret_cast<const float *>(triangleMesh), numTriangles); }
+
+	void Set(const Polyhedron &polyhedron);
 
 	float IntersectRay(const Ray &ray) const;
 	float IntersectRay_TriangleIndex(const Ray &ray, int &outTriangleIndex) const;

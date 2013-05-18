@@ -22,9 +22,12 @@
 #include "../Math/float3.h"
 #include "Triangle.h"
 #include "Ray.h"
+#include "Polyhedron.h"
 #include "../MathGeoLibFwd.h"
 #include "../Math/MathConstants.h"
 #include "../Math/myassert.h"
+
+#include <vector>
 
 #ifdef MATH_SSE
 #include <intrin.h>
@@ -165,11 +168,32 @@ SIMDCapability DetectSIMDCapability()
 }
 
 const int simdCapability = DetectSIMDCapability();
+
+TriangleMesh::TriangleMesh()
+:data(0), numTriangles(0)
+{
+
+}
+
+void TriangleMesh::Set(const Polyhedron &polyhedron)
+{
+	std::vector<Triangle> tris = polyhedron.Triangulate();
+	if (!tris.empty())
+	{
+		int alignment = (simdCapability == SIMD_AVX) ? 8 : ((simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2) ? 4 : 1);
+		float3 degen(-FLOAT_INF, -FLOAT_INF, -FLOAT_INF);
+		Triangle degent(degen, degen, degen);
+		while(tris.size() % alignment != 0)
+			tris.push_back(degent);
+		Set(&tris[0], tris.size());
+	}
+}
+
 void TriangleMesh::Set(const float *triangleMesh, int numTriangles)
 {
 	if (simdCapability == SIMD_AVX)
 		SetSoA8(triangleMesh, numTriangles);
-	if (simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2)
+	else if (simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2)
 		SetSoA4(triangleMesh, numTriangles);
 	else
 		SetAoS(triangleMesh, numTriangles);
@@ -239,7 +263,7 @@ void TriangleMesh::ReallocVertexBuffer(int numTris)
 	data = (float*)_aligned_malloc(numTris*3*3*4, 32); // http://msdn.microsoft.com/en-us/library/8z34s9c6.aspx
 #else
 	free(data);
-	data = (float*)malloc(numTris*3*3*4); // http://msdn.microsoft.com/en-us/library/8z34s9c6.aspx
+	data = (float*)malloc(numTris*3*3*4);
 #endif
 	numTriangles = numTris;
 }
@@ -260,6 +284,8 @@ void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles)
 #ifdef _DEBUG
 	vertexDataLayout = 1; // SoA4
 #endif
+
+	assert(numTriangles % 4 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
 	// To xxxx yyyy zzzz xxxx yyyy zzzz xxxx yyyy zzzz
@@ -297,6 +323,8 @@ void TriangleMesh::SetSoA8(const float *vertexData, int numTriangles)
 #ifdef _DEBUG
 	vertexDataLayout = 2; // SoA8
 #endif
+
+	assert(numTriangles % 8 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
 	// To xxxxxxxx yyyyyyyy zzzzzzzz xxxxxxxx yyyyyyyy zzzzzzzz xxxxxxxx yyyyyyyy zzzzzzzz
