@@ -21,6 +21,7 @@
 #include "OBB.h"
 #include "Ray.h"
 #include "../Math/assume.h"
+#include "../Math/MathFunc.h"
 
 MATH_BEGIN_NAMESPACE
 
