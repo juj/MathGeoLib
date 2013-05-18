@@ -122,36 +122,34 @@ void SetStdoutTextColor(int newColor);
 #define MAX_LOG_LINE_LENGTH 512
 
 #if defined(NPAPI) && !defined(LOGGING_SUPPORT_DISABLED)
-///\todo Temporary. Implement logmsg as variadic directly instead of this kind of #define workaround.
-void logmsg(const char *msg);
 
 #define LOGI(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
 		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
-		logmsg(str____); \
-		logmsg("\n"); \
+		PrintToConsole(str____); \
+		PrintToConsole("\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOGW(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
 		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
-		logmsg("Warning: "); \
+		PrintToConsole("Warning: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
-		logmsg(str____); \
-		logmsg("\n"); \
+		PrintToConsole(str____); \
+		PrintToConsole("\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOGE(...) \
 	MULTI_LINE_MACRO_BEGIN \
 		char str____[MAX_LOG_LINE_LENGTH]; \
 		str____[MAX_LOG_LINE_LENGTH-1] = 0; \
-		logmsg("Error: "); \
+		PrintToConsole("Error: "); \
 		snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
-		logmsg(str____); \
-		logmsg("\n"); \
+		PrintToConsole(str____); \
+		PrintToConsole("\n"); \
 	MULTI_LINE_MACRO_END
 
 #define LOG(channel, ...) \
@@ -160,10 +158,10 @@ void logmsg(const char *msg);
 		{ \
 			char str____[MAX_LOG_LINE_LENGTH]; \
 			str____[MAX_LOG_LINE_LENGTH-1] = 0; \
-			logmsg(#channel); \
+			PrintToConsole(#channel); \
 			snprintf(str____, MAX_LOG_LINE_LENGTH-1, __VA_ARGS__); \
-			logmsg(str____); \
-			logmsg("\n"); \
+			PrintToConsole(str____); \
+			PrintToConsole("\n"); \
 		} \
 	MULTI_LINE_MACRO_END
 

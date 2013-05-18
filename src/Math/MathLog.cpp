@@ -17,6 +17,8 @@
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
 #include "MathLog.h"
 
+#include <cstdarg>
+
 #if defined(WIN32) && !defined(WIN8RT)
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -29,6 +31,28 @@ void SetStdoutTextColor(int newColor)
 #if defined(WIN32) && !defined(WIN8RT) // Win8 metro apps don't have SetConsoleTextAttribute.
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)newColor);
 #endif
+}
+
+#ifdef __native_client__
+extern void PrintToConsole(LogChannel channel, const char *str); ///< Implemented in gfxapi to route access to pp:Instance.
+#else
+void PrintToConsole(LogChannel channel, const char *str)
+{
+	printf("%s", str);
+}
+#endif
+
+void PrintToConsoleVariadic(LogChannel channel, const char *format, ...)
+{
+	const int capacity = 512;
+	char str[capacity];
+
+	va_list args;
+	va_start(args, format);
+
+	int len = vsnprintf((char *)str, capacity, format, args);
+	str[capacity-1] = 0; // Don't care if we fail/truncate, just make sure we zero-terminate so there won't be any issues.
+	PrintToConsole(channel, str);
 }
 
 MATH_END_NAMESPACE
