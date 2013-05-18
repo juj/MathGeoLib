@@ -102,7 +102,7 @@ public:
 	{
 #ifdef __ANDROID__
 		return "Android";
-#elif defined(PEPPER)
+#elif defined(__native_client__)
 		return "Native Client";
 #elif defined(__linux__) || defined(LINUX)
 		return "Linux";
@@ -151,7 +151,7 @@ public:
 		simd = "SSE1";
 #elif defined(MATH_NEON)
 		simd = "NEON";
-#elif defined(PEPPER) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)
+#elif defined(__native_client__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)
 		return ""; // These platforms don't have SIMD option, so don't report the absence of it either.
 #else
 		return "No SIMD";

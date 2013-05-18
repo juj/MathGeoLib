@@ -275,7 +275,7 @@ void logmsg(const char *msg);
 		SetStdoutTextColor(ColorRed | ColorGreen | ColorBlue); \
 	MULTI_LINE_MACRO_END
 
-#elif (defined(PEPPER) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)) && !defined(LOGGING_SUPPORT_DISABLED)
+#elif (defined(__native_client) || defined(__APPLE__) || defined(__GNUC__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)) && !defined(LOGGING_SUPPORT_DISABLED)
 
 /// Prints out a variadic message to the given log channel.
 //#define LOG(channel, msg, ...)  ( IsLogChannelActive(channel) && (TimeOutputDebugStringVariadic(channel, __FILE__, __LINE__, msg, ##__VA_ARGS__), true) )
