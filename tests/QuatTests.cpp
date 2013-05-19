@@ -12,19 +12,19 @@
 
 using namespace TestData;
 
-BENCHMARK(Quat_Transform_float3)
+BENCHMARK(Quat_Transform_float3, "Quat::Transform(float3)")
 {
 	v2[i].Float3Part() = q[i].Transform(v[i].Float3Part());
 }
 BENCHMARK_END;
 
-BENCHMARK(Quat_Transform_float4)
+BENCHMARK(Quat_Transform_float4, "Quat::Transform(float4)")
 {
 	v2[i] = q[i].Transform(v01[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Quat_to_float4x4)
+BENCHMARK(Quat_to_float4x4, "Quat::ToFloat4x4")
 {
 	m[i] = q[i].ToFloat4x4();
 }
@@ -68,33 +68,33 @@ RANDOMIZED_TEST(Quat_float4x4_conv)
 	assert(q.Equals(q2) || q.Equals(q2.Neg()));
 }
 
-BENCHMARK(Quat_op_mul_Quat)
+BENCHMARK(Quat_op_mul_Quat, "Quat * Quat")
 {
 	q2[i] = q[i] * q2[i];
 }
 BENCHMARK_END
 
-BENCHMARK(Quat_op_div_Quat)
+BENCHMARK(Quat_op_div_Quat, "Quat / Quat")
 {
 	q2[i] = q[i] / q2[i];
 }
 BENCHMARK_END
 
-BENCHMARK(Quat_Lerp)
+BENCHMARK(Quat_Lerp, "Quat::Lerp")
 {
 	q2[i] = q[i].Lerp(q2[i], uf[i]);
 }
 BENCHMARK_END
 
 #ifdef MATH_SIMD
-BENCHMARK(quat_mul_quat)
+BENCHMARK(quat_mul_quat, "test against Quat_op_mul_Quat")
 {
 	q2[i].q = quat_mul_quat(q[i].q, q2[i].q);
 }
 BENCHMARK_END
 
 #ifdef ANDROID
-BENCHMARK(quat_mul_quat_asm)
+BENCHMARK(quat_mul_quat_asm, "test against Quat_op_mul_Quat")
 {
 	quat_mul_quat_asm(q[i].ptr(), q2[i].ptr(), q2[i].ptr());
 }
@@ -123,7 +123,7 @@ RANDOMIZED_TEST(quat_mul_quat_asm)
 #endif
 
 #ifdef MATH_SSE
-BENCHMARK(quat_div_quat)
+BENCHMARK(quat_div_quat, "test against Quat_op_div_Quat")
 {
 	q2[i].q = quat_div_quat(q[i].q, q2[i].q);
 }
@@ -138,7 +138,7 @@ RANDOMIZED_TEST(quat_div_quat)
 	assert(q3.Equals(correct));
 }
 #endif
-BENCHMARK(quat_lerp_simd)
+BENCHMARK(quat_lerp_simd, "test against Quat_Lerp")
 {
 	q2[i].q = vec4_lerp(q[i].q, q2[i].q, uf[i]);
 }

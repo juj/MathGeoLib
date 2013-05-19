@@ -23,7 +23,7 @@ static int numTestsWarnings = 0;
 
 volatile int globalPokedData = 0;
 
-void AddTest(std::string name, TestFunctionPtr function, std::string description, bool runOnlyOnce)
+void AddTest(std::string name, TestFunctionPtr function, std::string file, std::string description, bool runOnlyOnce)
 {
 	Test t;
 	t.name = name;
@@ -32,10 +32,11 @@ void AddTest(std::string name, TestFunctionPtr function, std::string description
 	t.isRandomized = false;
 	t.runOnlyOnce = runOnlyOnce;
 	t.isBenchmark = false;
+	t.file = file;
 	Tests().push_back(t);
 }
 
-void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string description)
+void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string file, std::string description)
 {
 	Test t;
 	t.name = name;
@@ -44,10 +45,11 @@ void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string d
 	t.isRandomized = true;
 	t.runOnlyOnce = false;
 	t.isBenchmark = false;
+	t.file = file;
 	Tests().push_back(t);
 }
 
-void AddBenchmark(std::string name, TestFunctionPtr function, std::string description)
+void AddBenchmark(std::string name, TestFunctionPtr function, std::string file, std::string description)
 {
 	Test t;
 	t.name = name;
@@ -56,6 +58,7 @@ void AddBenchmark(std::string name, TestFunctionPtr function, std::string descri
 	t.isRandomized = false;
 	t.runOnlyOnce = true;
 	t.isBenchmark = true;
+	t.file = file;
 	Tests().push_back(t);
 }
 
@@ -95,7 +98,7 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 	if (t.isBenchmark)
 	{
 		numTimesToRun = numTrialsPerRun = 1;
-		LOGI_NL("Benchmark '%s': ", t.name.c_str());
+		LOGI_NL("Benchmark '%s': %s", t.name.c_str(), t.description.c_str());
 	}
 	else
 		LOGI_NL("Testing '%s': ", t.name.c_str());
@@ -246,7 +249,8 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONRe
 	std::vector<Test> &tests = Tests();
 	while(nextTestToRun < (int)tests.size())
 	{
-		if (StringBeginsWithOneOf(tests[nextTestToRun].name.c_str(), prefixes) || StringContainsOneOf(tests[nextTestToRun].description.c_str(), prefixes))
+		if (StringBeginsWithOneOf(tests[nextTestToRun].name.c_str(), prefixes) || StringContainsOneOf(tests[nextTestToRun].description.c_str(), prefixes)
+			|| StringContainsOneOf(tests[nextTestToRun].file.c_str(), prefixes))
 		{
 			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials, jsonReport);
 

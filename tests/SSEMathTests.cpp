@@ -212,19 +212,19 @@ inline __m128 colmajor_mat4x4_mul_avx_2(const __m256 *matrix, __m128 vector)
 	return _mm_add_ps(hi, lo); // Latency: 3, Throughput: 1
 }
 
-BENCHMARK(float3_cross)
+BENCHMARK(float3_cross, "float3::Cross")
 {
 	v2[i].Float3Part() = v[i].Float3Part().Cross(v2[i].Float3Part());
 }
 BENCHMARK_END;
 
-BENCHMARK(float4_cross)
+BENCHMARK(float4_cross, "float4::Cross3")
 {
 	v2[i] = v[i].Cross3(v2[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(mat4x4_mul_avx)
+BENCHMARK(mat4x4_mul_avx, "test against float4x4_mul_float4")
 {
 	v2[i] = mat4x4_mul_avx((__m256*)&m[i].row, v[i]);
 }
@@ -239,7 +239,7 @@ RANDOMIZED_TEST(mat4x4_mul_avx)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(mat4x4_mul_avx_2)
+BENCHMARK(mat4x4_mul_avx_2, "test against float4x4_mul_float4")
 {
 	v2[i] = mat4x4_mul_avx_2((__m256*)&m[i].row, v[i]);
 }
@@ -258,7 +258,7 @@ RANDOMIZED_TEST(mat4x4_mul_avx_2)
 
 #ifdef MATH_SSE41
 
-BENCHMARK(mat4x4_mul_sse41)
+BENCHMARK(mat4x4_mul_sse41, "test against float4x4_mul_float4")
 {
 	v2[i] = mat4x4_mul_sse41(m[i].row, v[i]);
 }
@@ -277,7 +277,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse41)
 
 #ifdef MATH_SSE3
 
-BENCHMARK(mat4x4_mul_sse3)
+BENCHMARK(mat4x4_mul_sse3, "test against float4x4_mul_float4")
 {
 	v2[i] = mat4x4_mul_sse3(m[i].row, v[i]);
 }
@@ -296,7 +296,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse3)
 
 #ifdef MATH_SSE
 
-BENCHMARK(mat4x4_mul_sse1)
+BENCHMARK(mat4x4_mul_sse1, "test against float4x4_mul_float4")
 {
 	v2[i] = mat4x4_mul_sse1(m[i].row, v[i]);
 }
@@ -311,7 +311,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse1)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(colmajor_mat4x4_mul_sse1)
+BENCHMARK(colmajor_mat4x4_mul_sse1, "test against float4x4_mul_float4")
 {
 	v2[i] = colmajor_mat4x4_mul_sse1(tpm[i].row, v[i]);
 }
@@ -327,7 +327,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(colmajor_mat4x4_mul_sse1_2)
+BENCHMARK(colmajor_mat4x4_mul_sse1_2, "test against float4x4_mul_float4")
 {
 	v2[i] = colmajor_mat4x4_mul_sse1_2(tpm[i].row, v[i]);
 }
@@ -345,7 +345,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1_2)
 
 #ifdef MATH_AVX
 
-BENCHMARK(colmajor_mat4x4_mul_avx)
+BENCHMARK(colmajor_mat4x4_mul_avx, "test against float4x4_mul_float4")
 {
 	v2[i] = colmajor_mat4x4_mul_avx((__m256*)tpm[i].row, v[i]);
 }
@@ -361,7 +361,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_avx)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(colmajor_mat4x4_mul_avx_2)
+BENCHMARK(colmajor_mat4x4_mul_avx_2, "test against float4x4_mul_float4")
 {
 	v2[i] = colmajor_mat4x4_mul_avx_2((__m256*)tpm[i].row, v[i]);
 }
@@ -379,7 +379,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_avx_2)
 
 #endif
 
-BENCHMARK(mat4x4_mul_dpps)
+BENCHMARK(mat4x4_mul_dpps, "test against float4x4_op_mul")
 {
 	mat4x4_mul_dpps(m2[i].row, m[0].row, m[i].row);
 }
@@ -395,7 +395,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(mat4x4_mul_dpps_2)
+BENCHMARK(mat4x4_mul_dpps_2, "test against float4x4_op_mul")
 {
 	mat4x4_mul_dpps(m2[i].row, m[0].row, m[i].row);
 }
@@ -411,7 +411,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_2)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(mat4x4_mul_dpps_3)
+BENCHMARK(mat4x4_mul_dpps_3, "test against float4x4_op_mul")
 {
 	mat4x4_mul_dpps(m2[i].row, m[0].row, m[i].row);
 }
@@ -427,7 +427,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_3)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(mat4x4_mul_sse)
+BENCHMARK(mat4x4_mul_sse, "test against float4x4_op_mul")
 {
 	mat4x4_mul_sse(m2[i].row, m[0].row, m[i].row);
 }
@@ -443,7 +443,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(mat4x4_mul_sse_2)
+BENCHMARK(mat4x4_mul_sse_2, "test against float4x4_op_mul")
 {
 	mat4x4_mul_sse_2(m2[i].row, m[0].row, m[i].row);
 }
@@ -461,50 +461,38 @@ RANDOMIZED_TEST(mat4x4_mul_sse_2)
 
 #endif
 
-BENCHMARK(scalar_mat_vec_mul)
-{
-	v2[i] = m[i] * v[i];
-}
-BENCHMARK_END;
-
-BENCHMARK(scalar_mat_mat_mul)
-{
-	m2[i] = m[0] * m[i];
-}
-BENCHMARK_END;
-
-BENCHMARK(float3_LengthSq)
+BENCHMARK(float3_LengthSq, "float3::LengthSq")
 {
 	f[i] = v[i].Float3Part().LengthSq();
 }
 BENCHMARK_END;
 
-BENCHMARK(float3_Length)
+BENCHMARK(float3_Length, "float3::Length")
 {
 	f[i] = v[i].Float3Part().Length();
 }
 BENCHMARK_END;
 
-BENCHMARK(float3_Normalize)
+BENCHMARK(float3_Normalize, "float3::Normalize")
 {
 	v[i].Float3Part().Normalize();
 }
 BENCHMARK_END;
 
-BENCHMARK(float4_Normalize3)
+BENCHMARK(float4_Normalize3, "float4::Normalize3")
 {
 	v[i].Normalize3();
 }
 BENCHMARK_END;
 
-BENCHMARK(float4_Normalize4)
+BENCHMARK(float4_Normalize4, "float4::Normalize4")
 {
 	v[i].Normalize4();
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE
-BENCHMARK(float4_Normalize4_Fast_SSE)
+BENCHMARK(float4_Normalize4_Fast_SSE, "test against float4_Normalize4")
 {
 	v[i].Normalize4_Fast_SSE();
 }

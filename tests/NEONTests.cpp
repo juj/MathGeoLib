@@ -12,9 +12,15 @@
 
 using namespace MATH_NS::TestData;
 
+BENCHMARK(float4_op_add, "float4 + float4")
+{
+	v3[i] = v[i] + v2[i];
+}
+BENCHMARK_END;
+
 #ifdef MATH_NEON
 
-BENCHMARK(rsqrtq)
+BENCHMARK(rsqrtq, "neon")
 {
 	float32x4_t r = v[i];
 	float32x4_t rcp = vrsqrteq_f32(r);
@@ -23,7 +29,7 @@ BENCHMARK(rsqrtq)
 }
 BENCHMARK_END
 
-BENCHMARK(rsqrt)
+BENCHMARK(rsqrt, "neon")
 {
 	float32x4_t r = v[i];
 	float32x2_t rcp = vrsqrte_f32(vget_low_f32(r));
@@ -130,57 +136,49 @@ UNIQUE_TEST(inline_asm_add_3)
 	assert(v3.Equals(correct));
 }
 
-BENCHMARK(float4_add_scalar_once)
-{
-	v3[i] = v[i] + v2[i];
-}
-BENCHMARK_END;
-
-BENCHMARK(float4_add_neon_intrinsics_once)
+BENCHMARK(float4_add_neon_intrinsics_once, "test against float4_op_add")
 {
 	v3[i] = vec4_add_vec4(v[i], v2[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_once)
+BENCHMARK(inline_asm_add_once, "test against float4_op_add")
 {
 	inline_asm_add(v[i].ptr(), v2[i].ptr(), v3[i].ptr());
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_byaddr_once)
+BENCHMARK(inline_asm_add_byaddr_once, "test against float4_op_add")
 {
 	inline_asm_add(&v[i], &v2[i], &v3[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_byaddr2_once)
+BENCHMARK(inline_asm_add_byaddr2_once, "test against float4_op_add")
 {
 	inline_asm_add(&v[i].v, &v2[i].v, &v3[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_nice_once)
+BENCHMARK(inline_asm_add_nice_once, "test against float4_op_add")
 {
 	v3[i] = inline_asm_add_nice(v[i], v2[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_2_once)
+BENCHMARK(inline_asm_add_2_once, "test against float4_op_add")
 {
 	v3[i] = inline_asm_add_2(v[i], v2[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_3_once)
+BENCHMARK(inline_asm_add_3_once, "test against float4_op_add")
 {
 	v3[i] = inline_asm_add_3(v[i], v2[i]);
 }
 BENCHMARK_END;
 
-
-
-BENCHMARK(float4_add_scalar_threetimes)
+BENCHMARK(float4_add_scalar_threetimes, "neon")
 {
 	v3[i] = v[i] + v2[i];
 	v3[i] = v2[i] + v3[i];
@@ -188,7 +186,7 @@ BENCHMARK(float4_add_scalar_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(float4_add_neon_intrinsics_threetimes)
+BENCHMARK(float4_add_neon_intrinsics_threetimes, "neon")
 {
 	v3[i] = vec4_add_vec4(v[i], v2[i]);
 	v3[i] = vec4_add_vec4(v2[i], v3[i]);
@@ -196,7 +194,7 @@ BENCHMARK(float4_add_neon_intrinsics_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_threetimes)
+BENCHMARK(inline_asm_add_threetimes, "neon")
 {
 	inline_asm_add(v[i].ptr(), v2[i].ptr(), v3[i].ptr());
 	inline_asm_add(v2[i].ptr(), v3[i].ptr(), v3[i].ptr());
@@ -204,7 +202,7 @@ BENCHMARK(inline_asm_add_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_byaddr_threetimes)
+BENCHMARK(inline_asm_add_byaddr_threetimes, "neon")
 {
 	inline_asm_add(&v[i], &v2[i], &v3[i]);
 	inline_asm_add(&v2[i], &v3[i], &v3[i]);
@@ -212,7 +210,7 @@ BENCHMARK(inline_asm_add_byaddr_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_byaddr2_threetimes)
+BENCHMARK(inline_asm_add_byaddr2_threetimes, "neon")
 {
 	inline_asm_add(&v[i].v, &v2[i].v, &v3[i].v);
 	inline_asm_add(&v2[i].v, &v3[i].v, &v3[i].v);
@@ -220,7 +218,7 @@ BENCHMARK(inline_asm_add_byaddr2_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_nice_threetimes)
+BENCHMARK(inline_asm_add_nice_threetimes, "neon")
 {
 	v3[i] = inline_asm_add_nice(v[i], v2[i]);
 	v3[i] = inline_asm_add_nice(v2[i], v3[i]);
@@ -228,7 +226,7 @@ BENCHMARK(inline_asm_add_nice_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_2_threetimes)
+BENCHMARK(inline_asm_add_2_threetimes, "neon")
 {
 	v3[i] = inline_asm_add_2(v[i], v2[i]);
 	v3[i] = inline_asm_add_2(v2[i], v3[i]);
@@ -236,7 +234,7 @@ BENCHMARK(inline_asm_add_2_threetimes)
 }
 BENCHMARK_END;
 
-BENCHMARK(inline_asm_add_3_threetimes)
+BENCHMARK(inline_asm_add_3_threetimes, "neon")
 {
 	v3[i] = inline_asm_add_3(v[i], v2[i]);
 	v3[i] = inline_asm_add_3(v2[i], v3[i]);
@@ -251,7 +249,7 @@ UNIQUE_TEST(vec4_length_sq_float_asm)
 	asserteq(len, 30.f);
 }
 
-BENCHMARK(vec4_length_sq_float_asm)
+BENCHMARK(vec4_length_sq_float_asm, "neon")
 {
 	f[i] = vec4_length_sq_float_asm(&v[i].v);
 }
@@ -269,7 +267,7 @@ UNIQUE_TEST(vec4_length_sq_ps_asm)
 	asserteq(lensq.w, 30.f);
 }
 
-BENCHMARK(vec4_length_sq_ps_asm)
+BENCHMARK(vec4_length_sq_ps_asm, "neon")
 {
 	vec4_length_sq_ps_asm(&v[i].v, &v3[i].v);
 }

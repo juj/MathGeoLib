@@ -331,50 +331,50 @@ UNIQUE_TEST(sqrt_precision)
 #endif
 }
 
-BENCHMARK(sqrt_sqrtf)
-{
-	f[i] = sqrtf(pf[i]);
-}
-BENCHMARK_END;
-
-BENCHMARK(sqrt_Sqrt)
+BENCHMARK(Sqrt, "Sqrt")
 {
 	f[i] = Sqrt(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_SqrtFast)
+BENCHMARK(sqrtf, "test against Sqrt")
+{
+	f[i] = sqrtf(pf[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(SqrtFast, "SqrtFast")
 {
 	f[i] = SqrtFast(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_NewtonRhapsonSqrt)
+BENCHMARK(NewtonRhapsonSqrt, "test against SqrtFast")
 {
 	f[i] = NewtonRhapsonSqrt(pf[i]);
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE
-BENCHMARK(sqrt_NewtonRhapsonSSESqrt)
+BENCHMARK(NewtonRhapsonSSESqrt, "test against SqrtFast")
 {
 	f[i] = NewtonRhapsonSSESqrt(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_NewtonRhapsonSSESqrt2)
+BENCHMARK(NewtonRhapsonSSESqrt2, "test against SqrtFast")
 {
 	f[i] = NewtonRhapsonSSESqrt2(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_NewtonRhapsonSSESqrt3)
+BENCHMARK(NewtonRhapsonSSESqrt3, "test against SqrtFast")
 {
 	f[i] = NewtonRhapsonSSESqrt3(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_Sqrt_Via_Rcp_RSqrt)
+BENCHMARK(Sqrt_Via_Rcp_RSqrt, "test against Sqrt")
 {
 	f[i] = Sqrt_Via_Rcp_RSqrt(pf[i]);
 }
@@ -438,31 +438,31 @@ UNIQUE_TEST(sqrt_rsqrt_precision)
 	assert(maxRelError[4] < 1e-3f);
 }
 
-BENCHMARK(sqrt_RSqrt)
+BENCHMARK(RSqrt, "RSqrt")
 {
 	f[i] = RSqrt(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_recip_sqrtf)
+BENCHMARK(recip_sqrtf, "test against RSqrt")
 {
 	f[i] = recip_sqrtf(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_sqrtf_recip)
+BENCHMARK(sqrtf_recip, "test against RSqrt")
 {
 	f[i] = sqrtf_recip(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_QuakeInvSqrt)
+BENCHMARK(QuakeInvSqrt, "test against RSqrt")
 {
 	f[i] = QuakeInvSqrt(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_RSqrtFast)
+BENCHMARK(RSqrtFast, "RSqrtFast")
 {
 	f[i] = RSqrtFast(pf[i]);
 }
@@ -550,51 +550,51 @@ UNIQUE_TEST(sqrt_recip_precision)
 	assert(maxRelError[4] < 1e-6f);
 }
 
-BENCHMARK(sqrt_Recip)
+BENCHMARK(Recip, "Recip")
 {
 	f[i] = Recip(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_RecipFast)
+BENCHMARK(RecipFast, "RecipFast")
 {
 	f[i] = RecipFast(pf[i]);
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE
-BENCHMARK(sqrt_NewtonRhapsonRecip)
+BENCHMARK(NewtonRhapsonRecip, "test against RecipFast")
 {
 	f[i] = NewtonRhapsonRecip(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sqrt_NewtonRhapsonRecip2)
+BENCHMARK(NewtonRhapsonRecip2, "test against RecipFast")
 {
 	f[i] = NewtonRhapsonRecip2(pf[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(sqrt_OneOverX)
+BENCHMARK(OneOverX, "rest against Recip")
 {
 	f[i] = OneOverX(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Sin)
+BENCHMARK(Sin, "Sin")
 {
 	f[i] = Sin(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sin)
+BENCHMARK(sin, "test against Sin")
 {
 	f[i] = sin(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sinf)
+BENCHMARK(sinf, "test against Sin")
 {
 	f[i] = sinf(pf[i]);
 }
@@ -602,7 +602,7 @@ BENCHMARK_END;
 
 #ifdef MATH_SSE2
 
-BENCHMARK(sin_ps)
+BENCHMARK(sin_ps, "test against Sin")
 {
 	f[i] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(pf[i])));
 }
@@ -648,61 +648,61 @@ UNIQUE_TEST(sin_ps_precision)
 
 #endif
 
-BENCHMARK(Cos)
+BENCHMARK(Cos, "Cos")
 {
 	f[i] = Cos(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(SinCos)
+BENCHMARK(SinCos, "SinCos")
 {
 	fl_2[i] = SinCos(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Tan)
+BENCHMARK(Tan, "Tan")
 {
 	f[i] = Tan(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Asin)
+BENCHMARK(Asin, "Asin")
 {
 	f[i] = Asin(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Acos)
+BENCHMARK(Acos, "Acos")
 {
 	f[i] = Acos(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Atan)
+BENCHMARK(Atan, "Atan")
 {
 	f[i] = Atan(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Atan2)
+BENCHMARK(Atan2, "Atan2")
 {
 	f[i] = Atan2(f[i], pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Sinh)
+BENCHMARK(Sinh, "Sinh")
 {
 	f[i] = Sinh(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Cosh)
+BENCHMARK(Cosh, "Cosh")
 {
 	f[i] = Cosh(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(Tanh)
+BENCHMARK(Tanh, "Tanh")
 {
 	f[i] = Tanh(pf[i]);
 }

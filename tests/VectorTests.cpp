@@ -27,13 +27,13 @@ TEST(vec4_permute)
 	assert(f2.Equals(float4(f3)));
 }
 
-BENCHMARK(Float4Swizzle)
+BENCHMARK(Float4Swizzle, "float4::Swizzled")
 {
 	v3[i] = v[i].Swizzled(2, 0, 1, 3);
 }
 BENCHMARK_END
 
-BENCHMARK(vec4_permute)
+BENCHMARK(vec4_permute, "test against Float4Swizzle")
 {
 	v3[i] = vec4_permute(v[i], 2, 0, 1, 3);
 }
@@ -470,7 +470,7 @@ TEST(Float4Div)
 	vmovss	xmm0, xmm0, xmm1
 	Without AVX: GOOD
 	movss	xmm0, DWORD PTR [edx+eax*4] */
-BENCHMARK(float_to_Float4_ss)
+BENCHMARK(float_to_Float4_ss, "sse")
 {
 	__m128 scale = _mm_set_ss(f[i]);
 	v[i] = scale;
@@ -483,7 +483,7 @@ BENCHMARK_END;
 	without AVX:
 		movss	xmm0, DWORD PTR [edx+eax*4]
 		shufps	xmm0, xmm0, 0 */
-BENCHMARK(float_to_Float4_set1)
+BENCHMARK(float_to_Float4_set1, "sse")
 {
 	__m128 scale = _mm_set1_ps(f[i]);
 	v[i] = scale;
@@ -493,7 +493,7 @@ BENCHMARK_END;
 /* 	VS2010 generates: vshufps is/should be unneeded, if not interested in higher channels!
 	vmovss	xmm0, DWORD PTR [edx+eax*4]
 	vshufps	xmm0, xmm0, xmm0, 0 */
-BENCHMARK(float_to_Float4_load1)
+BENCHMARK(float_to_Float4_load1, "sse")
 {
 	__m128 scale = _mm_load1_ps(&f[i]);
 	v[i] = scale;
@@ -520,7 +520,7 @@ BENCHMARK_END;
 /* 	vmovss	xmm1, DWORD PTR [edx+eax*4]
 	vxorps	xmm0, xmm0, xmm0
 	vmovss	xmm1, xmm0, xmm1 */
-BENCHMARK(float_to_Float4_macro1)
+BENCHMARK(float_to_Float4_macro1, "sse")
 {
 	__m128 scale = FLOAT_TO_M128(f[i]);
 	v[i] = scale;
@@ -532,7 +532,7 @@ BENCHMARK_END;
 	vxorps	xmm1, xmm1, xmm1
 	vmovss	xmm0, xmm1, xmm0
 	vshufps	xmm0, xmm0, xmm0, 0 */
-BENCHMARK(float_to_Float4_load_swizzle)
+BENCHMARK(float_to_Float4_load_swizzle, "sse")
 {
 	__m128 scale = shuffle1_ps(_mm_load_ss(&f[i]), _MM_SHUFFLE(0,0,0,0));
 	v[i] = scale;
@@ -544,28 +544,28 @@ BENCHMARK_END;
 	vxorps	xmm1, xmm1, xmm1
 	vmovss	xmm0, xmm1, xmm0
 	vshufps	xmm0, xmm0, xmm0, 0 */
-BENCHMARK(float_to_Float4_macro_swizzle)
+BENCHMARK(float_to_Float4_macro_swizzle, "sse")
 {
 	__m128 scale = shuffle1_ps(FLOAT_TO_M128(f[i]), _MM_SHUFFLE(0,0,0,0));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
-BENCHMARK(sse_shuffle1)
+BENCHMARK(sse_shuffle1, "sse")
 {
 	__m128 scale = shuffle1_ps(v[i].v, _MM_SHUFFLE(0,1,2,3));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
-BENCHMARK(sse_shuffle_ps)
+BENCHMARK(sse_shuffle_ps, "sse")
 {
 	__m128 scale = _mm_shuffle_ps(v[i].v, v[i].v, _MM_SHUFFLE(0,1,2,3));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
-BENCHMARK(sse_shuffle_epi32)
+BENCHMARK(sse_shuffle_epi32, "sse")
 {
 	__m128 scale = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((v[i].v)), _MM_SHUFFLE(0,1,2,3)));
 	v[i] = scale;
@@ -574,54 +574,54 @@ BENCHMARK_END;
 
 #endif
 
-BENCHMARK(Float4_Add)
+BENCHMARK(Float4_Add, "float4 + float4")
 {
 	v3[i] = v[i] + v2[i];
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Add_simd)
+BENCHMARK(Float4_Add_simd, "test against Float4_Add")
 {
 	v3[i] = vec4_add_vec4(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_AddEq)
+BENCHMARK(Float4_AddEq, "float4 += float4")
 {
 	v3[i] += v2[i];
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Sub)
+BENCHMARK(Float4_Sub, "float4 - float4")
 {
 	v3[i] = v[i] - v2[i];
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Sub_simd)
+BENCHMARK(Float4_Sub_simd, "test against Float4_Sub")
 {
 	v3[i] = vec4_sub_vec4(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_SubEq)
+BENCHMARK(Float4_SubEq, "float4 -= float4")
 {
 	v3[i] -= v2[i];
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Mul)
+BENCHMARK(Float4_Mul, "float4 * scalar")
 {
 	v3[i] = v[i] * f[i];
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Mul_simd)
+BENCHMARK(Float4_Mul_simd, "test against Float4_Mul")
 {
 	v3[i] = vec4_mul_float(v[i], f[i]);
 }
@@ -630,13 +630,13 @@ BENCHMARK_END;
 
 // Temp: Testing random seen cache(?) behavior, where running the identical code
 //       again produces *slower* results.
-BENCHMARK(Float4_Mul_Again)
+BENCHMARK(Float4_Mul_Again, "test against Float4_Mul")
 {
 	v3[i] = v[i] * f[i];
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_MulEq)
+BENCHMARK(Float4_MulEq, "float4 *= scalar")
 {
 	v3[i] *= f[i];
 }
@@ -644,13 +644,13 @@ BENCHMARK_END;
 
 // Temp: Testing random seen cache(?) behavior, where running the identical code
 //       again produces *slower* results.
-BENCHMARK(Float4_MulEq_Again)
+BENCHMARK(Float4_MulEq_Again, "test against Float4_MulEq")
 {
 	v3[i] *= f[i];
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Mul_scalar)
+BENCHMARK(Float4_Mul_scalar, "test against Float4_Mul")
 {
 	v3[i].x = v[i].x * f[i];
 	v3[i].y = v[i].y * f[i];
@@ -660,159 +660,159 @@ BENCHMARK(Float4_Mul_scalar)
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Mul_sse)
+BENCHMARK(Float4_Mul_sse, "test against Float4_Mul")
 {
 	v3[i].v = vec4_mul_float(v[i].v, f[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_Mul_float4)
+BENCHMARK(Float4_Mul_float4, "float4::Mul(float4)")
 {
 	v3[i] = v[i].Mul(v2[i]);
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Mul_float4_simd)
+BENCHMARK(Float4_Mul_float4_simd, "test against Float4_Mul_float4")
 {
 	v3[i] = vec4_mul_vec4(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_Div)
+BENCHMARK(Float4_Div, "float4 / scalar")
 {
 	v3[i] = v[i] / f[i];
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Div_simd)
+BENCHMARK(Float4_Div_simd, "test against Float4_Div")
 {
 	v3[i] = vec4_div_float(v[i], f[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_DivEq)
+BENCHMARK(Float4_DivEq, "float4 /= scalar")
 {
 	v3[i] /= f[i];
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Div_float4)
+BENCHMARK(Float4_Div_float4, "float4::Div(float4)")
 {
 	v3[i] = v[i].Div(v2[i]);
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Div_float4_simd)
+BENCHMARK(Float4_Div_float4_simd, "test against Float4_Div_float4")
 {
 	v3[i] = vec4_div_vec4(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_Abs)
+BENCHMARK(Float4_Abs, "float4::Abs")
 {
 	v3[i] = v[i].Abs();
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Neg)
+BENCHMARK(Float4_Neg, "float4::Neg")
 {
 	v3[i] = -v[i];
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(Float4_Neg_simd)
+BENCHMARK(Float4_Neg_simd, "test against Float4_Neg")
 {
 	v3[i] = negate_ps(v[i]);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_Length3)
+BENCHMARK(Float4_Length3, "float4::Length3")
 {
 	f[i] = v[i].Length3();
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Length4)
+BENCHMARK(Float4_Length4, "float4::Length4")
 {
 	f[i] = v[i].Length4();
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(vec4_length_float)
+BENCHMARK(vec4_length_float, "test against Float4_Length4")
 {
 	f[i] = vec4_length_float(v[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec4_length_ps)
+BENCHMARK(vec4_length_ps, "test against Float4_Length4")
 {
 	v3[i] = vec4_length_ps(v[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec3_length_float)
+BENCHMARK(vec3_length_float, "test against Float3_Length")
 {
 	f[i] = vec3_length_float(v[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec3_length_ps)
+BENCHMARK(vec3_length_ps, "test against Float3_Length")
 {
 	v3[i] = vec3_length_ps(v[i].v);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_Length4Sq)
+BENCHMARK(Float4_Length4Sq, "float4::Length4Sq")
 {
 	f[i] = v[i].LengthSq4();
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(vec4_length_sq_float)
+BENCHMARK(vec4_length_sq_float, "test against Float4_Length4Sq")
 {
 	f[i] = vec4_length_sq_float(v[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec4_length_sq_ps)
+BENCHMARK(vec4_length_sq_ps, "test against Float4_Length4Sq")
 {
 	v3[i] = vec4_length_sq_ps(v[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec3_length_sq_float)
+BENCHMARK(vec3_length_sq_float, "test against Float4_LengthSq")
 {
 	f[i] = vec3_length_sq_float(v[i].v);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec3_length_sq_ps)
+BENCHMARK(vec3_length_sq_ps, "test against Float4_LengthSq")
 {
 	v3[i] = vec3_length_sq_ps(v[i].v);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(Float4_Normalize3)
+BENCHMARK(Float4_Normalize3, "float4::Normalize3")
 {
 	v[i] = nv[i];
 	f[i] = v[i].Normalize3();
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4_Normalize4)
+BENCHMARK(Float4_Normalize4, "float4::Normalize4")
 {
 	v[i] = nv[i];
 	f[i] = v[i].Normalize4();
@@ -820,19 +820,25 @@ BENCHMARK(Float4_Normalize4)
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(vec4_normalize)
+BENCHMARK(vec4_normalize, "test against Float4_Normalize4")
 {
 	v3[i] = vec4_normalize(v[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec3_normalize)
+BENCHMARK(vec3_normalize, "test against Float4_Normalize3")
 {
 	v3[i] = vec3_normalize(v[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(vec4_lerp)
+BENCHMARK(float4_Lerp, "float4::Lerp")
+{
+	v3[i] = v[i].Lerp(v2[i], uf[i]);
+}
+BENCHMARK_END
+
+BENCHMARK(vec4_lerp, "test against float4_Lerp")
 {
 	v3[i] = vec4_lerp(v[i], v2[i], uf[i]);
 }

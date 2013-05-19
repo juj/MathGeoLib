@@ -25,6 +25,7 @@ struct Test
 		fastestTime = averageTime = worstTime = fastestCycles = 0.0;
 	}
 	std::string name;
+	std::string file;
 	std::string description;
 	bool isBenchmark;
 	bool isRandomized;
@@ -49,9 +50,9 @@ class JSONReport;
 
 extern volatile int globalPokedData;
 
-void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string description = "");
-void AddTest(std::string name, TestFunctionPtr function, std::string description = "", bool runOnlyOnce = false);
-void AddBenchmark(std::string name, TestFunctionPtr function, std::string description = "");
+void AddRandomizedTest(std::string name, TestFunctionPtr function, std::string file = "", std::string description = "");
+void AddTest(std::string name, TestFunctionPtr function, std::string file = "", std::string description = "", bool runOnlyOnce = false);
+void AddBenchmark(std::string name, TestFunctionPtr function, std::string file = "", std::string description = "");
 int RunTests(int numTimes);
 /// Returns -2: no tests left to run, -1: failed, 0: success, 1: success with warnings.
 int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONReport &jsonReport);
@@ -61,35 +62,35 @@ std::string FormatTime(double ticks);
 class AddTestOp
 {
 public:
-	AddTestOp(const char *name, const char *description, bool isRandomized, bool runOnlyOnce, bool isBenchmark, TestFunctionPtr function)
+	AddTestOp(const char *name, const char *file, const char *description, bool isRandomized, bool runOnlyOnce, bool isBenchmark, TestFunctionPtr function)
 	{
 		if (isBenchmark)
-			AddBenchmark(name, function, description);
+			AddBenchmark(name, function, file, description);
 		else if (isRandomized)
-			AddRandomizedTest(name, function, description);
+			AddRandomizedTest(name, function, file, description);
 		else
-			AddTest(name, function, description, runOnlyOnce);
+			AddTest(name, function, description, file, runOnlyOnce);
 	}
 };
 
 #define TEST(name) \
 	void TestFunc_##name(Test &test); \
-	AddTestOp addtestop_##name(#name, __FILE__, false, false, false, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, "", false, false, false, TestFunc_##name); \
 	void TestFunc_##name(Test & /*test*/)
 
 #define RANDOMIZED_TEST(name) \
 	void TestFunc_##name(Test &test); \
-	AddTestOp addtestop_##name(#name, __FILE__, true, false, false, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, "", true, false, false, TestFunc_##name); \
 	void TestFunc_##name(Test & /*test*/)
 
 #define UNIQUE_TEST(name) \
 	void TestFunc_##name(Test &test); \
-	AddTestOp addtestop_##name(#name, __FILE__, false, true, false, TestFunc_##name); \
+	AddTestOp addtestop_##name(#name, __FILE__, "", false, true, false, TestFunc_##name); \
 	void TestFunc_##name(Test & /*test*/)
 
-#define BENCHMARK(name) \
+#define BENCHMARK(name, description) \
 	void BenchmarkFunc_##name(Test &test); \
-	AddTestOp addbenchmarkop_##name(#name, __FILE__, false, false, true, BenchmarkFunc_##name); \
+	AddTestOp addbenchmarkop_##name(#name, __FILE__, description, false, false, true, BenchmarkFunc_##name); \
 	void BenchmarkFunc_##name(Test &test) \
 	{ \
 		unsigned long long bestTsc = (unsigned long long)-1; \

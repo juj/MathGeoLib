@@ -108,14 +108,14 @@ void aligned_avx_memcpy(void *dst_, void *src_, size_t size)
 }
 #endif
 
-BENCHMARK(memcpy)
+BENCHMARK(memcpy, "memcpy")
 {
 	memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE2
-BENCHMARK(aligned_sse_memcpy)
+BENCHMARK(aligned_sse_memcpy, "test against memcpy")
 {
 	aligned_sse_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
 }
@@ -123,27 +123,27 @@ BENCHMARK_END;
 #endif
 
 #ifdef MATH_AVX
-BENCHMARK(aligned_avx_memcpy)
+BENCHMARK(aligned_avx_memcpy, "test against memcpy")
 {
 	aligned_avx_memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(copy_float4x4_opequals)
+BENCHMARK(copy_float4x4_opequals, "float4x4 operator =")
 {
 	m2[i] = m[i];
 }
 BENCHMARK_END;
 
-BENCHMARK(copy_float4x4_memcpy)
+BENCHMARK(copy_float4x4_memcpy, "test against copy_float4x4_opequals")
 {
 	memcpy(&m2[i], &m[i], sizeof(m[i]));
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE
-BENCHMARK(copy_float4x4_sse)
+BENCHMARK(copy_float4x4_sse, "test against copy_float4x4_opequals")
 {
 	m2[i].row[0] = m[i].row[0];
 	m2[i].row[1] = m[i].row[1];
@@ -154,7 +154,7 @@ BENCHMARK_END;
 #endif
 
 #ifdef MATH_AVX
-BENCHMARK(copy_float4x4_avx)
+BENCHMARK(copy_float4x4_avx, "test against copy_float4x4_opequals")
 {
 	m2[i].row2[0] = m[i].row2[0];
 	m2[i].row2[1] = m[i].row2[1];
@@ -162,7 +162,7 @@ BENCHMARK(copy_float4x4_avx)
 BENCHMARK_END;
 #endif
 
-BENCHMARK(copy_float4x4_scalar)
+BENCHMARK(copy_float4x4_scalar, "test against copy_float4x4_opequals")
 {
 	m2[i].v[0][0] = m[i].v[0][0];
 	m2[i].v[0][1] = m[i].v[0][1];

@@ -425,41 +425,41 @@ TEST(Float4x4Scale)
 	assert(m.Equals(m2));
 }
 
-BENCHMARK(Float3x4Inverse)
+BENCHMARK(Float3x4Inverse, "float3x4::Inverse")
 {
 	m[i].Float3x4Part().Inverse();
 }
 BENCHMARK_END;
 
-BENCHMARK(Float4x4Inverse)
+BENCHMARK(Float4x4Inverse, "float4x4::Inverse")
 {
 	m[i].Inverse();
 }
 BENCHMARK_END;
 
 #ifdef MATH_SSE
-BENCHMARK(inverse_ps)
+BENCHMARK(inverse_ps, "test against Float4x4Inverse")
 {
 	mat4x4_inverse(m[i].row, m[i].row);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(float4x4_InverseOrthogonalUniformScale)
+BENCHMARK(float4x4_InverseOrthogonalUniformScale, "float4x4::InverseOrthogonalUniformScale")
 {
 	m[i] = ogm[i];
 	m[i].InverseOrthogonalUniformScale();
 }
 BENCHMARK_END;
 
-BENCHMARK(float4x4_InverseOrthonormal)
+BENCHMARK(float4x4_InverseOrthonormal, "float4x4::InverseOrthonormal")
 {
 	m[i] = om[i];
 	m[i].InverseOrthonormal();
 }
 BENCHMARK_END;
 
-BENCHMARK(float3x4_InverseOrthonormal)
+BENCHMARK(float3x4_InverseOrthonormal, "float3x4::InverseOrthonormal")
 {
 	m[i].Float3x4Part() = om[i].Float3x4Part();
 	m[i].Float3x4Part().InverseOrthonormal();
@@ -477,7 +477,7 @@ RANDOMIZED_TEST(mat_inverse_orthonormal_correctness)
 	assert(m2.Equals(m3));
 }
 
-BENCHMARK(mat3x4_inverse_orthonormal)
+BENCHMARK(mat3x4_inverse_orthonormal, "test against float3x4_InverseOrthonormal")
 {
 	mat3x4_inverse_orthonormal(m[i].row, m[i].row);
 }
@@ -591,13 +591,13 @@ UNIQUE_TEST(mat_determinant3_correctness)
 
 #endif
 
-BENCHMARK(float4x4_Determinant3)
+BENCHMARK(float4x4_Determinant3, "float4x4::Determinant3")
 {
 	f[i] = m[i].Determinant3();
 }
 BENCHMARK_END;
 
-BENCHMARK(float4x4_Determinant4)
+BENCHMARK(float4x4_Determinant4, "float4x4::Determinant4")
 {
 	f[i] = m[i].Determinant4();
 }
@@ -613,34 +613,34 @@ UNIQUE_TEST(float4x4_Determinant_Correctness)
 }
 
 #ifdef MATH_SSE
-BENCHMARK(mat4x4_determinant)
+BENCHMARK(mat4x4_determinant, "test against float4x4_Determinant4")
 {
 	f[i] = mat4x4_determinant(m[i].row);
 }
 BENCHMARK_END;
 
-BENCHMARK(mat3x4_determinant)
+BENCHMARK(mat3x4_determinant, "test against float3x4_Determinant")
 {
 	f[i] = mat3x4_determinant(m[i].row);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(float4x4_op_mul)
+BENCHMARK(float4x4_op_mul, "float4x4 * float4x4")
 {
 	m2[i] = m[i] * m2[i];
 }
 BENCHMARK_END;
 
 #ifdef MATH_SIMD
-BENCHMARK(mat4x4_mul_mat4x4)
+BENCHMARK(mat4x4_mul_mat4x4, "test against float4x4_op_mul")
 {
 	mat4x4_mul_mat4x4(m2[i].row, m[i].row, m2[i].row);
 }
 BENCHMARK_END;
 
 #ifdef ANDROID
-BENCHMARK(mat4x4_mul_mat4x4_asm)
+BENCHMARK(mat4x4_mul_mat4x4_asm, "test against float4x4_op_mul")
 {
 	mat4x4_mul_mat4x4_asm(m2[i].row, m[i].row, m2[i].row);
 }
@@ -671,8 +671,14 @@ RANDOMIZED_TEST(mat4x4_mul_mat4x4_asm)
 }
 #endif
 
+BENCHMARK(float4x4_Transposed, "float4x4::Transposed")
+{
+	m2[i] = m[i].Transposed();
+}
+BENCHMARK_END;
+
 #if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
-BENCHMARK(mat4x4_transpose)
+BENCHMARK(mat4x4_transpose, "test against float4x4_Transposed")
 {
 	mat4x4_transpose(m2[i].row, m[i].row);
 }
@@ -692,29 +698,29 @@ RANDOMIZED_TEST(mat4x4_transpose)
 }
 #endif
 
+BENCHMARK(float4x4_mul_float4, "float4x4 * float4")
+{
+	v2[i] = m[i] * v[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(float4_mul_float4x4, "float4 * float4x4")
+{
+	v2[i] = v[i] * m[i];
+}
+BENCHMARK_END;
+
 #if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
-BENCHMARK(mat4x4_mul_vec4)
+BENCHMARK(mat4x4_mul_vec4, "test against float4x4_mul_float4")
 {
 	v2[i] = mat4x4_mul_vec4(m[i].row, v[i].v);
 }
 BENCHMARK_END;
 #endif
 
-BENCHMARK(vec4_mul_mat4x4)
+BENCHMARK(vec4_mul_mat4x4, "test against float4_mul_float4x4")
 {
 	v2[i] = vec4_mul_mat4x4(v[i].v, m[i].row);
-}
-BENCHMARK_END;
-
-BENCHMARK(float4x4_mul_float4)
-{
-	v2[i] = m[i] * v[i];
-}
-BENCHMARK_END;
-
-BENCHMARK(float4_mul_float4x4)
-{
-	v2[i] = v[i] * m[i];
 }
 BENCHMARK_END;
 
@@ -738,9 +744,3 @@ RANDOMIZED_TEST(vec4_mul_mat4x4)
 	assert(v2.Equals(correct));
 }
 #endif
-
-BENCHMARK(float4x4_Transposed)
-{
-	m2[i] = m[i].Transposed();
-}
-BENCHMARK_END;
