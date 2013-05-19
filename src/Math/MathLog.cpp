@@ -84,7 +84,7 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 	OutputDebugStringA("\r\n");
 }
 
-#elif defined(WIN32)
+#elif defined(WIN32) && !defined(WIN8RT)
 
 void PrintToConsole(MathLogChannel channel, const char *str)
 {
