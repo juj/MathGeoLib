@@ -43,13 +43,6 @@
 
 MATH_BEGIN_NAMESPACE
 
-void SetStdoutTextColor(int newColor)
-{
-#if defined(WIN32) && !defined(WIN8RT) // Win8 metro apps don't have SetConsoleTextAttribute.
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)newColor);
-#endif
-}
-
 #if defined(__native_client__) || defined(NPAPI)
 
 extern void PrintToConsole(MathLogChannel channel, const char *str); ///< Implemented in gfxapi to route access to application instance.
