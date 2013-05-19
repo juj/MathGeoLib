@@ -304,8 +304,8 @@ public:
 
 	void Report(const Test &t)
 	{
-		LOG_WRITE("\t\t{ \"type\": \"%s\", \"name\": \"%s\", \"numTimesRun\": %d, \"numTrialsPerRun\": %d, \"numPasses\": %d, \"numFails\": %d, \"fastestTime\": %f, \"averageTime\": %f, \"slowestTime\": %f, \"fastestCycles\": %f },\n", 
-			t.isBenchmark ? "benchmark" : "test", t.name.c_str(), t.numTimesRun, t.numTrialsPerRun, t.numPasses, t.numFails, 
+		LOG_WRITE("\t\t{ \"type\": \"%s\", \"name\": \"%s\", \"description\": \"%s\", \"file\": \"%s\", \"numTimesRun\": %d, \"numTrialsPerRun\": %d, \"numPasses\": %d, \"numFails\": %d, \"fastestTime\": %f, \"averageTime\": %f, \"slowestTime\": %f, \"fastestCycles\": %f },\n", 
+			t.isBenchmark ? "benchmark" : "test", t.name.c_str(), t.description.c_str(), t.file.c_str(), t.numTimesRun, t.numTrialsPerRun, t.numPasses, t.numFails, 
 			TicksToMicroseconds(t.fastestTime), TicksToMicroseconds(t.averageTime), TicksToMicroseconds(t.worstTime), t.fastestCycles);
 		if (handle)
 			fflush(handle);
