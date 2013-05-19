@@ -59,13 +59,13 @@ void Clock::InitClockData()
 #ifdef WIN32
 	if (!QueryPerformanceFrequency(&ddwTimerFrequency))
 	{
-		LOG(LogError, "The system doesn't support high-resolution timers!");
+		LOGE("The system doesn't support high-resolution timers!");
 		ddwTimerFrequency.HighPart = (unsigned long)-1;
 		ddwTimerFrequency.LowPart = (unsigned long)-1;
 	}
 
 	if (ddwTimerFrequency.HighPart > 0)
-		LOG(LogError, "Warning: Clock::TicksPerSec will yield invalid timing data!");
+		LOGE("Warning: Clock::TicksPerSec will yield invalid timing data!");
 
 	if (appStartTime == 0)
 	{
