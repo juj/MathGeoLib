@@ -27,6 +27,7 @@ class TriangleMesh
 {
 public:
 	TriangleMesh();
+	~TriangleMesh();
 
 	/// Specifies the vertex data of this triangle mesh. Replaces any old
 	/// specified geometry.

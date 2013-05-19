@@ -172,6 +172,11 @@ TriangleMesh::TriangleMesh()
 
 }
 
+TriangleMesh::~TriangleMesh()
+{
+	AlignedFree(data);
+}
+
 void TriangleMesh::Set(const Polyhedron &polyhedron)
 {
 	std::vector<Triangle> tris = polyhedron.Triangulate();
@@ -255,13 +260,8 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV(const Ray &ray, int &outTriang
 
 void TriangleMesh::ReallocVertexBuffer(int numTris)
 {
-#if defined(_MSC_VER) || defined(MATH_SSE)
-	_aligned_free(data);
-	data = (float*)_aligned_malloc(numTris*3*3*4, 32); // http://msdn.microsoft.com/en-us/library/8z34s9c6.aspx
-#else
-	free(data);
-	data = (float*)malloc(numTris*3*3*4);
-#endif
+	AlignedFree(data);
+	data = (float*)AlignedMalloc(numTris*3*3*sizeof(float), 32);
 	numTriangles = numTris;
 }
 
