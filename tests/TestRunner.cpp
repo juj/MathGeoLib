@@ -81,7 +81,7 @@ std::string FormatTime(double ticks)
 
 // Print text to log without appending a newline to the end, if possible.
 #if !defined(LOGI_NL)
-#if defined(ANDROID) || defined(NPAPI)
+#if defined(ANDROID) || defined(NPAPI) || defined(__native_client__)
 #define LOGI_NL LOGI
 #else
 #define LOGI_NL printf
