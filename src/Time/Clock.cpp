@@ -36,6 +36,7 @@
 
 #include "Clock.h"
 #include "../Math/myassert.h"
+#include "Math/assume.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -63,9 +64,6 @@ void Clock::InitClockData()
 		ddwTimerFrequency.HighPart = (unsigned long)-1;
 		ddwTimerFrequency.LowPart = (unsigned long)-1;
 	}
-
-	if (ddwTimerFrequency.HighPart > 0)
-		LOGE("Warning: Clock::TicksPerSec will yield invalid timing data!");
 
 	if (appStartTime == 0)
 	{
@@ -235,7 +233,8 @@ tick_t Clock::Tick()
 //	return (tick_t)clock();
 #elif defined(WIN32)
 	LARGE_INTEGER ddwTimer;
-	QueryPerformanceCounter(&ddwTimer);
+	BOOL success = QueryPerformanceCounter(&ddwTimer);
+	assume(success != 0);
 	return ddwTimer.QuadPart;
 #elif defined(__APPLE__)
 	return mach_absolute_time();
@@ -256,7 +255,8 @@ unsigned long Clock::TickU32()
 {
 #ifdef WIN32
 	LARGE_INTEGER ddwTimer;
-	QueryPerformanceCounter(&ddwTimer);
+	BOOL success = QueryPerformanceCounter(&ddwTimer);
+	assume(success != 0);
 	return ddwTimer.LowPart;
 #else
 	return (unsigned long)Tick();
