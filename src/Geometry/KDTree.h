@@ -206,7 +206,7 @@ struct TriangleKdTreeRayQueryNearestHitVisitor
 {
 	float rayT;
 	float3 pos;
-	int triangleIndex;
+	u32 triangleIndex;
 	float2 barycentricUV;
 
 	TriangleKdTreeRayQueryNearestHitVisitor()
