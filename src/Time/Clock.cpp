@@ -36,7 +36,7 @@
 
 #include "Clock.h"
 #include "../Math/myassert.h"
-#include "Math/assume.h"
+#include "../Math/assume.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -235,6 +235,7 @@ tick_t Clock::Tick()
 	LARGE_INTEGER ddwTimer;
 	BOOL success = QueryPerformanceCounter(&ddwTimer);
 	assume(success != 0);
+	MARK_UNUSED(success);
 	return ddwTimer.QuadPart;
 #elif defined(__APPLE__)
 	return mach_absolute_time();
@@ -257,6 +258,7 @@ unsigned long Clock::TickU32()
 	LARGE_INTEGER ddwTimer;
 	BOOL success = QueryPerformanceCounter(&ddwTimer);
 	assume(success != 0);
+	MARK_UNUSED(success);
 	return ddwTimer.LowPart;
 #else
 	return (unsigned long)Tick();
