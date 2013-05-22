@@ -63,11 +63,10 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 	}
 	else if (channel == MathLogWarning)
 	{
-		logLevel = ANDROID_LOG_WARN;
 		strcpy(text, "Warning: ");
 		strncat(text, str, capacity-9);
 		text[capacity-1] = 0;
-		(void)__android_log_print(ANDROID_LOG_WARNING, "native-activity", text);
+		(void)__android_log_print(ANDROID_LOG_WARN, "native-activity", text);
 	}
 	else
 		(void)__android_log_print(ANDROID_LOG_INFO, "native-activity", str);
