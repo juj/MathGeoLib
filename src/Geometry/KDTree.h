@@ -85,6 +85,11 @@ public:
 	/// After Build() has been called, do *not* call AddObjects() again.
 	void Build();
 
+	/// Empties the whole kD-tree of all objects.
+	/// Call this function if you want to reuse this structure for rebuilding another kD-tree, after first
+	/// having called AddObjects/Build to build a previous tree.
+	void Clear();
+
 	/// Returns an object bucket by the given bucket index.
 	/// An object bucket is a contiguous C array of object indices, terminated with a sentinel value BUCKET_SENTINEL.
 	/// To fetch the actual object based on an object index, call the Object() method.

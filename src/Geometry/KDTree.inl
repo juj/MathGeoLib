@@ -278,6 +278,17 @@ void KdTree<T>::Build()
 }
 
 template<typename T>
+void KdTree<T>::Clear()
+{
+	nodes.clear();
+	objects.clear();
+	buckets.clear();
+#ifdef _DEBUG
+	needsBuilding = false;
+#endif
+}
+
+template<typename T>
 KdTreeNode *KdTree<T>::Root() { return nodes.size() > 1 ? &nodes[1] : 0; }
 
 template<typename T>
@@ -321,7 +332,12 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	if (!rootAABB.IntersectLineAABB(r.pos, r.dir, tNear, tFar))
 		return; // The ray doesn't intersect the root, therefore no collision.
 
-	tNear = Max(tNear, 0.f); // We are performing a ray query - ignore any hits behind the ray starting position.
+	// tNear and tFar are updated above to the enter and exit distances of the root box.
+	// All objects in kD-tree are bound within the root box, so no need to clip these, which
+	// gives better numerical precision in case some objects are very close (or actually outside)
+	// the computed kD-tree root box.
+	tNear = 0.f;
+	tFar = FLOAT_INF;
 
 	static const CardinalAxis axes[] = { AxisX, AxisY, AxisZ, AxisX, AxisY };
 
