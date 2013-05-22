@@ -17,6 +17,7 @@
 	@brief The LOG and LOGUSER macros. Provides an unified mechanism for logging. */
 #include "MathLog.h"
 
+#include <cstring>
 #include <cstdarg>
 #include <stdio.h>
 
