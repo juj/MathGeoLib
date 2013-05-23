@@ -152,6 +152,7 @@ FORCE_INLINE __m128 pack_4ss_to_ps(__m128 x, __m128 y, __m128 z, const __m128 &w
 	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 }
 
+#ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
 FORCE_INLINE __m128 modf_ps(__m128 x, __m128 mod)
 {
 	// x % mod == x - floor(x/mod)*mod
@@ -160,6 +161,7 @@ FORCE_INLINE __m128 modf_ps(__m128 x, __m128 mod)
 	__m128 integerpart = _mm_round_ps(ints, _MM_FROUND_TO_ZERO);
 	return _mm_sub_ps(x, _mm_mul_ps(integerpart, mod));
 }
+#endif
 
 #endif // ~MATH_SSE
 

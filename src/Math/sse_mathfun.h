@@ -225,8 +225,10 @@ __m128 _ps_cephes_FOPI = _mm_set1_ps(1.27323954473516f); // 4 / M_PI
 __m128 sin_ps(__m128 x) { // any x
   __m128 xmm1, xmm2 = _mm_setzero_ps(), xmm3, sign_bit, y;
 
+#ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
   // XXX Added in MathGeoLib: Take a modulo of the input in 2pi to try to enhance the precision with large input values.
   x = modf_ps(x, _mm_set1_ps(2.f*3.141592654f));
+#endif
 
   __m128i emm0, emm2;
   sign_bit = x;
@@ -311,8 +313,10 @@ __m128 sin_ps(__m128 x) { // any x
 /* almost the same as sin_ps */
 __m128 cos_ps(__m128 x) { // any x
 
+#ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
   // XXX Added in MathGeoLib: Take a modulo of the input in 2pi to try to enhance the precision with large input values.
   x = modf_ps(x, _mm_set1_ps(2.f*3.141592654f));
+#endif
 
   __m128 xmm1, xmm2 = _mm_setzero_ps(), xmm3, y;
   __m128i emm0, emm2;
@@ -393,8 +397,10 @@ void sincos_ps(__m128 x, __m128 *s, __m128 *c) {
   __m128 xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
   __m128i emm0, emm2, emm4;
 
+#ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
   // XXX Added in MathGeoLib: Take a modulo of the input in 2pi to try to enhance the precision with large input values.
   x = modf_ps(x, _mm_set1_ps(2.f*3.141592654f));
+#endif
 
   sign_bit_sin = x;
   /* take the absolute value */

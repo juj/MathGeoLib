@@ -105,3 +105,15 @@ endif()
 if (MATH_SSE41)
 	add_definitions(-DMATH_SSE41)
 endif()
+
+if (MATH_SSE3)
+	add_definitions(-DMATH_SSE3)
+endif()
+
+if (MATH_SSE2)
+	add_definitions(-DMATH_SSE2)
+endif()
+
+if (MATH_SSE)
+	add_definitions(-DMATH_SSE)
+endif()

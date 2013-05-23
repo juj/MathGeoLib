@@ -149,6 +149,7 @@
 
 #ifdef MATH_SSE2
 #define MATH_SSE
+#include <emmintrin.h>
 #endif
 
 #ifdef MATH_SSE

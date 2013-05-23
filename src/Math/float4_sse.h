@@ -84,7 +84,7 @@ FORCE_INLINE __m128 dot3_ps(__m128 a, __m128 b)
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
 	return _mm_dp_ps(a, b, 0x7F); // Choose to multiply x, y and z (0x70 = 0111 0000), and store the output to all indices (0x0F == 0000 1111).
 #else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
-	__m128 v2 = sum_xyz_ps(_mm_mul_ps(a, b));
+	return sum_xyz_ps(_mm_mul_ps(a, b));
 #endif
 }
 
