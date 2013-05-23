@@ -29,7 +29,6 @@ public:
 	static std::string CompilerIdentifier() // http://sourceforge.net/p/predef/wiki/Compilers/
 	{
 #ifdef _MSC_VER
-		char fullVer[256];
 		const char *majorVerString = "VS?";
 #if _MSC_VER < 1310 /* VS2003 */
 		return "Old unsupported VS";
@@ -47,23 +46,6 @@ public:
 		majorVerString = "VS2012 (or newer?)";
 #endif
 		return majorVerString;
-	/*
-		int majorVer = _MSC_FULL_VER / 100000000;
-		int minorVer = (_MSC_FULL_VER / 100000) % 100;
-		int patch = _MSC_FULL_VER % 100000;
-#if _MSC_VER < 1500)
-		if (majorVer == 14)
-			majorVerString = "VS2005";
-		else if (majorVer == 15)
-			majorVerString = "VS2008";
-		else if (majorVer == 16)
-			majorVerString = "VS2010";
-		else if (majorVer == 17)
-			majorVerString = "VS2012";
-		sprintf(fullVer, "%s (%02d.%02d.%05d)", majorVerString, majorVer, minorVer, patch);
-
-		return fullVer;
-#endif*/
 #elif defined(EMSCRIPTEN)
 		char str[256];
 		sprintf(str, "Emscripten Clang %s", __clang_version__);

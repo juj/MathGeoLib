@@ -227,7 +227,7 @@ BOOL GetOSDisplayString( LPTSTR pszOS)
 
       TCHAR buf[80];
 
-      StringCchPrintf( buf, 80, TEXT(" (build %d)"), osvi.dwBuildNumber);
+      StringCchPrintf( buf, 80, TEXT(" (build %d)"), (int)osvi.dwBuildNumber);
       StringCchCat(pszOS, BUFSIZE, buf);
 
       if ( osvi.dwMajorVersion >= 6 )
@@ -311,9 +311,8 @@ std::string GetProcessorCPUIDString()
 	// not in linear order. The code below arranges the information 
 	// in a human readable form.
 	__cpuid(CPUInfo, 0);
-	unsigned nIds = CPUInfo[0];
-	char CPUString[0x20];
-	memset(CPUString, 0, sizeof(CPUString));
+//	unsigned nIds = CPUInfo[0];
+	char CPUString[0x20] = {};
 	*((int*)CPUString) = CPUInfo[1];
 	*((int*)(CPUString+4)) = CPUInfo[3];
 	*((int*)(CPUString+8)) = CPUInfo[2];
@@ -346,10 +345,10 @@ std::string GetProcessorExtendedCPUIDInfo()
 	int nSteppingID = CPUInfo[0] & 0xf;
 	int nModel = (CPUInfo[0] >> 4) & 0xf;
 	int nFamily = (CPUInfo[0] >> 8) & 0xf;
-	int nProcessorType = (CPUInfo[0] >> 12) & 0x3;
+//	int nProcessorType = (CPUInfo[0] >> 12) & 0x3;
 	int nExtendedmodel = (CPUInfo[0] >> 16) & 0xf;
 	int nExtendedfamily = (CPUInfo[0] >> 20) & 0xff;
-	int nBrandIndex = CPUInfo[1] & 0xff;
+//	int nBrandIndex = CPUInfo[1] & 0xff;
 
 	std::stringstream ss;
 	ss << CPUString << ", " << "Stepping: " << nSteppingID << ", Model: " << nModel <<
@@ -398,9 +397,9 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 	DWORD dwSpeed;
 
 	// Get the key name
-	TCHAR szKey[256];
-	_sntprintf(szKey, sizeof(szKey)/sizeof(TCHAR),
-		TEXT("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d\\"), dwCPU);
+	TCHAR szKey[256] = {};
+	_sntprintf(szKey, sizeof(szKey)/sizeof(TCHAR)-1,
+		TEXT("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d\\"), (int)dwCPU);
 
 	// Open the key
 	if(RegOpenKeyEx(HKEY_LOCAL_MACHINE,szKey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)

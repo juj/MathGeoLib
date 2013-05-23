@@ -371,7 +371,7 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	{
 		while(!currentNode->IsLeaf()) // while currentNode is an internal node (not a leaf)
 		{
-//#ifdef TRACKSTATS			
+//#ifdef TRACKSTATS
 //			++travelledNodes;
 //#endif
 //#ifdef VISSTATS
@@ -424,10 +424,10 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 			stack[exitPoint].pos[axis3] = r.pos[axis3] + t * r.dir[axis3];
 		}
 
-		const float tNear = stack[entryPoint].t;
-		const float tFar = stack[exitPoint].t;
+		const float dNear = stack[entryPoint].t;
+		const float dFar = stack[exitPoint].t;
 
-		bool traversalFinished = nodeProcessFunc(*this, *currentNode, r, tNear, tFar);
+		bool traversalFinished = nodeProcessFunc(*this, *currentNode, r, dNear, dFar);
 //#ifdef VISSTATS
 //		if (bVisNumIntersections)
 //			statsCounter += nodeProcessFunc.nIntersections;
