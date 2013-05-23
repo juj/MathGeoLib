@@ -163,6 +163,19 @@ float4 *NormalizedVectorArray()
 	return arr;
 }
 
+float4 *NormalizedVectorArray2()
+{
+	LCG lcg;
+	static float4 *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<float4>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+			arr[i] = float4::RandomDir(lcg);
+	}
+	return arr;
+}
+
 float4 *VectorArray()
 {
 	LCG lcg;
@@ -230,6 +243,7 @@ public:
 		AlignedFree(MatrixArray2());
 		AlignedFree(Float2Array());
 		AlignedFree(NormalizedVectorArray());
+		AlignedFree(NormalizedVectorArray2());
 		AlignedFree(VectorArray());
 		AlignedFree(VectorArray2());
 		AlignedFree(VectorArray3());

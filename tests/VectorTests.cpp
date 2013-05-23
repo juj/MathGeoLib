@@ -834,7 +834,7 @@ BENCHMARK_END;
 
 BENCHMARK(float4_Lerp, "float4::Lerp")
 {
-	v3[i] = v[i].Lerp(v2[i], uf[i]);
+	v3[i] = nv[i].Lerp(nv2[i], uf[i]);
 }
 BENCHMARK_END
 
