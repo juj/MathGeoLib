@@ -374,12 +374,17 @@ FORCE_INLINE simd4f vec4_normalize(simd4f vec)
 
 FORCE_INLINE float vec3_length_float(simd4f vec)
 {
-	return SIMD4F_TO_FLOAT(vec4_sqrt(dot3_ps(vec, vec)));
+	return SIMD4F_TO_FLOAT(vec4_sqrt(dot3_ps3(vec, vec)));
 }
 
 FORCE_INLINE simd4f vec3_length_ps(simd4f vec)
 {
 	return vec4_sqrt(dot3_ps(vec, vec));
+}
+
+FORCE_INLINE simd4f vec3_length_ps3(simd4f vec)
+{
+	return vec4_sqrt(dot3_ps3(vec, vec));
 }
 
 FORCE_INLINE simd4f vec3_normalize(simd4f vec)

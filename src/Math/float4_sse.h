@@ -24,7 +24,7 @@
 #include "MathTypes.h"
 #include "SSEMath.h"
 
-// Input: [w,z,y,x], Output: x+y+z in all four registers.
+// Input: [w,z,y,x], Output: x+y+z in all four channels.
 FORCE_INLINE __m128 sum_xyz_ps(__m128 m)
 {
 #ifdef MATH_SSE3 // If we have SSE 3, we can use the haddps (horizontal add) instruction, _mm_hadd_ps intrinsic.
@@ -33,16 +33,26 @@ FORCE_INLINE __m128 sum_xyz_ps(__m128 m)
 	m = _mm_hadd_ps(m, m); // m = (x+y+z, x+y+z, x+y+z, x+y+z).
 	return m; // Each index of the output will contain the sum x+y+z.
 #else // We only have SSE 1, and must individually shuffle.
-	__m128 Y = shuffle1_ps(m, _MM_SHUFFLE(1,1,1,1)); // Load Y to lowest index. (others don't matter)
-	__m128 Z = shuffle1_ps(m, _MM_SHUFFLE(2,2,2,2)); // Load Z to lowest index. (others don't matter)
-	__m128 XYZ = _mm_add_ps(m, _mm_add_ps(Y, Z));
+	__m128 X = shuffle1_ps(m, _MM_SHUFFLE(0,0,0,0));
+	__m128 Y = shuffle1_ps(m, _MM_SHUFFLE(1,1,1,1));
+	__m128 Z = shuffle1_ps(m, _MM_SHUFFLE(2,2,2,2));
+	__m128 XYZ = _mm_add_ps(X, _mm_add_ps(Y, Z)); 
 	return XYZ; // Each index of the output will contain the sum x+y+z.
 #endif
 }
 
+// Input: [w,z,y,x], Output: x+y+z in three lowest channels, w is undefined.
+FORCE_INLINE __m128 sum_xyz_ps3(__m128 m)
+{
+	__m128 yzx = shuffle1_ps(m, _MM_SHUFFLE(3,0,2,1)); // [_, x, z, y]
+	__m128 zxy = shuffle1_ps(m, _MM_SHUFFLE(3,1,0,2)); // [_, y, x, z]
+	__m128 XYZ = _mm_add_ps(m, _mm_add_ps(yzx, zxy)); // [_, x+y+z, x+y+z, x+y+z]
+	return XYZ; // The three lowest elements will contain the sum x+y+z. Highest element is undefined.
+}
+
 FORCE_INLINE float sum_xyz_float(__m128 m)
 {
-	return M128_TO_FLOAT(sum_xyz_ps(m));
+	return M128_TO_FLOAT(sum_xyz_ps3(m));
 }
 
 /// The returned SP FP contains x+y+z+w in all channels of the vector.
@@ -88,9 +98,19 @@ FORCE_INLINE __m128 dot3_ps(__m128 a, __m128 b)
 #endif
 }
 
+// Returns the dot-product of the x,y,z components in all channels of the output vector.
+FORCE_INLINE __m128 dot3_ps3(__m128 a, __m128 b)
+{
+#ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
+	return _mm_dp_ps(a, b, 0x7F); // Choose to multiply x, y and z (0x70 = 0111 0000), and store the output to all indices (0x0F == 0000 1111).
+#else // Otherwise, use SSE3 haddps or SSE1 with individual shuffling.
+	return sum_xyz_ps3(_mm_mul_ps(a, b));
+#endif
+}
+
 FORCE_INLINE float dot3_float(__m128 a, __m128 b)
 {
-	return M128_TO_FLOAT(dot3_ps(a, b));
+	return M128_TO_FLOAT(dot3_ps3(a, b));
 }
 
 /// The dot product is stored in each channel of the returned vector.
@@ -123,11 +143,12 @@ FORCE_INLINE __m128 cross_ps(__m128 a, __m128 b)
 }
 
 FORCE_INLINE simd4f vec3_length_ps(simd4f vec);
+FORCE_INLINE simd4f vec3_length_ps3(simd4f vec);
 
 /// Returns a normalized copy of the given vector. Returns the length of the original vector in outLength.
 FORCE_INLINE __m128 vec4_safe_normalize3(__m128 vec, __m128 &outLength)
 {
-	outLength = vec3_length_ps(vec);
+	outLength = vec3_length_ps3(vec);
 	__m128 isZero = _mm_cmplt_ps(outLength, sseEpsilonFloat); // Was the length zero?
 	__m128 normalized = _mm_div_ps(vec, outLength); // Normalize.
 	normalized = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0).

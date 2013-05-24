@@ -133,12 +133,14 @@ float4 float4::Swizzled(int i, int j, int k, int l) const
 #ifdef MATH_SSE
 
 /// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.
+///\todo Delete this function.
 __m128 float4::LengthSq3_SSE() const
 {
-	return dot3_ps(v, v);
+	return dot3_ps3(v, v);
 }
 
 /// The returned vector contains the length of the float3 part in eacj channel of the vector.
+///\todo Delete this function.
 __m128 float4::Length3_SSE() const
 {
 	return _mm_sqrt_ps(dot3_ps(v, v));
