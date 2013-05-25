@@ -1,7 +1,7 @@
 if (NACL_SDK_ROOT)
 	set(NACL_PATH ${NACL_SDK_ROOT} CACHE STRING "Native Client SDK Root Path")
 elseif ("$ENV{NACL_SDK_ROOT}" STREQUAL "")
-	message(STATUS "Environment variable NACL_SDK_ROOT was not set! Assuming NaCl SDK is found from C:/nacl_sdk/pepper_19")
+	message(STATUS "Environment variable NACL_SDK_ROOT was not set! Assuming NaCl SDK is found from C:/nacl_sdk")
 	set(NACL_PATH "C:/nacl_sdk" CACHE STRING "Native Client SDK Root Path")
 else()
 	FILE(TO_CMAKE_PATH "$ENV{NACL_SDK_ROOT}" NACL_SDK_ROOTPATH)
@@ -9,7 +9,8 @@ else()
 endif()
 
 if (NOT NACL_TOOLCHAIN)
-	message(STATUS "NaCl toolchain was not set. Using 'pepper_26' as default. Specify -DNACL_TOOLCHAIN=pepper_xx to configure")
+	message(STATUS "NaCl toolchain was not set. Using 'pepper_canary' as default. Specify -DNACL_TOOLCHAIN=pepper_xx to configure")
+	set(NACL_TOOLCHAIN "pepper_canary")
 endif()
 
 set(NACL_TAG pnacl)
