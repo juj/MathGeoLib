@@ -77,6 +77,11 @@ public:
 		@see NumVertices(), NumFaces(), EulerFormulaHolds(), Edge(), Edges(), EdgeIndices(). */
 	int NumEdges() const;
 
+	/// Returns a pointer to an array of vertices of this polyhedron. The array contains NumVertices() elements.
+	/// @note Do NOT hold on to this pointer, since it is an alias to the underlying std::vector owned by this polyhedron. Calling any non-const Polyhedron member function may invalidate the pointer!
+	float3 *VertexArrayPtr() { return !v.empty() ? &v[0] : 0; }
+	const float3 *VertexArrayPtr() const { return !v.empty() ? &v[0] : 0; }
+
 	/// Returns the <i>i</i>th vertex of this polyhedron.
 	/** @param vertexIndex The vertex to get, in the range [0, NumVertices()-1].
 		@see NumVertices(). */

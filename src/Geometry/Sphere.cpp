@@ -625,10 +625,10 @@ bool Sphere::Intersects(const Polyhedron &polyhedron) const
 	return polyhedron.Intersects(*this);
 }
 
-void Sphere::Enclose(const float3 &point)
+void Sphere::Enclose(const float3 &point, float epsilon)
 {
 	float3 d = point - pos;
-	float dist2 = d.LengthSq();
+	float dist2 = d.LengthSq() + epsilon;
 	if (dist2 > r*r)
 	{
 		float dist = Sqrt(dist2);
@@ -678,6 +678,29 @@ void Sphere::Enclose(const float3 *pointArray, int numPoints)
 	///@todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
 	for(int i = 0; i < numPoints; ++i)
 		Enclose(pointArray[i]);
+}
+
+void Sphere::Enclose(const Triangle &triangle)
+{
+	Enclose(triangle.a);
+	Enclose(triangle.b);
+	Enclose(triangle.c);
+}
+
+void Sphere::Enclose(const Polygon &polygon)
+{
+	Enclose(polygon.VertexArrayPtr(), polygon.NumVertices());
+}
+
+void Sphere::Enclose(const Polyhedron &polyhedron)
+{
+	Enclose(polyhedron.VertexArrayPtr(), polyhedron.NumVertices());
+}
+
+void Sphere::Enclose(const Frustum &frustum)
+{
+	for(int i = 0; i < 8; ++i)
+		Enclose(frustum.CornerPoint(i));
 }
 
 int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const

@@ -281,14 +281,20 @@ public:
 	/** This function may adjust both the position and the radius of this sphere to produce a new sphere that encloses
 		both objects. The sphere that results may not be the optimal enclosing sphere.
 		This function operates in-place.
-		@see FastEnclosingSphere().
-		@todo Add Sphere::Enclose(Triangle/Polygon/Polyhedron). */
-	void Enclose(const float3 &point);
+		@param epsilon An extra distance-squared parameter for the amount to overgrow the Sphere to encompass the given point.
+			This can be set to zero, but it may cause that Sphere::Contains(point) may return false.
+		@note This function will not produce the optimal enclosure.
+		@see FastEnclosingSphere(), OptimalEnclosingSphere(). */
+	void Enclose(const float3 &point, float epsilon = 1e-2f);
 	void Enclose(const float3 *pointArray, int numPoints);
 	void Enclose(const LineSegment &lineSegment);
 	void Enclose(const AABB &aabb);
 	void Enclose(const OBB &obb);
 	void Enclose(const Sphere &sphere);
+	void Enclose(const Triangle &triangle);
+	void Enclose(const Polygon &polygon);
+	void Enclose(const Polyhedron &polyhedron);
+	void Enclose(const Frustum &frustum);
 
 	/// Generates a random point inside this sphere.
 	/** The points are distributed uniformly.

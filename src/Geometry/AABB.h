@@ -427,8 +427,9 @@ public:
 	void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
 
 	/// Expands this AABB to enclose the given object.
-	/** This function computes the AABB that encloses both this AABB and the specified object, and stores the resulting
-		AABB into this. */
+	/** This function computes an AABB that encloses both this AABB and the specified object, and stores the resulting
+		AABB into this.
+		@note The generated AABB is not necessarily the optimal enclosing AABB for this AABB and the given object. */
 	void Enclose(const float3 &point);
 	void Enclose(const LineSegment &lineSegment);
 	void Enclose(const AABB &aabb);

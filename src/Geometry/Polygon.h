@@ -56,6 +56,11 @@ public:
 		@see p, Vertex(), NumVertices(). */
 	int NumVertices() const;
 
+	/// Returns a pointer to an array of vertices of this polygon. The array contains NumVertices() elements.
+	/// @note Do NOT hold on to this pointer, since it is an alias to the underlying std::vector owned by this polygon. Calling any non-const Polygon member function may invalidate the pointer!
+	float3 *VertexArrayPtr() { return !p.empty() ? &p[0] : 0; }
+	const float3 *VertexArrayPtr() const { return !p.empty() ? &p[0] : 0; }
+
 	/// Returns a vertex of this polygon.
 	/** @param vertexIndex The index of the vertex to get, in the range [0, NumVertices()-1].
 		@see p, NumVertices(), Edge(). */

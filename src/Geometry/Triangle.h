@@ -132,13 +132,9 @@ public:
 		@see Area(), Edge(). */
 	float Perimeter() const;
 
-	/// Returns an edge of this triangle.
-	/** @param i The index of the edge to generate: 0, 1 or 2.
-		@return A LineSegment representing the given edge of this triangle. Edge(0) returns LineSegment(a,b), Edge(1)
-			returns LineSegment(b,c) and Edge(2) returns LineSegment(c,a).
-		@note If an index outside [0, 2] is passed, an assume() failure occurs and LineSegment(NaN, NaN) is returned.
-		@see Vertex(). */
-	LineSegment Edge(int i) const;
+	/// Returns a pointer to the vertices of this triangle. The array contains three elements.
+	float3 *VertexArrayPtr() { return &a; }
+	const float3 *VertexArrayPtr() const { return &a; }
 
 	/// Returns a vertex of this triangle.
 	/** @param i The vertex of this triangle to get: 0, 1 or 2.
@@ -146,6 +142,14 @@ public:
 		@note If an index outside [0, 2] is passed, an assume() failure occurs and float3(NaN) is returned.
 		@see Edge(). */
 	float3 Vertex(int i) const;
+
+	/// Returns an edge of this triangle.
+	/** @param i The index of the edge to generate: 0, 1 or 2.
+		@return A LineSegment representing the given edge of this triangle. Edge(0) returns LineSegment(a,b), Edge(1)
+			returns LineSegment(b,c) and Edge(2) returns LineSegment(c,a).
+		@note If an index outside [0, 2] is passed, an assume() failure occurs and LineSegment(NaN, NaN) is returned.
+		@see Vertex(). */
+	LineSegment Edge(int i) const;
 
 	/// Returns the counterclockwise-oriented plane this triangle lies on.
 	/** The normal of the returned plane points towards the halfspace in which the vertices of this triangle are winded
