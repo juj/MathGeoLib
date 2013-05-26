@@ -168,9 +168,6 @@ RANDOMIZED_TEST(Sphere_Enclose_point)
 	float3 pt = RandomPointNearOrigin(DISTSCALE);
 	s.Enclose(pt);
 
-	float d = s.Distance(pt);
-	float dsq = s.pos.DistanceSq(pt);
-	float rr = s.r*s.r;
 	assert(s.Contains(pt));
 }
 
