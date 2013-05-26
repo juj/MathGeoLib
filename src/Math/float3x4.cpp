@@ -952,9 +952,6 @@ bool float3x4::InverseColOrthogonal()
 bool float3x4::InverseOrthogonalUniformScale()
 {
 	///\todo SSE.
-#ifdef MATH_ASSERT_CORRECTNESS
-	float3x4 orig = *this;
-#endif
 	assume(IsColOrthogonal(1e-3f));
 	assume(HasUniformScale());
 	Swap(v[0][1], v[1][0]);
@@ -976,10 +973,6 @@ bool float3x4::InverseOrthogonalUniformScale()
 
 void float3x4::InverseOrthonormal()
 {
-#ifdef MATH_ASSERT_CORRECTNESS
-	float3x4 orig = *this;
-#endif
-
 	assume(IsOrthonormal());
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
