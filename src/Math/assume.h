@@ -87,22 +87,13 @@ MATH_END_NAMESPACE
 			throw std::runtime_error(#x); \
 	MULTI_LINE_MACRO_END
 
-#elif defined(_MSC_VER)
+#else
 
-#define assume(x) (void)((!!(x)) || ( printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__) && MATH_NS::AssumeFailed()) )
-
-#elif defined(ANDROID)
-
-#include <android/log.h>
-#define assume(x) do { if (!(x)) { __android_log_print(ANDROID_LOG_ERROR, "native-activity", "Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
-#ifdef assert
-#undef assert
-#endif
-#define assert(x) do { if (!(x)) { __android_log_print(ANDROID_LOG_ERROR, "native-activity", "Assertion \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
-
-#else // All other platforms
-
-#define assume(x) do { if (!(x)) { printf("Assumption \"%s\" failed! in file %s, line %d!\n", #x, __FILE__, __LINE__); } } while(0)
+#define assume(x) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			LOGE("Assumption \"%s\" failed! in file %s, line %d!", #x, __FILE__, __LINE__); \
+	MULTI_LINE_MACRO_END
 
 #endif
 
