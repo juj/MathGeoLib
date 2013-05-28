@@ -657,7 +657,7 @@ void Sphere::Enclose(const Sphere &sphere)
 	// To enclose another sphere into this sphere, we can simply enclose the farthest point
 	// of that sphere to this sphere.
 	float3 farthestPoint = sphere.pos - pos;
-	farthestPoint = sphere.pos + farthestPoint * (sphere.r / farthestPoint.Length()));
+	farthestPoint = sphere.pos + farthestPoint * (sphere.r / farthestPoint.Length());
 	Enclose(farthestPoint);
 }
 
