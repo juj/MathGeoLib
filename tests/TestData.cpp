@@ -231,6 +231,14 @@ float4 *VectorArrayWithW0Or1()
 	return arr;
 }
 
+float2 uninitializedFloat2;
+float3 uninitializedFloat3;
+float4 uninitializedFloat4;
+float3x3 uninitializedFloat3x3;
+float3x4 uninitializedFloat3x4;
+float4x4 uninitializedFloat4x4;
+Quat uninitializedQuat;
+
 class FreeTestData
 {
 public:

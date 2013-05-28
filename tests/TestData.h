@@ -46,6 +46,14 @@ static DONT_WARN_UNUSED float4 *v01 = VectorArrayWithW0Or1();
 static DONT_WARN_UNUSED Quat *q = QuatArray();
 static DONT_WARN_UNUSED Quat *q2 = QuatArray2();
 
+extern float2 uninitializedFloat2;
+extern float3 uninitializedFloat3;
+extern float4 uninitializedFloat4;
+extern float3x3 uninitializedFloat3x3;
+extern float3x4 uninitializedFloat3x4;
+extern float4x4 uninitializedFloat4x4;
+extern Quat uninitializedQuat;
+
 } // ~TestData
 
 MATH_END_NAMESPACE

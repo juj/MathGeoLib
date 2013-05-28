@@ -865,3 +865,105 @@ TEST(float4_Lerp)
 	assert(a.Lerp(b, 1.f).Equals(10,10,10,1));
 	assert(a.Lerp(b, 0.5f).Equals(6,6,6,1));
 }
+
+// Test that copying uninitialized memory around is ok:
+
+RANDOMIZED_TEST(copy_uninitialized_float2)
+{
+	float2 a;
+	float2 b = a;
+	uninitializedFloat2 = b;
+}
+
+RANDOMIZED_TEST(copy_uninitialized_float3)
+{
+	float3 a;
+	float3 b = a;
+	uninitializedFloat3 = b;
+}
+
+RANDOMIZED_TEST(copy_uninitialized_float4)
+{
+	float4 a;
+	float4 b = a;
+	uninitializedFloat4 = b;
+}
+
+RANDOMIZED_TEST(copy_uninitialized_float3x3)
+{
+	float3x3 a;
+	float3x3 b = a;
+	uninitializedFloat3x3 = b;
+}
+
+RANDOMIZED_TEST(copy_uninitialized_float3x4)
+{
+	float3x4 a;
+	float3x4 b = a;
+	uninitializedFloat3x4 = b;
+}
+
+RANDOMIZED_TEST(copy_uninitialized_float4x4)
+{
+	float4x4 a;
+	float4x4 b = a;
+	uninitializedFloat4x4 = b;
+}
+
+RANDOMIZED_TEST(copy_uninitialized_Quat)
+{
+	Quat a;
+	Quat b = a;
+	uninitializedQuat = b;
+}
+
+// Also, it must be safe to assign NaN types around:
+
+RANDOMIZED_TEST(copy_nan_float2)
+{
+	float2 a = float2::nan;
+	float2 b = a;
+	uninitializedFloat2 = b;
+}
+
+RANDOMIZED_TEST(copy_nan_float3)
+{
+	float3 a = float3::nan;
+	float3 b = a;
+	uninitializedFloat3 = b;
+}
+
+RANDOMIZED_TEST(copy_nan_float4)
+{
+	float4 a = float4::nan;
+	float4 b = a;
+	uninitializedFloat4 = b;
+}
+
+RANDOMIZED_TEST(copy_nan_float3x3)
+{
+	float3x3 a = float3x3::nan;
+	float3x3 b = a;
+	uninitializedFloat3x3 = b;
+}
+
+RANDOMIZED_TEST(copy_nan_float3x4)
+{
+	float3x4 a = float3x4::nan;
+	float3x4 b = a;
+	uninitializedFloat3x4 = b;
+}
+
+RANDOMIZED_TEST(copy_nan_float4x4)
+{
+	float4x4 a = float4x4::nan;
+	float4x4 b = a;
+	uninitializedFloat4x4 = b;
+}
+
+RANDOMIZED_TEST(copy_nan_Quat)
+{
+	Quat a;
+	Quat b = a;
+	uninitializedQuat = b;
+}
