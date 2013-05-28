@@ -386,6 +386,7 @@ public:
 	bool Contains(const Polygon &polygon) const;
 	bool Contains(const Frustum &frustum) const;
 	bool Contains(const Polyhedron &polyhedron) const;
+	bool Contains(const Capsule &capsule) const;
 
 	/// Tests whether this AABB and the given object intersect.
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside

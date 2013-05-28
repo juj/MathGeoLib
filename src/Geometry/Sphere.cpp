@@ -657,7 +657,7 @@ void Sphere::Enclose(const Sphere &sphere)
 	// To enclose another sphere into this sphere, we can simply enclose the farthest point
 	// of that sphere to this sphere.
 	float3 farthestPoint = sphere.pos - pos;
-	farthestPoint = sphere.pos + farthestPoint * (sphere.r / farthestPoint.Length());
+	farthestPoint = sphere.pos + farthestPoint * (sphere.r / farthestPoint.Length()));
 	Enclose(farthestPoint);
 }
 
@@ -701,6 +701,40 @@ void Sphere::Enclose(const Frustum &frustum)
 {
 	for(int i = 0; i < 8; ++i)
 		Enclose(frustum.CornerPoint(i));
+}
+
+void Sphere::Enclose(const Capsule &capsule)
+{
+	// Capsule is a convex object spanned by the endpoint spheres - enclosing
+	// the endpoint spheres will also cause this Sphere to enclose the middle
+	// section since Sphere is convex as well.
+	float da = pos.DistanceSq(capsule.l.a);
+	float db = pos.DistanceSq(capsule.l.b);
+
+	// Enclose the farther Sphere of the Capsule, and expand the radius so that it contains the closer Sphere.
+	// If we Enclose()d both, the second enclosure might move the sphere center so it no longer contains the first enclosed Sphere.
+	if (da > db) 
+	{
+		Enclose(capsule.SphereA());
+		ExtendRadiusToContain(capsule.SphereB());
+	}
+	else
+	{
+		Enclose(capsule.SphereB());
+		ExtendRadiusToContain(capsule.SphereA());
+	}
+}
+
+void Sphere::ExtendRadiusToContain(const float3 &point, float epsilon)
+{
+	float requiredRadius = pos.Distance(point) + epsilon;
+	r = Max(r, requiredRadius);
+}
+
+void Sphere::ExtendRadiusToContain(const Sphere &sphere, float epsilon)
+{
+	float requiredRadius = pos.Distance(sphere.pos) + sphere.r + epsilon;
+	r = Max(r, requiredRadius);
 }
 
 int Sphere::Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const

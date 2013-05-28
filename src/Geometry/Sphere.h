@@ -295,6 +295,13 @@ public:
 	void Enclose(const Polygon &polygon);
 	void Enclose(const Polyhedron &polyhedron);
 	void Enclose(const Frustum &frustum);
+	void Enclose(const Capsule &capsule);
+
+	/// Expands the radius of this Sphere until it encloses the given object.
+	/** @param epsilon A small amount to extrude the given object by for numerical precision.
+		@note This function is like Enclose(), but unlike Enclose(), this function keeps the center point of this Sphere fixed. */
+	void ExtendRadiusToContain(const float3 &point, float epsilon = 1e-4f);
+	void ExtendRadiusToContain(const Sphere &sphere, float epsilon = 1e-4f);
 
 	/// Generates a random point inside this sphere.
 	/** The points are distributed uniformly.

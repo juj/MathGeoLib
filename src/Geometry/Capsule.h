@@ -164,6 +164,12 @@ public:
 		@see PointInside(). */
 	float3 UniformPointPerhapsInside(float l, float x, float y) const;
 
+	/// Returns the Sphere defining the 'bottom' section of this Capsule (corresponding to the endpoint l.a)
+	Sphere SphereA() const;
+
+	/// Returns the Sphere defining the 'top' section of this Capsule (corresponding to the endpoint l.b)
+	Sphere SphereB() const;
+
 	/// Returns the smallest AABB that encloses this capsule.
 	/** @see MinimalEnclosingOBB(). */
 	AABB MinimalEnclosingAABB() const;

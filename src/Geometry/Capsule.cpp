@@ -161,6 +161,16 @@ float3 Capsule::UniformPointPerhapsInside(float l, float x, float y) const
 	return MinimalEnclosingOBB().PointInside(l, x, y);
 }
 
+Sphere Capsule::SphereA() const
+{
+	return Sphere(l.a, r);
+}
+
+Sphere Capsule::SphereB() const
+{
+	return Sphere(l.b, r);
+}
+
 AABB Capsule::MinimalEnclosingAABB() const
 {
 	AABB aabb(Min(l.a, l.b) - float3(r, r, r), Max(l.a, l.b) + float3(r, r, r));

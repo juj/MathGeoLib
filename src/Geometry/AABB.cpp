@@ -548,6 +548,11 @@ bool AABB::Contains(const Sphere &sphere) const
 	return Contains(sphere.MinimalEnclosingAABB());
 }
 
+bool AABB::Contains(const Capsule &capsule) const
+{
+	return Contains(capsule.MinimalEnclosingAABB());
+}
+
 bool AABB::Contains(const Triangle &triangle) const
 {
 	return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);

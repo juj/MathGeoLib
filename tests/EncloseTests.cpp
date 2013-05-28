@@ -33,6 +33,12 @@ Sphere RandomSphereNearOrigin(float maxDistanceFromOrigin, float maxRadius)
 	return RandomSphereContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin), maxRadius);
 }
 
+Capsule RandomCapsuleContainingPoint(const float3 &pt);
+Capsule RandomCapsuleNearOrigin(float maxDistanceFromOrigin)
+{
+	return RandomCapsuleContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin));
+}
+
 Triangle RandomTriangleNearOrigin(float maxDistanceFromOrigin)
 {
 	return Triangle(RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin));
@@ -124,7 +130,6 @@ RANDOMIZED_TEST(AABB_Enclose_Triangle)
 	assert(aabb.Contains(t));
 }
 
-/* TODO: Enable this once AABB::Contains(Capsule) is implemented.
 RANDOMIZED_TEST(AABB_Enclose_Capsule)
 {
 	AABB aabb = RandomAABBNearOrigin(DISTSCALE, SIZESCALE);
@@ -133,7 +138,6 @@ RANDOMIZED_TEST(AABB_Enclose_Capsule)
 
 	assert(aabb.Contains(c));
 }
-*/
 
 RANDOMIZED_TEST(AABB_Enclose_Frustum)
 {
@@ -216,7 +220,6 @@ RANDOMIZED_TEST(Sphere_Enclose_Triangle)
 	assert(s.Contains(t));
 }
 
-/* TODO: Enable this once Sphere::Contains(Capsule) is implemented.
 RANDOMIZED_TEST(Sphere_Enclose_Capsule)
 {
 	Sphere s = RandomSphereNearOrigin(DISTSCALE, SIZESCALE);
@@ -225,7 +228,6 @@ RANDOMIZED_TEST(Sphere_Enclose_Capsule)
 
 	assert(s.Contains(c));
 }
-*/
 
 RANDOMIZED_TEST(Sphere_Enclose_Frustum)
 {
