@@ -825,7 +825,7 @@ int Plane::Clip(const Triangle &triangle, Triangle &t1, Triangle &t2) const
 	Intersects(LineSegment(t1.a, t1.b), &t);
 	float3 ab = t1.a + (t1.b-t1.a)*t;
 	Intersects(LineSegment(t1.a, t1.c), &r);
-	float3 ac = t1.a + (t1.c-t1.a)*t;
+	float3 ac = t1.a + (t1.c-t1.a)*r;
 	t1.a = ab;
 
 	t2.a = t1.c;
