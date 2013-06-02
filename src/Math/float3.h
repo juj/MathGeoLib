@@ -669,7 +669,7 @@ public:
 	static const float3 inf;
 
 #ifdef MATH_OGRE_INTEROP
-	float3(const Ogre::Vector3 &other) { x = other.x; y = other.y; z = other.z; }
+	float3(const Ogre::Vector3 &other):x(other.x), y(other.y), z(other.z) {}
 	operator Ogre::Vector3() const { return Ogre::Vector3(x, y, z); }
 #endif
 /*
@@ -679,7 +679,7 @@ public:
 #endif
 */
 #ifdef MATH_QT_INTEROP
-	float3(const QVector3D &other) { x = other.x(); y = other.y(); z = other.z(); }
+	float3(const QVector3D &other):x(other.x()), y(other.y()), z(other.z()) {}
 	operator QVector3D() const { return QVector3D(x, y, z); }
 	operator QString() const { return "float3(" + QString::number(x) + "," + QString::number(y) + "," + QString::number(z) + ")"; }
 	QString toString() const { return (QString)*this; }
@@ -688,7 +688,7 @@ public:
 	static float3 FromString(const QString &str) { return FromString(str.toStdString()); }
 #endif
 #ifdef MATH_BULLET_INTEROP
-	float3(const btVector3 &other) { x = other.x(); y = other.y(); z = other.z(); }
+	float3(const btVector3 &other):x(other.x()), y(other.y()), z(other.z()) {}
 	operator btVector3() const { return btVector3(x, y, z); }
 #endif
 };

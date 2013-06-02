@@ -659,12 +659,12 @@ public:
 	static const float4 inf;
 
 #ifdef MATH_OGRE_INTEROP
-	float4(const Ogre::Vector4 &other) { x = other.x; y = other.y; z = other.z; w = other.w; }
+	float4(const Ogre::Vector4 &other): x(other.x), y(other.y), z(other.z), w(other.w) {}
 	float4 &operator =(const Ogre::Vector4 &other) { x = other.x; y = other.y; z = other.z; w = other.w; return *this; }
 	operator Ogre::Vector4() const { return Ogre::Vector4(x, y, z, w); }
 #endif
 #ifdef MATH_QT_INTEROP
-	float4(const QVector4D &other) { x = other.x(); y = other.y(); z = other.z(); w = other.w(); }
+	float4(const QVector4D &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator QVector4D() const { return QVector4D(x, y, z, w); }
 	operator QString() const { return "float4(" + QString::number(x) + "," + QString::number(y) + "," + QString::number(z) + "," + QString::number(w) + ")"; }
 	QString toString() const { return (QString)*this; }
@@ -674,7 +674,7 @@ public:
 #endif
 #ifdef MATH_BULLET_INTEROP
 	// Bullet uses the same btVector3 class for both 3- and 4 -tuples (due to SSE).
-	float4(const btVector3 &other) { x = other.x(); y = other.y(); z = other.z(); w = other.w(); }
+	float4(const btVector3 &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator btVector3() const { btVector3 v(x, y, z); v.setW(w); return v; }
 #endif
 

@@ -598,11 +598,11 @@ public:
 	static const float2 inf;
 
 #ifdef MATH_OGRE_INTEROP
-	float2(const Ogre::Vector2 &other) { x = other.x; y = other.y; }
+	float2(const Ogre::Vector2 &other):x(other.x), y(other.y) {}
 	operator Ogre::Vector2() const { return Ogre::Vector2(x, y); }
 #endif
 #ifdef MATH_QT_INTEROP
-	float2(const QVector2D &other) { x = other.x(); y = other.y(); }
+	float2(const QVector2D &other):x(other.x()), y(other.y()) {}
 	operator QVector2D() const { return QVector2D(x, y); }
 	operator QString() const { return "float2(" + QString::number(x) + "," + QString::number(y) + ")"; }
 	QString toString() const { return (QString)*this; }

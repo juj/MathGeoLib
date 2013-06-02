@@ -367,7 +367,7 @@ public:
 	Quat operator +() const { return *this; }
 
 #ifdef MATH_OGRE_INTEROP
-	Quat(const Ogre::Quaternion &other) { w = other.w; x = other.x; y = other.y; z = other.z; }
+	Quat(const Ogre::Quaternion &other):x(other.x), y(other.y), z(other.z), w(other.w) {}
 	operator Ogre::Quaternion() const { return Ogre::Quaternion(w, x, y, z); }
 #endif
 /*
@@ -377,7 +377,7 @@ public:
 #endif
 */
 #ifdef MATH_QT_INTEROP
-	Quat(const QQuaternion &other) { w = other.scalar(); x = other.x(); y = other.y(); z = other.z(); }
+	Quat(const QQuaternion &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator QQuaternion() const { return QQuaternion(w, x, y, z); }
 	operator QString() const { return toString(); }
 	QString toString() const { return ToString2().c_str(); }
@@ -386,7 +386,7 @@ public:
 	static MUST_USE_RESULT Quat FromString(const QString &str) { return FromString(str.toStdString()); }
 #endif
 #ifdef MATH_BULLET_INTEROP
-	Quat(const btQuaternion &other) { w = other.w(); x = other.x(); y = other.y(); z = other.z(); }
+	Quat(const btQuaternion &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator btQuaternion() const { return btQuaternion(x, y, z, w); }
 #endif
 
