@@ -369,7 +369,7 @@ public:
 	static bool IntersectLinePlane(const float3 &planeNormal, float planeD, const float3 &linePos, const float3 &lineDir, float &t);
 
 #ifdef MATH_OGRE_INTEROP
-	Plane(const Ogre::Plane &other) { normal = other.normal; d = other.d; }
+	Plane(const Ogre::Plane &other):normal(other.normal), d(other.d) {}
 	operator Ogre::Plane() const { return Ogre::Plane(normal, d); }
 #endif
 

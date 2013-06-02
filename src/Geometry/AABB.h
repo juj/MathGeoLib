@@ -537,7 +537,7 @@ public:
 #endif
 
 #ifdef MATH_OGRE_INTEROP
-	AABB(const Ogre::AxisAlignedBox &other) { minPoint = other.getMinimum(); maxPoint = other.getMaximum(); }
+	AABB(const Ogre::AxisAlignedBox &other):minPoint(other.getMinimum()), maxPoint(other.getMaximum()) {}
 	operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
 #endif
 

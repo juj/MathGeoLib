@@ -211,7 +211,7 @@ public:
 #endif
 
 #ifdef MATH_OGRE_INTEROP
-	Ray(const Ogre::Ray &other) { pos = other.getOrigin(); dir = other.getDirection(); }
+	Ray(const Ogre::Ray &other):pos(other.getOrigin()), dir(other.getDirection()) {}
 	operator Ogre::Ray() const { return Ogre::Ray(pos, dir); }
 #endif
 
