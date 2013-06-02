@@ -366,12 +366,12 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTr
 #endif
 
 	float nearestD = FLOAT_INF;
-	float u, v, d;
 
 	const Triangle *tris = reinterpret_cast<const Triangle*>(data);
 	for(int i = 0; i < numTriangles; ++i)
 	{
-		d = Triangle::IntersectLineTri(ray.pos, ray.dir, tris->a, tris->b, tris->c, u, v);
+		float u, v;
+		float d = Triangle::IntersectLineTri(ray.pos, ray.dir, tris->a, tris->b, tris->c, u, v);
 		if (d >= 0.f && d < nearestD)
 		{
 			nearestD = d;
