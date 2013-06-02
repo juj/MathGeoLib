@@ -71,7 +71,7 @@ void AlignedFree(void *ptr);
 #define set_ps_hex(w, z, y, x) _mm_castsi128_ps(_mm_set_epi32(w, z, y, x))
 #define set1_ps_hex(x) _mm_castsi128_ps(_mm_set1_epi32(x))
 #else
-#define set_ps_hex(w, z, y, x) _mm_set_ps(ReinterpretAsFloat(w), ReinterpretAsFloat(z), ReinterpretAsFloat(y), ReinterpretAsFloat(x)))
+#define set_ps_hex(w, z, y, x) _mm_set_ps(ReinterpretAsFloat(w), ReinterpretAsFloat(z), ReinterpretAsFloat(y), ReinterpretAsFloat(x))
 #define set1_ps_hex(x) _mm_set1_ps(ReinterpretAsFloat(x))
 #endif
 
