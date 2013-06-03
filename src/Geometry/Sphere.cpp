@@ -154,7 +154,7 @@ bool Sphere::IsFinite() const
 
 bool Sphere::IsDegenerate() const
 {
-	return !(r > 0.f) && pos.IsFinite(); // Peculiar order of testing so that NaNs end up being degenerate.
+	return !(r > 0.f) || !pos.IsFinite(); // Peculiar order of testing so that NaNs end up being degenerate.
 }
 
 void Sphere::SetDegenerate()
