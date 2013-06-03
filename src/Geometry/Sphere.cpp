@@ -154,13 +154,13 @@ bool Sphere::IsFinite() const
 
 bool Sphere::IsDegenerate() const
 {
-	return r < 0.f;
+	return !(r > 0.f) && pos.IsFinite(); // Peculiar order of testing so that NaNs end up being degenerate.
 }
 
 void Sphere::SetDegenerate()
 {
 	pos = float3::nan;
-	r = FLOAT_NAN;
+	r = nan;
 }
 
 bool Sphere::Contains(const float3 &point) const

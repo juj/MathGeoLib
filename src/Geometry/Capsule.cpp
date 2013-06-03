@@ -59,6 +59,16 @@ void Capsule::SetFrom(const Sphere &s)
 	r = s.r;
 }
 
+void Capsule::SetDegenerate()
+{
+	r = -1.f;
+}
+
+bool Capsule::IsDegenerate() const
+{
+	return r <= 0.f;
+}
+
 float Capsule::LineLength() const
 {
 	return l.Length();

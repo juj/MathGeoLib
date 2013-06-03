@@ -55,6 +55,13 @@ public:
 		length of the inner line segment is set to 0. */
 	void SetFrom(const Sphere &s);
 
+	/// Sets this Capsule to a degenerate negative-volume state.
+	void SetDegenerate();
+
+	/// Tests if this Capsule is degenerate.
+	/** @return True if this Capsule does not span a strictly positive volume. */
+	bool IsDegenerate() const;
+
 	/// Computes the distance of the two inner points of this capsule.
 	/** <img src="CapsuleFunctions.png" />
 		@see Height(). */
