@@ -125,6 +125,45 @@ public:
 		FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
 }
 
+#define BENCHMARK_ITERS(name, numTests_, numIters_, description) \
+	void BenchmarkFunc_##name(Test &test); \
+	AddTestOp addbenchmarkop_##name(#name, __FILE__, description, false, false, true, BenchmarkFunc_##name); \
+	void BenchmarkFunc_##name(Test &test) \
+	{ \
+		const int numTests = numTests_; \
+		const int numIters = numIters_; \
+		unsigned long long bestTsc = (unsigned long long)-1; \
+		tick_t bestTicks = (tick_t)-1; \
+		tick_t accumTicks = 0; \
+		tick_t worstTicks = 0; \
+		for(int xx = 0; xx < numTests; ++xx) \
+		{ \
+			tick_t start = Clock::Tick(); \
+			unsigned long long startTsc = Clock::Rdtsc(); \
+			for(int i = 0; i < numIters; ++i) \
+			{
+
+#define BENCHMARK_ITERS_END \
+		} \
+		unsigned long long endTsc = Clock::Rdtsc(); \
+		tick_t end = Clock::Tick(); \
+		tick_t elapsedTicks = end - start; \
+		tick_t elapsedTsc = endTsc - startTsc; \
+		bestTsc = Min(bestTsc, elapsedTsc); \
+		bestTicks = Min(bestTicks, elapsedTicks); \
+		worstTicks = Max(worstTicks, elapsedTicks); \
+		accumTicks += elapsedTicks; \
+	} \
+	test.numTimesRun = numTests; \
+	test.numTrialsPerRun = numIters; \
+	test.fastestCycles = (double)bestTsc / numIters; \
+	test.fastestTime = (double)bestTicks / numIters; \
+	test.averageTime = (double)accumTicks / (numTests * numIters); \
+	test.worstTime = (double)worstTicks / numIters; \
+	LOGI("\n   Best: %s / %g ticks, Avg: %s, Worst: %s", FormatTime(test.fastestTime).c_str(), test.fastestCycles, \
+		FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
+}
+
 #if defined(_DEBUG) || defined(DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
 #if defined(EMSCRIPTEN)
 const int testrunner_numTimerTests = 1;
