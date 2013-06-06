@@ -31,6 +31,7 @@
 #include "../Math/float2.h"
 #include "../Math/float3x3.h"
 #include "../Math/float3x4.h"
+#include "../Math/float4x4.h"
 #include "../Math/float4.h"
 #include "../Math/Quat.h"
 #include "../Algorithm/Random/LCG.h"

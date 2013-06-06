@@ -69,10 +69,6 @@ class ScaleOp;
 class AABB;
 class Capsule;
 class Circle;
-#ifdef Complex
-#undef Complex
-#endif
-class Complex;
 class Cone;
 class Cylinder;
 class Ellipsoid;

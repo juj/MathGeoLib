@@ -25,7 +25,6 @@
 #include "../MathGeoLibFwd.h"
 #include "MatrixProxy.h"
 #include "../Math/float3.h"
-#include "CoordinateAxisConvention.h"
 
 #ifdef MATH_OGRE_INTEROP
 #include <OgreMatrix3.h>

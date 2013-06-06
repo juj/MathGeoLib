@@ -18,6 +18,7 @@
 #include "TransformOps.h"
 #include "MathFunc.h"
 #include "float4.h"
+#include "float3x3.h"
 #include "float3x4.h"
 #include "float4x4.h"
 

@@ -22,9 +22,9 @@
 #endif
 
 #include "../MathGeoLibFwd.h"
-#include "MatrixProxy.h"
-#include "CoordinateAxisConvention.h"
 #include "../MathBuildConfig.h"
+#include "MatrixProxy.h"
+#include "float3.h"
 #include "SSEMath.h"
 
 MATH_BEGIN_NAMESPACE
