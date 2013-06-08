@@ -171,9 +171,14 @@ public:
 	:reason(reason_)
 	{
 	}
+
+	virtual ~TestSkippedException() throw()
+	{
+	}
+
 	std::string reason;
 
-	virtual const char* what() const throw ()
+	virtual const char* what() const throw()
 	{
 		return reason.c_str();
 	}
