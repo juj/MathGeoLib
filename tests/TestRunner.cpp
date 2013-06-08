@@ -123,6 +123,14 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 				t.function(t);
 #ifdef FAIL_USING_EXCEPTIONS
 			}
+			catch(const TestSkippedException &e)
+			{
+				if (failReason.empty())
+				{
+					failReason = std::string("SKIPPED: ") + e.what();
+					LOGW("%s", failReason.c_str());
+				}
+			}
 			catch(const std::runtime_error &e)
 			{
 				if (!!strcmp(e.what(), "expect failure"))

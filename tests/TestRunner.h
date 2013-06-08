@@ -164,6 +164,23 @@ public:
 		FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
 }
 
+class TestSkippedException : public std::exception
+{
+public:
+	explicit TestSkippedException(const char *reason_)
+	:reason(reason_)
+	{
+	}
+	std::string reason;
+
+	const char *what() const
+	{
+		return reason.c_str();
+	}
+};
+
+#define SKIP_TEST(reason) throw TestSkippedException(reason)
+
 #if defined(_DEBUG) || defined(DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
 #if defined(EMSCRIPTEN)
 const int testrunner_numTimerTests = 1;
@@ -176,3 +193,4 @@ const int testrunner_numItersPerTest = 100;
 const int testrunner_numTimerTests = 100;
 const int testrunner_numItersPerTest = 1000;
 #endif
+
