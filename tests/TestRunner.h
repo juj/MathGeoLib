@@ -173,7 +173,7 @@ public:
 	}
 	std::string reason;
 
-	const char *what() const
+	virtual const char* what() const throw ()
 	{
 		return reason.c_str();
 	}
