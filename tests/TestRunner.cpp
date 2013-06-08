@@ -173,13 +173,21 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 
 	if (!t.isBenchmark)
 	{
-		t.fastestTime = (double)times[0] / numTrialsPerRun;
-		t.averageTime = (double)total / times.size() / numTrialsPerRun;
-		t.worstTime = (double)times.back() / numTrialsPerRun;
-		t.numTimesRun = numTimesToRun;
-		t.numTrialsPerRun = numTrialsPerRun;
+		if (!times.empty())
+		{
+			t.fastestTime = (double)times[0] / numTrialsPerRun;
+			t.averageTime = (double)total / times.size() / numTrialsPerRun;
+			t.worstTime = (double)times.back() / numTrialsPerRun;
+			t.numTimesRun = numTimesToRun;
+			t.numTrialsPerRun = numTrialsPerRun;
+		}
+		else
+		{
+			t.fastestTime = t.averageTime = t.worstTime = -1.0;
+			t.numTimesRun = t.numTrialsPerRun = 0;
+		}
 	}
-	float successRate = (float)t.numPasses * 100.f / (t.numPasses + t.numFails);
+	float successRate = (t.numPasses + t.numFails > 0) ? (float)t.numPasses * 100.f / (t.numPasses + t.numFails) : 0.f;
 
 	jsonReport.Report(t);
 
