@@ -120,7 +120,7 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 
 void PrintToConsoleVariadic(MathLogChannel channel, const char *format, ...)
 {
-	const int capacity = 512;
+	const int capacity = 2048;
 	char str[capacity];
 
 	va_list args;
