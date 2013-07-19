@@ -133,16 +133,18 @@ public:
 		simd = "SSE1";
 #elif defined(MATH_NEON)
 		simd = "NEON";
-#elif defined(__native_client__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)
-		return ""; // These platforms don't have SIMD option, so don't report the absence of it either.
-#else
-		return "No SIMD";
 #endif
 
+#if defined(MATH_SSE) || defined(MATH_NEON)
 #ifdef MATH_AUTOMATIC_SSE
 		return simd + "(auto)";
 #else
 		return simd + "(manual)";
+#endif
+#elif defined(__native_client__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)
+		return ""; // These platforms don't have SIMD option, so don't report the absence of it either.
+#else
+		return "No SIMD";
 #endif
 	}
 
