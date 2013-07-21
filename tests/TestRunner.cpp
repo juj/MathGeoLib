@@ -268,7 +268,14 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONRe
 		if (StringBeginsWithOneOf(tests[nextTestToRun].name.c_str(), prefixes) || StringContainsOneOf(tests[nextTestToRun].description.c_str(), prefixes)
 			|| StringContainsOneOf(tests[nextTestToRun].file.c_str(), prefixes))
 		{
-			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials, jsonReport);
+			int ret = -1;
+			try
+			{
+				ret = RunTest(tests[nextTestToRun], numTimes, numTrials, jsonReport);
+			} catch(...)
+			{
+				LOGE("An exception leaked out from RunTest! ");
+			}
 
 			if (ret == 0 || ret == 1)
 				++numTestsPassed;
