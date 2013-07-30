@@ -79,14 +79,18 @@ float3 Frustum::WorldRight() const
 
 float Frustum::NearPlaneWidth() const
 {
-	///\todo Optimize!
-	return NearPlanePos(-1.f, 0.f).Distance(NearPlanePos(1.f, 0.f));
+	if (type == PerspectiveFrustum)
+		return Tan(horizontalFov*0.5f)*2.f * nearPlaneDistance;
+	else
+		return orthographicWidth;
 }
 
 float Frustum::NearPlaneHeight() const
 {
-	///\todo Optimize!
-	return NearPlanePos(0.f, -1.f).Distance(NearPlanePos(0.f, 1.f));
+	if (type == PerspectiveFrustum)
+		return Tan(verticalFov*0.5f)*2.f * nearPlaneDistance;
+	else
+		return orthographicHeight;
 }
 
 Plane Frustum::NearPlane() const

@@ -276,3 +276,21 @@ UNIQUE_TEST(Frustum_MinimalEnclosingOBB)
 		assert(o.Contains(f));
 	}
 }
+
+UNIQUE_TEST(Frustum_AspectRatio_NearPlanePos)
+{
+	Frustum f;
+	f.type = PerspectiveFrustum;
+	f.handedness = FrustumRightHanded;
+	f.projectiveSpace = FrustumSpaceGL;
+	f.pos = float3::zero;
+	f.front = -float3::unitZ;
+	f.up = float3::unitY;
+	f.nearPlaneDistance = 0.5f;
+	f.farPlaneDistance = 10.f;
+	f.horizontalFov = DegToRad(140.f);
+	f.verticalFov = DegToRad(30.f);
+
+	asserteq(f.NearPlaneWidth(), 0.5f*Tan(DegToRad(140.f)/2.f)*2.f);
+	asserteq(f.NearPlaneHeight(), 0.5f*Tan(DegToRad(30.f)/2.f)*2.f);
+}
