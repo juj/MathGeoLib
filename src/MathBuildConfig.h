@@ -103,6 +103,32 @@
 //#define KNET_LOGGING_SUPPORT_ENABLED
 #endif
 
+// If MATH_USE_DIRECT3D is defined, the Frustum class defaults to creating Frustums with projectiveSpace = FrustumSpaceD3D.
+#ifndef MATH_USE_DIRECT3D
+//#define MATH_USE_DIRECT3D
+#endif
+// If MATH_USE_OPENGL is defined, the Frustum class defaults to creating Frustums with projectiveSpace = FrustumSpaceGL.
+#ifndef MATH_USE_OPENGL
+//#define MATH_USE_OPENGL
+#endif
+
+// If MATH_LEFTHANDED_CAMERA is defined, the Frustum class defaults to creating Frustums with handedness = FrustumLeftHanded.
+#ifndef MATH_LEFTHANDED_CAMERA
+//#define MATH_LEFTHANDED_CAMERA
+#endif
+// If MATH_RIGHTHANDED_CAMERA is defined, the Frustum class defaults to creating Frustums with handedness = FrustumRightHanded.
+#ifndef MATH_RIGHTHANDED_CAMERA
+//#define MATH_RIGHTHANDED_CAMERA
+#endif
+
+#if defined(MATH_USE_DIRECT3D) && defined(MATH_USE_OPENGL)
+#error Defines MATH_USE_DIRECT3D and MATH_USE_OPENGL are mutually exclusive!
+#endif
+
+#if defined(MATH_LEFTHANDED_CAMERA) && defined(MATH_RIGHTHANDED_CAMERA)
+#error Defines MATH_LEFTHANDED_CAMERA and MATH_RIGHTHANDED_CAMERA are mutually exclusive!
+#endif
+
 // Uncomment to specify the SIMD instruction set level in use.
 //#define MATH_AVX
 //#define MATH_SSE41

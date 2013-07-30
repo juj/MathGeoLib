@@ -46,6 +46,24 @@
 
 MATH_BEGIN_NAMESPACE
 
+Frustum::Frustum()
+{
+	// For conveniency, allow automatic initialization of the graphics API and handedness in use.
+	// If neither of the #defines are set, user must specify per-instance.
+
+#ifdef MATH_USE_DIRECT3D
+	projectiveSpace = FrustumSpaceD3D;
+#elif defined(MATH_USE_OPENGL)
+	projectiveSpace = FrustumSpaceGL;
+#endif
+
+#ifdef MATH_LEFTHANDED_CAMERA
+	handedness = FrustumLeftHanded;
+#elif defined(MATH_RIGHTHANDED_CAMERA)
+	handedness = FrustumRightHanded;
+#endif
+}
+
 float Frustum::AspectRatio() const
 {
 	return horizontalFov / verticalFov;
@@ -147,18 +165,46 @@ float4x4 Frustum::ViewProjMatrix() const
 float4x4 Frustum::ProjectionMatrix() const
 {
 	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
+	assume(projectiveSpace == FrustumSpaceGL || projectiveSpace == FrustumSpaceD3D);
+	assume(handedness == FrustumLeftHanded || handedness == FrustumRightHanded);
 	if (type == PerspectiveFrustum)
 	{
-#if USE_D3D11
-		return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
-#else
-		return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
-#endif
+		if (projectiveSpace == FrustumSpaceGL)
+		{
+			if (handedness == FrustumRightHanded)
+				return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
+			else if (handedness == FrustumLeftHanded)
+				return float4x4::OpenGLPerspProjLH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
+		}
+		else if (projectiveSpace == FrustumSpaceD3D)
+		{
+			if (handedness == FrustumRightHanded)
+				return float4x4::D3DPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
+			else if (handedness == FrustumLeftHanded)
+				return float4x4::D3DPerspProjLH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
+		}
 	}
-	else
+	else if (type == OrthographicFrustum)
 	{
-		return float4x4::D3DOrthoProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+		if (projectiveSpace == FrustumSpaceGL)
+		{
+			if (handedness == FrustumRightHanded)
+				return float4x4::OpenGLOrthoProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+			else if (handedness == FrustumLeftHanded)
+				return float4x4::OpenGLOrthoProjLH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+		}
+		else if (projectiveSpace == FrustumSpaceD3D)
+		{
+			if (handedness == FrustumRightHanded)
+				return float4x4::D3DOrthoProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+			else if (handedness == FrustumLeftHanded)
+				return float4x4::D3DOrthoProjLH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+		}
 	}
+#ifndef OPTIMIZED_RELEASE
+	LOGE("Not all values of Frustum were initialized properly! Please initialize correctly before calling Frustum::ProjectionMatrix()!");
+	return float4x4::nan;
+#endif
 }
 
 float3 Frustum::NearPlanePos(float x, float y) const

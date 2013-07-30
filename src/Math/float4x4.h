@@ -286,19 +286,35 @@ public:
 
 	/// Identical to D3DXMatrixOrthoLH, except transposed to account for Matrix * vector convention used in MathGeoLib.
 	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205346(v=vs.85).aspx
+	/// @note Use the M*v multiplication order to project points with this matrix.
 	static float4x4 D3DOrthoProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 	/// Identical to D3DXMatrixOrthoRH, except transposed to account for Matrix * vector convention used in MathGeoLib.
 	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205349(v=vs.85).aspx
+	/// @note Use the M*v multiplication order to project points with this matrix.
 	static float4x4 D3DOrthoProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+
 	/// Identical to D3DXMatrixPerspectiveLH, except transposed to account for Matrix * vector convention used in MathGeoLib.
 	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205352(v=vs.85).aspx
+	/// @note Use the M*v multiplication order to project points with this matrix.
 	static float4x4 D3DPerspProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 	/// Identical to D3DXMatrixPerspectiveRH, except transposed to account for Matrix * vector convention used in MathGeoLib.
 	/// See http://msdn.microsoft.com/en-us/library/windows/desktop/bb205355(v=vs.85).aspx
+	/// @note Use the M*v multiplication order to project points with this matrix.
 	static float4x4 D3DPerspProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 
+	/// Computes a left-handled orthographic projection matrix for OpenGL.
+	/// @note Use the M*v multiplication order to project points with this matrix.
+	static float4x4 OpenGLOrthoProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+	/// Computes a right-handled orthographic projection matrix for OpenGL.
+	/// @note Use the M*v multiplication order to project points with this matrix.
+	static float4x4 OpenGLOrthoProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
+
+	/// Computes a left-handed perspective projection matrix for OpenGL.
+	/// @note Use the M*v multiplication order to project points with this matrix.
+	static float4x4 OpenGLPerspProjLH(float n, float f, float h, float v);
 	/// Identical to http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml , except uses viewport sizes instead of FOV to set up the
 	/// projection matrix.
+	/// @note Use the M*v multiplication order to project points with this matrix.
 	static float4x4 OpenGLPerspProjRH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 
 	/// Creates a new float4x4 that performs orthographic projection. [indexTitle: OrthographicProjection/YZ/XZ/XY]

@@ -28,11 +28,68 @@
 
 MATH_BEGIN_NAMESPACE
 
+/// A Frustum can be set to one of the two common different forms.
 enum FrustumType
 {
-	InvalidFrustum,
+	InvalidFrustum = 0,
+
+	/// Set the Frustum type to this value to define the orthographic projection formula. In orthographic projection,
+	/// 3D images are projected onto a 2D plane essentially by flattening the object along one direction (the plane normal).
+	/// The size of the projected images appear the same independent of their distance to the camera, and distant objects will 
+	/// not appear smaller. The shape of the Frustum is identical to an oriented bounding box (OBB).
 	OrthographicFrustum,
+
+	/// Set the Frustum type to this value to use the perspective projection formula. With perspective projection, the 2D
+	/// image is formed by projecting 3D points towards a single point (the eye point/tip) of the Frustum, and computing the
+	/// point of intersection of the line of the projection and the near plane of the Frustum.
+	/// This corresponds to the optics in the real-world, and objects become smaller as they move to the distance.
+	/// The shape of the Frustum is a rectangular pyramid capped from the tip.
 	PerspectiveFrustum
+};
+
+/// The Frustum class offers choosing between the two common conventions for the value ranges in 
+/// post-projection space. If you are using either the OpenGL or Diret3D API, you must feed the API data that matches
+/// the correct convention.
+enum FrustumProjectiveSpace
+{
+	FrustumSpaceInvalid = 0,
+
+	/// If this option is chosen, the post-projective unit cube of the Frustum
+	/// is modelled after the OpenGL API convention, meaning that in projected space,
+	/// points inside the Frustum have the X and Y range in [-1, 1], and Z ranges in [-1, 1],
+	/// where the near plane maps to Z=-1, and the far plane maps to Z=1.
+	/// @note If you are submitting projection matrices to GPU hardware using the OpenGL API, you *must*
+	///       use this convention. (or otherwise more than half of the precision of the GL depth buffer is wasted)
+	FrustumSpaceGL,
+
+	/// If this option is chosen, the post-projective unit cube is modelled after the
+	/// Direct3D API convention, which differs from the GL convention that Z ranges in [0, 1] instead.
+	/// Near plane maps to Z=0, and far plane maps to Z=1. The X and Y range in [-1, 1] as is with GL.
+	/// @note If you are submitting projection matrices to GPU hardware using the Direct3D API, you *must*
+	///       use this convention. (or otherwise objects will clip too near of the camera)
+	FrustumSpaceD3D
+};
+
+/// The handedness rule in MathGeoLib bundles together two different conventions related to the camera:
+///    the chirality of the world and view spaces, and the fixed local front direction of the Frustum.
+/// @note The world and view spaces are always assumed to the same chirality, meaning that Frustum::ViewMatrix()
+///       (and hence Frustum::WorldMatrix()) always returns a matrix with a positive determinant, i.e. it does not mirror.
+///       If FrustumRightHanded is chosen, then Frustum::ProjectionMatrix() is a mirroring matrix, since the post-projective space
+///       is always left-handed.
+/// @note Even though in the local space of the camera +Y is always up, in the world space one can use any 'world up' direction
+///       as one pleases, by orienting the camera via the Frustum::up vector.
+enum FrustumHandedness
+{
+	FrustumHandednessInvalid = 0,
+
+	/// If a Frustum is left-handed, then in the local space of the Frustum (the view space), the camera looks towards +Z,
+	/// while +Y goes towards up, and +X goes towards right.
+	/// @note The fixed-pipeline D3D9 API traditionally used the FrustumLeftHanded convention.
+	FrustumLeftHanded,
+
+	/// If a Frustum is right-handed, then the camera looks towards -Z, +Y is up, and +X is right.
+	/// @note The fixed-pipeline OpenGL API traditionally used the FrustumRightHanded convention.
+	FrustumRightHanded
 };
 
 /// Represents either an orthographic or a perspective viewing frustum.
@@ -42,6 +99,10 @@ public:
 	/// Specifies whether this frustum is a perspective or an orthographic frustum.
 	/** [noscript] @todo Remove the noscript attribute. */
 	FrustumType type;
+	/// Specifies whether the [-1,1] or [0,1] range is used for the post-projective depth range.
+	FrustumProjectiveSpace projectiveSpace;
+	/// Specifies the chirality of world and view spaces.
+	FrustumHandedness handedness;
 	/// The eye point of this frustum.
 	/** Specifies the position of the camera (the eye point) for this frustum in world (global) space. [similarOverload: type] */
 	float3 pos;
@@ -87,12 +148,12 @@ public:
 		float orthographicHeight;
 	};
 
-	/// The default constructor does not initialize any members of this class.
-	/** This means that the values of the members type, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov/orthographicWidth and
+	/// The default constructor creates a Frustum with undefined values.
+	/** This means that the values of the members type, projectiveSpace, handedness, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov/orthographicWidth and
 		verticalFov/orthographicHeight are all undefined after creating a new Frustum using this
 		default constructor. Remember to assign to them before use. [opaque-qtscript] @todo remove the opaque-qtscript attribute.
-		@see type, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov, verticalFov, orthographicWidth, orthographicHeight. */
-	Frustum() {}
+		@see type, pos, front, up, nearPlaneDistance, projectiveSpace, handedness, farPlaneDistance, horizontalFov, verticalFov, orthographicWidth, orthographicHeight. */
+	Frustum();
 
 	int NumEdges() const { return 12; }
 
