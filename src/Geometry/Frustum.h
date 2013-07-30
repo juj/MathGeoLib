@@ -164,6 +164,14 @@ public:
 		@see horizontalFov, verticalFov. */
 	float AspectRatio() const;
 
+	/// Specifies the horizontal and vertical field-of-view values for this Frustum based on the given horizontal FOV
+	/// and the screen size aspect ratio.
+	void SetHorizontalFovAndAspectRatio(float horizontalFov, float aspectRatio);
+
+	/// Specifies the horizontal and vertical field-of-view values for this Frustum based on the given vertical FOV
+	/// and the screen size aspect ratio.
+	void SetVerticalFovAndAspectRatio(float verticalFov, float aspectRatio);
+
 	/// Computes the direction vector that points logically to the right-hand side of the Frustum.
 	/** This vector together with the member variables 'front' and 'up' form the orthonormal basis of the view frustum.
 		@see pos, front. */

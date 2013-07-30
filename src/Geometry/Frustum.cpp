@@ -69,6 +69,18 @@ float Frustum::AspectRatio() const
 	return Tan(horizontalFov*0.5f) / Tan(verticalFov*0.5f);
 }
 
+void Frustum::SetHorizontalFovAndAspectRatio(float hFov, float aspectRatio)
+{
+	horizontalFov = hFov;
+	verticalFov = 2.f * Atan(Tan(hFov*0.5f)/aspectRatio);
+}
+
+void Frustum::SetVerticalFovAndAspectRatio(float vFov, float aspectRatio)
+{
+	verticalFov = vFov;
+	horizontalFov = 2.f * Atan(Tan(vFov*0.5f)*aspectRatio);
+}
+
 float3 Frustum::WorldRight() const
 {
 	if (handedness == FrustumRightHanded)
