@@ -47,6 +47,9 @@ Sphere RandomSphereContainingPoint(const float3 &pt, float maxRadius)
 Frustum RandomFrustumContainingPoint(const float3 &pt)
 {
 	Frustum f;
+	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
+	f.projectiveSpace = (rng.Int(0,1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL;
+
 	if (rng.Int(0,1))
 	{
 		f.type = OrthographicFrustum;

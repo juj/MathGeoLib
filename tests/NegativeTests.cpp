@@ -108,6 +108,9 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 	assert(plane.SignedDistance(extremePoint) > 0.f);
 	assert(plane.SignedDistance(f) > 0.f);
 
+	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
+	f.projectiveSpace = (rng.Int(0,1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL;
+
 	return f;
 }
 
