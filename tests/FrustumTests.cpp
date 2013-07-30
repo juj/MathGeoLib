@@ -293,4 +293,7 @@ UNIQUE_TEST(Frustum_AspectRatio_NearPlanePos)
 
 	asserteq(f.NearPlaneWidth(), 0.5f*Tan(DegToRad(140.f)/2.f)*2.f);
 	asserteq(f.NearPlaneHeight(), 0.5f*Tan(DegToRad(30.f)/2.f)*2.f);
+
+	float aspect = f.NearPlaneWidth() / f.NearPlaneHeight();
+	asserteq(aspect, f.AspectRatio());
 }

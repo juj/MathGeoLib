@@ -66,7 +66,7 @@ Frustum::Frustum()
 
 float Frustum::AspectRatio() const
 {
-	return horizontalFov / verticalFov;
+	return Tan(horizontalFov*0.5f) / Tan(verticalFov*0.5f);
 }
 
 float3 Frustum::WorldRight() const
