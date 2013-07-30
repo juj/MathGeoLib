@@ -69,6 +69,14 @@ float Frustum::AspectRatio() const
 	return horizontalFov / verticalFov;
 }
 
+float3 Frustum::WorldRight() const
+{
+	if (handedness == FrustumRightHanded)
+		return Cross(front, up);
+	else
+		return Cross(up, front);
+}
+
 float Frustum::NearPlaneWidth() const
 {
 	///\todo Optimize!
@@ -93,7 +101,7 @@ Plane Frustum::FarPlane() const
 
 Plane Frustum::LeftPlane() const
 {
-	float3 left = Cross(up, front);
+	float3 left = -WorldRight();
 	left.ScaleToLength(Tan(horizontalFov*0.5f));
 	float3 leftSide = front + left;
 	float3 leftSideNormal = Cross(up, leftSide).Normalized();
@@ -120,7 +128,7 @@ Plane Frustum::TopPlane() const
 Plane Frustum::BottomPlane() const
 {
 	float3 bottomSide = front - Tan(verticalFov * 0.5f) * up;
-	float3 left = Cross(up, front);
+	float3 left = -WorldRight();
 	float3 bottomSideNormal = Cross(left, bottomSide).Normalized();
 	return Plane(pos, bottomSideNormal);
 }
@@ -128,7 +136,10 @@ Plane Frustum::BottomPlane() const
 void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
 {
 	pos = worldTransform.TranslatePart();
-	front = -worldTransform.Col(2); // The camera looks towards -Z axis of the given transform.
+	if (handedness == FrustumRightHanded)
+		front = -worldTransform.Col(2); // The camera looks towards -Z axis of the given transform.
+	else
+		front = worldTransform.Col(2); // The camera looks towards +Z axis of the given transform.
 	up = worldTransform.Col(1); // The camera up points towards +Y of the given transform.
 	assume(pos.IsFinite());
 	assume(front.IsNormalized());
@@ -142,9 +153,12 @@ float3x4 Frustum::WorldMatrix() const
 	assume(up.IsNormalized());
 	assume(front.IsNormalized());
 	float3x4 m;
-	m.SetCol(0, front.Cross(up).Normalized());
+	m.SetCol(0, WorldRight().Normalized());
 	m.SetCol(1, up);
-	m.SetCol(2, -front);
+	if (handedness == FrustumRightHanded)
+		m.SetCol(2, -front); // In right-handed convention, the -Z axis must map towards the front vector. (so +Z maps to -front)
+	else
+		m.SetCol(2, front); // In left-handed convention, the +Z axis must map towards the front vector.
 	m.SetCol(3, pos);
 	assume(!m.HasNegativeScale());
 	return m;
@@ -325,14 +339,25 @@ float3 Frustum::Project(const float3 &point) const
 bool Frustum::Contains(const float3 &point) const
 {
 	float3 projected = Project(point);
-#ifdef USE_D3D11
-	return projected.x >= -1.f && projected.x <= 1.f &&
-		projected.y >= -1.f && projected.y <= 1.f &&
-		projected.z >= 0.f && projected.z <= 1.f;
-#else
-	return projected.x >= -1.f && projected.x <= 1.f &&
-		projected.y >= -1.f && projected.y <= 1.f &&
-		projected.z >= -1.f && projected.z <= 1.f;
+	if (projectiveSpace == FrustumSpaceD3D)
+	{
+		return projected.x >= -1.f && projected.x <= 1.f &&
+			projected.y >= -1.f && projected.y <= 1.f &&
+			projected.z >= 0.f && projected.z <= 1.f;
+	}
+	else if (projectiveSpace == FrustumSpaceGL)
+	{
+		return projected.x >= -1.f && projected.x <= 1.f &&
+			projected.y >= -1.f && projected.y <= 1.f &&
+			projected.z >= -1.f && projected.z <= 1.f;
+	}
+#ifndef OPTIMIZED_RELEASE
+	else
+	{
+		///\todo Make Frustum::Contains agnostic of the projection settings.
+		LOGE("Not all values of Frustum were initialized properly! Please initialize correctly before calling Frustum::Contains()!");
+		return false;
+	}
 #endif
 }
 

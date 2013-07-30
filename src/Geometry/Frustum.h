@@ -167,10 +167,7 @@ public:
 	/// Computes the direction vector that points logically to the right-hand side of the Frustum.
 	/** This vector together with the member variables 'front' and 'up' form the orthonormal basis of the view frustum.
 		@see pos, front. */
-	float3 WorldRight() const
-	{
-		return Cross(front, up);
-	}
+	float3 WorldRight() const;
 
 	/// Computes the plane equation of the near plane of this Frustum.
 	/** The normal vector of the returned plane points outwards from the volume inside the frustum, i.e. towards the eye point
@@ -254,7 +251,8 @@ public:
 	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
 
 	/// Sets the pos, front and up members of this frustum from the given world transform.
-	/** This function sets the 'front' parameter of this Frustum to look towards the -Z axis of the given matrix,
+	/** This function sets the 'front' parameter of this Frustum to look towards the -Z/+Z axis of the given matrix
+		depending on the handedness set to the Frustum,
 		and the 'up' parameter of this Frustum to point towards the +Y axis of the given matrix.
 		@param worldTransform An orthonormalized matrix with determinant of +1 (no mirroring). */
 	void SetWorldMatrix(const float3x4 &worldTransform);
