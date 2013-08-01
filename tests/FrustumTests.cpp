@@ -35,7 +35,7 @@ UNIQUE_TEST(Frustum_AspectRatio)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
-		asserteq(f.AspectRatio(), 1.f);
+		assert(EqualAbs(f.AspectRatio(), 1.f));
 	}
 }
 
@@ -68,10 +68,10 @@ UNIQUE_TEST(Frustum_Planes)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		assert(f.NearPlane().normal.Equals(float3::unitZ));
-		asserteq(f.NearPlane().d, -1.f);
+		assert(EqualAbs(f.NearPlane().d, -1.f));
 
 		assert(f.FarPlane().normal.Equals(-float3::unitZ));
-		asserteq(f.FarPlane().d, 100.f);
+		assert(EqualAbs(f.FarPlane().d, 100.f));
 	}
 }
 
@@ -291,8 +291,8 @@ UNIQUE_TEST(Frustum_AspectRatio_NearPlanePos)
 	f.horizontalFov = DegToRad(140.f);
 	f.verticalFov = DegToRad(30.f);
 
-	asserteq(f.NearPlaneWidth(), 0.5f*Tan(DegToRad(140.f)/2.f)*2.f);
-	asserteq(f.NearPlaneHeight(), 0.5f*Tan(DegToRad(30.f)/2.f)*2.f);
+	assert(EqualAbs(f.NearPlaneWidth(), 0.5f*Tan(DegToRad(140.f)/2.f)*2.f));
+	assert(EqualAbs(f.NearPlaneHeight(), 0.5f*Tan(DegToRad(30.f)/2.f)*2.f));
 
 	float aspect = f.NearPlaneWidth() / f.NearPlaneHeight();
 	assert(EqualAbs(aspect, f.AspectRatio()));
