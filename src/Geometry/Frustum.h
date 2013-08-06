@@ -422,7 +422,7 @@ public:
 			a larger volume. If the type of this Frustum is orthographic, this conversion is exact, since the shape of an
 			orthographic Frustum is an OBB.
 		@see MinimalEnclosingAABB(), ToPolyhedron(). */
-	OBB MinimalEnclosingOBB() const;
+	OBB MinimalEnclosingOBB(float expandGuardband = 1e-5f) const;
 
 	/// Converts this Frustum to a Polyhedron.
 	/** This function returns a Polyhedron representation of this Frustum. This conversion is exact, meaning that the returned

@@ -640,7 +640,7 @@ AABB Frustum::MinimalEnclosingAABB() const
 	return aabb;
 }
 
-OBB Frustum::MinimalEnclosingOBB() const
+OBB Frustum::MinimalEnclosingOBB(float expandGuardband) const
 {
 	assume(IsFinite());
 	assume(front.IsNormalized());
@@ -654,6 +654,12 @@ OBB Frustum::MinimalEnclosingOBB() const
 	obb.r = float3::zero;
 	for(int i = 0; i < 8; ++i)
 		obb.Enclose(CornerPoint(i));
+
+	// Expand the generated OBB very slightly to avoid numerical issues when
+	// testing whether this Frustum actually is contained inside the generated OBB.
+	obb.r.x += expandGuardband;
+	obb.r.y += expandGuardband;
+	obb.r.z += expandGuardband;
 	return obb;
 }
 
