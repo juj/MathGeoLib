@@ -273,6 +273,11 @@ UNIQUE_TEST(Frustum_MinimalEnclosingOBB)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		OBB o = f.MinimalEnclosingOBB();
+		if (!o.Contains(f))
+		{
+			LOGE("OBB: %s", o.ToString().c_str());
+			LOGE("Frustum: %s", f.ToString().c_str());
+		}
 		assert(o.Contains(f));
 	}
 }
