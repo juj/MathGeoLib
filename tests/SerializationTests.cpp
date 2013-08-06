@@ -12,8 +12,13 @@ MATH_END_NAMESPACE
 
 UNIQUE_TEST(StartupLocale)
 {
-	LOGI("Startup locale for LC_ALL is %s", setlocale(LC_ALL, NULL));
-	LOGI("Startup locale for LC_NUMERIC is %s", setlocale(LC_NUMERIC, NULL));
+	LOGI("Startup locale for LC_ALL is '%s'", setlocale(LC_ALL, NULL));
+	LOGI("Startup locale for LC_NUMERIC is '%s'", setlocale(LC_NUMERIC, NULL));
+#ifndef ANDROID // Not implemented on Android, see float2.cpp/IsNeutralCLocale().
+	lconv *lc = localeconv();
+	LOGI("Decimal point is '%s'", lc->decimal_point);
+#endif
+
 	bool isGoodLocale = MATH_NS::IsNeutralCLocale();
 	if (isGoodLocale)
 		LOGI("This locale setup is appropriate for string serialization.");

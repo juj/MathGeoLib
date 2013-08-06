@@ -225,7 +225,9 @@ bool float2::Equals(float x_, float y_, float epsilon) const
 /// at debug runs.
 bool IsNeutralCLocale()
 {
-#ifndef ANDROID ///\todo error: 'struct lconv' has no member named 'decimal_point'
+	// Android NDK locale.h does not have struct lconv or localeconv() implemented, and only contains stub 
+	// symbols with a comment 'MISSING FROM BIONIC - DEFINED TO MAKE libstdc++-v3 happy'
+#ifndef ANDROID
 	lconv *lc = localeconv();
 	if (strcmp(lc->decimal_point, "."))
 		return false;
