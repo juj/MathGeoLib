@@ -360,7 +360,7 @@ inline T Clamp01(const T &val) { return Clamp(val, T(0), T(1)); }
 /// Computes the smaller of two values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
-const T Min(const T &a, const T &b)
+T Min(const T &a, const T &b)
 {
 	return a < b ? a : b;
 }
@@ -368,13 +368,13 @@ const T Min(const T &a, const T &b)
 /// Computes the larger of two values.
 /** @see Clamp(), Clamp01(), Min(). */
 template<typename T>
-const T Max(const T &a, const T &b)
+T Max(const T &a, const T &b)
 {
 	return a >= b ? a : b;
 }
 
 template<>
-inline const float Max(const float &a, const float &b)
+inline float Max(const float &a, const float &b)
 {
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(_mm_max_ss(FLOAT_TO_M128(a), FLOAT_TO_M128(b)));
@@ -386,13 +386,13 @@ inline const float Max(const float &a, const float &b)
 /// Computes the smallest of three values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
-const T Min(const T &a, const T &b, const T &c)
+T Min(const T &a, const T &b, const T &c)
 {
 	return Min(Min(a, b), c);
 }
 
 template<>
-inline const float Min(const float &a, const float &b)
+inline float Min(const float &a, const float &b)
 {
 #ifdef MATH_SSE
 	return M128_TO_FLOAT(_mm_min_ss(FLOAT_TO_M128(a), FLOAT_TO_M128(b)));
@@ -404,7 +404,7 @@ inline const float Min(const float &a, const float &b)
 /// Computes the largest of three values.
 /** @see Clamp(), Clamp01(), Min(). */
 template<typename T>
-const T Max(const T &a, const T &b, const T &c)
+T Max(const T &a, const T &b, const T &c)
 {
 	return Max(Max(a, b), c);
 }
@@ -412,7 +412,7 @@ const T Max(const T &a, const T &b, const T &c)
 /// Computes the smallest of four values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
-const T Min(const T &a, const T &b, const T &c, const T &d)
+T Min(const T &a, const T &b, const T &c, const T &d)
 {
 	return Min(Min(a, b), Min(c, d));
 }
@@ -420,7 +420,7 @@ const T Min(const T &a, const T &b, const T &c, const T &d)
 /// Computes the largest of four values.
 /** @see Clamp(), Clamp01(), Min(). */
 template<typename T>
-const T Max(const T &a, const T &b, const T &c, const T &d)
+T Max(const T &a, const T &b, const T &c, const T &d)
 {
 	return Max(Max(a, b), Max(c, d));
 }
