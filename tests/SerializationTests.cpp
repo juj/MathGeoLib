@@ -27,6 +27,8 @@ UNIQUE_TEST(StartupLocale)
 	assert(isGoodLocale);
 }
 
+#define assertveq(a,b) if (!(a).Equals((b))) { LOGE("%s != %s (%s != %s)", #a, #b, (a).ToString().c_str(), (b).ToString().c_str()); } assert((a).Equals(b));
+
 TEST(Float2FromString)
 {
 	const char *locales[] = { "C", "en" /*, "fi" */ }; // From http://www.loc.gov/standards/iso639-2/php/code_list.php
@@ -35,21 +37,21 @@ TEST(Float2FromString)
 	{
 		if (i != -1)
 			setlocale(LC_ALL, locales[i]);
-		assert(float2::FromString("-1.0000, +2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000, +2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000, +2)").Equals(float2(-1.0000,2)));
+		assertveq(float2::FromString("-1.0000, +2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000, +2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000, +2)"), float2(-1.0000,2));
 
-		assert(float2::FromString("-1.0000 ; +2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000 ; +2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000 ; +2)").Equals(float2(-1.0000,2)));
+		assertveq(float2::FromString("-1.0000 ; +2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000 ; +2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000 ; +2)"), float2(-1.0000,2));
 
-		assert(float2::FromString("-1.0000,+2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000,+2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000,+2)").Equals(float2(-1.0000,2)));
+		assertveq(float2::FromString("-1.0000,+2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000,+2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000,+2)"), float2(-1.0000,2));
 
-		assert(float2::FromString("-1.0000 +2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000 +2").Equals(float2(-1.0000,2)));
-		assert(float2::FromString("(-1.0000 +2)").Equals(float2(-1.0000,2)));
+		assertveq(float2::FromString("-1.0000 +2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000 +2"), float2(-1.0000,2));
+		assertveq(float2::FromString("(-1.0000 +2)"), float2(-1.0000,2));
 	}
 }
 
@@ -61,21 +63,21 @@ TEST(Float3FromString)
 	{
 		if (i != -1)
 			setlocale(LC_ALL, locales[i]);
-		assert(float3::FromString("+2, 3.1, -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2, 3.1, -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2, 3.1, -4)").Equals(float3(2,3.1f,-4)));
+		assertveq(float3::FromString("+2, 3.1, -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2, 3.1, -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2, 3.1, -4)"), float3(2,3.1f,-4));
 
-		assert(float3::FromString("+2; 3.1; -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2; 3.1; -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2; 3.1; -4)").Equals(float3(2,3.1f,-4)));
+		assertveq(float3::FromString("+2; 3.1; -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2; 3.1; -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2; 3.1; -4)"), float3(2,3.1f,-4));
 
-		assert(float3::FromString("+2,3.1, -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2,3.1, -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2,3.1, -4)").Equals(float3(2,3.1f,-4)));
+		assertveq(float3::FromString("+2,3.1, -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2,3.1, -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2,3.1, -4)"), float3(2,3.1f,-4));
 
-		assert(float3::FromString("+2 3.1  -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2 3.1  -4").Equals(float3(2,3.1f,-4)));
-		assert(float3::FromString("(+2 3.1  -4)").Equals(float3(2,3.1f,-4)));
+		assertveq(float3::FromString("+2 3.1  -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2 3.1  -4"), float3(2,3.1f,-4));
+		assertveq(float3::FromString("(+2 3.1  -4)"), float3(2,3.1f,-4));
 	}
 }
 TEST(Float4FromString)
@@ -86,21 +88,21 @@ TEST(Float4FromString)
 	{
 		if (i != -1)
 			setlocale(LC_ALL, locales[i]);
-		assert(float4::FromString("1, +2, 3.1, -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1, +2, 3.1, -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1, +2, 3.1, -4)").Equals(float4(1,2,3.1f,-4)));
+		assertveq(float4::FromString("1, +2, 3.1, -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1, +2, 3.1, -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1, +2, 3.1, -4)"), float4(1,2,3.1f,-4));
 
-		assert(float4::FromString("1 ; +2; 3.1; -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1 ; +2; 3.1; -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1 ; +2; 3.1; -4)").Equals(float4(1,2,3.1f,-4)));
+		assertveq(float4::FromString("1 ; +2; 3.1; -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1 ; +2; 3.1; -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1 ; +2; 3.1; -4)"), float4(1,2,3.1f,-4));
 
-		assert(float4::FromString("1,+2,3.1, -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1,+2,3.1, -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1,+2,3.1, -4)").Equals(float4(1,2,3.1f,-4)));
+		assertveq(float4::FromString("1,+2,3.1, -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1,+2,3.1, -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1,+2,3.1, -4)"), float4(1,2,3.1f,-4));
 
-		assert(float4::FromString("1 +2 3.1  -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1 +2 3.1  -4").Equals(float4(1,2,3.1f,-4)));
-		assert(float4::FromString("(1 +2 3.1  -4)").Equals(float4(1,2,3.1f,-4)));
+		assertveq(float4::FromString("1 +2 3.1  -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1 +2 3.1  -4"), float4(1,2,3.1f,-4));
+		assertveq(float4::FromString("(1 +2 3.1  -4)"), float4(1,2,3.1f,-4));
 	}
 }
 
@@ -112,20 +114,20 @@ TEST(QuatFromString)
 	{
 		if (i != -1)
 			setlocale(LC_ALL, locales[i]);
-		assert(Quat::FromString("1, +2, 3.1, -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1, +2, 3.1, -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1, +2, 3.1, -4)").Equals(Quat(1,2,3.1f,-4)));
+		assertveq(Quat::FromString("1, +2, 3.1, -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1, +2, 3.1, -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1, +2, 3.1, -4)"), Quat(1,2,3.1f,-4));
 
-		assert(Quat::FromString("1 ; +2; 3.1; -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1 ; +2; 3.1; -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1 ; +2; 3.1; -4)").Equals(Quat(1,2,3.1f,-4)));
+		assertveq(Quat::FromString("1 ; +2; 3.1; -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1 ; +2; 3.1; -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1 ; +2; 3.1; -4)"), Quat(1,2,3.1f,-4));
 
-		assert(Quat::FromString("1,+2,3.1, -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1,+2,3.1, -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1,+2,3.1, -4)").Equals(Quat(1,2,3.1f,-4)));
+		assertveq(Quat::FromString("1,+2,3.1, -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1,+2,3.1, -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1,+2,3.1, -4)"), Quat(1,2,3.1f,-4));
 
-		assert(Quat::FromString("1 +2 3.1  -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1 +2 3.1  -4").Equals(Quat(1,2,3.1f,-4)));
-		assert(Quat::FromString("(1 +2 3.1  -4)").Equals(Quat(1,2,3.1f,-4)));
+		assertveq(Quat::FromString("1 +2 3.1  -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1 +2 3.1  -4"), Quat(1,2,3.1f,-4));
+		assertveq(Quat::FromString("(1 +2 3.1  -4)"), Quat(1,2,3.1f,-4));
 	}
 }
