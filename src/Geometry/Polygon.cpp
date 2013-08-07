@@ -208,7 +208,7 @@ bool Polygon::IsPlanar(float epsilon) const
 		return false;
 	if (p.size() <= 3)
 		return true;
-	Plane plane(p[0], p[1], p[2]);
+	Plane plane = PlaneCCW();
 	for(size_t i = 3; i < p.size(); ++i)
 		if (plane.Distance(p[i]) > epsilon)
 			return false;
@@ -267,7 +267,19 @@ float3 Polygon::NormalCW() const
 
 Plane Polygon::PlaneCCW() const
 {
-	if (p.size() >= 3)
+	if (p.size() > 3)
+	{
+		for(size_t i = 0; i < p.size(); ++i)
+			for(size_t j = i+1; j < p.size(); ++j)
+				for(size_t k = j+1; k < p.size(); ++k)
+					if (!float3::AreCollinear(p[i], p[j], p[k]))
+						return Plane(p[i], p[j], p[k]);
+
+		// Polygon contains multiple points, but they are all collinear.
+		// Pick an arbitrary plane along the line as the polygon plane (as if the polygon had only two points)
+		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
+	}
+	if (p.size() == 3)
 		return Plane(p[0], p[1], p[2]);
 	if (p.size() == 2)
 		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
@@ -278,13 +290,9 @@ Plane Polygon::PlaneCCW() const
 
 Plane Polygon::PlaneCW() const
 {
-	if (p.size() >= 3)
-		return Plane(p[0], p[2], p[1]);
-	if (p.size() == 2)
-		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
-	if (p.size() == 1)
-		return Plane(p[0], float3(0,1,0));
-	return Plane();
+	Plane plane = PlaneCCW();
+	plane.ReverseNormal();
+	return plane;
 }
 
 void Polygon::Translate(const float3 &offset)
