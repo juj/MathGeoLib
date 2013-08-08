@@ -2,6 +2,7 @@
 
 std::string GetOSDisplayString();
 
+/// @return The total amount of RAM on the system, in bytes.
 unsigned long long GetTotalSystemPhysicalMemory();
 
 /// @return A readable string of the processor as given by cpuid, like "AMD Turion(tm) X2 Dual-Core Mobile RM-74".
