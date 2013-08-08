@@ -55,6 +55,8 @@ if (EMSCRIPTEN)
 
 	SET(CMAKE_FIND_LIBRARY_PREFIXES "")
 	SET(CMAKE_FIND_LIBRARY_SUFFIXES ".bc")
+	
+	add_definitions(-Wno-warn-absolute-paths)
 endif()
 
 if (FLASCC)
