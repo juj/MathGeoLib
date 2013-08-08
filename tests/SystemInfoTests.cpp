@@ -4,6 +4,7 @@
 
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
+#include "SystemInfo.h"
 #include "TestRunner.h"
 
 UNIQUE_TEST(GetOSDisplayString)
