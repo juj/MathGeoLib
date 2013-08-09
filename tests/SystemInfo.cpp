@@ -423,11 +423,24 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 
 #include <string>
 #include <sstream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+std::string TrimLeft(std::string str)
+{
+	return str.substr(str.find_first_not_of(" \n\r\t"));
+}
 
 std::string TrimRight(std::string str)
 {
 	str.erase(str.find_last_not_of(" \n\r\t")+1);
 	return str;
+}
+
+std::string Trim(std::string str)
+{
+	return TrimLeft(TrimRight(str));
 }
 
 // http://stackoverflow.com/questions/646241/c-run-a-system-command-and-get-output
@@ -440,7 +453,7 @@ std::string RunProcess(const char *cmd)
 	std::stringstream ss;
 	char str[1035];
 	while(fgets(str, sizeof(str)-1, fp))
-		ss += str;
+		ss << str;
 
 	pclose(fp);
 
@@ -452,15 +465,15 @@ std::string GetOSDisplayString()
 	return RunProcess("lsb_release -ds") + " " + RunProcess("uname -mrs");
 }
 
-std::string FindLine(std::string &inStr, const char *lineStart)
+std::string FindLine(const std::string &inStr, const char *lineStart)
 {
 	int lineStartLen = strlen(lineStart);
 	size_t idx = inStr.find(lineStart);
-	if (idx == string::npos)
+	if (idx == std::string::npos)
 		return std::string();
 	idx += lineStartLen;
 	size_t lineEnd = inStr.find("\n", idx);
-	if (lineEnd == string::npos)
+	if (lineEnd == std::string::npos)
 		return inStr.substr(idx);
 	else
 		return inStr.substr(idx, lineEnd-idx);
@@ -481,21 +494,21 @@ unsigned long long GetTotalSystemPhysicalMemory()
 std::string GetProcessorBrandName()
 {
 	std::string r = RunProcess("cat /proc/cpuinfo");
-	return TrimRight(FindLine(r, "vendor_id       : "));
+	return Trim(FindLine(FindLine(r, "vendor_id"),":"));
 }
 
 std::string GetProcessorCPUIDString()
 {
 	std::string r = RunProcess("cat /proc/cpuinfo");
-	return TrimRight(FindLine(r, "model name      : "));
+	return Trim(FindLine(FindLine(r, "model name"),":"));
 }
 
 std::string GetProcessorExtendedCPUIDInfo()
 {
 	std::string r = RunProcess("cat /proc/cpuinfo");
-	std::string stepping = TrimRight(FindLine(r, "stepping        : "));
-	std::string model = TrimRight(FindLine(r, "model           : "));
-	std::string family = TrimRight(FindLine(r, "cpu family      : "));
+	std::string stepping = Trim(FindLine(FindLine(r, "stepping"),":"));
+	std::string model = Trim(FindLine(FindLine(r, "model"),":"));
+	std::string family = Trim(FindLine(FindLine(r, "cpu family"),":"));
 
 	std::stringstream ss;
 	ss << GetProcessorBrandName() << ", " << "Stepping: " << stepping << ", Model: " << model <<
@@ -506,7 +519,7 @@ std::string GetProcessorExtendedCPUIDInfo()
 int GetNumCPUs()
 {
 	std::string r = RunProcess("lscpu");
-	r = TrimRight(FindLine("CPU(s):"));
+	r = TrimRight(FindLine(r, "CPU(s):"));
 	int numCPUs = 0;
 	int n = sscanf(r.c_str(), "%d", &numCPUs);
 	return (n == 1) ? numCPUs : 0;
@@ -515,7 +528,7 @@ int GetNumCPUs()
 unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
 {
 	std::string r = RunProcess("lscpu");
-	r = TrimRight(FindLine("CPU MHz:"));
+	r = TrimRight(FindLine(r, "CPU MHz:"));
 	int mhz = 0;
 	int n = sscanf(r.c_str(), "%d", &mhz);
 	return (n == 1) ? (unsigned long)mhz : 0;
