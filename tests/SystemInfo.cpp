@@ -419,9 +419,9 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 	RegCloseKey(hKey);
 	return dwSpeed;
 }
-#else
+#elif defined(EMSCRIPTEN)
+
 #include <emscripten.h>
-#ifdef EMSCRIPTEN
 extern "C" {
 	extern const char *browser_info();
 }
@@ -431,7 +431,9 @@ std::string GetProcessorBrandName() { return "n/a"; }
 std::string GetProcessorCPUIDString() { return "n/a"; }
 std::string GetProcessorExtendedCPUIDInfo() { return "n/a"; }
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 1; }
+
 #else
+
 ///\todo
 std::string GetOSDisplayString() { return ""; }
 unsigned long long GetTotalSystemPhysicalMemory() { return 0; }
@@ -439,6 +441,5 @@ std::string GetProcessorBrandName() { return ""; }
 std::string GetProcessorCPUIDString() { return ""; }
 std::string GetProcessorExtendedCPUIDInfo() { return ""; }
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 0; }
-#endif
 
 #endif
