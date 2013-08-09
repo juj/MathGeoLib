@@ -419,6 +419,108 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 	RegCloseKey(hKey);
 	return dwSpeed;
 }
+#elif defined(LINUX)
+
+#include <string>
+#include <sstream>
+
+std::string TrimRight(std::string str)
+{
+	str.erase(str.find_last_not_of(" \n\r\t")+1);
+	return str;
+}
+
+// http://stackoverflow.com/questions/646241/c-run-a-system-command-and-get-output
+std::string RunProcess(const char *cmd)
+{
+	FILE *fp = popen(cmd, "r");
+	if (!fp)
+		return std::string();
+
+	std::stringstream ss;
+	char str[1035];
+	while(fgets(str, sizeof(str)-1, fp))
+		ss += str;
+
+	pclose(fp);
+
+	return TrimRight(ss.str()); // Trim the end of the result to remove \n.
+}
+
+std::string GetOSDisplayString()
+{
+	return RunProcess("lsb_release -ds") + " " + RunProcess("uname -mrs");
+}
+
+std::string FindLine(std::string &inStr, const char *lineStart)
+{
+	int lineStartLen = strlen(lineStart);
+	size_t idx = inStr.find(lineStart);
+	if (idx == string::npos)
+		return std::string();
+	idx += lineStartLen;
+	size_t lineEnd = inStr.find("\n", idx);
+	if (lineEnd == string::npos)
+		return inStr.substr(idx);
+	else
+		return inStr.substr(idx, lineEnd-idx);
+}
+
+unsigned long long GetTotalSystemPhysicalMemory()
+{
+	std::string r = RunProcess("cat /proc/meminfo");
+	std::string memTotal = FindLine(r, "MemTotal:");
+	int mem = 0;
+	int n = sscanf(memTotal.c_str(), "%d", &mem);
+	if (n == 1)
+		return (unsigned long long)mem * 1024;
+	else
+		return 0;
+}
+
+std::string GetProcessorBrandName()
+{
+	std::string r = RunProcess("cat /proc/cpuinfo");
+	return TrimRight(FindLine(r, "vendor_id       : "));
+}
+
+std::string GetProcessorCPUIDString()
+{
+	std::string r = RunProcess("cat /proc/cpuinfo");
+	return TrimRight(FindLine(r, "model name      : "));
+}
+
+std::string GetProcessorExtendedCPUIDInfo()
+{
+	std::string r = RunProcess("cat /proc/cpuinfo");
+	std::string stepping = TrimRight(FindLine(r, "stepping        : "));
+	std::string model = TrimRight(FindLine(r, "model           : "));
+	std::string family = TrimRight(FindLine(r, "cpu family      : "));
+
+	std::stringstream ss;
+	ss << GetProcessorBrandName() << ", " << "Stepping: " << stepping << ", Model: " << model <<
+		", Family: " << family;
+	return ss.str();
+}
+
+int GetNumCPUs()
+{
+	std::string r = RunProcess("lscpu");
+	r = TrimRight(FindLine("CPU(s):"));
+	int numCPUs = 0;
+	int n = sscanf(r.c_str(), "%d", &numCPUs);
+	return (n == 1) ? numCPUs : 0;
+}
+
+unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
+{
+	std::string r = RunProcess("lscpu");
+	r = TrimRight(FindLine("CPU MHz:"));
+	int mhz = 0;
+	int n = sscanf(r.c_str(), "%d", &mhz);
+	return (n == 1) ? (unsigned long)mhz : 0;
+}
+
 #elif defined(EMSCRIPTEN)
 
 #include <emscripten.h>
