@@ -38,16 +38,22 @@ TEST(SubMillisecondPrecision)
 
 	tick_t minDiff = Clock::TicksPerSec();
 	tick_t prev = Clock::Tick();
-	for(int i = 0; i < 10000; ++i)
+	int numTimesZeroDiff = 0;
+	int numIters = 10000;
+	for(int i = 0; i < numIters; ++i)
 	{
 		tick_t now = Clock::Tick();
 		tick_t diff = Clock::TicksInBetween(now, prev);
 		if (diff > 0)
 			minDiff = Min(diff, minDiff);
+		else
+			++numTimesZeroDiff;
 
 		prev = now;
 	}
 
+	LOGI("Smallest observed non-zero delta in Clock::Tick() is %d ticks. A zero delta was observed %d times (out of %d tests)", 
+		(int)minDiff, numTimesZeroDiff, numIters);
 	assert(minDiff > 0);
 	assert(minDiff < ticksPerMillisecond/2); // Smallest met quantity must be less than half a millisecond.
 }
