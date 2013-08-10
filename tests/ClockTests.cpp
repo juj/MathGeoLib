@@ -31,7 +31,7 @@ UNIQUE_TEST(Clock_RdTsc)
 	LOGI("Two subsequent calls to rdtsc report %llu and %llu. (delta: %llu)", tsc, tsc2, tsc2 - tsc);
 }
 
-TEST(SubMillisecondPrecision)
+UNIQUE_TEST(SubMillisecondPrecision)
 {
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
 	assert(ticksPerMillisecond > 1);
@@ -39,7 +39,7 @@ TEST(SubMillisecondPrecision)
 	tick_t minDiff = Clock::TicksPerSec();
 	tick_t prev = Clock::Tick();
 	int numTimesZeroDiff = 0;
-	int numIters = 10000;
+	int numIters = 50000;
 	for(int i = 0; i < numIters; ++i)
 	{
 		tick_t now = Clock::Tick();
