@@ -14,8 +14,8 @@ std::string GetProcessorCPUIDString();
 /// @return Technical information about the processor.
 std::string GetProcessorExtendedCPUIDInfo();
 
-///\todo This doesn't work on Core i3/i5/i7, so leave it out.
-//int GetNumberOfLogicalCPUCores();
+/// @return The maximum number of threads the CPU can simultaneously accommodate.
+int GetMaxSimultaneousThreads();
 
 /// @return The clock speed of the given core, in MHz. This is nominal, not actual. It is read from registry.
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU);

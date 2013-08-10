@@ -2,6 +2,49 @@
 
 #include "SystemInfo.h"
 
+#if defined(LINUX) || defined(__APPLE__)
+
+#include <string>
+#include <sstream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+std::string TrimLeft(std::string str)
+{
+	return str.substr(str.find_first_not_of(" \n\r\t"));
+}
+
+std::string TrimRight(std::string str)
+{
+	str.erase(str.find_last_not_of(" \n\r\t")+1);
+	return str;
+}
+
+std::string Trim(std::string str)
+{
+	return TrimLeft(TrimRight(str));
+}
+
+// http://stackoverflow.com/questions/646241/c-run-a-system-command-and-get-output
+std::string RunProcess(const char *cmd)
+{
+	FILE *fp = popen(cmd, "r");
+	if (!fp)
+		return std::string();
+    
+	std::stringstream ss;
+	char str[1035];
+	while(fgets(str, sizeof(str)-1, fp))
+		ss << str;
+    
+	pclose(fp);
+    
+	return TrimRight(ss.str()); // Trim the end of the result to remove \n.
+}
+
+#endif
+
 #if defined(WIN32) && !defined(__MINGW32__) && !defined(WIN8RT)
 
 #include <windows.h>
@@ -421,45 +464,6 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 }
 #elif defined(LINUX)
 
-#include <string>
-#include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-std::string TrimLeft(std::string str)
-{
-	return str.substr(str.find_first_not_of(" \n\r\t"));
-}
-
-std::string TrimRight(std::string str)
-{
-	str.erase(str.find_last_not_of(" \n\r\t")+1);
-	return str;
-}
-
-std::string Trim(std::string str)
-{
-	return TrimLeft(TrimRight(str));
-}
-
-// http://stackoverflow.com/questions/646241/c-run-a-system-command-and-get-output
-std::string RunProcess(const char *cmd)
-{
-	FILE *fp = popen(cmd, "r");
-	if (!fp)
-		return std::string();
-
-	std::stringstream ss;
-	char str[1035];
-	while(fgets(str, sizeof(str)-1, fp))
-		ss << str;
-
-	pclose(fp);
-
-	return TrimRight(ss.str()); // Trim the end of the result to remove \n.
-}
-
 std::string GetOSDisplayString()
 {
 	return RunProcess("lsb_release -ds") + " " + RunProcess("uname -mrs");
@@ -516,7 +520,7 @@ std::string GetProcessorExtendedCPUIDInfo()
 	return ss.str();
 }
 
-int GetNumCPUs()
+int GetMaxSimultaneousThreads()
 {
 	std::string r = RunProcess("lscpu");
 	r = TrimRight(FindLine(r, "CPU(s):"));
@@ -547,14 +551,117 @@ std::string GetProcessorCPUIDString() { return "n/a"; }
 std::string GetProcessorExtendedCPUIDInfo() { return "n/a"; }
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 1; }
 
+#elif defined(__APPLE__)
+
+std::string GetOSDisplayString()
+{
+    std::string uname = RunProcess("uname -mrs");
+    
+    // http://stackoverflow.com/questions/11072804/mac-os-x-10-8-replacement-for-gestalt-for-testing-os-version-at-runtime/11697362#11697362
+    std::string systemVer = RunProcess("cat /System/Library/CoreServices/SystemVersion.plist");
+    size_t idx = systemVer.find("<key>ProductVersion</key>");
+    if (idx == std::string::npos)
+        return uname;
+    idx = systemVer.find("<string>", idx);
+    if (idx == std::string::npos)
+        return uname;
+    idx += strlen("<string>");
+    size_t endIdx = systemVer.find("</string>", idx);
+    if (endIdx == std::string::npos)
+        return uname;
+    std::string marketingVersion = Trim(systemVer.substr(idx, endIdx-idx));
+
+    uname += " Mac OS X " + marketingVersion;
+    int majorVer = 0, minorVer = 0;
+    int n = sscanf(marketingVersion.c_str(), "%d.%d", &majorVer, &minorVer);
+    if (n != 2)
+        return uname;
+    switch (majorVer * 100 + minorVer)
+    {
+        case 1001: return uname + " Puma";
+        case 1002: return uname + " Jaguar";
+        case 1003: return uname + " Panther";
+        case 1004: return uname + " Tiger";
+        case 1005: return uname + " Leopard";
+        case 1006: return uname + " Snow Leopard";
+        case 1007: return uname + " Lion";
+        case 1008: return uname + " Mountain Lion";
+        default: return uname;
+    }
+}
+
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
+std::string sysctl_string(const char *sysctl_name)
+{
+    char str[128] = {};
+    size_t size = sizeof(str)-1;
+    sysctlbyname(sysctl_name, str, &size, NULL, 0);
+    return str;    
+}
+
+int sysctl_int32(const char *sysctl_name)
+{
+    int32_t val = 0;
+    size_t size = sizeof(val);
+    sysctlbyname(sysctl_name, &val, &size, NULL, 0);
+    return (int)val;
+}
+
+int64_t sysctl_int64(const char *sysctl_name)
+{
+    int64_t val = 0;
+    size_t size = sizeof(val);
+    sysctlbyname(sysctl_name, &val, &size, NULL, 0);
+    return val;
+}
+
+unsigned long long GetTotalSystemPhysicalMemory()
+{
+    return (unsigned long long)sysctl_int64("hw.memsize");
+}
+
+std::string GetProcessorBrandName()
+{
+    return sysctl_string("machdep.cpu.vendor");
+}
+
+std::string GetProcessorCPUIDString()
+{
+    return sysctl_string("machdep.cpu.brand_string");
+}
+
+std::string GetProcessorExtendedCPUIDInfo()
+{
+    char str[1024];
+    sprintf(str, "%s, Stepping: %d, Model: %d, Family: %d, Ext.model: %d, Ext.family: %d.", GetProcessorCPUIDString().c_str(), sysctl_int32("machdep.cpu.stepping"), sysctl_int32("machdep.cpu.model"), sysctl_int32("machdep.cpu.family"), sysctl_int32("machdep.cpu.extmodel"), sysctl_int32("machdep.cpu.extfamily"));
+    return str;
+}
+
+unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
+{
+    int64_t freq = sysctl_int64("hw.cpufrequency");
+    return (unsigned long)(freq / 1000 / 1000);
+}
+
+// Returns the maximum number of threads the CPU can simultaneously accommodate.
+// E.g. for dualcore hyperthreaded Intel CPUs, this returns 4.
+int GetMaxSimultaneousThreads()
+{
+    return (int)sysctl_int32("machdep.cpu.thread_count");
+}
+
 #else
 
-///\todo
+#warning SystemInfo.cpp not implemented for the current platform!
+
 std::string GetOSDisplayString() { return ""; }
 unsigned long long GetTotalSystemPhysicalMemory() { return 0; }
-std::string GetProcessorBrandName() { return ""; } 
+std::string GetProcessorBrandName() { return ""; }
 std::string GetProcessorCPUIDString() { return ""; }
 std::string GetProcessorExtendedCPUIDInfo() { return ""; }
-unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 0; }
+unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/) { return 0; }
+int GetMaxSimultaneousThreads() { return 0; }
 
 #endif

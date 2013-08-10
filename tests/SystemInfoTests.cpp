@@ -45,3 +45,8 @@ UNIQUE_TEST(GetCPUSpeedFromRegistry)
 	assert((int)GetCPUSpeedFromRegistry(0) > 0);
 	assert((int)GetCPUSpeedFromRegistry(0) < 32 * 1024); // Arbitrary cap on large values.
 }
+
+UNIQUE_TEST(GetMaxSimultaneousThreads)
+{
+    LOGI("Maximum number of simultaneous threads (number of logical cores): %d", GetMaxSimultaneousThreads());
+}
