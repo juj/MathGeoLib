@@ -399,41 +399,14 @@ std::string GetProcessorExtendedCPUIDInfo()
 
 	return ss.str();
 }
-/* This doesn't work on Core i3/i5/i7, so leave it out.
-int GetNumberOfLogicalCPUCores()
+
+int GetMaxSimultaneousThreads()
 {
-    int CPUInfo[4] = {-1};
-
-    // __cpuid with an InfoType argument of 0 returns the number of
-    // valid Ids in CPUInfo[0] and the CPU identification string in
-    // the other three array elements. The CPU identification string is
-    // not in linear order. The code below arranges the information 
-    // in a human readable form.
-    __cpuid(CPUInfo, 0);
-    unsigned nIds = CPUInfo[0];
-
-	 if (nIds == 0)
-		 return 1;
-
-    __cpuid(CPUInfo, 1);
-
-	int nFeatureInfo = CPUInfo[3];
-	bool bMultithreading = (nFeatureInfo & (1 << 28)) || false;
-	if (!bMultithreading)
-		return 1;
-
-	int nLogicalProcessors = ((CPUInfo[1] >> 16) & 0xff);
-
-	if (nLogicalProcessors == 16)
-	{
-		// HACK: Core i7's show 16 logical processors.. double-check and make it 8.
-		std::string cpuString = GetProcessorCPUIDString();
-		if (cpuString.find("Intel(R) Core(TM) i7 CPU") != cpuString.npos)
-			nLogicalProcessors = 8;
-	}
-	return nLogicalProcessors;
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    return sysinfo.dwNumberOfProcessors;
 }
-*/
+
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 {
 	HKEY hKey;
@@ -550,6 +523,7 @@ std::string GetProcessorBrandName() { return "n/a"; }
 std::string GetProcessorCPUIDString() { return "n/a"; }
 std::string GetProcessorExtendedCPUIDInfo() { return "n/a"; }
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 1; }
+int GetMaxSimultaneousThreads() { return 1; }
 
 #elif defined(__APPLE__)
 
