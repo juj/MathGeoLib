@@ -80,6 +80,10 @@ if (FLASCC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O4")
 endif()
 
+if (LINUX)
+	add_definitions(-DLINUX)
+endif()
+
 if(MSVC)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
