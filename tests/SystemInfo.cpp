@@ -2,7 +2,7 @@
 
 #include "SystemInfo.h"
 
-#if defined(LINUX) || defined(__APPLE__)
+#if defined(LINUX) || defined(__APPLE__) || defined(ANDROID)
 
 #include <string>
 #include <sstream>
@@ -41,6 +41,20 @@ std::string RunProcess(const char *cmd)
 	pclose(fp);
 
 	return TrimRight(ss.str()); // Trim the end of the result to remove \n.
+}
+
+std::string FindLine(const std::string &inStr, const char *lineStart)
+{
+	int lineStartLen = strlen(lineStart);
+	size_t idx = inStr.find(lineStart);
+	if (idx == std::string::npos)
+		return std::string();
+	idx += lineStartLen;
+	size_t lineEnd = inStr.find("\n", idx);
+	if (lineEnd == std::string::npos)
+		return inStr.substr(idx);
+	else
+		return inStr.substr(idx, lineEnd-idx);
 }
 
 #endif
@@ -386,20 +400,6 @@ std::string GetOSDisplayString()
 	return RunProcess("lsb_release -ds") + " " + RunProcess("uname -mrs");
 }
 
-std::string FindLine(const std::string &inStr, const char *lineStart)
-{
-	int lineStartLen = strlen(lineStart);
-	size_t idx = inStr.find(lineStart);
-	if (idx == std::string::npos)
-		return std::string();
-	idx += lineStartLen;
-	size_t lineEnd = inStr.find("\n", idx);
-	if (lineEnd == std::string::npos)
-		return inStr.substr(idx);
-	else
-		return inStr.substr(idx, lineEnd-idx);
-}
-
 unsigned long long GetTotalSystemPhysicalMemory()
 {
 	std::string r = RunProcess("cat /proc/meminfo");
@@ -570,6 +570,27 @@ int GetMaxSimultaneousThreads()
 {
 	return (int)sysctl_int32("machdep.cpu.thread_count");
 }
+
+#elif defined(ANDROID)
+
+unsigned long long GetTotalSystemPhysicalMemory()
+{
+	std::string r = RunProcess("cat /proc/meminfo");
+	std::string memTotal = FindLine(r, "MemTotal:");
+	int mem = 0;
+	int n = sscanf(memTotal.c_str(), "%d", &mem);
+	if (n == 1)
+		return (unsigned long long)mem * 1024;
+	else
+		return 0;
+}
+
+std::string GetOSDisplayString() { return ""; }
+std::string GetProcessorBrandName() { return ""; }
+std::string GetProcessorCPUIDString() { return ""; }
+std::string GetProcessorExtendedCPUIDInfo() { return ""; }
+unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/) { return 0; }
+int GetMaxSimultaneousThreads() { return 0; }
 
 #else
 
