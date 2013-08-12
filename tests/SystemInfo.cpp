@@ -585,12 +585,79 @@ unsigned long long GetTotalSystemPhysicalMemory()
 		return 0;
 }
 
-std::string GetOSDisplayString() { return ""; }
-std::string GetProcessorBrandName() { return ""; }
-std::string GetProcessorCPUIDString() { return ""; }
-std::string GetProcessorExtendedCPUIDInfo() { return ""; }
-unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/) { return 0; }
-int GetMaxSimultaneousThreads() { return 0; }
+std::string GetOSDisplayString()
+{
+	std::string ver = Trim(RunProcess("getprop ro.build.version.release"));
+	std::string apiLevel = Trim(RunProcess("getprop ro.build.version.sdk"));
+	if (apiLevel.empty())
+		apiLevel = Trim(RunProcess("getprop ro.build.version.sdk_int"));
+
+	std::string os;
+	if (!ver.empty())
+		os = "Android " + ver + " ";
+	if (!apiLevel.empty())
+		os += "SDK API Level " + apiLevel + " ";
+	os += Trim(RunProcess("getprop ro.build.description"));
+	return os;
+}
+
+std::string GetProcessorBrandName()
+{
+	std::string r = RunProcess("cat /proc/cpuinfo");
+	return Trim(FindLine(FindLine(r, "Processor"),":"));
+}
+
+std::string GetProcessorCPUIDString()
+{
+	// Note: This is actually HW identifier, not CPU ID.
+	std::string manufacturer = RunProcess("getprop ro.product.manufacturer");
+	std::string brand = RunProcess("getprop ro.product.brand");
+	std::string model = RunProcess("getprop ro.product.model");
+	std::string board = RunProcess("getprop ro.product.board");
+	std::string device = RunProcess("getprop ro.product.device");
+	std::string name = RunProcess("getprop ro.product.name");
+	return manufacturer + " " + brand + " " + model + " " + board + " " + device + " " + name;
+}
+
+std::string GetProcessorExtendedCPUIDInfo()
+{
+	std::string r = RunProcess("cat /proc/cpuinfo");
+	std::string implementer = Trim(FindLine(FindLine(r, "CPU implementer"),":"));
+	std::string arch = Trim(FindLine(FindLine(r, "CPU architecture"),":"));
+	std::string variant = Trim(FindLine(FindLine(r, "CPU variant"),":"));
+	std::string part = Trim(FindLine(FindLine(r, "CPU part"),":"));
+	std::string rev = Trim(FindLine(FindLine(r, "CPU revision"),":"));
+	std::string hw = Trim(FindLine(FindLine(r, "Hardware"),":"));
+
+	std::stringstream ss;
+	ss << "Hardware: " << hw << ", CPU implementer: " << implementer << ", arch: " << arch << ", variant: " << variant 
+		<< ", part: " << part << ", revision: " << rev;
+	return ss.str();
+}
+
+unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
+{
+	std::stringstream ss;
+	ss << "cat /sys/devices/system/cpu/cpu" << dwCPU << "/cpufreq/cpuinfo_max_freq";
+	std::string r = RunProcess(ss.str().c_str());
+	int freq = 0;
+	int n = sscanf(r.c_str(), "%d", &freq);
+	if (n == 1)
+		return freq / 1000000;
+	else
+		return 0;
+}
+
+int GetMaxSimultaneousThreads()
+{
+	std::string r = RunProcess("cat /sys/devices/system/cpu/present");
+	int nCoresMin = 0, nCoresMax = 0;
+	int n = sscanf(r.c_str(), "%d-%d", &nCoresMin, &nCoresMax);
+	if (n == 2 && nCoresMax > 0)
+		return nCoresMax;
+	else
+		return 1;
+}
 
 #else
 
