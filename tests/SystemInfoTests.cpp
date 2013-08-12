@@ -48,5 +48,6 @@ UNIQUE_TEST(GetCPUSpeedFromRegistry)
 
 UNIQUE_TEST(GetMaxSimultaneousThreads)
 {
-    LOGI("Maximum number of simultaneous threads (number of logical cores): %d", GetMaxSimultaneousThreads());
+	LOGI("Maximum number of simultaneous threads (number of logical cores): %d", GetMaxSimultaneousThreads());
+	assert(GetMaxSimultaneousThreads() > 0);
 }
