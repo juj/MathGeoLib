@@ -643,7 +643,7 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 	int freq = 0;
 	int n = sscanf(r.c_str(), "%d", &freq);
 	if (n == 1)
-		return freq / 1000000;
+		return freq / 1000; // cpuinfo_max_freq seems to be in kHz. Output MHz.
 	else
 		return 0;
 }
