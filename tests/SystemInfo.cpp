@@ -653,8 +653,8 @@ int GetMaxSimultaneousThreads()
 	std::string r = RunProcess("cat /sys/devices/system/cpu/present");
 	int nCoresMin = 0, nCoresMax = 0;
 	int n = sscanf(r.c_str(), "%d-%d", &nCoresMin, &nCoresMax);
-	if (n == 2 && nCoresMax > 0)
-		return nCoresMax;
+	if (n == 2)
+		return nCoresMax - nCoresMin + 1; // The min-max numbers are indices to cpu cores, so +1 for the count.
 	else
 		return 1;
 }
