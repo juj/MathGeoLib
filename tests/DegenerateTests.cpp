@@ -22,7 +22,7 @@ TEST(OBB_Degenerate)
 	assert(o.IsDegenerate());
 
 	o = OBB(AABB(float3::zero, float3::one));
-	assert(!o.IsDegenerate());
+	assert1(!o.IsDegenerate(), o);
 }
 
 TEST(Capsule_Degenerate)

@@ -40,7 +40,7 @@ OBB RandomOBBInHalfspace(const Plane &plane, float maxSideLength)
 	float distance = plane.Distance(obbExtremePoint);
 	o.Translate((distance + GUARDBAND) * plane.normal);
 
-	assert(!o.IsDegenerate());
+	assert1(!o.IsDegenerate(), o);
 	assert(o.IsFinite());
 	assert(!o.Intersects(plane));
 //	assert(o.SignedDistance(plane) > 0.f);

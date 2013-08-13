@@ -28,7 +28,7 @@ OBB RandomOBBContainingPoint(const float3 &pt, float maxSideLength)
 	float3x4 rot = float3x4::RandomRotation(rng);
 	float3x4 tm = float3x4::Translate(pt) * rot * float3x4::Translate(-pt);
 	OBB o = a.Transform(tm);
-	assert(!o.IsDegenerate());
+	assert1(!o.IsDegenerate(), o);
 	assert(o.IsFinite());
 	assert(o.Contains(pt));
 	return o;
@@ -182,7 +182,7 @@ Polygon RandomPolygonContainingPoint(const float3 &pt)
 	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
 
 	float3 pt2 = poly.FastRandomPointInside(rng);
-	assert(poly.Contains(pt2));
+	assert3(poly.Contains(pt2), poly, pt2, poly.Distance(pt2));
 	poly.Translate(pt - pt2);
 
 	assert(!poly.IsDegenerate());

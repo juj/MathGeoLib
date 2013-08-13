@@ -52,9 +52,9 @@ RANDOMIZED_TEST(LCG_Float)
 	{
 		float f = lcg.Float();
 		float f2 = lcg.Float();
-		assert(f < 1.f);
-		assert(f >= 0.f);
-		assert(f != 0.f || f2 != 0.f);
+		assert1(f < 1.f, f);
+		assert1(f >= 0.f, f);
+		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		if (f != f2)
 			allEqual = false;
 	}
@@ -71,7 +71,7 @@ RANDOMIZED_TEST(LCG_Float01Incl)
 		float f2 = lcg.Float01Incl();
 		assert(f <= 1.f);
 		assert(f >= 0.f);
-		assert(f != 0.f || f2 != 0.f);
+		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		if (f != f2)
 			allEqual = false;
 	}
@@ -86,9 +86,9 @@ RANDOMIZED_TEST(LCG_FloatNeg1_1)
 	{
 		float f = lcg.FloatNeg1_1();
 		float f2 = lcg.FloatNeg1_1();
-		assert(f < 1.f);
-		assert(f > -1.f);
-		assert(f != 0.f || f2 != 0.f);
+		assert1(f < 1.f, f);
+		assert1(f > -1.f, f);
+		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		if (f != f2)
 			allEqual = false;
 	}
@@ -106,7 +106,7 @@ RANDOMIZED_TEST(LCG_Float_A_B)
 			Swap(a, b);
 
 		float f = lcg.Float(a, b);
-		assert(a <= f);
-		assert(f < b);
+		assert2(a <= f, a, b);
+		assert2(f < b, f, b);
 	}
 }
