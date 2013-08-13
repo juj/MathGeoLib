@@ -108,11 +108,13 @@ MATH_END_NAMESPACE
 #define assume_failed(message) LOGE("Assumption \"%s\" failed! in file %s, line %d!", message, __FILE__, __LINE__)
 #endif
 
+#ifndef assume
 #define assume(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
 			assume_failed(#x); \
 	MULTI_LINE_MACRO_END
+#endif
 
 // In assume1-assume4, print1-print4 are additional helper parameters that get printed out to log in case of failure.
 #define assume1(x, print1) \
