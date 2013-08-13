@@ -235,7 +235,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Frustum)
 	Frustum f = RandomFrustumNearOrigin(DISTSCALE);
 	s.Enclose(f);
 
-	assert(s.Contains(f));
+	assert2(s.Contains(f), s, f);
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Polygon)

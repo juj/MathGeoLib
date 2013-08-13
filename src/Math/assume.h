@@ -65,6 +65,20 @@ bool MathBreakOnAssume();
 /// Returns the current state of the math break-on-assume flag.
 bool AssumeFailed();
 
+template<typename T>
+std::string ObjToString(const T &obj)
+{
+	return obj.ToString();
+}
+
+template<>
+static inline std::string ObjToString<float>(const float &obj)
+{
+	std::stringstream ss;
+	ss << obj;
+	return ss.str();
+}
+
 MATH_END_NAMESPACE
 
 // If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
@@ -81,21 +95,62 @@ MATH_END_NAMESPACE
 
 #include <stdexcept>
 
+#define assume_failed(message) throw std::runtime_error((message))
+
+/*
 #define assume(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
 			throw std::runtime_error(#x); \
 	MULTI_LINE_MACRO_END
+*/
 
 #else
+
+#define assume_failed(message) LOGE("Assumption \"%s\" failed! in file %s, line %d!", message, __FILE__, __LINE__)
+
+//#define assume(x) \
+//	MULTI_LINE_MACRO_BEGIN \
+//		if (!(x)) \
+//			LOGE("Assumption \"%s\" failed! in file %s, line %d!", #x, __FILE__, __LINE__); \
+//	MULTI_LINE_MACRO_END
+
+#endif
 
 #define assume(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			LOGE("Assumption \"%s\" failed! in file %s, line %d!", #x, __FILE__, __LINE__); \
+			assume_failed(#x); \
 	MULTI_LINE_MACRO_END
 
-#endif
+// In assume1-assume4, print1-print4 are additional helper parameters that get printed out to log in case of failure.
+#define assume1(x, print1) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1)); \
+	MULTI_LINE_MACRO_END
+#define assert1 assume1
+
+#define assume2(x, print1, print2) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2)); \
+	MULTI_LINE_MACRO_END
+#define assert2 assume2
+
+#define assume3(x, print1, print2, print3) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + ", " + #print3 + ": " + MATH_NS::ObjToString(print3)); \
+	MULTI_LINE_MACRO_END
+#define assert3 assume3
+
+#define assume4(x, print1, print2, print3, print4) \
+	MULTI_LINE_MACRO_BEGIN \
+		if (!(x)) \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + ", " + #print3 + ": " + MATH_NS::ObjToString(print3) + ", " + #print4 + ": " + MATH_NS::ObjToString(print4)); \
+	MULTI_LINE_MACRO_END
+#define assert4 assume4
 
 // If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test
 // that all forms of optimizations inside the math library produce proper results.

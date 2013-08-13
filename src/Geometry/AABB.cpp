@@ -624,8 +624,8 @@ bool AABB::Intersects(const LineSegment &lineSegment) const
 
 bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
 {
-	assume(lineDir.IsNormalized());
-	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
+	assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
+	assume2(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!", tNear, tFar);
 	// The user should have inputted values for tNear and tFar to specify the desired subrange [tNear, tFar] of the line
 	// for this intersection test.
 	// For a Line-AABB test, pass in
