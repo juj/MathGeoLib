@@ -109,7 +109,6 @@ public:
 	    @return A float in the range [a, b[ */
 	float Float(float a, float b);
 
-private:
 	u32 multiplier;
 	u32 increment;
 	u32 modulus;
