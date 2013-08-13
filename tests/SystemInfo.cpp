@@ -470,6 +470,27 @@ std::string GetProcessorExtendedCPUIDInfo() { return "n/a"; }
 unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/) { return 1; }
 int GetMaxSimultaneousThreads() { return 1; }
 
+bool IsChromeBrowser()
+{
+	return GetChromeVersion().v[0] > 0;
+}
+
+bool IsChromeBrowserOnWin32()
+{
+	std::string os = GetOSDisplayString();
+
+	return GetChromeVersion().v[0] > 0 && os.find("Win32") != std::string::npos;
+}
+
+BrowserVersion GetChromeVersion()
+{
+	std::string os = GetOSDisplayString();
+	size_t idx = os.find("Chrome/");
+	if (idx == std::string::npos)
+		return BrowserVersion();
+	return BrowserVersion(os.substr(idx+strlen("Chrome/")).c_str());
+}
+
 #elif defined(__APPLE__)
 
 std::string GetOSDisplayString()

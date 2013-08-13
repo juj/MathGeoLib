@@ -3,6 +3,7 @@
 
 #include "SystemInfo.h"
 #include "../src/Math/myassert.h"
+#include "../src/Math/assume.h"
 
 class JSONReport
 {
@@ -187,6 +188,8 @@ public:
 		handle = fopen(filename, "w");
 		if (!handle)
 			LOGE("Failed to open file '%s'!", filename);
+#else
+		MARK_UNUSED(filename);
 #endif
 
 		LOG_WRITE("{\n");

@@ -1,6 +1,7 @@
 #include "../src/Math/myassert.h"
 #include "../src/MathGeoLib.h"
 #include "../tests/TestRunner.h"
+#include "SystemInfo.h"
 
 TEST(MonotonousClock)
 {
@@ -33,6 +34,14 @@ UNIQUE_TEST(Clock_RdTsc)
 
 UNIQUE_TEST(SubMillisecondPrecision)
 {
+#ifdef EMSCRIPTEN
+	if (IsChromeBrowserOnWin32())
+	{
+		if (GetChromeVersion() <= BrowserVersion("28.0.1500.95") || GetChromeVersion() == BrowserVersion("30.0.1599.0"))
+			WARN_AND_EXPECT_FAIL("Chrome on Win32 has bad timer resolution: https://code.google.com/p/chromium/issues/detail?id=158234");
+	}
+#endif
+
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
 	assert(ticksPerMillisecond > 1);
 

@@ -19,3 +19,69 @@ int GetMaxSimultaneousThreads();
 
 /// @return The clock speed of the given core, in MHz. This is nominal, not actual. It is read from registry.
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU);
+
+#ifdef EMSCRIPTEN
+
+class BrowserVersion
+{
+public:
+	int v[5];
+
+	BrowserVersion()
+	{
+		v[0] = v[1] = v[2] = v[3] = v[4] = 0;
+	}
+
+	BrowserVersion(int v1, int v2, int v3, int v4)
+	{
+		v[0] = v1;
+		v[1] = v2;
+		v[2] = v3;
+		v[3] = v4;
+		v[4] = 0;
+	}
+
+	explicit BrowserVersion(const char *str)
+	{
+		int n = sscanf(str, "%d.%d.%d.%d.%d", &v[0], &v[1], &v[2], &v[3], &v[4]);
+		if (n < 5) v[4] = 0;
+		if (n < 4) v[3] = 0;
+		if (n < 3) v[2] = 0;
+		if (n < 2) v[1] = 0;
+		if (n < 1) v[0] = 0;
+	}
+
+#define LEXCOMPARE(a,b) if (a < b) return true; else if (a > b) return false;
+	bool operator <(const BrowserVersion &rhs) const
+	{
+		LEXCOMPARE(v[0], rhs.v[0]);
+		LEXCOMPARE(v[1], rhs.v[1]);
+		LEXCOMPARE(v[2], rhs.v[2]);
+		LEXCOMPARE(v[3], rhs.v[3]);
+		LEXCOMPARE(v[4], rhs.v[4]);
+		return false;
+	}
+	bool operator >(const BrowserVersion &rhs) const
+	{
+		return rhs < *this;
+	}
+	bool operator ==(const BrowserVersion &rhs) const
+	{
+		return !(rhs < *this || rhs > *this);
+	}
+	bool operator <=(const BrowserVersion &rhs) const
+	{
+		return *this < rhs || *this == rhs;
+	}
+	bool operator >=(const BrowserVersion &rhs) const
+	{
+		return rhs <= *this;
+	}
+};
+
+BrowserVersion GetChromeVersion();
+
+bool IsChromeBrowser();
+bool IsChromeBrowserOnWin32();
+
+#endif
