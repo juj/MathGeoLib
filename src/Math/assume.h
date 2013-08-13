@@ -17,6 +17,7 @@
 	@brief Global compilation defines. */
 #pragma once
 
+#include <sstream>
 #include "../MathBuildConfig.h"
 #include "MathNamespace.h"
 #include <stdio.h>
