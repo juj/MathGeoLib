@@ -187,7 +187,7 @@ public:
 };
 
 #define SKIP_TEST(reason) throw TestSkippedException(reason)
-#define WARN_AND_EXPECT_FAIL_WARN(reason) { globalTestExpectedToFail = 2; globalTestFailureDescription = reason; }
+#define WARN_AND_EXPECT_FAIL(reason) { globalTestExpectedToFail = 2; globalTestFailureDescription = reason; }
 #define EXPECT_FAIL(reason) { globalTestExpectedToFail = 1; globalTestFailureDescription = reason; }
 
 #if defined(_DEBUG) || defined(DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
