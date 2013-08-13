@@ -41,8 +41,9 @@ UNIQUE_TEST(SubMillisecondPrecision)
 			WARN_AND_EXPECT_FAIL("Chrome on Win32 has bad timer resolution: https://code.google.com/p/chromium/issues/detail?id=158234");
 	}
 	if (IsOperaBrowser() && GetOperaVersion() <= BrowserVersion("12.16"))
-			WARN_AND_EXPECT_FAIL("Opera has bad timer resolution and doesn't support window.performance.now().");
-
+		WARN_AND_EXPECT_FAIL("Opera has bad timer resolution and doesn't support window.performance.now().");
+	if (IsSafariBrowser() && GetSafariVersion() <= BrowserVersion("6.0.5"))
+		WARN_AND_EXPECT_FAIL("Safari has bad timer resolution and doesn't support window.performance.now().");
 #endif
 
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();

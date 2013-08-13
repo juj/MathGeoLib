@@ -80,8 +80,13 @@ public:
 };
 
 BrowserVersion GetChromeVersion();
+BrowserVersion GetOperaVersion();
+BrowserVersion GetSafariVersion();
 
 bool IsChromeBrowser();
 bool IsChromeBrowserOnWin32();
+
+bool IsOperaBrowser();
+bool IsSafariBrowser();
 
 #endif

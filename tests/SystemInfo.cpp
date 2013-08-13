@@ -482,11 +482,16 @@ bool IsChromeBrowserOnWin32()
 	return GetChromeVersion().v[0] > 0 && os.find("Win32") != std::string::npos;
 }
 
-bool IsOperaBrowserOnWin32()
+bool IsOperaBrowser()
 {
 	std::string os = GetOSDisplayString();
+	return GetOperaVersion().v[0] > 0;
+}
 
-	return GetChromeVersion().v[0] > 0 && os.find("Win32") != std::string::npos;
+bool IsSafariBrowser()
+{
+	std::string os = GetOSDisplayString();
+	return GetSafariVersion().v[0] > 0;
 }
 
 BrowserVersion GetChromeVersion()
@@ -502,6 +507,19 @@ BrowserVersion GetOperaVersion()
 {
 	std::string os = GetOSDisplayString();
 	size_t idx = os.find("Opera");
+	if (idx == std::string::npos)
+		return BrowserVersion();
+
+	idx = os.find("Version/");
+	if (idx == std::string::npos)
+		return BrowserVersion();
+	return BrowserVersion(os.substr(idx+strlen("Version/")).c_str());
+}
+
+BrowserVersion GetSafariVersion()
+{
+	std::string os = GetOSDisplayString();
+	size_t idx = os.find("Safari");
 	if (idx == std::string::npos)
 		return BrowserVersion();
 
