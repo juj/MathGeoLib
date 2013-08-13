@@ -79,6 +79,14 @@ static inline std::string ObjToString<float>(const float &obj)
 	return ss.str();
 }
 
+template<>
+static inline std::string ObjToString<u32>(const u32 &obj)
+{
+	std::stringstream ss;
+	ss << obj;
+	return ss.str();
+}
+
 MATH_END_NAMESPACE
 
 // If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
@@ -89,32 +97,15 @@ MATH_END_NAMESPACE
 
 #ifdef MATH_ASSERT_ON_ASSUME
 #define assume(x) assert(x)
+#define assume_failed(message) assert(false && #message)
 #elif defined(MATH_SILENT_ASSUME)
 #define assume(x) ((void)0)
+#define assume_failed(message) ((void)0)
 #elif defined(FAIL_USING_EXCEPTIONS)
-
 #include <stdexcept>
-
 #define assume_failed(message) throw std::runtime_error((message))
-
-/*
-#define assume(x) \
-	MULTI_LINE_MACRO_BEGIN \
-		if (!(x)) \
-			throw std::runtime_error(#x); \
-	MULTI_LINE_MACRO_END
-*/
-
 #else
-
 #define assume_failed(message) LOGE("Assumption \"%s\" failed! in file %s, line %d!", message, __FILE__, __LINE__)
-
-//#define assume(x) \
-//	MULTI_LINE_MACRO_BEGIN \
-//		if (!(x)) \
-//			LOGE("Assumption \"%s\" failed! in file %s, line %d!", #x, __FILE__, __LINE__); \
-//	MULTI_LINE_MACRO_END
-
 #endif
 
 #define assume(x) \
