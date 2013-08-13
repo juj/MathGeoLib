@@ -84,6 +84,13 @@ if (LINUX)
 	add_definitions(-DLINUX)
 endif()
 
+if (MINGW)
+	# Require Windows XP.
+	# See http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
+	add_definitions(-DWINVER=0x0501)
+	add_definitions(-D_WIN32_WINNT=0x0501)
+endif()
+
 if(MSVC)
   # Force to always compile with W4
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
