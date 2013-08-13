@@ -467,7 +467,7 @@ unsigned long long GetTotalSystemPhysicalMemory() { return (unsigned long long)e
 std::string GetProcessorBrandName() { return "n/a"; } 
 std::string GetProcessorCPUIDString() { return "n/a"; }
 std::string GetProcessorExtendedCPUIDInfo() { return "n/a"; }
-unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU) { return 1; }
+unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/) { return 1; }
 int GetMaxSimultaneousThreads() { return 1; }
 
 #elif defined(__APPLE__)
