@@ -148,7 +148,7 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 				if (globalTestExpectedToFail)
 				{
 					if (globalTestExpectedToFail == 2)
-						LOGW("This test failed as expected. Caught an exception '%s', failure is due to reason '%s'.", e.what(), globalTestFailureDescription.c_str());
+						LOGE("This test failed as expected. Caught an exception '%s', failure is due to reason '%s'.", e.what(), globalTestFailureDescription.c_str());
 					else
 						LOGI("This test failed as expected. Caught an exception '%s', failure is due to reason '%s'.", e.what(), globalTestFailureDescription.c_str());
 				}
