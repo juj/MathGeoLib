@@ -111,9 +111,9 @@ UNIQUE_TEST(Frustum_Contains)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		for(int i = 0; i < 8; ++i)
-			assert(f.Contains(f.CornerPoint(i)));
+			assert4(f.Contains(f.CornerPoint(i)), i, f.CornerPoint(i), f, f.Distance(f.CornerPoint(i)));
 
-		assert(f.Contains(f.CenterPoint()));
+		assert3(f.Contains(f.CenterPoint()), f, f.CenterPoint(), f.Distance(f.CenterPoint()));
 	}
 }
 
