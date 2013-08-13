@@ -482,6 +482,13 @@ bool IsChromeBrowserOnWin32()
 	return GetChromeVersion().v[0] > 0 && os.find("Win32") != std::string::npos;
 }
 
+bool IsOperaBrowserOnWin32()
+{
+	std::string os = GetOSDisplayString();
+
+	return GetChromeVersion().v[0] > 0 && os.find("Win32") != std::string::npos;
+}
+
 BrowserVersion GetChromeVersion()
 {
 	std::string os = GetOSDisplayString();
@@ -489,6 +496,19 @@ BrowserVersion GetChromeVersion()
 	if (idx == std::string::npos)
 		return BrowserVersion();
 	return BrowserVersion(os.substr(idx+strlen("Chrome/")).c_str());
+}
+
+BrowserVersion GetOperaVersion()
+{
+	std::string os = GetOSDisplayString();
+	size_t idx = os.find("Opera");
+	if (idx == std::string::npos)
+		return BrowserVersion();
+
+	idx = os.find("Version/");
+	if (idx == std::string::npos)
+		return BrowserVersion();
+	return BrowserVersion(os.substr(idx+strlen("Version/")).c_str());
 }
 
 #elif defined(__APPLE__)
