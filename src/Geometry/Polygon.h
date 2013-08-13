@@ -368,6 +368,8 @@ public:
 		@see ToPolyhedron(), Triangulate(). */
 	AABB MinimalEnclosingAABB() const;
 
+	std::string ToString() const;
+
 	// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.
 //	bool IsConcaveVertex(int i) const;
 

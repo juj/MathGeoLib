@@ -856,6 +856,23 @@ AABB Polygon::MinimalEnclosingAABB() const
 	return aabb;
 }
 
+std::string Polygon::ToString() const
+{
+	if (p.empty())
+		return "Polygon(0 vertices)";
+
+	std::stringstream ss;
+	ss << "Polygon(" << p.size() << " vertices:";
+	for(size_t i = 0; i < p.size(); ++i)
+	{
+		if (i != 0)
+			ss << ",";
+		ss << p[i];
+	}
+	ss << ")";
+	return ss.str();
+}
+
 /*
 /// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.
 bool IsConcaveVertex(int i) const;
