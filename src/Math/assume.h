@@ -66,13 +66,13 @@ bool MathBreakOnAssume();
 bool AssumeFailed();
 
 template<typename T>
-std::string ObjToString(const T &obj)
+inline std::string ObjToString(const T &obj)
 {
 	return obj.ToString();
 }
 
 template<>
-static inline std::string ObjToString<float>(const float &obj)
+inline std::string ObjToString<float>(const float &obj)
 {
 	std::stringstream ss;
 	ss << obj;
@@ -80,7 +80,7 @@ static inline std::string ObjToString<float>(const float &obj)
 }
 
 template<>
-static inline std::string ObjToString<u32>(const u32 &obj)
+inline std::string ObjToString<u32>(const u32 &obj)
 {
 	std::stringstream ss;
 	ss << obj;
