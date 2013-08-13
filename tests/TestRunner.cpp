@@ -23,6 +23,13 @@ static int numTestsWarnings = 0;
 
 volatile int globalPokedData = 0;
 
+// If true, the currently running test should fail, and succeeding is an error.
+// 0 - not expected to fail
+// 1 - expected to fail, issue LOGI diagnostics.
+// 2 - expected to fail, issue LOGW diagnostics.
+int globalTestExpectedToFail = 0;
+std::string globalTestFailureDescription = ""; // A custom optional message describing why this test is expected to fail.
+
 void AddTest(std::string name, TestFunctionPtr function, std::string file, std::string description, bool runOnlyOnce)
 {
 	Test t;
@@ -110,6 +117,9 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 	t.numPasses = 0;
 	std::string failReason; // Stores the failure reason of the first failure.
 	std::vector<std::string> failReasons;
+	globalTestExpectedToFail = 0;
+	globalTestFailureDescription = std::string();
+
 	for(int j = 0; j < numTimesToRun; ++j)
 	{
 		tick_t start = Clock::Tick();
@@ -121,6 +131,8 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 			{
 #endif
 				t.function(t);
+				if (globalTestExpectedToFail)
+					throw std::runtime_error(std::string("This test should have failed due to reason '") + globalTestFailureDescription + "', but it didn't fail!");
 #ifdef FAIL_USING_EXCEPTIONS
 			}
 			catch(const TestSkippedException &e)
@@ -131,35 +143,26 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 					LOGW("%s", failReason.c_str());
 				}
 			}
-			catch(const std::runtime_error &e)
-			{
-				if (!!strcmp(e.what(), "expect failure"))
-				{
-					if (failReason.empty())
-						failReason = e.what();
-					++t.numFails;
-				}
-				else
-				{
-					LOGI("Caught std::runtime_error thrown from another file as expected.");
-				}
-			}
 			catch(const std::exception &e)
 			{
-				if (!!strcmp(e.what(), "expect failure"))
+				if (globalTestExpectedToFail)
+				{
+					if (globalTestExpectedToFail == 2)
+						LOGW("This test failed as expected. Caught an exception '%s', failure is due to reason '%s'.", e.what(), globalTestFailureDescription.c_str());
+					else
+						LOGI("This test failed as expected. Caught an exception '%s', failure is due to reason '%s'.", e.what(), globalTestFailureDescription.c_str());
+				}
+				else
 				{
 					if (failReason.empty())
 						failReason = e.what();
 					++t.numFails;
-				}
-				else
-				{
-					LOGI("Caught std::runtime_error as std::exception thrown from another file as expected.");
 				}
 			}
 			catch(...)
 			{
-				LOGE("Error: Received an unknown exception type that is _not_ derived from std::exception!");
+				++t.numFails;
+				LOGE("Error: Received an unknown exception type that is _not_ derived from std::exception! This should not happen!");
 			}
 #endif
 		}
@@ -268,23 +271,7 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONRe
 		if (StringBeginsWithOneOf(tests[nextTestToRun].name.c_str(), prefixes) || StringContainsOneOf(tests[nextTestToRun].description.c_str(), prefixes)
 			|| StringContainsOneOf(tests[nextTestToRun].file.c_str(), prefixes))
 		{
-			int ret = -1;
-			try ///\todo REMOVE THIS.
-			{
-				ret = RunTest(tests[nextTestToRun], numTimes, numTrials, jsonReport);
-			}
-///\todo REMOVE THESE catch() blocks once exception handling works in JS environment.
-			catch(const TestSkippedException &e)
-			{
-				ret = 0; // The test was supposed to be skipped anyways, so return with success.
-				LOGW("SKIPPED");
-				LOGE("A TestSkippedException exception leaked out from RunTest! ");
-			} catch(...)
-			{
-				LOGE("An exception leaked out from RunTest! ");
-				ret = 1; // As a workaround to the exception bug in Emscripten, return with only warning to avoid noise against real errors.
-			}
-///\todo REMOVE ABOVE.
+			int ret = RunTest(tests[nextTestToRun], numTimes, numTrials, jsonReport);
 
 			if (ret == 0 || ret == 1)
 				++numTestsPassed;

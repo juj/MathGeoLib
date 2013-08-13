@@ -26,7 +26,9 @@ bool TrueCondition() // This is a function that always returns true, but it is i
 
 UNIQUE_TEST(ExceptionGoesThrough)
 {
-	LOGI("Testing exception throwing.");
+	EXPECT_FAIL("Testing exception throwing");
+
+	LOGI("Testing exception throwing");
 	if (TrueCondition())
 		throw std::runtime_error("expect failure");
 }
