@@ -202,16 +202,16 @@ Triangle RandomTriangleInHalfspace(const Plane &plane)
 	float3 c = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
 	Triangle t(a,b,c);
 
-	assert(t.IsFinite());
-	assert(!t.IsDegenerate());
+	assert1(t.IsFinite(), t);
+	assert1(!t.IsDegenerate(), t);
 
 	float3 extremePoint = t.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
 	t.Translate((distance + GUARDBAND) * plane.normal);
 
-	assert(t.IsFinite());
-	assert(!t.IsDegenerate());
-	assert(!t.Intersects(plane));
+	assert1(t.IsFinite(), t);
+	assert1(!t.IsDegenerate(), t);
+	assert2(!t.Intersects(plane), t, plane);
 //	assert(t.SignedDistance(plane) > 0.f);
 	extremePoint = t.ExtremePoint(-plane.normal);
 	assert(plane.SignedDistance(extremePoint) > 0.f);
@@ -260,11 +260,11 @@ Polygon RandomPolygonInHalfspace(const Plane &plane)
 	Polyhedron p = RandomPolyhedronInHalfspace(plane);
 	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
 
-	assert(!poly.IsDegenerate());
-	assert(!poly.IsNull());
-	assert(poly.IsPlanar());
-	assert(poly.IsFinite());
-	assert(!poly.Intersects(plane));
+	assert1(!poly.IsDegenerate(), poly);
+	assert1(!poly.IsNull(), poly);
+	assert1(poly.IsPlanar(), poly);
+	assert1(poly.IsFinite(), poly);
+	assert2(!poly.Intersects(plane), poly, plane);
 	float3 extremePoint = poly.ExtremePoint(-plane.normal);
 	assert(plane.SignedDistance(extremePoint) > 0.f);
 	assert(plane.SignedDistance(poly) > 0.f);

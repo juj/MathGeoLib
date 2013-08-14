@@ -22,7 +22,7 @@ RANDOMIZED_TEST(LCG_Int)
 	{
 		int prev = lcg.Int();
 		int next = lcg.Int();
-		assert(prev != 0 || next != 0);
+		assert4(prev != 0 || next != 0, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		if (prev != next)
 			allEqual = false;
 	}

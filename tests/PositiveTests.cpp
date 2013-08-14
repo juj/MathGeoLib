@@ -151,9 +151,9 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 	t.b -= d;
 	t.c -= d;
 
-	assert(t.IsFinite());
-	assert(!t.IsDegenerate());
-	assert(t.Contains(pt));
+	assert1(t.IsFinite(), t);
+	assert1(!t.IsDegenerate(), t);
+	assert3(t.Contains(pt), t, pt, t.Distance(pt));
 	return t;
 }
 
@@ -171,9 +171,9 @@ Polyhedron RandomPolyhedronContainingPoint(const float3 &pt)
 	default: return Polyhedron::Dodecahedron(pt, SCALE); break;
 	}
 
-//	assert(t.IsFinite());
-//	assert(!t.IsDegenerate());
-//	assert(t.Contains(pt));
+//	assert1(t.IsFinite(), t);
+//	assert1(!t.IsDegenerate(), t);
+//	assert3(t.Contains(pt), t, pt, t.Distance(pt));
 }
 
 Polygon RandomPolygonContainingPoint(const float3 &pt)
@@ -185,11 +185,11 @@ Polygon RandomPolygonContainingPoint(const float3 &pt)
 	assert3(poly.Contains(pt2), poly, pt2, poly.Distance(pt2));
 	poly.Translate(pt - pt2);
 
-	assert(!poly.IsDegenerate());
-	assert(!poly.IsNull());
-	assert(poly.IsPlanar());
-	assert(poly.IsFinite());
-	assert(poly.Contains(pt));
+	assert1(!poly.IsDegenerate(), poly);
+	assert1(!poly.IsNull(), poly);
+	assert1(poly.IsPlanar(), poly);
+	assert1(poly.IsFinite(), poly);
+	assert3(poly.Contains(pt), poly, pt, poly.Distance(pt));
 
 	return poly;
 }

@@ -14,14 +14,14 @@ UNIQUE_TEST(Polygon_collinear_points_Plane)
 	poly.p.push_back(float3(4820, 8600, 12835));
 	poly.p.push_back(float3(4980, 8600, 12835));
 
-	assert(!poly.IsDegenerate());
-	assert(!poly.IsNull());
-	assert(poly.IsPlanar());
-	assert(poly.IsFinite());
+	assert1(!poly.IsDegenerate(), poly);
+	assert1(!poly.IsNull(), poly);
+	assert1(poly.IsPlanar(), poly);
+	assert1(poly.IsFinite(), poly);
 
 	math::Plane plane = poly.PlaneCCW();
 
-	assert(!plane.IsDegenerate());
+	assert1(!plane.IsDegenerate(), plane);
 
 	for(size_t i = 0; i < poly.p.size(); ++i)
 		assert(plane.Contains(poly.p[i]));
