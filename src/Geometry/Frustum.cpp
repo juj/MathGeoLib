@@ -233,8 +233,8 @@ float4x4 Frustum::ProjectionMatrix() const
 	}
 #ifndef OPTIMIZED_RELEASE
 	LOGE("Not all values of Frustum were initialized properly! Please initialize correctly before calling Frustum::ProjectionMatrix()!");
-	return float4x4::nan;
 #endif
+	return float4x4::nan;
 }
 
 float3 Frustum::NearPlanePos(float x, float y) const
@@ -367,14 +367,14 @@ bool Frustum::Contains(const float3 &point) const
 			projected.y >= -1.f && projected.y <= 1.f &&
 			projected.z >= -1.f && projected.z <= 1.f;
 	}
-#ifndef OPTIMIZED_RELEASE
 	else
 	{
+#ifndef OPTIMIZED_RELEASE
 		///\todo Make Frustum::Contains agnostic of the projection settings.
 		LOGE("Not all values of Frustum were initialized properly! Please initialize correctly before calling Frustum::Contains()!");
+#endif
 		return false;
 	}
-#endif
 }
 
 bool Frustum::Contains(const LineSegment &lineSegment) const
