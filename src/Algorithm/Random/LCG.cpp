@@ -64,9 +64,12 @@ void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 
 u32 LCG::IntFast()
 {
+	assert(increment == 0);
+	assert(multiplier % 2 == 1 && "Multiplier should be odd for LCG::IntFast(), since modulus==2^32 is even!");
 // The configurable modulus and increment are not used by this function.
 	u32 mul = lastNumber * multiplier;
-	lastNumber = mul - (mul <= lastNumber?1:0); // Whenever we overflow, flip by one to avoid even multiplier always producing even results, since modulus is even.
+	lastNumber = mul + (mul <= lastNumber?1:0); // Whenever we overflow, flip by one to avoid even multiplier always producing even results, since modulus is even.
+	assert(lastNumber != 0); // We don't use an adder in IntFast(), so must never degenerate to zero.
 	return lastNumber;
 }
 
@@ -91,6 +94,7 @@ u32 LCG::Int()
 //#endif
 	// Save the newly generated random number to use as seed for the next one.
 //	lastNumber = m;//(u32)newNum;
+	assert4((((u32)newNum) != 0 || increment != 0) && "LCG degenerated to producing a stream of zeroes!", lastNumber, multiplier, increment, modulus);
 	lastNumber = (u32)newNum;
 	return lastNumber;
 }

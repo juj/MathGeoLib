@@ -17,6 +17,7 @@ RANDOMIZED_TEST(LCG_IntFast)
 RANDOMIZED_TEST(LCG_Int)
 {
 	LCG lcg;
+	assert4((lcg.lastNumber != 0 || lcg.increment != 0) && "Default-seeded LCG should be functional!", lcg.lastNumber, lcg.increment, lcg.multiplier, lcg.modulus);
 	bool allEqual = true;
 	for(int i = 0; i < 1000; ++i)
 	{
