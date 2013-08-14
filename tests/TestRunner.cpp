@@ -132,7 +132,10 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 #endif
 				t.function(t);
 				if (globalTestExpectedToFail)
+				{
+					globalTestExpectedToFail = 0; // Signal that the following exception reports a failure of this test, and not an expected failure.
 					throw std::runtime_error(std::string("This test should have failed due to reason '") + globalTestFailureDescription + "', but it didn't fail!");
+				}
 #ifdef FAIL_USING_EXCEPTIONS
 			}
 			catch(const TestSkippedException &e)
