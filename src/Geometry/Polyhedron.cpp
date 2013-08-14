@@ -1441,6 +1441,23 @@ std::vector<Triangle> Polyhedron::Triangulate() const
 	return outTriangleList;
 }
 
+std::string Polyhedron::ToString() const
+{
+	if (v.empty())
+		return "Polyhedron(0 vertices)";
+
+	std::stringstream ss;
+	ss << "Polyhedron(" << v.size() << " vertices:";
+	for(size_t i = 0; i < v.size(); ++i)
+	{
+		if (i != 0)
+			ss << ",";
+		ss << v[i];
+	}
+	ss << ")";
+	return ss.str();
+}
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 {

@@ -360,6 +360,8 @@ public:
 
 	std::vector<Triangle> Triangulate() const;
 
+	std::string ToString() const;
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb) const;
