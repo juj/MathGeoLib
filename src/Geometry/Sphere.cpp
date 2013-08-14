@@ -447,8 +447,8 @@ bool Sphere::Intersects(const Capsule &capsule) const
 int Sphere::IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter,
                           float sphereRadius, float &t1, float &t2)
 {
-	assume(lineDir.IsNormalized());
-	assume(sphereRadius >= 0.f);
+	assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
+	assume1(sphereRadius >= 0.f, sphereRadius);
 
 	/* A line is represented explicitly by the set { linePos + t * lineDir }, where t is an arbitrary float.
 	  A sphere is represented implictly by the set of vectors that satisfy ||v - sphereCenter|| == sphereRadius.

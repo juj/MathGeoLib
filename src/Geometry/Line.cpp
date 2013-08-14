@@ -88,13 +88,13 @@ float3 Line::ClosestPointLineLine(float3 start0, float3 end0, float3 start1, flo
 Line::Line(const float3 &pos_, const float3 &dir_)
 :pos(pos_), dir(dir_)
 {
-	assume(dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Line::Line(const Ray &ray)
 :pos(ray.pos), dir(ray.dir)
 {
-	assume(dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Line::Line(const LineSegment &lineSegment)
@@ -109,7 +109,7 @@ bool Line::IsFinite() const
 
 float3 Line::GetPoint(float d) const
 {
-	assert(dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 	return pos + d * dir;
 }
 
@@ -159,8 +159,8 @@ bool Line::Contains(const LineSegment &lineSegment, float epsilon) const
 
 bool Line::Equals(const Line &line, float epsilon) const
 {
-	assume(dir.IsNormalized());
-	assume(line.dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	assume2(line.dir.IsNormalized(), line.dir, line.dir.LengthSq());
 	// If the point of the other line is on this line, and the two lines point to the same, or exactly reverse directions,
 	// they must be equal.
 	return Contains(line.pos, epsilon) && EqualAbs(Abs(dir.Dot(line.dir)), 1.f, epsilon);
