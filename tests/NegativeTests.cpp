@@ -279,7 +279,7 @@ RANDOMIZED_TEST(AABBAABBNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	AABB b = RandomAABBInHalfspace(p, 10.f);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -295,7 +295,7 @@ RANDOMIZED_TEST(AABBOBBNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -316,7 +316,7 @@ RANDOMIZED_TEST(AABBLineNoIntersect)
 		LOGI("AABB: %s", a.ToString().c_str());
 		LOGI("Line: %s", b.ToString().c_str());
 	}
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -332,7 +332,7 @@ RANDOMIZED_TEST(AABBRayNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -348,7 +348,7 @@ RANDOMIZED_TEST(AABBLineSegmentNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -364,7 +364,7 @@ RANDOMIZED_TEST(AABBPlaneNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -380,7 +380,7 @@ RANDOMIZED_TEST(AABBSphereNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, SCALE);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -396,7 +396,7 @@ RANDOMIZED_TEST(AABBCapsuleNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -412,7 +412,7 @@ RANDOMIZED_TEST(AABBTriangleNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -428,7 +428,7 @@ RANDOMIZED_TEST(AABBFrustumNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -444,7 +444,7 @@ RANDOMIZED_TEST(AABBPolyhedronNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -460,7 +460,7 @@ RANDOMIZED_TEST(AABBPolygonNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -479,7 +479,7 @@ RANDOMIZED_TEST(OBBOBBNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -495,7 +495,7 @@ RANDOMIZED_TEST(OBBLineNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -511,7 +511,7 @@ RANDOMIZED_TEST(OBBRayNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -527,7 +527,7 @@ RANDOMIZED_TEST(OBBLineSegmentNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -543,7 +543,7 @@ RANDOMIZED_TEST(OBBPlaneNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -559,7 +559,7 @@ RANDOMIZED_TEST(OBBSphereNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, SCALE);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -575,7 +575,7 @@ RANDOMIZED_TEST(OBBCapsuleNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -591,7 +591,7 @@ RANDOMIZED_TEST(OBBTriangleNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -607,7 +607,7 @@ RANDOMIZED_TEST(OBBFrustumNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -623,7 +623,7 @@ RANDOMIZED_TEST(OBBPolyhedronNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -639,7 +639,7 @@ RANDOMIZED_TEST(OBBPolygonNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 ///	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -659,7 +659,7 @@ RANDOMIZED_TEST(SphereSphereNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, 10.f);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -675,7 +675,7 @@ RANDOMIZED_TEST(SphereLineNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -691,7 +691,7 @@ RANDOMIZED_TEST(SphereRayNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -707,7 +707,7 @@ RANDOMIZED_TEST(SphereLineSegmentNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -723,7 +723,7 @@ RANDOMIZED_TEST(SpherePlaneNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -739,7 +739,7 @@ RANDOMIZED_TEST(SphereCapsuleNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -755,7 +755,7 @@ RANDOMIZED_TEST(SphereTriangleNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -771,7 +771,7 @@ RANDOMIZED_TEST(SphereFrustumNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -787,7 +787,7 @@ RANDOMIZED_TEST(SpherePolyhedronNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -803,7 +803,7 @@ RANDOMIZED_TEST(SpherePolygonNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -822,7 +822,7 @@ RANDOMIZED_TEST(FrustumLineNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -838,7 +838,7 @@ RANDOMIZED_TEST(FrustumRayNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -854,7 +854,7 @@ RANDOMIZED_TEST(FrustumLineSegmentNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -870,7 +870,7 @@ RANDOMIZED_TEST(FrustumPlaneNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -886,7 +886,7 @@ RANDOMIZED_TEST(FrustumCapsuleNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -902,7 +902,7 @@ RANDOMIZED_TEST(FrustumTriangleNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -918,7 +918,7 @@ RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -934,7 +934,7 @@ RANDOMIZED_TEST(FrustumPolyhedronNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -950,7 +950,7 @@ RANDOMIZED_TEST(FrustumPolygonNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -969,7 +969,7 @@ RANDOMIZED_TEST(CapsuleLineNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -985,7 +985,7 @@ RANDOMIZED_TEST(CapsuleRayNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -1001,7 +1001,7 @@ RANDOMIZED_TEST(CapsuleLineSegmentNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -1017,7 +1017,7 @@ RANDOMIZED_TEST(CapsulePlaneNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -1033,7 +1033,7 @@ RANDOMIZED_TEST(CapsuleCapsuleNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -1049,7 +1049,7 @@ RANDOMIZED_TEST(CapsuleTriangleNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1065,7 +1065,7 @@ RANDOMIZED_TEST(CapsulePolyhedronNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 ///	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1081,7 +1081,7 @@ RANDOMIZED_TEST(CapsulePolygonNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1101,7 +1101,7 @@ RANDOMIZED_TEST(PolyhedronLineNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1117,7 +1117,7 @@ RANDOMIZED_TEST(PolyhedronRayNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1133,7 +1133,7 @@ RANDOMIZED_TEST(PolyhedronLineSegmentNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1152,7 +1152,7 @@ RANDOMIZED_TEST(PolyhedronPlaneNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1168,7 +1168,7 @@ RANDOMIZED_TEST(PolyhedronTriangleNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1184,7 +1184,7 @@ RANDOMIZED_TEST(PolyhedronPolyhedronNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1216,7 +1216,7 @@ RANDOMIZED_TEST(PolyhedronPolygonNoIntersect)
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1234,7 +1234,7 @@ RANDOMIZED_TEST(PolygonLineNoIntersect)
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1250,7 +1250,7 @@ RANDOMIZED_TEST(PolygonRayNoIntersect)
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1266,7 +1266,7 @@ RANDOMIZED_TEST(PolygonLineSegmentNoIntersect)
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1285,7 +1285,7 @@ RANDOMIZED_TEST(PolygonPlaneNoIntersect)
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1301,7 +1301,7 @@ RANDOMIZED_TEST(PolygonTriangleNoIntersect)
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1317,7 +1317,7 @@ RANDOMIZED_TEST(PolygonPolygonNoIntersect)
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1335,7 +1335,7 @@ RANDOMIZED_TEST(TriangleLineNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 //	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1351,7 +1351,7 @@ RANDOMIZED_TEST(TriangleRayNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1367,7 +1367,7 @@ RANDOMIZED_TEST(TriangleLineSegmentNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 //	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1383,7 +1383,7 @@ RANDOMIZED_TEST(TrianglePlaneNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1399,7 +1399,7 @@ RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1418,7 +1418,7 @@ RANDOMIZED_TEST(PlaneLineNoIntersect)
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 ///	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1434,7 +1434,7 @@ RANDOMIZED_TEST(PlaneRayNoIntersect)
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1450,7 +1450,7 @@ RANDOMIZED_TEST(PlaneLineSegmentNoIntersect)
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
@@ -1466,7 +1466,7 @@ RANDOMIZED_TEST(PlanePlaneNoIntersect)
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
-	assert(!a.Intersects(b));
+	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);

@@ -22,8 +22,8 @@ RANDOMIZED_TEST(LineLineClosestPoint)
 	float3 closestPointB = b.GetPoint(d2);
 	float D, D2;
 	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
-	assert(EqualAbs(d, D2, 1e-2f));
-	assert(EqualAbs(D, d2, 1e-2f));
+	assert2(EqualAbs(d, D2, 1e-2f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
@@ -46,8 +46,8 @@ RANDOMIZED_TEST(LineRayClosestPoint)
 	float3 closestPointB = b.GetPoint(d2);
 	float D, D2;
 	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
-	assert(EqualAbs(d, D2));
-	assert(EqualAbs(D, d2));
+	assert2(EqualAbs(d, D2), d, D2);
+	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
@@ -73,8 +73,8 @@ RANDOMIZED_TEST(LineLineSegmentClosestPoint)
 	float3 closestPointB = b.GetPoint(d2);
 	float D, D2;
 	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
-	assert(EqualAbs(d, D2));
-	assert(EqualAbs(D, d2));
+	assert2(EqualAbs(d, D2), d, D2);
+	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
@@ -102,8 +102,8 @@ RANDOMIZED_TEST(RayRayClosestPoint)
 	float3 closestPointB = b.GetPoint(d2);
 	float D, D2;
 	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
-	assert(EqualAbs(d, D2));
-	assert(EqualAbs(D, d2));
+	assert2(EqualAbs(d, D2), d, D2);
+	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
@@ -132,8 +132,8 @@ RANDOMIZED_TEST(RayLineSegmentClosestPoint)
 	float3 closestPointB = b.GetPoint(d2);
 	float D, D2;
 	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
-	assert(EqualAbs(d, D2));
-	assert(EqualAbs(D, d2));
+	assert2(EqualAbs(d, D2), d, D2);
+	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
@@ -164,8 +164,8 @@ RANDOMIZED_TEST(LineSegmentLineSegmentClosestPoint)
 	float3 closestPointB = b.GetPoint(d2);
 	float D, D2;
 	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
-	assert(EqualAbs(d, D2));
-	assert(EqualAbs(D, d2));
+	assert2(EqualAbs(d, D2), d, D2);
+	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
 	float3 closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));

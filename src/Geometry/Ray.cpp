@@ -43,13 +43,13 @@ MATH_BEGIN_NAMESPACE
 Ray::Ray(const float3 &pos_, const float3 &dir_)
 :pos(pos_), dir(dir_)
 {
-	assume(dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Ray::Ray(const Line &line)
 :pos(line.pos), dir(line.dir)
 {
-	assume(dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Ray::Ray(const LineSegment &lineSegment)
@@ -64,7 +64,7 @@ bool Ray::IsFinite() const
 
 float3 Ray::GetPoint(float d) const
 {
-	assert(dir.IsNormalized());
+	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 	return pos + d * dir;
 }
 

@@ -154,7 +154,7 @@ RANDOMIZED_TEST(AABB_Enclose_Polygon)
 	Polygon p = RandomPolygonNearOrigin(DISTSCALE);
 	aabb.Enclose(p);
 
-	assert(aabb.Contains(p));
+	assert2(aabb.Contains(p), aabb, p);
 }
 
 RANDOMIZED_TEST(AABB_Enclose_Polyhedron)
@@ -163,7 +163,7 @@ RANDOMIZED_TEST(AABB_Enclose_Polyhedron)
 	Polyhedron p = RandomPolyhedronNearOrigin(DISTSCALE);
 	aabb.Enclose(p);
 
-	assert(aabb.Contains(p));
+	assert2(aabb.Contains(p), aabb, p);
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_point)
@@ -244,7 +244,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Polygon)
 	Polygon p = RandomPolygonNearOrigin(DISTSCALE);
 	s.Enclose(p);
 
-	assert(s.Contains(p));
+	assert2(s.Contains(p), s, p);
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Polyhedron)
@@ -253,5 +253,5 @@ RANDOMIZED_TEST(Sphere_Enclose_Polyhedron)
 	Polyhedron p = RandomPolyhedronNearOrigin(DISTSCALE);
 	s.Enclose(p);
 
-	assert(s.Contains(p));
+	assert2(s.Contains(p), s, p);
 }
