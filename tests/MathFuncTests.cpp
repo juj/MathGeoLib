@@ -24,6 +24,58 @@ bool TrueCondition() // This is a function that always returns true, but it is i
 
 #ifdef FAIL_USING_EXCEPTIONS
 
+UNIQUE_TEST(assumeWorks)
+{
+	EXPECT_FAIL("Testing exception throwing");
+
+	if (TrueCondition())
+		assume(false && "Testing that assume() macro fails as expected!");
+}
+
+UNIQUE_TEST(assertWorks)
+{
+	EXPECT_FAIL("Testing exception throwing");
+
+	if (TrueCondition())
+		assert(false && "Testing that assert() macro fails as expected!");
+}
+
+UNIQUE_TEST(assume1Works)
+{
+	EXPECT_FAIL("Testing exception throwing");
+
+	int val = 5;
+	if (TrueCondition())
+		assume1(false && "Testing that assume() macro fails as expected!", val);
+}
+
+UNIQUE_TEST(assert1Works)
+{
+	EXPECT_FAIL("Testing exception throwing");
+
+	int val = 5;
+	if (TrueCondition())
+		assert1(false && "Testing that assert() macro fails as expected!", val);
+}
+
+UNIQUE_TEST(assume4Works)
+{
+	EXPECT_FAIL("Testing exception throwing");
+
+	int val = 5;
+	if (TrueCondition())
+		assume4(false && "Testing that assume() macro fails as expected!", val, val, val, val);
+}
+
+UNIQUE_TEST(assert4Works)
+{
+	EXPECT_FAIL("Testing exception throwing");
+
+	int val = 5;
+	if (TrueCondition())
+		assert4(false && "Testing that assert() macro fails as expected!", val, val, val, val);
+}
+
 UNIQUE_TEST(ExceptionGoesThrough)
 {
 	EXPECT_FAIL("Testing exception throwing");

@@ -71,6 +71,18 @@ inline std::string ObjToString(const T &obj)
 {
 	return obj.ToString();
 }
+/*
+template<>
+inline std::string ObjToString<const char*>(const char * const & obj)
+{
+	return obj;
+}
+*/
+template<>
+inline std::string ObjToString<std::string>(const std::string &obj)
+{
+	return obj;
+}
 
 template<>
 inline std::string ObjToString<float>(const float &obj)
