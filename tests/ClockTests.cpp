@@ -36,8 +36,8 @@ UNIQUE_TEST(SubMillisecondPrecision)
 #ifdef EMSCRIPTEN
 	if (IsChromeBrowserOnWin32())
 	{
-		if (GetChromeVersion() <= BrowserVersion("30.0.9999.9999"))
-			WARN_AND_EXPECT_FAIL("Chrome on Win32 has bad timer resolution: https://code.google.com/p/chromium/issues/detail?id=158234");
+		// Newest version failure was observed in is 31.0.1600.1.
+		WARN_AND_EXPECT_FAIL("Chrome on Win32 has bad timer resolution: https://code.google.com/p/chromium/issues/detail?id=158234");
 	}
 	if (IsOperaBrowser() && GetOperaVersion() <= BrowserVersion("12.16"))
 		WARN_AND_EXPECT_FAIL("Opera has bad timer resolution and doesn't support window.performance.now().");
