@@ -56,9 +56,9 @@ UNIQUE_TEST(GetMaxSimultaneousThreads)
 
 UNIQUE_TEST(DetectBrowser)
 {
-	LOGI("Chrome version: %s", GetChromeVersion().c_str();
-	LOGI("Opera version: %s", GetOperaVersion().c_str();
-	LOGI("Safari version: %s", GetSafariVersion().c_str();
+	LOGI("Chrome version: %s", GetChromeVersion().ToString().c_str());
+	LOGI("Opera version: %s", GetOperaVersion().ToString().c_str());
+	LOGI("Safari version: %s", GetSafariVersion().ToString().c_str());
 	LOGI("IsChromeBrowser: %s", IsChromeBrowser()?"true":"false");
 	LOGI("IsChromeBrowserOnWin32: %s", IsChromeBrowserOnWin32()?"true":"false");
 	LOGI("IsOperaBrowser: %s", IsOperaBrowser()?"true":"false");
