@@ -24,6 +24,8 @@ bool TrueCondition() // This is a function that always returns true, but it is i
 
 #ifdef FAIL_USING_EXCEPTIONS
 
+#ifndef OPTIMIZED_RELEASE // In OPTIMIZED_RELEASE builds, assume() macro does not exist.
+
 UNIQUE_TEST(assumeWorks)
 {
 	EXPECT_FAIL("Testing exception throwing");
@@ -31,6 +33,8 @@ UNIQUE_TEST(assumeWorks)
 	if (TrueCondition())
 		assume(false && "Testing that assume() macro fails as expected!");
 }
+
+#endif
 
 UNIQUE_TEST(assertWorks)
 {
