@@ -1,4 +1,5 @@
 #include <string>
+#include <sstream>
 
 std::string GetOSDisplayString();
 
