@@ -36,7 +36,7 @@ UNIQUE_TEST(SubMillisecondPrecision)
 #ifdef EMSCRIPTEN
 	if (IsChromeBrowserOnWin32())
 	{
-		if (GetChromeVersion() <= BrowserVersion("28.0.1500.95") || GetChromeVersion() == BrowserVersion("30.0.1599.0"))
+		if (GetChromeVersion() <= BrowserVersion("30.0.9999.9999"))
 			WARN_AND_EXPECT_FAIL("Chrome on Win32 has bad timer resolution: https://code.google.com/p/chromium/issues/detail?id=158234");
 	}
 	if (IsOperaBrowser() && GetOperaVersion() <= BrowserVersion("12.16"))

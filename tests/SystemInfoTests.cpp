@@ -51,3 +51,18 @@ UNIQUE_TEST(GetMaxSimultaneousThreads)
 	LOGI("Maximum number of simultaneous threads (number of logical cores): %d", GetMaxSimultaneousThreads());
 	assert(GetMaxSimultaneousThreads() > 0);
 }
+
+#ifdef EMSCRIPTEN
+
+UNIQUE_TEST(DetectBrowser)
+{
+	LOGI("Chrome version: %s", GetChromeVersion().c_str();
+	LOGI("Opera version: %s", GetOperaVersion().c_str();
+	LOGI("Safari version: %s", GetSafariVersion().c_str();
+	LOGI("IsChromeBrowser: %s", IsChromeBrowser()?"true":"false");
+	LOGI("IsChromeBrowserOnWin32: %s", IsChromeBrowserOnWin32()?"true":"false");
+	LOGI("IsOperaBrowser: %s", IsOperaBrowser()?"true":"false");
+	LOGI("IsSafariBrowser: %s", IsSafariBrowser()?"true":"false");
+}
+
+#endif

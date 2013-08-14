@@ -77,6 +77,12 @@ public:
 	{
 		return rhs <= *this;
 	}
+	std::string ToString() const
+	{
+		std::stringstream ss;
+		ss << v[0] << "." << v[1] << "." << v[2] << "." << v[3] << "." << v[4];
+		return ss.str();
+	}
 };
 
 BrowserVersion GetChromeVersion();
