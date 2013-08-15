@@ -720,7 +720,11 @@ int GetMaxSimultaneousThreads()
 
 #else
 
+#ifdef _MSC_VER
+#pragma WARNING("SystemInfo.cpp not implemented for the current platform!")
+#else
 #warning SystemInfo.cpp not implemented for the current platform!
+#endif
 
 std::string GetOSDisplayString() { return ""; }
 unsigned long long GetTotalSystemPhysicalMemory() { return 0; }
