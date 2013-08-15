@@ -622,17 +622,25 @@ float OBB::SurfaceArea() const
 
 float3 OBB::RandomPointInside(LCG &rng) const
 {
-	return PointInside(rng.Float(), rng.Float(), rng.Float());
+	float f1 = rng.Float();
+	float f2 = rng.Float();
+	float f3 = rng.Float();
+	return PointInside(f1, f2, f3);
 }
 
 float3 OBB::RandomPointOnSurface(LCG &rng) const
 {
-	return FacePoint(rng.Int(0, 5), rng.Float(), rng.Float());
+	int i = rng.Int(0, 5);
+	float f1 = rng.Float();
+	float f2 = rng.Float();
+	return FacePoint(i, f1, f2);
 }
 
 float3 OBB::RandomPointOnEdge(LCG &rng) const
 {
-	return PointOnEdge(rng.Int(0, 11), rng.Float());
+	int i = rng.Int(0, 11);
+	float f = rng.Float();
+	return PointOnEdge(i, f);
 }
 
 float3 OBB::RandomCornerPoint(LCG &rng) const

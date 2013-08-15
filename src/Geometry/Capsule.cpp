@@ -217,7 +217,9 @@ float3 Capsule::RandomPointInside(LCG &rng) const
 
 float3 Capsule::RandomPointOnSurface(LCG &rng) const
 {
-	return PointInside(rng.Float(), rng.Float(), 1.f);
+	float f1 = rng.Float();
+	float f2 = rng.Float();
+	return PointInside(f1, f2, 1.f);
 }
 
 void Capsule::Translate(const float3 &offset)

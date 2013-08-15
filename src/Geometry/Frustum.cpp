@@ -471,7 +471,10 @@ float Frustum::Volume() const
 
 float3 Frustum::FastRandomPointInside(LCG &rng) const
 {
-	return PointInside(rng.Float(-1.f, 1.f), rng.Float(-1.f, 1.f), rng.Float(0.f, 1.f));
+	float f1 = rng.Float(-1.f, 1.f);
+	float f2 = rng.Float(-1.f, 1.f);
+	float f3 = rng.Float(0.f, 1.f);
+	return PointInside(f1, f2, f3);
 }
 
 float3 Frustum::UniformRandomPointInside(LCG &rng) const

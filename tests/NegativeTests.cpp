@@ -154,7 +154,8 @@ Ray RandomRayInHalfspace(const Plane &plane)
 
 LineSegment RandomLineSegmentInHalfspace(const Plane &plane)
 {
-	LineSegment ls = RandomRayInHalfspace(plane).ToLineSegment(0.f, rng.Float(0.f, SCALE));
+	float f = rng.Float(0.f, SCALE);
+	LineSegment ls = RandomRayInHalfspace(plane).ToLineSegment(0.f, f);
 	assert(ls.IsFinite());
 	assert(plane.SignedDistance(ls) > 0.f);
 

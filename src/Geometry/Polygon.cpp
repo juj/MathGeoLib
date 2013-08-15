@@ -707,7 +707,8 @@ float3 Polygon::FastRandomPointInside(LCG &rng) const
 	std::vector<Triangle> tris = Triangulate();
 	if (tris.empty())
 		return float3::nan;
-	return tris[rng.Int(0, (int)tris.size()-1)].RandomPointInside(rng);
+	int i = rng.Int(0, (int)tris.size()-1);
+	return tris[i].RandomPointInside(rng);
 }
 
 Polyhedron Polygon::ToPolyhedron() const

@@ -139,8 +139,12 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 {
 	Plane p = RandomPlaneContainingPoint(pt);
 	float3 a = pt;
-	float3 b = p.Point(rng.Float(-SCALE, SCALE), rng.Float(-SCALE, SCALE));
-	float3 c = p.Point(rng.Float(-SCALE, SCALE), rng.Float(-SCALE, SCALE));
+	float f1 = rng.Float(-SCALE, SCALE);
+	float f2 = rng.Float(-SCALE, SCALE);
+	float f3 = rng.Float(-SCALE, SCALE);
+	float f4 = rng.Float(-SCALE, SCALE);
+	float3 b = p.Point(f1, f2);
+	float3 c = p.Point(f3, f4);
 	Triangle t(a,b,c);
 	assert(t.Contains(pt));
 
