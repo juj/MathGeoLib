@@ -907,7 +907,9 @@ bool float3x4::Inverse(float epsilon)
 	float4x4 temp(*this); ///@todo It is possible optimize to avoid copying here by writing the inverse function specifically for float3x4.
 	bool success = temp.Inverse(epsilon);
 	*this = temp.Float3x4Part();
-	mathassert(!success || (orig * *this).IsIdentity(1e-1f));
+#ifdef MATH_ASSERT_CORRECTNESS
+	assert3(!success || (orig * *this).IsIdentity(1e-1f), orig, *this, orig * *this);
+#endif
 	return success;
 }
 
