@@ -104,8 +104,10 @@ void Plane::Set(const float3 &point, const float3 &normal_)
 	assume(normal.IsNormalized());
 	d = Dot(point, normal);
 
-	mathassert(EqualAbs(SignedDistance(point), 0.f, 0.01f));
-	mathassert(EqualAbs(SignedDistance(point + normal_), 1.f, 0.01f));
+#ifdef MATH_ASSERT_CORRECTNESS
+	assert1(EqualAbs(SignedDistance(point), 0.f, 0.01f), SignedDistance(point));
+	assert1(EqualAbs(SignedDistance(point + normal_), 1.f, 0.01f), SignedDistance(point + normal_));
+#endif
 }
 
 void Plane::ReverseNormal()
