@@ -21,9 +21,7 @@
 #include "../MathBuildConfig.h"
 #include "MathNamespace.h"
 #include <stdio.h>
-#ifdef WIN32
 #include "myassert.h"
-#endif
 #include "MathLog.h"
 
 #ifndef MARK_UNUSED
@@ -133,7 +131,7 @@ MATH_END_NAMESPACE
 #define assume(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(#x); \
+			assume_failed(#x " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 #endif
 
@@ -141,28 +139,28 @@ MATH_END_NAMESPACE
 #define assume1(x, print1) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1)); \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 #define assert1 assume1
 
 #define assume2(x, print1, print2) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2)); \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 #define assert2 assume2
 
 #define assume3(x, print1, print2, print3) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + ", " + #print3 + ": " + MATH_NS::ObjToString(print3)); \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + ", " + #print3 + ": " + MATH_NS::ObjToString(print3) + " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 #define assert3 assume3
 
 #define assume4(x, print1, print2, print3, print4) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + ", " + #print3 + ": " + MATH_NS::ObjToString(print3) + ", " + #print4 + ": " + MATH_NS::ObjToString(print4)); \
+			assume_failed(std::string(#x) + ", " + #print1 + ": " + MATH_NS::ObjToString(print1) + ", " + #print2 + ": " + MATH_NS::ObjToString(print2) + ", " + #print3 + ": " + MATH_NS::ObjToString(print3) + ", " + #print4 + ": " + MATH_NS::ObjToString(print4) + " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 #define assert4 assume4
 

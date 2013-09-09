@@ -16,6 +16,7 @@
 	@author Jukka Jylänki
 	@brief Control over assert() macro for MathGeoLib. */
 #include "MathLog.h"
+#include "assume.h"
 
 #include <sstream>
 
@@ -36,7 +37,7 @@
 #define assert(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			throw std::runtime_error(#x); \
+			throw std::runtime_error(#x " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 
 #define asserteq(x,y) \
@@ -44,7 +45,7 @@
 		if ((x) != (y)) \
 		{ \
 			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
 			throw std::runtime_error(std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
@@ -54,7 +55,7 @@
 		if (!((x) cmp (y))) \
 		{ \
 			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!)"; \
+			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
 			throw std::runtime_error(std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
@@ -68,7 +69,7 @@
 		if ((x) != (y)) \
 		{ \
 			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
 			LOGE("%s", std_stringstream.str().c_str()); \
 			_CrtDebugBreak(); \
 		} \
@@ -79,7 +80,7 @@
 		if (!((x) cmp (y))) \
 		{ \
 			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!)"; \
+			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
 			LOGE("%s", std_stringstream.str().c_str()); \
 			_CrtDebugBreak(); \
 		} \
@@ -87,13 +88,13 @@
 
 #elif defined(_DEBUG)
 
-#define assert(x) do { if (!(x)) LOGW("Assertion failed: %s",  #x); } while(0)
+#define assert(x) do { if (!(x)) LOGW("Assertion failed: %s in %s:%d",  #x, __FILE__, __LINE__); } while(0)
 #define asserteq(x,y) \
 	MULTI_LINE_MACRO_BEGIN \
 		if ((x) != (y)) \
 		{ \
 			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!)"; \
+			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
 			LOGE("%s", std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
@@ -102,7 +103,7 @@
 		if (!((x) cmp (y))) \
 		{ \
 			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!)"; \
+			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
 			LOGE("%s", std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
