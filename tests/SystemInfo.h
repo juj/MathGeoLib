@@ -104,7 +104,7 @@ extern "C"
 {
 	extern const char *browser_info();
 }
-std::string GetOSDisplayString() { return browser_info(); }
+inline std::string GetOSDisplayString() { return browser_info(); }
 
 #else
 inline bool IsIE11DeveloperPreview() { return false; }
