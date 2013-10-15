@@ -21,6 +21,7 @@
 #include "../Math/float3.h"
 #include "AABB.h"
 #include "Plane.h"
+#include "Sphere.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -97,5 +98,9 @@ public:
 		return result;
 	}
 };
+
+class Frustum;
+
+PBVolume<6> ToPBVolume(const Frustum &frustum);
 
 MATH_END_NAMESPACE
