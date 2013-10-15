@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <sstream>
 
@@ -96,4 +98,14 @@ bool IsChromeBrowserOnWin32();
 bool IsOperaBrowser();
 bool IsSafariBrowser();
 
+inline bool IsIE11DeveloperPreview() { std::string os = GetOSDisplayString(); return os.find("Trident") != os.npos && os.find("rv:11.0") != os.npos; }
+
+extern "C"
+{
+	extern const char *browser_info();
+}
+std::string GetOSDisplayString() { return browser_info(); }
+
+#else
+inline bool IsIE11DeveloperPreview() { return false; }
 #endif

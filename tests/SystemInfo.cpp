@@ -458,11 +458,7 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
 #elif defined(EMSCRIPTEN)
 
 #include <emscripten.h>
-extern "C"
-{
-	extern const char *browser_info();
-}
-std::string GetOSDisplayString() { return browser_info(); }
+
 unsigned long long GetTotalSystemPhysicalMemory() { return (unsigned long long)emscripten_run_script_int("TOTAL_MEMORY"); }
 std::string GetProcessorBrandName() { return "n/a"; } 
 std::string GetProcessorCPUIDString() { return "n/a"; }

@@ -63,6 +63,7 @@ UNIQUE_TEST(DetectBrowser)
 	LOGI("IsChromeBrowserOnWin32: %s", IsChromeBrowserOnWin32()?"true":"false");
 	LOGI("IsOperaBrowser: %s", IsOperaBrowser()?"true":"false");
 	LOGI("IsSafariBrowser: %s", IsSafariBrowser()?"true":"false");
+	LOGI("IsIE11DeveloperPreview: %s", IsIE11DeveloperPreview()?"true":"false");
 }
 
 #endif
