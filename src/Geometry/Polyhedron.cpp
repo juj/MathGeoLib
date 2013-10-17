@@ -400,7 +400,7 @@ bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, floa
 	{
 		float2 p1 = float2(Dot(v[vertices[i]], basisU), Dot(v[vertices[i]], basisV)) - localSpacePoint;
 		if (Abs(p1.y) < epsilon)
-			p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
+			p1.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
 
 		if (p0.y * p1.y < 0.f)
 		{
