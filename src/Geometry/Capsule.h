@@ -88,7 +88,7 @@ public:
 	float3 Bottom() const;
 
 	/// Returns the center point of this Capsule.
-	/** <img src="CapsuleFunctions.png" />		
+	/** <img src="CapsuleFunctions.png" />
 		@return The point (l.a + l.b) / 2. This point is the center of mass for this capsule.
 		@see l, Bottom(), Top(). */
 	float3 Center() const;

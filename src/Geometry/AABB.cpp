@@ -155,7 +155,7 @@ bool AABB::IsDegenerate() const
 
 float3 AABB::CenterPoint() const
 {
-	return (minPoint + maxPoint) / 2.f;
+	return (minPoint + maxPoint) * 0.5f;
 }
 
 float3 AABB::PointInside(float x, float y, float z) const
@@ -260,7 +260,7 @@ float3 AABB::FaceCenterPoint(int faceIndex) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
 
-	float3 center = (minPoint + maxPoint) / 2.f;
+	float3 center = (minPoint + maxPoint) * 0.5f;
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -372,7 +372,7 @@ float3 AABB::Size() const
 
 float3 AABB::HalfSize() const
 {
-	return Size() / 2.f;
+	return Size() * 0.5f;
 }
 
 float AABB::Volume() const
@@ -438,14 +438,15 @@ void AABB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
 template<typename Matrix>
 void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 {
-	float3 newCenter = m.MulPos(aabb.CenterPoint());
+	const float3 halfSize = (aabb.maxPoint - aabb.minPoint) * 0.5f;
+	const float3 centerPoint = aabb.minPoint + halfSize;
+	float3 newCenter = m.MulPos(centerPoint);
 
 	float3 newDir;
-	float3 h = aabb.HalfSize();
 	// The following is equal to taking the absolute value of the whole matrix m.
-	newDir.x = ABSDOT3(m[0], h);
-	newDir.y = ABSDOT3(m[1], h);
-	newDir.z = ABSDOT3(m[2], h);
+	newDir.x = ABSDOT3(m[0], halfSize);
+	newDir.y = ABSDOT3(m[1], halfSize);
+	newDir.z = ABSDOT3(m[2], halfSize);
 	aabb.minPoint = newCenter - newDir;
 	aabb.maxPoint = newCenter + newDir;
 }
@@ -478,7 +479,7 @@ void AABB::TransformAsAABB(const float4x4 &transform)
 void AABB::TransformAsAABB(const Quat &transform)
 {
 	float3 newCenter = transform.Transform(CenterPoint());
-	float3 newDir = Abs((transform.Transform(Size()) / 2.f));
+	float3 newDir = Abs((transform.Transform(Size()) * 0.5f));
 	minPoint = newCenter - newDir;
 	maxPoint = newCenter + newDir;
 }

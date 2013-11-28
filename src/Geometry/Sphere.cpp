@@ -274,7 +274,7 @@ Sphere Sphere::FastEnclosingSphere(const float3 *pts, int numPoints)
 	}
 
 	// The two points on the longest axis define the initial sphere.
-	s.pos = (pts[min] + pts[max]) / 2.f;
+	s.pos = (pts[min] + pts[max]) * 0.5f;
 	s.r = pts[min].Distance(s.pos);
 
 	// Second pass: Make sure each point lies inside this sphere, expand if necessary.
@@ -632,7 +632,7 @@ void Sphere::Enclose(const float3 &point, float epsilon)
 	if (dist2 > r*r)
 	{
 		float dist = Sqrt(dist2);
-		float newRadius = (r + dist) / 2.f;
+		float newRadius = (r + dist) * 0.5f;
 		pos += d * (newRadius - r) / dist;
 		r = newRadius;
 	}
@@ -880,7 +880,7 @@ float3 Sphere::RandomPointOnSurface(LCG &lcg, const float3 &center, float radius
 Sphere Sphere::OptimalEnclosingSphere(const float3 &a, const float3 &b)
 {
 	Sphere s;
-	s.pos = (a + b) / 2.f;
+	s.pos = (a + b) * 0.5f;
 	s.r = (b - s.pos).Length();
 	assume(s.pos.IsFinite());
 	assume(s.r >= 0.f);

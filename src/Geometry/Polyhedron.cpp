@@ -1233,7 +1233,7 @@ Polyhedron Polyhedron::Hexahedron(const float3 &centerPos, float scale, bool ccw
 Polyhedron Polyhedron::Icosahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
 {
 	float a = 0.5f;
-	float phi = (1.f + Sqrt(5.f)) / 2.f;
+	float phi = (1.f + Sqrt(5.f)) * 0.5f;
 	float b = 1.f / (2.f * phi);
 
 	const float3 vertices[12] = { float3( 0,  b, -a),
@@ -1291,7 +1291,7 @@ Polyhedron Polyhedron::Icosahedron(const float3 &centerPos, float scale, bool cc
 /// See http://paulbourke.net/geometry/platonic/
 Polyhedron Polyhedron::Dodecahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
 {
-	float phi = (1.f + Sqrt(5.f)) / 2.f;
+	float phi = (1.f + Sqrt(5.f)) * 0.5f;
 	float b = 1.f / phi;
 	float c = 2.f - phi;
 

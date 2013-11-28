@@ -282,7 +282,7 @@ float float2::ProductOfElements() const
 
 float float2::AverageOfElements() const
 {
-	return (x + y) / 2.f;
+	return (x + y) * 0.5f;
 }
 
 float float2::MinElement() const
