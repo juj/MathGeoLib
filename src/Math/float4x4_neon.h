@@ -22,6 +22,7 @@
 
 #include "SSEMath.h"
 #include "float4_neon.h"
+#include "float4x4_sse.h"
 
 #if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 // Multiplies mat * vec, where mat is a matrix in row-major format.
