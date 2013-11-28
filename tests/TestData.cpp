@@ -277,6 +277,7 @@ public:
 		AlignedFree(QuatArray());
 		AlignedFree(QuatArray2());
 		AlignedFree(VectorArrayWithW0Or1());
+		AlignedFree(AABBArray());
 	}
 };
 
