@@ -48,6 +48,21 @@ float4::float4(const float3 &xyz, float w_)
 {
 }
 
+float4::float4(float x_, float y_, const float2 &zw)
+:x(x_), y(y_), z(zw.x), w(zw.y)
+{
+}
+
+float4::float4(float x_, const float2 &yz, float w_)
+:x(x_), y(yz.x), z(yz.y), w(w_)
+{
+}
+
+float4::float4(float x_, const float3 &yzw)
+:x(x_), y(yzw.x), z(yzw.y), w(yzw.z)
+{
+}
+
 float4::float4(const float2 &xy, float z_, float w_)
 :x(xy.x), y(xy.y), z(z_), w(w_)
 {

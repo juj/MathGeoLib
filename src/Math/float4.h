@@ -97,6 +97,11 @@ public:
 	/** @see x, y, z, w. */
 	float4(const float3 &xyz, float w);
 
+	float4(float x, float y, const float2 &zw);
+	float4(float x, const float2 &yz, float w);
+	float4(float x, const float3 &yzw);
+	float4(const float2 &xy, const float2 &zw);
+
 	/// Constructs a new float3 with the value (xy.x, xy.y, z, w).
 	/** @see x, y, z, w. */
 	float4(const float2 &xy, float z, float w);
