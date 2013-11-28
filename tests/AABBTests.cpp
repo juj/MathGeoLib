@@ -27,6 +27,19 @@ RANDOMIZED_TEST(AABBTransformAsAABB)
 	assert(x.Equals(y));
 }
 
+BENCHMARK(AABBTransformOBBToAABB_BM, "AABB::Transform to OBB and convert back to AABB")
+{
+	aabb[i] = aabb[i].Transform(om[i]).MinimalEnclosingAABB();
+}
+BENCHMARK_END
+
+BENCHMARK(AABBTransformAsAABB_BM, "AABB::TransformAsAABB")
+{
+	aabb[i].TransformAsAABB(om[i]);
+}
+BENCHMARK_END
+
+#ifdef MATH_SSE
 RANDOMIZED_TEST(AABBTransformAsAABB_SIMD)
 {
 	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
@@ -42,23 +55,11 @@ RANDOMIZED_TEST(AABBTransformAsAABB_SIMD)
 	assert(x.Equals(y));
 }
 
-BENCHMARK(AABBTransformOBBToAABB_BM, "AABB::Transform to OBB and convert back to AABB")
-{
-	aabb[i] = aabb[i].Transform(om[i]).MinimalEnclosingAABB();
-}
-BENCHMARK_END
-
-BENCHMARK(AABBTransformAsAABB_BM, "AABB::TransformAsAABB")
-{
-	aabb[i].TransformAsAABB(om[i]);
-}
-BENCHMARK_END
-
 BENCHMARK(AABBTransformAsAABB_SIMD_BM, "AABB::TransformAsAABB SIMD")
 {
 	AABBTransformAsAABB_SIMD(aabb[i], om[i]);
 }
 BENCHMARK_END
-
+#endif
 
 MATH_END_NAMESPACE
