@@ -563,4 +563,8 @@ Q_DECLARE_METATYPE(AABB*)
 std::ostream &operator <<(std::ostream &o, const AABB &aabb);
 #endif
 
+#ifdef MATH_SSE
+void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m);
+#endif
+
 MATH_END_NAMESPACE

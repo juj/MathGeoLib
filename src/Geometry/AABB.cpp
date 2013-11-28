@@ -40,6 +40,8 @@
 #include "Triangle.h"
 #include "Capsule.h"
 
+#include "../Math/float4x4_neon.h"
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
 #endif
@@ -438,8 +440,8 @@ void AABB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
 template<typename Matrix>
 void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 {
-	const float3 halfSize = (aabb.maxPoint - aabb.minPoint) * 0.5f;
-	const float3 centerPoint = aabb.minPoint + halfSize;
+	const float3 centerPoint = (aabb.minPoint + aabb.maxPoint) * 0.5f;
+	const float3 halfSize = centerPoint - aabb.minPoint;
 	float3 newCenter = m.MulPos(centerPoint);
 
 	float3 newDir;
@@ -450,6 +452,32 @@ void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 	aabb.minPoint = newCenter - newDir;
 	aabb.maxPoint = newCenter + newDir;
 }
+
+#ifdef MATH_SSE
+void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
+{
+	// For the purposes of this run, we need the .w components of the AABB vectors to be one.
+	// TODO: perhaps remove the padding fields and make the .w components explicit.
+	aabb.padding = 1.f;
+	aabb.padding2 = 1.f;
+	simd4f minPt = aabb.MinPoint_SSE();
+	simd4f maxPt = aabb.MaxPoint_SSE();
+	simd4f centerPoint = _mm_mul_ps(_mm_add_ps(minPt, maxPt), _mm_set1_ps(0.5f));
+	simd4f halfSize = _mm_sub_ps(centerPoint, minPt);
+	simd4f newCenter = mat4x4_mul_vec4(m.row, centerPoint);
+
+	simd4f x = abs_ps(_mm_mul_ps(m.row[0], halfSize));
+	simd4f y = abs_ps(_mm_mul_ps(m.row[1], halfSize));
+	simd4f z = abs_ps(_mm_mul_ps(m.row[2], halfSize));
+	simd4f w = _mm_setzero_ps();
+	_MM_TRANSPOSE4_PS(x, y, z, w); // Contains 2x unpacklo's, 2x unpackhi's, 2x movelh's and 2x movehl's. (or 8 shuffles, depending on the compiler)
+
+	simd4f newDir = _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
+
+	aabb.MinPoint_SSE() = _mm_sub_ps(newCenter, newDir);
+	aabb.MaxPoint_SSE() = _mm_add_ps(newCenter, newDir);
+}
+#endif
 
 void AABB::TransformAsAABB(const float3x3 &transform)
 {
@@ -473,7 +501,11 @@ void AABB::TransformAsAABB(const float4x4 &transform)
 	assume(transform.HasUniformScale());
 	assume(transform.Row(3).Equals(0,0,0,1));
 
+#ifdef MATH_AUTOMATIC_SSE
+	AABBTransformAsAABB_SIMD(*this, transform);
+#else
 	AABBTransformAsAABB(*this, transform);
+#endif
 }
 
 void AABB::TransformAsAABB(const Quat &transform)
