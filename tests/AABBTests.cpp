@@ -27,6 +27,12 @@ RANDOMIZED_TEST(AABBTransformAsAABB)
 	assert(x.Equals(y));
 }
 
+BENCHMARK(AABBTransformOBBToAABB_BM, "AABB::Transform to OBB and convert back to AABB")
+{
+	aabb[i] = aabb[i].Transform(om[i]).MinimalEnclosingAABB();
+}
+BENCHMARK_END
+
 BENCHMARK(AABBTransformAsAABB_BM, "AABB::TransformAsAABB")
 {
 	aabb[i].TransformAsAABB(om[i]);
