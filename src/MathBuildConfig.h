@@ -152,16 +152,24 @@
 #ifndef MATH_SSE41
 #define MATH_SSE41
 #endif
+#ifndef MATH_SSE3
 #define MATH_SSE3
+#endif
+#ifndef MATH_SSE2
 #define MATH_SSE2
+#endif
 #ifndef MATH_SSE
 #define MATH_SSE
 #endif
 #endif
 
 #ifdef MATH_SSE41
+#ifndef MATH_SSE3
 #define MATH_SSE3
+#endif
+#ifndef MATH_SSE2
 #define MATH_SSE2
+#endif
 #ifndef MATH_SSE
 #define MATH_SSE
 #endif
@@ -173,7 +181,9 @@
 #else
 #include <pmmintrin.h>
 #endif
+#ifndef MATH_SSE2
 #define MATH_SSE2
+#endif
 #ifndef MATH_SSE
 #define MATH_SSE
 #endif
