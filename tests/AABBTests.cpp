@@ -4,8 +4,13 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "TestData.h"
 
 AABB RandomAABBContainingPoint(const float3 &pt, float maxSideLength);
+
+MATH_BEGIN_NAMESPACE
+
+using namespace TestData;
 
 RANDOMIZED_TEST(AABBTransformAsAABB)
 {
@@ -21,3 +26,11 @@ RANDOMIZED_TEST(AABBTransformAsAABB)
 	AABB y = o.MinimalEnclosingAABB();
 	assert(x.Equals(y));
 }
+
+BENCHMARK(AABBTransformAsAABB_BM, "AABB::TransformAsAABB")
+{
+	aabb[i].TransformAsAABB(om[i]);
+}
+BENCHMARK_END
+
+MATH_END_NAMESPACE

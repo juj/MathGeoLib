@@ -59,6 +59,22 @@ Quat *QuatArray2()
 	return arr;
 }
 
+AABB *AABBArray()
+{
+	LCG lcg;
+	static AABB *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<AABB>(testrunner_numItersPerTest);
+		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		{
+			arr[i].minPoint = float3::RandomBox(lcg, -100.f, 100.f);
+			arr[i].maxPoint = arr[i].minPoint + float3::RandomBox(lcg, 0, 100.f);
+		}
+	}
+	return arr;
+}
+
 float *FloatArray()
 {
 	LCG lcg;
