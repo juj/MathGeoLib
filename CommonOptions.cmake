@@ -127,3 +127,7 @@ endif()
 if (MATH_SSE)
 	add_definitions(-DMATH_SSE)
 endif()
+
+if (MATH_AUTOMATIC_SSE)
+	add_definitions(-DMATH_AUTOMATIC_SSE)
+endif()
