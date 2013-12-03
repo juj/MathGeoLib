@@ -211,11 +211,20 @@ float3x4 operator *(const float3x4 &lhs, const ScaleOp &rhs)
 float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
 {
 	float4x4 ret;
+#ifdef MATH_AUTOMATIC_SSE
+	simd4f x = _mm_shuffle_ps(lhs.v, lhs.v, _MM_SHUFFLE(0,0,0,0));
+	simd4f y = _mm_shuffle_ps(lhs.v, lhs.v, _MM_SHUFFLE(1,1,1,1));
+	simd4f z = _mm_shuffle_ps(lhs.v, lhs.v, _MM_SHUFFLE(2,2,2,2));
+	ret.row[0] = _mm_mul_ps(rhs.row[0], x);
+	ret.row[1] = _mm_mul_ps(rhs.row[1], y);
+	ret.row[2] = _mm_mul_ps(rhs.row[2], z);
+	ret.row[3] = rhs.row[3];
+#else
 	ret[0][0] = rhs[0][0] * lhs.x; ret[0][1] = rhs[0][1] * lhs.x; ret[0][2] = rhs[0][2] * lhs.x; ret[0][3] = rhs[0][3] * lhs.x;
 	ret[1][0] = rhs[1][0] * lhs.y; ret[1][1] = rhs[1][1] * lhs.y; ret[1][2] = rhs[1][2] * lhs.y; ret[1][3] = rhs[1][3] * lhs.y;
 	ret[2][0] = rhs[2][0] * lhs.z; ret[2][1] = rhs[2][1] * lhs.z; ret[2][2] = rhs[2][2] * lhs.z; ret[2][3] = rhs[2][3] * lhs.z;
-	ret[3][0] = rhs[3][0];		 ret[3][1] = rhs[3][1];		 ret[3][2] = rhs[3][2];		 ret[3][3] = rhs[3][3];
-
+	ret[3][0] = rhs[3][0];         ret[3][1] = rhs[3][1];         ret[3][2] = rhs[3][2];         ret[3][3] = rhs[3][3];
+#endif
 	mathassert(ret.Equals(lhs.ToFloat4x4() * rhs));
 	return ret;
 }

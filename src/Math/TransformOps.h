@@ -19,21 +19,40 @@
 
 #include "../MathGeoLibFwd.h"
 #include "float3.h"
+#include "SSEMath.h"
 
 MATH_BEGIN_NAMESPACE
 
 /// A structure that represents the translate operation for 3D objects.
 /** This structure is used to optimize special cases of 3D transformation concatenations. The use of this
 	class occurs transparently to the user. You do not need to instantiate new TranslateOp objects in your code. */
-class TranslateOp
+class ALIGN16 TranslateOp
 {
 public:
-	/// The x offset of translation.
-	float x;
-	/// The y offset of translation.
-	float y;
-	/// The z offset of translation.
-	float z;
+
+#if defined(MATH_SIMD)
+	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
+
+	union
+	{
+		struct
+		{
+#endif
+			/// The x offset of translation.
+			float x;
+			/// The y offset of translation.
+			float y;
+			/// The z offset of translation.
+			float z;
+
+			float padding;
+
+#if defined(MATH_SIMD)
+		};
+		simd4f v;
+	};
+	NAMELESS_UNION_END
+#endif
 
 	/// Constructs an uninitialized TranslateOp.
 	TranslateOp() {}
@@ -64,15 +83,33 @@ float4x4 operator *(const float4x4 &lhs, const TranslateOp &rhs);
 /// A structure that represents the scale operation for 3D objects.
 /** This structure is used to optimize special cases of 3D transformation concatenations. The use of this
 	class occurs transparently to the user. You do not need to instantiate new ScaleOp objects in your code. */
-class ScaleOp
+class ALIGN16 ScaleOp
 {
 public:
-	/// The scale factor along the x axis.
-	float x;
-	/// The scale factor along the y axis.
-	float y;
-	/// The scale factor along the z axis.
-	float z;
+
+#if defined(MATH_SIMD)
+	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
+
+	union
+	{
+		struct
+		{
+#endif
+		/// The scale factor along the x axis.
+		float x;
+		/// The scale factor along the y axis.
+		float y;
+		/// The scale factor along the z axis.
+		float z;
+
+		float padding;
+
+#if defined(MATH_SIMD)
+		};
+		simd4f v;
+	};
+	NAMELESS_UNION_END
+#endif
 
 	/// Constructs an uninitialized ScaleOp.
 	ScaleOp() {}
