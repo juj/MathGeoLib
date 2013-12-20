@@ -142,7 +142,7 @@ inline float3 mat3x4_mul_vec(const __m128 *matrix, __m128 vector)
 	__m128 y = dot4_ps(matrix[1], vector);
 	__m128 z = dot4_ps(matrix[2], vector);
 
-	return float3(M128_TO_FLOAT(x), M128_TO_FLOAT(y), M128_TO_FLOAT(z));
+	return float3(s4f_x(x), s4f_x(y), s4f_x(z));
 }
 
 #define _mm_transpose_matrix_intel(row0, row1, row2, row3) \
@@ -452,7 +452,7 @@ FORCE_INLINE float mat4x4_inverse(const __m128 *mat, __m128 *out)
 	out[1] = _mm_mul_ps(r2, rcp);
 	out[2] = _mm_mul_ps(r3, rcp);
 	out[3] = _mm_mul_ps(r4, rcp);
-	return M128_TO_FLOAT(det);
+	return s4f_x(det);
 }
 
 /// Inverts a 3x4 affine transformation matrix (in row-major format) that only consists of rotation (+possibly mirroring) and translation.
@@ -525,7 +525,7 @@ inline float mat4x4_determinant(const __m128 *row)
 	__m128 d2 = row[0];
 	__m128 d3 = shuffle1_ps(row1, _MM_SHUFFLE(1,1,1,1));
 	__m128 d = _mm_mul_ss(d1, _mm_mul_ss(d2, d3));
-	return M128_TO_FLOAT(d);
+	return s4f_x(d);
 }
 
 /// Computes the determinant of a 3x4 matrix stored in row-major format. (Treated as a square matrix with last row [0,0,0,1])
@@ -548,7 +548,7 @@ inline float mat3x4_determinant(const __m128 *row)
 	__m128 d1 = _mm_sub_ss(a, b);
 	__m128 d2 = row[0];
 	__m128 d = _mm_mul_ss(d1, d2);
-	return M128_TO_FLOAT(d);
+	return s4f_x(d);
 }
 
 inline void mat3x4_transpose(const __m128 *src, __m128 *dst)

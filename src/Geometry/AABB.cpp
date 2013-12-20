@@ -501,7 +501,7 @@ void AABB::TransformAsAABB(const float4x4 &transform)
 	assume(transform.HasUniformScale());
 	assume(transform.Row(3).Equals(0,0,0,1));
 
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	AABBTransformAsAABB_SIMD(*this, transform);
 #else
 	AABBTransformAsAABB(*this, transform);

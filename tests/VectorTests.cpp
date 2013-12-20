@@ -516,13 +516,13 @@ BENCHMARK(float_to_Float4_inline_asm)
 BENCHMARK_END;
 #endif
 */
-// Test what FLOAT_TO_M128 produces:
+// Test what setx_ps produces:
 /* 	vmovss	xmm1, DWORD PTR [edx+eax*4]
 	vxorps	xmm0, xmm0, xmm0
 	vmovss	xmm1, xmm0, xmm1 */
 BENCHMARK(float_to_Float4_macro1, "sse")
 {
-	__m128 scale = FLOAT_TO_M128(f[i]);
+	__m128 scale = setx_ps(f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;
@@ -546,7 +546,7 @@ BENCHMARK_END;
 	vshufps	xmm0, xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_macro_swizzle, "sse")
 {
-	__m128 scale = shuffle1_ps(FLOAT_TO_M128(f[i]), _MM_SHUFFLE(0,0,0,0));
+	__m128 scale = shuffle1_ps(setx_ps(f[i]), _MM_SHUFFLE(0,0,0,0));
 	v[i] = scale;
 }
 BENCHMARK_END;

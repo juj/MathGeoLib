@@ -138,13 +138,6 @@ FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 
 #endif // ~MATH_SSE
 
-#ifdef MATH_NEON
-FORCE_INLINE simd4f xor_ps(simd4f a, simd4f b)
-{
-	return vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(a), vreinterpretq_u32_f32(b)));
-}
-#endif
-
 #ifdef ANDROID
 inline void quat_mul_quat_asm(const void *q1, const void *q2, void *out)
 {

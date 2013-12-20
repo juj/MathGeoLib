@@ -211,7 +211,7 @@ float3x4 operator *(const float3x4 &lhs, const ScaleOp &rhs)
 float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
 {
 	float4x4 ret;
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	simd4f x = _mm_shuffle_ps(lhs.v, lhs.v, _MM_SHUFFLE(0,0,0,0));
 	simd4f y = _mm_shuffle_ps(lhs.v, lhs.v, _MM_SHUFFLE(1,1,1,1));
 	simd4f z = _mm_shuffle_ps(lhs.v, lhs.v, _MM_SHUFFLE(2,2,2,2));

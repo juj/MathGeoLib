@@ -149,26 +149,26 @@ float4 float4::Swizzled(int i, int j, int k, int l) const
 
 /// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.
 ///\todo Delete this function.
-__m128 float4::LengthSq3_SSE() const
+simd4f float4::LengthSq3_SSE() const
 {
 	return dot3_ps3(v, v);
 }
 
 /// The returned vector contains the length of the float3 part in eacj channel of the vector.
 ///\todo Delete this function.
-__m128 float4::Length3_SSE() const
+simd4f float4::Length3_SSE() const
 {
 	return _mm_sqrt_ps(dot3_ps(v, v));
 }
 
 /// The returned vector contains the squared length of the float4 in each channel of the vector.
-__m128 float4::LengthSq4_SSE() const
+simd4f float4::LengthSq4_SSE() const
 {
 	return dot4_ps(v, v);
 }
 
 /// The returned vector contains the length of the float4 in each channel of the vector.
-__m128 float4::Length4_SSE() const
+simd4f float4::Length4_SSE() const
 {
 	return _mm_sqrt_ps(dot4_ps(v, v));
 }
@@ -176,29 +176,29 @@ __m128 float4::Length4_SSE() const
 
 void float4::Normalize3_Fast_SSE()
 {
-	__m128 len = Length3_SSE();
-	__m128 normalized = _mm_div_ps(v, len); // Normalize.
+	simd4f len = Length3_SSE();
+	simd4f normalized = _mm_div_ps(v, len); // Normalize.
 	v = cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
 
-__m128 float4::Normalize4_SSE()
+simd4f float4::Normalize4_SSE()
 {
-	__m128 len = Length4_SSE();
-	__m128 isZero = _mm_cmplt_ps(len, sseEpsilonFloat); // Was the length zero?
-	__m128 normalized = _mm_div_ps(v, len); // Normalize.
+	simd4f len = Length4_SSE();
+	simd4f isZero = _mm_cmplt_ps(len, simd4fEpsilon); // Was the length zero?
+	simd4f normalized = _mm_div_ps(v, len); // Normalize.
 	v = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
 	return len;
 }
 
 void float4::Normalize4_Fast_SSE()
 {
-	__m128 recipLen = _mm_rsqrt_ps(dot4_ps(v, v));
+	simd4f recipLen = _mm_rsqrt_ps(dot4_ps(v, v));
 	v = _mm_mul_ps(v, recipLen);
 }
 
 void float4::NormalizeW_SSE()
 {
-	__m128 div = shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
+	simd4f div = shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
 	v = _mm_div_ps(v, div);
 }
 
@@ -243,9 +243,9 @@ float float4::Length4() const
 float float4::Normalize3()
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	__m128 origLength;
+	simd4f origLength;
 	v = vec4_safe_normalize3(v, origLength);
-	return M128_TO_FLOAT(origLength);
+	return s4f_x(origLength);
 #else
 	assume(IsFinite());
 	float lengthSq = LengthSq3();
@@ -269,7 +269,7 @@ float float4::Normalize3()
 float4 float4::Normalized3() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	__m128 origLength;
+	simd4f origLength;
 	return vec4_safe_normalize3(v, origLength);
 #else
 	float4 copy = *this;
@@ -282,9 +282,9 @@ float4 float4::Normalized3() const
 
 float float4::Normalize4()
 {
-#ifdef MATH_AUTOMATIC_SSE
-	__m128 len = Normalize4_SSE();
-	return M128_TO_FLOAT(len);
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	simd4f len = Normalize4_SSE();
+	return s4f_x(len);
 #else
 	assume(IsFinite());
 	float lengthSq = LengthSq4();
@@ -313,7 +313,7 @@ float4 float4::Normalized4() const
 
 void float4::NormalizeW()
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	NormalizeW_SSE();
 #else
 	if (fabs(w) > 1e-6f)
@@ -354,9 +354,9 @@ bool float4::IsNormalized3(float epsilonSq) const
 
 void float4::Scale3(float scalar)
 {
-#ifdef MATH_AUTOMATIC_SSE
-	__m128 scale = FLOAT_TO_M128(scalar);
-	scale = _mm_shuffle_ps(scale, sseOne, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	simd4f scale = setx_ps(scalar);
+	scale = _mm_shuffle_ps(scale, simd4fOne, _MM_SHUFFLE(0,0,0,0)); // scale = (1 1 s s)
 	scale = shuffle1_ps(scale, _MM_SHUFFLE(3,0,0,0)); // scale = (1 s s s)
 	v = _mm_mul_ps(v, scale);
 #else
@@ -561,7 +561,7 @@ float4 float4::Recip4() const
 
 float4 float4::RecipFast4() const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return float4(_mm_rcp_ps(v));
 #else
 	return float4(1.f/x, 1.f/y, 1.f/z, 1.f/w);
@@ -570,9 +570,8 @@ float4 float4::RecipFast4() const
 
 float4 float4::Min(float ceil) const
 {
-#ifdef MATH_AUTOMATIC_SSE
-	__m128 v2 = _mm_set1_ps(ceil);
-	return float4(_mm_min_ps(v, v2));
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return float4(min_ps(v, set1_ps(ceil)));
 #else
 	return float4(MATH_NS::Min(x, ceil), MATH_NS::Min(y, ceil), MATH_NS::Min(z, ceil), MATH_NS::Min(w, ceil));
 #endif
@@ -581,7 +580,7 @@ float4 float4::Min(float ceil) const
 float4 float4::Min(const float4 &ceil) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return float4(_mm_min_ps(v, ceil.v));
+	return float4(min_ps(v, ceil.v));
 #else
 	return float4(MATH_NS::Min(x, ceil.x), MATH_NS::Min(y, ceil.y), MATH_NS::Min(z, ceil.z), MATH_NS::Min(w, ceil.w));
 #endif
@@ -590,8 +589,7 @@ float4 float4::Min(const float4 &ceil) const
 float4 float4::Max(float floor) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	__m128 v2 = _mm_set1_ps(floor);
-	return float4(_mm_max_ps(v, v2));
+	return float4(max_ps(v, set1_ps(floor)));
 #else
 	return float4(MATH_NS::Max(x, floor), MATH_NS::Max(y, floor), MATH_NS::Max(z, floor), MATH_NS::Max(w, floor));
 #endif
@@ -600,7 +598,7 @@ float4 float4::Max(float floor) const
 float4 float4::Max(const float4 &floor) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return float4(_mm_max_ps(v, floor.v));
+	return float4(max_ps(v, floor.v));
 #else
 	return float4(MATH_NS::Max(x, floor.x), MATH_NS::Max(y, floor.y), MATH_NS::Max(z, floor.z), MATH_NS::Max(w, floor.w));
 #endif
@@ -609,7 +607,7 @@ float4 float4::Max(const float4 &floor) const
 float4 float4::Clamp(const float4 &floor, const float4 &ceil) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return float4(_mm_max_ps(_mm_min_ps(v, ceil.v), floor.v));
+	return float4(max_ps(min_ps(v, ceil.v), floor.v));
 #else
 	return float4(MATH_NS::Clamp(x, floor.x, ceil.x),
 				  MATH_NS::Clamp(y, floor.y, ceil.y),
@@ -621,9 +619,7 @@ float4 float4::Clamp(const float4 &floor, const float4 &ceil) const
 float4 float4::Clamp01() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	__m128 floor = _mm_setzero_ps();
-	__m128 ceil = _mm_set1_ps(1.f);
-	return float4(_mm_max_ps(_mm_min_ps(v, ceil), floor));
+	return float4(max_ps(min_ps(v, simd4fOne), simd4fZero));
 #else
 	return float4(MATH_NS::Clamp(x, 0.f, 1.f),
 				  MATH_NS::Clamp(y, 0.f, 1.f),
@@ -635,9 +631,7 @@ float4 float4::Clamp01() const
 float4 float4::Clamp(float floor, float ceil) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	__m128 vfloor = _mm_set1_ps(floor);
-	__m128 vceil = _mm_set1_ps(ceil);
-	return float4(_mm_max_ps(_mm_min_ps(v, vceil), vfloor));
+	return float4(max_ps(min_ps(v, set1_ps(ceil)), set1_ps(floor)));
 #else
 	return float4(MATH_NS::Clamp(x, floor, ceil),
 				  MATH_NS::Clamp(y, floor, ceil),
@@ -648,7 +642,7 @@ float4 float4::Clamp(float floor, float ceil) const
 
 float float4::Distance3Sq(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return vec3_length_sq_float(sub_ps(v, rhs.v));
 #else
 	float dx = x - rhs.x;
@@ -660,7 +654,7 @@ float float4::Distance3Sq(const float4 &rhs) const
 
 float float4::Distance3(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return vec3_length_float(sub_ps(v, rhs.v));
 #else
 	return Sqrt(Distance3Sq(rhs));
@@ -669,7 +663,7 @@ float float4::Distance3(const float4 &rhs) const
 
 float float4::Distance4Sq(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return vec4_length_sq_float(sub_ps(v, rhs.v));
 #else
 	float dx = x - rhs.x;
@@ -682,7 +676,7 @@ float float4::Distance4Sq(const float4 &rhs) const
 
 float float4::Distance4(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return vec4_length_float(sub_ps(v, rhs.v));
 #else
 	return Sqrt(Distance4Sq(rhs));
@@ -691,7 +685,7 @@ float float4::Distance4(const float4 &rhs) const
 
 float float4::Dot3(const float3 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return dot3_float(v, float4(rhs, 0.f));
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
@@ -700,7 +694,7 @@ float float4::Dot3(const float3 &rhs) const
 
 float float4::Dot3(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return dot3_float(v, rhs.v);
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
@@ -709,7 +703,7 @@ float float4::Dot3(const float4 &rhs) const
 
 float float4::Dot4(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return dot4_float(v, rhs.v);
 #else
 	return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
@@ -739,7 +733,7 @@ i x j == -(j x i) == k,
 (k x i) == -(i x k) == j. */
 float4 float4::Cross3(const float3 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return float4(cross_ps(v, float4(rhs, 0.f).v));
 #else
 	float4 dst;
@@ -753,7 +747,7 @@ float4 float4::Cross3(const float3 &rhs) const
 
 float4 float4::Cross3(const float4 &rhs) const
 {
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return float4(cross_ps(v, rhs.v));
 #else
 	return Cross3(rhs.xyz());
@@ -852,7 +846,7 @@ float4 float4::Lerp(const float4 &b, float t) const
 {
 	assume(EqualAbs(this->w, b.w));
 	assume(0.f <= t && t <= 1.f);
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return vec4_lerp(v, b.v, t);
 #else
 	return (1.f - t) * *this + t * b;
@@ -877,7 +871,7 @@ float4 float4::FromScalar(float scalar, float w)
 void float4::SetFromScalar(float scalar)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = _mm_set1_ps(scalar);
+	v = set1_ps(scalar);
 #else
 	x = scalar;
 	y = scalar;
@@ -889,7 +883,7 @@ void float4::SetFromScalar(float scalar)
 void float4::Set(float x_, float y_, float z_, float w_)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = _mm_set_ps(w_, z_, y_, x_);
+	v = set_ps(w_, z_, y_, x_);
 #else
 	x = x_;
 	y = y_;
@@ -901,7 +895,7 @@ void float4::Set(float x_, float y_, float z_, float w_)
 void float4::SetFromScalar(float scalar, float w_)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = _mm_set_ps(w_, scalar, scalar, scalar);
+	v = set_ps(w_, scalar, scalar, scalar);
 #else
 	x = scalar;
 	y = scalar;
@@ -939,7 +933,7 @@ float4 float4::RandomGeneral(LCG &lcg, float minElem, float maxElem)
 float4 float4::operator +(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_add_vec4(v, rhs.v);
+	return add_ps(v, rhs.v);
 #else
 	return float4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 #endif
@@ -948,7 +942,7 @@ float4 float4::operator +(const float4 &rhs) const
 float4 float4::operator -(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_sub_vec4(v, rhs.v);
+	return sub_ps(v, rhs.v);
 #else
 	return float4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
 #endif
@@ -994,7 +988,7 @@ float4 float4::operator /(float scalar) const
 float4 &float4::operator +=(const float4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec4_add_vec4(v, rhs.v);
+	v = add_ps(v, rhs.v);
 #else
 	x += rhs.x;
 	y += rhs.y;
@@ -1008,7 +1002,7 @@ float4 &float4::operator +=(const float4 &rhs)
 float4 &float4::operator -=(const float4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec4_sub_vec4(v, rhs.v);
+	v = sub_ps(v, rhs.v);
 #else
 	x -= rhs.x;
 	y -= rhs.y;
@@ -1087,7 +1081,7 @@ float4 float4::DivLeft(float s) const
 float4 float4::Mul(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_mul_vec4(v, rhs.v);
+	return mul_ps(v, rhs.v);
 #else
 	return float4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w);
 #endif
@@ -1096,7 +1090,7 @@ float4 float4::Mul(const float4 &rhs) const
 float4 float4::Div(const float4 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_div_vec4(v, rhs.v);
+	return div_ps(v, rhs.v);
 #else
 	return float4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w);
 #endif

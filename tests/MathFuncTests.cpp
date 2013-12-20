@@ -303,40 +303,40 @@ float NewtonRhapsonSqrt(float x)
 #ifdef MATH_SSE
 float NewtonRhapsonSSESqrt(float x)
 {
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 estimate = _mm_rcp_ss(_mm_rsqrt_ss(X));
 	__m128 e2 = _mm_mul_ss(estimate,estimate);
 	__m128 half = _mm_set_ss(0.5f);
 	__m128 recipEst = _mm_rcp_ss(estimate);
 
-	return M128_TO_FLOAT(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
+	return s4f_x(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
 
 float NewtonRhapsonSSESqrt2(float x)
 {
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 estimate = _mm_rsqrt_ss(_mm_rcp_ss(X));
 	__m128 e2 = _mm_mul_ss(estimate,estimate);
 	__m128 half = _mm_set_ss(0.5f);
 	__m128 recipEst = _mm_rcp_ss(estimate);
 
-	return M128_TO_FLOAT(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
+	return s4f_x(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
 
 float NewtonRhapsonSSESqrt3(float x)
 {
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 estimate = _mm_mul_ss(X, _mm_rsqrt_ss(X));
 	__m128 e2 = _mm_mul_ss(estimate,estimate);
 	__m128 half = _mm_set_ss(0.5f);
 	__m128 recipEst = _mm_rcp_ss(estimate);
 
-	return M128_TO_FLOAT(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
+	return s4f_x(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
 
 float Sqrt_Via_Rcp_RSqrt(float x)
 {
-	return M128_TO_FLOAT(_mm_rcp_ss(_mm_rsqrt_ss(FLOAT_TO_M128(x))));
+	return s4f_x(_mm_rcp_ss(_mm_rsqrt_ss(setx_ps(x))));
 }
 
 #endif
@@ -532,7 +532,7 @@ float OneOverX(float x)
 #ifdef MATH_SSE
 float NewtonRhapsonRecip(float x)
 {
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 e = _mm_rcp_ss(X);
 	// 1/x = D
 	// f(e) = e^-1 - x
@@ -545,12 +545,12 @@ float NewtonRhapsonRecip(float x)
 	// Do one iteration of Newton-Rhapson:
 	__m128 e2 = _mm_mul_ss(e,e);
 	
-	return M128_TO_FLOAT(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
+	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 
 float NewtonRhapsonRecip2(float x)
 {
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 e = _mm_rcp_ss(X);
 	// 1/x = D
 	// f(e) = e^-1 - x
@@ -565,7 +565,7 @@ float NewtonRhapsonRecip2(float x)
 
 	e = _mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2));
 	e2 = _mm_mul_ss(e,e);
-	return M128_TO_FLOAT(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
+	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 #endif
 
@@ -660,7 +660,7 @@ BENCHMARK_END;
 
 BENCHMARK(sin_ps, "test against Sin")
 {
-	f[i] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(pf[i])));
+	f[i] = s4f_x(sin_ps(setx_ps(pf[i])));
 }
 BENCHMARK_END;
 
@@ -679,7 +679,7 @@ UNIQUE_TEST(sin_ps_precision)
 			float f = rng.Float(-maxVal, maxVal);//3.141592654f);
 			float x = (float)sin((double)f); // best precision of the Sin.
 
-			X[0] = M128_TO_FLOAT(sin_ps(FLOAT_TO_M128(f)));
+			X[0] = s4f_x(sin_ps(setx_ps(f)));
 			X[1] = sinf(f);
 			X[2] = Sin(f);
 

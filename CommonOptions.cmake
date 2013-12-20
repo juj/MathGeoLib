@@ -128,6 +128,13 @@ if (MATH_SSE)
 	add_definitions(-DMATH_SSE)
 endif()
 
+if (MATH_NEON)
+	add_definitions(-DMATH_NEON)
+	if (NOT MSVC)
+		add_definitions(-mfpu=neon)
+	endif()
+endif()
+
 if (MATH_AUTOMATIC_SSE)
 	add_definitions(-DMATH_AUTOMATIC_SSE)
 endif()

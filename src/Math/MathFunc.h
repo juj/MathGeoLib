@@ -262,7 +262,7 @@ float Frac(float x);
 FORCE_INLINE float Sqrt(float x)
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_sqrt_ss(FLOAT_TO_M128(x)));
+	return s4f_x(_mm_sqrt_ss(setx_ps(x)));
 #else
 	return sqrtf(x);
 #endif
@@ -272,8 +272,8 @@ FORCE_INLINE float Sqrt(float x)
 FORCE_INLINE float SqrtFast(float x)
 {
 #ifdef MATH_SSE
-	__m128 X = FLOAT_TO_M128(x);
-	return M128_TO_FLOAT(_mm_mul_ss(X, _mm_rsqrt_ss(X)));
+	__m128 X = setx_ps(x);
+	return s4f_x(_mm_mul_ss(X, _mm_rsqrt_ss(X)));
 #else
 	return sqrtf(x);
 #endif
@@ -283,7 +283,7 @@ FORCE_INLINE float SqrtFast(float x)
 FORCE_INLINE float RSqrt(float x)
 {
 #ifdef MATH_SSE
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 e = _mm_rsqrt_ss(X);
 
 	// Do one iteration of Newton-Rhapson:
@@ -291,7 +291,7 @@ FORCE_INLINE float RSqrt(float x)
 	__m128 e3 = _mm_mul_ss(_mm_mul_ss(e,e), e);
 	__m128 half = _mm_set_ss(0.5f);
 	
-	return M128_TO_FLOAT(_mm_add_ss(e, _mm_mul_ss(half, _mm_sub_ss(e, _mm_mul_ss(X, e3)))));
+	return s4f_x(_mm_add_ss(e, _mm_mul_ss(half, _mm_sub_ss(e, _mm_mul_ss(X, e3)))));
 #else
 	return 1.f / sqrtf(x);
 #endif
@@ -301,7 +301,7 @@ FORCE_INLINE float RSqrt(float x)
 FORCE_INLINE float RSqrtFast(float x)
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_rsqrt_ss(FLOAT_TO_M128(x)));
+	return s4f_x(_mm_rsqrt_ss(setx_ps(x)));
 #else
 	return 1.f / sqrtf(x);
 #endif
@@ -311,12 +311,12 @@ FORCE_INLINE float RSqrtFast(float x)
 FORCE_INLINE float Recip(float x)
 {
 #ifdef MATH_SSE
-	__m128 X = FLOAT_TO_M128(x);
+	__m128 X = setx_ps(x);
 	__m128 e = _mm_rcp_ss(X);
 	// Do one iteration of Newton-Rhapson:
 	// e_n = 2*e - x*e^2
 	__m128 e2 = _mm_mul_ss(e,e);
-	return M128_TO_FLOAT(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
+	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 #else
 	return 1.f / x;
 #endif
@@ -326,7 +326,7 @@ FORCE_INLINE float Recip(float x)
 FORCE_INLINE float RecipFast(float x)
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_rcp_ss(FLOAT_TO_M128(x)));
+	return s4f_x(_mm_rcp_ss(setx_ps(x)));
 #else
 	return 1.f / x;
 #endif
@@ -377,7 +377,7 @@ template<>
 inline float Max(const float &a, const float &b)
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_max_ss(FLOAT_TO_M128(a), FLOAT_TO_M128(b)));
+	return s4f_x(_mm_max_ss(setx_ps(a), setx_ps(b)));
 #else
 	return a >= b ? a : b;
 #endif
@@ -395,7 +395,7 @@ template<>
 inline float Min(const float &a, const float &b)
 {
 #ifdef MATH_SSE
-	return M128_TO_FLOAT(_mm_min_ss(FLOAT_TO_M128(a), FLOAT_TO_M128(b)));
+	return s4f_x(_mm_min_ss(setx_ps(a), setx_ps(b)));
 #else
 	return a <= b ? a : b;
 #endif
