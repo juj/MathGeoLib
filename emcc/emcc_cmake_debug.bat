@@ -1,2 +1,3 @@
-cmake -DCMAKE_TOOLCHAIN_FILE=emcc_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ..
+set PATH=%PATH:git=git_unused%
+emconfigure cmake -DCMAKE_BUILD_TYPE=Debug ..
 pause
