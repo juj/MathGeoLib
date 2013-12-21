@@ -218,11 +218,13 @@ BENCHMARK(IntToString_sprintf, "sprintf int -> string conversion")
 }
 BENCHMARK_END;
 
+#ifdef _MSC_VER
 BENCHMARK(IntToString_itoa, "itoa int -> string conversion")
 {
 	_itoa(i*1053928445, int_to_string, 10);
 }
 BENCHMARK_END;
+#endif
 
 RANDOMIZED_TEST(U32ToString)
 {
@@ -261,8 +263,10 @@ BENCHMARK(U32ToString_sprintf, "sprintf uint -> string conversion")
 }
 BENCHMARK_END;
 
+#ifdef _MSC_VER
 BENCHMARK(U32ToString_itoa, "itoa uint -> string conversion")
 {
 	_itoa(i*1053928445, int_to_string, 10);
 }
 BENCHMARK_END;
+#endif
