@@ -72,6 +72,12 @@ struct AABB2D
 			&& rhs.maxPoint.x <= maxPoint.x && rhs.maxPoint.y <= maxPoint.y;
 	}
 
+	bool Contains(int x, int y) const
+	{
+		return x >= minPoint.x && y >= minPoint.y
+			&& x <= maxPoint.x && y <= maxPoint.y;
+	}
+
 	bool IsDegenerate() const
 	{
 		return minPoint.x >= maxPoint.x || minPoint.y >= maxPoint.y;

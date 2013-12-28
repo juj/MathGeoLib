@@ -68,6 +68,11 @@ float4::float4(const float2 &xy, float z_, float w_)
 {
 }
 
+float4::float4(const float2 &xy, const float2 &zw)
+:x(xy.x), y(xy.y), z(zw.x), w(zw.y)
+{
+}
+
 float4::float4(const float *data)
 {
 	assume(data);
