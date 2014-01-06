@@ -50,6 +50,9 @@ int U32ToString(u32 i, char *str)
 
 #ifdef _MSC_VER
 #define LOAD_TO_M128(dst, integer) dst.m128i_i32[0] = integer;
+#elif defined(__clang__)
+// Would like to prefer _mm_loadu_si32, but it doesn't seem to exist for clang?
+#define LOAD_TO_M128(dst, integer) dst = _mm_set1_epi32(integer)
 #else
 #define LOAD_TO_M128(dst, integer) dst = _mm_loadu_si32(&integer)
 #endif
@@ -63,7 +66,11 @@ FORCE_INLINE __m128i INT_TO_M128(int i)
 
 FORCE_INLINE int M128_TO_INT16(__m128i i)
 {
+#ifdef _MSC_VER
 	return i.m128i_i16[0];
+#else
+    return (int)*(s16*)&i;
+#endif
 }
 
 static const __m128i one_hundredmth = INT_TO_M128((int)2882303761 /*42.94967295*65536*32*32 */);
@@ -118,7 +125,11 @@ int U32ToString_SSE(u32 i, char *str)
 	ones = _mm_or_si128(_mm_slli_si128(ones, 1), ones);
 	unsigned int onesBits = (unsigned int)_mm_movemask_epi8(ones);
 	unsigned long shift;
+#ifdef _MSC_VER
 	_BitScanForward(&shift, onesBits);
+#else
+    shift = (onesBits != 0) ? __builtin_ctz(onesBits) : 0;
+#endif
 	_mm_maskmoveu_si128(lo, ones, str-shift);
 	int len = 16-shift;
 	str[len] = '\0';
