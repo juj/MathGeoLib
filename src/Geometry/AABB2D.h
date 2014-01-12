@@ -93,6 +93,16 @@ struct AABB2D
 		return minPoint.IsFinite() && maxPoint.IsFinite() && minPoint.MinElement() > -1e5f && maxPoint.MaxElement() < 1e5f;
 	}
 
+	float2 PosInside(const float2 &normalizedPos) const
+	{
+		return minPoint + normalizedPos.Mul(maxPoint - minPoint);
+	}
+
+	float2 ToNormalizedLocalSpace(const float2 &pt) const
+	{
+		return (pt - minPoint).Div(maxPoint - minPoint);
+	}
+
 	AABB2D operator +(const float2 &pt) const
 	{
 		AABB2D a;
