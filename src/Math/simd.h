@@ -144,20 +144,22 @@ const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 FORCE_INLINE simd4f setx_ps(float f)
 {
 	// On VS2010+AVX generates vmovss+vxorps+vmovss
-	//return _mm_load_ss(&f);
+	// return _mm_load_ss(&f);
 
+#if _MSC_VER < 1700 // == VS2012
+	// On VS2010+AVX generates vmovss+vshufps (to broadcast the single element to all channels). Best performance so far for VS2010.
+	// On VS2013 generates a vbroadcastss instruction.
+	return set1_ps(f);
+#else
 	// On VS2010+AVX is the same as _mm_load_ss, i.e. vmovss+vxorps+vmovss
 	// On VS2013, this is the perfect thing - a single vmovss instruction!
 	return _mm_set_ss(f);
+#endif
 
 	// On VS2010+AVX generates vmovss reg <- mem, vmovss alignedmem <- reg, vmovaps reg <- alignedmem, so is the worst!
-	//	simd4f s;
-	//	s.m128_f32[0] = f;
-	//	return s;
-
-	// On VS2010+AVX generates vmovss+vshufps (to broadcast the single element to all channels). Best performance so far for VS2010.
-	// On VS2013 generates a vbroadcastss instruction.
-	//return set1_ps(f);
+	// simd4f s;
+	// s.m128_f32[0] = f;
+	// return s;
 }
 
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.
