@@ -763,3 +763,98 @@ BENCHMARK(Tanh, "Tanh")
 	f[i] = Tanh(pf[i]);
 }
 BENCHMARK_END;
+
+#ifdef min
+#undef min
+#endif
+
+RANDOMIZED_TEST(Min)
+{
+	float a = rng.Float(-1e9, 1e9);
+	float b = rng.Float(-1e9, 1e9);
+	if (rng.Int(0,10) == 0) a = -FLOAT_INF;
+	if (rng.Int(0,10) == 0) a = FLOAT_INF;
+	if (rng.Int(0,10) == 0) b = -FLOAT_INF;
+	if (rng.Int(0,10) == 0) b = FLOAT_INF;
+	float correctMin = std::min(a,b);
+	float mglMin = Min(a, b);
+	assert(correctMin == mglMin);
+}
+
+#ifdef max
+#undef max
+#endif
+
+RANDOMIZED_TEST(Max)
+{
+	float a = rng.Float(-1e9, 1e9);
+	float b = rng.Float(-1e9, 1e9);
+	if (rng.Int(0,10) == 0) a = -FLOAT_INF;
+	if (rng.Int(0,10) == 0) a = FLOAT_INF;
+	if (rng.Int(0,10) == 0) b = -FLOAT_INF;
+	if (rng.Int(0,10) == 0) b = FLOAT_INF;
+	float correctMin = std::min(a,b);
+	float mglMin = Min(a, b);
+	assert(correctMin == mglMin);
+}
+
+BENCHMARK(Min, "Min")
+{
+	f[i] = Min(pf[i], uf[i]);
+	f[i+1] = Min(pf[i+1], uf[i+1]);
+	f[i+2] = Min(pf[i+2], uf[i+2]);
+	f[i+3] = Min(pf[i+3], uf[i+3]);
+	f[i+4] = Min(pf[i+4], uf[i+4]);
+	f[i+5] = Min(pf[i+5], uf[i+5]);
+	f[i+6] = Min(pf[i+6], uf[i+6]);
+	f[i+7] = Min(pf[i+7], uf[i+7]);
+}
+BENCHMARK_END;
+
+template<typename T>
+T MinWithTemplate(const T &a, const T &b)
+{
+	return a <= b ? a : b;
+}
+
+BENCHMARK(Min_template, "Min with template<>")
+{
+	f[i] = MinWithTemplate(pf[i], uf[i]);
+	f[i+1] = MinWithTemplate(pf[i+1], uf[i+1]);
+	f[i+2] = MinWithTemplate(pf[i+2], uf[i+2]);
+	f[i+3] = MinWithTemplate(pf[i+3], uf[i+3]);
+	f[i+4] = MinWithTemplate(pf[i+4], uf[i+4]);
+	f[i+5] = MinWithTemplate(pf[i+5], uf[i+5]);
+	f[i+6] = MinWithTemplate(pf[i+6], uf[i+6]);
+	f[i+7] = MinWithTemplate(pf[i+7], uf[i+7]);
+}
+BENCHMARK_END;
+
+#define MinTernary(a,b) ((a) <= (b) ? (a) : (b))
+BENCHMARK(Min_ternary, "Min with ternary")
+{
+	f[i] = MinTernary(pf[i], uf[i]);
+	f[i+1] = MinTernary(pf[i+1], uf[i+1]);
+	f[i+2] = MinTernary(pf[i+2], uf[i+2]);
+	f[i+3] = MinTernary(pf[i+3], uf[i+3]);
+	f[i+4] = MinTernary(pf[i+4], uf[i+4]);
+	f[i+5] = MinTernary(pf[i+5], uf[i+5]);
+	f[i+6] = MinTernary(pf[i+6], uf[i+6]);
+	f[i+7] = MinTernary(pf[i+7], uf[i+7]);
+}
+BENCHMARK_END;
+
+#ifndef _MSC_VER
+BENCHMARK(Min_fmin, "C99/C++11 fmin")
+{
+	f[i] = fmin(pf[i], uf[i]);
+	f[i+1] = fmin(pf[i+1], uf[i+1]);
+	f[i+2] = fmin(pf[i+2], uf[i+2]);
+	f[i+3] = fmin(pf[i+3], uf[i+3]);
+	f[i+4] = fmin(pf[i+4], uf[i+4]);
+	f[i+5] = fmin(pf[i+5], uf[i+5]);
+	f[i+6] = fmin(pf[i+6], uf[i+6]);
+	f[i+7] = fmin(pf[i+7], uf[i+7]);
+}
+BENCHMARK_END;
+#endif
