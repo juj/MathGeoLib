@@ -7,14 +7,17 @@ MATH_BEGIN_NAMESPACE
 namespace TestData
 {
 
+// Number of extra elements to put in to allow for indexing in benchmarks that have unrolled loop bodies.
+#define UNROLL_LOOP_PADDING 100
+
 float *PosFloatArray()
 {
 	LCG lcg;
 	static float *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = lcg.Float(0.f, 100000.f);
 	}
 	return arr;
@@ -26,8 +29,8 @@ float *UnitFloatArray()
 	static float *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = lcg.Float();
 	}
 	return arr;
@@ -39,8 +42,8 @@ Quat *QuatArray()
 	static Quat *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<Quat>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<Quat>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = Quat::RandomRotation(lcg);
 	}
 	return arr;
@@ -52,8 +55,8 @@ Quat *QuatArray2()
 	static Quat *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<Quat>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<Quat>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = Quat::RandomRotation(lcg);
 	}
 	return arr;
@@ -65,8 +68,8 @@ AABB *AABBArray()
 	static AABB *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<AABB>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<AABB>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 		{
 			arr[i].minPoint = float3::RandomBox(lcg, -100.f, 100.f);
 			arr[i].maxPoint = arr[i].minPoint + float3::RandomBox(lcg, 0, 100.f);
@@ -81,8 +84,8 @@ float *FloatArray()
 	static float *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = lcg.Float(-10.f, 10.f);
 	}
 	return arr;
@@ -94,8 +97,8 @@ float4x4 *MatrixArray()
 	static float4x4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4x4::RandomGeneral(lcg, -10.f, 10.f);
 	}
 	return arr;
@@ -107,8 +110,8 @@ float4x4 *MatrixArray2()
 	static float4x4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4x4::RandomGeneral(lcg, -10.f, 10.f);
 	}
 	return arr;
@@ -120,8 +123,8 @@ float4x4 *OrthonormalMatrixArray()
 	static float4x4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4x4(Quat::RandomRotation(lcg), float3::RandomBox(lcg, -10000.f, 10000.f));
 	}
 	return arr;
@@ -133,8 +136,8 @@ float4x4 *OrthogonalMatrixArray()
 	static float4x4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4x4(Quat::RandomRotation(lcg), float3::RandomBox(lcg, -10000.f, 10000.f)) * float4x4::UniformScale(lcg.Float(0.01f, 1e3f));
 	}
 	return arr;
@@ -145,9 +148,9 @@ float4x4 *TransposedMatrixArray()
 	static float4x4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4x4>(testrunner_numItersPerTest);
+		arr = AlignedNew<float4x4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
 		float4x4 *m = MatrixArray();
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = m[i].Transposed();
 	}
 	return arr;
@@ -159,8 +162,8 @@ float2 *Float2Array()
 	static float2 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float2>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float2>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float2::RandomBox(lcg, -10.f, 10.f);
 	}
 	return arr;
@@ -172,8 +175,8 @@ float4 *NormalizedVectorArray()
 	static float4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4::RandomDir(lcg);
 	}
 	return arr;
@@ -185,8 +188,8 @@ float4 *NormalizedVectorArray2()
 	static float4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4::RandomDir(lcg);
 	}
 	return arr;
@@ -198,8 +201,8 @@ float4 *VectorArray()
 	static float4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
 	}
 	return arr;
@@ -211,8 +214,8 @@ float4 *VectorArray2()
 	static float4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
 	}
 	return arr;
@@ -224,8 +227,8 @@ float4 *VectorArray3()
 	static float4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
 	}
 	return arr;
@@ -237,8 +240,8 @@ float4 *VectorArrayWithW0Or1()
 	static float4 *arr;
 	if (!arr)
 	{
-		arr = AlignedNew<float4>(testrunner_numItersPerTest);
-		for(int i = 0; i < testrunner_numItersPerTest; ++i)
+		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 		{
 			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
 			arr[i].w = (float)lcg.Int(0, 1);
