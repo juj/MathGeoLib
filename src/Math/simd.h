@@ -89,10 +89,28 @@ const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 /// the resulting float is represented in an XMM register as well. Check the disassembly to confirm!
 FORCE_INLINE float s4f_x(simd4f s4f)
 {
+#ifdef _MSC_VER
+	// On VS2013, generates only one spurious vmovups, then a vmovss mem <- reg
+	return s4f.m128_f32[0];
+#else
+	// On VS2013 this is bad: generates a spurious vmovups, vmovss tempMem <- reg, vmovss reg <- tempMem, vmovss dstMem <- reg sequence
 	float ret;
 	_mm_store_ss(&ret, s4f);
 	return ret;
+#endif
+	// One could do this as well: On VS2013, gives the same extra vmovups, and then a store.
+	//	return *(float*)&s4f;
+
+	// On VS2013, same as the above - extra vmovups and vmovss.
+	//	union
+	//	{
+	//		__m128 m;
+	//		float v[4];
+	//	} u;
+	//	u.m = s4f;
+	//	return u.v[0];
 }
+
 #define s4f_y(s4f) s4f_x(shuffle1_ps((s4f), _MM_SHUFFLE(1,1,1,1)))
 #define s4f_z(s4f) s4f_x(shuffle1_ps((s4f), _MM_SHUFFLE(2,2,2,2)))
 #define s4f_w(s4f) s4f_x(shuffle1_ps((s4f), _MM_SHUFFLE(3,3,3,3)))
@@ -129,17 +147,17 @@ FORCE_INLINE simd4f setx_ps(float f)
 	//return _mm_load_ss(&f);
 
 	// On VS2010+AVX is the same as _mm_load_ss, i.e. vmovss+vxorps+vmovss
-	//return _mm_set_ss(f);
+	// On VS2013, this is the perfect thing - a single vmovss instruction!
+	return _mm_set_ss(f);
 
 	// On VS2010+AVX generates vmovss reg <- mem, vmovss alignedmem <- reg, vmovaps reg <- alignedmem, so is the worst!
 	//	simd4f s;
 	//	s.m128_f32[0] = f;
 	//	return s;
 
-	// On VS2010+AVX generates vmovss+vshufps (to broadcast the single element to all channels). Best performance so far.
-	return set1_ps(f);
-
-	///\todo What intrinsic to use exactly to generate a no-op when f is already in a xmm register, and a single vmovss load when f is in memory?
+	// On VS2010+AVX generates vmovss+vshufps (to broadcast the single element to all channels). Best performance so far for VS2010.
+	// On VS2013 generates a vbroadcastss instruction.
+	//return set1_ps(f);
 }
 
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.

@@ -8,6 +8,7 @@
 #include "TestRunner.h"
 #include "TestData.h"
 #include <cmath>
+#include <algorithm>
 
 #ifdef MATH_SSE2
 #include "../src/Math/sse_mathfun.h"
@@ -810,6 +811,30 @@ BENCHMARK(Min, "Min")
 	f[i+7] = Min(pf[i+7], uf[i+7]);
 }
 BENCHMARK_END;
+
+#ifdef MATH_SSE
+
+// Test if explicitly storing the destination gives better codegen.
+// (does not seem to be the case)
+FORCE_INLINE void Min_SSE_dst(float *dst, float a, float b)
+{
+	_mm_store_ss(dst, _mm_min_ss(setx_ps(a), setx_ps(b)));
+}
+
+BENCHMARK(Min_SSE_dst, "Min SSE with dst pointer")
+{
+	Min_SSE_dst(f+i, pf[i], uf[i]);
+	Min_SSE_dst(f+i+1, pf[i + 1], uf[i + 1]);
+	Min_SSE_dst(f+i+2, pf[i + 2], uf[i + 2]);
+	Min_SSE_dst(f+i+3, pf[i + 3], uf[i + 3]);
+	Min_SSE_dst(f+i+4, pf[i + 4], uf[i + 4]);
+	Min_SSE_dst(f+i+5, pf[i + 5], uf[i + 5]);
+	Min_SSE_dst(f+i+6, pf[i + 6], uf[i + 6]);
+	Min_SSE_dst(f+i+7, pf[i + 7], uf[i + 7]);
+}
+BENCHMARK_END;
+
+#endif
 
 template<typename T>
 T MinWithTemplate(const T &a, const T &b)
