@@ -869,6 +869,27 @@ BENCHMARK(Min_ternary, "Min with ternary")
 }
 BENCHMARK_END;
 
+// Test Emscripten-specific effects of a function call.
+#ifdef EMSCRIPTEN
+float __attribute__((noinline)) Min_funccall(float a, float b)
+{
+	return MinTernary(a, b);
+}
+
+BENCHMARK(Min_funccall, "Min with funccall")
+{
+	f[i] = Min_funccall(pf[i], uf[i]);
+	f[i+1] = Min_funccall(pf[i+1], uf[i+1]);
+	f[i+2] = Min_funccall(pf[i+2], uf[i+2]);
+	f[i+3] = Min_funccall(pf[i+3], uf[i+3]);
+	f[i+4] = Min_funccall(pf[i+4], uf[i+4]);
+	f[i+5] = Min_funccall(pf[i+5], uf[i+5]);
+	f[i+6] = Min_funccall(pf[i+6], uf[i+6]);
+	f[i+7] = Min_funccall(pf[i+7], uf[i+7]);
+}
+BENCHMARK_END;
+#endif
+
 #ifndef _MSC_VER
 BENCHMARK(Min_fmin, "C99/C++11 fmin")
 {
