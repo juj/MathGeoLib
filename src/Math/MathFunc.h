@@ -362,7 +362,7 @@ inline T Clamp01(const T &val) { return Clamp(val, T(0), T(1)); }
 template<typename T>
 T Min(const T &a, const T &b)
 {
-	return a < b ? a : b;
+	return a <= b ? a : b;
 }
 
 /// Computes the larger of two values.
