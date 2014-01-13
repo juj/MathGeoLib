@@ -117,16 +117,29 @@ const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 #define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)
 #endif
 
-/// Returns the simd vector [0, 0, 0, f], that is, a SSE variable with the given float f in the lowest index. 
-/** The three higher indices are set to zero.
+/// Returns the simd vector [_, _, _, f], that is, a SSE variable with the given float f in the lowest index. 
+/** The three higher indices should all be treated undefined.
 	@note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast" if the given 
 	float is already in a register, since it will lie in an XMM register already. Check the disassembly to confirm!
-	@note Detected on VS2010 32-bit + AVX that this generates a vmovss+vxorps+vmovss instruction triple!
 	@note Never use this function if you need to generate a 4-vector [f,f,f,f]. Instead, use set1_ps(f), which
 		generates a vmovss+vhufps and no redundant vxorps+vmovss! */
 FORCE_INLINE simd4f setx_ps(float f)
 {
-	return _mm_load_ss(&f);
+	// On VS2010+AVX generates vmovss+vxorps+vmovss
+	//return _mm_load_ss(&f);
+
+	// On VS2010+AVX is the same as _mm_load_ss, i.e. vmovss+vxorps+vmovss
+	//return _mm_set_ss(f);
+
+	// On VS2010+AVX generates vmovss reg <- mem, vmovss alignedmem <- reg, vmovaps reg <- alignedmem, so is the worst!
+	//	simd4f s;
+	//	s.m128_f32[0] = f;
+	//	return s;
+
+	// On VS2010+AVX generates vmovss+vshufps (to broadcast the single element to all channels). Best performance so far.
+	return set1_ps(f);
+
+	///\todo What intrinsic to use exactly to generate a no-op when f is already in a xmm register, and a single vmovss load when f is in memory?
 }
 
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.
