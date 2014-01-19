@@ -62,4 +62,90 @@ BENCHMARK(AABBTransformAsAABB_SIMD_BM, "AABB::TransformAsAABB SIMD")
 BENCHMARK_END
 #endif
 
+UNIQUE_TEST(AABBIsDegenerate)
+{
+	AABB a(float3::nan, float3::nan);
+	assert(a.IsDegenerate());
+	assert(!a.IsFinite());
+
+	a = AABB(float3::zero, float3::nan);
+	assert(a.IsDegenerate());
+	assert(!a.IsFinite());
+
+	a = AABB(float3::zero, float3::one);
+	assert(!a.IsDegenerate());
+	assert(a.IsFinite());
+
+	a = AABB(float3::zero, float3::inf);
+	assert(!a.IsDegenerate());
+	assert(!a.IsFinite());
+
+	a = AABB(float3::zero, float3::zero);
+	assert(a.IsDegenerate());
+	assert(a.IsFinite());
+
+	a = AABB(float3::zero, -float3::zero);
+	assert(a.IsDegenerate());
+	assert(a.IsFinite());
+
+	a = AABB(float3::zero, -float3::one);
+	assert(a.IsDegenerate());
+	assert(a.IsFinite());
+
+	a = AABB(float3::zero, -float3::inf);
+	assert(a.IsDegenerate());
+	assert(!a.IsFinite());
+
+	a = AABB(float3::inf, -float3::inf);
+	assert(a.IsDegenerate());
+	assert(!a.IsFinite());
+
+	a = AABB(-float3::inf, float3::inf);
+	assert(!a.IsDegenerate());
+	assert(!a.IsFinite());
+}
+
+UNIQUE_TEST(OBBIsDegenerate)
+{
+	OBB o = AABB(float3::nan, float3::nan);
+	assert(o.IsDegenerate());
+	assert(!o.IsFinite());
+
+	o = OBB(AABB(float3::zero, float3::nan));
+	assert(o.IsDegenerate());
+	assert(!o.IsFinite());
+
+	o = OBB(AABB(float3::zero, float3::one));
+	assert(!o.IsDegenerate());
+	assert(o.IsFinite());
+
+	o = OBB(AABB(float3::zero, float3::inf));
+	assert(!o.IsDegenerate());
+	assert(!o.IsFinite());
+
+	o = OBB(AABB(float3::zero, float3::zero));
+	assert(o.IsDegenerate());
+	assert(o.IsFinite());
+
+	o = OBB(AABB(float3::zero, -float3::zero));
+	assert(o.IsDegenerate());
+	assert(o.IsFinite());
+
+	o = OBB(AABB(float3::zero, -float3::one));
+	assert(o.IsDegenerate());
+	assert(o.IsFinite());
+
+	o = OBB(AABB(float3::zero, -float3::inf));
+	assert(o.IsDegenerate());
+	assert(!o.IsFinite());
+
+	o = OBB(AABB(float3::inf, -float3::inf));
+	assert(o.IsDegenerate());
+	assert(!o.IsFinite());
+
+	o = OBB(AABB(-float3::inf, float3::inf));
+	assert(!o.IsDegenerate());
+	assert(!o.IsFinite());
+}
+
 MATH_END_NAMESPACE

@@ -152,7 +152,7 @@ bool AABB::IsFinite() const
 
 bool AABB::IsDegenerate() const
 {
-	return minPoint.x > maxPoint.x || minPoint.y > maxPoint.y || minPoint.z > maxPoint.z;
+	return !(minPoint.x < maxPoint.x && minPoint.y < maxPoint.y && minPoint.z < maxPoint.z);
 }
 
 float3 AABB::CenterPoint() const

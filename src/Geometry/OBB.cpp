@@ -231,7 +231,7 @@ bool OBB::IsFinite() const
 
 bool OBB::IsDegenerate() const
 {
-	return r.x <= 0.f || r.y <= 0.f || r.z <= 0.f;
+	return !(r.x > 0.f && r.y > 0.f && r.z > 0.f);
 }
 
 float3 OBB::CenterPoint() const

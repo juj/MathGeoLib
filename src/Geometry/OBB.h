@@ -185,6 +185,9 @@ public:
 
 	/// Tests if this OBB is degenerate.
 	/** @return True if this OBB does not span a strictly positive volume.
+		@note This function only checks that the axis radius member of this OBB denotes a strictly positive volume, and ignores 
+			the position and axis direction vectors of this OBB. Be sure to check those manually for NaNs and +/-infs if that 
+			is desired.
 		@see r, Volume(). */
 	bool IsDegenerate() const;
 
