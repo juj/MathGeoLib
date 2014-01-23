@@ -1,7 +1,7 @@
 mergeInto(LibraryManager.library, {
     browser_info: function () {
         idstr = "";
-        if (navigator) {
+        if (typeof navigator != "undefined") {
           if (navigator.vendor && navigator.vendor.length > 0)
               idstr += navigator.vendor + " ";
           if (navigator.platform && navigator.platform.length > 0)
