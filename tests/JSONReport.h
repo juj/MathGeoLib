@@ -49,7 +49,8 @@ public:
 		return majorVerString;
 #elif defined(EMSCRIPTEN)
 		char str[256];
-		sprintf(str, "Emscripten Clang %s", __clang_version__);
+		std::string browserVersion = GetOSDisplayString();
+		sprintf(str, "%s, Clang %s", browserVersion.c_str(), __clang_version__);
 		return str;
 #elif defined(__clang__)
 		char str[256];
