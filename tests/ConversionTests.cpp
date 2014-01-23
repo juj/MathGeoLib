@@ -69,7 +69,7 @@ FORCE_INLINE int M128_TO_INT16(__m128i i)
 #ifdef _MSC_VER
 	return i.m128i_i16[0];
 #else
-    return (int)*(s16*)&i;
+	return (int)*(s16*)&i;
 #endif
 }
 
