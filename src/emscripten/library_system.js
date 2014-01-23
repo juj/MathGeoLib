@@ -22,9 +22,23 @@ mergeInto(LibraryManager.library, {
           if (typeof module !== 'undefined' && module.exports && typeof process !== 'undefined' && typeof process.versions !== 'undefined') {
             idstr = 'Node.js ' + process.versions.node + ' v8 version ' + process.versions.v8;
           } else if (typeof isAsmJSCompilationAvailable === 'function' && isAsmJSCompilationAvailable.toString().indexOf('[native code]') > 0) {
-            idstr = "SpiderMonkey";
-            var asmJsEnabled = isAsmJSCompilationAvailable();
-            idstr += ' asm.js ' + (asmJsEnabled ? 'enabled' : 'disabled');
+            // Workaround a SpiderMonkey shell issue - the commands build(); and help(); do print out build information, but
+            // they short-circuit to printing that information to the system console, and don't give it back as a JS string.
+            // Therefore execute the JS shell via command line, and fetch the required info via a file.
+            // This requires that the SPIDERMONKEY environment variable is present and identifies the currently running SpiderMonkey VM.
+            try {
+              if (environment['SPIDERMONKEY']) {
+                system(environment['SPIDERMONKEY'] + ' --execute="build();help();">spidermonkey_version.txt');
+                var version = read('spidermonkey_version.txt').split('\n').slice(0,2);
+                var asmJsEnabled = isAsmJSCompilationAvailable();
+                var debugStr = (typeof debug === 'function' && debug.toString().indexOf('[native code]') > 0) ? "DEBUG" : "RELEASE";
+                idstr = "SpiderMonkey " + version[1] + ' ' + debugStr + ', asm.js ' + (asmJsEnabled ? 'enabled, ' : 'disabled, ') + version[0];
+              } else {
+                idstr = "SpiderMonkey";
+              }
+            } catch(e) {
+              idstr = "SpiderMonkey";
+            }
           } else {
             idstr = "Unknown browser environment";
           }
