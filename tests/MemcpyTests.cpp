@@ -108,9 +108,60 @@ void aligned_avx_memcpy(void *dst_, void *src_, size_t size)
 }
 #endif
 
-BENCHMARK(memcpy, "memcpy")
+static char memcpydata[512*1024];
+static char memcpydata2[512*1024];
+
+BENCHMARK(memcpy4, "memcpy 4 bytes")
 {
-	memcpy(m2, m, (sizeof(float4x4)*testrunner_numItersPerTest)/100);
+	memcpy(memcpydata2, memcpydata, 4);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy16, "memcpy 16 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 16);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy64, "memcpy 64 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 64);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy256, "memcpy 256 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 256);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy1024, "memcpy 1024 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy8k, "memcpy 8 K")
+{
+	memcpy(memcpydata2, memcpydata, 8*1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy64k, "memcpy 64 K")
+{
+	memcpy(memcpydata2, memcpydata, 64*1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy256k, "memcpy 256 K")
+{
+	memcpy(memcpydata2, memcpydata, 256*1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy512k, "memcpy 512 K")
+{
+	memcpy(memcpydata2, memcpydata, 512*1024);
 }
 BENCHMARK_END;
 
