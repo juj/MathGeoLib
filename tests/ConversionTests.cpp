@@ -202,7 +202,7 @@ RANDOMIZED_TEST(IntToString)
 {
 	const int nums[] = { 0, 1, -1, 10, 11, -10, -11, INT_MIN, INT_MAX, (int)UINT_MAX, 42};
 
-	for(int j = 0; j < sizeof(nums)/sizeof(nums[0]); ++j)
+	for(int j = 0; j < (int)sizeof(nums)/sizeof(nums[0]); ++j)
 	{
 		int i = nums[j];
 		if (i == 42) i = rng.Int();
@@ -241,7 +241,7 @@ RANDOMIZED_TEST(U32ToString)
 {
 	const u32 nums[] = { 0, 1, (u32)-1, 10, 11, (u32)-10, (u32)-11, (u32)INT_MIN, INT_MAX, UINT_MAX, 42};
 
-	for(int j = 0; j < sizeof(nums)/sizeof(nums[0]); ++j)
+	for(int j = 0; j < (int)sizeof(nums)/sizeof(nums[0]); ++j)
 	{
 		u32 i = nums[j];
 		if (i == 42) i = (u32)rng.Int();
