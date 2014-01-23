@@ -108,8 +108,8 @@ void aligned_avx_memcpy(void *dst_, void *src_, size_t size)
 }
 #endif
 
-static char memcpydata[512*1024];
-static char memcpydata2[512*1024];
+char memcpydata[512*1024];
+char memcpydata2[512*1024];
 
 BENCHMARK(memcpy4, "memcpy 4 bytes")
 {
