@@ -21,7 +21,7 @@ mergeInto(LibraryManager.library, {
         } else {
           if (typeof module !== 'undefined' && module.exports && typeof process !== 'undefined' && typeof process.versions !== 'undefined') {
             idstr = 'Node.js ' + process.versions.node + ' v8 version ' + process.versions.v8;
-          } else if (typeof gc === 'function' && gc.toString().indexOf('[native code]') > 0)) {
+          } else if (typeof gc === 'function' && gc.toString().indexOf('[native code]') > 0) {
             idstr = "SpiderMonkey";
             var asmJsEnabled = isAsmJSCompilationAvailable();
             idstr += ' asm.js ' + (asmJsEnabled ? 'enabled' : 'disabled');
