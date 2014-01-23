@@ -152,7 +152,14 @@ bool AABB::IsFinite() const
 
 bool AABB::IsDegenerate() const
 {
+#ifdef _MSC_VER
+	// MSVC generates code that assumes nans can't be present - add an explicit check for that case.
+	return IsNan(minPoint.x) || IsNan(minPoint.y) || IsNan(minPoint.z) ||
+		IsNan(maxPoint.x) || IsNan(maxPoint.y) || IsNan(maxPoint.z) ||
+		!(minPoint.x < maxPoint.x && minPoint.y < maxPoint.y && minPoint.z < maxPoint.z);
+#else
 	return !(minPoint.x < maxPoint.x && minPoint.y < maxPoint.y && minPoint.z < maxPoint.z);
+#endif
 }
 
 float3 AABB::CenterPoint() const
