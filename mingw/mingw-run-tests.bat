@@ -3,7 +3,8 @@
 del /Q /S *.gcda > NUL 2> NUL
 del /Q *.gcno > NUL 2> NUL
 
-MathGeoLib.exe
+:: Pass --exit0 so that the execution does not cause to throw - we don't want to report test failure from code coverage analysis runs.
+MathGeoLib.exe --exit0
 SET ERRORLEV=%ERRORLEVEL%
 
 for /R %%x in (*.gcda, *.gcno) do copy %%x . > NUL
