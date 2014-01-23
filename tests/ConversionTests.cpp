@@ -50,7 +50,7 @@ int U32ToString(u32 i, char *str)
 
 #ifdef _MSC_VER
 #define LOAD_TO_M128(dst, integer) dst.m128i_i32[0] = integer;
-#elif defined(__clang__)
+#elif defined(__clang__) || defined(__GNUC__)
 // Would like to prefer _mm_loadu_si32, but it doesn't seem to exist for clang?
 #define LOAD_TO_M128(dst, integer) dst = _mm_set1_epi32(integer)
 #else
