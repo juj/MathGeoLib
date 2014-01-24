@@ -1,9 +1,12 @@
 if (MSVC)
-	add_definitions(/EHsc -D_CRT_SECURE_NO_WARNINGS)
+	# Exception handling model: Catch C++ exceptions only, assume that "extern C" functions will never throw a C++ exception.
+	add_definitions(/EHsc)
+	# Ignore noisy VS warnings that complain about bad std library functions (for now?)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 	# Perform extremely aggressive optimization on Release builds:
-	# Runtime library: Multi-threaded (/MT)
 	# Flags on Visual Studio 2010 and newer:
+	# Runtime library: Multi-threaded (/MT) as opposed to default 'Multi-threaded DLL' - static runtime library allows better LTCG inlining opportunities.
 	# Optimization: Full Optimization (/Ox)
 	# Inline Function Expansion: Any Suitable (/Ob2)
 	# Enable Intrinsic Functions: Yes (/Oi)
