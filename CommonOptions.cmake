@@ -2,31 +2,48 @@ if (MSVC)
 	add_definitions(/EHsc -D_CRT_SECURE_NO_WARNINGS)
 
 	# Perform extremely aggressive optimization on Release builds:
+	# Runtime library: Multi-threaded (/MT)
+	# Flags on Visual Studio 2010 and newer:
 	# Optimization: Full Optimization (/Ox)
 	# Inline Function Expansion: Any Suitable (/Ob2)
 	# Enable Intrinsic Functions: Yes (/Oi)
 	# Favor Size Or Speed: Favor fast code (/Ot)
-	# Omit Frame Pointers: Yes (/Oy)
 	# Enable Fiber-Safe Optimizations: Yes (/GT)
 	# Whole Program Optimization: Yes (/GL)
 	# Enable String Pooling: Yes (/GF)
 	# Buffer Security Check: No (/GS-)
 	# Floating Point Model: Fast (/fp:fast)
 	# Enable Floating Point Exceptions: No (/fp:except-)
-	set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} /Ox /Ob2 /Oi /Ot /Oy /GT /GL /GF /GS- /fp:fast /fp:except-")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Ob2 /Oi /Ot /Oy /GT /GL /GF /GS- /fp:fast /fp:except-")
+	# Build with Multiple Processes (/MP)
+	set(relFlags "/MT /Ox /Ob2 /Oi /Ot /GT /GL /GF /GS- /fp:fast /fp:except- /MP")
+
+	# Disable all forms of MSVC debug iterator checking in new and old Visual Studios.
+	set(relFlags "${relFlags} /D_SECURE_SCL=0 /D_SCL_SECURE_NO_WARNINGS /D_ITERATOR_DEBUG_LEVEL=0 /D_HAS_ITERATOR_DEBUGGING=0")
+
+	# Since Visual Studio 2012 the IDE has an option: Secure Development Lifecycle (SDL) flags: No (/sdl-)
+	# but that is implied by /GS- already above, so no need to set that.
+
+	# Link-time Code Generation (/LTCG)
+	# Remove unreferenced data (/OPT:REF)
+	# Perform identical COMDAT folding (/OPT:ICF)
+	set(relLinkFlags "/LTCG /OPT:REF /OPT:ICF")
+
+	# Omit Frame Pointers: Yes (/Oy)
+	set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} /Oy ${relFlags}")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Oy ${relFlags}")
 
 	# Don't omit frame pointers, but add Debug database (/Zi).
-	set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} /Zi /GS- /Ox /Ob2 /Oi /Ot /GT /GL /GF /GS- /fp:fast /fp:except-")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /Zi /GS- /Ox /Ob2 /Oi /Ot /GT /GL /GF /GS- /fp:fast /fp:except-")
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} /Zi ${relFlags}")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /Zi ${relFlags}")
 
-	if (MSVC11)
-		# SDL checks: No (/sdl-)
-		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} /sdl-")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /sdl-")
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} /sdl-")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /sdl-")
-	endif()
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${relLinkFlags}")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${relLinkFlags}")
+	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} ${relLinkFlags}")
+
+	set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
+	set(CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
+
 else()
 #	GCC 4.7.2 generates broken code that fails Float4Normalize4 test and others under -O3 -ffast-math, so don't do that.
 #	set(OPT_FLAGS "-O3 -ffast-math")
