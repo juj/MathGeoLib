@@ -1328,7 +1328,7 @@ RANDOMIZED_TEST(RayKdTreeIntersect)
 	KdTree<Triangle> t;
 	std::vector<Triangle> tris = a.Triangulate();
 	if (!tris.empty())
-		t.AddObjects(&tris[0], tris.size());
+		t.AddObjects(&tris[0], (int)tris.size());
 	t.Build();
 	Ray b = RandomRayContainingPoint(pt);
 	TriangleKdTreeRayQueryNearestHitVisitor result;

@@ -187,7 +187,7 @@ void TriangleMesh::Set(const Polyhedron &polyhedron)
 		Triangle degent(degen, degen, degen);
 		while(tris.size() % alignment != 0)
 			tris.push_back(degent);
-		Set(&tris[0], tris.size());
+		Set(&tris[0], (int)tris.size());
 	}
 }
 

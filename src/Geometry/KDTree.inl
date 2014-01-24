@@ -28,7 +28,7 @@ MATH_BEGIN_NAMESPACE
 template<typename T>
 int KdTree<T>::AllocateNodePair()
 {
-	int index = nodes.size();
+	int index = (int)nodes.size();
 	KdTreeNode n;
 	n.splitAxis = AxisNone; // The newly allocated nodes will be leaves.
 	n.bucketIndex = 0;
@@ -139,7 +139,7 @@ void KdTree<T>::SplitLeaf(int nodeIndex, const AABB &nodeAABB, int numObjectsInB
 
 	// For the right child, allocate a new bucket.
 	KdTreeNode *rightChild = &nodes[childIndex+1];
-	rightChild->bucketIndex = buckets.size();
+	rightChild->bucketIndex = (u32)buckets.size();
 	buckets.push_back(rightBucket);
 
 	assert(numObjectsLeft < numObjectsInBucket && numObjectsRight < numObjectsInBucket);
@@ -262,7 +262,7 @@ void KdTree<T>::Build()
 	// Initially, add all objects to the root node.
 	u32 *rootBucket = new u32[objects.size()+1];
 	for(size_t i = 0; i < objects.size(); ++i)
-		rootBucket[i] = i;
+		rootBucket[i] = (u32)i;
 	rootBucket[objects.size()] = BUCKET_SENTINEL;
 	buckets.push_back(rootBucket);
 
@@ -270,7 +270,7 @@ void KdTree<T>::Build()
 
 	// We now have a single root leaf node which is unsplit and contains all the objects
 	// in the kD-tree. Now recursively subdivide until the whole tree is built.
-	SplitLeaf(1, rootAABB, objects.size(), 1);
+	SplitLeaf(1, rootAABB, (int)objects.size(), 1);
 
 #ifdef _DEBUG
 	needsBuilding = false;

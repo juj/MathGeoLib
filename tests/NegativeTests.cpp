@@ -1496,7 +1496,7 @@ RANDOMIZED_TEST(RayKdTreeNoIntersect)
 	KdTree<Triangle> t;
 	std::vector<Triangle> tris = a.Triangulate();
 	if (!tris.empty())
-		t.AddObjects(&tris[0], tris.size());
+		t.AddObjects(&tris[0], (int)tris.size());
 	t.Build();
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
