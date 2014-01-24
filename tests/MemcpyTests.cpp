@@ -141,6 +141,30 @@ BENCHMARK(memcpy1024, "memcpy 1024 bytes")
 }
 BENCHMARK_END;
 
+BENCHMARK(memcpy2048, "memcpy 2048 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 2048);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy3072, "memcpy 3072 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 3072);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy4096, "memcpy 4096 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 4096);
+}
+BENCHMARK_END;
+
+BENCHMARK(memcpy6144, "memcpy 6144 bytes")
+{
+	memcpy(memcpydata2, memcpydata, 6144);
+}
+BENCHMARK_END;
+
 BENCHMARK(memcpy8k, "memcpy 8 K")
 {
 	memcpy(memcpydata2, memcpydata, 8*1024);
