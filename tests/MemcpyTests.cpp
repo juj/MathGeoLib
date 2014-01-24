@@ -165,6 +165,60 @@ BENCHMARK(memcpy512k, "memcpy 512 K")
 }
 BENCHMARK_END;
 
+BENCHMARK(memset4, "memset 4 bytes")
+{
+	memset(memcpydata2, 0, 4);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset16, "memset 16 bytes")
+{
+	memset(memcpydata2, 0, 16);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset64, "memset 64 bytes")
+{
+	memset(memcpydata2, 0, 64);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset256, "memset 256 bytes")
+{
+	memset(memcpydata2, 0, 256);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset1024, "memset 1024 bytes")
+{
+	memset(memcpydata2, 0, 1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset8k, "memset 8 K")
+{
+	memset(memcpydata2, 0, 8*1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset64k, "memset 64 K")
+{
+	memset(memcpydata2, 0, 64*1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset256k, "memset 256 K")
+{
+	memset(memcpydata2, 0, 256*1024);
+}
+BENCHMARK_END;
+
+BENCHMARK(memset512k, "memset 512 K")
+{
+	memset(memcpydata2, 0, 512*1024);
+}
+BENCHMARK_END;
+
 #ifdef MATH_SSE2
 BENCHMARK(aligned_sse_memcpy, "test against memcpy")
 {
