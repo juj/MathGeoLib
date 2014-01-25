@@ -203,7 +203,7 @@ public:
 	/// Projects the given point to the negative half-space of this plane.
 	/** This means that if the point lies on the plane, or in the negative half-space, the same point is 
 		returned unchanged. If the point lies on the positive half-space, it is projected orthographically onto the plane.
-	/** @see ProjectToPositiveHalf(), Project() */
+		@see ProjectToPositiveHalf(), Project() */
 	float3 ProjectToNegativeHalf(const float3 &point) const;
 
 	/// Projects the given point to the positivehalf-space of this plane.
