@@ -29,6 +29,10 @@
 #include <Windows.h>
 #endif
 
+#ifdef MATH_SSE2
+#include "sse_mathfun.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 bool mathBreakOnAssume = false;
@@ -55,14 +59,26 @@ bool AssumeFailed()
 	return mathBreakOnAssume;
 }
 
+static const __m128 pi2 = _mm_set1_ps(2.f*pi);
+
 float Sin(float angleRadians)
 {
+#ifdef MATH_SSE2
+	// Do range reduction by 2pi before calling sin - this enchances precision of sin_ps a lot
+	return s4f_x(sin_ps(modf_ps(setx_ps(angleRadians), pi2)));
+#else
 	return sinf(angleRadians);
+#endif
 }
 
 float Cos(float angleRadians)
 {
+#ifdef MATH_SSE2
+	// Do range reduction by 2pi before calling cos - this enchances precision of cos_ps a lot
+	return s4f_x(cos_ps(modf_ps(setx_ps(angleRadians), pi2)));
+#else
 	return cosf(angleRadians);
+#endif
 }
 
 float Tan(float angleRadians)

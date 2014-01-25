@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #ifdef MATH_SSE2
+#include "../src/Math/simd.h"
 #include "../src/Math/sse_mathfun.h"
 #endif
 
@@ -645,13 +646,13 @@ BENCHMARK(Sin, "Sin")
 }
 BENCHMARK_END;
 
-BENCHMARK(sin, "test against Sin")
+BENCHMARK(sin, "sin")
 {
 	f[i] = sin(pf[i]);
 }
 BENCHMARK_END;
 
-BENCHMARK(sinf, "test against Sin")
+BENCHMARK(sinf, "sinf")
 {
 	f[i] = sinf(pf[i]);
 }
@@ -659,30 +660,48 @@ BENCHMARK_END;
 
 #ifdef MATH_SSE2
 
-BENCHMARK(sin_ps, "test against Sin")
+BENCHMARK(sin_ps, "sin_ps")
 {
 	f[i] = s4f_x(sin_ps(setx_ps(pf[i])));
 }
 BENCHMARK_END;
 
+static const __m128 pi2 = _mm_set1_ps(2.f*pi);
+
+FORCE_INLINE __m128 sin_ps_range_reduced(__m128 fl)
+{
+	return sin_ps(modf_ps(fl, pi2));
+}
+
+BENCHMARK(sin_ps_range_reduced, "sin_ps_range_reduced")
+{
+	f[i] = s4f_x(sin_ps_range_reduced(_mm_set_ss(pf[i])));
+}
+BENCHMARK_END;
+
 UNIQUE_TEST(sin_ps_precision)
 {
-	const int C = 3;
+	const int C = 5;
 	float maxRelError[C] = {};
 	float maxAbsError[C] = {};
 	float X[C] = {};
 
 	for(int l = 0; l < 2; ++l)
 	{
-		float maxVal = (l == 0 ? 4.f*pi : 1e8f);
+		float maxVal = (l == 0 ? 4.f*pi : 1e6f);
 		for(int i = 0; i < 1000000; ++i)
 		{
 			float f = rng.Float(-maxVal, maxVal);//3.141592654f);
-			float x = (float)sin((double)f); // best precision of the Sin.
+			//f = Mod(f, 2.f*pi);
+//			Mod(f, 2.f*pi)
+			const double pi_d = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679;
+			float x = (float)sin(fmod((double)f, 2.0*pi_d)); // best precision of the Sin.
 
 			X[0] = s4f_x(sin_ps(setx_ps(f)));
-			X[1] = sinf(f);
-			X[2] = Sin(f);
+			X[1] = s4f_x(sin_ps_range_reduced(setx_ps(f)));
+			X[2] = sinf(f);
+			X[3] = Sin(f);
+			X[4] = (float)sin((double)f);
 
 			for(int j = 0; j < C; ++j)
 			{
@@ -693,13 +712,17 @@ UNIQUE_TEST(sin_ps_precision)
 
 		LOGI("With |x| < %f:", maxVal);
 		LOGI("Max absolute error with sin_ps(x): %e",  maxAbsError[0]);
-		LOGI("Max absolute error with sinf(x): %e",  maxAbsError[1]);
-		LOGI("Max absolute error with Sin(x): %e",  maxAbsError[2]);
+		LOGI("Max absolute error with sin_ps_range_reduced(x): %e",  maxAbsError[1]);
+		LOGI("Max absolute error with sinf(x): %e",  maxAbsError[2]);
+		LOGI("Max absolute error with Sin(x): %e",  maxAbsError[3]);
+		LOGI("Max absolute error with unwrapped sin(x): %e",  maxAbsError[4]);
 		LOGI(" ");
 
 		LOGI("Max relative error with sin_ps(x): %e",  maxRelError[0]);
-		LOGI("Max relative error with sinf(x): %e",  maxRelError[1]);
-		LOGI("Max relative error with Sin(x): %e",  maxRelError[2]);
+		LOGI("Max relative error with sin_ps_range_reduced(x): %e",  maxRelError[1]);
+		LOGI("Max relative error with sinf(x): %e",  maxRelError[2]);
+		LOGI("Max relative error with Sin(x): %e",  maxRelError[3]);
+		LOGI("Max relative error with unwrapped sin(x): %e",  maxRelError[4]);
 	}
 }
 
