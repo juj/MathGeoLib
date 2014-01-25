@@ -12,13 +12,12 @@ if (MSVC)
 	# Enable Intrinsic Functions: Yes (/Oi)
 	# Favor Size Or Speed: Favor fast code (/Ot)
 	# Enable Fiber-Safe Optimizations: Yes (/GT)
-	# Whole Program Optimization: Yes (/GL)
 	# Enable String Pooling: Yes (/GF)
 	# Buffer Security Check: No (/GS-)
 	# Floating Point Model: Fast (/fp:fast)
 	# Enable Floating Point Exceptions: No (/fp:except-)
 	# Build with Multiple Processes (/MP)
-	set(relFlags "/MT /Ox /Ob2 /Oi /Ot /GT /GL /GF /GS- /fp:fast /fp:except- /MP")
+	set(relFlags "/MT /Ox /Ob2 /Oi /Ot /GT /GF /GS- /fp:fast /fp:except- /MP")
 
 	# Disable all forms of MSVC debug iterator checking in new and old Visual Studios.
 	set(relFlags "${relFlags} /D_SECURE_SCL=0 /D_SCL_SECURE_NO_WARNINGS /D_ITERATOR_DEBUG_LEVEL=0 /D_HAS_ITERATOR_DEBUGGING=0")
@@ -26,10 +25,22 @@ if (MSVC)
 	# Since Visual Studio 2012 the IDE has an option: Secure Development Lifecycle (SDL) flags: No (/sdl-)
 	# but that is implied by /GS- already above, so no need to set that.
 
-	# Link-time Code Generation (/LTCG)
+	# Disable Incremental Linking (/INCREMENTAL:NO) This is incompatible with LTCG, but RelWithDebInfo has this default on.
 	# Remove unreferenced data (/OPT:REF)
 	# Perform identical COMDAT folding (/OPT:ICF)
-	set(relLinkFlags "/LTCG /OPT:REF /OPT:ICF")
+	set(relLinkFlags "/OPT:REF /OPT:ICF /INCREMENTAL:NO")
+
+	# XXX Work around MSVC bug with x64 + /GL + /O2 /arch:AVX, see https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
+	if (MATH_AVX AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(VS_BUG TRUE)
+		message(STATUS "NOTE: Whole Program Optimization is disabled due to detected MSVC bug with x64+/O2+/GL+/arch:AVX!")
+	endif()
+	if (NOT VS_BUG)
+		# Whole Program Optimization: Yes (/GL)
+		set(relFlags "${relFlags} /GL")
+		# Link-time Code Generation (/LTCG)
+		set(relLinkFlags "${relLinkFlags} /LTCG")
+	endif()
 
 	# Omit Frame Pointers: Yes (/Oy)
 	set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} /Oy ${relFlags}")
