@@ -62,7 +62,13 @@
 
 #elif defined(WIN32)
 
+#include <crtdbg.h>
 #include <cassert>
+
+// Visual Studio 2013 seems to not have _CrtDebugBreak anymore.
+#if _MSC_VER >= 1800
+#define _CrtDebugBreak __debugbreak
+#endif
 
 #define asserteq(x,y) \
 	MULTI_LINE_MACRO_BEGIN \

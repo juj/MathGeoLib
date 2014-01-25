@@ -1,5 +1,6 @@
 #include <list>
 #include <string>
+#include <Algorithm>
 
 #include "SystemInfo.h"
 #include "../src/Math/myassert.h"
