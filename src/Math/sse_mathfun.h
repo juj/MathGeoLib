@@ -37,37 +37,37 @@
 
 #include "SSEMath.h"
 
-const __m128 _ps_1 = _mm_set1_ps(1.f);
-const __m128 _ps_0p5 = _mm_set1_ps(0.5f);
-const __m128 _ps_min_norm_pos = set1_ps_hex(0x00800000);
-const __m128 _ps_mant_mask = set1_ps_hex(0x7f800000);
-const __m128 _ps_inv_mant_mask = set1_ps_hex(~0x7f800000);
-const __m128 _ps_sign_mask = set1_ps_hex(0x80000000);
-const __m128 _ps_inv_sign_mask = set1_ps_hex(~0x80000000);
+static const __m128 _ps_1 = _mm_set1_ps(1.f);
+static const __m128 _ps_0p5 = _mm_set1_ps(0.5f);
+static const __m128 _ps_min_norm_pos = set1_ps_hex(0x00800000);
+static const __m128 _ps_mant_mask = set1_ps_hex(0x7f800000);
+static const __m128 _ps_inv_mant_mask = set1_ps_hex(~0x7f800000);
+static const __m128 _ps_sign_mask = set1_ps_hex(0x80000000);
+static const __m128 _ps_inv_sign_mask = set1_ps_hex(~0x80000000);
 
-const __m128i _pi32_1 = _mm_set1_epi32(1);
-const __m128i _pi32_inv1 = _mm_set1_epi32(~1);
-const __m128i _pi32_2 = _mm_set1_epi32(2);
-const __m128i _pi32_4 = _mm_set1_epi32(4);
-const __m128i _pi32_0x7f = _mm_set1_epi32(0x7f);
+static const __m128i _pi32_1 = _mm_set1_epi32(1);
+static const __m128i _pi32_inv1 = _mm_set1_epi32(~1);
+static const __m128i _pi32_2 = _mm_set1_epi32(2);
+static const __m128i _pi32_4 = _mm_set1_epi32(4);
+static const __m128i _pi32_0x7f = _mm_set1_epi32(0x7f);
 
-const __m128 _ps_cephes_SQRTHF = _mm_set1_ps(0.707106781186547524f);
-const __m128 _ps_cephes_log_p0 = _mm_set1_ps(7.0376836292E-2f);
-const __m128 _ps_cephes_log_p1 = _mm_set1_ps(-1.1514610310E-1f);
-const __m128 _ps_cephes_log_p2 = _mm_set1_ps(1.1676998740E-1f);
-const __m128 _ps_cephes_log_p3 = _mm_set1_ps(-1.2420140846E-1f);
-const __m128 _ps_cephes_log_p4 = _mm_set1_ps(+1.4249322787E-1f);
-const __m128 _ps_cephes_log_p5 = _mm_set1_ps(-1.6668057665E-1f);
-const __m128 _ps_cephes_log_p6 = _mm_set1_ps(+2.0000714765E-1f);
-const __m128 _ps_cephes_log_p7 = _mm_set1_ps(-2.4999993993E-1f);
-const __m128 _ps_cephes_log_p8 = _mm_set1_ps(+3.3333331174E-1f);
-const __m128 _ps_cephes_log_q1 = _mm_set1_ps(-2.12194440e-4f);
-const __m128 _ps_cephes_log_q2 = _mm_set1_ps(0.693359375f);
+static const __m128 _ps_cephes_SQRTHF = _mm_set1_ps(0.707106781186547524f);
+static const __m128 _ps_cephes_log_p0 = _mm_set1_ps(7.0376836292E-2f);
+static const __m128 _ps_cephes_log_p1 = _mm_set1_ps(-1.1514610310E-1f);
+static const __m128 _ps_cephes_log_p2 = _mm_set1_ps(1.1676998740E-1f);
+static const __m128 _ps_cephes_log_p3 = _mm_set1_ps(-1.2420140846E-1f);
+static const __m128 _ps_cephes_log_p4 = _mm_set1_ps(+1.4249322787E-1f);
+static const __m128 _ps_cephes_log_p5 = _mm_set1_ps(-1.6668057665E-1f);
+static const __m128 _ps_cephes_log_p6 = _mm_set1_ps(+2.0000714765E-1f);
+static const __m128 _ps_cephes_log_p7 = _mm_set1_ps(-2.4999993993E-1f);
+static const __m128 _ps_cephes_log_p8 = _mm_set1_ps(+3.3333331174E-1f);
+static const __m128 _ps_cephes_log_q1 = _mm_set1_ps(-2.12194440e-4f);
+static const __m128 _ps_cephes_log_q2 = _mm_set1_ps(0.693359375f);
 
 /* natural logarithm computed for 4 simultaneous float 
    return NaN for x <= 0
 */
-__m128 log_ps(__m128 x) {
+FORCE_INLINE __m128 log_ps(__m128 x) {
   __m128i emm0;
   __m128 one = _ps_1;
   __m128 invalid_mask = _mm_cmple_ps(x, _mm_setzero_ps());
@@ -121,21 +121,21 @@ __m128 log_ps(__m128 x) {
   return x;
 }
 
-__m128 _ps_exp_hi = _mm_set1_ps(88.3762626647949f);
-__m128 _ps_exp_lo = _mm_set1_ps(-88.3762626647949f);
+static __m128 _ps_exp_hi = _mm_set1_ps(88.3762626647949f);
+static __m128 _ps_exp_lo = _mm_set1_ps(-88.3762626647949f);
 
-__m128 _ps_cephes_LOG2EF = _mm_set1_ps(1.44269504088896341f);
-__m128 _ps_cephes_exp_C1 = _mm_set1_ps(0.693359375f);
-__m128 _ps_cephes_exp_C2 = _mm_set1_ps(-2.12194440e-4f);
+static __m128 _ps_cephes_LOG2EF = _mm_set1_ps(1.44269504088896341f);
+static __m128 _ps_cephes_exp_C1 = _mm_set1_ps(0.693359375f);
+static __m128 _ps_cephes_exp_C2 = _mm_set1_ps(-2.12194440e-4f);
 
-__m128 _ps_cephes_exp_p0 = _mm_set1_ps(1.9875691500E-4f);
-__m128 _ps_cephes_exp_p1 = _mm_set1_ps(1.3981999507E-3f);
-__m128 _ps_cephes_exp_p2 = _mm_set1_ps(8.3334519073E-3f);
-__m128 _ps_cephes_exp_p3 = _mm_set1_ps(4.1665795894E-2f);
-__m128 _ps_cephes_exp_p4 = _mm_set1_ps(1.6666665459E-1f);
-__m128 _ps_cephes_exp_p5 = _mm_set1_ps(5.0000001201E-1f);
+static __m128 _ps_cephes_exp_p0 = _mm_set1_ps(1.9875691500E-4f);
+static __m128 _ps_cephes_exp_p1 = _mm_set1_ps(1.3981999507E-3f);
+static __m128 _ps_cephes_exp_p2 = _mm_set1_ps(8.3334519073E-3f);
+static __m128 _ps_cephes_exp_p3 = _mm_set1_ps(4.1665795894E-2f);
+static __m128 _ps_cephes_exp_p4 = _mm_set1_ps(1.6666665459E-1f);
+static __m128 _ps_cephes_exp_p5 = _mm_set1_ps(5.0000001201E-1f);
 
-__m128 exp_ps(__m128 x) {
+FORCE_INLINE __m128 exp_ps(__m128 x) {
   __m128 tmp = _mm_setzero_ps(), fx;
   __m128i emm0;
   __m128 one = _ps_1;
@@ -183,16 +183,16 @@ __m128 exp_ps(__m128 x) {
   return y;
 }
 
-__m128 _ps_minus_cephes_DP1 = _mm_set1_ps(-0.78515625f);
-__m128 _ps_minus_cephes_DP2 = _mm_set1_ps(-2.4187564849853515625e-4f);
-__m128 _ps_minus_cephes_DP3 = _mm_set1_ps(-3.77489497744594108e-8f);
-__m128 _ps_sincof_p0 = _mm_set1_ps(-1.9515295891E-4f);
-__m128 _ps_sincof_p1 = _mm_set1_ps( 8.3321608736E-3f);
-__m128 _ps_sincof_p2 = _mm_set1_ps(-1.6666654611E-1f);
-__m128 _ps_coscof_p0 = _mm_set1_ps( 2.443315711809948E-005f);
-__m128 _ps_coscof_p1 = _mm_set1_ps(-1.388731625493765E-003f);
-__m128 _ps_coscof_p2 = _mm_set1_ps( 4.166664568298827E-002f);
-__m128 _ps_cephes_FOPI = _mm_set1_ps(1.27323954473516f); // 4 / M_PI
+static __m128 _ps_minus_cephes_DP1 = _mm_set1_ps(-0.78515625f);
+static __m128 _ps_minus_cephes_DP2 = _mm_set1_ps(-2.4187564849853515625e-4f);
+static __m128 _ps_minus_cephes_DP3 = _mm_set1_ps(-3.77489497744594108e-8f);
+static __m128 _ps_sincof_p0 = _mm_set1_ps(-1.9515295891E-4f);
+static __m128 _ps_sincof_p1 = _mm_set1_ps( 8.3321608736E-3f);
+static __m128 _ps_sincof_p2 = _mm_set1_ps(-1.6666654611E-1f);
+static __m128 _ps_coscof_p0 = _mm_set1_ps( 2.443315711809948E-005f);
+static __m128 _ps_coscof_p1 = _mm_set1_ps(-1.388731625493765E-003f);
+static __m128 _ps_coscof_p2 = _mm_set1_ps( 4.166664568298827E-002f);
+static __m128 _ps_cephes_FOPI = _mm_set1_ps(1.27323954473516f); // 4 / M_PI
 
 /* evaluation of 4 sines at onces, using only SSE1+MMX intrinsics so
    it runs also on old athlons XPs and the pentium III of your grand
@@ -222,12 +222,14 @@ __m128 _ps_cephes_FOPI = _mm_set1_ps(1.27323954473516f); // 4 / M_PI
    Since it is based on SSE intrinsics, it has to be compiled at -O2 to
    deliver full speed.
 */
-__m128 sin_ps(__m128 x) { // any x
+FORCE_INLINE __m128 sin_ps(__m128 x) { // any x
   __m128 xmm1, xmm2 = _mm_setzero_ps(), xmm3, sign_bit, y;
 
+#if 0 // Currently expect user to round manually if he knows input can be unbounded.
 #ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
   // XXX Added in MathGeoLib: Take a modulo of the input in 2pi to try to enhance the precision with large input values.
-  x = modf_ps(x, _mm_set1_ps(2.f*3.141592654f));
+  x = modf_ps(x, _mm_set1_ps(2.f*pi));
+#endif
 #endif
 
   __m128i emm0, emm2;
@@ -311,11 +313,13 @@ __m128 sin_ps(__m128 x) { // any x
 }
 
 /* almost the same as sin_ps */
-__m128 cos_ps(__m128 x) { // any x
+FORCE_INLINE __m128 cos_ps(__m128 x) { // any x
 
+#if 0 // Currently expect user to round manually if he knows input can be unbounded.
 #ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
   // XXX Added in MathGeoLib: Take a modulo of the input in 2pi to try to enhance the precision with large input values.
-  x = modf_ps(x, _mm_set1_ps(2.f*3.141592654f));
+  x = modf_ps(x, _mm_set1_ps(2.f*pi));
+#endif
 #endif
 
   __m128 xmm1, xmm2 = _mm_setzero_ps(), xmm3, y;
@@ -393,13 +397,15 @@ __m128 cos_ps(__m128 x) { // any x
 
 /* since sin_ps and cos_ps are almost identical, sincos_ps could replace both of them..
    it is almost as fast, and gives you a free cosine with your sine */
-void sincos_ps(__m128 x, __m128 *s, __m128 *c) {
+FORCE_INLINE void sincos_ps(__m128 x, __m128 *s, __m128 *c) {
   __m128 xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
   __m128i emm0, emm2, emm4;
 
+#if 0
 #ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
   // XXX Added in MathGeoLib: Take a modulo of the input in 2pi to try to enhance the precision with large input values.
   x = modf_ps(x, _mm_set1_ps(2.f*3.141592654f));
+#endif
 #endif
 
   sign_bit_sin = x;
