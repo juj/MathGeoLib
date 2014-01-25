@@ -128,6 +128,19 @@ FORCE_INLINE void mat4x4_transpose(simd4f *out, const simd4f *mat)
 	vst1q_f32((float32_t*)out+8, m.val[2]);
 	vst1q_f32((float32_t*)out+12, m.val[3]);
 #else
+
+	// Work around Visual Studio AVX codegen issue and avoid movelh and movehl altogether,
+	// they seem to produce fishy results even when /GL is not enabled. Related: https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
+#ifdef MATH_AVX
+	__m128 tmp0 = _mm_shuffle_ps(mat[0], mat[1], 0x44);
+	__m128 tmp2 = _mm_shuffle_ps(mat[0], mat[1], 0xEE);
+	__m128 tmp1 = _mm_shuffle_ps(mat[2], mat[3], 0x44);
+	__m128 tmp3 = _mm_shuffle_ps(mat[2], mat[3], 0xEE);
+	out[0] = _mm_shuffle_ps(tmp0, tmp1, 0x88);
+	out[1] = _mm_shuffle_ps(tmp0, tmp1, 0xDD);
+	out[2] = _mm_shuffle_ps(tmp2, tmp3, 0x88);
+	out[3] = _mm_shuffle_ps(tmp2, tmp3, 0xDD);
+#else
 	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]);
 	__m128 tmp2 = _mm_unpacklo_ps(mat[2], mat[3]);
 	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]);
@@ -136,6 +149,8 @@ FORCE_INLINE void mat4x4_transpose(simd4f *out, const simd4f *mat)
 	out[1] = _mm_movehl_ps(tmp2, tmp0);
 	out[2] = _mm_movelh_ps(tmp1, tmp3);
 	out[3] = _mm_movehl_ps(tmp3, tmp1);
+#endif
+
 #endif
 }
 #endif
