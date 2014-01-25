@@ -106,12 +106,46 @@ UNIQUE_TEST(Frustum_Corners)
 	}
 }
 
+/* TODO: Support this.
+UNIQUE_TEST(Frustum_IsConvex)
+{
+	Frustum f;
+	FOR_EACH_FRUSTUM_CONVENTION(f)
+		Polyhedron p = f.ToPolyhedron();
+		assert(p.IsClosed());
+		assert(p.IsConvex());
+		assert(!p.IsNull());
+	}
+}
+*/
+
+UNIQUE_TEST(Plane_ProjectToNegativeHalf)
+{
+	Plane p(float3(0,1,0), 50.f);
+
+	float3 neg = float3(0,-100.f, 0);
+	float3 pos = float3(0, 100.f, 0);
+	assert(neg.Equals(p.ProjectToNegativeHalf(neg)));
+	assert(!neg.Equals(p.ProjectToPositiveHalf(neg)));
+
+	assert(pos.Equals(p.ProjectToPositiveHalf(pos)));
+	assert(!pos.Equals(p.ProjectToNegativeHalf(pos)));
+}
+
 UNIQUE_TEST(Frustum_Contains)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		for(int i = 0; i < 8; ++i)
-			assert4(f.Contains(f.CornerPoint(i)), i, f.CornerPoint(i), f, f.Distance(f.CornerPoint(i)));
+		{
+			float3 corner = f.CornerPoint(i);
+			float3 closestPoint = f.ClosestPoint(corner);
+			float distance = f.Distance(corner);
+			if (!f.Contains(corner) || distance > 1e-4f)
+				LOGE("Closest point to %s: %s", corner.ToString().c_str(), closestPoint.ToString().c_str());
+			assert4(f.Contains(corner), i, corner, f, distance);
+			assert1(distance < 10.f, distance);
+		}
 
 		assert3(f.Contains(f.CenterPoint()), f, f.CenterPoint(), f.Distance(f.CenterPoint()));
 	}
