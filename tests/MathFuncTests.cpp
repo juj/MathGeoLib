@@ -368,7 +368,7 @@ UNIQUE_TEST(sqrt_precision)
 	}
 
 	LOGI("Max relative error with Sqrt: %e", maxRelError[0]);
-	assert(maxRelError[0] < 1e-9f);
+	assert(maxRelError[0] < 1e-6f);
 	LOGI("Max relative error with SqrtFast: %e", maxRelError[1]);
 	assert(maxRelError[1] < 1e-3f);
 	LOGI("Max relative error with NewtonRhapsonSqrt: %e", maxRelError[2]);
