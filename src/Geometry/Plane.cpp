@@ -293,6 +293,16 @@ float3 Plane::Project(const float3 &point) const
 	return projected;
 }
 
+float3 Plane::ProjectToNegativeHalf(const float3 &point) const
+{
+	return point - Max(0.f, (Dot(normal, point) - d)) * normal;
+}
+
+float3 Plane::ProjectToPositiveHalf(const float3 &point) const
+{
+	return point - Min(0.f, (Dot(normal, point) - d)) * normal;
+}
+
 LineSegment Plane::Project(const LineSegment &lineSegment) const
 {
 	return LineSegment(Project(lineSegment.a), Project(lineSegment.b));

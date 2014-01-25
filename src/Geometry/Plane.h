@@ -187,7 +187,7 @@ public:
 
 	/// Projects the given object onto this plane orthographically.
 	/** @note This mapping can be expressed as a float3x4 matrix operation. See the OrthoProjection() function.
-		@see OrthoProjection(). */
+		@see OrthoProjection(), ProjectToPositiveHalf(), ProjectToNegativeHalf(). */
 	float3 Project(const float3 &point) const;
 	LineSegment Project(const LineSegment &lineSegment) const;
 	/** @param nonDegenerate [out] If the line or ray is perpendicular to the plane, the projection is
@@ -199,6 +199,16 @@ public:
 
 	Triangle Project(const Triangle &triangle) const;
 	Polygon Project(const Polygon &polygon) const;
+
+	/// Projects the given point to the negative half-space of this plane.
+	/** This means that if the point lies on the plane, or in the negative half-space, the same point is 
+		returned unchanged. If the point lies on the positive half-space, it is projected orthographically onto the plane.
+	/** @see ProjectToPositiveHalf(), Project() */
+	float3 ProjectToNegativeHalf(const float3 &point) const;
+
+	/// Projects the given point to the positivehalf-space of this plane.
+	/** @see ProjectToNegativeHalf(), Project() */
+	float3 ProjectToPositiveHalf(const float3 &point) const;
 
 #if 0
 	/// Computes the affine transformation matrix that projects onto this plane in an oblique (slanted) angle.
