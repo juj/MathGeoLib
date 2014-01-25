@@ -329,7 +329,7 @@ bool Polyhedron::IsConvex() const
 			float d = p.SignedDistance(Vertex(i));
 			if (d > 1e-3f) // Tolerate a small epsilon error.
 			{
-				LOGW("Distance of vertex %d from plane %d: %f", i, f, d);
+//				LOGW("Distance of vertex %s/%d from plane %s/%d: %f", Vertex(i).ToString().c_str(), i, p.ToString().c_str(), f, d);
 				return false;
 			}
 		}
