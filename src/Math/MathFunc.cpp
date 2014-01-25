@@ -59,7 +59,9 @@ bool AssumeFailed()
 	return mathBreakOnAssume;
 }
 
+#ifdef MATH_SSE2
 static const __m128 pi2 = _mm_set1_ps(2.f*pi);
+#endif
 
 float Sin(float angleRadians)
 {
