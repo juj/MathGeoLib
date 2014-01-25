@@ -354,18 +354,21 @@ float3 Frustum::Project(const float3 &point) const
 
 bool Frustum::Contains(const float3 &point) const
 {
+	const float eps = 1e-4f;
+	const float neg = -1.f - eps;
+	const float pos = 1.f + eps;
 	float3 projected = Project(point);
 	if (projectiveSpace == FrustumSpaceD3D)
 	{
-		return projected.x >= -1.f && projected.x <= 1.f &&
-			projected.y >= -1.f && projected.y <= 1.f &&
-			projected.z >= 0.f && projected.z <= 1.f;
+		return projected.x >= neg && projected.x <= pos &&
+			projected.y >= neg && projected.y <= pos &&
+			projected.z >= -eps && projected.z <= pos;
 	}
 	else if (projectiveSpace == FrustumSpaceGL)
 	{
-		return projected.x >= -1.f && projected.x <= 1.f &&
-			projected.y >= -1.f && projected.y <= 1.f &&
-			projected.z >= -1.f && projected.z <= 1.f;
+		return projected.x >= neg && projected.x <= pos &&
+			projected.y >= neg && projected.y <= pos &&
+			projected.z >= neg && projected.z <= pos;
 	}
 	else
 	{
@@ -434,7 +437,10 @@ bool Frustum::Contains(const Polyhedron &polyhedron) const
 
 float3 Frustum::ClosestPoint(const float3 &point) const
 {
-	return ToPolyhedron().ClosestPointConvex(point);
+	return ToPolyhedron().ClosestPoint(point);
+
+///\todo Improve numerical stability enough to do effectively this - but do so without temporary memory allocations.
+//	return ToPolyhedron().ClosestPointConvex(point);
 }
 
 float Frustum::Distance(const float3 &point) const
