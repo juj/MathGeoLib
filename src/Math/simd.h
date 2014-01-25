@@ -171,13 +171,17 @@ FORCE_INLINE simd4f pack_4ss_to_ps(simd4f x, simd4f y, simd4f z, const simd4f &w
 	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 }
 
-#ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
+#ifdef MATH_SSE2
 FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 {
 	// x % mod == x - floor(x/mod)*mod
 	// floor(x/mod) = integerpart(x/mod)
 	simd4f ints = _mm_div_ps(x, mod);
+#ifdef MATH_SSE41 // _mm_round_ps is SSE4.1
 	simd4f integerpart = _mm_round_ps(ints, _MM_FROUND_TO_ZERO);
+#else
+	simd4f integerpart = _mm_cvtepi32_ps(_mm_cvttps_epi32(ints));
+#endif
 	return _mm_sub_ps(x, _mm_mul_ps(integerpart, mod));
 }
 #endif
