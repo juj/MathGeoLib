@@ -94,6 +94,9 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 	f.front = float3::RandomDir(rng);
 	f.up = f.front.RandomPerpendicular(rng);
 
+	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
+	f.projectiveSpace = (rng.Int(0,1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL;
+
 //	assert(!f.IsDegenerate());
 
 	float3 extremePoint = f.ExtremePoint(-plane.normal);
@@ -107,9 +110,6 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 	extremePoint = f.ExtremePoint(-plane.normal);
 	assert(plane.SignedDistance(extremePoint) > 0.f);
 	assert(plane.SignedDistance(f) > 0.f);
-
-	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
-	f.projectiveSpace = (rng.Int(0,1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL;
 
 	return f;
 }
