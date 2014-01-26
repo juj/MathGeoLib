@@ -211,11 +211,10 @@ std::string GetProcessorExtendedCPUIDInfo()
 	// in a human readable form.
 	CpuId(CPUInfo, 0);
 	unsigned nIds = CPUInfo[0];
-	char CPUString[0x20];
-	memset(CPUString, 0, sizeof(CPUString));
-	*((int*)CPUString) = CPUInfo[1];
-	*((int*)(CPUString+4)) = CPUInfo[3];
-	*((int*)(CPUString+8)) = CPUInfo[2];
+	char CPUString[13] = {};
+	memcpy(CPUString, CPUInfo+1, sizeof(int));
+	memcpy(CPUString+4, CPUInfo+3, sizeof(int));
+	memcpy(CPUString+8, CPUInfo+2, sizeof(int));
 
 	if (nIds == 0)
 		return CPUString;
