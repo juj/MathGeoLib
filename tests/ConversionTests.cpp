@@ -135,7 +135,7 @@ int U32ToString_SSE(u32 i, char *str)
 #ifdef _MSC_VER
 	_BitScanForward(&shift, onesBits);
 #else
-    shift = (onesBits != 0) ? __builtin_ctz(onesBits) : 0;
+	shift = (onesBits != 0) ? __builtin_ctz(onesBits) : 0;
 #endif
 	_mm_maskmoveu_si128(lo, ones, str-shift);
 	int len = 16-shift;
@@ -150,7 +150,7 @@ RANDOMIZED_TEST(U32ToString_SSE)
 	for(int i = 0; i < 100; ++i)
 	{
 		u32 m = rng.Int(0, 43);
-		m *= 100000000;
+		m *= 100000000U;
 		u32 n = rng.Int();
 		U32ToString_SSE(n+m, str);
 		U32ToString(n+m, str2);
@@ -160,7 +160,8 @@ RANDOMIZED_TEST(U32ToString_SSE)
 
 BENCHMARK(U32ToString_SSE, "SSE uint -> string conversion")
 {
-	U32ToString_SSE(i*1053928445, int_to_string);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	U32ToString_SSE((u32)pseudoRandom, int_to_string);
 }
 BENCHMARK_END;
 
@@ -226,20 +227,23 @@ RANDOMIZED_TEST(IntToString)
 
 BENCHMARK(IntToString, "custom int -> string conversion")
 {
-	IntToString(i*1053928445, int_to_string);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	IntToString((int)pseudoRandom, int_to_string);
 }
 BENCHMARK_END;
 
 BENCHMARK(IntToString_sprintf, "sprintf int -> string conversion")
 {
-	sprintf(int_to_string, "%d", i*1053928445);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	sprintf(int_to_string, "%d", (int)pseudoRandom);
 }
 BENCHMARK_END;
 
 #ifdef _MSC_VER
 BENCHMARK(IntToString_itoa, "itoa int -> string conversion")
 {
-	_itoa(i*1053928445, int_to_string, 10);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	_itoa((int)pseudoRandom, int_to_string, 10);
 }
 BENCHMARK_END;
 #endif
@@ -265,26 +269,30 @@ RANDOMIZED_TEST(U32ToString)
 
 BENCHMARK(U32ToString, "custom uint -> string conversion")
 {
-	U32ToString(i*1053928445, int_to_string);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	U32ToString((u32)pseudoRandom, int_to_string);
 }
 BENCHMARK_END;
 
 BENCHMARK(U32ToString_Slow, "custom slow uint -> string conversion")
 {
-	U32ToString_Slow(i*1053928445, int_to_string);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	U32ToString_Slow((u32)pseudoRandom, int_to_string);
 }
 BENCHMARK_END;
 
 BENCHMARK(U32ToString_sprintf, "sprintf uint -> string conversion")
 {
-	sprintf(int_to_string, "%u", (unsigned int)i*1053928445U);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	sprintf(int_to_string, "%u", pseudoRandom);
 }
 BENCHMARK_END;
 
 #ifdef _MSC_VER
 BENCHMARK(U32ToString_itoa, "itoa uint -> string conversion")
 {
-	_itoa(i*1053928445, int_to_string, 10);
+	unsigned int pseudoRandom = (unsigned int)i * 1053928445U;
+	_itoa((int)pseudoRandom, int_to_string, 10);
 }
 BENCHMARK_END;
 #endif
