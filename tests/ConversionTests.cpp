@@ -84,9 +84,9 @@ static const __m128i one_hundredmth = INT_TO_M128((int)2882303761 /*42.94967295*
 static const __m128i hundredm = INT_TO_M128(100000000);
 static const __m128i one_tenthousandth = _mm_set1_epi32((int)3518437209 /*429496.7295*8192 */);
 static const __m128i tenthousand = _mm_set1_epi32(10000);
-static const __m128i one_hundredth = _mm_set1_epi16((short)41944 /*655.36*64 */);
+static const __m128i one_hundredth = _mm_set1_epi16((short)(unsigned short)41944 /*655.36*64 */);
 static const __m128i hundred = _mm_set1_epi16(100);
-static const __m128i one_tenth = _mm_set1_epi16((short)52429 /* == 8 * 6553.6 */);
+static const __m128i one_tenth = _mm_set1_epi16((short)(unsigned short)52429 /* == 8 * 6553.6 */);
 static const __m128i ten = _mm_set1_epi16(10);
 static const __m128i zerochar = _mm_set1_epi8('0');
 
