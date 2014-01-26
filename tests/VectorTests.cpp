@@ -972,7 +972,7 @@ RANDOMIZED_TEST(copy_nan_float4x4)
 
 RANDOMIZED_TEST(copy_nan_Quat)
 {
-	Quat a;
+	Quat a = Quat::nan;
 	Quat b = a;
 	uninitializedQuat = b;
 }
