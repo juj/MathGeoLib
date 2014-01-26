@@ -116,8 +116,10 @@ float float2::Length() const
 
 void float2::SetFromPolarCoordinates(float theta, float length)
 {
-	x = Cos(theta) * length;
-	y = Sin(theta) * length;
+	float sin, cos;
+	SinCos(theta, sin, cos);
+	x = cos * length;
+	y = sin * length;
 }
 
 float2 float2::FromPolarCoordinates(float theta, float length)

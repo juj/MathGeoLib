@@ -736,7 +736,7 @@ BENCHMARK_END;
 
 BENCHMARK(SinCos, "SinCos")
 {
-	fl_2[i] = SinCos(pf[i]);
+	SinCos(pf[i], pf[i+1], pf[i+2]);
 }
 BENCHMARK_END;
 

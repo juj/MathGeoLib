@@ -30,8 +30,8 @@ MATH_BEGIN_NAMESPACE
 template<typename Matrix>
 void Set3x3PartRotateX(Matrix &m, float angle)
 {
-	const float cosz = Cos(angle);
-	const float sinz = Sin(angle);
+	float sinz, cosz;
+	SinCos(angle, sinz, cosz);
 	
 	m[0][0] = 1.f; m[0][1] =  0.f; m[0][2] =   0.f;
 	m[1][0] = 0.f; m[1][1] = cosz; m[1][2] = -sinz;
@@ -46,8 +46,8 @@ void Set3x3PartRotateX(Matrix &m, float angle)
 template<typename Matrix>
 void Set3x3PartRotateY(Matrix &m, float angle)
 {
-	const float cosz = Cos(angle);
-	const float sinz = Sin(angle);
+	float sinz, cosz;
+	SinCos(angle, sinz, cosz);
 
 	m[0][0] =  cosz; m[0][1] = 0.f; m[0][2] = sinz;
 	m[1][0] =   0.f; m[1][1] = 1.f; m[1][2] =  0.f;
@@ -62,8 +62,8 @@ void Set3x3PartRotateY(Matrix &m, float angle)
 template<typename Matrix>
 void Set3x3PartRotateZ(Matrix &m, float angle)
 {
-	const float cosz = Cos(angle);
-	const float sinz = Sin(angle);
+	float sinz, cosz;
+	SinCos(angle, sinz, cosz);
 
 	m[0][0] = cosz; m[0][1] = -sinz; m[0][2] = 0.f;
 	m[1][0] = sinz; m[1][1] =  cosz; m[1][2] = 0.f;
@@ -77,8 +77,11 @@ void Set3x3PartRotateZ(Matrix &m, float angle)
 template<typename Matrix>
 void Set3x3PartRotateEulerXYZ(Matrix &m, float x, float y, float z)
 {
-	float cx = cos(x); float cy = cos(y); float cz = cos(z);
-	float sx = sin(x); float sy = sin(y); float sz = sin(z);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx, sx, cy, sy, cz, sz;
+	SinCos(x, cx, sx);
+	SinCos(y, cy, sy);
+	SinCos(z, cz, sz);
 
 	m[0][0] =             cy*cz; m[0][1] =         -cy * sz; m[0][2] =     sy;
 	m[1][0] =  cz*sx*sy + cx*sz; m[1][1] = cx*cz - sx*sy*sz; m[1][2] = -cy*sx;
@@ -125,8 +128,11 @@ void ExtractEulerXYZ(Matrix &m, float &x, float &y, float &z)
 template<typename Matrix>
 void Set3x3PartRotateEulerXZY(Matrix &m, float &x, float &z, float &y)
 {
-	float cx = cos(x); float cy = cos(y); float cz = cos(z);
-	float sx = sin(x); float sy = sin(y); float sz = sin(z);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx, sx, cy, sy, cz, sz;
+	SinCos(x, cx, sx);
+	SinCos(y, cy, sy);
+	SinCos(z, cz, sz);
 
 	m[0][0] =             cy*cz; m[0][1] =   -sz; m[0][2] =             cz*sy;
 	m[1][0] =  sx*sy + cx*cy*sz; m[1][1] = cx*cz; m[1][2] = -cy*sx + cx*sy*sz;
@@ -173,8 +179,11 @@ void ExtractEulerXZY(Matrix &m, float &x, float &z, float &y)
 template<typename Matrix>
 void Set3x3PartRotateEulerYXZ(Matrix &m, float &y, float &x, float &z)
 {
-	float cx = cos(x); float cy = cos(y); float cz = cos(z);
-	float sx = sin(x); float sy = sin(y); float sz = sin(z);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx, sx, cy, sy, cz, sz;
+	SinCos(x, cx, sx);
+	SinCos(y, cy, sy);
+	SinCos(z, cz, sz);
 
 	m[0][0] =  cy*cz + sx*sy*sz; m[0][1] = cx*sx*sy - cy*sz; m[0][2] = cx*sy;
 	m[1][0] =             cx*sz; m[1][1] = cx*cz;            m[1][2] =   -sx;
@@ -221,8 +230,11 @@ void ExtractEulerYXZ(Matrix &m, float &y, float &x, float &z)
 template<typename Matrix>
 void Set3x3PartRotateEulerYZX(Matrix &m, float &y, float &z, float &x)
 {
-	float cx = cos(x); float cy = cos(y); float cz = cos(z);
-	float sx = sin(x); float sy = sin(y); float sz = sin(z);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx, sx, cy, sy, cz, sz;
+	SinCos(x, cx, sx);
+	SinCos(y, cy, sy);
+	SinCos(z, cz, sz);
 
 	m[0][0] =  cy*cz; m[0][1] = sx*sy - cx*cy*sz; m[0][2] = cx*sy + cy*sx*sz;
 	m[1][0] =     sz; m[1][1] =            cx*cz; m[1][2] =           -cz*sx;
@@ -269,8 +281,11 @@ void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 template<typename Matrix>
 void Set3x3PartRotateEulerZXY(Matrix &m, float &z, float &x, float &y)
 {
-	float cx = cos(x); float cy = cos(y); float cz = cos(z);
-	float sx = sin(x); float sy = sin(y); float sz = sin(z);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx, sx, cy, sy, cz, sz;
+	SinCos(x, cx, sx);
+	SinCos(y, cy, sy);
+	SinCos(z, cz, sz);
 
 	m[0][0] = cy*cz - sx*sy*sz; m[0][1] = -cx*sz; m[0][2] =  cz*sy + cy*sx*sz;
 	m[1][0] = cz*sx*sy + cy*sz; m[1][1] =  cx*cz; m[1][2] = -cy*cz*sx + sy*sz;
@@ -317,8 +332,11 @@ void ExtractEulerZXY(const Matrix &m, float &z, float &x, float &y)
 template<typename Matrix>
 void Set3x3PartRotateEulerZYX(Matrix &m, float &z, float &y, float &x)
 {
-	float cx = cos(x); float cy = cos(y); float cz = cos(z);
-	float sx = sin(x); float sy = sin(y); float sz = sin(z);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx, sx, cy, sy, cz, sz;
+	SinCos(x, cx, sx);
+	SinCos(y, cy, sy);
+	SinCos(z, cz, sz);
 
 	m[0][0] = cy*cz; m[0][1] = cz*sx*sy - cx*sz; m[0][2] =  cx*cz*sy + sx*sz;
 	m[1][0] = cy*sz; m[1][1] = cx*cz + sx*sy*sz; m[1][2] = -cz*sx + cx*sy*sz;
@@ -365,8 +383,11 @@ void ExtractEulerZYX(Matrix &m, float &z, float &y, float &x)
 template<typename Matrix>
 void Set3x3PartRotateEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 {
-	float cx2 = cos(x2); float cy = cos(y); float cx1 = cos(x1);
-	float sx2 = sin(x2); float sy = sin(y); float sx1 = sin(x1);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx2, sx2, cy, sy, cx1, sx1;
+	SinCos(x2, cx2, sx2);
+	SinCos(y, cy, sy);
+	SinCos(x1, cx1, sx1);
 
 	m[0][0] =      cy; m[0][1] =               sy*sx1; m[0][2] =                sy*cx1;
 	m[1][0] =  sy*sx2; m[1][1] = cx2*cx1 - cy*sx2*sx1; m[1][2] = -cy*cx1*sx2 - cx2*sx1;
@@ -413,8 +434,11 @@ void ExtractEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 template<typename Matrix>
 void Set3x3PartRotateEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 {
-	float cx2 = cos(x2); float cz = cos(z); float cx1 = cos(x1);
-	float sx2 = sin(x2); float sz = sin(z); float sx1 = sin(x1);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cx2, sx2, cz, sz, cx1, sx1;
+	SinCos(x2, cx2, sx2);
+	SinCos(z, cz, sz);
+	SinCos(x1, cx1, sx1);
 
 	m[0][0] =     cz; m[0][1] =              -sz*cx1; m[0][2] =                sz*sx1;
 	m[1][0] = sz*cx2; m[1][1] = cz*cx2*cx1 - sx2*sx1; m[1][2] = -cx1*sx2 - cz*cx2*sx1;
@@ -461,8 +485,11 @@ void ExtractEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 template<typename Matrix>
 void Set3x3PartRotateEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 {
-	float cy2 = cos(y2); float cx = cos(x); float cy1 = cos(y1);
-	float sy2 = sin(y2); float sx = sin(x); float sy1 = sin(y1);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cy2, sy2, cx, sx, cy1, sy1;
+	SinCos(y2, cy2, sy2);
+	SinCos(x, cx, sx);
+	SinCos(y1, cy1, sy1);
 
 	m[0][0] =  cy2*cy1 - cx*sy2*sy1; m[0][1] = sx*sy2; m[0][2] = cx*cy1*sy2 + cy2*sy1;
 	m[1][0] =                sx*sy1; m[1][1] =     cx; m[1][2] =              -sx*cy1;
@@ -509,8 +536,11 @@ void ExtractEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 template<typename Matrix>
 void Set3x3PartRotateEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 {
-	float cy2 = cos(y2); float cz = cos(z); float cy1 = cos(y1);
-	float sy2 = sin(y2); float sz = sin(z); float sy1 = sin(y1);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cy2, sy2, cz, sz, cy1, sy1;
+	SinCos(y2, cy2, sy2);
+	SinCos(z, cz, sz);
+	SinCos(y1, cy1, sy1);
 
 	m[0][0] =  cz*cy2*cy1 - sy2*sy1; m[0][1] = -sz*cy2; m[0][2] = cy1*sy2 + cz*cy2*sy1;
 	m[1][0] =                sz*cy1; m[1][1] =      cz; m[1][2] =               sz*sy1;
@@ -557,8 +587,11 @@ void ExtractEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 template<typename Matrix>
 void Set3x3PartRotateEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 {
-	float cz2 = cos(z2); float cx = cos(x); float cz1 = cos(z1);
-	float sz2 = sin(z2); float sx = sin(x); float sz1 = sin(z1);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cz2, sz2, cx, sx, cz1, sz1;
+	SinCos(z2, cz2, sz2);
+	SinCos(x, cx, sx);
+	SinCos(z1, cz1, sz1);
 
 	m[0][0] = cz2*cz1 - cx*sz2*sz1; m[0][1] = -cx*cz1*sz2 - cz2*sz1; m[0][2] =  sx*sz2;
 	m[1][0] = cz1*sz2 + cx*cz2*sz1; m[1][1] =  cx*cz2*cz1 - sz2*sz1; m[1][2] = -sx*cz2;
@@ -605,8 +638,11 @@ void ExtractEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 template<typename Matrix>
 void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 {
-	float cz2 = cos(z2); float cy = cos(y); float cz1 = cos(z1);
-	float sz2 = sin(z2); float sy = sin(y); float sz1 = sin(z1);
+	///\todo Vectorize to compute 4 sines+cosines at one time.
+	float cz2, sz2, cy, sy, cz1, sz1;
+	SinCos(z2, cz2, sz2);
+	SinCos(y, cy, sy);
+	SinCos(z1, cz1, sz1);
 
 	m[0][0] = cy*cz2*cz1 - sz2*sz1; m[0][1] = -cz1*sz2 - cy*cz2*sz1; m[0][2] = sy*cz2;
 	m[1][0] =           cy*cz1*sz2; m[1][1] =  cz2*cz1 - cy*sz2*sz1; m[1][2] = sy*sz2;
@@ -658,9 +694,10 @@ void SetRotationAxis3x3(Matrix &m, const Vector &a, float angle)
 {
 //	assert(axis is normalized);
 
-	const float c = Cos(angle);
+	float s, c;
+	SinCos(angle, s, c);
+
 	const float c1 = 1.f - c;
-	const float s = Sin(angle);
 
 	m[0][0] = c+c1*a.x*a.x;
 	m[1][0] = c1*a.x*a.y+s*a.z;

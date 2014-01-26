@@ -1144,9 +1144,9 @@ void float4x4::SetRotatePart(const float3 &a, float angle)
 	assume(a.IsNormalized());
 	assume(MATH_NS::IsFinite(angle));
 
-	const float c = Cos(angle);
+	float s, c;
+	SinCos(angle, s, c);
 	const float c1 = (1.f-c);
-	const float s = Sin(angle);
 
 	v[0][0] = c+c1*a.x*a.x;
 	v[1][0] = c1*a.x*a.y+s*a.z;

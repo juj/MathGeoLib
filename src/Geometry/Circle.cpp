@@ -18,6 +18,7 @@
 #include "Circle.h"
 #include "Plane.h"
 #include "../Math/MathFunc.h"
+#include "../Math/float2.h"
 #include "../Math/float3x3.h"
 #include "../Math/float3x4.h"
 #include "../Math/float4x4.h"
@@ -53,12 +54,16 @@ float3 Circle::BasisV() const
 
 float3 Circle::GetPoint(float angleRadians) const
 {
-	return pos + r * (Cos(angleRadians) * BasisU() + Sin(angleRadians) * BasisV());
+	float sin, cos;
+	SinCos(angleRadians, sin, cos);
+	return pos + r * (sin * BasisU() + cos * BasisV());
 }
 
 float3 Circle::GetPoint(float angleRadians, float d) const
 {
-	return pos + r * d * (Cos(angleRadians) * BasisU() + Sin(angleRadians) * BasisV());
+	float sin, cos;
+	SinCos(angleRadians, sin, cos);
+	return pos + r * d * (cos * BasisU() + sin * BasisV());
 }
 
 float3 Circle::ExtremePoint(const float3 &direction) const

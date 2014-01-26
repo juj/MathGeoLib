@@ -88,15 +88,17 @@ float Tan(float angleRadians)
 	return tanf(angleRadians);
 }
 
-float2 SinCos(float angleRadians)
+void SinCos(float angleRadians, float &outSin, float &outCos)
 {
 #ifdef MATH_SSE2
 	__m128 angle = modf_ps(setx_ps(angleRadians), pi2);
 	__m128 sin, cos;
 	sincos_ps(angle, &sin, &cos);
-	return float2(s4f_x(sin), s4f_x(cos));
+	outSin = s4f_x(sin);
+	outCos = s4f_x(cos);
 #else
-	return float2(Sin(angleRadians), Cos(angleRadians));
+	outSin = Sin(angleRadians);
+	outCos = Cos(angleRadians);
 #endif
 }
 

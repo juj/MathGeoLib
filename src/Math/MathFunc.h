@@ -132,7 +132,7 @@ float Tan(float angleRadians);
 /// Simultaneously computes both sin(x) and cos(x), which yields a small performance increase over to
 /// computing them separately.
 /** @see Sin(), Cos(), Tan(), Asin(), Acos(), Atan(), Atan2(), Sinh(), Cosh(), Tanh(). */
-float2 SinCos(float angleRadians);
+void SinCos(float angleRadians, float &outSin, float &outCos);
 /// Computes the function arcsin(x), in radians.
 /** @see Sin(), Cos(), Tan(), SinCos(), Acos(), Atan(), Atan2(), Sinh(), Cosh(), Tanh(). */
 float Asin(float x);
