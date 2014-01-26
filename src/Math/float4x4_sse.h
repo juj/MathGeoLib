@@ -465,12 +465,16 @@ FORCE_INLINE void mat3x4_inverse_orthonormal(__m128 *mat, __m128 *out)
 
 	// First get the translation part (tx,ty,tz) from the original matrix,
 	// and compute T=-M^(-1).
-	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]);                      // [ty,tx,12,02]
-	__m128 xyz = _mm_shuffle_ps(tmp1, mat[2], _MM_SHUFFLE(3, 3, 3, 2)); // [ _,tz,ty,tx]
-	__m128 vec = negate_ps(colmajor_mat4x4_muldir_sse1(mat, xyz));      // [ _,Tz,Ty,Tx]
+	__m128 tx = _mm_shuffle_ps(mat[0], mat[0], _MM_SHUFFLE(3,3,3,3));
+	__m128 ty = _mm_shuffle_ps(mat[1], mat[1], _MM_SHUFFLE(3,3,3,3));
+	__m128 tz = _mm_shuffle_ps(mat[2], mat[2], _MM_SHUFFLE(3,3,3,3));
+	tx = _mm_mul_ps(tx, mat[0]);
+	ty = _mm_mul_ps(ty, mat[1]);
+	tz = _mm_mul_ps(tz, mat[2]);
+	__m128 vec = negate_ps(_mm_add_ps(_mm_add_ps(tx, ty), tz));
 
 	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]); // [11,01,10,00]
-	//     tmp1 = computed already above              [ty,tx,12,02]
+	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]); // [ty,tx,12,02]
 	__m128 tmp2 = _mm_unpacklo_ps(mat[2], vec);    // [Ty,21,Tx,20]
 	__m128 tmp3 = _mm_unpackhi_ps(mat[2], vec);    // [ _,23,Tz,22]
 
