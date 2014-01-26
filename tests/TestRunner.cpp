@@ -4,6 +4,7 @@
 #include "../src/Time/Clock.h"
 #include <algorithm>
 #include <cstring>
+#include <stdexcept>
 #include "TestData.h"
 #include "JSONReport.h"
 
