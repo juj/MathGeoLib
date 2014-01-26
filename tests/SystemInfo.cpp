@@ -133,29 +133,33 @@ std::string GetOSDisplayString()
 			if (osvi.wProductType == VER_NT_WORKSTATION)
 				ss << "Windows 8 ";
 		}
-		PGPI pGPI = (PGPI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetProductInfo");
-		DWORD dwType = 0;
-		pGPI(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &dwType);
-
-		switch(dwType)
+		HMODULE kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+		if (kernel32)
 		{
-		case 0x1 /*PRODUCT_ULTIMATE*/: ss << "Ultimate Edition"; break;
-		case 0x2 /*PRODUCT_HOME_BASIC*/: ss << "Home Basic Edition"; break;
-		case 0x3 /*PRODUCT_HOME_PREMIUM*/: ss << "Home Premium Edition"; break;
-		case 0x4 /*PRODUCT_ENTERPRISE*/: ss << "Enterprise Edition"; break;
-		case 0x6 /*PRODUCT_BUSINESS*/: ss << "Business Edition"; break;
-		case 0xB /*PRODUCT_STARTER*/: ss << "Starter Edition"; break;
-		case 0x12 /*PRODUCT_CLUSTER_SERVER*/: ss << "Cluster Server Edition"; break;
-		case 0x8 /*PRODUCT_DATACENTER_SERVER*/: ss << "Datacenter Edition"; break;
-		case 0xC /*PRODUCT_DATACENTER_SERVER_CORE*/: ss << "Datacenter Edition (core installation)"; break;
-		case 0xA /*PRODUCT_ENTERPRISE_SERVER*/: ss << "Enterprise Edition"; break;
-		case 0xE /*PRODUCT_ENTERPRISE_SERVER_CORE*/: ss << "Enterprise Edition (core installation)"; break;
-		case 0xF /*PRODUCT_ENTERPRISE_SERVER_IA64*/: ss << "Enterprise Edition for Itanium-based Systems"; break;
-		case 0x9 /*PRODUCT_SMALLBUSINESS_SERVER*/: ss << "Small Business Server"; break;
-		case 0x19 /*PRODUCT_SMALLBUSINESS_SERVER_PREMIUM*/: ss << "Small Business Server Premium Edition"; break;
-		case 0x7 /*PRODUCT_STANDARD_SERVER*/: ss << "Standard Edition"; break;
-		case 0xD /*PRODUCT_STANDARD_SERVER_CORE*/: ss << "Standard Edition (core installation)"; break;
-		case 0x11 /*PRODUCT_WEB_SERVER*/: ss << "Web Server Edition"; break;
+			PGPI pGPI = (PGPI)GetProcAddress(kernel32, "GetProductInfo");
+			DWORD dwType = 0;
+			pGPI(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &dwType);
+
+			switch(dwType)
+			{
+			case 0x1 /*PRODUCT_ULTIMATE*/: ss << "Ultimate Edition"; break;
+			case 0x2 /*PRODUCT_HOME_BASIC*/: ss << "Home Basic Edition"; break;
+			case 0x3 /*PRODUCT_HOME_PREMIUM*/: ss << "Home Premium Edition"; break;
+			case 0x4 /*PRODUCT_ENTERPRISE*/: ss << "Enterprise Edition"; break;
+			case 0x6 /*PRODUCT_BUSINESS*/: ss << "Business Edition"; break;
+			case 0xB /*PRODUCT_STARTER*/: ss << "Starter Edition"; break;
+			case 0x12 /*PRODUCT_CLUSTER_SERVER*/: ss << "Cluster Server Edition"; break;
+			case 0x8 /*PRODUCT_DATACENTER_SERVER*/: ss << "Datacenter Edition"; break;
+			case 0xC /*PRODUCT_DATACENTER_SERVER_CORE*/: ss << "Datacenter Edition (core installation)"; break;
+			case 0xA /*PRODUCT_ENTERPRISE_SERVER*/: ss << "Enterprise Edition"; break;
+			case 0xE /*PRODUCT_ENTERPRISE_SERVER_CORE*/: ss << "Enterprise Edition (core installation)"; break;
+			case 0xF /*PRODUCT_ENTERPRISE_SERVER_IA64*/: ss << "Enterprise Edition for Itanium-based Systems"; break;
+			case 0x9 /*PRODUCT_SMALLBUSINESS_SERVER*/: ss << "Small Business Server"; break;
+			case 0x19 /*PRODUCT_SMALLBUSINESS_SERVER_PREMIUM*/: ss << "Small Business Server Premium Edition"; break;
+			case 0x7 /*PRODUCT_STANDARD_SERVER*/: ss << "Standard Edition"; break;
+			case 0xD /*PRODUCT_STANDARD_SERVER_CORE*/: ss << "Standard Edition (core installation)"; break;
+			case 0x11 /*PRODUCT_WEB_SERVER*/: ss << "Web Server Edition"; break;
+			}
 		}
 	}
 	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
