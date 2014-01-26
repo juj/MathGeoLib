@@ -292,7 +292,7 @@ RANDOMIZED_TEST(Float4x4Ctor)
 	float4x4 m2(m);
 	for(int y = 0; y < 3; ++y)
 		for(int x = 0; x < 3; ++x)
-			assert(EqualAbs(m.At(y,x), m2.At(y,x)));
+			assert2(EqualAbs(m.At(y,x), m2.At(y,x)), m.At(y,x), m2.At(y,x));
 	assert(EqualAbs(m2[0][3], 0.f));
 	assert(EqualAbs(m2[1][3], 0.f));
 	assert(EqualAbs(m2[2][3], 0.f));
