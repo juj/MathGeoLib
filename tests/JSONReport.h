@@ -31,23 +31,25 @@ public:
 	static std::string CompilerIdentifier() // http://sourceforge.net/p/predef/wiki/Compilers/
 	{
 #ifdef _MSC_VER
-		const char *majorVerString = "VS?";
-#if _MSC_VER < 1310 /* VS2003 */
-		return "Old unsupported VS";
-#elif _MSC_VER < 1400
-		majorVerString = "VS2003";
-#elif _MSC_VER < 1500
-		majorVerString = "VS2005";
-#elif _MSC_VER < 1600
-		majorVerString = "VS2008";
-#elif _MSC_VER < 1700
-		majorVerString = "VS2010";
-#elif _MSC_VER < 1800
-		majorVerString = "VS2012";
-#else
-		majorVerString = "VS2012 (or newer?)";
-#endif
-		return majorVerString;
+		// http://stackoverflow.com/questions/70013/how-to-detect-if-im-compiling-code-with-visual-studio-2008
+		switch(_MSC_VER)
+		{
+			case 1100: return "MSVC 5.0";
+			case 1200: return "MSVC 6.0";
+			case 1300: return "MSVC 7.0";
+			case 1310: return "VS2003";
+			case 1400: return "VS2005";
+			case 1500: return "VS2008";
+			case 1600: return "VS2010";
+			case 1700: return "VS2012";
+			case 1800: return "VS2013";
+			default:
+			{
+				char str[256];
+				sprintf(str, "MSVC ver. %d", _MSC_VER);
+				return str;
+			}
+		}
 #elif defined(EMSCRIPTEN)
 		char str[256];
 		std::string browserVersion = GetOSDisplayString();
