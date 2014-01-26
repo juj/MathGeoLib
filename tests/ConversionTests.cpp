@@ -22,17 +22,17 @@ char int_to_string[64];
 // sprintf     - 210.107 nsecs
 // From 2013 Macbook Pro + Win8.1 + VS2010
 
-int U32ToString(u32 i, char *str)
+int U32ToString(u32 val, char *str)
 {
 	char *s = str;
 	for(;;)
 	{
-		int ni = i / 10;
-		int digit = i - ni*10;
+		int ni = val / 10;
+		int digit = val - ni*10;
 		*s++ = (char)('0' + digit);
 		if (ni == 0)
 			break;
-		i = ni;
+		val = ni;
 	}
 	*s = '\0';
 	ptrdiff_t len = s - str;
@@ -160,15 +160,15 @@ BENCHMARK_END;
 #endif
 
 // Tests whether modulus+division is slower than division+multiplication. (doesn't seem to be the case)
-int U32ToString_Slow(u32 i, char *str)
+int U32ToString_Slow(u32 val, char *str)
 {
 	char *s = str;
 	for(;;)
 	{
-		int digit = i % 10;
+		int digit = val % 10;
 		*s++ = (char)('0' + digit);
-		i /= 10;
-		if (i == 0)
+		val /= 10;
+		if (val == 0)
 			break;
 	}
 	*s = '\0';
@@ -270,7 +270,7 @@ BENCHMARK_END;
 
 BENCHMARK(U32ToString_sprintf, "sprintf uint -> string conversion")
 {
-	sprintf(int_to_string, "%u", i*1053928445);
+	sprintf(int_to_string, "%u", (unsigned int)i*1053928445U);
 }
 BENCHMARK_END;
 
