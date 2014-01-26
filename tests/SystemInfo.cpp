@@ -248,7 +248,7 @@ int GetMaxSimultaneousThreads()
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 {
 	char str[256];
-	sprintf(str, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d\\", dwCPU);
+	sprintf(str, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%lu\\", dwCPU);
 	return (unsigned long)ReadRegistryKeyU32(str, "~MHz");
 }
 
