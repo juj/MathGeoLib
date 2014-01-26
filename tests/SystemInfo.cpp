@@ -79,180 +79,53 @@ std::string FindLine(const std::string &inStr, const char *lineStart)
 #include <cpuid.h>
 #endif
 
-typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
-typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, PDWORD);
+std::string ReadRegistryKeyString(const char *registryKey, const char *registryValue)
+{
+	// Open the key
+	HKEY hKey;
+	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+		return 0;
+
+	char str[256] = {};
+	DWORD dwLen = 255;
+	LSTATUS ret = RegQueryValueExA(hKey, registryValue, NULL, NULL, (LPBYTE)str, &dwLen);
+	RegCloseKey(hKey);
+
+	if (ret == ERROR_SUCCESS)
+		return str;
+	else
+		return std::string();
+}
+
+unsigned int ReadRegistryKeyU32(const char *registryKey, const char *registryValue)
+{
+	// Open the key
+	HKEY hKey;
+	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+		return 0;
+
+	unsigned int value = 0;
+	DWORD dwLen = 4;
+	LSTATUS ret = RegQueryValueExA(hKey, registryValue, NULL, NULL, (LPBYTE)&value, &dwLen);
+	RegCloseKey(hKey);
+
+	if (ret == ERROR_SUCCESS)
+		return value;
+	else
+		return 0;
+}
 
 std::string GetOSDisplayString()
 {
-	OSVERSIONINFOEXA osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEXA));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXA);
-	BOOL bOsVersionInfoEx = GetVersionExA((OSVERSIONINFOA *)&osvi);
-	if (!bOsVersionInfoEx)
-		return "Unknown OS";
-
-	// Call GetNativeSystemInfo if supported or GetSystemInfo otherwise.
-	SYSTEM_INFO si;
-	ZeroMemory(&si, sizeof(SYSTEM_INFO));
-
-	PGNSI pGNSI = (PGNSI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo");
-	if (pGNSI)
-		pGNSI(&si);
+	std::string productName = ReadRegistryKeyString("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\", "ProductName");
+	std::string servicePack = ReadRegistryKeyString("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\", "CSDVersion");
+	std::string bitness = ReadRegistryKeyString("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\", "BuildLabEx");
+	if (bitness.find("amd64") != std::string::npos)
+		bitness = "64-bit";
 	else
-		GetSystemInfo(&si);
+		bitness = "32-bit";
 
-	std::stringstream ss;
-
-	if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT)
-	{
-		ss << "Unknown OS (PlatformID: " << osvi.dwPlatformId << ", MajorVersion: " << osvi.dwMajorVersion << ", MinorVersion: " << osvi.dwMinorVersion << ")";
-		return ss.str();
-	}
-
-	ss << "Microsoft ";
-
-	// Test for the specific product.
-	if (osvi.dwMajorVersion == 6)
-	{
-		if (osvi.dwMinorVersion == 0)
-		{
-			if (osvi.wProductType == VER_NT_WORKSTATION)
-				ss << "Windows Vista ";
-			else
-				ss << "Windows Server 2008 ";
-		}
-		else if (osvi.dwMinorVersion == 1)
-		{
-			if (osvi.wProductType == VER_NT_WORKSTATION)
-				ss << "Windows 7 ";
-			else
-				ss << "Windows Server 2008 R2 ";
-		}
-		else if (osvi.dwMinorVersion == 2)
-		{
-			if (osvi.wProductType == VER_NT_WORKSTATION)
-				ss << "Windows 8 ";
-		}
-		HMODULE kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-		if (kernel32)
-		{
-			PGPI pGPI = (PGPI)GetProcAddress(kernel32, "GetProductInfo");
-			DWORD dwType = 0;
-			pGPI(osvi.dwMajorVersion, osvi.dwMinorVersion, 0, 0, &dwType);
-
-			switch(dwType)
-			{
-			case 0x1 /*PRODUCT_ULTIMATE*/: ss << "Ultimate Edition"; break;
-			case 0x2 /*PRODUCT_HOME_BASIC*/: ss << "Home Basic Edition"; break;
-			case 0x3 /*PRODUCT_HOME_PREMIUM*/: ss << "Home Premium Edition"; break;
-			case 0x4 /*PRODUCT_ENTERPRISE*/: ss << "Enterprise Edition"; break;
-			case 0x6 /*PRODUCT_BUSINESS*/: ss << "Business Edition"; break;
-			case 0xB /*PRODUCT_STARTER*/: ss << "Starter Edition"; break;
-			case 0x12 /*PRODUCT_CLUSTER_SERVER*/: ss << "Cluster Server Edition"; break;
-			case 0x8 /*PRODUCT_DATACENTER_SERVER*/: ss << "Datacenter Edition"; break;
-			case 0xC /*PRODUCT_DATACENTER_SERVER_CORE*/: ss << "Datacenter Edition (core installation)"; break;
-			case 0xA /*PRODUCT_ENTERPRISE_SERVER*/: ss << "Enterprise Edition"; break;
-			case 0xE /*PRODUCT_ENTERPRISE_SERVER_CORE*/: ss << "Enterprise Edition (core installation)"; break;
-			case 0xF /*PRODUCT_ENTERPRISE_SERVER_IA64*/: ss << "Enterprise Edition for Itanium-based Systems"; break;
-			case 0x9 /*PRODUCT_SMALLBUSINESS_SERVER*/: ss << "Small Business Server"; break;
-			case 0x19 /*PRODUCT_SMALLBUSINESS_SERVER_PREMIUM*/: ss << "Small Business Server Premium Edition"; break;
-			case 0x7 /*PRODUCT_STANDARD_SERVER*/: ss << "Standard Edition"; break;
-			case 0xD /*PRODUCT_STANDARD_SERVER_CORE*/: ss << "Standard Edition (core installation)"; break;
-			case 0x11 /*PRODUCT_WEB_SERVER*/: ss << "Web Server Edition"; break;
-			}
-		}
-	}
-	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-	{
-		if (GetSystemMetrics(SM_SERVERR2))
-			ss << "Windows Server 2003 R2, ";
-		else if (osvi.wSuiteMask == VER_SUITE_STORAGE_SERVER)
-			ss << "Windows Storage Server 2003";
-		else if (osvi.wSuiteMask == 0x00008000)
-			ss << "Windows Home Server";
-		else if (osvi.wProductType == VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-			ss << "Windows XP Professional x64 Edition";
-		else
-			ss << "Windows Server 2003, ";
-
-		// Test for the server type.
-		if (osvi.wProductType != VER_NT_WORKSTATION)
-		{
-			if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					ss << "Datacenter Edition for Itanium-based Systems";
-				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					ss << "Enterprise Edition for Itanium-based Systems";
-			}
-			else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					ss << "Datacenter x64 Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					ss << "Enterprise x64 Edition";
-				else
-					ss << "Standard x64 Edition";
-			}
-			else
-			{
-				if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
-					ss << "Compute Cluster Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					ss << "Datacenter Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					ss << "Enterprise Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_BLADE)
-					ss << "Web Edition";
-				else
-					ss << "Standard Edition";
-			}
-		}
-	}
-	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
-	{
-		ss << "Windows XP ";
-		if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
-			ss << "Home Edition";
-		else
-			ss << "Professional";
-	}
-	else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
-	{
-		ss << "Windows 2000 ";
-
-		if (osvi.wProductType == VER_NT_WORKSTATION)
-			ss << "Professional";
-		else
-		{
-			if (osvi.wSuiteMask & VER_SUITE_DATACENTER )
-				ss << "Datacenter Server";
-			else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-				ss << "Advanced Server";
-			else
-				ss << "Server";
-		}
-	}
-	else
-	{
-		ss << "Unknown OS (PlatformID: " << osvi.dwPlatformId << ", MajorVersion: " << osvi.dwMajorVersion << ", MinorVersion: " << osvi.dwMinorVersion << ")";
-		return ss.str();
-	}
-
-	// Include service pack (if any) and build number.
-	if (strlen(osvi.szCSDVersion) > 0)
-		ss << " " << osvi.szCSDVersion;
-
-	ss << " (build " << (int)osvi.dwBuildNumber << ")";
-
-	if (osvi.dwMajorVersion >= 6)
-	{
-		if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-			ss << ", 64-bit";
-		else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-			ss << ", 32-bit";
-	}
-	return ss.str();
+	return productName + " " + bitness + " " + servicePack;
 }
 
 unsigned long long GetTotalSystemPhysicalMemory()
@@ -378,25 +251,11 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 	DWORD dwSpeed;
 
 	// Get the key name
-	TCHAR szKey[256] = {};
-	_sntprintf(szKey, sizeof(szKey)/sizeof(TCHAR)-1, TEXT("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d\\"), (int)dwCPU);
-
-	// Open the key
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,szKey, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
-		return 0;
-
-	// Read the value
-	DWORD dwLen = 4;
-	if (RegQueryValueEx(hKey, TEXT("~MHz"), NULL, NULL, (LPBYTE)&dwSpeed, &dwLen) != ERROR_SUCCESS)
-	{
-		RegCloseKey(hKey);
-		return 0;
-	}
-
-	// Cleanup and return
-	RegCloseKey(hKey);
-	return dwSpeed;
+	char str[256];
+	sprintf(str, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d\\", dwCPU);
+	return (unsigned long)ReadRegistryKeyU32(str, "~MHz");
 }
+
 #elif defined(LINUX)
 
 std::string GetOSDisplayString()
