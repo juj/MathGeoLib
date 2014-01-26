@@ -788,10 +788,6 @@ float3x3 float3x3::Adjugate() const
 
 bool float3x3::Inverse(float epsilon)
 {
-#ifdef MATH_ASSERT_CORRECTNESS
-	float3x3 orig = *this;
-#endif
-
 	// There exists a generic matrix inverse calculator that uses Gaussian elimination.
 	// It would be invoked by calling
 	// return InverseMatrix(*this, epsilon);
@@ -800,13 +796,6 @@ bool float3x3::Inverse(float epsilon)
 	bool success = InverseMatrix(i, epsilon);
 	if (!success)
 		return false;
-
-#ifdef MATH_ASSERT_CORRECTNESS
-	float3x3 id = orig * i;
-	float3x3 id2 = i * orig;
-	mathassert(id.IsIdentity(0.5f));
-	mathassert(id2.IsIdentity(0.5f));
-#endif
 
 	*this = i;
 	return true;

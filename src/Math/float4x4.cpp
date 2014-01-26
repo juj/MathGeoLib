@@ -1371,15 +1371,7 @@ bool float4x4::Inverse(float epsilon)
 	float det = mat4x4_inverse(row, row);
 	return det > 1e-5f;
 #else
-#ifdef MATH_ASSERT_CORRECTNESS
-	float4x4 copy = *this;
-	bool success = InverseMatrix(*this, epsilon);
-	mathassert(!(success == false && Determinant4() == 0.f));
-	mathassert(!success || (copy * *this).IsIdentity(1e-1f));
-	return success;
-#else
 	return InverseMatrix(*this, epsilon);
-#endif
 #endif
 }
 

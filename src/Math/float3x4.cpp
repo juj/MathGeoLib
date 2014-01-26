@@ -901,15 +901,9 @@ float float3x4::Determinant() const
 bool float3x4::Inverse(float epsilon)
 {
 	///\todo SSE.
-#ifdef MATH_ASSERT_CORRECTNESS
-	float3x4 orig = *this;
-#endif
 	float4x4 temp(*this); ///@todo It is possible optimize to avoid copying here by writing the inverse function specifically for float3x4.
 	bool success = temp.Inverse(epsilon);
 	*this = temp.Float3x4Part();
-#ifdef MATH_ASSERT_CORRECTNESS
-	assert3(!success || (orig * *this).IsIdentity(1e-1f), orig, *this, orig * *this);
-#endif
 	return success;
 }
 
