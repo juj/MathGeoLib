@@ -88,7 +88,7 @@ std::string ReadRegistryKeyString(const char *registryKey, const char *registryV
 
 	char str[256] = {};
 	DWORD dwLen = 255;
-	LSTATUS ret = RegQueryValueExA(hKey, registryValue, NULL, NULL, (LPBYTE)str, &dwLen);
+	LONG ret = RegQueryValueExA(hKey, registryValue, NULL, NULL, (LPBYTE)str, &dwLen);
 	RegCloseKey(hKey);
 
 	if (ret == ERROR_SUCCESS)
@@ -106,7 +106,7 @@ unsigned int ReadRegistryKeyU32(const char *registryKey, const char *registryVal
 
 	unsigned int value = 0;
 	DWORD dwLen = 4;
-	LSTATUS ret = RegQueryValueExA(hKey, registryValue, NULL, NULL, (LPBYTE)&value, &dwLen);
+	LONG ret = RegQueryValueExA(hKey, registryValue, NULL, NULL, (LPBYTE)&value, &dwLen);
 	RegCloseKey(hKey);
 
 	if (ret == ERROR_SUCCESS)
@@ -247,10 +247,6 @@ int GetMaxSimultaneousThreads()
 
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU)
 {
-	HKEY hKey;
-	DWORD dwSpeed;
-
-	// Get the key name
 	char str[256];
 	sprintf(str, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d\\", dwCPU);
 	return (unsigned long)ReadRegistryKeyU32(str, "~MHz");
