@@ -30,12 +30,6 @@ MATH_BEGIN_NAMESPACE
 template<typename Matrix>
 void Set3x3PartRotateX(Matrix &m, float angle)
 {
-	/*
-	 ³   1   0   0 ³
-	 ³   0  cz -sz ³
-	 ³   0  sz  cz ³
-	*/
-
 	const float cosz = Cos(angle);
 	const float sinz = Sin(angle);
 	
@@ -52,12 +46,6 @@ void Set3x3PartRotateX(Matrix &m, float angle)
 template<typename Matrix>
 void Set3x3PartRotateY(Matrix &m, float angle)
 {
-	/*
-	 ³  cz   0  sz ³
-	 ³   0   1   0 ³
-	 ³ -sz   0  cz ³
-	*/
-
 	const float cosz = Cos(angle);
 	const float sinz = Sin(angle);
 
@@ -74,12 +62,6 @@ void Set3x3PartRotateY(Matrix &m, float angle)
 template<typename Matrix>
 void Set3x3PartRotateZ(Matrix &m, float angle)
 {
-	/*
-	 ³  cz -sz   0 ³
-	 ³  sz  cz   0 ³
-	 ³   0   0   1 ³
-	*/
-
 	const float cosz = Cos(angle);
 	const float sinz = Sin(angle);
 
