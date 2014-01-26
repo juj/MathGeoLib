@@ -192,11 +192,10 @@ std::string GetProcessorCPUIDString()
 	// not in linear order. The code below arranges the information 
 	// in a human readable form.
 	CpuId(CPUInfo, 0);
-//	unsigned nIds = CPUInfo[0];
-	char CPUString[0x20] = {};
-	*((int*)CPUString) = CPUInfo[1];
-	*((int*)(CPUString+4)) = CPUInfo[3];
-	*((int*)(CPUString+8)) = CPUInfo[2];
+	char CPUString[13] = {};
+	memcpy(CPUString, CPUInfo+1, sizeof(int));
+	memcpy(CPUString+4, CPUInfo+3, sizeof(int));
+	memcpy(CPUString+8, CPUInfo+2, sizeof(int));
 
 	return CPUString;
 }
