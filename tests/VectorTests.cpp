@@ -866,7 +866,12 @@ TEST(float4_Lerp)
 	assert(a.Lerp(b, 0.5f).Equals(6,6,6,1));
 }
 
-// Test that copying uninitialized memory around is ok:
+// Test that copying uninitialized memory around is ok in the sense that it doesn't crash or assert:
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
 
 RANDOMIZED_TEST(copy_uninitialized_float2)
 {
@@ -916,6 +921,10 @@ RANDOMIZED_TEST(copy_uninitialized_Quat)
 	Quat b = a;
 	uninitializedQuat = b;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 // Also, it must be safe to assign NaN types around:
 
