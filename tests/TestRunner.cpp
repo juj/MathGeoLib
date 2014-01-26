@@ -20,6 +20,7 @@ std::vector<Test> &Tests()
 static int numTestsPassed = 0;
 static int numTestsFailed = 0;
 static int numTestsWarnings = 0;
+static int numTestsRun = 0;
 
 volatile int globalPokedData = 0;
 
@@ -284,6 +285,7 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONRe
 				++numTestsFailed;
 
 			++nextTestToRun;
+			++numTestsRun;
 			return ret;
 		}
 		++nextTestToRun;
@@ -295,7 +297,7 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONRe
 // Returns the number of failures.
 int RunTests(int numTimes, int numTrials, const char * const *prefixes, JSONReport &jsonReport)
 {
-	numTestsPassed = numTestsWarnings = numTestsFailed = 0;
+	numTestsRun = numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
 	for(size_t i = 0; i < Tests().size(); ++i)
 		RunOneTest(numTimes, numTrials, prefixes, jsonReport);
@@ -306,7 +308,7 @@ int RunTests(int numTimes, int numTrials, const char * const *prefixes, JSONRepo
 
 void PrintTestRunSummary()
 {
-	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", (int)Tests().size(), numTestsPassed, numTestsWarnings, numTestsFailed);
+	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", numTestsRun, numTestsPassed, numTestsWarnings, numTestsFailed);
 }
 
 #ifdef MATH_TESTS_EXECUTABLE
@@ -317,8 +319,17 @@ int main(int argc, char **argv)
 #ifdef EMSCRIPTEN
 	numTotalRuns = numTrialsPerTimedBlock = 10;
 #endif
-	const char * const noPrefixes[] = { "", 0 };
-	const char * const *prefixes = (argc >= 4) ? &argv[3] : noPrefixes;
+	// A list of test prefixes to include in the run.
+	std::vector<const char *>prefixesArray;
+	for(int i = 3; i < argc; ++i)
+	{
+		if (argv[i][0] != '-' && argv[i][0] != '/')
+			prefixesArray.push_back(argv[i]);
+	}
+	if (prefixesArray.empty())
+		prefixesArray.push_back(""); // Empty prefix runs all tests.
+	prefixesArray.push_back(0); // Sentinel to terminate prefix string list.
+	const char * const *prefixes = &prefixesArray[0];
 
 	if (numTotalRuns == 0 || numTrialsPerTimedBlock == 0)
 	{
