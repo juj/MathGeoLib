@@ -31,6 +31,7 @@ public:
 	static std::string CompilerIdentifier() // http://sourceforge.net/p/predef/wiki/Compilers/
 	{
 #ifdef _MSC_VER
+#pragma warning(disable:6326) // C6326: potential comparison of a constant with another constant http://msdn.microsoft.com/en-us/library/tz3zbzw6.aspx
 		// http://stackoverflow.com/questions/70013/how-to-detect-if-im-compiling-code-with-visual-studio-2008
 		switch(_MSC_VER)
 		{
@@ -50,6 +51,7 @@ public:
 				return str;
 			}
 		}
+#pragma warning(default:6326)
 #elif defined(EMSCRIPTEN)
 		char str[256];
 		std::string browserVersion = GetOSDisplayString();
