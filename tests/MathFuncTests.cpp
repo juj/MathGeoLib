@@ -740,6 +740,45 @@ BENCHMARK(SinCos, "SinCos")
 }
 BENCHMARK_END;
 
+static float2 Sin_Cos(float angleRadians)
+{
+	return float2(Sin(angleRadians), Cos(angleRadians));
+}
+
+static float2 sinfcosf(float angleRadians)
+{
+	return float2(sinf(angleRadians), cosf(angleRadians));
+}
+
+BENCHMARK(Sin_Cos, "Sin()+Cos()")
+{
+	fl_2[i] = Sin_Cos(pf[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(sinfcosf, "sinfcosf")
+{
+	fl_2[i] = sinfcosf(pf[i]);
+}
+BENCHMARK_END;
+
+#ifdef MATH_SSE2
+float2 sincos_ps_float2(float angleRadians)
+{
+	__m128 angle = modf_ps(setx_ps(angleRadians), pi2);
+	__m128 sin, cos;
+	sincos_ps(angle, &sin, &cos);
+	return float2(s4f_x(sin), s4f_x(cos));
+}
+
+BENCHMARK(sincos_ps, "sincos_ps")
+{
+	fl_2[i] = sincos_ps_float2(pf[i]);
+}
+BENCHMARK_END;
+
+#endif
+
 BENCHMARK(Tan, "Tan")
 {
 	f[i] = Tan(pf[i]);
