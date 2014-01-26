@@ -62,7 +62,10 @@
 
 #elif defined(WIN32)
 
+#ifdef _MSC_VER
 #include <crtdbg.h>
+#endif
+
 #include <cassert>
 
 // Visual Studio 2013 seems to not have _CrtDebugBreak anymore.
