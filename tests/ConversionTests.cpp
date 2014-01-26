@@ -257,7 +257,7 @@ RANDOMIZED_TEST(U32ToString)
 		assert(len > 0);
 		assert(strlen(str) == (size_t)len);
 		char str2[32] = {};
-		sprintf(str2, "%lu", i);
+		sprintf(str2, "%lu", (unsigned long)i);
 	//	printf("i: %d, str: %s, str2: %s\n", i, str, str2);
 		assert(!strcmp(str, str2));
 	}
