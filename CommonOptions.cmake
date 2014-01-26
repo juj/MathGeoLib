@@ -1,3 +1,7 @@
+# If true, output assembly source code (.asm) for examination.
+# Set this in calling code
+# SET(GENERATE_ASM_LISTING TRUE)
+
 if (MSVC)
 	# Exception handling model: Catch C++ exceptions only, assume that "extern C" functions will never throw a C++ exception.
 	add_definitions(/EHsc)
@@ -26,9 +30,12 @@ if (MSVC)
 	# but that is implied by /GS- already above, so no need to set that.
 
 	# Disable Incremental Linking (/INCREMENTAL:NO) This is incompatible with LTCG, but RelWithDebInfo has this default on.
-	# Remove unreferenced data (/OPT:REF)
 	# Perform identical COMDAT folding (/OPT:ICF)
-	set(relLinkFlags "/OPT:REF /OPT:ICF /INCREMENTAL:NO")
+	set(relLinkFlags "/OPT:ICF /INCREMENTAL:NO")
+	if (NOT GENERATE_ASM_LISTING) # When outputting assembly we want to have all functions in, independent of whether they're used.
+		# Remove unreferenced data (/OPT:REF)
+		set(relLinkFlags "${relLinkFlags} /OPT:REF")
+	endif()
 
 	# XXX Work around MSVC bug with x64 + /GL + /O2 /arch:AVX, see https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
 	if (MATH_AVX AND CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -57,6 +64,14 @@ if (MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
 	set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
 	set(CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
+
+	set(outputAsmCodeFlags "/FAs /Fa$(IntDir) /GL /DOPTIMIZED_RELEASE")
+	set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${outputAsmCodeFlags}")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${outputAsmCodeFlags}")
+	set(outputAsmCodeLinkFlags "/OPT:NOREF /LTCG")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${outputAsmCodeLinkFlags}")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${outputAsmCodeLinkFlags}")
+	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} ${outputAsmCodeLinkFlags}")
 
 else()
 #	GCC 4.7.2 generates broken code that fails Float4Normalize4 test and others under -O3 -ffast-math, so don't do that.

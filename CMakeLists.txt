@@ -6,6 +6,10 @@ if (EMSCRIPTEN OR NACL OR ANDROID OR FLASCC)
 	SET(WIN32)
 endif()
 
+if (MATH_TESTS_EXECUTABLE)
+	SET(GENERATE_ASM_LISTING FALSE)
+endif()
+
 include(CommonOptions.cmake)
 
 # If requested from the command line, run Visual Studio 2012 static code analysis. Warning: this is very slow!
@@ -14,7 +18,8 @@ if (MSVC11 AND RUN_VS2012_ANALYZE)
 endif()
 
 if (FAIL_USING_EXCEPTIONS)
-	add_definitions(-DFAIL_USING_EXCEPTIONS)
+	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG} -DFAIL_USING_EXCEPTIONS")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DFAIL_USING_EXCEPTIONS")
 
 	if (EMSCRIPTEN)
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
