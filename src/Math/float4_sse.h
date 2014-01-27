@@ -142,8 +142,8 @@ FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
-FORCE_INLINE simd4f vec3_length_ps(simd4f vec);
-FORCE_INLINE simd4f vec3_length_ps3(simd4f vec);
+simd4f vec3_length_ps(simd4f vec);
+simd4f vec3_length_ps3(simd4f vec);
 
 /// Returns a normalized copy of the given vector. Returns the length of the original vector in outLength.
 FORCE_INLINE simd4f vec4_safe_normalize3(simd4f vec, simd4f &outLength)
