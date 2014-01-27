@@ -878,7 +878,9 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 		return; // Benign failure
 #endif
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+// Require VS2012 for the following line - VS2010 fails at internal compiler error, see
+// http://clb.demon.fi:8113/builders/vs2010-MathGeoLib-32bit-SSE4.1/builds/379/steps/Compile%20MathGeoLib-32bit-Release/logs/stdio
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE) && _MSC_VER >= 1700
 	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
 	v[row][0] = m_r0;
