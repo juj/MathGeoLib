@@ -371,7 +371,7 @@ float3 MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 void Quat::ToAxisAngle(float3 &axis, float &angle) const
 {
 	angle = Acos(w) * 2.f;
-	float sinz = Sin(angle/2.f);
+	float sinz = Sin(angle * 0.5f);
 	if (fabs(sinz) > 1e-4f)
 	{
 		sinz = 1.f / sinz;
@@ -390,8 +390,8 @@ void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 {
 	assume(axis.IsNormalized());
 	assume(MATH_NS::IsFinite(angle));
-	float cosz = Cos(angle/2.f);
-	float sinz = Sin(angle/2.f);
+	float sinz, cosz;
+	SinCos(angle*0.5f, sinz, cosz);
 	x = axis.x * sinz;
 	y = axis.y * sinz;
 	z = axis.z * sinz;
