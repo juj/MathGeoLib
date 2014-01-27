@@ -24,20 +24,34 @@
 #undef assert
 #endif
 
-#if defined(OPTIMIZED_RELEASE) && !defined(FAIL_USING_EXCEPTIONS)
-
-#define assert(x)
-#define asserteq(x,y)
-#define assertcmp(x, cmp, y)
-
-#elif defined(FAIL_USING_EXCEPTIONS)
-
+#ifdef FAIL_USING_EXCEPTIONS
 #include <stdexcept>
+#define RuntimeFailure(str) throw std::runtime_error(str)
+#elif defined(OPTIMIZED_RELEASE) || defined(NDEBUG)
+#define RuntimeFailure(str) ((void)0)
+#define RUNTIME_FAILURE_DISABLED
+#elif defined(_MSC_VER)
+#include <crtdbg.h>
+#define RuntimeFailure(str) do { LOGE("%s", str); _CrtDbgBreak(); } while(0)
+#else
+#define RuntimeFailure(str) do { LOGE("%s", str); } while(0)
+#endif
+
+#ifdef RUNTIME_FAILURE_DISABLED
+
+#define assert(x) ((void)0)
+#define asserteq(x,y) ((void)0)
+#define assertcmp(x, cmp, y) ((void)0)
+
+#else
 
 #define assert(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			throw std::runtime_error(#x " in " __FILE__ ":" STRINGIZE(__LINE__)); \
+		{ \
+			const char *error = #x " in " __FILE__ ":" STRINGIZE(__LINE__); \
+			RuntimeFailure(error); \
+		} \
 	MULTI_LINE_MACRO_END
 
 #define asserteq(x,y) \
@@ -46,7 +60,7 @@
 		{ \
 			std::stringstream std_stringstream; \
 			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			throw std::runtime_error(std_stringstream.str().c_str()); \
+			RuntimeFailure(std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
 
@@ -56,71 +70,8 @@
 		{ \
 			std::stringstream std_stringstream; \
 			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			throw std::runtime_error(std_stringstream.str().c_str()); \
+			RuntimeFailure(std_stringstream.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
-
-#elif defined(WIN32)
-
-#ifdef _MSC_VER
-#include <crtdbg.h>
-#endif
-
-#include <cassert>
-
-// Visual Studio 2013 seems to not have _CrtDebugBreak anymore.
-#if _MSC_VER >= 1800
-#define _CrtDebugBreak __debugbreak
-#endif
-
-#define asserteq(x,y) \
-	MULTI_LINE_MACRO_BEGIN \
-		if ((x) != (y)) \
-		{ \
-			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			LOGE("%s", std_stringstream.str().c_str()); \
-			_CrtDebugBreak(); \
-		} \
-	MULTI_LINE_MACRO_END
-
-#define assertcmp(x, cmp, y) \
-	MULTI_LINE_MACRO_BEGIN \
-		if (!((x) cmp (y))) \
-		{ \
-			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			LOGE("%s", std_stringstream.str().c_str()); \
-			_CrtDebugBreak(); \
-		} \
-	MULTI_LINE_MACRO_END
-
-#elif defined(_DEBUG)
-
-#define assert(x) do { if (!(x)) LOGW("Assertion failed: %s in %s:%d",  #x, __FILE__, __LINE__); } while(0)
-#define asserteq(x,y) \
-	MULTI_LINE_MACRO_BEGIN \
-		if ((x) != (y)) \
-		{ \
-			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			LOGE("%s", std_stringstream.str().c_str()); \
-		} \
-	MULTI_LINE_MACRO_END
-#define assertcmp(x, cmp, y) \
-	MULTI_LINE_MACRO_BEGIN \
-		if (!((x) cmp (y))) \
-		{ \
-			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			LOGE("%s", std_stringstream.str().c_str()); \
-		} \
-	MULTI_LINE_MACRO_END
-
-#else
-
-#define assert(x)
-#define asserteq(x,y)
-#define assertcmp(x, cmp, y)
 
 #endif
