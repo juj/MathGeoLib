@@ -2,6 +2,12 @@
 # Set this in calling code
 # SET(GENERATE_ASM_LISTING TRUE)
 
+set(optFlags "-DMATH_ENABLE_INSECURE_OPTIMIZATIONS")
+set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${optFlags}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${optFlags}")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${optFlags}")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${optFlags}")
+
 if (MSVC)
 	# Exception handling model: Catch C++ exceptions only, assume that "extern C" functions will never throw a C++ exception.
 	add_definitions(/EHsc)
