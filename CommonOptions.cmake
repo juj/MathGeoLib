@@ -139,11 +139,16 @@ if (LINUX)
 	add_definitions(-DLINUX)
 endif()
 
-if (MINGW)
+# MATH_NO_WINVER: Set this to TRUE to have MathGeoLib build to not define the Windows version to target itself.
+# MATH_WINVER: Set this to a custom Windows version that MathGeoLib should target.
+if (MINGW AND NOT MATH_NO_WINVER)
+	if (NOT MATH_WINVER)
+		set(MATH_WINVER 0x0501)
+	endif()
 	# Require Windows XP.
 	# See http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
-	add_definitions(-DWINVER=0x0501)
-	add_definitions(-D_WIN32_WINNT=0x0501)
+	add_definitions(-DWINVER=${MATH_WINVER})
+	add_definitions(-D_WIN32_WINNT=${MATH_WINVER})
 endif()
 
 if(MSVC)
