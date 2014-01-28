@@ -25,6 +25,7 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/MathConstants.h"
 #include "../Math/myassert.h"
+#include "../../tests/SystemInfo.h"
 
 #include <vector>
 
@@ -82,7 +83,7 @@ SIMDCapability DetectSIMDCapability()
 #endif
 //	bool    bMOVOptimization = false;
 
-	__cpuid(CPUInfo, 0);
+	CpuId(CPUInfo, 0);
 	nIds = CPUInfo[0];
 
 	// Get the information associated with each valid Id
@@ -91,7 +92,7 @@ SIMDCapability DetectSIMDCapability()
 	{
 	//	__cpuid(CPUInfo, i);
 
-		__cpuid(CPUInfo, 1);
+		CpuId(CPUInfo, 1);
 		// Interpret CPU feature information.
 //		if  (i == 1)
 		{

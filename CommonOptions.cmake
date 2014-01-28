@@ -80,6 +80,12 @@ if (MSVC)
 	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} ${outputAsmCodeLinkFlags}")
 
 else()
+	if (IS_GCC_LIKE AND GENERATE_ASM_LISTING)
+		set(outputAsmCodeFlags "-S -fverbose-asm -g")
+		# To interleave source code, run 'as -alhnd file.s > file.lst'
+		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${outputAsmCodeFlags}")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${outputAsmCodeFlags}")
+	endif()
 #	GCC 4.7.2 generates broken code that fails Float4Normalize4 test and others under -O3 -ffast-math, so don't do that.
 #	set(OPT_FLAGS "-O3 -ffast-math")
 #	set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${OPT_FLAGS}")

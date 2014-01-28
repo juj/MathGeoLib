@@ -1,14 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
 project(MathGeoLib)
 
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES ".*(gcc|clang|emcc).*" OR CMAKE_C_COMPILER_ID MATCHES ".*(GCC|Clang|emcc).*")
+	set(IS_GCC_LIKE TRUE)
+else()
+	set(IS_GCC_LIKE FALSE)
+endif()
+
 # Undef WIN32 when Windows is only used as a host system
 if (EMSCRIPTEN OR NACL OR ANDROID OR FLASCC)
 	SET(WIN32)
 endif()
 
-if (MATH_TESTS_EXECUTABLE)
-	SET(GENERATE_ASM_LISTING FALSE)
-endif()
+#if (MATH_TESTS_EXECUTABLE)
+#	SET(GENERATE_ASM_LISTING FALSE)
+#endif()
 
 include(CommonOptions.cmake)
 
@@ -32,7 +38,7 @@ if (MATH_TESTS_EXECUTABLE)
 	add_definitions(-DMATH_TESTS_EXECUTABLE)
 
 	if (BUILD_FOR_GCOV)
-		if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES ".*(gcc|clang).*" OR CMAKE_C_COMPILER_ID MATCHES ".*(GCC|Clang).*")
+		if (IS_GCC_LIKE)
 			add_definitions(-fprofile-arcs -ftest-coverage)
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
 			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs")

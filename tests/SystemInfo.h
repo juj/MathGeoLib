@@ -23,6 +23,8 @@ int GetMaxSimultaneousThreads();
 /// @return The clock speed of the given core, in MHz. This is nominal, not actual. It is read from registry.
 unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU);
 
+void CpuId(int *outInfo, int infoType);
+
 #ifdef EMSCRIPTEN
 
 class BrowserVersion
