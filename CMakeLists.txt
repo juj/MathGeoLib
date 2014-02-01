@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 2.8)
 project(MathGeoLib)
 
+if (CMAKE_C_COMPILER MATCHES ".*(clang|emcc).*" OR CMAKE_C_COMPILER_ID MATCHES ".*(Clang|emcc).*")
+	set(COMPILER_IS_CLANG TRUE)
+endif()
+
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES ".*(gcc|clang|emcc).*" OR CMAKE_C_COMPILER_ID MATCHES ".*(GCC|Clang|emcc).*")
 	set(IS_GCC_LIKE TRUE)
 else()
 	set(IS_GCC_LIKE FALSE)
+endif()
+
+if (IS_GCC_LIKE AND NOT COMPILER_IS_CLANG)
+	set(COMPILER_IS_GCC TRUE)
 endif()
 
 # Undef WIN32 when Windows is only used as a host system
