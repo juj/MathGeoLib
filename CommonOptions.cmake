@@ -2,7 +2,17 @@
 # Set this in calling code
 # SET(GENERATE_ASM_LISTING TRUE)
 
-set(optFlags "-DMATH_ENABLE_INSECURE_OPTIMIZATIONS")
+if (WIN32 AND IS_GCC_LIKE)
+	add_definitions(-DWIN32)
+endif()
+
+if (MINGW)
+	set(CMAKE_C_FLAGS_RELEASE   "-O3")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif()
+
+set(optFlags "-DMATH_ENABLE_INSECURE_OPTIMIZATIONS -DNDEBUG -DMATH_SILENT_ASSUME")
+
 set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${optFlags}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${optFlags}")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${optFlags}")
@@ -81,7 +91,17 @@ if (MSVC)
 
 else()
 	if (IS_GCC_LIKE AND GENERATE_ASM_LISTING)
-		set(outputAsmCodeFlags "-S -fverbose-asm -g")
+		# -fkeep-inline-functions: Inline everything, but also keep a separate inlined copy for asm outputting purposes.
+		# Add -ffast-math and -fno-math-errno
+		set(outputAsmCodeFlags "-S -fkeep-inline-functions -fverbose-asm -g")
+
+		# Prefer outputting Intel syntax for assembly.
+		if (COMPILER_IS_CLANG)
+			set(outputAsmCodeFlags "${outputAsmCodeFlags} -mllvm --x86-asm-syntax=intel")
+		else()
+			set(outputAsmCodeFlags "${outputAsmCodeFlags} -masm=intel -Wa,-alnd") # GCC
+		endif()
+
 		# To interleave source code, run 'as -alhnd file.s > file.lst'
 		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${outputAsmCodeFlags}")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${outputAsmCodeFlags}")
@@ -166,29 +186,49 @@ else()
   message(WARNING "Unknown compiler '${CMAKE_C_COMPILER}'/'${CMAKE_C_COMPILER_ID}' used! Cannot set up max warning level.")
 endif()
 
+if (COMPILER_IS_GCC)
+	if (MATH_SSE OR MATH_SSE2 OR MATH_SSE3 OR MATH_SSE41 OR MATH_AVX)
+		add_definitions(-mfpmath=sse)
+	endif()
+endif()
+
 if (MATH_AVX)
 	add_definitions(-DMATH_AVX)
 	if (MSVC)
 		add_definitions(/arch:AVX)
-	else()
-		add_definitions(-mavx)
+	elseif (IS_GCC_LIKE)
+		# http://gcc.gnu.org/onlinedocs/gcc-4.8.2/gcc/i386-and-x86-64-Options.html#i386-and-x86-64-Options
+		add_definitions(-mavx -march=corei7-avx -mtune=corei7-avx)
 	endif()
-endif()
-
-if (MATH_SSE41)
+elseif (MATH_SSE41)
 	add_definitions(-DMATH_SSE41)
-endif()
-
-if (MATH_SSE3)
+	if (MSVC)
+		add_definitions(/arch:SSE2) # No equivalent for Visual Studio, after SSE2, arch jumps to AVX.
+	elseif (IS_GCC_LIKE)
+		# Note: corei7 also requires SSE 4.2
+		add_definitions(-msse4.1 -march=corei7 -mtune=corei7)
+	endif()
+elseif (MATH_SSE3)
 	add_definitions(-DMATH_SSE3)
-endif()
-
-if (MATH_SSE2)
+	if (MSVC)
+		add_definitions(/arch:SSE2) # No equivalent for Visual Studio, after SSE2, arch jumps to AVX.
+	elseif (IS_GCC_LIKE)
+		add_definitions(-msse3 -march=core2 -mtune=core2)
+	endif()
+elseif (MATH_SSE2)
 	add_definitions(-DMATH_SSE2)
-endif()
-
-if (MATH_SSE)
+	if (MSVC)
+		add_definitions(/arch:SSE2)
+	elseif (IS_GCC_LIKE)
+		add_definitions(-msse2 -march=pentium4 -mtune=pentium4)
+	endif()
+elseif (MATH_SSE)
 	add_definitions(-DMATH_SSE)
+	if (MSVC)
+		add_definitions(/arch:SSE)
+	elseif (IS_GCC_LIKE)
+		add_definitions(-msse -march=pentium3 -mtune=pentium3)
+	endif()
 endif()
 
 if (MATH_NEON)
