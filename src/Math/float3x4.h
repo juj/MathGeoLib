@@ -142,8 +142,10 @@ public:
 	float3x4(const Quat &orientation, const float3 &translation);
 
 	/// Creates a new transformation matrix that translates by the given offset.
+	/** @param offset A position or a direction vector specifying the amount of translation. The w-component is ignored. */
 	static TranslateOp Translate(float tx, float ty, float tz);
 	static TranslateOp Translate(const float3 &offset);
+	static TranslateOp Translate(const float4 &offset);
 
 	/// Creates a new float3x4 that rotates about one of the principal axes. [indexTitle: RotateX/Y/Z]
 	/** Calling RotateX, RotateY or RotateZ is slightly faster than calling the more generic RotateAxisAngle function.
@@ -605,6 +607,7 @@ public:
 	float3 TransformPos(float x, float y, float z) const;
 
 	/// Transforms the given direction vector by this matrix M , i.e. returns M * (x, y, z, 0).
+	float4 TransformDir(const float4 &directionVector) const;
 	float3 TransformDir(const float3 &directionVector) const;
 	float3 TransformDir(float x, float y, float z) const;
 
@@ -781,7 +784,9 @@ public:
 	float4x4 Mul(const float4x4 &rhs) const;
 	float3x4 Mul(const Quat &rhs) const;
 	float3 MulPos(const float3 &pointVector) const;
+	float4 MulPos(const float4 &pointVector) const;
 	float3 MulDir(const float3 &directionVector) const;
+	float4 MulDir(const float4 &directionVector) const;
 	float4 Mul(const float4 &vector) const;
 
 #ifdef MATH_QT_INTEROP

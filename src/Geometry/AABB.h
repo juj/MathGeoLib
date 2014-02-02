@@ -21,6 +21,10 @@
 #include "../Math/float3.h"
 #include "../Math/SSEMath.h"
 
+#ifdef MATH_AUTOMATIC_SSE
+#include "../Math/float4.h"
+#endif
+
 #ifdef MATH_OGRE_INTEROP
 #include <OgreAxisAlignedBox.h>
 #endif
@@ -42,16 +46,9 @@ class ALIGN16 AABB
 public:
 
 	/// Specifies the minimum extent of this AABB in the world space x, y and z axes.
-	ALIGN16 float3 minPoint;
-#ifdef MATH_SIMD
-	float padding;
-#endif
-
+	vec minPoint;
 	/// Specifies the maximum extent of this AABB in the world space x, y and z axes. [similarOverload: minPoint]
-	ALIGN16 float3 maxPoint;
-#ifdef MATH_SIMD
-	float padding2;
-#endif
+	vec maxPoint;
 
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members minPoint and maxPoint are undefined after creating a new AABB using this
@@ -62,6 +59,8 @@ public:
 	/// Constructs this AABB by specifying the minimum and maximum extending corners of the box.
 	/** @see minPoint, maxPoint. */
 	AABB(const float3 &minPoint, const float3 &maxPoint);
+
+	AABB(const float4 &minPoint, const float4 &maxPoint);
 
 	/// Constructs this AABB to enclose the given OBB.
 	/** This constructor computes the optimal minimum volume AABB that encloses the given OBB.
@@ -97,7 +96,8 @@ public:
 	/** @param center The center point of this AABB.
 		@param size A vector that specifies the size of this AABB in x, y and z directions.
 		@see SetFrom(), FromCenterAndSize(). */
-	void SetFromCenterAndSize(const float3 &center, const float3 &size);
+	void SetFromCenterAndSize(const float3 &center, const float3 &size) { SetFromCenterAndSize(POINT_VEC(center), DIR_VEC(size)); }
+	void SetFromCenterAndSize(const vec &center, const vec &size);
 
 	/// Sets this AABB to enclose the given OBB.
 	/** This function computes the minimal axis-aligned bounding box for the given oriented bounding box. If the orientation
@@ -160,9 +160,9 @@ public:
 	bool IsDegenerate() const;
 
 	/// @return The center point of this AABB.
-	float3 CenterPoint() const;
+	vec CenterPoint() const;
 	/// [similarOverload: CenterPoint]
-	float3 Centroid() const { return CenterPoint(); }
+	vec Centroid() const { return CenterPoint(); }
 
 	/// Generates a point inside this AABB.
 	/** @param x A normalized value between [0,1]. This specifies the point position along the world x axis.
@@ -170,7 +170,7 @@ public:
 		@param z A normalized value between [0,1]. This specifies the point position along the world z axis.
 		@return A point inside this AABB at point specified by given parameters.
 		@see Edge(), CornerPoint(), PointOnEdge(), FaceCenterPoint(), FacePoint(). */
-	float3 PointInside(float x, float y, float z) const;
+	vec PointInside(float x, float y, float z) const;
 
 	/// Returns an edge of this AABB.
 	/** @param edgeIndex The index of the edge line segment to get, in the range [0, 11].
@@ -184,7 +184,7 @@ public:
 			The points are returned in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++. (corresponding the XYZ axis directions).
 		@todo Draw which index generates which corner point.
 		@see PointInside(), Edge(), PointOnEdge(), FaceCenterPoint(), FacePoint(), GetCornerPoints(). */
-	float3 CornerPoint(int cornerIndex) const;
+	vec CornerPoint(int cornerIndex) const;
 
 	/// Computes an extreme point of this AABB in the given direction.
 	/** An extreme point is a farthest point of this AABB in the given direction. Given a direction,
@@ -194,19 +194,20 @@ public:
 		@return An extreme point of this AABB in the given direction. The returned point is always a
 			corner point of this AABB.
 		@see CornerPoint(). */
-	float3 ExtremePoint(const float3 &direction) const;
+	vec ExtremePoint(const vec &direction) const;
+	float3 ExtremePoint(const float3 &direction) const { return POINT_TO_FLOAT3(ExtremePoint(DIR_VEC(direction))); }
 
 	/// Returns a point on an edge of this AABB.
 	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.
 		@param u A normalized value between [0,1]. This specifies the relative distance of the point along the edge.
 		@see PointInside(), CornerPoint(), CornerPoint(), FaceCenterPoint(), FacePoint(). */
-	float3 PointOnEdge(int edgeIndex, float u) const;
+	vec PointOnEdge(int edgeIndex, float u) const;
 
 	/// Returns the point at the center of the given face of this AABB.
 	/** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
 			This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
 		@see PointInside(), CornerPoint(), PointOnEdge(), PointOnEdge(), FacePoint(). */
-	float3 FaceCenterPoint(int faceIndex) const;
+	vec FaceCenterPoint(int faceIndex) const;
 
 	/// Generates a point at the surface of the given face of this AABB.
 	/** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
@@ -214,13 +215,13 @@ public:
 		@param u A normalized value between [0, 1].
 		@param v A normalized value between [0, 1].
 		@see PointInside(), CornerPoint(), PointOnEdge(), PointOnEdge(), FaceCenterPoint(). */
-	float3 FacePoint(int faceIndex, float u, float v) const;
+	vec FacePoint(int faceIndex, float u, float v) const;
 
 	/// Returns the surface normal direction vector the given face points towards.
 	/** @param faceIndex The index of the AABB face to generate the point at. The valid range is [0, 5].
 			This index corresponds to the planes in the order (-X, +X, -Y, +Y, -Z, +Z).
 		@see FacePoint(), FacePlane(). */
-	float3 FaceNormal(int faceIndex) const;
+	vec FaceNormal(int faceIndex) const;
 
 	/// Computes the plane equation of the given face of this AABB.
 	/** @param faceIndex The index of the AABB face. The valid range is [0, 5].
@@ -259,29 +260,30 @@ public:
 
 	/// Creates a new AABB given is center position and size along the X, Y and Z axes.
 	/** @see SetCenter(). */
-	static AABB FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize);
+	static AABB FromCenterAndSize(const vec &aabbCenterPos, const vec &aabbSize);
+	static AABB FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize) { return AABB::FromCenterAndSize(POINT_VEC(aabbCenterPos), DIR_VEC(aabbSize)); }
 
 	/// Returns the side lengths of this AABB in x, y and z directions.
 	/** The returned vector is equal to the diagonal vector of this AABB, i.e. it spans from the
 		minimum corner of the AABB to the maximum corner of the AABB.
 		@see HalfSize(), Diagonal(). */
-	float3 Size() const;
+	vec Size() const;
 
 	/// [similarOverload: Size]
 	/** Returns Size()/2.
 		@see Size(), HalfDiagonal(). */
-	float3 HalfSize() const;
+	vec HalfSize() const;
 
 	/// Returns the diameter vector of this AABB.
 	/** @note For AABB, Diagonal() and Size() are the same concept. These functions are provided for symmetry
 		with the OBB class.
 		@see Size(), HalfDiagonal(). */
-	float3 Diagonal() const { return Size(); }
+	vec Diagonal() const { return Size(); }
 
 	/// [similarOverload: Diagonal]
 	/** Returns Diagonal()/2.
 		@see Diagonal(), HalfSize(). */
-	float3 HalfDiagonal() const { return HalfSize(); }
+	vec HalfDiagonal() const { return HalfSize(); }
 
 	/// Computes the volume of this AABB.
 	/** @see SurfaceArea(), IsDegenerate(). */
@@ -294,27 +296,28 @@ public:
 	/// Generates a random point inside this AABB.
 	/** The points are distributed uniformly.
 		@see RandomPointOnSurface(), RandomPointOnEdge(), RandomCornerPoint(). */
-	float3 RandomPointInside(LCG &rng) const;
+	vec RandomPointInside(LCG &rng) const;
 
 	/// Generates a random point on a random face of this AABB.
 	/** The points are distributed uniformly.
 		@see RandomPointInside(), RandomPointOnEdge(), RandomCornerPoint(). */
-	float3 RandomPointOnSurface(LCG &rng) const;
+	vec RandomPointOnSurface(LCG &rng) const;
 
 	/// Generates a random point on a random edge of this AABB.
 	/** The points are distributed uniformly.
 		@see RandomPointInside(), RandomPointOnSurface(), RandomCornerPoint(). */
-	float3 RandomPointOnEdge(LCG &rng) const;
+	vec RandomPointOnEdge(LCG &rng) const;
 
 	/// Picks a random corner point of this AABB.
 	/** The points are distributed uniformly.
 		@see RandomPointInside(), RandomPointOnSurface(), RandomPointOnEdge(). */
-	float3 RandomCornerPoint(LCG &rng) const;
+	vec RandomCornerPoint(LCG &rng) const;
 
 	/// Translates this AABB in world space.
 	/** @param offset The amount of displacement to apply to this AABB, in world space coordinates.
 		@see Scale(), Transform(). */
-	void Translate(const float3 &offset);
+	void Translate(const vec &offset);
+	void Translate(const float3 &offset) { Translate(DIR_VEC(offset)); }
 
 	/// Applies a uniform scale to this AABB.
 	/** This function scales this AABB structure in-place, using the given center point as the origin
@@ -322,7 +325,8 @@ public:
 		@param centerPoint Specifies the center of the scaling operation, in world space.
 		@param scaleFactor The uniform scale factor to apply to each world space axis.
 		@see Translate(), Transform(). */
-	void Scale(const float3 &centerPoint, float scaleFactor);
+	void Scale(const vec &centerPoint, float scaleFactor);
+	void Scale(const float3 &centerPoint, float scaleFactor) { Scale(POINT_VEC(centerPoint), scaleFactor); }
 
 	/// Applies a non-uniform scale to this AABB.
 	/** This function scales this AABB structure in-place, using the given center point as the origin
@@ -330,7 +334,8 @@ public:
 		@param centerPoint Specifies the center of the scaling operation, in world space.
 		@param scaleFactor The non-uniform scale factors to apply to each world space axis.
 		@see Translate(), Transform(). */
-	void Scale(const float3 &centerPoint, const float3 &scaleFactor);
+	void Scale(const vec &centerPoint, const vec &scaleFactor);
+	void Scale(const float3 &centerPoint, const float3 &scaleFactor) { Scale(POINT_VEC(centerPoint), DIR_VEC(scaleFactor)); }
 
 	/// Applies a transformation to this AABB.
 	/** This function transforms this AABB with the given transformation, and then recomputes this AABB
@@ -361,14 +366,16 @@ public:
 	/** If the target point lies inside this AABB, then that point is returned.
 		@see Distance(), Contains(), Intersects().
 		@todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-	float3 ClosestPoint(const float3 &targetPoint) const;
+	vec ClosestPoint(const vec &targetPoint) const;
+	inline float3 ClosestPoint(const float3 &targetPoint) const { return POINT_TO_FLOAT3(ClosestPoint(POINT_VEC(targetPoint)));  }
 
 	/// Computes the distance between this AABB and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
 		@todo Add AABB::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron).
 		@see Contains(), Intersects(), ClosestPoint(). */
-	float Distance(const float3 &point) const;
+	float Distance(const vec &point) const;
+	inline float Distance(const float3 &point) const { return Distance(POINT_VEC(point)); }
 	float Distance(const Sphere &sphere) const;
 
 	/// Tests if the given object is fully contained inside this AABB.
@@ -378,6 +385,7 @@ public:
 		@todo Add Contains(Circle/Disc/Sphere/Capsule).
 		@see Distance(), Intersects(), ClosestPoint(). */
 	bool Contains(const float3 &point) const;
+	bool Contains(const vec &point) const { return Contains(POINT_TO_FLOAT3(point)); }
 	bool Contains(const LineSegment &lineSegment) const;
 	bool Contains(const AABB &aabb) const;
 	bool Contains(const OBB &obb) const;
@@ -425,13 +433,15 @@ public:
 	/** @param axis The axis to project onto. This vector can be unnormalized.
 		@param dMin [out] Returns the minimum extent of this AABB on the given axis.
 		@param dMax [out] Returns the maximum extent of this AABB on the given axis. */
-	void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const;
+	void ProjectToAxis(const vec &axis, float &dMin, float &dMax) const;
+	inline void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const { return ProjectToAxis(DIR_VEC(axis), dMin, dMax); }
 
 	/// Expands this AABB to enclose the given object.
 	/** This function computes an AABB that encloses both this AABB and the specified object, and stores the resulting
 		AABB into this.
 		@note The generated AABB is not necessarily the optimal enclosing AABB for this AABB and the given object. */
-	void Enclose(const float3 &point);
+	void Enclose(const vec &point);
+	void Enclose(const float3 &point) { Enclose(POINT_VEC(point)); }
 	void Enclose(const LineSegment &lineSegment);
 	void Enclose(const AABB &aabb);
 	void Enclose(const OBB &obb);

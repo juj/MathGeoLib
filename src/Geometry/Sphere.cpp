@@ -194,7 +194,7 @@ bool Sphere::Contains(const Polygon &polygon) const
 bool Sphere::Contains(const AABB &aabb) const
 {
 	for(int i = 0; i < 8; ++i)
-		if (!Contains(aabb.CornerPoint(i)))
+		if (!Contains(POINT_TO_FLOAT3(aabb.CornerPoint(i))))
 			return false;
 
 	return true;
@@ -642,7 +642,7 @@ void Sphere::Enclose(const AABB &aabb)
 {
 	///@todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
 	for(int i = 0; i < 8; ++i)
-		Enclose(aabb.CornerPoint(i));
+		Enclose(POINT_TO_FLOAT3(aabb.CornerPoint(i)));
 }
 
 void Sphere::Enclose(const OBB &obb)

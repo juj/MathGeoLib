@@ -49,6 +49,11 @@
 MATH_BEGIN_NAMESPACE
 
 AABB::AABB(const float3 &minPoint_, const float3 &maxPoint_)
+:minPoint(POINT_VEC(minPoint_)), maxPoint(POINT_VEC(maxPoint_))
+{
+}
+
+AABB::AABB(const float4 &minPoint_, const float4 &maxPoint_)
 :minPoint(minPoint_), maxPoint(maxPoint_)
 {
 }
@@ -69,9 +74,9 @@ void AABB::SetNegativeInfinity()
 	maxPoint.SetFromScalar(-FLOAT_INF);
 }
 
-void AABB::SetFromCenterAndSize(const float3 &center, const float3 &size)
+void AABB::SetFromCenterAndSize(const vec &center, const vec &size)
 {
-	float3 halfSize = 0.5f * size;
+	vec halfSize = 0.5f * size;
 	minPoint = center - halfSize;
 	maxPoint = center + halfSize;
 }
@@ -84,8 +89,10 @@ void AABB::SetFrom(const OBB &obb)
 
 void AABB::SetFrom(const Sphere &s)
 {
-	minPoint = s.pos - float3(s.r, s.r, s.r);
-	maxPoint = s.pos + float3(s.r, s.r, s.r);
+	vec d = DIR_VEC(float3::FromScalar(s.r));
+	vec pos = POINT_VEC(s.pos);
+	minPoint = pos - d;
+	maxPoint = pos + d;
 }
 
 void AABB::SetFrom(const float3 *pointArray, int numPoints)
@@ -95,7 +102,7 @@ void AABB::SetFrom(const float3 *pointArray, int numPoints)
 	if (!pointArray)
 		return;
 	for(int i = 0; i < numPoints; ++i)
-		Enclose(pointArray[i]);
+		Enclose(POINT_VEC(pointArray[i]));
 }
 
 Polyhedron AABB::ToPolyhedron() const
@@ -105,7 +112,7 @@ Polyhedron AABB::ToPolyhedron() const
 	// Populate the corners of this AABB.
 	// The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
 	for(int i = 0; i < 8; ++i)
-		p.v.push_back(CornerPoint(i));
+		p.v.push_back(POINT_TO_FLOAT3(CornerPoint(i)));
 
 	// Generate the 6 faces of this AABB.
 	const int faces[6][4] =
@@ -136,13 +143,13 @@ OBB AABB::ToOBB() const
 
 Sphere AABB::MinimalEnclosingSphere() const
 {
-	return Sphere(CenterPoint(), Size().Length()/2.f);
+	return Sphere(POINT_TO_FLOAT3(CenterPoint()), Size().Length() * 0.5f);
 }
 
 Sphere AABB::MaximalContainedSphere() const
 {
-	float3 halfSize = HalfSize();
-	return Sphere(CenterPoint(), Min(halfSize.x, halfSize.y, halfSize.z));
+	vec halfSize = HalfSize();
+	return Sphere(POINT_TO_FLOAT3(CenterPoint()), Min(halfSize.x, halfSize.y, halfSize.z));
 }
 
 bool AABB::IsFinite() const
@@ -162,19 +169,19 @@ bool AABB::IsDegenerate() const
 #endif
 }
 
-float3 AABB::CenterPoint() const
+vec AABB::CenterPoint() const
 {
 	return (minPoint + maxPoint) * 0.5f;
 }
 
-float3 AABB::PointInside(float x, float y, float z) const
+vec AABB::PointInside(float x, float y, float z) const
 {
 	assume(0.f <= x && x <= 1.f);
 	assume(0.f <= y && y <= 1.f);
 	assume(0.f <= z && z <= 1.f);
 
-	float3 d = maxPoint - minPoint;
-	return minPoint + float3(d.x*x, d.y*y, d.z*z);
+	vec d = maxPoint - minPoint;
+	return minPoint + d.Mul(POINT_VEC(float3(x, y, z)));
 }
 
 LineSegment AABB::Edge(int edgeIndex) const
@@ -213,113 +220,113 @@ LineSegment AABB::Edge(int edgeIndex) const
 	}
 }
 
-float3 AABB::CornerPoint(int cornerIndex) const
+vec AABB::CornerPoint(int cornerIndex) const
 {
 	assume(0 <= cornerIndex && cornerIndex <= 7);
 	switch(cornerIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-		case 0: return float3(minPoint.x, minPoint.y, minPoint.z);
-		case 1: return float3(minPoint.x, minPoint.y, maxPoint.z);
-		case 2: return float3(minPoint.x, maxPoint.y, minPoint.z);
-		case 3: return float3(minPoint.x, maxPoint.y, maxPoint.z);
-		case 4: return float3(maxPoint.x, minPoint.y, minPoint.z);
-		case 5: return float3(maxPoint.x, minPoint.y, maxPoint.z);
-		case 6: return float3(maxPoint.x, maxPoint.y, minPoint.z);
-		case 7: return float3(maxPoint.x, maxPoint.y, maxPoint.z);
+		case 0: return POINT_VEC(float3(minPoint.x, minPoint.y, minPoint.z));
+		case 1: return POINT_VEC(float3(minPoint.x, minPoint.y, maxPoint.z));
+		case 2: return POINT_VEC(float3(minPoint.x, maxPoint.y, minPoint.z));
+		case 3: return POINT_VEC(float3(minPoint.x, maxPoint.y, maxPoint.z));
+		case 4: return POINT_VEC(float3(maxPoint.x, minPoint.y, minPoint.z));
+		case 5: return POINT_VEC(float3(maxPoint.x, minPoint.y, maxPoint.z));
+		case 6: return POINT_VEC(float3(maxPoint.x, maxPoint.y, minPoint.z));
+		case 7: return POINT_VEC(float3(maxPoint.x, maxPoint.y, maxPoint.z));
 	}
 }
 
-float3 AABB::ExtremePoint(const float3 &direction) const
+vec AABB::ExtremePoint(const vec &direction) const
 {
 	float3 pt;
 	pt.x = (direction.x >= 0.f ? maxPoint.x : minPoint.x);
 	pt.y = (direction.y >= 0.f ? maxPoint.y : minPoint.y);
 	pt.z = (direction.z >= 0.f ? maxPoint.z : minPoint.z);
-	return pt;
+	return POINT_VEC(pt);
 }
 
-float3 AABB::PointOnEdge(int edgeIndex, float u) const
+vec AABB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);
 	assume(0 <= u && u <= 1.f);
 
-	float3 d = maxPoint - minPoint;
+	vec d = maxPoint - minPoint;
 	switch(edgeIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return float3(minPoint.x, minPoint.y, minPoint.z + u * d.z);
-	case 1: return float3(minPoint.x, maxPoint.y, minPoint.z + u * d.z);
-	case 2: return float3(maxPoint.x, minPoint.y, minPoint.z + u * d.z);
-	case 3: return float3(maxPoint.x, maxPoint.y, minPoint.z + u * d.z);
+	case 0: return POINT_VEC(float3(minPoint.x, minPoint.y, minPoint.z + u * d.z));
+	case 1: return POINT_VEC(float3(minPoint.x, maxPoint.y, minPoint.z + u * d.z));
+	case 2: return POINT_VEC(float3(maxPoint.x, minPoint.y, minPoint.z + u * d.z));
+	case 3: return POINT_VEC(float3(maxPoint.x, maxPoint.y, minPoint.z + u * d.z));
 
-	case 4: return float3(minPoint.x, minPoint.y + u * d.y, minPoint.z);
-	case 5: return float3(maxPoint.x, minPoint.y + u * d.y, minPoint.z);
-	case 6: return float3(minPoint.x, minPoint.y + u * d.y, maxPoint.z);
-	case 7: return float3(maxPoint.x, minPoint.y + u * d.y, maxPoint.z);
+	case 4: return POINT_VEC(float3(minPoint.x, minPoint.y + u * d.y, minPoint.z));
+	case 5: return POINT_VEC(float3(maxPoint.x, minPoint.y + u * d.y, minPoint.z));
+	case 6: return POINT_VEC(float3(minPoint.x, minPoint.y + u * d.y, maxPoint.z));
+	case 7: return POINT_VEC(float3(maxPoint.x, minPoint.y + u * d.y, maxPoint.z));
 
-	case 8: return float3(minPoint.x + u * d.x, minPoint.y, minPoint.z);
-	case 9: return float3(minPoint.x + u * d.x, minPoint.y, maxPoint.z);
-	case 10: return float3(minPoint.x + u * d.x, maxPoint.y, minPoint.z);
-	case 11: return float3(minPoint.x + u * d.x, maxPoint.y, maxPoint.z);
+	case 8: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y, minPoint.z));
+	case 9: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y, maxPoint.z));
+	case 10: return POINT_VEC(float3(minPoint.x + u * d.x, maxPoint.y, minPoint.z));
+	case 11: return POINT_VEC(float3(minPoint.x + u * d.x, maxPoint.y, maxPoint.z));
 	}
 }
 
-float3 AABB::FaceCenterPoint(int faceIndex) const
+vec AABB::FaceCenterPoint(int faceIndex) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
 
-	float3 center = (minPoint + maxPoint) * 0.5f;
+	vec center = (minPoint + maxPoint) * 0.5f;
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return float3(minPoint.x, center.y, center.z);
-	case 1: return float3(maxPoint.x, center.y, center.z);
-	case 2: return float3(center.x, minPoint.y, center.z);
-	case 3: return float3(center.x, maxPoint.y, center.z);
-	case 4: return float3(center.x, center.y, minPoint.z);
-	case 5: return float3(center.x, center.y, maxPoint.z);
+	case 0: return POINT_VEC(float3(minPoint.x, center.y, center.z));
+	case 1: return POINT_VEC(float3(maxPoint.x, center.y, center.z));
+	case 2: return POINT_VEC(float3(center.x, minPoint.y, center.z));
+	case 3: return POINT_VEC(float3(center.x, maxPoint.y, center.z));
+	case 4: return POINT_VEC(float3(center.x, center.y, minPoint.z));
+	case 5: return POINT_VEC(float3(center.x, center.y, maxPoint.z));
 	}
 }
 
-float3 AABB::FacePoint(int faceIndex, float u, float v) const
+vec AABB::FacePoint(int faceIndex, float u, float v) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
 	assume(0 <= u && u <= 1.f);
 	assume(0 <= v && v <= 1.f);
 
-	float3 d = maxPoint - minPoint;
+	vec d = maxPoint - minPoint;
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return float3(minPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z);
-	case 1: return float3(maxPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z);
-	case 2: return float3(minPoint.x + u * d.x, minPoint.y, minPoint.z + v * d.z);
-	case 3: return float3(minPoint.x + u * d.x, maxPoint.y, minPoint.z + v * d.z);
-	case 4: return float3(minPoint.x + u * d.x, minPoint.y + v * d.y, minPoint.z);
-	case 5: return float3(minPoint.x + u * d.x, minPoint.y + v * d.y, maxPoint.z);
+	case 0: return POINT_VEC(float3(minPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z));
+	case 1: return POINT_VEC(float3(maxPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z));
+	case 2: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y, minPoint.z + v * d.z));
+	case 3: return POINT_VEC(float3(minPoint.x + u * d.x, maxPoint.y, minPoint.z + v * d.z));
+	case 4: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y + v * d.y, minPoint.z));
+	case 5: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y + v * d.y, maxPoint.z));
 	}
 }
 
-float3 AABB::FaceNormal(int faceIndex) const
+vec AABB::FaceNormal(int faceIndex) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return float3(-1,0,0);
-	case 1: return float3( 1,0,0);
-	case 2: return float3(0,-1,0);
-	case 3: return float3(0, 1,0);
-	case 4: return float3(0,0,-1);
-	case 5: return float3(0,0, 1);
+	case 0: return DIR_VEC(float3(-1,  0,  0));
+	case 1: return DIR_VEC(float3( 1,  0,  0));
+	case 2: return DIR_VEC(float3( 0, -1,  0));
+	case 3: return DIR_VEC(float3( 0,  1,  0));
+	case 4: return DIR_VEC(float3( 0,  0, -1));
+	case 5: return DIR_VEC(float3( 0,  0,  1));
 	}
 }
 
 Plane AABB::FacePlane(int faceIndex) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
-	return Plane(FaceCenterPoint(faceIndex), FaceNormal(faceIndex));
+	return Plane(POINT_TO_FLOAT3(FaceCenterPoint(faceIndex)), DIR_TO_FLOAT3(FaceNormal(faceIndex)));
 }
 
 void AABB::GetCornerPoints(float3 *outPointArray) const
@@ -330,7 +337,7 @@ void AABB::GetCornerPoints(float3 *outPointArray) const
 		return;
 #endif
 	for(int i = 0; i < 8; ++i)
-		outPointArray[i] = CornerPoint(i);
+		outPointArray[i] = POINT_TO_FLOAT3(CornerPoint(i));
 }
 
 void AABB::GetFacePlanes(Plane *outPlaneArray) const
@@ -368,18 +375,18 @@ void AABB::ExtremePointsAlongAABB(const float3 *pts, int numPoints, int &minx, i
 	}
 }
 
-AABB AABB::FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize)
+AABB AABB::FromCenterAndSize(const vec &aabbCenterPos, const vec &aabbSize)
 {
-	float3 halfSize = aabbSize * 0.5f;
+	vec halfSize = aabbSize * 0.5f;
 	return AABB(aabbCenterPos - halfSize, aabbCenterPos + halfSize);
 }
 
-float3 AABB::Size() const
+vec AABB::Size() const
 {
 	return maxPoint - minPoint;
 }
 
-float3 AABB::HalfSize() const
+vec AABB::HalfSize() const
 {
 	return Size() * 0.5f;
 }
@@ -391,11 +398,11 @@ float AABB::Volume() const
 
 float AABB::SurfaceArea() const
 {
-	float3 size = Size();
+	vec size = Size();
 	return 2.f * (size.x*size.y + size.x*size.z + size.y*size.z);
 }
 
-float3 AABB::RandomPointInside(LCG &rng) const
+vec AABB::RandomPointInside(LCG &rng) const
 {
 	float f1 = rng.Float();
 	float f2 = rng.Float();
@@ -403,7 +410,7 @@ float3 AABB::RandomPointInside(LCG &rng) const
 	return PointInside(f1, f2, f3);
 }
 
-float3 AABB::RandomPointOnSurface(LCG &rng) const
+vec AABB::RandomPointOnSurface(LCG &rng) const
 {
 	int i = rng.Int(0, 5);
 	float f1 = rng.Float();
@@ -411,34 +418,34 @@ float3 AABB::RandomPointOnSurface(LCG &rng) const
 	return FacePoint(i, f1, f2);
 }
 
-float3 AABB::RandomPointOnEdge(LCG &rng) const
+vec AABB::RandomPointOnEdge(LCG &rng) const
 {
 	int i = rng.Int(0, 11);
 	float f = rng.Float();
 	return PointOnEdge(i, f);
 }
 
-float3 AABB::RandomCornerPoint(LCG &rng) const
+vec AABB::RandomCornerPoint(LCG &rng) const
 {
 	return CornerPoint(rng.Int(0, 7));
 }
 
-void AABB::Translate(const float3 &offset)
+void AABB::Translate(const vec &offset)
 {
 	minPoint += offset;
 	maxPoint += offset;
 }
 
-void AABB::Scale(const float3 &centerPoint, float scaleFactor)
+void AABB::Scale(const vec &centerPoint, float scaleFactor)
 {
-	return Scale(centerPoint, float3(scaleFactor, scaleFactor, scaleFactor));
+	return Scale(centerPoint, DIR_VEC(float3(scaleFactor, scaleFactor, scaleFactor)));
 }
 
-void AABB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
+void AABB::Scale(const vec &centerPoint, const vec &scaleFactor)
 {
-	float3x4 transform = float3x4::Scale(scaleFactor, centerPoint);
-	minPoint = transform.MulPos(minPoint);
-	maxPoint = transform.MulPos(maxPoint);
+	float3x4 transform = float3x4::Scale(DIR_TO_FLOAT3(scaleFactor), POINT_TO_FLOAT3(centerPoint)); ///\todo mat
+	minPoint = POINT_VEC(transform.MulPos(POINT_TO_FLOAT3(minPoint))); ///\todo mat
+	maxPoint = POINT_VEC(transform.MulPos(POINT_TO_FLOAT3(maxPoint))); ///\todo mat
 }
 
 /// See Christer Ericson's Real-time Collision Detection, p. 87, or
@@ -447,15 +454,12 @@ void AABB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
 template<typename Matrix>
 void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 {
-	const float3 centerPoint = (aabb.minPoint + aabb.maxPoint) * 0.5f;
-	const float3 halfSize = centerPoint - aabb.minPoint;
-	float3 newCenter = m.MulPos(centerPoint);
+	const vec centerPoint = (aabb.minPoint + aabb.maxPoint) * 0.5f;
+	const vec halfSize = centerPoint - aabb.minPoint;
+	vec newCenter = m.MulPos(centerPoint);
 
-	float3 newDir;
 	// The following is equal to taking the absolute value of the whole matrix m.
-	newDir.x = ABSDOT3(m[0], halfSize);
-	newDir.y = ABSDOT3(m[1], halfSize);
-	newDir.z = ABSDOT3(m[2], halfSize);
+	vec newDir = DIR_VEC(float3(ABSDOT3(m[0], halfSize), ABSDOT3(m[1], halfSize), ABSDOT3(m[2], halfSize)));
 	aabb.minPoint = newCenter - newDir;
 	aabb.maxPoint = newCenter + newDir;
 }
@@ -463,10 +467,6 @@ void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 #ifdef MATH_SSE
 void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
 {
-	// For the purposes of this run, we need the .w components of the AABB vectors to be one.
-	// TODO: perhaps remove the padding fields and make the .w components explicit.
-	aabb.padding = 1.f;
-	aabb.padding2 = 1.f;
 	simd4f minPt = aabb.MinPoint_SSE();
 	simd4f maxPt = aabb.MaxPoint_SSE();
 	simd4f centerPoint = _mm_mul_ps(_mm_add_ps(minPt, maxPt), _mm_set1_ps(0.5f));
@@ -517,8 +517,8 @@ void AABB::TransformAsAABB(const float4x4 &transform)
 
 void AABB::TransformAsAABB(const Quat &transform)
 {
-	float3 newCenter = transform.Transform(CenterPoint());
-	float3 newDir = Abs((transform.Transform(Size()) * 0.5f));
+	vec newCenter = transform.Transform(CenterPoint());
+	vec newDir = Abs((transform.Transform(Size()) * 0.5f));
 	minPoint = newCenter - newDir;
 	maxPoint = newCenter + newDir;
 }
@@ -551,12 +551,15 @@ OBB AABB::Transform(const Quat &transform) const
 	return obb;
 }
 
-float3 AABB::ClosestPoint(const float3 &targetPoint) const
+vec AABB::ClosestPoint(const vec &targetPoint) const
 {
+	assume(EqualAbs(minPoint.w, 1.f));
+	assume(EqualAbs(maxPoint.w, 1.f));
+	assume(EqualAbs(targetPoint.w, 1.f));
 	return targetPoint.Clamp(minPoint, maxPoint);
 }
 
-float AABB::Distance(const float3 &point) const
+float AABB::Distance(const vec &point) const
 {
 	///@todo This function could be slightly optimized. See Christer Ericson's
 	/// Real-Time Collision Detection, p.131.
@@ -941,22 +944,22 @@ bool AABB::Intersects(const Polyhedron &polyhedron) const
 	return polyhedron.Intersects(*this);
 }
 
-void AABB::ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const
+void AABB::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 {
-	float3 c = CenterPoint();
-	float3 e = HalfDiagonal();
+	vec c = CenterPoint();
+	vec e = HalfDiagonal();
 
 	// Compute the projection interval radius of the AABB onto L(t) = aabb.center + t * plane.normal;
 	float r = e[0]*Abs(axis[0]) + e[1]*Abs(axis[1]) + e[2]*Abs(axis[2]);
 	// Compute the distance of the box center from plane.
-	float s = Dot(axis, c);
+	float s = axis.Dot(c);
 	dMin = s - r;
 	dMax = s + r;
 	if (dMin > dMax)
 		Swap(dMin, dMax);
 }
 
-void AABB::Enclose(const float3 &point)
+void AABB::Enclose(const vec &point)
 {
 	minPoint = Min(minPoint, point);
 	maxPoint = Max(maxPoint, point);
@@ -1072,14 +1075,14 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 				float u2 = (float)(x+1) / (numFacesU);
 				float v2 = (float)(y+1) / (numFacesV);
 			
-				outPos[i]   = FacePoint(face, u, v);
-				outPos[i+1] = FacePoint(face, u, v2);
-				outPos[i+2] = FacePoint(face, u2, v);
+				outPos[i]   = POINT_TO_FLOAT3(FacePoint(face, u, v));
+				outPos[i+1] = POINT_TO_FLOAT3(FacePoint(face, u, v2));
+				outPos[i+2] = POINT_TO_FLOAT3(FacePoint(face, u2, v));
 				if (flip)
 					Swap(outPos[i+1], outPos[i+2]);
 				outPos[i+3] = outPos[i+2];
 				outPos[i+4] = outPos[i+1];
-				outPos[i+5] = FacePoint(face, u2, v2);
+				outPos[i+5] = POINT_TO_FLOAT3(FacePoint(face, u2, v2));
 
 				if (outUV)
 				{
@@ -1095,7 +1098,7 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 
 				if (outNormal)
 					for(int j = 0; j < 6; ++j)
-						outNormal[i+j] = FaceNormal(face);
+						outNormal[i+j] = POINT_TO_FLOAT3(FaceNormal(face));
 
 				i += 6;
 			}

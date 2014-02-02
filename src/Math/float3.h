@@ -722,3 +722,40 @@ Q_DECLARE_METATYPE(float3*)
 #endif
 
 MATH_END_NAMESPACE
+
+#include "float4.h"
+#include "MathFunc.h"
+
+MATH_BEGIN_NAMESPACE
+
+#ifdef MATH_AUTOMATIC_SSE
+bool EqualAbs(float a, float b, float epsilon);
+typedef float4 vec;
+#define POINT_VEC(x) float4(x, 1.f)
+#define DIR_VEC(x) float4(x, 0.f)
+
+#define POINT_TO_FLOAT3(v) (v).xyz()
+#define DIR_TO_FLOAT3(v) (v).xyz()
+
+/* /// TODO: Enable this:
+inline float3 POINT_TO_FLOAT3(const vec &v)
+{
+	assume(EqualAbs(v.w, 1.f, 1e-4f));
+	return v.xyz();
+}
+inline float3 DIR_TO_FLOAT3(const vec &v)
+{
+	assume(EqualAbs(v.w, 0.f, 1e-4f));
+	return v.xyz();
+}
+*/
+#else
+typedef float3 vec;
+#define POINT_VEC(x) x
+#define DIR_VEC(x) x
+#define POINT_TO_FLOAT3(x) x
+#define DIR_TO_FLOAT3(x) x
+#endif
+
+
+MATH_END_NAMESPACE

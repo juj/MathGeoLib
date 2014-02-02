@@ -25,6 +25,7 @@
 #include "../MathGeoLibFwd.h"
 #include "float3.h"
 #include "SSEMath.h"
+#include "assume.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector4D>
@@ -313,7 +314,7 @@ public:
 	/** @return Sqrt(x*x + y*y + z*z + w*w).
 		@see LengthSq3(), Length3(), LengthSq4(), Normalize3(), Normalize4(). */
 	float Length4() const;
-
+	inline float Length() const { return Length4(); }
 	/// Normalizes the (x, y, z) part of this vector.
 	/** @note This function ignores the w component of this vector, retaining whatever value was set there.
 		@note This function fails silently. If you expect to receive an error message in case the normalization
@@ -531,6 +532,7 @@ public:
 		@see Distance4Sq(), Distance3(), Distance3Sq(), Length3Sq(), Length3().
 		@return Sqrt((x-rhs.x)^2 + (y-rhs.y)^2 + (z-rhs.z)^2 + (w-rhs.w)^2). */
 	float Distance4(const float4 &rhs) const;
+	inline float Distance(const float4 &rhs) const { return Distance4(rhs); }
 
 	/// Computes the dot product of the (x, y, z) parts of this and the given float4.
 	/** @note This function ignores the w component of this vector (assumes w=0).
@@ -541,6 +543,8 @@ public:
 	/// Computes the dot product of this and the given float4, taking into account the w component.
 	/** @see Dot3(), Cross3(). */
 	float Dot4(const float4 &rhs) const;
+
+	inline float Dot(const float4 &rhs) const { return Dot4(rhs); }
 
 	/// Computes the cross product of the (x, y, z) parts of this and the given vector. Returns a vector with w=0.
 	/** @see Dot3(), Dot4(). */

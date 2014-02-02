@@ -476,7 +476,7 @@ bool Polyhedron::Contains(const Polygon &polygon) const
 bool Polyhedron::Contains(const AABB &aabb) const
 {
 	for(int i = 0; i < 8; ++i)
-		if (!Contains(aabb.CornerPoint(i)))
+		if (!Contains(POINT_TO_FLOAT3(aabb.CornerPoint(i))))
 			return false;
 
 	return true;
@@ -755,7 +755,7 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 template<typename T>
 bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 {
-	if (p.Contains(obj.CenterPoint()))
+	if (p.Contains(POINT_TO_FLOAT3(obj.CenterPoint())))
 		return true;
 	if (obj.Contains(p.Centroid()))
 		return true;

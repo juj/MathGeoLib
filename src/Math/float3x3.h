@@ -662,8 +662,22 @@ public:
 	float4x4 Mul(const float4x4 &rhs) const;
 	float3x3 Mul(const Quat &rhs) const;
 	float3 Mul(const float3 &rhs) const;
+	float4 Mul(const float4 &rhs) const
+	{
+		return float4(Mul(rhs.xyz()), rhs.w);
+	}
 	float3 MulPos(const float3 &rhs) const { return Mul(rhs); }
+	float4 MulPos(const float4 &rhs) const
+	{
+		assume(!EqualAbs(rhs.w, 0.f));
+		return Mul(rhs);
+	}
 	float3 MulDir(const float3 &rhs) const { return Mul(rhs); }
+	float4 MulDir(const float4 &rhs) const
+	{
+		assume(EqualAbs(rhs.w, 0.f));
+		return Mul(rhs);
+	}
 
 #ifdef MATH_OGRE_INTEROP
 	float3x3(const Ogre::Matrix3 &m) { Set(&m[0][0]); }

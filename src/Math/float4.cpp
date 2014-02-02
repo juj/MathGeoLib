@@ -837,14 +837,14 @@ float4 float4::ProjectTo3(const float3 &target) const
 {
 	assume(!target.IsZero());
 	assume(this->IsWZeroOrOne());
-	return float4(target * Dot(xyz(), target) / target.LengthSq(), w);
+	return float4(target * MATH_NS::Dot(xyz(), target) / target.LengthSq(), w);
 }
 
 float4 float4::ProjectToNorm3(const float3 &target) const
 {
 	assume(target.IsNormalized());
 	assume(this->IsWZeroOrOne());
-	return float4(target * Dot(xyz(), target), w);
+	return float4(target * MATH_NS::Dot(xyz(), target), w);
 }
 
 float4 float4::Lerp(const float4 &b, float t) const

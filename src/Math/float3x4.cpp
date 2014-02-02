@@ -88,6 +88,11 @@ TranslateOp float3x4::Translate(const float3 &offset)
 	return TranslateOp(offset);
 }
 
+TranslateOp float3x4::Translate(const float4 &offset)
+{
+	return TranslateOp(offset.xyz());
+}
+
 float3x4 float3x4::RotateX(float angle)
 {
 	float3x4 r;
@@ -1124,6 +1129,12 @@ float3 float3x4::TransformDir(float x, float y, float z) const
 #endif
 }
 
+float4 float3x4::TransformDir(const float4 &directionVector) const
+{
+	assume(EqualAbs(directionVector.w, 0.f));
+	return Transform(directionVector);
+}
+
 float4 float3x4::Transform(const float4 &vector) const
 {
 #ifdef MATH_SSE
@@ -1665,7 +1676,17 @@ float3x4 float3x4::Mul(const float3x4 &rhs) const { return *this * rhs; }
 float4x4 float3x4::Mul(const float4x4 &rhs) const { return *this * rhs; }
 float3x4 float3x4::Mul(const Quat &rhs) const { return *this * rhs; }
 float3 float3x4::MulPos(const float3 &pointVector) const { return this->TransformPos(pointVector); }
+float4 float3x4::MulPos(const float4 &pointVector) const
+{
+	assume(!EqualAbs(pointVector.w, 0.f));
+	return this->Transform(pointVector);
+}
 float3 float3x4::MulDir(const float3 &directionVector) const { return this->TransformDir(directionVector); }
+float4 float3x4::MulDir(const float4 &directionVector) const
+{
+	assume(EqualAbs(directionVector.w, 0.f));
+	return this->TransformDir(directionVector);
+}
 float4 float3x4::Mul(const float4 &vector) const { return *this * vector; }
 
 const float3x4 float3x4::zero	 = float3x4(0,0,0,0, 0,0,0,0, 0,0,0,0);

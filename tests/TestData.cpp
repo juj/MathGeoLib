@@ -71,8 +71,8 @@ AABB *AABBArray()
 		arr = AlignedNew<AABB>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
 		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 		{
-			arr[i].minPoint = float3::RandomBox(lcg, -100.f, 100.f);
-			arr[i].maxPoint = arr[i].minPoint + float3::RandomBox(lcg, 0, 100.f);
+			arr[i].minPoint = POINT_VEC(float3::RandomBox(lcg, -100.f, 100.f));
+			arr[i].maxPoint = arr[i].minPoint + POINT_VEC(float3::RandomBox(lcg, 0, 100.f));
 		}
 	}
 	return arr;

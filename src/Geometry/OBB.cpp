@@ -65,8 +65,8 @@ void OBB::SetNegativeInfinity()
 
 void OBB::SetFrom(const AABB &aabb)
 {
-	pos = aabb.CenterPoint();
-	r = aabb.HalfSize();
+	pos = POINT_TO_FLOAT3(aabb.CenterPoint());
+	r = POINT_TO_FLOAT3(aabb.HalfSize());
 	axis[0] = float3(1,0,0);
 	axis[1] = float3(0,1,0);
 	axis[2] = float3(0,0,1);
@@ -77,8 +77,8 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 {
 	assume(m.IsColOrthogonal()); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
 	assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
-	obb.pos = m.MulPos(aabb.CenterPoint());
-	float3 size = aabb.HalfSize();
+	obb.pos = m.MulPos(POINT_TO_FLOAT3(aabb.CenterPoint()));
+	float3 size = POINT_TO_FLOAT3(aabb.HalfSize());
 	obb.axis[0] = m.Col(0);
 	obb.axis[1] = m.Col(1);
 	obb.axis[2] = m.Col(2);
@@ -731,7 +731,7 @@ bool OBB::Contains(const AABB &aabb) const
 	// Since both AABB and OBB are convex objects, this OBB contains the AABB
 	// if and only if it contains all its corner points.
 	for(int i = 0; i < 8; ++i)
-		if (!Contains(aabb.CornerPoint(i)))
+	if (!Contains(POINT_TO_FLOAT3(aabb.CornerPoint(i))))
 			return false;
 
 	return true;

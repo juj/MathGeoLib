@@ -718,7 +718,7 @@ float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, float minElem, float maxElem)
 
 float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, const float3 &minValues, const float3 &maxValues)
 {
-	return AABB(minValues, maxValues).RandomPointInside(lcg);
+	return POINT_TO_FLOAT3(AABB(POINT_VEC(minValues), POINT_VEC(maxValues)).RandomPointInside(lcg));
 }
 
 float3 float3::operator +(const float3 &rhs) const
