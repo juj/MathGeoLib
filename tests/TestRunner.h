@@ -12,6 +12,14 @@
 
 extern LCG rng;
 
+enum TestResult
+{
+	TestNotRun,
+	TestPassed,
+	TestPassedWithWarnings,
+	TestFailed
+};
+
 // The test function can read test info and write test result to t.
 struct Test;
 typedef void (*TestFunctionPtr)(Test &t);
@@ -23,6 +31,7 @@ struct Test
 		function = 0;
 		numTimesRun = numTrialsPerRun = numPasses = numFails = 0;
 		fastestTime = averageTime = worstTime = fastestCycles = 0.0;
+		result = TestNotRun;
 	}
 	std::string name;
 	std::string file;
@@ -33,6 +42,8 @@ struct Test
 	/// be called only exactly once. Used mostly for very slow tests that would take too long to run multiple times.
 	bool runOnlyOnce;
 	TestFunctionPtr function;
+
+	TestResult result;
 
 	// Results:
 	int numTimesRun; ///< The total number of times this test was executed.

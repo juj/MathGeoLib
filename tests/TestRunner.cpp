@@ -219,6 +219,7 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 		else
 			LOGI(" ok ");
 //		++numTestsPassed;
+		t.result = TestPassed;
 	}
 	else if (successRate >= 95.0f)
 	{
@@ -227,6 +228,7 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 //		++numTestsPassed;
 //		++numWarnings;
 		ret = 1; // Success with warnings
+		t.result = TestPassedWithWarnings;
 	}
 	else
 	{
@@ -235,6 +237,7 @@ int RunTest(Test &t, int numTimesToRun, int numTrialsPerRun, JSONReport &jsonRep
 		else
 			LOGE("FAILED: '%s'", failReason.c_str());
 		ret = -1; // Failed
+		t.result = TestFailed;
 	}
 
 	if (!times.empty())
@@ -310,6 +313,16 @@ int RunTests(int numTimes, int numTrials, const char * const *prefixes, JSONRepo
 void PrintTestRunSummary()
 {
 	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", numTestsRun, numTestsPassed, numTestsWarnings, numTestsFailed);
+	if (numTestsFailed > 0)
+	{
+		LOGE("The following tests failed:");
+		std::vector<Test> &tests = Tests();
+		for (size_t i = 0; i < tests.size(); ++i)
+		{
+			if (tests[i].result == TestFailed)
+				LOGE("   %s", tests[i].name.c_str());
+		}
+	}
 }
 
 #ifdef MATH_TESTS_EXECUTABLE
