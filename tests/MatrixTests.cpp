@@ -744,3 +744,89 @@ RANDOMIZED_TEST(vec4_mul_mat4x4)
 	assert(v2.Equals(correct));
 }
 #endif
+
+BENCHMARK(matrix_copy0, "matrix-copy-default")
+{
+	m2[i] = m[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(matrix_copy1, "matrix-copy-memcpy")
+{
+	memcpy(&m2[i], &m[i], sizeof(float4x4));
+}
+BENCHMARK_END;
+
+BENCHMARK(matrix_copy2, "matrix-copy-for-loop")
+{
+	float *dst = (float*)&m2[i];
+	float *src = (float*)&m[i];
+	for(int i = 0; i < 16; ++i)
+		dst[i] = src[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(matrix_copy3, "matrix-copy-unrolled")
+{
+	float *dst = (float*)&m2[i];
+	float *src = (float*)&m[i];
+	dst[0] = src[0];
+	dst[1] = src[1];
+	dst[2] = src[2];
+	dst[3] = src[3];
+	dst[4] = src[4];
+	dst[5] = src[5];
+	dst[6] = src[6];
+	dst[7] = src[7];
+	dst[8] = src[8];
+	dst[9] = src[9];
+	dst[10] = src[10];
+	dst[11] = src[11];
+	dst[12] = src[12];
+	dst[13] = src[13];
+	dst[14] = src[14];
+	dst[15] = src[15];
+}
+BENCHMARK_END;
+
+#ifdef MATH_SSE
+BENCHMARK(matrix_copy4, "matrix-copy-sse")
+{
+	simd4f *dst = (simd4f *)&m2[i];
+	simd4f *src = (simd4f *)&m[i];
+	for (int i = 0; i < 4; ++i)
+		dst[i] = src[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(matrix_copy5, "matrix-copy-sse-unrolled")
+{
+	simd4f *dst = (simd4f *)&m2[i];
+	simd4f *src = (simd4f *)&m[i];
+	dst[0] = src[0];
+	dst[1] = src[1];
+	dst[2] = src[2];
+	dst[3] = src[3];
+}
+BENCHMARK_END;
+#endif
+
+#ifdef MATH_AVX
+BENCHMARK(matrix_copy6, "matrix-copy-avx")
+{
+	__m256 *dst = (__m256 *)&m2[i];
+	__m256 *src = (__m256 *)&m[i];
+	for (int i = 0; i < 2; ++i)
+		dst[i] = src[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(matrix_copy7, "matrix-copy-avx-unrolled")
+{
+	__m256 *dst = (__m256 *)&m2[i];
+	__m256 *src = (__m256 *)&m[i];
+	dst[0] = src[0];
+	dst[1] = src[1];
+}
+BENCHMARK_END;
+#endif
