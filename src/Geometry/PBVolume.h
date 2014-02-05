@@ -48,27 +48,29 @@ public:
 	{
 		TestResult result = TestInside;
 
-		//float3 r = (aabb.maxPoint - aabb.minPoint) * 0.5f;
-		//float3 c = aabb.minPoint + r;
+		//vec r = (aabb.maxPoint - aabb.minPoint) * 0.5f;
+		//vec c = aabb.minPoint + r;
 		for(int i = 0; i < N; ++i)
 		{
-			float3 nPoint;// = aabb.minPoint;
-			float3 pPoint;// = aabb.maxPoint;
+			vec nPoint;// = aabb.minPoint;
+			vec pPoint;// = aabb.maxPoint;
 			nPoint.x = (p[i].normal.x < 0.f ? aabb.maxPoint.x : aabb.minPoint.x);
 			nPoint.y = (p[i].normal.y < 0.f ? aabb.maxPoint.y : aabb.minPoint.y);
 			nPoint.z = (p[i].normal.z < 0.f ? aabb.maxPoint.z : aabb.minPoint.z);
+			nPoint.w = 1.f;
 
 			pPoint.x = (p[i].normal.x >= 0.f ? aabb.maxPoint.x : aabb.minPoint.x);
 			pPoint.y = (p[i].normal.y >= 0.f ? aabb.maxPoint.y : aabb.minPoint.y);
 			pPoint.z = (p[i].normal.z >= 0.f ? aabb.maxPoint.z : aabb.minPoint.z);
+			pPoint.w = 1.f;
 
 			/*
 			// Find the n and p points of the aabb. (The nearest and farthest corners relative to the plane)
-			const float3 &sign = npPointsSignLUT[((p[i].normal.z >= 0.f) ? 4 : 0) +
+			const vec &sign = npPointsSignLUT[((p[i].normal.z >= 0.f) ? 4 : 0) +
 												 ((p[i].normal.y >= 0.f) ? 2 : 0) +
 												 ((p[i].normal.x >= 0.f) ? 1 : 0)];
-			const float3 nPoint = c + sign*r;
-			const float3 pPoint = c - sign*r;
+			const vec nPoint = c + sign*r;
+			const vec pPoint = c - sign*r;
 			*/
 
 			float a = p[i].SignedDistance(nPoint);

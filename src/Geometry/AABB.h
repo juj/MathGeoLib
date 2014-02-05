@@ -58,9 +58,7 @@ public:
 
 	/// Constructs this AABB by specifying the minimum and maximum extending corners of the box.
 	/** @see minPoint, maxPoint. */
-	AABB(const float3 &minPoint, const float3 &maxPoint);
-
-	AABB(const float4 &minPoint, const float4 &maxPoint);
+	AABB(const vec &minPoint, const vec &maxPoint);
 
 	/// Constructs this AABB to enclose the given OBB.
 	/** This constructor computes the optimal minimum volume AABB that encloses the given OBB.
@@ -96,7 +94,6 @@ public:
 	/** @param center The center point of this AABB.
 		@param size A vector that specifies the size of this AABB in x, y and z directions.
 		@see SetFrom(), FromCenterAndSize(). */
-	void SetFromCenterAndSize(const float3 &center, const float3 &size) { SetFromCenterAndSize(POINT_VEC(center), DIR_VEC(size)); }
 	void SetFromCenterAndSize(const vec &center, const vec &size);
 
 	/// Sets this AABB to enclose the given OBB.
@@ -124,7 +121,7 @@ public:
 	/** @param pointArray A pointer to an array of points to enclose inside an AABB.
 		@param numPoints The number of elements in the pointArray list.
 		@see MinimalEnclosingAABB(). */
-	void SetFrom(const float3 *pointArray, int numPoints);
+	void SetFrom(const vec *pointArray, int numPoints);
 
 	/// Converts this AABB to a polyhedron.
 	/** This function returns a polyhedron representation of this AABB. This conversion is exact, meaning that the returned
@@ -195,7 +192,6 @@ public:
 			corner point of this AABB.
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
-	float3 ExtremePoint(const float3 &direction) const { return POINT_TO_FLOAT3(ExtremePoint(DIR_VEC(direction))); }
 
 	/// Returns a point on an edge of this AABB.
 	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.
@@ -233,7 +229,7 @@ public:
 	/// Fills an array with all the eight corner points of this AABB.
 	/** @param outPointArray [out] The array to write the points to. Must have space for 8 elements.
 		@see CornerPoint(). */
-	void GetCornerPoints(float3 *outPointArray) const;
+	void GetCornerPoints(vec *outPointArray) const;
 
 	/// Fills an array with all the six planes of this AABB.
 	/** @param outPlaneArray [out] The array to write the planes to. Must have space for 6 elements.
@@ -245,7 +241,7 @@ public:
 		@param pointArray A pointer to an array of points to enclose inside an AABB.
 		@param numPoints The number of elements in the pointArray list.
 		@see SetFrom(). */
-	static AABB MinimalEnclosingAABB(const float3 *pointArray, int numPoints);
+	static AABB MinimalEnclosingAABB(const vec *pointArray, int numPoints);
 
 	/// Finds the most extremal points along the three world axes simultaneously.
 	/** @param pointArray A pointer to an array of points to process.
@@ -256,12 +252,11 @@ public:
 		@param maxy [out] Receives the point that has the largest y coordinate.
 		@param minz [out] Receives the point that has the smallest z coordinate.
 		@param maxz [out] Receives the point that has the largest z coordinate. */
-	static void ExtremePointsAlongAABB(const float3 *pointArray, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz);
+	static void ExtremePointsAlongAABB(const vec *pointArray, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz);
 
 	/// Creates a new AABB given is center position and size along the X, Y and Z axes.
 	/** @see SetCenter(). */
 	static AABB FromCenterAndSize(const vec &aabbCenterPos, const vec &aabbSize);
-	static AABB FromCenterAndSize(const float3 &aabbCenterPos, const float3 &aabbSize) { return AABB::FromCenterAndSize(POINT_VEC(aabbCenterPos), DIR_VEC(aabbSize)); }
 
 	/// Returns the side lengths of this AABB in x, y and z directions.
 	/** The returned vector is equal to the diagonal vector of this AABB, i.e. it spans from the
@@ -317,7 +312,6 @@ public:
 	/** @param offset The amount of displacement to apply to this AABB, in world space coordinates.
 		@see Scale(), Transform(). */
 	void Translate(const vec &offset);
-	void Translate(const float3 &offset) { Translate(DIR_VEC(offset)); }
 
 	/// Applies a uniform scale to this AABB.
 	/** This function scales this AABB structure in-place, using the given center point as the origin
@@ -326,7 +320,6 @@ public:
 		@param scaleFactor The uniform scale factor to apply to each world space axis.
 		@see Translate(), Transform(). */
 	void Scale(const vec &centerPoint, float scaleFactor);
-	void Scale(const float3 &centerPoint, float scaleFactor) { Scale(POINT_VEC(centerPoint), scaleFactor); }
 
 	/// Applies a non-uniform scale to this AABB.
 	/** This function scales this AABB structure in-place, using the given center point as the origin
@@ -335,7 +328,6 @@ public:
 		@param scaleFactor The non-uniform scale factors to apply to each world space axis.
 		@see Translate(), Transform(). */
 	void Scale(const vec &centerPoint, const vec &scaleFactor);
-	void Scale(const float3 &centerPoint, const float3 &scaleFactor) { Scale(POINT_VEC(centerPoint), DIR_VEC(scaleFactor)); }
 
 	/// Applies a transformation to this AABB.
 	/** This function transforms this AABB with the given transformation, and then recomputes this AABB
@@ -367,7 +359,6 @@ public:
 		@see Distance(), Contains(), Intersects().
 		@todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
 	vec ClosestPoint(const vec &targetPoint) const;
-	inline float3 ClosestPoint(const float3 &targetPoint) const { return POINT_TO_FLOAT3(ClosestPoint(POINT_VEC(targetPoint)));  }
 
 	/// Computes the distance between this AABB and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
@@ -375,7 +366,6 @@ public:
 		@todo Add AABB::Distance(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Capsule/Frustum/Polyhedron).
 		@see Contains(), Intersects(), ClosestPoint(). */
 	float Distance(const vec &point) const;
-	inline float Distance(const float3 &point) const { return Distance(POINT_VEC(point)); }
 	float Distance(const Sphere &sphere) const;
 
 	/// Tests if the given object is fully contained inside this AABB.
@@ -384,8 +374,7 @@ public:
 			due to float inaccuracies, this cannot generally be relied upon.
 		@todo Add Contains(Circle/Disc/Sphere/Capsule).
 		@see Distance(), Intersects(), ClosestPoint(). */
-	bool Contains(const float3 &point) const;
-	bool Contains(const vec &point) const { return Contains(POINT_TO_FLOAT3(point)); }
+	bool Contains(const vec &point) const;
 	bool Contains(const LineSegment &lineSegment) const;
 	bool Contains(const AABB &aabb) const;
 	bool Contains(const OBB &obb) const;
@@ -422,7 +411,7 @@ public:
 		@param sphere The first parameter of this function specifies the other object to test against.
 		@param closestPointOnAABB [out] Returns the closest point on this AABB to the given sphere. This pointer
 			may be null. */
-	bool Intersects(const Sphere &sphere, float3 *closestPointOnAABB = 0) const;
+	bool Intersects(const Sphere &sphere, vec *closestPointOnAABB = 0) const;
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Triangle &triangle) const;
 	bool Intersects(const Polygon &polygon) const;
@@ -434,14 +423,12 @@ public:
 		@param dMin [out] Returns the minimum extent of this AABB on the given axis.
 		@param dMax [out] Returns the maximum extent of this AABB on the given axis. */
 	void ProjectToAxis(const vec &axis, float &dMin, float &dMax) const;
-	inline void ProjectToAxis(const float3 &axis, float &dMin, float &dMax) const { return ProjectToAxis(DIR_VEC(axis), dMin, dMax); }
 
 	/// Expands this AABB to enclose the given object.
 	/** This function computes an AABB that encloses both this AABB and the specified object, and stores the resulting
 		AABB into this.
 		@note The generated AABB is not necessarily the optimal enclosing AABB for this AABB and the given object. */
 	void Enclose(const vec &point);
-	void Enclose(const float3 &point) { Enclose(POINT_VEC(point)); }
 	void Enclose(const LineSegment &lineSegment);
 	void Enclose(const AABB &aabb);
 	void Enclose(const OBB &obb);
@@ -451,7 +438,7 @@ public:
 	void Enclose(const Frustum &frustum);
 	void Enclose(const Polygon &polygon);
 	void Enclose(const Polyhedron &polyhedron);
-	void Enclose(const float3 *pointArray, int numPoints);
+	void Enclose(const vec *pointArray, int numPoints);
 
 	/// Generates an unindexed triangle mesh representation of this AABB.
 	/** @param numFacesX The number of faces to generate along the X axis. This value must be >= 1.
@@ -470,7 +457,7 @@ public:
 		NumVerticesInTriangulation to obtain this value.
 		@see ToPolyhedron(), ToEdgeList(), NumVerticesInTriangulation(). */
 	void Triangulate(int numFacesX, int numFacesY, int numFacesZ,
-	                 float3 *outPos, float3 *outNormal, float2 *outUV,
+	                 vec *outPos, vec *outNormal, float2 *outUV,
 	                 bool ccwIsFrontFacing) const;
 
 	/// Returns the number of vertices that the Triangulate() function will output with the given subdivision parameters.
@@ -483,7 +470,7 @@ public:
 	/// Generates an edge list representation of the edges of this AABB.
 	/** @param outPos [out] An array that contains space for at least 24 vertices (NumVerticesInEdgeList()).
 		@see Triangulate(), Edge(), NumVerticesInEdgeList(). */
-	void ToEdgeList(float3 *outPos) const;
+	void ToEdgeList(vec *outPos) const;
 
 	/// Returns the number of vertices that the ToEdgeList() function will output.
 	/** @see ToEdgeList(). */
@@ -534,9 +521,9 @@ public:
 		@note This is a low level utility function. It may be more convenient to use one of the AABB::Intersects()
 			functions instead.
 		@see Intersects(). */
-	bool IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const;
+	bool IntersectLineAABB(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const;
 
-	bool IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const;
+	bool IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const;
 #ifdef MATH_SSE
 	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float tNear, float tFar) const;
 

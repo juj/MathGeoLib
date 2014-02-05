@@ -42,7 +42,7 @@ public:
 	Polygon() {}
 
 	/// Stores the vertices of this polygon.
-	std::vector<float3> p;
+	std::vector<vec> p;
 
 	FORCE_INLINE static int NumFaces() { return 1; }
 
@@ -58,13 +58,13 @@ public:
 
 	/// Returns a pointer to an array of vertices of this polygon. The array contains NumVertices() elements.
 	/// @note Do NOT hold on to this pointer, since it is an alias to the underlying std::vector owned by this polygon. Calling any non-const Polygon member function may invalidate the pointer!
-	float3 *VertexArrayPtr() { return !p.empty() ? &p[0] : 0; }
-	const float3 *VertexArrayPtr() const { return !p.empty() ? &p[0] : 0; }
+	vec *VertexArrayPtr() { return !p.empty() ? &p[0] : 0; }
+	const vec *VertexArrayPtr() const { return !p.empty() ? &p[0] : 0; }
 
 	/// Returns a vertex of this polygon.
 	/** @param vertexIndex The index of the vertex to get, in the range [0, NumVertices()-1].
 		@see p, NumVertices(), Edge(). */
-	float3 Vertex(int vertexIndex) const;
+	vec Vertex(int vertexIndex) const;
 
 	/// Returns a line segment between two adjacent vertices of this polygon.
 	/** @param edgeIndex The index of the edge line segment to construct, in the range [0, NumEdges()-1].
@@ -86,7 +86,7 @@ public:
 		@param edgeIndex The index of the edge line segment to construct, in the range [0, NumEdges()-1].
 		@return A normalized direction vector perpendicular to the normal of the polygon, and the given edge.
 		@see NumEdges(), Edge(), Edge2D(), EdgePlane(). */
-	float3 EdgeNormal(int edgeIndex) const;
+	vec EdgeNormal(int edgeIndex) const;
 
 	/// Returns the normal plane of the given edge.
 	/** The normal vector of the returned plane points towards the direction specified by EdgeNormal(), and the given edge
@@ -102,7 +102,7 @@ public:
 		@return An extreme point of this Polygon in the given direction. The returned point is always a
 			vertex of this Polygon.
 		@see Vertex(). */
-	float3 ExtremePoint(const float3 &direction) const;
+	vec ExtremePoint(const vec &direction) const;
 
 	/// Projects this Polygon onto the given 1D axis direction vector.
 	/** This function collapses this Polygon onto an 1D axis for the purposes of e.g. separate axis test computations.
@@ -111,7 +111,7 @@ public:
 			of this function gets scaled by the length of this vector.
 		@param outMin [out] Returns the minimum extent of this object along the projection axis.
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
-	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
 	/// Tests if the given diagonal exists.
 	/** This function tests whether the diagonal that joins the two given vertices lies inside this polygon and is not intersected
@@ -186,12 +186,12 @@ public:
 	/// Generates the U vector of the local space of this polygon.
 	/** This vector specifies in global (world) space the direction of the local X axis of this polygon.
 		@note This function assumes that the first two points (p[0] and p[1]) of this polygon are finite and inequal. */
-	float3 BasisU() const;
+	vec BasisU() const;
 	/// Generates the V vector of the local space of this polygon. [similarOverload: BasisU]
 	/** This vector specifies in global (world) space the direction of the local Y axis of this polygon.
 		@note This function assumes that the first two points (p[0] and p[1]) of this polygon are finite and inequal.
 		@see MapTo2D(), MapFrom2D(), Edge2D(), BasisU(), BasisV(). */
-	float3 BasisV() const;
+	vec BasisV() const;
 
 	/// Returns the given vertex of this polygon mapped to a local 2D space on this polygon.
 	/** In the local space of the polygon, the z-coordinate is always zero, and the polygon lies in the XY-plane, with
@@ -204,24 +204,24 @@ public:
 	/// Maps the given global (world) space point to the local 2D space of this polygon.
 	/// @todo Return a float3 to be able to read the distance of the point from the plane of the polygon? (or add an overload for that)
 	/// @todo Add MapTo2D(Line/LineSegment/Ray/Triangle/Polygon).
-	float2 MapTo2D(const float3 &point) const;
+	float2 MapTo2D(const vec &point) const;
 
 	/// Given a 2D point in the local space, returns the corresponding 3D point in the global (world) space.
 	/** @see MapTo2D(), BasisU(), BasisV(). */
-	float3 MapFrom2D(const float2 &point) const;
+	vec MapFrom2D(const float2 &point) const;
 
 	/// Computes the normal of this polygon.
 	/** @return The normal of this polygon. This vector is normalized and points to the direction from which observed the
 		vertices of this polygon wind in counter-clockwise order.
 		@note Only call this function if this Polygon is planar. */
-	float3 NormalCCW() const;
+	vec NormalCCW() const;
 	/// Computes the normal of this polygon in clockwise direction. [similarOverload: NormalCCW]
 	/** @return The normal of this polygon in clockwise direction. This vector is normalized and points to the direction
 		from which observed the vertices of this polygon wind in clockwise order.
 		@note Only call this function if this Polygon is planar.
 		@note These two functions follow the relation NormalCCW() == -NormalCW().
 		@see PlaneCW(), PlaneCCW(). */
-	float3 NormalCW() const;
+	vec NormalCW() const;
 
 	/// Computes the plane this polygon is contained in.
 	/** @note Only call this function if this Polygon is planar.
@@ -237,7 +237,7 @@ public:
 	/// Translates this Polygon in world space.
 	/** @param offset The amount of displacement to apply to this Polygon, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &offset);
+	void Translate(const vec &offset);
 
 	/// Applies a transformation to this Polygon.
 	/** This function operates in-place.
@@ -254,7 +254,7 @@ public:
 //	void ProjectToPlane(const Plane &plane);
 
 	// Returns true if the edges of this polygon self-intersect when viewed from the given direction.
-//	bool IsSelfIntersecting(const float3 &viewDirection) const;
+//	bool IsSelfIntersecting(const vec &viewDirection) const;
 
 	// Returns true if there exists edges (p_{i-1}, p_i) and (p_i, p_{i+1}) which are collinear.
 //	bool HasCollinearEdges() const;
@@ -268,14 +268,14 @@ public:
 			allow floating-point inaccuracies. This parameter defines how much "thickness" to give to the polygon
 			for the purposes of the test.
 		@return True if the given object is fully contained inside this polygon (and the plane of this polygon).
-		@todo Add ContainsConvex(float3/etc.). See RTCD p. 202.
+		@todo Add ContainsConvex(vec/etc.). See RTCD p. 202.
 		@todo Add Contains(Circle/Disc). */
-	bool Contains(const float3 &point, float polygonThickness = 1e-3f) const;
+	bool Contains(const vec &point, float polygonThickness = 1e-3f) const;
 	bool Contains(const LineSegment &lineSegment, float polygonThickness = 1e-3f) const;
 	bool Contains(const Triangle &triangle, float polygonThickness = 1e-3f) const;
 	bool Contains(const Polygon &polygon, float polygonThickness = 1e-3f) const;
 	//todo Add RTCD, p. 202.
-	//bool ContainsConvex(const float3 &worldSpacePoint, float polygonThickness = 1e-3f) const;
+	//bool ContainsConvex(const vec &worldSpacePoint, float polygonThickness = 1e-3f) const;
 
 	/// Tests if the given object, expressed in the local space of this polygon, is fully contained inside this polyhedron.
 	/** This test is exactly like in Contains(), except it is performed in 2D in the local space of this polygon.
@@ -311,13 +311,13 @@ public:
 			pointer may be null.
 		@see Contains(), Distance(), Intersects().
 		@todo Add ClosestPoint(Line/Ray/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-	float3 ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const;
-	float3 ClosestPoint(const LineSegment &lineSegment) const;
-	float3 ClosestPoint(const float3 &point) const;
+	vec ClosestPoint(const LineSegment &lineSegment, vec *lineSegmentPt) const;
+	vec ClosestPoint(const LineSegment &lineSegment) const;
+	vec ClosestPoint(const vec &point) const;
 
 	/// Returns the distance between this polygon and the given point.
 	/** @see Contains(), ClosestPoint(), Intersects(). */
-	float Distance(const float3 &point) const;
+	float Distance(const vec &point) const;
 
 	/// Returns the surface area of this polygon.
 	/** @see Perimeter(), Centroid(). */
@@ -329,10 +329,10 @@ public:
 
 	/// Returns the center of mass of this polygon.
 	/** @see Area(), Perimeter(). */
-	float3 Centroid() const;
+	vec Centroid() const;
 	/// Identical to CenterPoint(), but provided to enable common signature with Triangle, AABB and OBB to allow them to be used
 	/// in template classes.
-	float3 CenterPoint() const { return Centroid(); }
+	vec CenterPoint() const { return Centroid(); }
 
 	/// Computes a point on the perimeter of this polygon.
 	/** @param normalizedDistance A value in the range [0,1[ specifying the distance along the polygon edge to travel.
@@ -340,14 +340,14 @@ public:
 		polygon. As another example, PointOnEdge(0.5f) returns the point half-way around the polygon edge (but not necessarily the farthest
 		point from p[0]).
 		@see p, RandomPointOnEdge(). */
-	float3 PointOnEdge(float normalizedDistance) const;
+	vec PointOnEdge(float normalizedDistance) const;
 
 	/// Computes a random point on the perimeter of this polygon.
 	/** This function generates points with uniform distribution.
 		@see PointOnEdge(). */
-	float3 RandomPointOnEdge(LCG &rng) const;
+	vec RandomPointOnEdge(LCG &rng) const;
 
-	float3 FastRandomPointInside(LCG &rng) const;
+	vec FastRandomPointInside(LCG &rng) const;
 
 	/// Converts this Polygon to a Polyhedron representation.
 	/** This function will create a Polyhedron with two faces, one for the front face of this Polygon,
@@ -378,10 +378,10 @@ public:
 
 //	bool IsSupportingPoint(int i) const;
 
-//	bool IsSupportingPoint(const float3 &point) const;
+//	bool IsSupportingPoint(const vec &point) const;
 
 	// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
-//	static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
+//	static bool IsConvexQuad(const vec &pointA, const vec &pointB, const vec &pointC, const vec &pointD);
 };
 
 Polygon operator *(const float3x3 &transform, const Polygon &polygon);

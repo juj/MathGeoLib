@@ -162,6 +162,18 @@ FORCE_INLINE simd4f setx_ps(float f)
 	// return s;
 }
 
+/// Returns a direction vector (w == 0) with xyz all set to the same scalar value.
+FORCE_INLINE simd4f dir_from_scalar_ps(float scalar)
+{
+	return set_ps(0.f, scalar, scalar, scalar);
+}
+
+/// Returns a position vector (w == 1) with xyz all set to the same scalar value.
+FORCE_INLINE simd4f pos_from_scalar_ps(float scalar)
+{
+	return set_ps(1.f, scalar, scalar, scalar);
+}
+
 // Given four scalar SS FP registers, packs the four values into a single SP FP register.
 //inline simd4f pack_4ss_to_ps(simd4f x, simd4f y, simd4f z, simd4f w) // VS2010 BUG! Can't use this signature!
 FORCE_INLINE simd4f pack_4ss_to_ps(simd4f x, simd4f y, simd4f z, const simd4f &w)

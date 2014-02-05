@@ -56,20 +56,20 @@ OBB::OBB(const AABB &aabb)
 
 void OBB::SetNegativeInfinity()
 {
-	pos = float3(0,0,0);
+	pos = POINT_VEC_SCALAR(0.f);
 	r.SetFromScalar(-FLOAT_INF);
-	axis[0] = float3(1,0,0);
-	axis[1] = float3(0,1,0);
-	axis[2] = float3(0,0,1);
+	axis[0] = DIR_VEC(1,0,0);
+	axis[1] = DIR_VEC(0, 1, 0);
+	axis[2] = DIR_VEC(0, 0, 1);
 }
 
 void OBB::SetFrom(const AABB &aabb)
 {
-	pos = POINT_TO_FLOAT3(aabb.CenterPoint());
-	r = POINT_TO_FLOAT3(aabb.HalfSize());
-	axis[0] = float3(1,0,0);
-	axis[1] = float3(0,1,0);
-	axis[2] = float3(0,0,1);
+	pos = aabb.CenterPoint();
+	r = aabb.HalfSize();
+	axis[0] = DIR_VEC(1, 0, 0);
+	axis[1] = DIR_VEC(0, 1, 0);
+	axis[2] = DIR_VEC(0, 0, 1);
 }
 
 template<typename Matrix>
@@ -77,8 +77,8 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 {
 	assume(m.IsColOrthogonal()); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
 	assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
-	obb.pos = m.MulPos(POINT_TO_FLOAT3(aabb.CenterPoint()));
-	float3 size = POINT_TO_FLOAT3(aabb.HalfSize());
+	obb.pos = m.MulPos(aabb.CenterPoint());
+	vec size = aabb.HalfSize();
 	obb.axis[0] = m.Col(0);
 	obb.axis[1] = m.Col(1);
 	obb.axis[2] = m.Col(2);
@@ -95,10 +95,10 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 	obb.axis[1] *= matrixScale;
 	obb.axis[2] *= matrixScale;
 
-//	mathassert(float3::AreOrthogonal(obb.axis[0], obb.axis[1], obb.axis[2]));
-//	mathassert(float3::AreOrthonormal(obb.axis[0], obb.axis[1], obb.axis[2]));
+//	mathassert(vec::AreOrthogonal(obb.axis[0], obb.axis[1], obb.axis[2]));
+//	mathassert(vec::AreOrthonormal(obb.axis[0], obb.axis[1], obb.axis[2]));
 	///@todo Would like to simply do the above, but instead numerical stability requires to do the following:
-	float3::Orthonormalize(obb.axis[0], obb.axis[1], obb.axis[2]);
+	vec::Orthonormalize(obb.axis[0], obb.axis[1], obb.axis[2]);
 }
 
 void OBB::SetFrom(const AABB &aabb, const float3x3 &transform)
@@ -127,9 +127,9 @@ void OBB::SetFrom(const Sphere &sphere)
 {
 	pos = sphere.pos;
 	r.SetFromScalar(sphere.r);
-	axis[0] = float3(1,0,0);
-	axis[1] = float3(0,1,0);
-	axis[2] = float3(0,0,1);
+	axis[0] = DIR_VEC(1,0,0);
+	axis[1] = DIR_VEC(0,1,0);
+	axis[2] = DIR_VEC(0,0,1);
 }
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
@@ -149,7 +149,7 @@ bool OBB::SetFrom(const Polyhedron &polyhedron)
 #endif
 
 #if 0
-void OBB::SetFromApproximate(const float3 *pointArray, int numPoints)
+void OBB::SetFromApproximate(const vec *pointArray, int numPoints)
 {
 	*this = PCAEnclosingOBB(pointArray, numPoints);
 }
@@ -234,12 +234,12 @@ bool OBB::IsDegenerate() const
 	return !(r.x > 0.f && r.y > 0.f && r.z > 0.f);
 }
 
-float3 OBB::CenterPoint() const
+vec OBB::CenterPoint() const
 {
 	return pos;
 }
 
-float3 OBB::PointInside(float x, float y, float z) const
+vec OBB::PointInside(float x, float y, float z) const
 {
 	assume(0.f <= x && x <= 1.f);
 	assume(0.f <= y && y <= 1.f);
@@ -271,7 +271,7 @@ LineSegment OBB::Edge(int edgeIndex) const
 	}
 }
 
-float3 OBB::CornerPoint(int cornerIndex) const
+vec OBB::CornerPoint(int cornerIndex) const
 {	
 	assume(0 <= cornerIndex && cornerIndex <= 7);
 	switch(cornerIndex)
@@ -288,16 +288,16 @@ float3 OBB::CornerPoint(int cornerIndex) const
 	}
 }
 
-float3 OBB::ExtremePoint(const float3 &direction) const
+vec OBB::ExtremePoint(const vec &direction) const
 {
-	float3 pt = pos;
+	vec pt = pos;
 	pt += axis[0] * (Dot(direction, axis[0]) >= 0.f ? r.x : -r.x);
 	pt += axis[1] * (Dot(direction, axis[1]) >= 0.f ? r.y : -r.y);
 	pt += axis[2] * (Dot(direction, axis[2]) >= 0.f ? r.z : -r.z);
 	return pt;
 }
 
-void OBB::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+void OBB::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	float x = Abs(Dot(direction, axis[0]) * r.x);
 	float y = Abs(Dot(direction, axis[1]) * r.y);
@@ -307,13 +307,13 @@ void OBB::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) c
 	outMax = pt + x + y + z;
 }
 
-float3 OBB::PointOnEdge(int edgeIndex, float u) const
+vec OBB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);
 	assume(0 <= u && u <= 1.f);
 
 	edgeIndex = Clamp(edgeIndex, 0, 11);
-	float3 d = axis[edgeIndex/4] * (2.f * u - 1.f) * r[edgeIndex/4];
+	vec d = axis[edgeIndex/4] * (2.f * u - 1.f) * r[edgeIndex/4];
 	switch(edgeIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -334,7 +334,7 @@ float3 OBB::PointOnEdge(int edgeIndex, float u) const
 	}
 }
 
-float3 OBB::FaceCenterPoint(int faceIndex) const
+vec OBB::FaceCenterPoint(int faceIndex) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
 
@@ -350,7 +350,7 @@ float3 OBB::FaceCenterPoint(int faceIndex) const
 	}
 }
 
-float3 OBB::FacePoint(int faceIndex, float u, float v) const
+vec OBB::FacePoint(int faceIndex, float u, float v) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
 	assume(0 <= u && u <= 1.f);
@@ -358,8 +358,8 @@ float3 OBB::FacePoint(int faceIndex, float u, float v) const
 
 	int uIdx = faceIndex/2;
 	int vIdx = (faceIndex/2 + 1) % 3;
-	float3 U = axis[uIdx] * (2.f * u - 1.f) * r[uIdx];
-	float3 V = axis[vIdx] * (2.f * v - 1.f) * r[vIdx];
+	vec U = axis[uIdx] * (2.f * u - 1.f) * r[uIdx];
+	vec V = axis[vIdx] * (2.f * v - 1.f) * r[vIdx];
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -387,7 +387,7 @@ Plane OBB::FacePlane(int faceIndex) const
 	}
 }
 
-void OBB::GetCornerPoints(float3 *outPointArray) const
+void OBB::GetCornerPoints(vec *outPointArray) const
 {
 	assume(outPointArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -410,7 +410,7 @@ void OBB::GetFacePlanes(Plane *outPlaneArray) const
 }
 
 /// See Christer Ericson's book Real-Time Collision Detection, page 83.
-void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArray, int numPoints, int &idxSmallest, int &idxLargest)
+void OBB::ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int numPoints, int &idxSmallest, int &idxLargest)
 {
 	assume(pointArray || numPoints == 0);
 
@@ -440,7 +440,7 @@ void OBB::ExtremePointsAlongDirection(const float3 &dir, const float3 *pointArra
 }
 
 #if 0
-OBB OBB::PCAEnclosingOBB(const float3 * /*pointArray*/, int /*numPoints*/)
+OBB OBB::PCAEnclosingOBB(const vec * /*pointArray*/, int /*numPoints*/)
 {
 #ifdef _MSC_VER
 #pragma WARNING(OBB::PCAEnclosingOBB not implemented!)
@@ -453,7 +453,7 @@ OBB OBB::PCAEnclosingOBB(const float3 * /*pointArray*/, int /*numPoints*/)
 #endif
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
-int LexFloat3Cmp(const float3 &a, const float3 &b)
+int LexFloat3Cmp(const vec &a, const vec &b)
 {
 	LEXCMP(a.x, b.x);
 	LEXCMP(a.y, b.y);
@@ -461,7 +461,7 @@ int LexFloat3Cmp(const float3 &a, const float3 &b)
 	return 0;
 }
 
-OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
+OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 {
 	OBB minOBB;
 	float minVolume = FLOAT_INF;
@@ -470,12 +470,12 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 	pts.resize(numPoints);
 	///\todo Convex hull'ize.
 
-	std::vector<float3> dirs;
+	std::vector<vec> dirs;
 	dirs.reserve((numPoints * numPoints-1) / 2);
 	for(int i = 0; i < numPoints; ++i)
 		for(int j = i+1; j < numPoints; ++j)
 		{
-			float3 edge = pointArray[i]-pointArray[j];
+			vec edge = pointArray[i]-pointArray[j];
 			float oldLength = edge.Normalize();
 			if (edge.z < 0.f)
 				edge = -edge;
@@ -505,14 +505,14 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 		//for(int j = i+1; j < numPoints; ++j)
 		for(size_t i = 0; i < dirs.size(); ++i)
 		{
-			float3 edge = dirs[i];//(pointArray[i]-pointArray[j]).Normalized();
+			vec edge = dirs[i];//(pointArray[i]-pointArray[j]).Normalized();
 
 			int e1, e2;
 			ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
 			float edgeLength = Abs(Dot(pointArray[e1], edge) - Dot(pointArray[e2], edge));
 
-			float3 u = edge.Perpendicular();
-			float3 v = edge.AnotherPerpendicular();
+			vec u = edge.Perpendicular();
+			vec v = edge.AnotherPerpendicular();
 			for(int k = 0; k < numPoints; ++k)
 				pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
 
@@ -521,7 +521,7 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 			float2 rectV;
 			float minU, maxU, minV, maxV;
 			float rectArea = float2::MinAreaRect(&pts[0], (int)pts.size(), rectCenter, rectU, rectV, minU, maxU, minV, maxV);
-			float3 rectCenterPos = u * rectCenter.x + v * rectCenter.y;
+			vec rectCenterPos = u * rectCenter.x + v * rectCenter.y;
 			
 			float volume = rectArea * edgeLength;
 			if (volume < minVolume)
@@ -544,22 +544,22 @@ OBB OBB::OptimalEnclosingOBB(const float3 *pointArray, int numPoints)
 }
 #endif
 
-float3 OBB::Size() const
+vec OBB::Size() const
 {
 	return r * 2.f;
 }
 
-float3 OBB::HalfSize() const
+vec OBB::HalfSize() const
 {
 	return r;
 }
 
-float3 OBB::Diagonal() const
+vec OBB::Diagonal() const
 {
 	return 2.f * HalfDiagonal();
 }
 
-float3 OBB::HalfDiagonal() const
+vec OBB::HalfDiagonal() const
 {
 	return axis[0] * r[0] + axis[1] * r[1] + axis[2] * r[2];
 }
@@ -576,9 +576,9 @@ float3x4 OBB::LocalToWorld() const
 	// To produce a normalized local->world matrix, do the following.
 	/*
 	float3x4 m;
-	float3 x = axis[0] * r.x;
-	float3 y = axis[1] * r.y;
-	float3 z = axis[2] * r.z;
+	vec x = axis[0] * r.x;
+	vec y = axis[1] * r.y;
+	vec z = axis[2] * r.z;
 	m.SetCol(0, 2.f * x);
 	m.SetCol(1, 2.f * y);
 	m.SetCol(2, 2.f * z);
@@ -599,10 +599,10 @@ float3x4 OBB::LocalToWorld() const
 }
 
 /// The implementation of this function is from Christer Ericson's Real-Time Collision Detection, p.133.
-float3 OBB::ClosestPoint(const float3 &targetPoint) const
+vec OBB::ClosestPoint(const vec &targetPoint) const
 {
-	float3 d = targetPoint - pos;
-	float3 closestPoint = pos; // Start at the center point of the OBB.
+	vec d = targetPoint - pos;
+	vec closestPoint = pos; // Start at the center point of the OBB.
 	for(int i = 0; i < 3; ++i) // Project the target onto the OBB axes and walk towards that point.
 		closestPoint += Clamp(Dot(d, axis[i]), -r[i], r[i]) * axis[i];
 
@@ -616,11 +616,11 @@ float OBB::Volume() const
 
 float OBB::SurfaceArea() const
 {
-	const float3 size = Size();
+	const vec size = Size();
 	return 2.f * (size.x*size.y + size.x*size.z + size.y*size.z);
 }
 
-float3 OBB::RandomPointInside(LCG &rng) const
+vec OBB::RandomPointInside(LCG &rng) const
 {
 	float f1 = rng.Float();
 	float f2 = rng.Float();
@@ -628,7 +628,7 @@ float3 OBB::RandomPointInside(LCG &rng) const
 	return PointInside(f1, f2, f3);
 }
 
-float3 OBB::RandomPointOnSurface(LCG &rng) const
+vec OBB::RandomPointOnSurface(LCG &rng) const
 {
 	int i = rng.Int(0, 5);
 	float f1 = rng.Float();
@@ -636,29 +636,29 @@ float3 OBB::RandomPointOnSurface(LCG &rng) const
 	return FacePoint(i, f1, f2);
 }
 
-float3 OBB::RandomPointOnEdge(LCG &rng) const
+vec OBB::RandomPointOnEdge(LCG &rng) const
 {
 	int i = rng.Int(0, 11);
 	float f = rng.Float();
 	return PointOnEdge(i, f);
 }
 
-float3 OBB::RandomCornerPoint(LCG &rng) const
+vec OBB::RandomCornerPoint(LCG &rng) const
 {
 	return CornerPoint(rng.Int(0, 7));
 }
 
-void OBB::Translate(const float3 &offset)
+void OBB::Translate(const vec &offset)
 {
 	pos += offset;
 }
 
-void OBB::Scale(const float3 &centerPoint, float scaleFactor)
+void OBB::Scale(const vec &centerPoint, float scaleFactor)
 {
-	return Scale(centerPoint, float3(scaleFactor, scaleFactor, scaleFactor));
+	return Scale(centerPoint, vec(scaleFactor, scaleFactor, scaleFactor));
 }
 
-void OBB::Scale(const float3 &centerPoint, const float3 &scaleFactor)
+void OBB::Scale(const vec &centerPoint, const vec &scaleFactor)
 {
 	///@bug This scales in global axes, not local axes.
 	float3x4 transform = float3x4::Scale(scaleFactor, centerPoint);
@@ -700,11 +700,11 @@ void OBB::Transform(const Quat &transform)
 	OBBTransform(*this, transform.ToFloat3x3());
 }
 
-float OBB::Distance(const float3 &point) const
+float OBB::Distance(const vec &point) const
 {
 	///@todo This code can be optimized a bit. See Christer Ericson's Real-Time Collision Detection,
 	/// p.134.
-	float3 closestPoint = ClosestPoint(point);
+	vec closestPoint = ClosestPoint(point);
 	return point.Distance(closestPoint);
 }
 
@@ -713,9 +713,9 @@ float OBB::Distance(const Sphere &sphere) const
 	return Max(0.f, Distance(sphere.pos) - sphere.r);
 }
 
-bool OBB::Contains(const float3 &point) const
+bool OBB::Contains(const vec &point) const
 {
-	float3 pt = point - pos;
+	vec pt = point - pos;
 	return Abs(Dot(pt, axis[0])) <= r[0] &&
 	       Abs(Dot(pt, axis[1])) <= r[1] &&
 	       Abs(Dot(pt, axis[2])) <= r[2];
@@ -783,9 +783,9 @@ bool OBB::Intersects(const AABB &aabb) const
 	return Intersects(OBB(aabb));
 }
 
-void OBB::Enclose(const float3 &point)
+void OBB::Enclose(const vec &point)
 {
-	float3 p = point - pos;
+	vec p = point - pos;
 	for(int i = 0; i < 3; ++i)
 	{
 		assert(EqualAbs(axis[i].Length(), 1.f));
@@ -808,9 +808,9 @@ void OBB::Enclose(const float3 &point)
 	assume(Distance(point) <= 1e-3f);
 }
 
-void OBB::Triangulate(int x, int y, int z, float3 *outPos, float3 *outNormal, float2 *outUV, bool ccwIsFrontFacing) const
+void OBB::Triangulate(int x, int y, int z, vec *outPos, vec *outNormal, float2 *outUV, bool ccwIsFrontFacing) const
 {
-	AABB aabb(float3(0,0,0), float3(r.x*2.f,r.y*2.f,r.z*2.f));
+	AABB aabb(vec(0,0,0), float3(r.x*2.f,r.y*2.f,r.z*2.f));
 	aabb.Triangulate(x, y, z, outPos, outNormal, outUV, ccwIsFrontFacing);
 	float3x4 localToWorld = LocalToWorld();
 	assume(localToWorld.HasUnitaryScale()); // Transforming of normals will fail otherwise.

@@ -731,8 +731,11 @@ MATH_BEGIN_NAMESPACE
 #ifdef MATH_AUTOMATIC_SSE
 bool EqualAbs(float a, float b, float epsilon);
 typedef float4 vec;
-#define POINT_VEC(x) float4(x, 1.f)
-#define DIR_VEC(x) float4(x, 0.f)
+#define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
+#define DIR_VEC(...) float4(__VA_ARGS__, 0.f)
+
+#define POINT_VEC_SCALAR(s) pos_from_scalar_ps(s)
+#define DIR_VEC_SCALAR(s) dir_from_scalar_ps(s)
 
 #define POINT_TO_FLOAT3(v) (v).xyz()
 #define DIR_TO_FLOAT3(v) (v).xyz()
@@ -751,10 +754,13 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 */
 #else
 typedef float3 vec;
-#define POINT_VEC(x) x
-#define DIR_VEC(x) x
+#define POINT_VEC(...) float3(__VA_ARGS__)
+#define DIR_VEC(...) float3(__VA_ARGS__)
 #define POINT_TO_FLOAT3(x) x
 #define DIR_TO_FLOAT3(x) x
+#define POINT_VEC_SCALAR(s) float3::FromScalar(s)
+#define DIR_VEC_SCALAR(s) float3::FromScalar(s)
+
 #endif
 
 

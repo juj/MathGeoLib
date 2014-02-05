@@ -47,36 +47,54 @@
 MATH_BEGIN_NAMESPACE
 
 Plane::Plane(const float3 &normal_, float d_)
-:normal(normal_), d(d_)
+:normal(DIR_VEC(normal_)), d(d_)
 {
 	assume(normal.IsNormalized());
 }
 
 Plane::Plane(const float3 &v1, const float3 &v2, const float3 &v3)
 {
+	Set(POINT_VEC(v1), POINT_VEC(v2), POINT_VEC(v3));
+}
+
+Plane::Plane(const vec &v1, const vec &v2, const vec &v3)
+{
 	Set(v1, v2, v3);
 }
 
 Plane::Plane(const float3 &point, const float3 &normal_)
+{
+	Set(POINT_VEC(point), DIR_VEC(normal_));
+}
+
+Plane::Plane(const vec &point, const vec &normal_)
 {
 	Set(point, normal_);
 }
 
 Plane::Plane(const Ray &ray, const float3 &normal)
 {
-	float3 perpNormal = normal - normal.ProjectToNorm(ray.dir);
+	vec n = DIR_VEC(normal);
+	vec perpNormal = n - n.ProjectToNorm(ray.dir);
 	Set(ray.pos, perpNormal.Normalized());
 }
 
-Plane::Plane(const Line &line, const float3 &normal)
+Plane::Plane(const Ray &ray, const float4 &normal)
 {
-	float3 perpNormal = normal - normal.ProjectToNorm(line.dir);
+	vec perpNormal = normal - normal.ProjectToNorm(ray.dir);
+	Set(ray.pos, perpNormal.Normalized());
+}
+
+Plane::Plane(const Line &line, const vec &normal)
+{
+	vec perpNormal = normal - normal.ProjectToNorm(line.dir);
 	Set(line.pos, perpNormal.Normalized());
 }
 
 Plane::Plane(const LineSegment &lineSegment, const float3 &normal)
 {
-	float3 perpNormal = normal - normal.ProjectTo(lineSegment.b - lineSegment.a);
+	vec n = DIR_VEC(normal);
+	vec perpNormal = n - n.ProjectTo(lineSegment.b - lineSegment.a);
 	Set(lineSegment.a, perpNormal.Normalized());
 }
 
@@ -85,24 +103,24 @@ bool Plane::IsDegenerate() const
 	return !normal.IsFinite() || normal.IsZero() || !IsFinite(d);
 }
 
-void Plane::Set(const float3 &v1, const float3 &v2, const float3 &v3)
+void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 {
 	normal = ((v2-v1).Cross(v3-v1)).Normalized();
-	d = Dot(v1, normal);
+	d = normal.Dot(v1);
 
 #ifdef MATH_ASSERT_CORRECTNESS
-	float d2 = Dot(v2, normal);
-	float d3 = Dot(v3, normal);
+	float d2 = normal.Dot(v2);
+	float d3 = normal.Dot(v3);
 	mathassert(EqualAbs(d, d2, 1e-2f));
 	mathassert(EqualAbs(d, d3, 1e-2f));
 #endif
 }
 
-void Plane::Set(const float3 &point, const float3 &normal_)
+void Plane::Set(const vec &point, const vec &normal_)
 {
 	normal = normal_;
 	assume(normal.IsNormalized());
-	d = Dot(point, normal);
+	d = point.Dot(normal);
 
 #ifdef MATH_ASSERT_CORRECTNESS
 	assert1(EqualAbs(SignedDistance(point), 0.f, 0.01f), SignedDistance(point));
@@ -116,24 +134,24 @@ void Plane::ReverseNormal()
 	d = -d;
 }
 
-float3 Plane::PointOnPlane() const
+vec Plane::PointOnPlane() const
 {
 	return normal * d;
 }
 
-float3 Plane::Point(float u, float v) const
+vec Plane::Point(float u, float v) const
 {
 	return PointOnPlane() + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
 }
 
-float3 Plane::Point(float u, float v, const float3 &referenceOrigin) const
+vec Plane::Point(float u, float v, const vec &referenceOrigin) const
 {
 	return Project(referenceOrigin) + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
 }
 
-void Plane::Translate(const float3 &offset)
+void Plane::Translate(const vec &offset)
 {
-	d -= Dot(normal, offset);
+	d -= normal.Dot(offset);
 }
 
 void Plane::Transform(const float3x3 &transform)
@@ -150,7 +168,7 @@ void Plane::Transform(const float3x4 &transform)
 	bool success = r.Inverse(); ///@todo Can optimize the inverse here by assuming orthogonality or orthonormality.
 	assume(success);
 	MARK_UNUSED(success);
-	d = d + Dot(normal, r * transform.TranslatePart());
+	d = d + normal.Dot(DIR_VEC(r * transform.TranslatePart()));
 	normal = normal * r;
 }
 
@@ -166,21 +184,21 @@ void Plane::Transform(const Quat &transform)
 	Transform(r);
 }
 
-bool Plane::IsInPositiveDirection(const float3 &directionVector) const
+bool Plane::IsInPositiveDirection(const vec &directionVector) const
 {
 	return normal.Dot(directionVector) >= 0.f;
 }
 
-bool Plane::IsOnPositiveSide(const float3 &point) const
+bool Plane::IsOnPositiveSide(const vec &point) const
 {
 	return SignedDistance(point) >= 0.f;
 }
 
 int Plane::ExamineSide(const Triangle &triangle) const
 {
-	float a = SignedDistance(triangle.a);
-	float b = SignedDistance(triangle.b);
-	float c = SignedDistance(triangle.c);
+	float a = SignedDistance(POINT_VEC(triangle.a));
+	float b = SignedDistance(POINT_VEC(triangle.b));
+	float c = SignedDistance(POINT_VEC(triangle.c));
 	const float epsilon = 1e-4f; // Allow a small epsilon amount for tests for floating point inaccuracies.
 	if (a >= -epsilon && b >= -epsilon && c >= -epsilon)
 		return 1;
@@ -189,12 +207,12 @@ int Plane::ExamineSide(const Triangle &triangle) const
 	return 0;
 }
 
-bool Plane::AreOnSameSide(const float3 &p1, const float3 &p2) const
+bool Plane::AreOnSameSide(const vec &p1, const vec &p2) const
 {
 	return SignedDistance(p1) * SignedDistance(p2) >= 0.f;
 }
 
-float Plane::Distance(const float3 &point) const
+float Plane::Distance(const vec &point) const
 {
 	return Abs(SignedDistance(point));
 }
@@ -214,7 +232,7 @@ float Plane::Distance(const Capsule &capsule) const
 	return Max(0.f, Distance(capsule.l) - capsule.r);
 }
 
-float Plane::SignedDistance(const float3 &point) const
+float Plane::SignedDistance(const vec &point) const
 {
 	return normal.Dot(point) - d;
 }
@@ -269,36 +287,36 @@ float3x4 Plane::MirrorMatrix() const
 	return float3x4::Mirror(*this);
 }
 
-float3 Plane::Mirror(const float3 &point) const
+vec Plane::Mirror(const vec &point) const
 {
 #ifdef MATH_ASSERT_CORRECTNESS
 	float signedDistance = SignedDistance(point);
 #endif
 	assume(normal.IsNormalized());
-	float3 reflected = point - 2.f * (Dot(point, normal) - d) * normal;
+	vec reflected = point - 2.f * (point.Dot(normal) - d) * normal;
 	mathassert(EqualAbs(signedDistance, -SignedDistance(reflected)));
 	mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));
 	return reflected;
 }
 
-float3 Plane::Refract(const float3 &vec, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const
+vec Plane::Refract(const vec &vec, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const
 {
-	return float3(vec).Refract(normal, negativeSideRefractionIndex, positiveSideRefractionIndex);
+	return vec.Refract(normal, negativeSideRefractionIndex, positiveSideRefractionIndex);
 }
 
-float3 Plane::Project(const float3 &point) const
+vec Plane::Project(const vec &point) const
 {
-	float3 projected = point - (Dot(normal, point) - d) * normal;
+	vec projected = point - (normal.Dot(point) - d) * normal;
 	mathassert(projected.Equals(OrthoProjection().MulPos(point)));
 	return projected;
 }
 
-float3 Plane::ProjectToNegativeHalf(const float3 &point) const
+vec Plane::ProjectToNegativeHalf(const vec &point) const
 {
-	return point - Max(0.f, (Dot(normal, point) - d)) * normal;
+	return point - Max(0.f, (normal.Dot(point) - d)) * normal;
 }
 
-float3 Plane::ProjectToPositiveHalf(const float3 &point) const
+vec Plane::ProjectToPositiveHalf(const vec &point) const
 {
 	return point - Min(0.f, (Dot(normal, point) - d)) * normal;
 }

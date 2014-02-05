@@ -48,12 +48,7 @@
 
 MATH_BEGIN_NAMESPACE
 
-AABB::AABB(const float3 &minPoint_, const float3 &maxPoint_)
-:minPoint(POINT_VEC(minPoint_)), maxPoint(POINT_VEC(maxPoint_))
-{
-}
-
-AABB::AABB(const float4 &minPoint_, const float4 &maxPoint_)
+AABB::AABB(const vec &minPoint_, const vec &maxPoint_)
 :minPoint(minPoint_), maxPoint(maxPoint_)
 {
 }
@@ -83,26 +78,25 @@ void AABB::SetFromCenterAndSize(const vec &center, const vec &size)
 
 void AABB::SetFrom(const OBB &obb)
 {
-	float3 halfSize = Abs(obb.axis[0]*obb.r[0]) + Abs(obb.axis[1]*obb.r[1]) + Abs(obb.axis[2]*obb.r[2]);
+	vec halfSize = Abs(obb.axis[0]*obb.r[0]) + Abs(obb.axis[1]*obb.r[1]) + Abs(obb.axis[2]*obb.r[2]);
 	SetFromCenterAndSize(obb.pos, 2.f*halfSize);
 }
 
 void AABB::SetFrom(const Sphere &s)
 {
 	vec d = DIR_VEC(float3::FromScalar(s.r));
-	vec pos = POINT_VEC(s.pos);
-	minPoint = pos - d;
-	maxPoint = pos + d;
+	minPoint = s.pos - d;
+	maxPoint = s.pos + d;
 }
 
-void AABB::SetFrom(const float3 *pointArray, int numPoints)
+void AABB::SetFrom(const vec *pointArray, int numPoints)
 {
 	assume(pointArray || numPoints == 0);
 	SetNegativeInfinity();
 	if (!pointArray)
 		return;
 	for(int i = 0; i < numPoints; ++i)
-		Enclose(POINT_VEC(pointArray[i]));
+		Enclose(pointArray[i]);
 }
 
 Polyhedron AABB::ToPolyhedron() const
@@ -112,7 +106,7 @@ Polyhedron AABB::ToPolyhedron() const
 	// Populate the corners of this AABB.
 	// The will be in the order 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++.
 	for(int i = 0; i < 8; ++i)
-		p.v.push_back(POINT_TO_FLOAT3(CornerPoint(i)));
+		p.v.push_back(CornerPoint(i));
 
 	// Generate the 6 faces of this AABB.
 	const int faces[6][4] =
@@ -143,13 +137,13 @@ OBB AABB::ToOBB() const
 
 Sphere AABB::MinimalEnclosingSphere() const
 {
-	return Sphere(POINT_TO_FLOAT3(CenterPoint()), Size().Length() * 0.5f);
+	return Sphere(CenterPoint(), Size().Length() * 0.5f);
 }
 
 Sphere AABB::MaximalContainedSphere() const
 {
 	vec halfSize = HalfSize();
-	return Sphere(POINT_TO_FLOAT3(CenterPoint()), Min(halfSize.x, halfSize.y, halfSize.z));
+	return Sphere(CenterPoint(), Min(halfSize.x, halfSize.y, halfSize.z));
 }
 
 bool AABB::IsFinite() const
@@ -205,18 +199,18 @@ LineSegment AABB::Edge(int edgeIndex) const
 		case 11: return LineSegment(CornerPoint(6), CornerPoint(7));
 		*/
 		// Force-optimize to avoid calling to CornerPoint for another switch-case statement.
-		case 0: return LineSegment(float3(minPoint.x, minPoint.y, minPoint.z), float3(minPoint.x, minPoint.y, maxPoint.z));
-		case 1: return LineSegment(float3(minPoint.x, minPoint.y, minPoint.z), float3(minPoint.x, maxPoint.y, minPoint.z));
-		case 2: return LineSegment(float3(minPoint.x, minPoint.y, minPoint.z), float3(maxPoint.x, minPoint.y, minPoint.z));
-		case 3: return LineSegment(float3(minPoint.x, minPoint.y, maxPoint.z), float3(minPoint.x, maxPoint.y, maxPoint.z));
-		case 4: return LineSegment(float3(minPoint.x, minPoint.y, maxPoint.z), float3(maxPoint.x, minPoint.y, maxPoint.z));
-		case 5: return LineSegment(float3(minPoint.x, maxPoint.y, minPoint.z), float3(minPoint.x, maxPoint.y, maxPoint.z));
-		case 6: return LineSegment(float3(minPoint.x, maxPoint.y, minPoint.z), float3(maxPoint.x, maxPoint.y, minPoint.z));
-		case 7: return LineSegment(float3(minPoint.x, maxPoint.y, maxPoint.z), float3(maxPoint.x, maxPoint.y, maxPoint.z));
-		case 8: return LineSegment(float3(maxPoint.x, minPoint.y, minPoint.z), float3(maxPoint.x, minPoint.y, maxPoint.z));
-		case 9: return LineSegment(float3(maxPoint.x, minPoint.y, minPoint.z), float3(maxPoint.x, maxPoint.y, minPoint.z));
-		case 10: return LineSegment(float3(maxPoint.x, minPoint.y, maxPoint.z), float3(maxPoint.x, maxPoint.y, maxPoint.z));
-		case 11: return LineSegment(float3(maxPoint.x, maxPoint.y, minPoint.z), float3(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 0: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, minPoint.z), POINT_VEC(minPoint.x, minPoint.y, maxPoint.z));
+		case 1: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, minPoint.z), POINT_VEC(minPoint.x, maxPoint.y, minPoint.z));
+		case 2: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, minPoint.z), POINT_VEC(maxPoint.x, minPoint.y, minPoint.z));
+		case 3: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, maxPoint.z), POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z));
+		case 4: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, maxPoint.z), POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z));
+		case 5: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, minPoint.z), POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z));
+		case 6: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, minPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z));
+		case 7: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 8: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, minPoint.z), POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z));
+		case 9: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, minPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z));
+		case 10: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 11: return LineSegment(POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, maxPoint.z));
 	}
 }
 
@@ -329,7 +323,7 @@ Plane AABB::FacePlane(int faceIndex) const
 	return Plane(POINT_TO_FLOAT3(FaceCenterPoint(faceIndex)), DIR_TO_FLOAT3(FaceNormal(faceIndex)));
 }
 
-void AABB::GetCornerPoints(float3 *outPointArray) const
+void AABB::GetCornerPoints(vec *outPointArray) const
 {
 	assume(outPointArray);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
@@ -337,7 +331,7 @@ void AABB::GetCornerPoints(float3 *outPointArray) const
 		return;
 #endif
 	for(int i = 0; i < 8; ++i)
-		outPointArray[i] = POINT_TO_FLOAT3(CornerPoint(i));
+		outPointArray[i] = CornerPoint(i);
 }
 
 void AABB::GetFacePlanes(Plane *outPlaneArray) const
@@ -351,14 +345,14 @@ void AABB::GetFacePlanes(Plane *outPlaneArray) const
 		outPlaneArray[i] = FacePlane(i);
 }
 
-AABB AABB::MinimalEnclosingAABB(const float3 *pointArray, int numPoints)
+AABB AABB::MinimalEnclosingAABB(const vec *pointArray, int numPoints)
 {
 	AABB aabb;
 	aabb.SetFrom(pointArray, numPoints);
 	return aabb;
 }
 
-void AABB::ExtremePointsAlongAABB(const float3 *pts, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz)
+void AABB::ExtremePointsAlongAABB(const vec *pts, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz)
 {
 	assume(pts || numPoints == 0);
 	if (!pts)
@@ -571,7 +565,7 @@ float AABB::Distance(const Sphere &sphere) const
 	return Max(0.f, Distance(sphere.pos) - sphere.r);
 }
 
-bool AABB::Contains(const float3 &point) const
+bool AABB::Contains(const vec &point) const
 {
 	return minPoint.x <= point.x && point.x <= maxPoint.x &&
 		   minPoint.y <= point.y && point.y <= maxPoint.y &&
@@ -624,7 +618,7 @@ bool AABB::Contains(const Polyhedron &polyhedron) const
 	return Contains(polyhedron.MinimalEnclosingAABB());
 }
 
-bool AABB::IntersectLineAABB(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
+bool AABB::IntersectLineAABB(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const
 {
 	// Never call the SSE version here. The SSE version does not output tNear and tFar, because
 	// the memory stores have been profiled to make it slower than the CPP version. Therefore the SSE
@@ -638,7 +632,7 @@ bool AABB::Intersects(const Line &line) const
 	float tFar = FLOAT_INF;
 
 #ifdef MATH_SSE
-	return IntersectLineAABB_SSE(float4(line.pos, 1.f), float4(line.dir, 0.f), tNear, tFar);
+	return IntersectLineAABB_SSE(line.pos, line.dir, tNear, tFar);
 #else
 	return IntersectLineAABB_CPP(line.pos, line.dir, tNear, tFar);
 #endif
@@ -650,7 +644,7 @@ bool AABB::Intersects(const Ray &ray) const
 	float tFar = FLOAT_INF;
 
 #ifdef MATH_SSE
-	return IntersectLineAABB_SSE(float4(ray.pos, 1.f), float4(ray.dir, 0.f), tNear, tFar);
+	return IntersectLineAABB_SSE(ray.pos, ray.dir, tNear, tFar);
 #else
 	return IntersectLineAABB_CPP(ray.pos, ray.dir, tNear, tFar);
 #endif
@@ -658,7 +652,7 @@ bool AABB::Intersects(const Ray &ray) const
 
 bool AABB::Intersects(const LineSegment &lineSegment) const
 {
-	float3 dir = lineSegment.b - lineSegment.a;
+	vec dir = lineSegment.b - lineSegment.a;
 	float len = dir.Length();
 	if (len <= 1e-4f) // Degenerate line segment? Fall back to point-in-AABB test.
 		return Contains(lineSegment.a);
@@ -667,13 +661,13 @@ bool AABB::Intersects(const LineSegment &lineSegment) const
 	dir *= invLen;
 	float tNear = 0.f, tFar = len;
 #ifdef MATH_SSE
-	return IntersectLineAABB_SSE(float4(lineSegment.a, 1.f), float4(dir, 0.f), tNear, tFar);
+	return IntersectLineAABB_SSE(lineSegment.a, dir, tNear, tFar);
 #else
 	return IntersectLineAABB_CPP(lineSegment.a, dir, tNear, tFar);
 #endif
 }
 
-bool AABB::IntersectLineAABB_CPP(const float3 &linePos, const float3 &lineDir, float &tNear, float &tFar) const
+bool AABB::IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const
 {
 	assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
 	assume2(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!", tNear, tFar);
@@ -867,7 +861,7 @@ bool AABB::Intersects(const Line &line, float &dNear, float &dFar) const
 
 bool AABB::Intersects(const LineSegment &lineSegment, float &dNear, float &dFar) const
 {
-	float3 dir = lineSegment.b - lineSegment.a;
+	vec dir = lineSegment.b - lineSegment.a;
 	float len = dir.Length();
 	if (len <= 1e-4f) // Degenerate line segment? Fall back to point-in-AABB test.
 	{
@@ -907,10 +901,10 @@ bool AABB::Intersects(const OBB &obb) const
 	return obb.Intersects(*this);
 }
 
-bool AABB::Intersects(const Sphere &sphere, float3 *closestPointOnAABB) const
+bool AABB::Intersects(const Sphere &sphere, vec *closestPointOnAABB) const
 {
 	// Find the point on this AABB closest to the sphere center.
-	float3 pt = ClosestPoint(sphere.pos);
+	vec pt = ClosestPoint(sphere.pos);
 
 	// If that point is inside sphere, the AABB and sphere intersect.
 	if (closestPointOnAABB)
@@ -985,8 +979,8 @@ void AABB::Enclose(const OBB &obb)
 
 void AABB::Enclose(const Sphere &sphere)
 {
-	Enclose(sphere.pos - float3(sphere.r,sphere.r,sphere.r));
-	Enclose(sphere.pos + float3(sphere.r,sphere.r,sphere.r));
+	Enclose(sphere.pos - POINT_VEC(sphere.r, sphere.r, sphere.r));
+	Enclose(sphere.pos + POINT_VEC(sphere.r, sphere.r, sphere.r));
 }
 
 void AABB::Enclose(const Triangle &triangle)
@@ -998,10 +992,10 @@ void AABB::Enclose(const Triangle &triangle)
 
 void AABB::Enclose(const Capsule &capsule)
 {
-	Enclose(capsule.l.a - float3(capsule.r, capsule.r, capsule.r));
-	Enclose(capsule.l.a + float3(capsule.r, capsule.r, capsule.r));
-	Enclose(capsule.l.b - float3(capsule.r, capsule.r, capsule.r));
-	Enclose(capsule.l.b + float3(capsule.r, capsule.r, capsule.r));
+	Enclose(capsule.l.a - POINT_VEC(capsule.r, capsule.r, capsule.r));
+	Enclose(capsule.l.a + POINT_VEC(capsule.r, capsule.r, capsule.r));
+	Enclose(capsule.l.b - POINT_VEC(capsule.r, capsule.r, capsule.r));
+	Enclose(capsule.l.b + POINT_VEC(capsule.r, capsule.r, capsule.r));
 }
 
 void AABB::Enclose(const Frustum &frustum)
@@ -1022,7 +1016,7 @@ void AABB::Enclose(const Polyhedron &polyhedron)
 		Enclose(polyhedron.Vertex(i));
 }
 
-void AABB::Enclose(const float3 *pointArray, int numPoints)
+void AABB::Enclose(const vec *pointArray, int numPoints)
 {
 	assume(pointArray || numPoints == 0);
 	if (!pointArray)
@@ -1032,7 +1026,7 @@ void AABB::Enclose(const float3 *pointArray, int numPoints)
 }
 
 void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
-                       float3 *outPos, float3 *outNormal, float2 *outUV,
+                       vec *outPos, vec *outNormal, float2 *outUV,
                        bool ccwIsFrontFacing) const
 {
 	assume(numFacesX >= 1);
@@ -1075,14 +1069,14 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 				float u2 = (float)(x+1) / (numFacesU);
 				float v2 = (float)(y+1) / (numFacesV);
 			
-				outPos[i]   = POINT_TO_FLOAT3(FacePoint(face, u, v));
-				outPos[i+1] = POINT_TO_FLOAT3(FacePoint(face, u, v2));
-				outPos[i+2] = POINT_TO_FLOAT3(FacePoint(face, u2, v));
+				outPos[i]   = FacePoint(face, u, v);
+				outPos[i+1] = FacePoint(face, u, v2);
+				outPos[i+2] = FacePoint(face, u2, v);
 				if (flip)
 					Swap(outPos[i+1], outPos[i+2]);
 				outPos[i+3] = outPos[i+2];
 				outPos[i+4] = outPos[i+1];
-				outPos[i+5] = POINT_TO_FLOAT3(FacePoint(face, u2, v2));
+				outPos[i+5] = FacePoint(face, u2, v2);
 
 				if (outUV)
 				{
@@ -1098,7 +1092,7 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 
 				if (outNormal)
 					for(int j = 0; j < 6; ++j)
-						outNormal[i+j] = POINT_TO_FLOAT3(FaceNormal(face));
+						outNormal[i+j] = FaceNormal(face);
 
 				i += 6;
 			}
@@ -1106,7 +1100,7 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 	assert(i == NumVerticesInTriangulation(numFacesX, numFacesY, numFacesZ));
 }
 
-void AABB::ToEdgeList(float3 *outPos) const
+void AABB::ToEdgeList(vec *outPos) const
 {
 	assume(outPos);
 	if (!outPos)

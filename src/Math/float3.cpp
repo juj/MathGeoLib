@@ -377,15 +377,15 @@ float float3::Distance(const float3 &rhs) const
 	return Sqrt(DistanceSq(rhs));
 }
 
-float float3::Distance(const Line &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const Ray &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const LineSegment &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const Plane &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const Triangle &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const AABB &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const OBB &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const Sphere &rhs) const { return rhs.Distance(*this); }
-float float3::Distance(const Capsule &rhs) const { return rhs.Distance(*this); }
+float float3::Distance(const Line &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const Ray &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const LineSegment &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const Plane &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const Triangle &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const AABB &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const OBB &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const Sphere &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
+float float3::Distance(const Capsule &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
 
 float float3::Dot(const float3 &rhs) const
 {
@@ -698,12 +698,12 @@ float4 float3::ToDir4() const
 
 float3 MUST_USE_RESULT float3::RandomDir(LCG &lcg, float length)
 {
-	return Sphere(float3(0,0,0), length).RandomPointOnSurface(lcg);
+	return POINT_TO_FLOAT3(Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg));
 }
 
 float3 MUST_USE_RESULT float3::RandomSphere(LCG &lcg, const float3 &center, float radius)
 {
-	return Sphere(center, radius).RandomPointInside(lcg);
+	return POINT_TO_FLOAT3(Sphere(POINT_VEC(center), radius).RandomPointInside(lcg));
 }
 
 float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)

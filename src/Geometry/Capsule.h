@@ -48,7 +48,7 @@ public:
 	/** This constructor is equivalent to calling Capsule(LineSegment(bottomPoint, topPoint), radius), but provided
 		here for conveniency.
 		@see l, r. */
-	Capsule(const float3 &bottomPoint, const float3 &topPoint, float radius);
+	Capsule(const vec &bottomPoint, const vec &topPoint, float radius);
 
 	/// Constructs a new capsule from a sphere.
 	/** This conversion results in a capsule which has its both endpoints at the exact same coordinates, and hence the
@@ -85,14 +85,14 @@ public:
 		@note The bottom-most point of the capsule is different than the point l.a. The returned point is the point at the very far
 			edge of this capsule, and does not lie on the internal line. See the attached diagram.
 		@see Top(), l. */
-	float3 Bottom() const;
+	vec Bottom() const;
 
 	/// Returns the center point of this Capsule.
 	/** <img src="CapsuleFunctions.png" />
 		@return The point (l.a + l.b) / 2. This point is the center of mass for this capsule.
 		@see l, Bottom(), Top(). */
-	float3 Center() const;
-	float3 Centroid() const { return l.CenterPoint(); } ///< [similarOverload: Center]
+	vec Center() const;
+	vec Centroid() const { return l.CenterPoint(); } ///< [similarOverload: Center]
 
 	/// Computes the extreme point of this Capsule in the given direction.
 	/** An extreme point is a farthest point of this Capsule in the given direction. Given a direction,
@@ -100,7 +100,7 @@ public:
 		@param direction The direction vector of the direction to find the extreme point. This vector may
 			be unnormalized, but may not be null.
 		@return The extreme point of this Capsule in the given direction. */
-	float3 ExtremePoint(const float3 &direction) const;
+	vec ExtremePoint(const vec &direction) const;
 
 	/// Projects this Capsule onto the given 1D axis direction vector.
 	/** This function collapses this Capsule onto an 1D axis for the purposes of e.g. separate axis test computations.
@@ -109,7 +109,7 @@ public:
 			of this function gets scaled by the length of this vector.
 		@param outMin [out] Returns the minimum extent of this object along the projection axis.
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
-	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
 	/// Returns the topmost point of this Capsule.
 	/** <img src="CapsuleFunctions.png" />
@@ -118,13 +118,13 @@ public:
 		@note The topmost point of the capsule is different than the point l.b. The returned point is the point at the very far
 			edge of this capsule, and does not lie on the internal line. See the attached diagram.
 		@see Bottom(), l. */
-	float3 Top() const;
+	vec Top() const;
 
 	/// Returns the direction from the bottommost point towards the topmost point of this Capsule.
 	/** <img src="CapsuleFunctions.png" />
 		@return The normalized direction vector from l.a to l.b.
 		@see l. */
-	float3 UpDirection() const;
+	vec UpDirection() const;
 
 	/// Computes the volume of this Capsule.
 	/** @return pi * r^2 * |b-a| + 4 * pi * r^2 / 3.
@@ -161,7 +161,7 @@ public:
 		@param d A normalized value between [0,1]. This specifies the normalized distance of the point position from the capsule line segment.
 		@note This function does not generate points inside this capsule uniformly, as (l,a,d) ranges uniformly over [0,1]^3.
 		@see UniformPointPerhapsInside(), RandomPointInside(). */
-	float3 PointInside(float l, float a, float d) const;
+	vec PointInside(float l, float a, float d) const;
 
 	/// Generates a point that perhaps lies inside this capsule.
 	/** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
@@ -169,7 +169,7 @@ public:
 		@param y A normalized value between [0,1]. This specifies the y coordinate on the plane of the circle cross-section specified by l.
 		@note This function will generate points uniformly, but they do not necessarily lie inside the capsule.
 		@see PointInside(). */
-	float3 UniformPointPerhapsInside(float l, float x, float y) const;
+	vec UniformPointPerhapsInside(float l, float x, float y) const;
 
 	/// Returns the Sphere defining the 'bottom' section of this Capsule (corresponding to the endpoint l.a)
 	Sphere SphereA() const;
@@ -188,19 +188,19 @@ public:
 	/// Generates a random point inside this capsule.
 	/** The points are distributed uniformly.
 		@see RandomPointOnSurface(). */
-	float3 RandomPointInside(LCG &rng) const;
+	vec RandomPointInside(LCG &rng) const;
 
 	/// Generates a random point on the surface of this Capsule.
 	/** @todo The points are NOT distributed uniformly. Convert this to using the rejection method and RandomPointInside()
 			to produce a uniform distribution.
 		@see RandomPointInside(). */
-	float3 RandomPointOnSurface(LCG &rng) const;
+	vec RandomPointOnSurface(LCG &rng) const;
 
 	/// Moves this capsule by the given offset vector.
 	/** @note This function operates in-place.
 		@param offset The world space offset to apply to the position of this capsule.
 		@see Transform(), Scale(). */
-	void Translate(const float3 &offset);
+	void Translate(const vec &offset);
 
 	/// Applies a uniform scale to this Capsule.
 	/** This function scales this capsule structure in-place, using the given center point as the origin
@@ -208,7 +208,7 @@ public:
 		@param centerPoint Specifies the center of the scaling operation, in world space.
 		@param scaleFactor The uniform scale factor to apply to each world space axis.
 		@see Translate(), Transform(). */
-	void Scale(const float3 &centerPoint, float scaleFactor);
+	void Scale(const vec &centerPoint, float scaleFactor);
 
 	/// Applies a transformation to this capsule.
 	/** @param transform The transformation to apply to this capsule. This transformation must be
@@ -224,14 +224,14 @@ public:
 	/** If the target point lies inside this capsule, then that point is returned.
 		@see Distance(), Contains(), Intersects().
 		@todo Add ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-	float3 ClosestPoint(const float3 &targetPoint) const;
+	vec ClosestPoint(const vec &targetPoint) const;
 
 	/// Computes the distance between this capsule and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
 		@todo Add Distance(Triangle/Polygon/Circle/Disc/Capsule).
 		@see Contains(), Intersects(), ClosestPoint(). */
-	float Distance(const float3 &point) const;
+	float Distance(const vec &point) const;
 	float Distance(const Plane &plane) const;
 	float Distance(const Sphere &sphere) const;
 	float Distance(const Ray &ray) const;
@@ -245,7 +245,7 @@ public:
 			due to float inaccuracies, this cannot generally be relied upon.
 		@todo Add Contains(Circle/Disc/Sphere/Capsule).
 		@see Distance(), Intersects(), ClosestPoint(). */
-	bool Contains(const float3 &point) const;
+	bool Contains(const vec &point) const;
 	bool Contains(const LineSegment &lineSegment) const;
 	bool Contains(const Triangle &triangle) const;
 	bool Contains(const Polygon &polygon) const;

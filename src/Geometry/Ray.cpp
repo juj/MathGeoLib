@@ -40,7 +40,7 @@
 
 MATH_BEGIN_NAMESPACE
 
-Ray::Ray(const float3 &pos_, const float3 &dir_)
+Ray::Ray(const vec &pos_, const vec &dir_)
 :pos(pos_), dir(dir_)
 {
 	assume2(dir.IsNormalized(), dir, dir.LengthSq());
@@ -62,13 +62,13 @@ bool Ray::IsFinite() const
 	return pos.IsFinite() && dir.IsFinite();
 }
 
-float3 Ray::GetPoint(float d) const
+vec Ray::GetPoint(float d) const
 {
 	assume2(dir.IsNormalized(), dir, dir.LengthSq());
 	return pos + d * dir;
 }
 
-void Ray::Translate(const float3 &offset)
+void Ray::Translate(const vec &offset)
 {
 	pos += offset;
 }
@@ -81,14 +81,14 @@ void Ray::Transform(const float3x3 &transform)
 
 void Ray::Transform(const float3x4 &transform)
 {
-	pos = transform.TransformPos(pos);
-	dir = transform.TransformDir(dir);
+	pos = transform.MulPos(pos);
+	dir = transform.MulDir(dir);
 }
 
 void Ray::Transform(const float4x4 &transform)
 {
-	pos = transform.TransformPos(pos);
-	dir = transform.TransformDir(dir);
+	pos = transform.MulPos(pos);
+	dir = transform.MulDir(dir);
 }
 
 void Ray::Transform(const Quat &transform)
@@ -97,7 +97,7 @@ void Ray::Transform(const Quat &transform)
 	dir = transform.Transform(dir);
 }
 
-bool Ray::Contains(const float3 &point, float distanceThreshold) const
+bool Ray::Contains(const vec &point, float distanceThreshold) const
 {
 	return ClosestPoint(point).DistanceSq(point) <= distanceThreshold;
 }
@@ -112,12 +112,12 @@ bool Ray::Equals(const Ray &rhs, float epsilon) const
 	return pos.Equals(rhs.pos, epsilon) && dir.Equals(rhs.dir, epsilon);
 }
 
-float Ray::Distance(const float3 &point, float *d) const
+float Ray::Distance(const vec &point, float *d) const
 {
 	return ClosestPoint(point, d).Distance(point);
 }
 
-float Ray::Distance(const float3 &point) const
+float Ray::Distance(const vec &point) const
 {
 	return Distance(point, 0);
 }
@@ -125,7 +125,7 @@ float Ray::Distance(const float3 &point) const
 float Ray::Distance(const Ray &other, float *d, float *d2) const
 {
 	float u2;
-	float3 c = ClosestPoint(other, d, &u2);
+	vec c = ClosestPoint(other, d, &u2);
 	if (d2) *d2 = u2;
 	return c.Distance(other.GetPoint(u2));
 }
@@ -138,7 +138,7 @@ float Ray::Distance(const Ray &ray) const
 float Ray::Distance(const Line &other, float *d, float *d2) const
 {
 	float u2;
-	float3 c = ClosestPoint(other, d, &u2);
+	vec c = ClosestPoint(other, d, &u2);
 	if (d2) *d2 = u2;
 	return c.Distance(other.GetPoint(u2));
 }
@@ -151,7 +151,7 @@ float Ray::Distance(const Line &line) const
 float Ray::Distance(const LineSegment &other, float *d, float *d2) const
 {
 	float u2;
-	float3 c = ClosestPoint(other, d, &u2);
+	vec c = ClosestPoint(other, d, &u2);
 	if (d2) *d2 = u2;
 	return c.Distance(other.GetPoint(u2));
 }
@@ -171,7 +171,7 @@ float Ray::Distance(const Capsule &capsule) const
 	return Max(0.f, Distance(capsule.l) - capsule.r);
 }
 
-float3 Ray::ClosestPoint(const float3 &targetPoint, float *d) const
+vec Ray::ClosestPoint(const vec &targetPoint, float *d) const
 {
 	float u = Max(0.f, Dot(targetPoint - pos, dir));
 	if (d)
@@ -179,15 +179,15 @@ float3 Ray::ClosestPoint(const float3 &targetPoint, float *d) const
 	return GetPoint(u);
 }
 
-float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
+vec Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
 	float u, u2;
-	float3 closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &u, &u2);
+	vec closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &u, &u2);
 	if (u < 0.f && u2 < 0.f)
 	{
 		closestPoint = ClosestPoint(other.pos, &u);
 
-		float3 closestPoint2 = other.ClosestPoint(pos, &u2);
+		vec closestPoint2 = other.ClosestPoint(pos, &u2);
 		if (closestPoint.DistanceSq(other.pos) <= closestPoint2.DistanceSq(pos))
 		{
 			if (d)
@@ -218,7 +218,7 @@ float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 	}
 	else if (u2 < 0.f)
 	{
-		float3 pt = ClosestPoint(other.pos, &u);
+		vec pt = ClosestPoint(other.pos, &u);
 		u = Max(0.f, u);
 		if (d)
 			*d = u;
@@ -236,10 +236,10 @@ float3 Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
 	}
 }
 
-float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
+vec Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 {
 	float t;
-	float3 closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &t, d2);
+	vec closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &t, d2);
 	if (t <= 0.f)
 	{
 		if (d)
@@ -256,10 +256,10 @@ float3 Ray::ClosestPoint(const Line &other, float *d, float *d2) const
 	}
 }
 
-float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
+vec Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
 	float u, u2;
-	float3 closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, &u, &u2);
+	vec closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, &u, &u2);
 	if (u < 0.f)
 	{
 		if (u2 >= 0.f && u2 <= 1.f)
@@ -271,7 +271,7 @@ float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 			return pos;
 		}
 
-		float3 p;
+		vec p;
 		float t2;
 
 		if (u2 < 0.f)
@@ -286,7 +286,7 @@ float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 		}
 
 		closestPoint = ClosestPoint(p, &u);
-		float3 closestPoint2 = other.ClosestPoint(pos, &u2);
+		vec closestPoint2 = other.ClosestPoint(pos, &u2);
 		if (closestPoint.DistanceSq(p) <= closestPoint2.DistanceSq(pos))
 		{
 			if (d)
@@ -328,7 +328,7 @@ float3 Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 	}
 }
 
-bool Ray::Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const
+bool Ray::Intersects(const Triangle &triangle, float *d, vec *intersectionPoint) const
 {
 	return triangle.Intersects(*this, d, intersectionPoint);
 }
@@ -352,7 +352,7 @@ bool Ray::Intersects(const Plane &plane) const
 	return plane.Intersects(*this, 0);
 }
 
-bool Ray::Intersects(const Sphere &sphere, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const
+bool Ray::Intersects(const Sphere &sphere, vec *intersectionPoint, vec *intersectionNormal, float *d) const
 {
 	return sphere.Intersects(*this, intersectionPoint, intersectionNormal, d) > 0;
 }
@@ -422,7 +422,7 @@ LineSegment Ray::ToLineSegment(float dStart, float dEnd) const
 	return LineSegment(GetPoint(dStart), GetPoint(dEnd));
 }
 
-void Ray::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+void Ray::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	outMin = outMax = Dot(direction, pos);
 	float d = Dot(direction, dir);

@@ -27,9 +27,9 @@ class LineSegment
 {
 public:
 	/// The starting point of this line segment.
-	float3 a;
+	vec a;
 	/// The end point of this line segment. [similarOverload: a]
-	float3 b;
+	vec b;
 
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members a and b are undefined after creating a new LineSegment using this
@@ -39,7 +39,7 @@ public:
 
 	/// Constructs a line segment through the given end points.
 	/** @see a, b. */
-	LineSegment(const float3 &a, const float3 &b);
+	LineSegment(const vec &a, const vec &b);
 
 	/// Constructs a line segment from a ray or a line.
 	/** This constructor takes the ray/line origin position as the starting point of this line segment, and defines the end point
@@ -60,12 +60,12 @@ public:
 			away from the starting point of this line segment, as is the case with Line and Ray.
 		@return (1-d)*a + d*b.
 		@see a, b, Line::GetPoint(), Ray::GetPoint(). */
-	float3 GetPoint(float d) const;
+	vec GetPoint(float d) const;
 
 	/// Returns the center point of this line segment.
 	/** This function is the same as calling GetPoint(0.5f), but provided here as conveniency.
 		@see GetPoint(). */
-	float3 CenterPoint() const;
+	vec CenterPoint() const;
 
 	/// Reverses the direction of this line segment.
 	/** This function swaps the start and end points of this line segment so that it runs from b to a.
@@ -78,7 +78,7 @@ public:
 	/// Returns the normalized direction vector that points in the direction a->b.
 	/** @note The returned vector is normalized, meaning that its length is 1, not |b-a|.
 		@see a, b. */
-	float3 Dir() const;
+	vec Dir() const;
 
 	/// Computes an extreme point of this LineSegment in the given direction.
 	/** An extreme point is a farthest point along this LineSegment in the given direction. Given a direction,
@@ -88,12 +88,12 @@ public:
 		@return An extreme point of this LineSegment in the given direction. The returned point is always
 			either a or b.
 		@see a, b.*/
-	float3 ExtremePoint(const float3 &direction) const;
+	vec ExtremePoint(const vec &direction) const;
 
 	/// Translates this LineSegment in world space.
 	/** @param offset The amount of displacement to apply to this LineSegment, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &offset);
+	void Translate(const vec &offset);
 
 	/// Applies a transformation to this line.
 	/** This function operates in-place.
@@ -131,7 +131,7 @@ public:
 			the radius indicated by this value.
 		@return True if this line segment contains the given point or line segment.
 		@see Intersects, ClosestPoint(), Distance(). */
-	bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
+	bool Contains(const vec &point, float distanceThreshold = 1e-3f) const;
 	bool Contains(const LineSegment &lineSegment, float distanceThreshold = 1e-3f) const;
 
 	/// Computes the closest point on this line segment to the given object.
@@ -140,13 +140,13 @@ public:
 			the specified point. This pointer may be null.
 		@return The closest point on this line segment to the given object.
 		@see Contains(), Distance(), Intersects(). */
-	float3 ClosestPoint(const float3 &point, float *d = 0) const;
+	vec ClosestPoint(const vec &point, float *d = 0) const;
 	/** @param d2 [out] If specified, this parameter receives the (normalized, in case of line segment)
 			distance along the other line object which specifies the closest point on that line to
 			this line segment. This pointer may be null. */
-	float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
-	float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
-	float3 ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+	vec ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
+	vec ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
+	vec ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
 
 	/// Computes the distance between this line segment and the given object.
 	/** @param d [out] If specified, this parameter receives the normalized distance along
@@ -154,7 +154,7 @@ public:
 			the specified point. This pointer may be null.
 		@return The distance between this line segment and the given object.
 		@see Constains(), ClosestPoint(), Intersects(). */
-	float Distance(const float3 &point, float *d = 0) const;
+	float Distance(const vec &point, float *d = 0) const;
 	/** @param d2 [out] If specified, this parameter receives the (normalized, in case of line segment)
 			distance along the other line object which specifies the closest point on that line to
 			this line segment. This pointer may be null. */
@@ -175,10 +175,10 @@ public:
 			the specified point. This pointer may be null. */
 	bool Intersects(const Plane &plane, float *d) const;
 	/** @param intersectionPoint [out] If specified, receives the point of intersection. This pointer may be null. */
-	bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const Triangle &triangle, float *d, vec *intersectionPoint) const;
 	/** @param intersectionNormal [out] If specified, receives the normal vector of the other object at the point of intersection.
 			This pointer may be null. */
-	bool Intersects(const Sphere &s, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0) const;
+	bool Intersects(const Sphere &s, vec *intersectionPoint = 0, vec *intersectionNormal = 0, float *d = 0) const;
 	/** @param dNear [out] If specified, receives the parametric distance along this line segment denoting where the line entered the
 			bounding box object.
 		@param dFar [out] If specified, receives the parametric distance along this line segment denoting where the line exited the
@@ -214,7 +214,7 @@ public:
 			of this function gets scaled by the length of this vector.
 		@param outMin [out] Returns the minimum extent of this object along the projection axis.
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
-	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this LineSegment. Most useful for debugging purposes.

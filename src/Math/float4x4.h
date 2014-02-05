@@ -19,6 +19,7 @@
 
 #include "../MathBuildConfig.h"
 #include "SSEMath.h"
+#include "float4.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include "myassert.h"
@@ -933,7 +934,9 @@ public:
 	float4x4 Mul(const float4x4 &rhs) const;
 	float4x4 Mul(const Quat &rhs) const;
 	float3 MulPos(const float3 &pointVector) const;
+	inline float4 MulPos(const float4 &pointVector) const { assume(!EqualAbs(pointVector.w, 0.f)); return Mul(pointVector); }
 	float3 MulDir(const float3 &directionVector) const;
+	inline float4 MulDir(const float4 &directionVector) const { assume(EqualAbs(directionVector.w, 0.f)); return Mul(directionVector); }
 	float4 Mul(const float4 &vector) const;
 };
 

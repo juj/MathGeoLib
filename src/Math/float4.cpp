@@ -847,6 +847,11 @@ float4 float4::ProjectToNorm3(const float3 &target) const
 	return float4(target * MATH_NS::Dot(xyz(), target), w);
 }
 
+bool MUST_USE_RESULT float4::AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon)
+{
+	return (p2 - p1).Cross(p3 - p1).LengthSq() <= epsilon;
+}
+
 float4 float4::Lerp(const float4 &b, float t) const
 {
 	assume(EqualAbs(this->w, b.w));
@@ -927,7 +932,7 @@ bool float4::Equals(float x_, float y_, float z_, float w_, float epsilon) const
 
 float4 float4::RandomDir(LCG &lcg, float length)
 {
-	return float4(Sphere(float3(0,0,0), length).RandomPointOnSurface(lcg), 0.f);
+	return Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg) - POINT_VEC_SCALAR(0.f);
 }
 
 float4 float4::RandomGeneral(LCG &lcg, float minElem, float maxElem)

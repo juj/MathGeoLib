@@ -320,7 +320,17 @@ ScaleOp float3x4::Scale(const float3 &scale)
 	return ScaleOp(scale);
 }
 
+ScaleOp float3x4::Scale(const float4 &scale)
+{
+	return ScaleOp(scale);
+}
+
 float3x4 float3x4::Scale(const float3 &scale, const float3 &scaleCenter)
+{
+	return float3x4::Translate(scaleCenter) * float3x4::Scale(scale) * float3x4::Translate(-scaleCenter);
+}
+
+float3x4 float3x4::Scale(const float4 &scale, const float4 &scaleCenter)
 {
 	return float3x4::Translate(scaleCenter) * float3x4::Scale(scale) * float3x4::Translate(-scaleCenter);
 }

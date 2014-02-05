@@ -27,7 +27,7 @@ class Sphere
 {
 public:
 	/// The center point of this sphere.
-	float3 pos;
+	vec pos;
 	/// The radius of this sphere.
 	/** [similarOverload: pos] */
 	float r;
@@ -41,26 +41,26 @@ public:
 	/// Constructs a sphere with a given position and radius.
 	/** @param radius A value > 0 constructs a sphere with positive volume. A value of <= 0 is valid, and constructs a degenerate sphere.
 		@see pos, r, IsFinite(), IsDegenerate() */
-	Sphere(const float3 &center, float radius);
+	Sphere(const vec &center, float radius);
 
 	/// Constructs a sphere that passes through the given two points.
 	/** The constructed sphere will be the minimal sphere that encloses the given two points. The center point of this
 		sphere will lie midway between pointA and pointB, and the radius will be half the distance between pointA and
 		pointB. Both input points are assumed to be finite. */
-	Sphere(const float3 &pointA, const float3 &pointB);
+	Sphere(const vec &pointA, const vec &pointB);
 
 	/// Constructs a sphere that passes through the given three points.
 	/** @note The resulting sphere may not be the minimal enclosing sphere for the three points! */
-	Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC);
+	Sphere(const vec &pointA, const vec &pointB, const vec &pointC);
 
 	/// Constructs a sphere that passes through the given four points.
 	/** @note The resulting sphere may not be the minimal enclosing sphere for the four points! */
-	Sphere(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
+	Sphere(const vec &pointA, const vec &pointB, const vec &pointC, const vec &pointD);
 
 	/// Translates this Sphere in world space.
 	/** @param offset The amount of displacement to apply to this Sphere, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &offset);
+	void Translate(const vec &offset);
 
 	/// Applies a transformation to this Sphere, in-place.
 	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */
@@ -102,7 +102,7 @@ public:
 	/// Returns the center of mass of this sphere.
 	/** @return pos.
 		@see pos */
-	float3 Centroid() const { return pos; }
+	vec Centroid() const { return pos; }
 
 	/// Computes the extreme point of this Sphere in the given direction.
 	/** An extreme point is a farthest point of this Sphere in the given direction. For
@@ -110,7 +110,7 @@ public:
 		@param direction The direction vector of the direction to find the extreme point. This vector may
 			be unnormalized, but may not be null.
 		@return The extreme point of this Sphere in the given direction. */
-	float3 ExtremePoint(const float3 &direction) const;
+	vec ExtremePoint(const vec &direction) const;
 
 	/// Projects this Sphere onto the given 1D axis direction vector.
 	/** This function collapses this Sphere onto an 1D axis for the purposes of e.g. separate axis test computations.
@@ -119,7 +119,7 @@ public:
 			of this function gets scaled by the length of this vector.
 		@param outMin [out] Returns the minimum extent of this object along the projection axis.
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
-	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
 	/// Tests if this Sphere is finite.
 	/** A sphere is <b><i>finite</i></b> if its members pos and r do not contain floating-point NaNs or +/-infs
@@ -140,8 +140,8 @@ public:
 	/// Tests if the given object is fully contained inside this sphere.
 	/** @see Distance(), Intersects(), ClosestPoint().
 		@todo Add Sphere::Contains(Circle/Disc). */
-	bool Contains(const float3 &point) const;
-	bool Contains(const float3 &point, float epsilon) const;
+	bool Contains(const vec &point) const;
+	bool Contains(const vec &point, float epsilon) const;
 	bool Contains(const LineSegment &lineSegment) const;
 	bool Contains(const Triangle &triangle) const;
 	bool Contains(const Polygon &polygon) const;
@@ -160,7 +160,7 @@ public:
 		@param pointArray An array of points to compute an enclosing sphere for. This pointer must not be null.
 		@param numPoints The number of elements in the input array pointArray.
 		@see OptimalEnclosingSphere(). */
-	static Sphere FastEnclosingSphere(const float3 *pointArray, int numPoints);
+	static Sphere FastEnclosingSphere(const vec *pointArray, int numPoints);
 
 	/// Computes the minimal bounding sphere for the given point array.
 	/** This function implements Emo Welzl's optimal enclosing sphere algorithm.
@@ -172,23 +172,23 @@ public:
 		@param pointArray An array of points to compute an enclosing sphere for. This pointer must not be null.
 		@param numPoints The number of elements in the input array pointArray.
 		@see FastEnclosingSphere(). */
-	static Sphere OptimalEnclosingSphere(const float3 *pointArray, int numPoints);
+	static Sphere OptimalEnclosingSphere(const vec *pointArray, int numPoints);
 
 	/// Computes the minimal bounding sphere for two points.
 	/** This function computes the smallest volume sphere that contains the given two points. For two points,
 		the OptimalEnclosingSphere(a, b) is the same as calling FitThroughPoints(a, b).
 		@see FitThroughPoints(). */
-	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b);
+	static Sphere OptimalEnclosingSphere(const vec &a, const vec &b);
 
 	/// Computes the minimal bounding sphere for three points.
 	/** This function computes the smallest volume sphere that contains the given three points. The smallest
 		enclosing sphere may not pass through all the three points that are specified. */
-	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c);
+	static Sphere OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c);
 
 	/// Computes the minimal bounding sphere for four points.
 	/** This function computes the smallest volume sphere that contains the given four points. The smallest
 		enclosing sphere may not pass through all the four points that are specified. */
-	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d);
+	static Sphere OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, const vec &d);
 
 	/// Computes the minimal bounding sphere for four points.
 	/** This function computes the smallest volume sphere that contains the given five points.
@@ -198,7 +198,7 @@ public:
 			(Note that there may be more than one point not lying on the support set of the sphere, but this function
 			only returns one)
 		@return The smallest volume sphere that encloses the given five points. */
-	static Sphere OptimalEnclosingSphere(const float3 &a, const float3 &b, const float3 &c, const float3 &d, const float3 &e,
+	static Sphere OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, const vec &d, const vec &e,
 	                                     int &redundantPoint);
 
 	/// Fits a sphere through the given two points.
@@ -206,7 +206,7 @@ public:
 		sphere for the given two points, which is uniquely defined. This function is identical to
 		OptimalEnclosingSphere(a, b) and is simply an alias for that function.
 		@see OptimalEnclosingSphere(). */
-	static Sphere FitThroughPoints(const float3 &a, const float3 &b) { return OptimalEnclosingSphere(a, b); }
+	static Sphere FitThroughPoints(const vec &a, const vec &b) { return OptimalEnclosingSphere(a, b); }
 
 	/// Fits a sphere through the given three points.
 	/** Three points do not uniquely define a sphere in 3D space. This function computes the sphere that goes
@@ -216,7 +216,7 @@ public:
 		@note The three points that are passed in must not be collinear, because in that case a sphere cannot
 			be fitted through these points.
 		@see OptimalEnclosingSphere(). */
-	static Sphere FitThroughPoints(const float3 &a, const float3 &b, const float3 &c);
+	static Sphere FitThroughPoints(const vec &a, const vec &b, const vec &c);
 
 	/// Fits a sphere through the given four points.
 	/** Four points uniquely define a sphere in 3D space. This function computes the sphere that passes through
@@ -225,14 +225,14 @@ public:
 		@note The four points that are passed in must not be coplanar, because in that case a sphere cannot
 			be fitted through these points.
 		@see OptimalEnclosingSphere(). */
-	static Sphere FitThroughPoints(const float3 &a, const float3 &b, const float3 &c, const float3 &d);
+	static Sphere FitThroughPoints(const vec &a, const vec &b, const vec &c, const vec &d);
 
 	/// Returns the distance between this sphere and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
 		@see Contains(), Intersects(), ClosestPoint().
 		@todo Add Sphere::Distance(Polygon/Circle/Disc/Frustum/Polyhedron). */
-	float Distance(const float3 &point) const;
+	float Distance(const vec &point) const;
 	float Distance(const Sphere &sphere) const;
 	float Distance(const Capsule &capsule) const;
 	float Distance(const AABB &aabb) const;
@@ -245,14 +245,14 @@ public:
 
 	/// Returns the maximal distance of this sphere to the given point.
 	/** The maximal distance is the distance of the farthest point inside this sphere to the target point. */
-	float MaxDistance(const float3 &point) const;
+	float MaxDistance(const vec &point) const;
 
 	/// Computes the closest point on this sphere to the given object.
 	/** If the other object intersects this sphere, this function will return an arbitrary point inside
 		the region of intersection.
 		@see Contains(), Distance(), Intersects().
 		@todo Add Sphere::ClosestPoint(Line/Ray/LineSegment/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
-	float3 ClosestPoint(const float3 &point) const;
+	vec ClosestPoint(const vec &point) const;
 
 	/// Tests whether this sphere and the given object intersect.
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
@@ -264,13 +264,13 @@ public:
 		@return In the case of Ray/Line/LineSegment intersection tests, the number of intersections is returned (0, 1 or 2).
 			For other functions, true is returned if an intersection occurs or one of the objects is contained inside the other, and false otherwise.
 		@see Contains(), Distance(), ClosestPoint(), LineSegment::GetPoint(). */
-	int Intersects(const LineSegment &lineSegment, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
-	int Intersects(const Line &line, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
-	int Intersects(const Ray &ray, float3 *intersectionPoint = 0, float3 *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
+	int Intersects(const LineSegment &lineSegment, vec *intersectionPoint = 0, vec *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
+	int Intersects(const Line &line, vec *intersectionPoint = 0, vec *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
+	int Intersects(const Ray &ray, vec *intersectionPoint = 0, vec *intersectionNormal = 0, float *d = 0, float *d2 = 0) const;
 	bool Intersects(const Plane &plane) const;
-	bool Intersects(const AABB &aabb, float3 *closestPointOnAABB = 0) const;
-	bool Intersects(const OBB &obb, float3 *closestPointOnOBB = 0) const;
-	bool Intersects(const Triangle &triangle, float3 *closestPointOnTriangle = 0) const;
+	bool Intersects(const AABB &aabb, vec *closestPointOnAABB = 0) const;
+	bool Intersects(const OBB &obb, vec *closestPointOnOBB = 0) const;
+	bool Intersects(const Triangle &triangle, vec *closestPointOnTriangle = 0) const;
 	bool Intersects(const Capsule &capsule) const;
 	bool Intersects(const Polygon &polygon) const;
 	bool Intersects(const Frustum &frustum) const;
@@ -285,8 +285,8 @@ public:
 			This can be set to zero, but it may cause that Sphere::Contains(point) may return false.
 		@note This function will not produce the optimal enclosure.
 		@see FastEnclosingSphere(), OptimalEnclosingSphere(). */
-	void Enclose(const float3 &point, float epsilon = 1e-2f);
-	void Enclose(const float3 *pointArray, int numPoints);
+	void Enclose(const vec &point, float epsilon = 1e-2f);
+	void Enclose(const vec *pointArray, int numPoints);
 	void Enclose(const LineSegment &lineSegment);
 	void Enclose(const AABB &aabb);
 	void Enclose(const OBB &obb);
@@ -300,7 +300,7 @@ public:
 	/// Expands the radius of this Sphere until it encloses the given object.
 	/** @param epsilon A small amount to extrude the given object by for numerical precision.
 		@note This function is like Enclose(), but unlike Enclose(), this function keeps the center point of this Sphere fixed. */
-	void ExtendRadiusToContain(const float3 &point, float epsilon = 1e-4f);
+	void ExtendRadiusToContain(const vec &point, float epsilon = 1e-4f);
 	void ExtendRadiusToContain(const Sphere &sphere, float epsilon = 1e-4f);
 
 	/// Generates a random point inside this sphere.
@@ -311,8 +311,8 @@ public:
 		@param lcg A pre-seeded random number generator object that is to be used by this function to generate random values.
 		@see class LCG, RandomPointOnSurface(), IsDegenerate().
 		@todo Add Sphere::Point(polarYaw, polarPitch, radius). */
-	float3 RandomPointInside(LCG &lcg);
-	static float3 RandomPointInside(LCG &lcg, const float3 &center, float radius);
+	vec RandomPointInside(LCG &lcg);
+	static vec RandomPointInside(LCG &lcg, const vec &center, float radius);
 	/// Generates a random point on the surface of this sphere.
 	/** The points are distributed uniformly.
 		This function uses the rejection method to generate a uniform distribution of points on the surface. Therefore
@@ -321,12 +321,12 @@ public:
 		@param lcg A pre-seeded random number generator object that is to be used by this function to generate random values.
 		@see class LCG, RandomPointInside(), IsDegenerate().
 		@todo Add Sphere::PointOnSurface(polarYaw, polarPitch). */
-	float3 RandomPointOnSurface(LCG &lcg);
-	static float3 RandomPointOnSurface(LCG &lcg, const float3 &center, float radius);
+	vec RandomPointOnSurface(LCG &lcg);
+	static vec RandomPointOnSurface(LCG &lcg, const vec &center, float radius);
 
-	/// Returns a random normalized float3 vector.
+	/// Returns a random normalized direction vector.
 	/** @param lcg A pre-seeded random number generator object that is to be used by this function to generate random values. */
-	static float3 RandomUnitaryFloat3(LCG &lcg) { return Sphere(float3(0,0,0), 1.f).RandomPointOnSurface(lcg); }
+	static vec RandomUnitaryFloat3(LCG &lcg) { return Sphere(POINT_VEC(0,0,0), 1.f).RandomPointOnSurface(lcg); }
 
 	/// Produces a geosphere-triangulation of this sphere.
 	/** @param outPos [out] An array of size numVertices which will receive a triangle list of vertex positions. Cannot be null.
@@ -334,7 +334,7 @@ public:
 		@param outUV [out] An array of size numVertices which will receive UV coordinates. If this parameter is null, UV coordinates are not generated.
 		@param numVertices The size of the input arrays outPos and outNormal. This value should be of form 24*4^n for some n >= 0. (24, 96, 384, 1536, 6144, 24576, ...)
 		@return The actual number of vertices generated (== the number of elements written to outPos and outNormal). */
-	int Triangulate(float3 *outPos, float3 *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const;
+	int Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const;
 
 	/// Computes the intersection of a line and a sphere.
 	/** This function solves the points of intersection between a line and a sphere.
@@ -358,7 +358,7 @@ public:
 		@note The outputted variables t1 and t2 always satisfy t1 < t2. This allows distinguishing between the "enter"
 			and "exit" positions of the line, if the line is interpreted more like a ray starting at linePos, and extending
 			towards lineDir. */
-	static int IntersectLine(const float3 &linePos, const float3 &lineDir, const float3 &sphereCenter,
+	static int IntersectLine(const vec &linePos, const vec &lineDir, const vec &sphereCenter,
 	                         float sphereRadius, float &t1, float &t2);
 
 #ifdef MATH_ENABLE_STL_SUPPORT

@@ -309,6 +309,7 @@ public:
 		@return x*x + y*y + z*z + w*w.
 		@see Length3(), LengthSq3(), Length4(), Normalize3(), Normalize4(). */
 	float LengthSq4() const;
+	inline float LengthSq() const { return LengthSq4(); }
 
 	/// Computes the length of this vector.
 	/** @return Sqrt(x*x + y*y + z*z + w*w).
@@ -333,6 +334,7 @@ public:
 		this vector is set to (1, 0, 0, 0), so that Normalize() function will never result in an unnormalized vector.
 		@see Length3(), Length4(), Normalize3(), Normalized3(), Normalized4(). */
 	float Normalize4();
+	inline float Normalize() { return Normalize4(); }
 
 	/// Returns a copy of this vector with the (x, y, z) part normalized.
 	/** The w component of this vector is carried over unchanged.
@@ -346,6 +348,7 @@ public:
 			If the normalization fails, an error message is printed and the vector (1, 0, 0, oldW) is returned.
 		@see Length3(), Length4(), Normalize3(), Normalize4(), Normalized3(). */
 	float4 Normalized4() const;
+	inline float4 Normalized() { return Normalized4(); }
 
 	/// Divides each element by w to produce a float4 of form (x, y, z, 1).
 	/** This function performs the <b>perspective divide</b> or the <b>homogeneous divide</b> on this vector, which is the
@@ -367,6 +370,7 @@ public:
 	/// Returns true if this vector is equal to (0,0,0,0), up to the given epsilon.
 	/** @see NormalizeW(), IsWZeroOrOne(), IsZero3(), IsNormalized3(), IsNormalized4(). */
 	bool IsZero4(float epsilonSq = 1e-6f) const;
+	bool IsZero(float epsilonSq = 1e-6f) const { return IsZero4(epsilonSq); }
 
 	/// Tests if the length of the (x, y, z) part of this vector is one, up to the given epsilon.
 	/** @see NormalizeW(), IsWZeroOrOne(), IsZero3(), IsZero4(), IsNormalized4(). */
@@ -376,6 +380,7 @@ public:
 	/** This function takes into account all the four components of this vector when calculating the norm.
 		@see NormalizeW(), IsWZeroOrOne(), IsZero3(), IsZero4(), IsNormalized3(). */
 	bool IsNormalized4(float epsilonSq = 1e-6f) const;
+	bool IsNormalized(float epsilonSq = 1e-6f) const { return IsNormalized4(epsilonSq); }
 
 	/// Multiplies the (x, y, z) part of this vector by the given scalar.
 	/** Sets this vector to (x*scalar, y*scalar, z*scalar, w).
@@ -389,16 +394,25 @@ public:
 		@see Length3(), Mul(), Scale3(), ScaledToLength3(). */
 	float ScaleToLength3(float newLength);
 
+	float ScaleToLength(float newLength);
+
 	/// Returns a scaled copy of this vector which has its new length as given.
 	/** This function assumes the length of this vector is not zero.
 		@see Length3(), Mul(), Scale3(), ScaleToLength3(). */
 	float4 ScaledToLength3(float newLength) const;
+	float4 ScaledToLength(float newLength) const;
 
 	/// Tests if this vector contains valid finite elements.
 	bool IsFinite() const;
 
 	/// Tests if the (x, y, z) parts of two vectors are perpendicular to each other.
 	bool IsPerpendicular3(const float4 &other, float epsilon = 1e-6f) const;
+
+	bool IsPerpendicular(const float4 &other, float epsilon = 1e-6f) const;
+
+	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
+	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
+	static MUST_USE_RESULT bool AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon = 1e-4f);
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x, y, z, w)".
@@ -526,6 +540,7 @@ public:
 		@see Distance4Sq(), Distance3(), Distance3Sq(), Length3Sq(), Length3().
 		@return (x-rhs.x)^2 + (y-rhs.y)^2 + (z-rhs.z)^2 + (w-rhs.w)^2. */
 	float Distance4Sq(const float4 &rhs) const;
+	inline float DistanceSq(const float4 &rhs) const { return Distance4Sq(rhs); }
 
 	/// Computes the distance between this and the given float4.
 	/** @note This function computes the Euclidean distance of the two vectors in 4D space (taking into account the w component).
@@ -551,21 +566,28 @@ public:
 	float4 Cross3(const float3 &rhs) const;
 	float4 Cross3(const float4 &rhs) const;
 
+	float4 Cross(const float4 &rhs) const { return Cross3(rhs); }
+
 	/// Computes the outer product of this and the given vector.
 	float4x4 OuterProduct(const float4 &rhs) const;
 
 	/// Returns a new normalized direction vector that points as close as possible towards the given hint vector.
 	float4 Perpendicular3(const float3 &hint = float3(0,1,0), const float3 &hint2 = float3(0,0,1)) const;
+	float4 Perpendicular(const float4 &hint = float4(0,1,0,0), const float4 &hint2 = float4(0,0,1,0)) const;
 
 	/// Returns another vector that is perpendicular to this vector and the vector returned by Perpendicular3(hint).
 	/** @todo Enforce that (x: this, y: Perpendicular3(), z: AnotherPerpendicular3) form a right-handed basis.
 		@see Perpendicular3(). */
 	float4 AnotherPerpendicular3(const float3 &hint = float3(0,1,0), const float3 &hint2 = float3(0,0,1)) const;
+	float4 AnotherPerpendicular(const float4 &hint = float4(0,1,0,0), const float4 &hint2 = float4(0,0,1,0)) const;
 
 	/// Returns this vector reflected about a plane with the given normal.
 	/** By convention, both this and the reflected vector point away from the plane with the given normal.
 		@note This function ignores the w component of this vector (assumes w=0). */
 	float4 Reflect3(const float3 &normal) const;
+	float4 Reflect(const float4 &normal) const;
+
+	float4 Refract(const float4 &normal, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const;
 
 	/// Returns the angle between this vector and the specified vector, in radians.
 	/** @note This function takes into account that this vector or the other vector can be unnormalized, and
@@ -596,12 +618,16 @@ public:
 		@see ProjectToNorm3(). */
 	float4 ProjectTo3(const float3 &target) const;
 
+	float4 ProjectTo(const float4 &target) const;
+
 	/// Projects this vector onto the given vector.
 	/** @param target The direction vector to project onto. This vector must be normalized.
 		@note This function treats this and target vector as direction vectors.
 		@note This function ignores the w component of this vector (assumes w=0 or 1) and returns it unmodified.
 		@see ProjectTo3(). */
 	float4 ProjectToNorm3(const float3 &target) const;
+
+	float4 ProjectToNorm(const float4 &target) const;
 
 	/// Returns true if this vector is equal to the given vector, up to given per-element epsilon.
 	bool Equals(const float4 &other, float epsilon = 1e-3f) const;
@@ -727,7 +753,9 @@ inline float4 operator /(float scalar, const float4 &rhs) { return float4::FromS
 
 inline float Dot3(const float4 &a, const float4 &b) { return a.Dot3(b); }
 inline float Dot4(const float4 &a, const float4 &b) { return a.Dot4(b); }
+inline float Dot(const float4 &a, const float4 &b) { return a.Dot(b); }
 inline float4 Cross3(const float4 &a, const float4 &b) { return a.Cross3(b); }
+inline float4 Cross(const float4 &a, const float4 &b) { return a.Cross(b); }
 inline float4 Abs(const float4 &a) { return a.Abs(); }
 inline float Length3(const float4 &a) { return a.Length3(); }
 inline float Length4(const float4 &a) { return a.Length4(); }

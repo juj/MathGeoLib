@@ -29,40 +29,18 @@ MATH_BEGIN_NAMESPACE
 class ALIGN16 TranslateOp
 {
 public:
-
-#if defined(MATH_SIMD)
-	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
-
-	union
-	{
-		struct
-		{
-#endif
-			/// The x offset of translation.
-			float x;
-			/// The y offset of translation.
-			float y;
-			/// The z offset of translation.
-			float z;
-
-			float padding;
-
-#if defined(MATH_SIMD)
-		};
-		simd4f v;
-	};
-	NAMELESS_UNION_END
-#endif
+	vec offset;
 
 	/// Constructs an uninitialized TranslateOp.
 	TranslateOp() {}
 
 	/// Constructs a TranslateOp that translates the given amount.
 	explicit TranslateOp(const float3 &offset);
+	explicit TranslateOp(const float4 &offset);
 	TranslateOp(float x, float y, float z);
 
 	/// Returns the translation offset (x, y, z).
-	float3 Offset() const;
+	vec Offset() const;
 
 	/// Converts this TranslateOp object to a matrix.
 	float3x4 ToFloat3x4() const;
@@ -86,40 +64,18 @@ float4x4 operator *(const float4x4 &lhs, const TranslateOp &rhs);
 class ALIGN16 ScaleOp
 {
 public:
-
-#if defined(MATH_SIMD)
-	NAMELESS_UNION_BEGIN // Allow nonstandard nameless struct in union extension on MSC.
-
-	union
-	{
-		struct
-		{
-#endif
-		/// The scale factor along the x axis.
-		float x;
-		/// The scale factor along the y axis.
-		float y;
-		/// The scale factor along the z axis.
-		float z;
-
-		float padding;
-
-#if defined(MATH_SIMD)
-		};
-		simd4f v;
-	};
-	NAMELESS_UNION_END
-#endif
+	vec scale;
 
 	/// Constructs an uninitialized ScaleOp.
 	ScaleOp() {}
 
 	/// Constructs a ScaleOp with the given scale factors.
 	explicit ScaleOp(const float3 &scale);
+	explicit ScaleOp(const float4 &scale);
 	ScaleOp(float sx, float sy, float sz);
 
 	/// Returns the scale factors (x, y, z).
-	float3 Offset() const;
+	vec Offset() const;
 
 	/// Converts this ScaleOp to a matrix.
 	operator float3x3() const;

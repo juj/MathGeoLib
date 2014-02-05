@@ -236,12 +236,14 @@ public:
 	/// This matrix scales with respect to origin.
 	static ScaleOp Scale(float sx, float sy, float sz);
 	static ScaleOp Scale(const float3 &scale);
+	static ScaleOp Scale(const float4 &scale);
 
 	/// Creates a new float3x4 that scales with respect to the given center point.
 	/** @param scale The amount of scale to apply to the x, y and z directions.
 		@param scaleCenter The coordinate system center point for the scaling. If omitted, the origin (0,0,0) will
 			be used as the origin for the scale operation. */
 	static float3x4 Scale(const float3 &scale, const float3 &scaleCenter);
+	static float3x4 Scale(const float4 &scale, const float4 &scaleCenter);
 
 	/// Creates a new float3x4 that scales points along the given axis.
 	/** @param axis A normalized direction vector that specifies the direction of scaling.

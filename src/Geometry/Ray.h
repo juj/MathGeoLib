@@ -31,12 +31,12 @@ class Ray
 {
 public:
 	/// Specifies the origin of this ray.
-	float3 pos;
+	vec pos;
 
 	/// The normalized direction vector of this ray. [similarOverload: pos]
 	/** @note For proper functionality, this direction vector needs to always be normalized. If you set to this
 		member manually, remember to make sure you only assign normalized direction vectors. */
-	float3 dir;
+	vec dir;
 
 	/// The default constructor does not initialize any members of this class.
 	/** This means that the values of the members pos and dir are undefined after creating a new Ray using this
@@ -49,7 +49,7 @@ public:
 		@param dir The direction of the ray. This vector must be normalized, this function will not normalize
 			the vector for you (for performance reasons).
 		@see pos, dir. */
-	Ray(const float3 &pos, const float3 &dir);
+	Ray(const vec &pos, const vec &dir);
 
 	/// Converts a Line to a Ray.
 	/** This conversion simply copies the members pos and dir over from the given Line to this Ray.
@@ -72,12 +72,12 @@ public:
 			returned point does not actually lie on this Ray.
 		@return pos + distance * dir.
 		@see pos, dir. */
-	float3 GetPoint(float distance) const;
+	vec GetPoint(float distance) const;
 
 	/// Translates this Ray in world space.
 	/** @param offset The amount of displacement to apply to this Ray, in world space coordinates.
 		@see Transform(). */
-	void Translate(const float3 &offset);
+	void Translate(const vec &offset);
 
 	/// Applies a transformation to this Ray, in-place.
 	/** See Translate(), classes float3x3, float3x4, float4x4, Quat. */
@@ -92,7 +92,7 @@ public:
 		inaccuracies.
 		@return True if this ray contains the given object, up to the given distance threshold.
 		@see class LineSegment, Distance(), ClosestPoint(), Intersects(). */
-	bool Contains(const float3 &point, float distanceThreshold = 1e-3f) const;
+	bool Contains(const vec &point, float distanceThreshold = 1e-3f) const;
 	bool Contains(const LineSegment &lineSegment, float distanceThreshold = 1e-3f) const;
 
 	/// Tests if two rays are equal.
@@ -106,8 +106,8 @@ public:
 			specifies the closest point on this ray to the given object. The value returned here can be negative.
 			This pointer may be null.
 		@see Contains(), Intersects(), ClosestPoint(), GetPoint(). */
-	float Distance(const float3 &point, float *d) const;
-	float Distance(const float3 &point) const;
+	float Distance(const vec &point, float *d) const;
+	float Distance(const vec &point) const;
 
 	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
 		closest point on that line to this ray. The value returned here can be negative. This pointer may
@@ -128,13 +128,13 @@ public:
 			specifies the closest point on this ray to the given object. The value returned here can be negative.
 			This pointer may be null.
 		@see Contains(), Distance(), Intersects(), GetPoint(). */
-	float3 ClosestPoint(const float3 &targetPoint, float *d = 0) const;
+	vec ClosestPoint(const vec &targetPoint, float *d = 0) const;
 	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
 		closest point on that line to this ray. The value returned here can be negative. This pointer may
 		be null. */
-	float3 ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
-	float3 ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
-	float3 ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+	vec ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
+	vec ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
+	vec ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
 
 	/// Tests whether this ray and the given object intersect.	
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
@@ -146,13 +146,13 @@ public:
 			may be null.
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
 		@see Contains(), Distance(), ClosestPoint(), GetPoint(). */
-	bool Intersects(const Triangle &triangle, float *d, float3 *intersectionPoint) const;
+	bool Intersects(const Triangle &triangle, float *d, vec *intersectionPoint) const;
 	bool Intersects(const Triangle &triangle) const;
 	bool Intersects(const Plane &plane, float *d) const;
 	bool Intersects(const Plane &plane) const;
 	/** @param intersectionNormal [out] If specified, receives the surface normal of the other object at
 		the point of intersection. This pointer may be null. */
-	bool Intersects(const Sphere &s, float3 *intersectionPoint, float3 *intersectionNormal, float *d) const;
+	bool Intersects(const Sphere &s, vec *intersectionPoint, vec *intersectionNormal, float *d) const;
 	bool Intersects(const Sphere &s) const;
 	/** @param dNear [out] If specified, receives the distance along this ray to where the ray enters
 		the bounding box.
@@ -190,7 +190,7 @@ public:
 			of this function gets scaled by the length of this vector.
 		@param outMin [out] Returns the minimum extent of this object along the projection axis.
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
-	void ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const;
+	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
 	/// Converts this Ray to a LineSegment.
 	/** @param dStart Specifies the position of the first endpoint along this Ray. This parameter may be negative,

@@ -1270,9 +1270,9 @@ float4x4 &float4x4::operator =(const Quat &rhs)
 
 float4x4 &float4x4::operator =(const TranslateOp &rhs)
 {
-	Set(1.f,   0,   0, rhs.x,
-	      0, 1.f,   0, rhs.y,
-	      0,   0, 1.f, rhs.z,
+	Set(1.f,   0,   0, rhs.offset.x,
+	      0, 1.f,   0, rhs.offset.y,
+	      0,   0, 1.f, rhs.offset.z,
 	      0,   0,   0,   1.f);
 	
 	return *this;
