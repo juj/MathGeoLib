@@ -320,7 +320,7 @@ vec AABB::FaceNormal(int faceIndex) const
 Plane AABB::FacePlane(int faceIndex) const
 {
 	assume(0 <= faceIndex && faceIndex <= 5);
-	return Plane(POINT_TO_FLOAT3(FaceCenterPoint(faceIndex)), DIR_TO_FLOAT3(FaceNormal(faceIndex)));
+	return Plane(FaceCenterPoint(faceIndex), FaceNormal(faceIndex));
 }
 
 void AABB::GetCornerPoints(vec *outPointArray) const

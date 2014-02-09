@@ -352,11 +352,11 @@ public:
 	/// \todo This function is strongly WIP!
 	static Polyhedron ConvexHull(const vec *pointArray, int numPoints);
 
-	static Polyhedron Tetrahedron(const vec &centerPos = vec(POINT_VEC(float3(0, 0, 0))), float scale = 1.f, bool ccwIsFrontFacing = true);
-	static Polyhedron Octahedron(const vec &centerPos = vec(POINT_VEC(float3(0, 0, 0))), float scale = 1.f, bool ccwIsFrontFacing = true);
-	static Polyhedron Hexahedron(const vec &centerPos = vec(POINT_VEC(float3(0, 0, 0))), float scale = 1.f, bool ccwIsFrontFacing = true);
-	static Polyhedron Icosahedron(const vec &centerPos = vec(POINT_VEC(float3(0, 0, 0))), float scale = 1.f, bool ccwIsFrontFacing = true);
-	static Polyhedron Dodecahedron(const vec &centerPos = vec(POINT_VEC(float3(0, 0, 0))), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Tetrahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Octahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Hexahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Icosahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
+	static Polyhedron Dodecahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 
 	std::vector<Triangle> Triangulate() const;
 

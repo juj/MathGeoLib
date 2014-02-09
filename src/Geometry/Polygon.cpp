@@ -52,13 +52,13 @@ int Polygon::NumEdges() const
 	return (int)p.size();
 }
 
-float3 Polygon::Vertex(int vertexIndex) const
+vec Polygon::Vertex(int vertexIndex) const
 {
 	assume(vertexIndex >= 0);
 	assume(vertexIndex < (int)p.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (vertexIndex < 0 || vertexIndex >= (int)p.size())
-		return float3::nan;
+		return vec::nan;
 #endif
 	return p[vertexIndex];
 }
@@ -66,7 +66,7 @@ float3 Polygon::Vertex(int vertexIndex) const
 LineSegment Polygon::Edge(int i) const
 {
 	if (p.empty())
-		return LineSegment(float3::nan, float3::nan);
+		return LineSegment(vec::nan, vec::nan);
 	if (p.size() == 1)
 		return LineSegment(p[0], p[0]);
 	return LineSegment(p[i], p[(i+1)%p.size()]);
@@ -75,10 +75,10 @@ LineSegment Polygon::Edge(int i) const
 LineSegment Polygon::Edge2D(int i) const
 {
 	if (p.empty())
-		return LineSegment(float3::nan, float3::nan);
+		return LineSegment(vec::nan, vec::nan);
 	if (p.size() == 1)
-		return LineSegment(float3::zero, float3::zero);
-	return LineSegment(float3(MapTo2D(i), 0), float3(MapTo2D((i+1)%p.size()), 0));
+		return LineSegment(vec::zero, vec::zero);
+	return LineSegment(POINT_VEC(MapTo2D(i), 0), POINT_VEC(MapTo2D((i+1)%p.size()), 0));
 }
 
 bool Polygon::DiagonalExists(int i, int j) const
@@ -114,19 +114,19 @@ bool Polygon::DiagonalExists(int i, int j) const
 	return IsConvex();
 }
 
-float3 Polygon::BasisU() const
+vec Polygon::BasisU() const
 {
 	if (p.size() < 2)
-		return float3::unitX;
-	float3 u = p[1] - p[0];
+		return vec::unitX;
+	vec u = p[1] - p[0];
 	u.Normalize(); // Always succeeds, even if u was zero (generates (1,0,0)).
 	return u;
 }
 
-float3 Polygon::BasisV() const
+vec Polygon::BasisV() const
 {
 	if (p.size() < 2)
-		return float3::unitY;
+		return vec::unitY;
 	return Cross(PlaneCCW().normal, BasisU()).Normalized();
 }
 
@@ -138,7 +138,7 @@ LineSegment Polygon::Diagonal(int i, int j) const
 	assume(j < (int)p.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (i < 0 || j < 0 || i >= (int)p.size() || j >= (int)p.size())
-		return LineSegment(float3::nan, float3::nan);
+		return LineSegment(vec::nan, vec::nan);
 #endif
 	return LineSegment(p[i], p[j]);
 }
@@ -179,25 +179,25 @@ float2 Polygon::MapTo2D(int i) const
 	return MapTo2D(p[i]);
 }
 
-float2 Polygon::MapTo2D(const float3 &point) const
+float2 Polygon::MapTo2D(const vec &point) const
 {
 	assume(!p.empty());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (p.empty())
 		return float2::nan;
 #endif
-	float3 basisU = BasisU();
-	float3 basisV = BasisV();
-	float3 pt = point - p[0];
+	vec basisU = BasisU();
+	vec basisV = BasisV();
+	vec pt = point - p[0];
 	return float2(Dot(pt, basisU), Dot(pt, basisV));
 }
 
-float3 Polygon::MapFrom2D(const float2 &point) const
+vec Polygon::MapFrom2D(const float2 &point) const
 {
 	assume(!p.empty());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (p.empty())
-		return float3::nan;
+		return vec::nan;
 #endif
 	return p[0] + point.x * BasisU() + point.y * BasisV();
 }
@@ -253,13 +253,13 @@ bool Polygon::IsDegenerate(float epsilon) const
 	return p.size() < 3 || Area() <= epsilon;
 }
 
-float3 Polygon::NormalCCW() const
+vec Polygon::NormalCCW() const
 {
 	///@todo Optimize temporaries.
 	return PlaneCCW().normal;
 }
 
-float3 Polygon::NormalCW() const
+vec Polygon::NormalCW() const
 {
 	///@todo Optimize temporaries.
 	return PlaneCW().normal;
@@ -272,7 +272,7 @@ Plane Polygon::PlaneCCW() const
 		for(size_t i = 0; i < p.size(); ++i)
 			for(size_t j = i+1; j < p.size(); ++j)
 				for(size_t k = j+1; k < p.size(); ++k)
-					if (!float3::AreCollinear(p[i], p[j], p[k]))
+					if (!vec::AreCollinear(p[i], p[j], p[k]))
 						return Plane(p[i], p[j], p[k]);
 
 		// Polygon contains multiple points, but they are all collinear.
@@ -284,7 +284,7 @@ Plane Polygon::PlaneCCW() const
 	if (p.size() == 2)
 		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
 	if (p.size() == 1)
-		return Plane(p[0], float3(0,1,0));
+		return Plane(p[0], DIR_VEC(0,1,0));
 	return Plane();
 }
 
@@ -295,7 +295,7 @@ Plane Polygon::PlaneCW() const
 	return plane;
 }
 
-void Polygon::Translate(const float3 &offset)
+void Polygon::Translate(const vec &offset)
 {
 	for(size_t i = 0; i < p.size(); ++i)
 		p[i] += offset;
@@ -333,7 +333,7 @@ bool Polygon::Contains(const Polygon &worldSpacePolygon, float polygonThickness)
 	return true;
 }
 
-bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) const
+bool Polygon::Contains(const vec &worldSpacePoint, float polygonThickness) const
 {
 	// Implementation based on the description from http://erich.realtimerendering.com/ptinpoly/
 
@@ -345,8 +345,8 @@ bool Polygon::Contains(const float3 &worldSpacePoint, float polygonThickness) co
 
 	int numIntersections = 0;
 
-	float3 basisU = BasisU();
-	float3 basisV = BasisV();
+	vec basisU = BasisU();
+	vec basisV = BasisV();
 	mathassert(basisU.IsNormalized());
 	mathassert(basisV.IsNormalized());
 	mathassert(basisU.IsPerpendicular(basisV));
@@ -535,16 +535,16 @@ bool Polygon::Intersects(const Capsule &capsule) const
 	return false;
 }
 
-float3 Polygon::ClosestPoint(const float3 &point) const
+vec Polygon::ClosestPoint(const vec &point) const
 {
 	assume(IsPlanar());
 
 	std::vector<Triangle> tris = Triangulate();
-	float3 closestPt = float3::nan;
+	vec closestPt = vec::nan;
 	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
-		float3 pt = tris[i].ClosestPoint(point);
+		vec pt = tris[i].ClosestPoint(point);
 		float d = pt.DistanceSq(point);
 		if (d < closestDist)
 		{
@@ -555,21 +555,21 @@ float3 Polygon::ClosestPoint(const float3 &point) const
 	return closestPt;
 }
 
-float3 Polygon::ClosestPoint(const LineSegment &lineSegment) const
+vec Polygon::ClosestPoint(const LineSegment &lineSegment) const
 {
 	return ClosestPoint(lineSegment, 0);
 }
 
-float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const
+vec Polygon::ClosestPoint(const LineSegment &lineSegment, vec *lineSegmentPt) const
 {
 	std::vector<Triangle> tris = Triangulate();
-	float3 closestPt = float3::nan;
-	float3 closestLineSegmentPt = float3::nan;
+	vec closestPt = vec::nan;
+	vec closestLineSegmentPt = vec::nan;
 	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
-		float3 lineSegPt;
-		float3 pt = tris[i].ClosestPoint(lineSegment, &lineSegPt);
+		vec lineSegPt;
+		vec pt = tris[i].ClosestPoint(lineSegment, &lineSegPt);
 		float d = pt.DistanceSq(lineSegPt);
 		if (d < closestDist)
 		{
@@ -583,13 +583,13 @@ float3 Polygon::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegment
 	return closestPt;
 }
 
-float Polygon::Distance(const float3 &point) const
+float Polygon::Distance(const vec &point) const
 {
-	float3 pt = ClosestPoint(point);
+	vec pt = ClosestPoint(point);
 	return pt.Distance(point);
 }
 
-float3 Polygon::EdgeNormal(int edgeIndex) const
+vec Polygon::EdgeNormal(int edgeIndex) const
 {
 	return Cross(Edge(edgeIndex).Dir(), PlaneCCW().normal).Normalized();
 }
@@ -599,13 +599,13 @@ Plane Polygon::EdgePlane(int edgeIndex) const
 	return Plane(Edge(edgeIndex).a, EdgeNormal(edgeIndex));
 }
 
-float3 Polygon::ExtremePoint(const float3 &direction) const
+vec Polygon::ExtremePoint(const vec &direction) const
 {
-	float3 mostExtreme = float3::nan;
+	vec mostExtreme = vec::nan;
 	float mostExtremeDist = -FLT_MAX;
 	for(int i = 0; i < NumVertices(); ++i)
 	{
-		float3 pt = Vertex(i);
+		vec pt = Vertex(i);
 		float d = Dot(direction, pt);
 		if (d > mostExtremeDist)
 		{
@@ -616,11 +616,11 @@ float3 Polygon::ExtremePoint(const float3 &direction) const
 	return mostExtreme;
 }
 
-void Polygon::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+void Polygon::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	///\todo Optimize!
-	float3 minPt = ExtremePoint(-direction);
-	float3 maxPt = ExtremePoint(direction);
+	vec minPt = ExtremePoint(-direction);
+	vec maxPt = ExtremePoint(direction);
 	outMin = Dot(minPt, direction);
 	outMax = Dot(maxPt, direction);
 }
@@ -633,9 +633,9 @@ bool IsSelfIntersecting() const;
 void ProjectToPlane(const Plane &plane);
 
 /// Returns true if the edges of this polygon self-intersect when viewed from the given direction.
-bool IsSelfIntersecting(const float3 &viewDirection) const;
+bool IsSelfIntersecting(const vec &viewDirection) const;
 
-bool Contains(const float3 &point, const float3 &viewDirection) const;
+bool Contains(const vec &point, const vec &viewDirection) const;
 
 */
 
@@ -643,7 +643,7 @@ bool Contains(const float3 &point, const float3 &viewDirection) const;
 float Polygon::Area() const
 {
 	assume(IsPlanar());
-	float3 area = float3::zero;
+	vec area = vec::zero;
 	if (p.size() <= 2)
 		return 0.f;
 
@@ -665,20 +665,20 @@ float Polygon::Perimeter() const
 }
 
 ///\bug This function does not properly compute the centroid.
-float3 Polygon::Centroid() const
+vec Polygon::Centroid() const
 {
 	if (NumVertices() == 0)
-		return float3::nan;
-	float3 centroid = float3::zero;
+		return vec::nan;
+	vec centroid = vec::zero;
 	for(int i = 0; i < NumVertices(); ++i)
 		centroid += Vertex(i);
 	return centroid / (float)NumVertices();
 }
 
-float3 Polygon::PointOnEdge(float normalizedDistance) const
+vec Polygon::PointOnEdge(float normalizedDistance) const
 {
 	if (p.empty())
-		return float3::nan;
+		return vec::nan;
 	if (p.size() < 2)
 		return p[0];
 	normalizedDistance = Frac(normalizedDistance); // Take modulo 1 so we have the range [0,1[.
@@ -697,16 +697,16 @@ float3 Polygon::PointOnEdge(float normalizedDistance) const
 	return p[0];
 }
 
-float3 Polygon::RandomPointOnEdge(LCG &rng) const
+vec Polygon::RandomPointOnEdge(LCG &rng) const
 {
 	return PointOnEdge(rng.Float());
 }
 
-float3 Polygon::FastRandomPointInside(LCG &rng) const
+vec Polygon::FastRandomPointInside(LCG &rng) const
 {
 	std::vector<Triangle> tris = Triangulate();
 	if (tris.empty())
-		return float3::nan;
+		return vec::nan;
 	int i = rng.Int(0, (int)tris.size()-1);
 	return tris[i].RandomPointInside(rng);
 }
@@ -883,10 +883,10 @@ Polygon ConvexHull() const;
 
 bool IsSupportingPoint(int i) const;
 
-bool IsSupportingPoint(const float3 &point) const;
+bool IsSupportingPoint(const vec &point) const;
 
 /// Returns true if the quadrilateral defined by the four points is convex (and not concave or bowtie).
-static bool IsConvexQuad(const float3 &pointA, const float3 &pointB, const float3 &pointC, const float3 &pointD);
+static bool IsConvexQuad(const vec &pointA, const vec &pointB, const vec &pointC, const vec &pointD);
 */
 
 Polygon operator *(const float3x3 &transform, const Polygon &polygon)

@@ -184,7 +184,7 @@ void TriangleMesh::Set(const Polyhedron &polyhedron)
 	if (!tris.empty())
 	{
 		int alignment = (simdCapability == SIMD_AVX) ? 8 : ((simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2) ? 4 : 1);
-		float3 degen(-FLOAT_INF, -FLOAT_INF, -FLOAT_INF);
+		vec degen = POINT_VEC_SCALAR(-FLOAT_INF);
 		Triangle degent(degen, degen, degen);
 		while(tris.size() % alignment != 0)
 			tris.push_back(degent);

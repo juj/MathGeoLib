@@ -169,7 +169,7 @@ public:
 	///	   minDistance is the minimum distance the objects in this leaf (and all future leaves to be passed to the
 	///    callback) have to the point that is being queried.
 	template<typename Func>
-	inline void NearestObjects(const float3 &point, Func &leafCallback);
+	inline void NearestObjects(const vec &point, Func &leafCallback);
 #endif
 
 private:
@@ -205,7 +205,7 @@ private:
 struct TriangleKdTreeRayQueryNearestHitVisitor
 {
 	float rayT;
-	float3 pos;
+	vec pos;
 	u32 triangleIndex;
 	float2 barycentricUV;
 
@@ -213,7 +213,7 @@ struct TriangleKdTreeRayQueryNearestHitVisitor
 	{
 		rayT = FLOAT_INF;
 		triangleIndex = KdTree<Triangle>::BUCKET_SENTINEL;
-		pos = float3::nan;
+		pos = vec::nan;
 		barycentricUV = float2::nan;
 	}
 	bool operator()(KdTree<Triangle> &tree, const KdTreeNode &leaf, const Ray &ray, float tNear, float tFar)

@@ -11,7 +11,7 @@ TEST(AABB_Degenerate)
 	a.SetNegativeInfinity();
 	assert(a.IsDegenerate());
 
-	a = AABB(float3::zero, float3::one);
+	a = AABB(POINT_VEC_SCALAR(0.f), POINT_VEC_SCALAR(1.f));
 	assert(!a.IsDegenerate());
 }
 
@@ -21,7 +21,7 @@ TEST(OBB_Degenerate)
 	o.SetNegativeInfinity();
 	assert(o.IsDegenerate());
 
-	o = OBB(AABB(float3::zero, float3::one));
+	o = OBB(AABB(POINT_VEC_SCALAR(0.f), POINT_VEC_SCALAR(1.f)));
 	assert1(!o.IsDegenerate(), o);
 }
 
@@ -31,7 +31,7 @@ TEST(Capsule_Degenerate)
 	c.SetDegenerate();
 	assert(c.IsDegenerate());
 
-	c = Capsule(float3::zero, float3::one, 1.f);
+	c = Capsule(POINT_VEC_SCALAR(0.f), POINT_VEC_SCALAR(1.f), 1.f);
 	assert(!c.IsDegenerate());
 }
 /* ///\todo Implement.
@@ -128,7 +128,7 @@ TEST(Sphere_Degenerate)
 	s.SetDegenerate();
 	assert(s.IsDegenerate());
 
-	s = Sphere(float3::zero, float3::unitX);
+	s = Sphere(POINT_VEC_SCALAR(0.f), POINT_VEC(float3::unitX));
 	assert(!s.IsDegenerate());
 }
 /* ///\todo Implement.

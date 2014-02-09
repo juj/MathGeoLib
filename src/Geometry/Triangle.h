@@ -76,7 +76,7 @@ public:
 			lie in the plane formed by this triangle.
 		@return The factors (u,v,w) that satisfy the weighted sum equation point == u*a + v*b + w*c.
 		@see BarycentricUV(), BarycentricInsideTriangle(), Point(), http://mathworld.wolfram.com/BarycentricCoordinates.html */
-	vec BarycentricUVW(const vec &point) const;
+	float3 BarycentricUVW(const vec &point) const;
 
 	/// Expresses the given point in barycentric (u,v) coordinates.
 	/** @note There are two different conventions for representing barycentric coordinates. One uses
@@ -96,14 +96,14 @@ public:
 		@param uvw The barycentric vector containing the barycentric (u,v,w) coordinates.
 		@return True if the given coordinates lie inside a triangle.
 		@see BarycentricUV(), BarycentricUVW(), Point(). */
-	static bool BarycentricInsideTriangle(const vec &uvw);
+	static bool BarycentricInsideTriangle(const float3 &uvw);
 
 	/// Returns the point at the given barycentric coordinates.
 	/** This function computes the vector space point at the given barycentric coordinates.
 		@param uvw The barycentric UVW coordinate triplet. The condition u+v+w == 1 should hold for the input coordinate.
 			If 0 <= u,v,w <= 1, the returned point lies inside this triangle.
 		@return u*a + v*b + w*c. */
-	vec Point(const vec &uvw) const;
+	vec Point(const float3 &uvw) const;
 	vec Point(float u, float v, float w) const;
 	/** These functions are an alternate form of Point(u,v,w) for the case when the barycentric coordinates are
 		represented as a (u,v) pair and not as a (u,v,w) triplet. This function is provided for convenience

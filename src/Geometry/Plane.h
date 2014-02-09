@@ -54,31 +54,25 @@ public:
 	/** @param normal The direction the plane is facing. This vector must have been normalized in advance.
 		@param d The offset of this plane from the origin. The value -d gives the signed distance of this plane from the origin.
 		@see normal, d. */
-	Plane(const float3 &normal, float d);
-	Plane(const float4 &normal, float d);
+	Plane(const vec &normal, float d);
 	/// Constructs a plane by specifying three points on the plane.
 	/** The normal of the plane will point to
 		the halfspace from which the points are observed to be oriented in counter-clockwise order.
 		@note The points v1, v2 and v3 must not all lie on the same line.
 		@see Set(). */
-	Plane(const float3 &v1, const float3 &v2, const float3 &v3);
-	Plane(const float4 &v1, const float4 &v2, const float4 &v3);
+	Plane(const vec &v1, const vec &v2, const vec &v3);
 	/// Constructs a plane by specifying a single point on the plane, and the surface normal.
 	/** @param normal The direction the plane is facing. This vector must have been normalized in advance.
 		@see Set(). */
-	Plane(const float3 &point, const float3 &normal);
-	Plane(const float4 &point, const float4 &normal);
+	Plane(const vec &point, const vec &normal);
 	/// Constructs a plane by specifying a line that lies on the plane, and the plane normal.
 	/** @param line The line object that is to be contained in the newly constructed plane.
 		@param normal The direction the plane if facing. This vector must have been normalized in advance. The normal
 			of the line must not be collinear with the direction of this normal. If a line segment is specified, the line
 			segment must not be degenerate. */
-	Plane(const Ray &line, const float3 &normal);
-	Plane(const Ray &line, const float4 &normal);
-	Plane(const Line &line, const float3 &normal);
-	Plane(const Line &line, const float4 &normal);
-	Plane(const LineSegment &line, const float3 &normal);
-	Plane(const LineSegment &line, const float4 &normal);
+	Plane(const Ray &line, const vec &normal);
+	Plane(const Line &line, const vec &normal);
+	Plane(const LineSegment &line, const vec &normal);
 
 	bool IsDegenerate() const;
 

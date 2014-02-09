@@ -64,13 +64,13 @@ int Polyhedron::NumEdges() const
 	return (int)EdgeIndices().size();
 }
 
-float3 Polyhedron::Vertex(int vertexIndex) const
+vec Polyhedron::Vertex(int vertexIndex) const
 {
 	assume(vertexIndex >= 0);
 	assume(vertexIndex < (int)v.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (vertexIndex < 0 || vertexIndex >= (int)v.size())
-		return float3::nan;
+		return vec::nan;
 #endif
 	
 	return v[vertexIndex];
@@ -83,7 +83,7 @@ LineSegment Polyhedron::Edge(int edgeIndex) const
 	assume(edgeIndex < (int)edges.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (edgeIndex < 0 || edgeIndex >= (int)edges.size())
-		return LineSegment(float3::nan, float3::nan);
+		return LineSegment(vec::nan, vec::nan);
 #endif
 	return edges[edgeIndex];
 }
@@ -154,12 +154,12 @@ Plane Polyhedron::FacePlane(int faceIndex) const
 	else if (face.v.size() == 2)
 		return Plane(Line(v[face.v[0]], v[face.v[1]]), (v[face.v[0]]-v[face.v[1]]).Perpendicular());
 	else if (face.v.size() == 1)
-		return Plane(v[face.v[0]], float3(0,1,0));
+		return Plane(v[face.v[0]], DIR_VEC(0,1,0));
 	else
 		return Plane();
 }
 
-float3 Polyhedron::FaceNormal(int faceIndex) const
+vec Polyhedron::FaceNormal(int faceIndex) const
 {
 	const Face &face = f[faceIndex];
 	if (face.v.size() >= 3)
@@ -167,12 +167,12 @@ float3 Polyhedron::FaceNormal(int faceIndex) const
 	else if (face.v.size() == 2)
 		return (v[face.v[1]]-v[face.v[0]]).Cross((v[face.v[0]]-v[face.v[1]]).Perpendicular()-v[face.v[0]]).Normalized();
 	else if (face.v.size() == 1)
-		return float3(0,1,0);
+		return DIR_VEC(0,1,0);
 	else
-		return float3::nan;
+		return vec::nan;
 }
 
-int Polyhedron::ExtremeVertex(const float3 &direction) const
+int Polyhedron::ExtremeVertex(const vec &direction) const
 {
 	int mostExtreme = -1;
 	float mostExtremeDist = -FLT_MAX;
@@ -188,23 +188,23 @@ int Polyhedron::ExtremeVertex(const float3 &direction) const
 	return mostExtreme;
 }
 
-float3 Polyhedron::ExtremePoint(const float3 &direction) const
+vec Polyhedron::ExtremePoint(const vec &direction) const
 {
 	return Vertex(ExtremeVertex(direction));
 }
 
-void Polyhedron::ProjectToAxis(const float3 &direction, float &outMin, float &outMax) const
+void Polyhedron::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	///\todo Optimize!
-	float3 minPt = ExtremePoint(-direction);
-	float3 maxPt = ExtremePoint(direction);
+	vec minPt = ExtremePoint(-direction);
+	vec maxPt = ExtremePoint(direction);
 	outMin = Dot(minPt, direction);
 	outMax = Dot(maxPt, direction);
 }
 
-float3 Polyhedron::Centroid() const
+vec Polyhedron::Centroid() const
 {
-	float3 centroid = float3::zero;
+	vec centroid = vec::zero;
 	for(int i = 0; i < NumVertices(); ++i)
 		centroid += Vertex(i);
 	return centroid / (float)NumVertices();
@@ -361,7 +361,7 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 	return true;
 }
 
-bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, float polygonThickness) const
+bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float polygonThickness) const
 {
 	// N.B. This implementation is a duplicate of Polygon::Contains, but adapted to avoid dynamic memory allocation
 	// related to converting the face of a Polyhedron to a Polygon object.
@@ -380,9 +380,9 @@ bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, floa
 
 	int numIntersections = 0;
 
-	float3 basisU = v[vertices[1]] - v[vertices[0]];
+	vec basisU = v[vertices[1]] - v[vertices[0]];
 	basisU.Normalize();
-	float3 basisV = Cross(p.normal, basisU).Normalized();
+	vec basisV = Cross(p.normal, basisU).Normalized();
 	mathassert(basisU.IsNormalized());
 	mathassert(basisV.IsNormalized());
 	mathassert(basisU.IsPerpendicular(basisV));
@@ -430,7 +430,7 @@ bool Polyhedron::FaceContains(int faceIndex, const float3 &worldSpacePoint, floa
 	return numIntersections % 2 == 1;
 }
 
-bool Polyhedron::Contains(const float3 &point) const
+bool Polyhedron::Contains(const vec &point) const
 {
 	int numIntersections = 0;
 	for(int i = 0; i < (int)f.size(); ++i)
@@ -447,7 +447,7 @@ bool Polyhedron::Contains(const float3 &point) const
 			// If t >= 0, the plane and the ray intersect, and the ray potentially also intersects the polygon.
 			// Finish the test by checking whether the point of intersection is contained in the polygon, in
 			// which case the ray-polygon intersection occurs.
-			if (t >= 0.f && FaceContains(i, point + float3(t,0,0)))
+			if (t >= 0.f && FaceContains(i, point + DIR_VEC(t,0,0)))
 				++numIntersections;
 		}
 	}
@@ -476,7 +476,7 @@ bool Polyhedron::Contains(const Polygon &polygon) const
 bool Polyhedron::Contains(const AABB &aabb) const
 {
 	for(int i = 0; i < 8; ++i)
-		if (!Contains(POINT_TO_FLOAT3(aabb.CornerPoint(i))))
+		if (!Contains(aabb.CornerPoint(i)))
 			return false;
 
 	return true;
@@ -510,7 +510,7 @@ bool Polyhedron::Contains(const Polyhedron &polyhedron) const
 	return true;
 }
 
-bool Polyhedron::ContainsConvex(const float3 &point) const
+bool Polyhedron::ContainsConvex(const vec &point) const
 {
 	assume(IsConvex());
 	for(int i = 0; i < NumFaces(); ++i)
@@ -530,16 +530,16 @@ bool Polyhedron::ContainsConvex(const Triangle &triangle) const
 	return ContainsConvex(triangle.a) && ContainsConvex(triangle.b) && ContainsConvex(triangle.c);
 }
 
-float3 Polyhedron::ClosestPointConvex(const float3 &point) const
+vec Polyhedron::ClosestPointConvex(const vec &point) const
 {
 	assume(IsConvex());
 	if (ContainsConvex(point))
 		return point;
-	float3 closestPoint = float3::nan;
+	vec closestPoint = vec::nan;
 	float closestDistance = FLT_MAX;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
-		float3 closestOnPoly = FacePolygon(i).ClosestPoint(point);
+		vec closestOnPoly = FacePolygon(i).ClosestPoint(point);
 		float d = closestOnPoly.DistanceSq(point);
 		if (d < closestDistance)
 		{
@@ -550,15 +550,15 @@ float3 Polyhedron::ClosestPointConvex(const float3 &point) const
 	return closestPoint;
 }
 
-float3 Polyhedron::ClosestPoint(const float3 &point) const
+vec Polyhedron::ClosestPoint(const vec &point) const
 {
 	if (Contains(point))
 		return point;
-	float3 closestPoint = float3::nan;
+	vec closestPoint = vec::nan;
 	float closestDistance = FLT_MAX;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
-		float3 closestOnPoly = FacePolygon(i).ClosestPoint(point);
+		vec closestOnPoly = FacePolygon(i).ClosestPoint(point);
 		float d = closestOnPoly.DistanceSq(point);
 		if (d < closestDistance)
 		{
@@ -569,12 +569,12 @@ float3 Polyhedron::ClosestPoint(const float3 &point) const
 	return closestPoint;
 }
 
-float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment) const
+vec Polyhedron::ClosestPoint(const LineSegment &lineSegment) const
 {
 	return ClosestPoint(lineSegment, 0);
 }
 
-float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegmentPt) const
+vec Polyhedron::ClosestPoint(const LineSegment &lineSegment, vec *lineSegmentPt) const
 {
 	if (Contains(lineSegment.a))
 	{
@@ -588,13 +588,13 @@ float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegm
 			*lineSegmentPt = lineSegment.b;
 		return lineSegment.b;
 	}
-	float3 closestPt = float3::nan;
+	vec closestPt = vec::nan;
 	float closestDistance = FLT_MAX;
-	float3 closestLineSegmentPt = float3::nan;
+	vec closestLineSegmentPt = vec::nan;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
-		float3 lineSegPt;
-		float3 pt = FacePolygon(i).ClosestPoint(lineSegment, &lineSegPt);
+		vec lineSegPt;
+		vec pt = FacePolygon(i).ClosestPoint(lineSegment, &lineSegPt);
 		float d = pt.DistanceSq(lineSegPt);
 		if (d < closestDistance)
 		{
@@ -608,13 +608,13 @@ float3 Polyhedron::ClosestPoint(const LineSegment &lineSegment, float3 *lineSegm
 	return closestPt;
 }
 
-float Polyhedron::Distance(const float3 &point) const
+float Polyhedron::Distance(const vec &point) const
 {
-	float3 pt = ClosestPoint(point);
+	vec pt = ClosestPoint(point);
 	return pt.Distance(point);
 }
 
-bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const float3 &ptA, const float3 &dir,
+bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const vec &ptA, const vec &dir,
                                                    float &tFirst, float &tLast) const
 {
 	assume(IsConvex());
@@ -720,11 +720,11 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	{
 		assert(!f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
 		int v0 = f[i].v.back();
-		float3 l0 = v[v0];
+		vec l0 = v[v0];
 		for(size_t j = 0; j < f[i].v.size(); ++j)
 		{
 			int v1 = f[i].v[j];
-			float3 l1 = v[v1];
+			vec l1 = v[v1];
 			if (v0 < v1 && polyhedron.Intersects(LineSegment(l0, l1))) // If v0 < v1, then this line segment is the canonical one.
 				return true;
 			l0 = l1;
@@ -737,11 +737,11 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	{
 		assert(!polyhedron.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
 		int v0 = polyhedron.f[i].v.back();
-		float3 l0 = polyhedron.v[v0];
+		vec l0 = polyhedron.v[v0];
 		for(size_t j = 0; j < polyhedron.f[i].v.size(); ++j)
 		{
 			int v1 = polyhedron.f[i].v[j];
-			float3 l1 = polyhedron.v[v1];
+			vec l1 = polyhedron.v[v1];
 			if (v0 < v1 && Intersects(LineSegment(l0, l1))) // If v0 < v1, then this line segment is the canonical one.
 				return true;
 			l0 = l1;
@@ -755,7 +755,7 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 template<typename T>
 bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 {
-	if (p.Contains(POINT_TO_FLOAT3(obj.CenterPoint())))
+	if (p.Contains(obj.CenterPoint()))
 		return true;
 	if (obj.Contains(p.Centroid()))
 		return true;
@@ -770,11 +770,11 @@ bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 	{
 		assert(!p.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
 		int v0 = p.f[i].v.back();
-		float3 l0 = p.v[v0];
+		vec l0 = p.v[v0];
 		for(size_t j = 0; j < p.f[i].v.size(); ++j)
 		{
 			int v1 = p.f[i].v[j];
-			float3 l1 = p.v[v1];
+			vec l1 = p.v[v1];
 			if (v0 < v1 && obj.Intersects(LineSegment(l0, l1))) // If v0 < v1, then this line segment is the canonical one.
 				return true;
 			l0 = l1;
@@ -812,13 +812,13 @@ bool Polyhedron::Intersects(const Frustum &frustum) const
 
 bool Polyhedron::Intersects(const Sphere &sphere) const
 {
-	float3 closestPt = ClosestPoint(sphere.pos);
+	vec closestPt = ClosestPoint(sphere.pos);
 	return closestPt.DistanceSq(sphere.pos) <= sphere.r * sphere.r;
 }
 
 bool Polyhedron::Intersects(const Capsule &capsule) const
 {
-	float3 pt, ptOnLineSegment;
+	vec pt, ptOnLineSegment;
 	pt = ClosestPoint(capsule.l, &ptOnLineSegment);
 	return pt.DistanceSq(ptOnLineSegment) <= capsule.r * capsule.r;
 }
@@ -844,7 +844,7 @@ bool Polyhedron::IntersectsConvex(const LineSegment &lineSegment) const
 	return ClipLineSegmentToConvexPolyhedron(lineSegment.a, lineSegment.b - lineSegment.a, tFirst, tLast);
 }
 
-void Polyhedron::MergeConvex(const float3 &point)
+void Polyhedron::MergeConvex(const vec &point)
 {
 //	LOGI("mergeconvex.");
 	std::set<std::pair<int, int> > deletedEdges;
@@ -945,7 +945,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 		{
 			// If the adjoining face is planar to the triangle we'd like to add, instead extend the face to enclose
 			// this vertex.
-			//float3 newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
+			//vec newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
 
 			std::map<std::pair<int, int>, int>::iterator existing = remainingEdges.find(opposite);
 			assert(existing != remainingEdges.end());
@@ -954,7 +954,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 #if 0			
 			int adjoiningFace = existing->second;
 
-			if (FaceNormal(adjoiningFace).Dot(newTriangleNormal) >= 0.99999f) ///\todo float3::IsCollinear
+			if (FaceNormal(adjoiningFace).Dot(newTriangleNormal) >= 0.99999f) ///\todo vec::IsCollinear
 			{
 				bool added = false;
 				Face &adjoining = f[adjoiningFace];
@@ -970,11 +970,11 @@ void Polyhedron::MergeConvex(const float3 &point)
 						int next = (i + 2) % adjoining.v.size();
 						int next2 = (i + 3) % adjoining.v.size();
 
-						if (float3::AreCollinear(v[prev2], v[prev], v[cur]))
+						if (vec::AreCollinear(v[prev2], v[prev], v[cur]))
 							adjoining.v.erase(adjoining.v.begin() + prev);
-						else if (float3::AreCollinear(v[prev], v[cur], v[next]))
+						else if (vec::AreCollinear(v[prev], v[cur], v[next]))
 							adjoining.v.erase(adjoining.v.begin() + cur);
-						else if (float3::AreCollinear(v[cur], v[next], v[next2]))
+						else if (vec::AreCollinear(v[cur], v[next], v[next2]))
 							adjoining.v.erase(adjoining.v.begin() + next2);
 							*/
 
@@ -1010,7 +1010,7 @@ void Polyhedron::MergeConvex(const float3 &point)
 //		MergeConvex(point);
 }
 
-void Polyhedron::Translate(const float3 &offset)
+void Polyhedron::Translate(const vec &offset)
 {
 	for(size_t i = 0; i < v.size(); ++i)
 		v[i] += offset;
@@ -1042,7 +1042,7 @@ void Polyhedron::Transform(const Quat &transform)
 
 void Polyhedron::OrientNormalsOutsideConvex()
 {
-	float3 center = v[0];
+	vec center = v[0];
 	for(size_t i = 1; i < v.size(); ++i)
 		center += v[i];
 
@@ -1069,16 +1069,16 @@ struct CHullHelp
 	std::list<int> livePlanes;
 };
 
-Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
+Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
 	///\todo Check input ptr and size!
 	std::set<int> extremes;
 
-	const float3 dirs[] =
+	const vec dirs[] =
 	{
-		float3(1,0,0), float3(0,1,0), float3(0,0,1),
-		float3(1,1,0), float3(1,0,1), float3(0,1,1),
-		float3(1,1,1)
+		DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
+		DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
+		DIR_VEC(1, 1, 1)
 	};
 
 	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
@@ -1145,12 +1145,12 @@ Polyhedron Polyhedron::ConvexHull(const float3 *pointArray, int numPoints)
 }
 
 /// See http://paulbourke.net/geometry/platonic/
-Polyhedron Polyhedron::Tetrahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+Polyhedron Polyhedron::Tetrahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
-	const float3 vertices[4] = { float3(1,1,1),
-	                             float3(-1,1,-1),
-	                             float3(1,-1,-1),
-	                             float3(-1,-1,1) };
+	const vec vertices[4] = { POINT_VEC(1,1,1),
+		POINT_VEC(-1, 1, -1),
+		POINT_VEC(1, -1, -1),
+		POINT_VEC(-1, -1, 1) };
 	const int faces[4][3] = { { 0, 1, 2 },
 	                          { 1, 3, 2 },
 	                          { 0, 2, 3 },
@@ -1177,17 +1177,17 @@ Polyhedron Polyhedron::Tetrahedron(const float3 &centerPos, float scale, bool cc
 }
 
 /// See http://paulbourke.net/geometry/platonic/
-Polyhedron Polyhedron::Octahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+Polyhedron Polyhedron::Octahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
 	float a = 1.f / (2.f * Sqrt(2.f));
 	float b = 0.5f;
 
-	const float3 vertices[6] = { float3(-a, 0, a),
-	                             float3(-a, 0,-a),
-	                             float3( 0, b, 0),
-	                             float3( a, 0,-a),
-	                             float3( 0,-b, 0),
-	                             float3( a, 0, a) };
+	const vec vertices[6] = { POINT_VEC(-a, 0, a),
+		POINT_VEC(-a, 0, -a),
+		POINT_VEC(0, b, 0),
+		POINT_VEC(a, 0, -a),
+		POINT_VEC(0, -b, 0),
+		POINT_VEC(a, 0, a) };
 	const int faces[8][3] = { { 0, 1, 2 },
 	                          { 1, 3, 2 },
 	                          { 3, 5, 2 },
@@ -1218,10 +1218,10 @@ Polyhedron Polyhedron::Octahedron(const float3 &centerPos, float scale, bool ccw
 }
 
 /// See http://paulbourke.net/geometry/platonic/
-Polyhedron Polyhedron::Hexahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+Polyhedron Polyhedron::Hexahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
-	AABB aabb(float3(-1,-1,-1), float3(1,1,1));
-	aabb.Scale(float3::zero, scale * 0.5f);
+	AABB aabb(POINT_VEC(-1,-1,-1), POINT_VEC(1,1,1));
+	aabb.Scale(POINT_VEC_SCALAR(0.f), scale * 0.5f);
 	aabb.Translate(centerPos);
 	Polyhedron p = aabb.ToPolyhedron();
 	if (ccwIsFrontFacing)
@@ -1230,24 +1230,24 @@ Polyhedron Polyhedron::Hexahedron(const float3 &centerPos, float scale, bool ccw
 }
 
 /// See http://paulbourke.net/geometry/platonic/
-Polyhedron Polyhedron::Icosahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+Polyhedron Polyhedron::Icosahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
 	float a = 0.5f;
 	float phi = (1.f + Sqrt(5.f)) * 0.5f;
 	float b = 1.f / (2.f * phi);
 
-	const float3 vertices[12] = { float3( 0,  b, -a),
-	                              float3( b,  a,  0),
-	                              float3(-b,  a,  0),
-	                              float3( 0,  b,  a),
-	                              float3( 0, -b,  a),
-	                              float3(-a,  0,  b),
-	                              float3( a,  0,  b),
-	                              float3( 0, -b, -a),
-	                              float3(-a,  0, -b),
-	                              float3(-b, -a,  0),
-	                              float3( b, -a,  0),
-	                              float3( a,  0, -b) };
+	const vec vertices[12] = { POINT_VEC( 0,  b, -a),
+		POINT_VEC(b, a, 0),
+		POINT_VEC(-b, a, 0),
+		POINT_VEC(0, b, a),
+		POINT_VEC(0, -b, a),
+		POINT_VEC(-a, 0, b),
+		POINT_VEC(a, 0, b),
+		POINT_VEC(0, -b, -a),
+		POINT_VEC(-a, 0, -b),
+		POINT_VEC(-b, -a, 0),
+		POINT_VEC(b, -a, 0),
+		POINT_VEC(a, 0, -b) };
 	const int faces[20][3] = { { 0,  1,  2 },
 	                           { 3,  2,  1 },
 	                           { 3,  4,  5 },
@@ -1289,32 +1289,32 @@ Polyhedron Polyhedron::Icosahedron(const float3 &centerPos, float scale, bool cc
 }
 
 /// See http://paulbourke.net/geometry/platonic/
-Polyhedron Polyhedron::Dodecahedron(const float3 &centerPos, float scale, bool ccwIsFrontFacing)
+Polyhedron Polyhedron::Dodecahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
 	float phi = (1.f + Sqrt(5.f)) * 0.5f;
 	float b = 1.f / phi;
 	float c = 2.f - phi;
 
-	const float3 vertices[20] = { float3( c,  0,  1),
-	                              float3(-c,  0,  1),
-	                              float3(-b,  b,  b),
-	                              float3( 0,  1,  c),
-	                              float3( b,  b,  b),
-	                              float3( b, -b,  b),
-	                              float3( 0, -1,  c),
-	                              float3(-b, -b,  b),
-	                              float3( 0, -1, -c),
-	                              float3( b, -b, -b),
-	                              float3(-c,  0, -1),
-	                              float3( c,  0, -1),
-	                              float3(-b, -b, -b),
-	                              float3( b,  b, -b),
-	                              float3( 0,  1, -c),
-	                              float3(-b,  b, -b),
-	                              float3( 1,  c,  0),
-	                              float3(-1,  c,  0),
-	                              float3(-1, -c,  0),
-	                              float3( 1, -c,  0) };
+	const vec vertices[20] = { POINT_VEC( c,  0,  1),
+		POINT_VEC(-c, 0, 1),
+		POINT_VEC(-b, b, b),
+		POINT_VEC(0, 1, c),
+		POINT_VEC(b, b, b),
+		POINT_VEC(b, -b, b),
+		POINT_VEC(0, -1, c),
+		POINT_VEC(-b, -b, b),
+		POINT_VEC(0, -1, -c),
+		POINT_VEC(b, -b, -b),
+		POINT_VEC(-c, 0, -1),
+		POINT_VEC(c, 0, -1),
+		POINT_VEC(-b, -b, -b),
+		POINT_VEC(b, b, -b),
+		POINT_VEC(0, 1, -c),
+		POINT_VEC(-b, b, -b),
+		POINT_VEC(1, c, 0),
+		POINT_VEC(-1, c, 0),
+		POINT_VEC(-1, -c, 0),
+		POINT_VEC(1, -c, 0) };
 
 	const int faces[12][5] = { {  0,  1,  2,  3,  4 },
 	                           {  1,  0,  5,  6,  7 },
@@ -1482,7 +1482,7 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 			// Generate flat normals if VB has space for normals.
 			if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
 			{
-				float3 normal = ccwIsFrontFacing ? tris[j].NormalCCW() : tris[j].NormalCW();
+				vec normal = ccwIsFrontFacing ? tris[j].NormalCCW() : tris[j].NormalCW();
 				vb.Set(idx, VDNormal, float4(normal, 0.f));
 				vb.Set(idx+1, VDNormal, float4(normal, 0.f));
 				vb.Set(idx+2, VDNormal, float4(normal, 0.f));

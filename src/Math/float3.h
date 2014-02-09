@@ -740,6 +740,12 @@ typedef float4 vec;
 #define POINT_TO_FLOAT3(v) (v).xyz()
 #define DIR_TO_FLOAT3(v) (v).xyz()
 
+#define POINT_TO_FLOAT4(v) (v)
+#define DIR_TO_FLOAT4(v) (v)
+
+#define FLOAT4_TO_POINT(v) (v)
+#define FLOAT4_TO_DIR(v) (v)
+
 /* /// TODO: Enable this:
 inline float3 POINT_TO_FLOAT3(const vec &v)
 {
@@ -760,8 +766,11 @@ typedef float3 vec;
 #define DIR_TO_FLOAT3(x) x
 #define POINT_VEC_SCALAR(s) float3::FromScalar(s)
 #define DIR_VEC_SCALAR(s) float3::FromScalar(s)
+#define POINT_TO_FLOAT4(v) float4(v, 1.f)
+#define DIR_TO_FLOAT4(v) float4(v, 0.f)
+#define FLOAT4_TO_POINT(v) (v).xyz()
+#define FLOAT4_TO_DIR(v) (v).xyz()
 
 #endif
-
 
 MATH_END_NAMESPACE

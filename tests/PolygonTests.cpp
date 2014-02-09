@@ -8,11 +8,11 @@
 UNIQUE_TEST(Polygon_collinear_points_Plane)
 {
 	math::Polygon poly;
-	poly.p.push_back(float3(4980, 8600, 13060));
-	poly.p.push_back(float3(4849.33301f, 8600, 13060));
-	poly.p.push_back(float3(4820, 8600, 13060));
-	poly.p.push_back(float3(4820, 8600, 12835));
-	poly.p.push_back(float3(4980, 8600, 12835));
+	poly.p.push_back(POINT_VEC(4980, 8600, 13060));
+	poly.p.push_back(POINT_VEC(4849.33301f, 8600, 13060));
+	poly.p.push_back(POINT_VEC(4820, 8600, 13060));
+	poly.p.push_back(POINT_VEC(4820, 8600, 12835));
+	poly.p.push_back(POINT_VEC(4980, 8600, 12835));
 
 	assert1(!poly.IsDegenerate(), poly);
 	assert1(!poly.IsNull(), poly);

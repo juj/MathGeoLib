@@ -11,11 +11,11 @@ AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 	float h = rng.Float(0, maxSideLength);
 	float d = rng.Float(0, maxSideLength);
 
-	AABB a(float3(0,0,0), float3(w,h,d));
+	AABB a(POINT_VEC(0,0,0), POINT_VEC(w,h,d));
 
-	a.Translate(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)));
+	a.Translate(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)));
 
-	float3 aabbExtremePoint = a.ExtremePoint(-plane.normal);
+	vec aabbExtremePoint = a.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(aabbExtremePoint);
 	a.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -36,7 +36,7 @@ OBB RandomOBBInHalfspace(const Plane &plane, float maxSideLength)
 	float3x4 tm = float3x4::Translate(a.CenterPoint()) * rot * float3x4::Translate(-a.CenterPoint());
 	OBB o = a.Transform(tm);
 
-	float3 obbExtremePoint = o.ExtremePoint(-plane.normal);
+	vec obbExtremePoint = o.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(obbExtremePoint);
 	o.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -53,10 +53,10 @@ OBB RandomOBBInHalfspace(const Plane &plane, float maxSideLength)
 
 Sphere RandomSphereInHalfspace(const Plane &plane, float maxRadius)
 {
-	Sphere s(float3::zero, rng.Float(0.001f, maxRadius));
-	s.Translate(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)));
+	Sphere s(vec::zero, rng.Float(0.001f, maxRadius));
+	s.Translate(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)));
 
-	float3 extremePoint = s.ExtremePoint(-plane.normal);
+	vec extremePoint = s.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
 	s.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -90,8 +90,8 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 	}
 	f.nearPlaneDistance = rng.Float(0.1f, SCALE);
 	f.farPlaneDistance = f.nearPlaneDistance + rng.Float(0.1f, SCALE);
-	f.pos = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	f.front = float3::RandomDir(rng);
+	f.pos = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	f.front = vec::RandomDir(rng);
 	f.up = f.front.RandomPerpendicular(rng);
 
 	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
@@ -99,7 +99,7 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 
 //	assert(!f.IsDegenerate());
 
-	float3 extremePoint = f.ExtremePoint(-plane.normal);
+	vec extremePoint = f.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
 	f.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -116,13 +116,13 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 
 Line RandomLineInHalfspace(const Plane &plane)
 {
-	float3 linePos = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec linePos = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	if (plane.SignedDistance(linePos) < 0.f)
 		linePos = plane.Mirror(linePos);
 	linePos += plane.normal * 1e-2f;
 	assert(plane.SignedDistance(linePos) >= 1e-3f);
 
-	float3 dir = plane.normal.RandomPerpendicular(rng);
+	vec dir = plane.normal.RandomPerpendicular(rng);
 	Line l(linePos, dir);
 	assert(l.IsFinite());
 	assert(!plane.Intersects(l));
@@ -135,13 +135,13 @@ Ray RandomRayInHalfspace(const Plane &plane)
 	if (rng.Int(0, 10) == 0)
 		return RandomLineInHalfspace(plane).ToRay();
 
-	float3 rayPos = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec rayPos = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	if (plane.SignedDistance(rayPos) < 0.f)
 		rayPos = plane.Mirror(rayPos);
 	rayPos += plane.normal * 1e-2f;
 	assert(plane.SignedDistance(rayPos) >= 1e-3f);
 
-	float3 dir = float3::RandomDir(rng);
+	vec dir = vec::RandomDir(rng);
 	if (dir.Dot(plane.normal) < 0.f)
 		dir = -dir;
 	Ray r(rayPos, dir);
@@ -164,15 +164,15 @@ LineSegment RandomLineSegmentInHalfspace(const Plane &plane)
 
 Capsule RandomCapsuleInHalfspace(const Plane &plane)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 dir = float3::RandomDir(rng);
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec dir = vec::RandomDir(rng);
 	float a = rng.Float(0, SCALE);
 	float b = rng.Float(0, SCALE);
 	float r = rng.Float(0.001f, SCALE);
 	Capsule c(pt + a*dir, pt - b*dir, r);
 	assert(c.IsFinite());
 
-	float3 extremePoint = c.ExtremePoint(-plane.normal);
+	vec extremePoint = c.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
 	c.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -198,15 +198,15 @@ Plane RandomPlaneInHalfspace(Plane &plane)
 
 Triangle RandomTriangleInHalfspace(const Plane &plane)
 {
-	float3 a = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 b = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 c = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec a = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec b = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec c = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle t(a,b,c);
 
 	assert1(t.IsFinite(), t);
 	assert1(!t.IsDegenerate(), t);
 
-	float3 extremePoint = t.ExtremePoint(-plane.normal);
+	vec extremePoint = t.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
 	t.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -224,7 +224,7 @@ Triangle RandomTriangleInHalfspace(const Plane &plane)
 Polyhedron RandomPolyhedronInHalfspace(const Plane &plane)
 {
 	Polyhedron p;
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 
 	switch(rng.Int(0,7))
 	{
@@ -241,7 +241,7 @@ Polyhedron RandomPolyhedronInHalfspace(const Plane &plane)
 //	assert(p.IsFinite());
 //	assert(!p.IsDegenerate());
 
-	float3 extremePoint = p.ExtremePoint(-plane.normal);
+	vec extremePoint = p.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(extremePoint);
 	p.Translate((distance + GUARDBAND) * plane.normal);
 
@@ -266,7 +266,7 @@ Polygon RandomPolygonInHalfspace(const Plane &plane)
 	assert1(poly.IsPlanar(), poly);
 	assert1(poly.IsFinite(), poly);
 	assert2(!poly.Intersects(plane), poly, plane);
-	float3 extremePoint = poly.ExtremePoint(-plane.normal);
+	vec extremePoint = poly.ExtremePoint(-plane.normal);
 	assert(plane.SignedDistance(extremePoint) > 0.f);
 	assert(plane.SignedDistance(poly) > 0.f);
 
@@ -275,7 +275,7 @@ Polygon RandomPolygonInHalfspace(const Plane &plane)
 
 RANDOMIZED_TEST(AABBAABBNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
@@ -292,7 +292,7 @@ RANDOMIZED_TEST(AABBAABBNoIntersect)
 
 RANDOMIZED_TEST(AABBOBBNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
@@ -308,7 +308,7 @@ RANDOMIZED_TEST(AABBOBBNoIntersect)
 
 RANDOMIZED_TEST(AABBLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -329,7 +329,7 @@ RANDOMIZED_TEST(AABBLineNoIntersect)
 
 RANDOMIZED_TEST(AABBRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -345,7 +345,7 @@ RANDOMIZED_TEST(AABBRayNoIntersect)
 
 RANDOMIZED_TEST(AABBLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -361,7 +361,7 @@ RANDOMIZED_TEST(AABBLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(AABBPlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -377,7 +377,7 @@ RANDOMIZED_TEST(AABBPlaneNoIntersect)
 
 RANDOMIZED_TEST(AABBSphereNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, SCALE);
@@ -393,7 +393,7 @@ RANDOMIZED_TEST(AABBSphereNoIntersect)
 
 RANDOMIZED_TEST(AABBCapsuleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
@@ -409,7 +409,7 @@ RANDOMIZED_TEST(AABBCapsuleNoIntersect)
 
 RANDOMIZED_TEST(AABBTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -425,7 +425,7 @@ RANDOMIZED_TEST(AABBTriangleNoIntersect)
 
 RANDOMIZED_TEST(AABBFrustumNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
@@ -441,7 +441,7 @@ RANDOMIZED_TEST(AABBFrustumNoIntersect)
 
 RANDOMIZED_TEST(AABBPolyhedronNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -457,7 +457,7 @@ RANDOMIZED_TEST(AABBPolyhedronNoIntersect)
 
 RANDOMIZED_TEST(AABBPolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -476,7 +476,7 @@ RANDOMIZED_TEST(AABBPolygonNoIntersect)
 
 RANDOMIZED_TEST(OBBOBBNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
@@ -492,7 +492,7 @@ RANDOMIZED_TEST(OBBOBBNoIntersect)
 
 RANDOMIZED_TEST(OBBLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -508,7 +508,7 @@ RANDOMIZED_TEST(OBBLineNoIntersect)
 
 RANDOMIZED_TEST(OBBRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -524,7 +524,7 @@ RANDOMIZED_TEST(OBBRayNoIntersect)
 
 RANDOMIZED_TEST(OBBLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -540,7 +540,7 @@ RANDOMIZED_TEST(OBBLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(OBBPlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -556,7 +556,7 @@ RANDOMIZED_TEST(OBBPlaneNoIntersect)
 
 RANDOMIZED_TEST(OBBSphereNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, SCALE);
@@ -572,7 +572,7 @@ RANDOMIZED_TEST(OBBSphereNoIntersect)
 
 RANDOMIZED_TEST(OBBCapsuleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
@@ -588,7 +588,7 @@ RANDOMIZED_TEST(OBBCapsuleNoIntersect)
 
 RANDOMIZED_TEST(OBBTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -604,7 +604,7 @@ RANDOMIZED_TEST(OBBTriangleNoIntersect)
 
 RANDOMIZED_TEST(OBBFrustumNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
@@ -620,7 +620,7 @@ RANDOMIZED_TEST(OBBFrustumNoIntersect)
 
 RANDOMIZED_TEST(OBBPolyhedronNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -636,7 +636,7 @@ RANDOMIZED_TEST(OBBPolyhedronNoIntersect)
 
 RANDOMIZED_TEST(OBBPolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -656,7 +656,7 @@ RANDOMIZED_TEST(OBBPolygonNoIntersect)
 
 RANDOMIZED_TEST(SphereSphereNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, 10.f);
@@ -672,7 +672,7 @@ RANDOMIZED_TEST(SphereSphereNoIntersect)
 
 RANDOMIZED_TEST(SphereLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -688,7 +688,7 @@ RANDOMIZED_TEST(SphereLineNoIntersect)
 
 RANDOMIZED_TEST(SphereRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -704,7 +704,7 @@ RANDOMIZED_TEST(SphereRayNoIntersect)
 
 RANDOMIZED_TEST(SphereLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -720,7 +720,7 @@ RANDOMIZED_TEST(SphereLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(SpherePlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -736,7 +736,7 @@ RANDOMIZED_TEST(SpherePlaneNoIntersect)
 
 RANDOMIZED_TEST(SphereCapsuleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
@@ -752,7 +752,7 @@ RANDOMIZED_TEST(SphereCapsuleNoIntersect)
 
 RANDOMIZED_TEST(SphereTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -768,7 +768,7 @@ RANDOMIZED_TEST(SphereTriangleNoIntersect)
 
 RANDOMIZED_TEST(SphereFrustumNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
@@ -784,7 +784,7 @@ RANDOMIZED_TEST(SphereFrustumNoIntersect)
 
 RANDOMIZED_TEST(SpherePolyhedronNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -800,7 +800,7 @@ RANDOMIZED_TEST(SpherePolyhedronNoIntersect)
 
 RANDOMIZED_TEST(SpherePolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -819,7 +819,7 @@ RANDOMIZED_TEST(SpherePolygonNoIntersect)
 
 RANDOMIZED_TEST(FrustumLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -835,7 +835,7 @@ RANDOMIZED_TEST(FrustumLineNoIntersect)
 
 RANDOMIZED_TEST(FrustumRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -851,7 +851,7 @@ RANDOMIZED_TEST(FrustumRayNoIntersect)
 
 RANDOMIZED_TEST(FrustumLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -867,7 +867,7 @@ RANDOMIZED_TEST(FrustumLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(FrustumPlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -883,7 +883,7 @@ RANDOMIZED_TEST(FrustumPlaneNoIntersect)
 
 RANDOMIZED_TEST(FrustumCapsuleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
@@ -899,7 +899,7 @@ RANDOMIZED_TEST(FrustumCapsuleNoIntersect)
 
 RANDOMIZED_TEST(FrustumTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -915,7 +915,7 @@ RANDOMIZED_TEST(FrustumTriangleNoIntersect)
 
 RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
@@ -931,7 +931,7 @@ RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 
 RANDOMIZED_TEST(FrustumPolyhedronNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -947,7 +947,7 @@ RANDOMIZED_TEST(FrustumPolyhedronNoIntersect)
 
 RANDOMIZED_TEST(FrustumPolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -966,7 +966,7 @@ RANDOMIZED_TEST(FrustumPolygonNoIntersect)
 
 RANDOMIZED_TEST(CapsuleLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -982,7 +982,7 @@ RANDOMIZED_TEST(CapsuleLineNoIntersect)
 
 RANDOMIZED_TEST(CapsuleRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -998,7 +998,7 @@ RANDOMIZED_TEST(CapsuleRayNoIntersect)
 
 RANDOMIZED_TEST(CapsuleLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -1014,7 +1014,7 @@ RANDOMIZED_TEST(CapsuleLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(CapsulePlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -1030,7 +1030,7 @@ RANDOMIZED_TEST(CapsulePlaneNoIntersect)
 
 RANDOMIZED_TEST(CapsuleCapsuleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
@@ -1046,7 +1046,7 @@ RANDOMIZED_TEST(CapsuleCapsuleNoIntersect)
 
 RANDOMIZED_TEST(CapsuleTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -1062,7 +1062,7 @@ RANDOMIZED_TEST(CapsuleTriangleNoIntersect)
 
 RANDOMIZED_TEST(CapsulePolyhedronNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -1078,7 +1078,7 @@ RANDOMIZED_TEST(CapsulePolyhedronNoIntersect)
 
 RANDOMIZED_TEST(CapsulePolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -1098,7 +1098,7 @@ RANDOMIZED_TEST(CapsulePolygonNoIntersect)
 
 RANDOMIZED_TEST(PolyhedronLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -1114,7 +1114,7 @@ RANDOMIZED_TEST(PolyhedronLineNoIntersect)
 
 RANDOMIZED_TEST(PolyhedronRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -1130,7 +1130,7 @@ RANDOMIZED_TEST(PolyhedronRayNoIntersect)
 
 RANDOMIZED_TEST(PolyhedronLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -1149,7 +1149,7 @@ RANDOMIZED_TEST(PolyhedronLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(PolyhedronPlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -1165,7 +1165,7 @@ RANDOMIZED_TEST(PolyhedronPlaneNoIntersect)
 
 RANDOMIZED_TEST(PolyhedronTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -1181,7 +1181,7 @@ RANDOMIZED_TEST(PolyhedronTriangleNoIntersect)
 
 RANDOMIZED_TEST(PolyhedronPolyhedronNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -1198,7 +1198,7 @@ RANDOMIZED_TEST(PolyhedronPolyhedronNoIntersect)
 #ifndef _DEBUG
 RANDOMIZED_TEST(PolyhedronPolyhedronIntersectionPerformance)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Polyhedron b = RandomPolyhedronInHalfspace(p);
@@ -1213,7 +1213,7 @@ RANDOMIZED_TEST(PolyhedronPolyhedronIntersectionPerformance)
 
 RANDOMIZED_TEST(PolyhedronPolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -1231,7 +1231,7 @@ RANDOMIZED_TEST(PolyhedronPolygonNoIntersect)
 
 RANDOMIZED_TEST(PolygonLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -1247,7 +1247,7 @@ RANDOMIZED_TEST(PolygonLineNoIntersect)
 
 RANDOMIZED_TEST(PolygonRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -1263,7 +1263,7 @@ RANDOMIZED_TEST(PolygonRayNoIntersect)
 
 RANDOMIZED_TEST(PolygonLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -1282,7 +1282,7 @@ RANDOMIZED_TEST(PolygonLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(PolygonPlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -1298,7 +1298,7 @@ RANDOMIZED_TEST(PolygonPlaneNoIntersect)
 
 RANDOMIZED_TEST(PolygonTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -1314,7 +1314,7 @@ RANDOMIZED_TEST(PolygonTriangleNoIntersect)
 
 RANDOMIZED_TEST(PolygonPolygonNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polygon a = RandomPolygonInHalfspace(p);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
@@ -1332,7 +1332,7 @@ RANDOMIZED_TEST(PolygonPolygonNoIntersect)
 
 RANDOMIZED_TEST(TriangleLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -1348,7 +1348,7 @@ RANDOMIZED_TEST(TriangleLineNoIntersect)
 
 RANDOMIZED_TEST(TriangleRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -1364,7 +1364,7 @@ RANDOMIZED_TEST(TriangleRayNoIntersect)
 
 RANDOMIZED_TEST(TriangleLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -1380,7 +1380,7 @@ RANDOMIZED_TEST(TriangleLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(TrianglePlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -1396,7 +1396,7 @@ RANDOMIZED_TEST(TrianglePlaneNoIntersect)
 
 RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
@@ -1415,7 +1415,7 @@ RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 
 RANDOMIZED_TEST(PlaneLineNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	Line b = RandomLineInHalfspace(p);
@@ -1431,7 +1431,7 @@ RANDOMIZED_TEST(PlaneLineNoIntersect)
 
 RANDOMIZED_TEST(PlaneRayNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
@@ -1447,7 +1447,7 @@ RANDOMIZED_TEST(PlaneRayNoIntersect)
 
 RANDOMIZED_TEST(PlaneLineSegmentNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
@@ -1463,7 +1463,7 @@ RANDOMIZED_TEST(PlaneLineSegmentNoIntersect)
 
 RANDOMIZED_TEST(PlanePlaneNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Plane a = RandomPlaneInHalfspace(p);
 	p.ReverseNormal();
 	Plane b = RandomPlaneInHalfspace(p);
@@ -1479,7 +1479,7 @@ RANDOMIZED_TEST(PlanePlaneNoIntersect)
 
 RANDOMIZED_TEST(RayTriangleMeshNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	TriangleMesh tm;
 	tm.Set(a);
@@ -1491,7 +1491,7 @@ RANDOMIZED_TEST(RayTriangleMeshNoIntersect)
 
 RANDOMIZED_TEST(RayKdTreeNoIntersect)
 {
-	Plane p(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)), float3::RandomDir(rng));
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	KdTree<Triangle> t;
 	std::vector<Triangle> tris = a.Triangulate();

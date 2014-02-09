@@ -62,57 +62,41 @@ TEST(Float3x4SwapRows)
 	assert(v3.Equals(v4));
 }
 
-Line RandomLineContainingPoint(const float3 &pt);
+Line RandomLineContainingPoint(const vec &pt);
 
 RANDOMIZED_TEST(Float3x4TransformFloat4)
 {
-	Line l = RandomLineContainingPoint(float3::zero);
-	l.pos = float3::zero;
+	Line l = RandomLineContainingPoint(POINT_VEC_SCALAR(0.f));
+	l.pos = POINT_VEC(float3::zero);
 	assert(l.dir.IsNormalized());
-	float4 pt = float4(l.GetPoint(rng.Float(-3.f, 3.f)), 1.f);
+	float4 pt = POINT_TO_FLOAT4(l.GetPoint(rng.Float(-3.f, 3.f)));
 	float3x4 rot = Quat::RandomRotation(rng).ToFloat3x4();
-	float4 newDir = rot.Transform(float4(l.dir,0.f));
+	float4 newDir = rot.Transform(DIR_TO_FLOAT4(l.dir));
 	assert(newDir.w == 0.f);
-	l.dir = newDir.xyz();
+	l.dir = DIR_TO_FLOAT4(newDir);
 	assert(l.dir.IsNormalized(1e-1f));
 	l.dir.Normalize();
 	pt = rot.Transform(pt);
 	assert(pt.w == 1.f);
-	float d = l.Distance(pt.xyz());
+	float d = l.Distance(pt);
 	assert(EqualAbs(d, 0.f));
-	assert(l.Contains(pt.xyz()));
+	assert(l.Contains(pt));
 }
 
 RANDOMIZED_TEST(Float3x4TransformPosDir)
 {
-	Line l = RandomLineContainingPoint(float3::zero);
-	l.pos = float3::zero;
+	Line l = RandomLineContainingPoint(POINT_VEC_SCALAR(0.f));
+	l.pos = POINT_VEC(float3::zero);
 	assert(l.dir.IsNormalized());
-	float3 pt = l.GetPoint(rng.Float(-3.f, 3.f));
+	vec pt = l.GetPoint(rng.Float(-3.f, 3.f));
 	float3x4 rot = Quat::RandomRotation(rng).ToFloat3x4();
 	l.dir = rot.TransformDir(l.dir);
 	assert(l.dir.IsNormalized(1e-1f));
 	l.dir.Normalize();
-	pt = rot.TransformPos(pt);
-	float d = l.Distance(pt.xyz());
+	pt = POINT_VEC(rot.TransformPos(POINT_TO_FLOAT3(pt)));
+	float d = l.Distance(pt);
 	assert(EqualAbs(d, 0.f));
-	assert(l.Contains(pt.xyz()));
-}
-
-RANDOMIZED_TEST(Float3x4TransformPosDirXyz)
-{
-	Line l = RandomLineContainingPoint(float3::zero);
-	l.pos = float3::zero;
-	assert(l.dir.IsNormalized());
-	float3 pt = l.GetPoint(rng.Float(-3.f, 3.f));
-	float3x4 rot = Quat::RandomRotation(rng).ToFloat3x4();
-	l.dir = rot.TransformDir(l.dir.x, l.dir.y, l.dir.z);
-	assert(l.dir.IsNormalized(1e-1f));
-	l.dir.Normalize();
-	pt = rot.TransformPos(pt.x, pt.y, pt.z);
-	float d = l.Distance(pt.xyz());
-	assert(EqualAbs(d, 0.f));
-	assert(l.Contains(pt.xyz()));
+	assert(l.Contains(pt));
 }
 
 RANDOMIZED_TEST(Float3x4MulFloat3x4)

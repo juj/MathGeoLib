@@ -742,6 +742,8 @@ public:
 	/// Does not perform a perspective divide afterwards, so remember to divide by w afterwards
 	/// at some point, if this matrix contained a projection.
 	float4 Transform(const float4 &vector) const;
+	float4 TransformPos(const float4 &vector) const { return Transform(vector); }
+	float4 TransformDir(const float4 &vector) const { return Transform(vector); }
 
 	/// Performs a batch transform of the given point vector array.
 	void TransformPos(float3 *pointArray, int numPoints) const;

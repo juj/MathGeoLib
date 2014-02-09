@@ -410,9 +410,33 @@ public:
 
 	bool IsPerpendicular(const float4 &other, float epsilon = 1e-6f) const;
 
+	/// Makes the given vectors linearly independent.
+	/** This function directly follows the Gram-Schmidt procedure on the input vectors.
+	The vector a is kept unmodified, and vector b is modified to be perpendicular to a.
+	Finally, if specified, the vector c is adjusted to be perpendicular to a and b.
+	@note If any of the input vectors is zero, then the resulting set of vectors cannot be made orthogonal.
+	@see AreOrthogonal(), Orthonormalize(), AreOrthonormal(). */
+	static void Orthogonalize(const float4 &a, float4 &b);
+	static void Orthogonalize(const float4 &a, float4 &b, float4 &c);
+
 	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
 	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
 	static MUST_USE_RESULT bool AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon = 1e-4f);
+
+	/// Makes the given vectors linearly independent and normalized in length.
+	/** This function directly follows the Gram-Schmidt procedure on the input vectors.
+	The vector a is first normalized, and vector b is modified to be perpendicular to a, and also normalized.
+	Finally, if specified, the vector c is adjusted to be perpendicular to a and b, and normalized.
+	@note If any of the input vectors is zero, then the resulting set of vectors cannot be made orthonormal.
+	@see Orthogonalize(), AreOrthogonal(), AreOrthonormal(). */
+	static void Orthonormalize(float4 &a, float4 &b);
+	static void Orthonormalize(float4 &a, float4 &b, float4 &c);
+
+	/// Returns true if the given direction vectors are orthogonal to each other and all of length 1.
+	/** @note As 4D vectors, the w component is included in the computations, so call this function only for direction vectors for which w=0.
+		@see Orthogonalize(), AreOrthogonal(), Orthonormalize(), AreCollinear(). */
+	static MUST_USE_RESULT bool AreOrthonormal(const float4 &a, const float4 &b, float epsilon = 1e-3f);
+	static MUST_USE_RESULT bool AreOrthonormal(const float4 &a, const float4 &b, const float4 &c, float epsilon = 1e-3f);
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x, y, z, w)".
@@ -581,6 +605,10 @@ public:
 	float4 AnotherPerpendicular3(const float3 &hint = float3(0,1,0), const float3 &hint2 = float3(0,0,1)) const;
 	float4 AnotherPerpendicular(const float4 &hint = float4(0,1,0,0), const float4 &hint2 = float4(0,0,1,0)) const;
 
+	/// Generates a random vector that is perpendicular to this vector.
+	/** The distribution is uniformly random. */
+	float4 RandomPerpendicular(LCG &rng) const;
+
 	/// Returns this vector reflected about a plane with the given normal.
 	/** By convention, both this and the reflected vector point away from the plane with the given normal.
 		@note This function ignores the w component of this vector (assumes w=0). */
@@ -634,8 +662,21 @@ public:
 	bool Equals(float x, float y, float z, float w, float epsilon = 1e-3f) const;
 
 	/// Generates a direction vector of the given length pointing at a uniformly random direction.
-	/// The w-component for the returned vector is 0.
-	static float4 RandomDir(LCG &lcg, float length = 1.f);
+	/* The w-component for the returned vector is 0.
+	@see RandomSphere(), RandomBox(). */
+	static MUST_USE_RESULT float4 RandomDir(LCG &lcg, float length = 1.f);
+	/// Generates a random point inside a sphere.
+	/** The returned point is generated uniformly inside the sphere.
+	@see RandomDir(), RandomBox(). */
+	static MUST_USE_RESULT float4 RandomSphere(LCG &lcg, const float4 &center, float radius);
+	/// Generates a random point inside an axis-aligned box.
+	/** The returned point is generated uniformly inside the box.
+	@see RandomDir(), RandomSphere(). */
+	static MUST_USE_RESULT float4 RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax);
+	static MUST_USE_RESULT float4 RandomBox(LCG &lcg, const float4 &minValues, const float4 &maxValues);
+
+	/// Returns a random float3 with each entry randomized between the range [minElem, maxElem].
+	static MUST_USE_RESULT float4 RandomBox(LCG &lcg, float minElem, float maxElem);
 
 	/// Returns a random float4 with each entry randomized between the range [minElem, maxElem].
 	/** Warning: The vectors returned by this function generally have w != 0 or 1, so they don't do not represent

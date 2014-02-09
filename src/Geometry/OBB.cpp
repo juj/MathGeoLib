@@ -79,9 +79,9 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 	assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
 	obb.pos = m.MulPos(aabb.CenterPoint());
 	vec size = aabb.HalfSize();
-	obb.axis[0] = m.Col(0);
-	obb.axis[1] = m.Col(1);
-	obb.axis[2] = m.Col(2);
+	obb.axis[0] = DIR_VEC(m.Col(0));
+	obb.axis[1] = DIR_VEC(m.Col(1));
+	obb.axis[2] = DIR_VEC(m.Col(2));
 	obb.r.x = size.x;
 	obb.r.y = size.y;
 	obb.r.z = size.z;
@@ -589,11 +589,12 @@ float3x4 OBB::LocalToWorld() const
 	assume(axis[0].IsNormalized());
 	assume(axis[1].IsNormalized());
 	assume(axis[2].IsNormalized());
-	float3x4 m;
-	m.SetCol(0, axis[0]);
-	m.SetCol(1, axis[1]);
-	m.SetCol(2, axis[2]);
-	m.SetCol(3, pos - axis[0] * r.x - axis[1] * r.y - axis[2] * r.z);
+	float3x4 m; ///\todo sse-matrix
+	m.SetCol(0, axis[0].ptr());
+	m.SetCol(1, axis[1].ptr());
+	m.SetCol(2, axis[2].ptr());
+	vec p = pos - axis[0] * r.x - axis[1] * r.y - axis[2] * r.z;
+	m.SetCol(3, p.ptr());
 	assume(m.IsOrthonormal());
 	return m;
 }
@@ -655,7 +656,7 @@ void OBB::Translate(const vec &offset)
 
 void OBB::Scale(const vec &centerPoint, float scaleFactor)
 {
-	return Scale(centerPoint, vec(scaleFactor, scaleFactor, scaleFactor));
+	return Scale(centerPoint, DIR_VEC_SCALAR(scaleFactor));
 }
 
 void OBB::Scale(const vec &centerPoint, const vec &scaleFactor)
@@ -731,7 +732,7 @@ bool OBB::Contains(const AABB &aabb) const
 	// Since both AABB and OBB are convex objects, this OBB contains the AABB
 	// if and only if it contains all its corner points.
 	for(int i = 0; i < 8; ++i)
-	if (!Contains(POINT_TO_FLOAT3(aabb.CornerPoint(i))))
+	if (!Contains(aabb.CornerPoint(i)))
 			return false;
 
 	return true;
@@ -810,15 +811,15 @@ void OBB::Enclose(const vec &point)
 
 void OBB::Triangulate(int x, int y, int z, vec *outPos, vec *outNormal, float2 *outUV, bool ccwIsFrontFacing) const
 {
-	AABB aabb(vec(0,0,0), float3(r.x*2.f,r.y*2.f,r.z*2.f));
+	AABB aabb(POINT_VEC_SCALAR(0), r*2.f);
 	aabb.Triangulate(x, y, z, outPos, outNormal, outUV, ccwIsFrontFacing);
 	float3x4 localToWorld = LocalToWorld();
 	assume(localToWorld.HasUnitaryScale()); // Transforming of normals will fail otherwise.
-	localToWorld.BatchTransformPos(outPos, NumVerticesInTriangulation(x,y,z), sizeof(float3));
-	localToWorld.BatchTransformDir(outNormal, NumVerticesInTriangulation(x,y,z), sizeof(float3));
+	localToWorld.BatchTransformPos(outPos, NumVerticesInTriangulation(x,y,z), sizeof(vec));
+	localToWorld.BatchTransformDir(outNormal, NumVerticesInTriangulation(x,y,z), sizeof(vec));
 }
 
-void OBB::ToEdgeList(float3 *outPos) const
+void OBB::ToEdgeList(vec *outPos) const
 {
 	assume(outPos);
 	if (!outPos)
@@ -835,8 +836,8 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 {
 	assume(pos.IsFinite());
 	assume(b.pos.IsFinite());
-	assume(float3::AreOrthonormal(axis[0], axis[1], axis[2]));
-	assume(float3::AreOrthonormal(b.axis[0], b.axis[1], b.axis[2]));
+	assume(vec::AreOrthonormal(axis[0], axis[1], axis[2]));
+	assume(vec::AreOrthonormal(b.axis[0], b.axis[1], b.axis[2]));
 
 	// Generate a rotation matrix that transforms from world space to this OBB's coordinate space.
 	float3x3 R;
@@ -844,9 +845,9 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 		for(int j = 0; j < 3; ++j)
 			R[i][j] = Dot(axis[i], b.axis[j]);
 
-	float3 t = b.pos - pos;
+	vec t = b.pos - pos;
 	// Express the translation vector in a's coordinate frame.
-	t = float3(Dot(t, axis[0]), Dot(t, axis[1]), Dot(t, axis[2]));
+	t = DIR_VEC(Dot(t, axis[0]), Dot(t, axis[1]), Dot(t, axis[2]));
 
 	float3x3 AbsR;
 	for(int i = 0; i < 3; ++i)
@@ -945,51 +946,51 @@ bool OBB::Intersects(const Plane &p) const
 
 bool OBB::Intersects(const Ray &ray) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	Ray r = WorldToLocal() * ray;
 	return aabb.Intersects(r);
 }
 
 bool OBB::Intersects(const Ray &ray, float &dNear, float &dFar) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	Ray r = WorldToLocal() * ray;
 	return aabb.Intersects(r, dNear, dFar);
 }
 
 bool OBB::Intersects(const Line &line) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	Line l = WorldToLocal() * line;
 	return aabb.Intersects(l);
 }
 
 bool OBB::Intersects(const Line &line, float &dNear, float &dFar) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	Line l = WorldToLocal() * line;
 	return aabb.Intersects(l, dNear, dFar);
 }
 
 bool OBB::Intersects(const LineSegment &lineSegment) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	LineSegment l = WorldToLocal() * lineSegment;
 	return aabb.Intersects(l);
 }
 
 bool OBB::Intersects(const LineSegment &lineSegment, float &dNear, float &dFar) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	LineSegment l = WorldToLocal() * lineSegment;
 	return aabb.Intersects(l, dNear, dFar);
 }
 
 /// The implementation of the OBB-Sphere intersection test follows Christer Ericson's Real-Time Collision Detection, p. 166. [groupSyntax]
-bool OBB::Intersects(const Sphere &sphere, float3 *closestPointOnOBB) const
+bool OBB::Intersects(const Sphere &sphere, vec *closestPointOnOBB) const
 {
 	// Find the point on this AABB closest to the sphere center.
-	float3 pt = ClosestPoint(sphere.pos);
+	vec pt = ClosestPoint(sphere.pos);
 
 	// If that point is inside sphere, the AABB and sphere intersect.
 	if (closestPointOnOBB)
@@ -1005,7 +1006,7 @@ bool OBB::Intersects(const Capsule &capsule) const
 
 bool OBB::Intersects(const Triangle &triangle) const
 {
-	AABB aabb(float3(0,0,0), float3(Size()));
+	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
 	Triangle t = WorldToLocal() * triangle;
 	return t.Intersects(aabb);
 }
@@ -1045,8 +1046,8 @@ std::ostream &operator <<(std::ostream &o, const OBB &obb)
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFacing) const
 {
-	Array<float3> pos;
-	Array<float3> normal;
+	Array<vec> pos;
+	Array<vec> normal;
 	Array<float2> uv;
 	int numVertices = (x*y+y*z+x*z)*2*6;
 	pos.Resize_pod(numVertices);
@@ -1066,7 +1067,7 @@ void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFaci
 
 void OBB::ToLineList(VertexBuffer &vb) const
 {
-	Array<float3> pos;
+	Array<vec> pos;
 	pos.Resize_pod(NumVerticesInEdgeList());
 	ToEdgeList(&pos[0]);
 	int startIndex = vb.AppendVertices((int)pos.size());

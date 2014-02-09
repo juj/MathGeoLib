@@ -5,18 +5,18 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
-float3 RandomPointNearOrigin(float maxDistanceFromOrigin)
+vec RandomPointNearOrigin(float maxDistanceFromOrigin)
 {
-	return Sphere(float3::zero, maxDistanceFromOrigin).RandomPointInside(rng);
+	return Sphere(POINT_VEC_SCALAR(0.f), maxDistanceFromOrigin).RandomPointInside(rng);
 }
 
-AABB RandomAABBContainingPoint(const float3 &pt, float maxSideLength);
+AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength);
 AABB RandomAABBNearOrigin(float maxDistanceFromOrigin, float maxSideLength)
 {
 	return RandomAABBContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin), maxSideLength);
 }
 
-OBB RandomOBBContainingPoint(const float3 &pt, float maxSideLength);
+OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength);
 OBB RandomOBBNearOrigin(float maxDistanceFromOrigin, float maxSideLength)
 {
 	return RandomOBBContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin), maxSideLength);
@@ -27,13 +27,13 @@ LineSegment RandomLineSegmentNearOrigin(float maxDistanceFromOrigin)
 	return LineSegment(RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin));
 }
 
-Sphere RandomSphereContainingPoint(const float3 &pt, float maxRadius);
+Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius);
 Sphere RandomSphereNearOrigin(float maxDistanceFromOrigin, float maxRadius)
 {
 	return RandomSphereContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin), maxRadius);
 }
 
-Capsule RandomCapsuleContainingPoint(const float3 &pt);
+Capsule RandomCapsuleContainingPoint(const vec &pt);
 Capsule RandomCapsuleNearOrigin(float maxDistanceFromOrigin)
 {
 	return RandomCapsuleContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin));
@@ -44,19 +44,19 @@ Triangle RandomTriangleNearOrigin(float maxDistanceFromOrigin)
 	return Triangle(RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin));
 }
 
-Frustum RandomFrustumContainingPoint(const float3 &pt);
+Frustum RandomFrustumContainingPoint(const vec &pt);
 Frustum RandomFrustumNearOrigin(float maxDistanceFromOrigin)
 {
 	return RandomFrustumContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin));
 }
 
-Polygon RandomPolygonContainingPoint(const float3 &pt);
+Polygon RandomPolygonContainingPoint(const vec &pt);
 Polygon RandomPolygonNearOrigin(float maxDistanceFromOrigin)
 {
 	return RandomPolygonContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin));
 }
 
-Polyhedron RandomPolyhedronContainingPoint(const float3 &pt);
+Polyhedron RandomPolyhedronContainingPoint(const vec &pt);
 Polyhedron RandomPolyhedronNearOrigin(float maxDistanceFromOrigin)
 {
 	return RandomPolyhedronContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin));
@@ -68,7 +68,7 @@ Polyhedron RandomPolyhedronNearOrigin(float maxDistanceFromOrigin)
 RANDOMIZED_TEST(AABB_Enclose_point)
 {
 	AABB aabb = RandomAABBNearOrigin(DISTSCALE, SIZESCALE);
-	float3 pt = RandomPointNearOrigin(DISTSCALE);
+	vec pt = RandomPointNearOrigin(DISTSCALE);
 	aabb.Enclose(pt);
 
 	assert(aabb.Contains(pt));
@@ -78,7 +78,7 @@ RANDOMIZED_TEST(AABB_Enclose_point)
 RANDOMIZED_TEST(OBB_Enclose_point)
 {
 	OBB obb = RandomOBBNearOrigin(DISTSCALE, SIZESCALE);
-	float3 pt = RandomPointNearOrigin(DISTSCALE);
+	vec pt = RandomPointNearOrigin(DISTSCALE);
 	obb.Enclose(pt);
 
 	assert(obb.Contains(pt));
@@ -169,7 +169,7 @@ RANDOMIZED_TEST(AABB_Enclose_Polyhedron)
 RANDOMIZED_TEST(Sphere_Enclose_point)
 {
 	Sphere s = RandomSphereNearOrigin(DISTSCALE, SIZESCALE);
-	float3 pt = RandomPointNearOrigin(DISTSCALE);
+	vec pt = RandomPointNearOrigin(DISTSCALE);
 	s.Enclose(pt);
 
 	assert(s.Contains(pt));

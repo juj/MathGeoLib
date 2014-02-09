@@ -26,6 +26,7 @@
 
 #include "float2.h"
 #include "float3.h"
+#include "../Geometry/AABB.h"
 #include "../Geometry/Sphere.h"
 #include "../Algorithm/Random/LCG.h"
 #include "float4x4.h"
@@ -396,6 +397,21 @@ float4 float4::ScaledToLength3(float newLength) const
 	return v;
 }
 
+float float4::ScaleToLength(float newLength)
+{
+	float length = Length();
+	float scalar = newLength / length;
+	*this *= scalar;
+	return length;
+}
+
+float4 float4::ScaledToLength(float newLength) const
+{
+	float4 v = *this;
+	v.ScaleToLength(newLength);
+	return v;
+}
+
 bool float4::IsFinite() const
 {
 	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z) && MATH_NS::IsFinite(w);
@@ -403,7 +419,12 @@ bool float4::IsFinite() const
 
 bool float4::IsPerpendicular3(const float4 &other, float epsilon) const
 {
-	return fabs(this->Dot3(other)) < epsilon;
+	return MATH_NS::Abs(this->Dot3(other)) < epsilon;
+}
+
+bool float4::IsPerpendicular(const float4 &other, float epsilon) const
+{
+	return MATH_NS::Abs(this->Dot(other)) < epsilon;
 }
 
 bool IsNeutralCLocale();
@@ -783,6 +804,20 @@ float4 float4::Perpendicular3(const float3 &hint, const float3 &hint2) const
 		return float4(v, 0);
 }
 
+float4 float4::Perpendicular(const float4 &hint, const float4 &hint2) const
+{
+	assume(!this->IsZero3());
+	assume(EqualAbs(w, 0));
+	assume(hint.IsNormalized());
+	assume(hint2.IsNormalized());
+	float4 v = this->Cross(hint);
+	float len = v.Normalize();
+	if (len == 0)
+		return hint2;
+	else
+		return v;
+}
+
 float4 float4::AnotherPerpendicular3(const float3 &hint, const float3 &hint2) const
 {
 	float4 firstPerpendicular = Perpendicular3(hint, hint2);
@@ -790,11 +825,42 @@ float4 float4::AnotherPerpendicular3(const float3 &hint, const float3 &hint2) co
 	return v.Normalized3();
 }
 
+float4 float4::AnotherPerpendicular(const float4 &hint, const float4 &hint2) const
+{
+	float4 firstPerpendicular = Perpendicular(hint, hint2);
+	float4 v = this->Cross(firstPerpendicular);
+	return v.Normalized();
+}
+
+float4 float4::RandomPerpendicular(LCG &rng) const
+{
+	return Perpendicular(RandomDir(rng));
+}
+
 float4 float4::Reflect3(const float3 &normal) const
 {
 	assume(normal.IsNormalized());
 	assume(EqualAbs(w, 0));
 	return 2.f * this->ProjectToNorm3(normal) - *this;
+}
+
+float4 float4::Reflect(const float4 &normal) const
+{
+	assume(normal.IsNormalized());
+	assume(EqualAbs(w, 0));
+	return 2.f * this->ProjectToNorm(normal) - *this;
+}
+
+/// Implementation from http://www.flipcode.com/archives/reflection_transmission.pdf .
+float4 float4::Refract(const float4 &normal, float negativeSideRefractionIndex, float positiveSideRefractionIndex) const
+{
+	// This code is duplicated in float2::Refract.
+	float n = negativeSideRefractionIndex / positiveSideRefractionIndex;
+	float cosI = this->Dot(normal);
+	float sinT2 = n*n*(1.f - cosI*cosI);
+	if (sinT2 > 1.f) // Total internal reflection occurs?
+		return (-*this).Reflect(normal);
+	return n * *this - (n + Sqrt(1.f - sinT2)) * normal;
 }
 
 float float4::AngleBetween3(const float4 &other) const
@@ -840,11 +906,25 @@ float4 float4::ProjectTo3(const float3 &target) const
 	return float4(target * MATH_NS::Dot(xyz(), target) / target.LengthSq(), w);
 }
 
+float4 float4::ProjectTo(const float4 &target) const
+{
+	assume(!target.IsZero());
+	assume(this->IsWZeroOrOne());
+	return target * (this->Dot(target) / target.LengthSq());
+}
+
 float4 float4::ProjectToNorm3(const float3 &target) const
 {
 	assume(target.IsNormalized());
 	assume(this->IsWZeroOrOne());
 	return float4(target * MATH_NS::Dot(xyz(), target), w);
+}
+
+float4 float4::ProjectToNorm(const float4 &target) const
+{
+	assume(target.IsNormalized());
+	assume(this->IsWZeroOrOne());
+	return target * this->Dot(target);
 }
 
 bool MUST_USE_RESULT float4::AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon)
@@ -866,6 +946,43 @@ float4 float4::Lerp(const float4 &b, float t) const
 float4 float4::Lerp(const float4 &a, const float4 &b, float t)
 {
 	return a.Lerp(b, t);
+}
+
+void float4::Orthonormalize(float4 &a, float4 &b)
+{
+	assume(!a.IsZero());
+	assume(!b.IsZero());
+	a.Normalize();
+	b -= b.ProjectToNorm(a);
+	b.Normalize();
+}
+
+void float4::Orthonormalize(float4 &a, float4 &b, float4 &c)
+{
+	assume(!a.IsZero());
+	a.Normalize();
+	b -= b.ProjectToNorm(a);
+	assume(!b.IsZero());
+	b.Normalize();
+	c -= c.ProjectToNorm(a);
+	c -= c.ProjectToNorm(b);
+	assume(!c.IsZero());
+	c.Normalize();
+}
+
+bool MUST_USE_RESULT float4::AreOrthonormal(const float4 &a, const float4 &b, float epsilon)
+{
+	return a.IsPerpendicular(b, epsilon) && a.IsNormalized(epsilon*epsilon) && b.IsNormalized(epsilon*epsilon);
+}
+
+bool MUST_USE_RESULT float4::AreOrthonormal(const float4 &a, const float4 &b, const float4 &c, float epsilon)
+{
+	return a.IsPerpendicular(b, epsilon) &&
+		a.IsPerpendicular(c, epsilon) &&
+		b.IsPerpendicular(c, epsilon) &&
+		a.IsNormalized(epsilon*epsilon) &&
+		b.IsNormalized(epsilon*epsilon) &&
+		c.IsNormalized(epsilon*epsilon);
 }
 
 float4 float4::FromScalar(float scalar)
@@ -933,6 +1050,26 @@ bool float4::Equals(float x_, float y_, float z_, float w_, float epsilon) const
 float4 float4::RandomDir(LCG &lcg, float length)
 {
 	return Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg) - POINT_VEC_SCALAR(0.f);
+}
+
+float4 MUST_USE_RESULT float4::RandomSphere(LCG &lcg, const float4 &center, float radius)
+{
+	return POINT_TO_FLOAT4(Sphere(FLOAT4_TO_POINT(center), radius).RandomPointInside(lcg));
+}
+
+float4 MUST_USE_RESULT float4::RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
+{
+	return RandomBox(lcg, POINT_VEC(xmin, ymin, zmin), POINT_VEC(xmax, ymax, zmax));
+}
+
+float4 MUST_USE_RESULT float4::RandomBox(LCG &lcg, float minElem, float maxElem)
+{
+	return RandomBox(lcg, POINT_VEC(minElem, minElem, minElem), POINT_VEC(maxElem, maxElem, maxElem));
+}
+
+float4 MUST_USE_RESULT float4::RandomBox(LCG &lcg, const float4 &minValues, const float4 &maxValues)
+{
+	return POINT_TO_FLOAT4(AABB(FLOAT4_TO_POINT(minValues), FLOAT4_TO_POINT(maxValues)).RandomPointInside(lcg));
 }
 
 float4 float4::RandomGeneral(LCG &lcg, float minElem, float maxElem)

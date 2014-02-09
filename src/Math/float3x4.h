@@ -630,9 +630,13 @@ public:
 
 	/// Performs a batch transform of the given array.
 	void BatchTransform(float4 *vectorArray, int numVectors) const;
+	void BatchTransformPos(float4 *vectorArray, int numVectors) const { BatchTransform(vectorArray, numVectors); }
+	void BatchTransformDir(float4 *vectorArray, int numVectors) const { BatchTransform(vectorArray, numVectors); }
 
 	/// Performs a batch transform of the given array.
 	void BatchTransform(float4 *vectorArray, int numVectors, int stride) const;
+	void BatchTransformPos(float4 *vectorArray, int numVectors, int stride) const { BatchTransform(vectorArray, numVectors, stride); }
+	void BatchTransformDir(float4 *vectorArray, int numVectors, int stride) const { BatchTransform(vectorArray, numVectors, stride); }
 
 	/// Treats the float3x3 as a 4-by-4 matrix with the last row and column as identity, and multiplies the two matrices.
 	float3x4 operator *(const float3x3 &rhs) const;

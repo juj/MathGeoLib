@@ -6,7 +6,7 @@
 #include "TestRunner.h"
 #include "TestData.h"
 
-AABB RandomAABBContainingPoint(const float3 &pt, float maxSideLength);
+AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength);
 
 MATH_BEGIN_NAMESPACE
 
@@ -14,10 +14,10 @@ using namespace TestData;
 
 RANDOMIZED_TEST(AABBTransformAsAABB)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	float3x4 rot = float3x4::RandomRotation(rng);
-	float3x4 trans = float3x4::Translate(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)));
+	float3x4 trans = float3x4::Translate(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)));
 	float3x4 scale = float3x4::UniformScale(rng.Float(0.001f, 100.f));
 	float3x4 m = trans*rot*scale;
 	OBB o = a.Transform(m);
@@ -42,10 +42,10 @@ BENCHMARK_END
 #ifdef MATH_SSE
 RANDOMIZED_TEST(AABBTransformAsAABB_SIMD)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	float3x4 rot = float3x4::RandomRotation(rng);
-	float3x4 trans = float3x4::Translate(float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE)));
+	float3x4 trans = float3x4::Translate(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)));
 	float3x4 scale = float3x4::UniformScale(rng.Float(0.001f, 100.f));
 	float3x4 m = trans*rot*scale;
 	OBB o = a.Transform(m);
@@ -64,86 +64,86 @@ BENCHMARK_END
 
 UNIQUE_TEST(AABBIsDegenerate)
 {
-	AABB a(float3::nan, float3::nan);
+	AABB a(vec::nan, vec::nan);
 	assert(a.IsDegenerate());
 	assert(!a.IsFinite());
 
-	a = AABB(float3::zero, float3::nan);
+	a = AABB(vec::zero, vec::nan);
 	assert(a.IsDegenerate());
 	assert(!a.IsFinite());
 
-	a = AABB(float3::zero, float3::one);
+	a = AABB(vec::zero, vec::one);
 	assert(!a.IsDegenerate());
 	assert(a.IsFinite());
 
-	a = AABB(float3::zero, float3::inf);
+	a = AABB(vec::zero, vec::inf);
 	assert(!a.IsDegenerate());
 	assert(!a.IsFinite());
 
-	a = AABB(float3::zero, float3::zero);
+	a = AABB(vec::zero, vec::zero);
 	assert(a.IsDegenerate());
 	assert(a.IsFinite());
 
-	a = AABB(float3::zero, -float3::zero);
+	a = AABB(vec::zero, -vec::zero);
 	assert(a.IsDegenerate());
 	assert(a.IsFinite());
 
-	a = AABB(float3::zero, -float3::one);
+	a = AABB(vec::zero, -vec::one);
 	assert(a.IsDegenerate());
 	assert(a.IsFinite());
 
-	a = AABB(float3::zero, -float3::inf);
+	a = AABB(vec::zero, -vec::inf);
 	assert(a.IsDegenerate());
 	assert(!a.IsFinite());
 
-	a = AABB(float3::inf, -float3::inf);
+	a = AABB(vec::inf, -vec::inf);
 	assert(a.IsDegenerate());
 	assert(!a.IsFinite());
 
-	a = AABB(-float3::inf, float3::inf);
+	a = AABB(-vec::inf, vec::inf);
 	assert(!a.IsDegenerate());
 	assert(!a.IsFinite());
 }
 
 UNIQUE_TEST(OBBIsDegenerate)
 {
-	OBB o = AABB(float3::nan, float3::nan);
+	OBB o = AABB(vec::nan, vec::nan);
 	assert(o.IsDegenerate());
 	assert(!o.IsFinite());
 
-	o = OBB(AABB(float3::zero, float3::nan));
+	o = OBB(AABB(vec::zero, vec::nan));
 	assert(o.IsDegenerate());
 	assert(!o.IsFinite());
 
-	o = OBB(AABB(float3::zero, float3::one));
+	o = OBB(AABB(vec::zero, vec::one));
 	assert(!o.IsDegenerate());
 	assert(o.IsFinite());
 
-	o = OBB(AABB(float3::zero, float3::inf));
+	o = OBB(AABB(vec::zero, vec::inf));
 	assert(!o.IsDegenerate());
 	assert(!o.IsFinite());
 
-	o = OBB(AABB(float3::zero, float3::zero));
+	o = OBB(AABB(vec::zero, vec::zero));
 	assert(o.IsDegenerate());
 	assert(o.IsFinite());
 
-	o = OBB(AABB(float3::zero, -float3::zero));
+	o = OBB(AABB(vec::zero, -vec::zero));
 	assert(o.IsDegenerate());
 	assert(o.IsFinite());
 
-	o = OBB(AABB(float3::zero, -float3::one));
+	o = OBB(AABB(vec::zero, -vec::one));
 	assert(o.IsDegenerate());
 	assert(o.IsFinite());
 
-	o = OBB(AABB(float3::zero, -float3::inf));
+	o = OBB(AABB(vec::zero, -vec::inf));
 	assert(o.IsDegenerate());
 	assert(!o.IsFinite());
 
-	o = OBB(AABB(float3::inf, -float3::inf));
+	o = OBB(AABB(vec::inf, -vec::inf));
 	assert(o.IsDegenerate());
 	assert(!o.IsFinite());
 
-	o = OBB(AABB(-float3::inf, float3::inf));
+	o = OBB(AABB(-vec::inf, vec::inf));
 	assert(!o.IsDegenerate());
 	assert(!o.IsFinite());
 }

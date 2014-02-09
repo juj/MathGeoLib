@@ -5,24 +5,24 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
-AABB RandomAABBContainingPoint(const float3 &pt, float maxSideLength)
+AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength)
 {
 	float w = rng.Float(1e-2f, maxSideLength);
 	float h = rng.Float(1e-2f, maxSideLength);
 	float d = rng.Float(1e-2f, maxSideLength);
 
-	AABB a(float3(0,0,0), float3(w,h,d));
+	AABB a(POINT_VEC(0, 0, 0), POINT_VEC(w, h, d));
 	w = rng.Float(1e-3f, w-1e-3f);
 	h = rng.Float(1e-3f, h-1e-3f);
 	d = rng.Float(1e-3f, d-1e-3f);
-	a.Translate(pt - float3(w,h,d));
+	a.Translate(pt - POINT_VEC(w, h, d));
 	assert(!a.IsDegenerate());
 	assert(a.IsFinite());
 	assert(a.Contains(pt));
 	return a;
 }
 
-OBB RandomOBBContainingPoint(const float3 &pt, float maxSideLength)
+OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength)
 {
 	AABB a = RandomAABBContainingPoint(pt, maxSideLength);
 	float3x4 rot = float3x4::RandomRotation(rng);
@@ -34,17 +34,17 @@ OBB RandomOBBContainingPoint(const float3 &pt, float maxSideLength)
 	return o;
 }
 
-Sphere RandomSphereContainingPoint(const float3 &pt, float maxRadius)
+Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius)
 {
 	Sphere s(pt, rng.Float(1.f, maxRadius));
-	s.pos += float3::RandomSphere(rng, float3::zero, Max(0.f, s.r - 1e-2f));
+	s.pos += vec::RandomSphere(rng, POINT_VEC_SCALAR(0.f), Max(0.f, s.r - 1e-2f));
 	assert(s.IsFinite());
 	assert(!s.IsDegenerate());
 	assert(s.Contains(pt));
 	return s;
 }
 
-Frustum RandomFrustumContainingPoint(const float3 &pt)
+Frustum RandomFrustumContainingPoint(const vec &pt)
 {
 	Frustum f;
 	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
@@ -67,11 +67,11 @@ Frustum RandomFrustumContainingPoint(const float3 &pt)
 	}
 	f.nearPlaneDistance = rng.Float(0.1f, SCALE);
 	f.farPlaneDistance = f.nearPlaneDistance + rng.Float(0.1f, SCALE);
-	f.pos = float3::zero;
-	f.front = float3::RandomDir(rng);
+	f.pos = POINT_VEC_SCALAR(0.f);
+	f.front = vec::RandomDir(rng);
 	f.up = f.front.RandomPerpendicular(rng);
 
-	float3 pt2 = f.UniformRandomPointInside(rng);
+	vec pt2 = f.UniformRandomPointInside(rng);
 	f.pos += pt - pt2;
 
 	assert(f.IsFinite());
@@ -80,9 +80,9 @@ Frustum RandomFrustumContainingPoint(const float3 &pt)
 	return f;
 }
 
-Line RandomLineContainingPoint(const float3 &pt)
+Line RandomLineContainingPoint(const vec &pt)
 {
-	float3 dir = float3::RandomDir(rng);
+	vec dir = vec::RandomDir(rng);
 	Line l(pt, dir);
 	l.pos = l.GetPoint(rng.Float(-SCALE, SCALE));
 	assert(l.IsFinite());
@@ -90,9 +90,9 @@ Line RandomLineContainingPoint(const float3 &pt)
 	return l;
 }
 
-Ray RandomRayContainingPoint(const float3 &pt)
+Ray RandomRayContainingPoint(const vec &pt)
 {
-	float3 dir = float3::RandomDir(rng);
+	vec dir = vec::RandomDir(rng);
 	Ray l(pt, dir);
 	l.pos = l.GetPoint(rng.Float(-SCALE, 0));
 	assert(l.IsFinite());
@@ -100,9 +100,9 @@ Ray RandomRayContainingPoint(const float3 &pt)
 	return l;
 }
 
-LineSegment RandomLineSegmentContainingPoint(const float3 &pt)
+LineSegment RandomLineSegmentContainingPoint(const vec &pt)
 {
-	float3 dir = float3::RandomDir(rng);
+	vec dir = vec::RandomDir(rng);
 	float a = rng.Float(0, SCALE);
 	float b = rng.Float(0, SCALE);
 	LineSegment l(pt + a*dir, pt - b*dir);
@@ -111,14 +111,14 @@ LineSegment RandomLineSegmentContainingPoint(const float3 &pt)
 	return l;
 }
 
-Capsule RandomCapsuleContainingPoint(const float3 &pt)
+Capsule RandomCapsuleContainingPoint(const vec &pt)
 {
-	float3 dir = float3::RandomDir(rng);
+	vec dir = vec::RandomDir(rng);
 	float a = rng.Float(0, SCALE);
 	float b = rng.Float(0, SCALE);
 	float r = rng.Float(0.001f, SCALE);
 	Capsule c(pt + a*dir, pt - b*dir, r);
-	float3 d = float3::RandomSphere(rng, float3::zero, c.r);
+	vec d = vec::RandomSphere(rng, vec::zero, c.r);
 	c.l.a += d;
 	c.l.b += d;
 	assert(c.IsFinite());
@@ -127,28 +127,28 @@ Capsule RandomCapsuleContainingPoint(const float3 &pt)
 	return c;
 }
 
-Plane RandomPlaneContainingPoint(const float3 &pt)
+Plane RandomPlaneContainingPoint(const vec &pt)
 {
-	float3 dir = float3::RandomDir(rng);
+	vec dir = vec::RandomDir(rng);
 	Plane p(pt, dir);
 	assert(!p.IsDegenerate());
 	return p;
 }
 
-Triangle RandomTriangleContainingPoint(const float3 &pt)
+Triangle RandomTriangleContainingPoint(const vec &pt)
 {
 	Plane p = RandomPlaneContainingPoint(pt);
-	float3 a = pt;
+	vec a = pt;
 	float f1 = rng.Float(-SCALE, SCALE);
 	float f2 = rng.Float(-SCALE, SCALE);
 	float f3 = rng.Float(-SCALE, SCALE);
 	float f4 = rng.Float(-SCALE, SCALE);
-	float3 b = p.Point(f1, f2);
-	float3 c = p.Point(f3, f4);
+	vec b = p.Point(f1, f2);
+	vec c = p.Point(f3, f4);
 	Triangle t(a,b,c);
 	assert(t.Contains(pt));
 
-	float3 d = t.RandomPointInside(rng);
+	vec d = t.RandomPointInside(rng);
 	assert(t.Contains(d));
 	d = d - t.a;
 	t.a -= d;
@@ -161,7 +161,7 @@ Triangle RandomTriangleContainingPoint(const float3 &pt)
 	return t;
 }
 
-Polyhedron RandomPolyhedronContainingPoint(const float3 &pt)
+Polyhedron RandomPolyhedronContainingPoint(const vec &pt)
 {
 	switch(rng.Int(0,7))
 	{
@@ -180,12 +180,12 @@ Polyhedron RandomPolyhedronContainingPoint(const float3 &pt)
 //	assert3(t.Contains(pt), t, pt, t.Distance(pt));
 }
 
-Polygon RandomPolygonContainingPoint(const float3 &pt)
+Polygon RandomPolygonContainingPoint(const vec &pt)
 {
 	Polyhedron p = RandomPolyhedronContainingPoint(pt);
 	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
 
-	float3 pt2 = poly.FastRandomPointInside(rng);
+	vec pt2 = poly.FastRandomPointInside(rng);
 	assert3(poly.Contains(pt2), poly, pt2, poly.Distance(pt2));
 	poly.Translate(pt - pt2);
 
@@ -200,7 +200,7 @@ Polygon RandomPolygonContainingPoint(const float3 &pt)
 
 RANDOMIZED_TEST(AABBAABBIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	AABB b = RandomAABBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
@@ -215,7 +215,7 @@ RANDOMIZED_TEST(AABBAABBIntersect)
 
 RANDOMIZED_TEST(AABBOBBIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
@@ -230,7 +230,7 @@ RANDOMIZED_TEST(AABBOBBIntersect)
 
 RANDOMIZED_TEST(AABBLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -245,7 +245,7 @@ RANDOMIZED_TEST(AABBLineIntersect)
 
 RANDOMIZED_TEST(AABBRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -260,7 +260,7 @@ RANDOMIZED_TEST(AABBRayIntersect)
 
 RANDOMIZED_TEST(AABBLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -275,7 +275,7 @@ RANDOMIZED_TEST(AABBLineSegmentIntersect)
 
 RANDOMIZED_TEST(AABBPlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -290,7 +290,7 @@ RANDOMIZED_TEST(AABBPlaneIntersect)
 
 RANDOMIZED_TEST(AABBSphereIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
 	assert(a.Intersects(b));
@@ -305,7 +305,7 @@ RANDOMIZED_TEST(AABBSphereIntersect)
 
 RANDOMIZED_TEST(AABBCapsuleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -320,7 +320,7 @@ RANDOMIZED_TEST(AABBCapsuleIntersect)
 
 RANDOMIZED_TEST(AABBTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -335,7 +335,7 @@ RANDOMIZED_TEST(AABBTriangleIntersect)
 
 RANDOMIZED_TEST(AABBFrustumIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -350,7 +350,7 @@ RANDOMIZED_TEST(AABBFrustumIntersect)
 
 RANDOMIZED_TEST(AABBPolyhedronIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -365,7 +365,7 @@ RANDOMIZED_TEST(AABBPolyhedronIntersect)
 
 RANDOMIZED_TEST(AABBPolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -383,7 +383,7 @@ RANDOMIZED_TEST(AABBPolygonIntersect)
 
 RANDOMIZED_TEST(OBBOBBIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
@@ -398,7 +398,7 @@ RANDOMIZED_TEST(OBBOBBIntersect)
 
 RANDOMIZED_TEST(OBBLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -413,7 +413,7 @@ RANDOMIZED_TEST(OBBLineIntersect)
 
 RANDOMIZED_TEST(OBBRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -428,7 +428,7 @@ RANDOMIZED_TEST(OBBRayIntersect)
 
 RANDOMIZED_TEST(OBBLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -443,7 +443,7 @@ RANDOMIZED_TEST(OBBLineSegmentIntersect)
 
 RANDOMIZED_TEST(OBBPlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -458,7 +458,7 @@ RANDOMIZED_TEST(OBBPlaneIntersect)
 
 RANDOMIZED_TEST(OBBSphereIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
 	assert(a.Intersects(b));
@@ -473,7 +473,7 @@ RANDOMIZED_TEST(OBBSphereIntersect)
 
 RANDOMIZED_TEST(OBBCapsuleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -488,7 +488,7 @@ RANDOMIZED_TEST(OBBCapsuleIntersect)
 
 RANDOMIZED_TEST(OBBTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -503,7 +503,7 @@ RANDOMIZED_TEST(OBBTriangleIntersect)
 
 RANDOMIZED_TEST(OBBFrustumIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -518,7 +518,7 @@ RANDOMIZED_TEST(OBBFrustumIntersect)
 
 RANDOMIZED_TEST(OBBPolyhedronIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -533,7 +533,7 @@ RANDOMIZED_TEST(OBBPolyhedronIntersect)
 
 RANDOMIZED_TEST(OBBPolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -552,7 +552,7 @@ RANDOMIZED_TEST(OBBPolygonIntersect)
 
 RANDOMIZED_TEST(SphereSphereIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
@@ -567,7 +567,7 @@ RANDOMIZED_TEST(SphereSphereIntersect)
 
 RANDOMIZED_TEST(SphereLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -582,7 +582,7 @@ RANDOMIZED_TEST(SphereLineIntersect)
 
 RANDOMIZED_TEST(SphereRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -597,7 +597,7 @@ RANDOMIZED_TEST(SphereRayIntersect)
 
 RANDOMIZED_TEST(SphereLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -612,7 +612,7 @@ RANDOMIZED_TEST(SphereLineSegmentIntersect)
 
 RANDOMIZED_TEST(SpherePlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -627,7 +627,7 @@ RANDOMIZED_TEST(SpherePlaneIntersect)
 
 RANDOMIZED_TEST(SphereCapsuleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -642,7 +642,7 @@ RANDOMIZED_TEST(SphereCapsuleIntersect)
 
 RANDOMIZED_TEST(SphereTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -657,7 +657,7 @@ RANDOMIZED_TEST(SphereTriangleIntersect)
 
 RANDOMIZED_TEST(SphereFrustumIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -672,7 +672,7 @@ RANDOMIZED_TEST(SphereFrustumIntersect)
 
 RANDOMIZED_TEST(SpherePolyhedronIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -687,7 +687,7 @@ RANDOMIZED_TEST(SpherePolyhedronIntersect)
 
 RANDOMIZED_TEST(SpherePolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -705,7 +705,7 @@ RANDOMIZED_TEST(SpherePolygonIntersect)
 
 RANDOMIZED_TEST(FrustumLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -720,7 +720,7 @@ RANDOMIZED_TEST(FrustumLineIntersect)
 
 RANDOMIZED_TEST(FrustumRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -735,7 +735,7 @@ RANDOMIZED_TEST(FrustumRayIntersect)
 
 RANDOMIZED_TEST(FrustumLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -750,7 +750,7 @@ RANDOMIZED_TEST(FrustumLineSegmentIntersect)
 
 RANDOMIZED_TEST(FrustumPlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -765,7 +765,7 @@ RANDOMIZED_TEST(FrustumPlaneIntersect)
 
 RANDOMIZED_TEST(FrustumCapsuleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -780,7 +780,7 @@ RANDOMIZED_TEST(FrustumCapsuleIntersect)
 
 RANDOMIZED_TEST(FrustumTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -795,7 +795,7 @@ RANDOMIZED_TEST(FrustumTriangleIntersect)
 
 RANDOMIZED_TEST(FrustumFrustumIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -810,7 +810,7 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 
 RANDOMIZED_TEST(FrustumPolyhedronIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -825,7 +825,7 @@ RANDOMIZED_TEST(FrustumPolyhedronIntersect)
 
 RANDOMIZED_TEST(FrustumPolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -843,7 +843,7 @@ RANDOMIZED_TEST(FrustumPolygonIntersect)
 
 RANDOMIZED_TEST(CapsuleLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -858,7 +858,7 @@ RANDOMIZED_TEST(CapsuleLineIntersect)
 
 RANDOMIZED_TEST(CapsuleRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -873,7 +873,7 @@ RANDOMIZED_TEST(CapsuleRayIntersect)
 
 RANDOMIZED_TEST(CapsuleLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -888,7 +888,7 @@ RANDOMIZED_TEST(CapsuleLineSegmentIntersect)
 
 RANDOMIZED_TEST(CapsulePlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -903,7 +903,7 @@ RANDOMIZED_TEST(CapsulePlaneIntersect)
 
 RANDOMIZED_TEST(CapsuleCapsuleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -918,7 +918,7 @@ RANDOMIZED_TEST(CapsuleCapsuleIntersect)
 
 RANDOMIZED_TEST(CapsuleTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -933,7 +933,7 @@ RANDOMIZED_TEST(CapsuleTriangleIntersect)
 
 RANDOMIZED_TEST(CapsulePolyhedronIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -948,7 +948,7 @@ RANDOMIZED_TEST(CapsulePolyhedronIntersect)
 
 RANDOMIZED_TEST(CapsulePolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -967,7 +967,7 @@ RANDOMIZED_TEST(CapsulePolygonIntersect)
 
 RANDOMIZED_TEST(PolyhedronLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -982,7 +982,7 @@ RANDOMIZED_TEST(PolyhedronLineIntersect)
 
 RANDOMIZED_TEST(PolyhedronRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -997,7 +997,7 @@ RANDOMIZED_TEST(PolyhedronRayIntersect)
 
 RANDOMIZED_TEST(PolyhedronLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1015,7 +1015,7 @@ RANDOMIZED_TEST(PolyhedronLineSegmentIntersect)
 
 RANDOMIZED_TEST(PolyhedronPlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1030,7 +1030,7 @@ RANDOMIZED_TEST(PolyhedronPlaneIntersect)
 
 RANDOMIZED_TEST(PolyhedronTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1045,7 +1045,7 @@ RANDOMIZED_TEST(PolyhedronTriangleIntersect)
 
 RANDOMIZED_TEST(PolyhedronPolyhedronIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1060,7 +1060,7 @@ RANDOMIZED_TEST(PolyhedronPolyhedronIntersect)
 
 RANDOMIZED_TEST(PolyhedronPolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1077,7 +1077,7 @@ RANDOMIZED_TEST(PolyhedronPolygonIntersect)
 
 RANDOMIZED_TEST(PolygonLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1092,7 +1092,7 @@ RANDOMIZED_TEST(PolygonLineIntersect)
 
 RANDOMIZED_TEST(PolygonRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1107,7 +1107,7 @@ RANDOMIZED_TEST(PolygonRayIntersect)
 
 RANDOMIZED_TEST(PolygonLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1122,7 +1122,7 @@ RANDOMIZED_TEST(PolygonLineSegmentIntersect)
 
 RANDOMIZED_TEST(PolygonPlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1137,7 +1137,7 @@ RANDOMIZED_TEST(PolygonPlaneIntersect)
 
 RANDOMIZED_TEST(PolygonTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1152,7 +1152,7 @@ RANDOMIZED_TEST(PolygonTriangleIntersect)
 
 RANDOMIZED_TEST(PolygonPolygonIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1169,7 +1169,7 @@ RANDOMIZED_TEST(PolygonPolygonIntersect)
 
 RANDOMIZED_TEST(TriangleLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1184,7 +1184,7 @@ RANDOMIZED_TEST(TriangleLineIntersect)
 
 RANDOMIZED_TEST(TriangleRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1199,7 +1199,7 @@ RANDOMIZED_TEST(TriangleRayIntersect)
 
 RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1214,7 +1214,7 @@ RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 
 RANDOMIZED_TEST(TrianglePlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1229,7 +1229,7 @@ RANDOMIZED_TEST(TrianglePlaneIntersect)
 
 RANDOMIZED_TEST(TriangleTriangleIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1247,7 +1247,7 @@ RANDOMIZED_TEST(TriangleTriangleIntersect)
 
 RANDOMIZED_TEST(PlaneLineIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1262,7 +1262,7 @@ RANDOMIZED_TEST(PlaneLineIntersect)
 
 RANDOMIZED_TEST(PlaneRayIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1277,7 +1277,7 @@ RANDOMIZED_TEST(PlaneRayIntersect)
 
 RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
@@ -1292,7 +1292,7 @@ RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 
 RANDOMIZED_TEST(PlanePlaneIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
 	if (a.normal.Equals(b.normal))
@@ -1311,7 +1311,7 @@ RANDOMIZED_TEST(PlanePlaneIntersect)
 
 RANDOMIZED_TEST(RayTriangleMeshIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	TriangleMesh tm;
 	tm.Set(a);
@@ -1323,7 +1323,7 @@ RANDOMIZED_TEST(RayTriangleMeshIntersect)
 
 RANDOMIZED_TEST(RayKdTreeIntersect)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	KdTree<Triangle> t;
 	std::vector<Triangle> tris = a.Triangulate();
@@ -1344,12 +1344,12 @@ TEST(PolygonContains2D)
 {
 	float xmin = 0.f, xmax = 10.f, ymin = 0.f, ymax = 10.f, z = 2.f;
 
-	float3 point = float3((xmax-xmin)/2,(ymax-ymin)/2,z);
+	vec point = POINT_VEC((xmax-xmin)/2,(ymax-ymin)/2,z);
 	Polygon pol;
-	pol.p.push_back(float3(xmin,ymin,z));
-	pol.p.push_back(float3(xmax,ymin,z));
-	pol.p.push_back(float3(xmax,ymax,z));
-	pol.p.push_back(float3(xmin,ymax,z));
+	pol.p.push_back(POINT_VEC(xmin, ymin, z));
+	pol.p.push_back(POINT_VEC(xmax, ymin, z));
+	pol.p.push_back(POINT_VEC(xmax, ymax, z));
+	pol.p.push_back(POINT_VEC(xmin, ymax, z));
 
 	assert(pol.Contains(point));
 }

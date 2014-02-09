@@ -346,7 +346,7 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 	{
 		KdTreeNode *node;
 		float t;
-		float3 pos; // entry/exit point coordinates
+		vec pos; // entry/exit point coordinates
 		StackPtr prev; // index (pointer) to the previous item in stack.
 	};
 
@@ -672,7 +672,7 @@ struct NearestObjectsTraversalNode
 
 template<typename T>
 template<typename Func>
-inline void KdTree<T>::NearestObjects(const float3 &point, Func &leafCallback)
+inline void KdTree<T>::NearestObjects(const vec &point, Func &leafCallback)
 {
 	MaxHeap<NearestObjectsTraversalNode> queue;
 	NearestObjectsTraversalNode t;

@@ -5,27 +5,27 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
-Line RandomLineContainingPoint(const float3 &pt);
-Ray RandomRayContainingPoint(const float3 &pt);
-LineSegment RandomLineSegmentContainingPoint(const float3 &pt);
+Line RandomLineContainingPoint(const vec &pt);
+Ray RandomRayContainingPoint(const vec &pt);
+LineSegment RandomLineSegmentContainingPoint(const vec &pt);
 
 RANDOMIZED_TEST(LineLineClosestPoint)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec pt2 = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Line a = RandomLineContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt2);
 
 	float d, d2;
-	float3 closestPointA = a.ClosestPoint(b, &d, &d2);
+	vec closestPointA = a.ClosestPoint(b, &d, &d2);
 	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
-	float3 closestPointB = b.GetPoint(d2);
+	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
-	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
+	vec closestPointB2 = b.ClosestPoint(a, &D, &D2);
 	assert2(EqualAbs(d, D2, 1e-2f), d, D2);
 	assert2(EqualAbs(D, d2, 1e-2f), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
-	float3 closestPointA2 = a.GetPoint(D2);
+	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
@@ -35,21 +35,21 @@ RANDOMIZED_TEST(LineLineClosestPoint)
 
 RANDOMIZED_TEST(LineRayClosestPoint)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec pt2 = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Line a = RandomLineContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt2);
 
 	float d, d2;
-	float3 closestPointA = a.ClosestPoint(b, &d, &d2);
+	vec closestPointA = a.ClosestPoint(b, &d, &d2);
 	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
-	float3 closestPointB = b.GetPoint(d2);
+	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
-	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
+	vec closestPointB2 = b.ClosestPoint(a, &D, &D2);
 	assert2(EqualAbs(d, D2), d, D2);
 	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
-	float3 closestPointA2 = a.GetPoint(D2);
+	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
@@ -62,21 +62,21 @@ RANDOMIZED_TEST(LineRayClosestPoint)
 
 RANDOMIZED_TEST(LineLineSegmentClosestPoint)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec pt2 = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Line a = RandomLineContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt2);
 
 	float d, d2;
-	float3 closestPointA = a.ClosestPoint(b, &d, &d2);
+	vec closestPointA = a.ClosestPoint(b, &d, &d2);
 	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
-	float3 closestPointB = b.GetPoint(d2);
+	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
-	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
+	vec closestPointB2 = b.ClosestPoint(a, &D, &D2);
 	assert2(EqualAbs(d, D2), d, D2);
 	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
-	float3 closestPointA2 = a.GetPoint(D2);
+	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
@@ -91,21 +91,21 @@ RANDOMIZED_TEST(LineLineSegmentClosestPoint)
 
 RANDOMIZED_TEST(RayRayClosestPoint)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec pt2 = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Ray a = RandomRayContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt2);
 
 	float d, d2;
-	float3 closestPointA = a.ClosestPoint(b, &d, &d2);
+	vec closestPointA = a.ClosestPoint(b, &d, &d2);
 	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
-	float3 closestPointB = b.GetPoint(d2);
+	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
-	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
+	vec closestPointB2 = b.ClosestPoint(a, &D, &D2);
 	assert2(EqualAbs(d, D2), d, D2);
 	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
-	float3 closestPointA2 = a.GetPoint(D2);
+	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
@@ -121,21 +121,21 @@ RANDOMIZED_TEST(RayRayClosestPoint)
 
 RANDOMIZED_TEST(RayLineSegmentClosestPoint)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec pt2 = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Ray a = RandomRayContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt2);
 
 	float d, d2;
-	float3 closestPointA = a.ClosestPoint(b, &d, &d2);
+	vec closestPointA = a.ClosestPoint(b, &d, &d2);
 	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
-	float3 closestPointB = b.GetPoint(d2);
+	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
-	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
+	vec closestPointB2 = b.ClosestPoint(a, &D, &D2);
 	assert2(EqualAbs(d, D2), d, D2);
 	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
-	float3 closestPointA2 = a.GetPoint(D2);
+	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
@@ -153,21 +153,21 @@ RANDOMIZED_TEST(RayLineSegmentClosestPoint)
 
 RANDOMIZED_TEST(LineSegmentLineSegmentClosestPoint)
 {
-	float3 pt = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
-	float3 pt2 = float3::RandomBox(rng, -float3(SCALE,SCALE,SCALE), float3(SCALE,SCALE,SCALE));
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec pt2 = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	LineSegment a = RandomLineSegmentContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt2);
 
 	float d, d2;
-	float3 closestPointA = a.ClosestPoint(b, &d, &d2);
+	vec closestPointA = a.ClosestPoint(b, &d, &d2);
 	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
-	float3 closestPointB = b.GetPoint(d2);
+	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
-	float3 closestPointB2 = b.ClosestPoint(a, &D, &D2);
+	vec closestPointB2 = b.ClosestPoint(a, &D, &D2);
 	assert2(EqualAbs(d, D2), d, D2);
 	assert2(EqualAbs(D, d2), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-2f));
-	float3 closestPointA2 = a.GetPoint(D2);
+	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-2f));
 
 	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
