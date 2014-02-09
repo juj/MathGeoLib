@@ -1147,10 +1147,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 /// See http://paulbourke.net/geometry/platonic/
 Polyhedron Polyhedron::Tetrahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
-	const vec vertices[4] = { POINT_VEC(1,1,1),
-		POINT_VEC(-1, 1, -1),
-		POINT_VEC(1, -1, -1),
-		POINT_VEC(-1, -1, 1) };
+	const vec vertices[4] = { DIR_VEC(1, 1, 1),
+		DIR_VEC(-1, 1, -1),
+		DIR_VEC(1, -1, -1),
+		DIR_VEC(-1, -1, 1) };
 	const int faces[4][3] = { { 0, 1, 2 },
 	                          { 1, 3, 2 },
 	                          { 0, 2, 3 },
@@ -1182,12 +1182,12 @@ Polyhedron Polyhedron::Octahedron(const vec &centerPos, float scale, bool ccwIsF
 	float a = 1.f / (2.f * Sqrt(2.f));
 	float b = 0.5f;
 
-	const vec vertices[6] = { POINT_VEC(-a, 0, a),
-		POINT_VEC(-a, 0, -a),
-		POINT_VEC(0, b, 0),
-		POINT_VEC(a, 0, -a),
-		POINT_VEC(0, -b, 0),
-		POINT_VEC(a, 0, a) };
+	const vec vertices[6] = { DIR_VEC(-a, 0, a),
+		DIR_VEC(-a, 0, -a),
+		DIR_VEC(0, b, 0),
+		DIR_VEC(a, 0, -a),
+		DIR_VEC(0, -b, 0),
+		DIR_VEC(a, 0, a) };
 	const int faces[8][3] = { { 0, 1, 2 },
 	                          { 1, 3, 2 },
 	                          { 3, 5, 2 },
@@ -1220,7 +1220,7 @@ Polyhedron Polyhedron::Octahedron(const vec &centerPos, float scale, bool ccwIsF
 /// See http://paulbourke.net/geometry/platonic/
 Polyhedron Polyhedron::Hexahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
-	AABB aabb(POINT_VEC(-1,-1,-1), POINT_VEC(1,1,1));
+	AABB aabb(DIR_VEC(-1, -1, -1), DIR_VEC(1, 1, 1));
 	aabb.Scale(POINT_VEC_SCALAR(0.f), scale * 0.5f);
 	aabb.Translate(centerPos);
 	Polyhedron p = aabb.ToPolyhedron();
@@ -1236,18 +1236,18 @@ Polyhedron Polyhedron::Icosahedron(const vec &centerPos, float scale, bool ccwIs
 	float phi = (1.f + Sqrt(5.f)) * 0.5f;
 	float b = 1.f / (2.f * phi);
 
-	const vec vertices[12] = { POINT_VEC( 0,  b, -a),
-		POINT_VEC(b, a, 0),
-		POINT_VEC(-b, a, 0),
-		POINT_VEC(0, b, a),
-		POINT_VEC(0, -b, a),
-		POINT_VEC(-a, 0, b),
-		POINT_VEC(a, 0, b),
-		POINT_VEC(0, -b, -a),
-		POINT_VEC(-a, 0, -b),
-		POINT_VEC(-b, -a, 0),
-		POINT_VEC(b, -a, 0),
-		POINT_VEC(a, 0, -b) };
+	const vec vertices[12] = { DIR_VEC( 0,  b, -a),
+		DIR_VEC(b, a, 0),
+		DIR_VEC(-b, a, 0),
+		DIR_VEC(0, b, a),
+		DIR_VEC(0, -b, a),
+		DIR_VEC(-a, 0, b),
+		DIR_VEC(a, 0, b),
+		DIR_VEC(0, -b, -a),
+		DIR_VEC(-a, 0, -b),
+		DIR_VEC(-b, -a, 0),
+		DIR_VEC(b, -a, 0),
+		DIR_VEC(a, 0, -b) };
 	const int faces[20][3] = { { 0,  1,  2 },
 	                           { 3,  2,  1 },
 	                           { 3,  4,  5 },
@@ -1295,26 +1295,26 @@ Polyhedron Polyhedron::Dodecahedron(const vec &centerPos, float scale, bool ccwI
 	float b = 1.f / phi;
 	float c = 2.f - phi;
 
-	const vec vertices[20] = { POINT_VEC( c,  0,  1),
-		POINT_VEC(-c, 0, 1),
-		POINT_VEC(-b, b, b),
-		POINT_VEC(0, 1, c),
-		POINT_VEC(b, b, b),
-		POINT_VEC(b, -b, b),
-		POINT_VEC(0, -1, c),
-		POINT_VEC(-b, -b, b),
-		POINT_VEC(0, -1, -c),
-		POINT_VEC(b, -b, -b),
-		POINT_VEC(-c, 0, -1),
-		POINT_VEC(c, 0, -1),
-		POINT_VEC(-b, -b, -b),
-		POINT_VEC(b, b, -b),
-		POINT_VEC(0, 1, -c),
-		POINT_VEC(-b, b, -b),
-		POINT_VEC(1, c, 0),
-		POINT_VEC(-1, c, 0),
-		POINT_VEC(-1, -c, 0),
-		POINT_VEC(1, -c, 0) };
+	const vec vertices[20] = { DIR_VEC( c,  0,  1),
+		DIR_VEC(-c, 0, 1),
+		DIR_VEC(-b, b, b),
+		DIR_VEC(0, 1, c),
+		DIR_VEC(b, b, b),
+		DIR_VEC(b, -b, b),
+		DIR_VEC(0, -1, c),
+		DIR_VEC(-b, -b, b),
+		DIR_VEC(0, -1, -c),
+		DIR_VEC(b, -b, -b),
+		DIR_VEC(-c, 0, -1),
+		DIR_VEC(c, 0, -1),
+		DIR_VEC(-b, -b, -b),
+		DIR_VEC(b, b, -b),
+		DIR_VEC(0, 1, -c),
+		DIR_VEC(-b, b, -b),
+		DIR_VEC(1, c, 0),
+		DIR_VEC(-1, c, 0),
+		DIR_VEC(-1, -c, 0),
+		DIR_VEC(1, -c, 0) };
 
 	const int faces[12][5] = { {  0,  1,  2,  3,  4 },
 	                           {  1,  0,  5,  6,  7 },

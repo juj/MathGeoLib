@@ -78,13 +78,10 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 	assume(m.IsColOrthogonal()); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
 	assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
 	obb.pos = m.MulPos(aabb.CenterPoint());
-	vec size = aabb.HalfSize();
+	obb.r = aabb.HalfSize();
 	obb.axis[0] = DIR_VEC(m.Col(0));
 	obb.axis[1] = DIR_VEC(m.Col(1));
 	obb.axis[2] = DIR_VEC(m.Col(2));
-	obb.r.x = size.x;
-	obb.r.y = size.y;
-	obb.r.z = size.z;
 	// If the matrix m contains scaling, propagate the scaling from the axis vectors to the half-length vectors,
 	// since we want to keep the axis vectors always normalized in our representation.
 	float matrixScale = obb.axis[0].LengthSq();

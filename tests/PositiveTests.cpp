@@ -19,6 +19,10 @@ AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength)
 	assert(!a.IsDegenerate());
 	assert(a.IsFinite());
 	assert(a.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(a.minPoint.w, 1.f);
+	asserteq(a.maxPoint.w, 1.f);
+#endif
 	return a;
 }
 
@@ -31,16 +35,26 @@ OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength)
 	assert1(!o.IsDegenerate(), o);
 	assert(o.IsFinite());
 	assert(o.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(o.pos.w, 1.f);
+	asserteq(o.r.w, 0.f);
+	asserteq(o.axis[0].w, 0.f);
+	asserteq(o.axis[1].w, 0.f);
+	asserteq(o.axis[2].w, 0.f);
+#endif
 	return o;
 }
 
 Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius)
 {
 	Sphere s(pt, rng.Float(1.f, maxRadius));
-	s.pos += vec::RandomSphere(rng, POINT_VEC_SCALAR(0.f), Max(0.f, s.r - 1e-2f));
+	s.pos += vec::RandomDir(rng, Max(0.f, s.r - 1e-2f));
 	assert(s.IsFinite());
 	assert(!s.IsDegenerate());
 	assert(s.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(s.pos.w, 1.f);
+#endif
 	return s;
 }
 
@@ -77,6 +91,11 @@ Frustum RandomFrustumContainingPoint(const vec &pt)
 	assert(f.IsFinite());
 //	assert(!f.IsDegenerate());
 	assert(f.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(f.pos.w, 1.f);
+	asserteq(f.front.w, 0.f);
+	asserteq(f.up.w, 0.f);
+#endif
 	return f;
 }
 
@@ -87,6 +106,10 @@ Line RandomLineContainingPoint(const vec &pt)
 	l.pos = l.GetPoint(rng.Float(-SCALE, SCALE));
 	assert(l.IsFinite());
 	assert(l.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(l.pos.w, 1.f);
+	asserteq(l.dir.w, 0.f);
+#endif
 	return l;
 }
 
@@ -97,6 +120,10 @@ Ray RandomRayContainingPoint(const vec &pt)
 	l.pos = l.GetPoint(rng.Float(-SCALE, 0));
 	assert(l.IsFinite());
 	assert(l.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(l.pos.w, 1.f);
+	asserteq(l.dir.w, 0.f);
+#endif
 	return l;
 }
 
@@ -108,6 +135,10 @@ LineSegment RandomLineSegmentContainingPoint(const vec &pt)
 	LineSegment l(pt + a*dir, pt - b*dir);
 	assert(l.IsFinite());
 	assert(l.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(l.a.w, 1.f);
+	asserteq(l.b.w, 1.f);
+#endif
 	return l;
 }
 
@@ -123,6 +154,10 @@ Capsule RandomCapsuleContainingPoint(const vec &pt)
 	c.l.b += d;
 	assert(c.IsFinite());
 	assert(c.Contains(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(c.l.a.w, 1.f);
+	asserteq(c.l.b.w, 1.f);
+#endif
 
 	return c;
 }
@@ -132,6 +167,9 @@ Plane RandomPlaneContainingPoint(const vec &pt)
 	vec dir = vec::RandomDir(rng);
 	Plane p(pt, dir);
 	assert(!p.IsDegenerate());
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(p.normal.w, 0.f);
+#endif
 	return p;
 }
 
@@ -158,23 +196,33 @@ Triangle RandomTriangleContainingPoint(const vec &pt)
 	assert1(t.IsFinite(), t);
 	assert1(!t.IsDegenerate(), t);
 	assert3(t.Contains(pt), t, pt, t.Distance(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	asserteq(t.a.w, 1.f);
+	asserteq(t.b.w, 1.f);
+	asserteq(t.c.w, 1.f);
+#endif
 	return t;
 }
 
 Polyhedron RandomPolyhedronContainingPoint(const vec &pt)
 {
+	Polyhedron p;
 	switch(rng.Int(0,7))
 	{
-	case 0: return RandomAABBContainingPoint(pt, SCALE).ToPolyhedron();
-	case 1: return RandomOBBContainingPoint(pt, SCALE).ToPolyhedron();
-	case 2: return RandomFrustumContainingPoint(pt).ToPolyhedron();
-	case 3: return Polyhedron::Tetrahedron(pt, SCALE); break;
-	case 4: return Polyhedron::Octahedron(pt, SCALE); break;
-	case 5: return Polyhedron::Hexahedron(pt, SCALE); break;
-	case 6: return Polyhedron::Icosahedron(pt, SCALE); break;
-	default: return Polyhedron::Dodecahedron(pt, SCALE); break;
+	case 0: p = RandomAABBContainingPoint(pt, SCALE).ToPolyhedron(); break;
+	case 1: p = RandomOBBContainingPoint(pt, SCALE).ToPolyhedron(); break;
+	case 2: p = RandomFrustumContainingPoint(pt).ToPolyhedron(); break;
+	case 3: p = Polyhedron::Tetrahedron(pt, SCALE); break;
+	case 4: p = Polyhedron::Octahedron(pt, SCALE); break;
+	case 5: p = Polyhedron::Hexahedron(pt, SCALE); break;
+	case 6: p = Polyhedron::Icosahedron(pt, SCALE); break;
+	default: p = Polyhedron::Dodecahedron(pt, SCALE); break;
 	}
-
+#ifdef MATH_AUTOMATIC_SSE
+	for (int i = 0; i < p.NumVertices(); ++i)
+		asserteq(p.Vertex(i).w, 1.f);
+#endif
+	return p;
 //	assert1(t.IsFinite(), t);
 //	assert1(!t.IsDegenerate(), t);
 //	assert3(t.Contains(pt), t, pt, t.Distance(pt));
@@ -194,6 +242,10 @@ Polygon RandomPolygonContainingPoint(const vec &pt)
 	assert1(poly.IsPlanar(), poly);
 	assert1(poly.IsFinite(), poly);
 	assert3(poly.Contains(pt), poly, pt, poly.Distance(pt));
+#ifdef MATH_AUTOMATIC_SSE
+	for (int i = 0; i < poly.NumVertices(); ++i)
+		asserteq(poly.Vertex(i).w, 1.f);
+#endif
 
 	return poly;
 }

@@ -11,9 +11,10 @@ AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 	float h = rng.Float(0, maxSideLength);
 	float d = rng.Float(0, maxSideLength);
 
-	AABB a(POINT_VEC(0,0,0), POINT_VEC(w,h,d));
+	AABB a(DIR_VEC(0, 0, 0), DIR_VEC(w, h, d)); // Store with w == 0, the translate below will set the origin and w=1.
 
-	a.Translate(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)));
+	vec origin = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	a.Translate(origin);
 
 	vec aabbExtremePoint = a.ExtremePoint(-plane.normal);
 	float distance = plane.Distance(aabbExtremePoint);
