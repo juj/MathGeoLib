@@ -979,8 +979,9 @@ void AABB::Enclose(const OBB &obb)
 
 void AABB::Enclose(const Sphere &sphere)
 {
-	Enclose(sphere.pos - POINT_VEC(sphere.r, sphere.r, sphere.r));
-	Enclose(sphere.pos + POINT_VEC(sphere.r, sphere.r, sphere.r));
+	vec d = POINT_VEC_SCALAR(sphere.r);
+	Enclose(sphere.pos - d);
+	Enclose(sphere.pos + d);
 }
 
 void AABB::Enclose(const Triangle &triangle)
@@ -992,10 +993,11 @@ void AABB::Enclose(const Triangle &triangle)
 
 void AABB::Enclose(const Capsule &capsule)
 {
-	Enclose(capsule.l.a - POINT_VEC(capsule.r, capsule.r, capsule.r));
-	Enclose(capsule.l.a + POINT_VEC(capsule.r, capsule.r, capsule.r));
-	Enclose(capsule.l.b - POINT_VEC(capsule.r, capsule.r, capsule.r));
-	Enclose(capsule.l.b + POINT_VEC(capsule.r, capsule.r, capsule.r));
+	vec d = POINT_VEC_SCALAR(capsule.r);
+	Enclose(capsule.l.a - d);
+	Enclose(capsule.l.a + d);
+	Enclose(capsule.l.b - d);
+	Enclose(capsule.l.b + d);
 }
 
 void AABB::Enclose(const Frustum &frustum)
