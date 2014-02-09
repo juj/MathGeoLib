@@ -32,7 +32,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 //	TRACESTART(RayTriMeshIntersectAVX);
 
 	assert(sizeof(float3) == 3*sizeof(float));
-	assert(sizeof(Triangle) == 3*sizeof(float3));
+	assert(sizeof(Triangle) == 3*sizeof(vec));
 #ifdef _DEBUG
 	assert(vertexDataLayout == 2); // Must be SoA8 structured!
 #endif

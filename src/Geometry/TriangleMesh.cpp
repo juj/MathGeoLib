@@ -192,14 +192,14 @@ void TriangleMesh::Set(const Polyhedron &polyhedron)
 	}
 }
 
-void TriangleMesh::Set(const float *triangleMesh, int numTriangles)
+void TriangleMesh::Set(const float *triangleMesh, int numTriangles, int vertexSizeBytes)
 {
 	if (simdCapability == SIMD_AVX)
-		SetSoA8(triangleMesh, numTriangles);
+		SetSoA8(triangleMesh, numTriangles, vertexSizeBytes);
 	else if (simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2)
-		SetSoA4(triangleMesh, numTriangles);
+		SetSoA4(triangleMesh, numTriangles, vertexSizeBytes);
 	else
-		SetAoS(triangleMesh, numTriangles);
+		SetAoS(triangleMesh, numTriangles, vertexSizeBytes);
 }
 
 float TriangleMesh::IntersectRay(const Ray &ray) const
@@ -266,23 +266,37 @@ void TriangleMesh::ReallocVertexBuffer(int numTris)
 	numTriangles = numTris;
 }
 
-void TriangleMesh::SetAoS(const float *vertexData, int numTriangles)
+void TriangleMesh::SetAoS(const float *vertexData, int numTriangles, int vertexSizeBytes)
 {
 	ReallocVertexBuffer(numTriangles);
 #ifdef _DEBUG
 	vertexDataLayout = 0; // AoS
 #endif
 
-	memcpy(data, vertexData, numTriangles*3*3*4);
+	if (vertexSizeBytes == 12)
+		memcpy(data, vertexData, numTriangles*3*3*4);
+	else
+	{
+		assert(vertexSizeBytes % 4 == 0);
+		int vertexSizeFloats = vertexSizeBytes / 4;
+		for (int i = 0; i < numTriangles * 3; ++i)
+		{
+			data[i * 3] = vertexData[i*vertexSizeFloats];
+			data[i * 3 + 1] = vertexData[i*vertexSizeFloats + 1];
+			data[i * 3 + 2] = vertexData[i*vertexSizeFloats + 2];
+		}
+	}
 }
 
-void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles)
+void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles, int vertexSizeBytes)
 {
 	ReallocVertexBuffer(numTriangles);
 #ifdef _DEBUG
 	vertexDataLayout = 1; // SoA4
 #endif
 
+	assert(vertexSizeBytes % 4 == 0);
+	int strideFloats = vertexSizeBytes / 4;
 	assert(numTriangles % 4 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
@@ -294,12 +308,12 @@ void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles)
 		for(int j = 0; j < 9; ++j)
 		{
 			*o++ = vertexData[0];
-			*o++ = vertexData[9];
-			*o++ = vertexData[18];
-			*o++ = vertexData[27];
+			*o++ = vertexData[3 * strideFloats];
+			*o++ = vertexData[6 * strideFloats];
+			*o++ = vertexData[9 * strideFloats];
 			++vertexData;
 		}
-		vertexData += 9 * 3;
+		vertexData += 9 * strideFloats;
 	}
 
 #ifdef SOA_HAS_EDGES
@@ -315,13 +329,15 @@ void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles)
 #endif
 }
 
-void TriangleMesh::SetSoA8(const float *vertexData, int numTriangles)
+void TriangleMesh::SetSoA8(const float *vertexData, int numTriangles, int vertexSizeBytes)
 {
 	ReallocVertexBuffer(numTriangles);
 #ifdef _DEBUG
 	vertexDataLayout = 2; // SoA8
 #endif
 
+	assert(vertexSizeBytes % 4 == 0);
+	int strideFloats = vertexSizeBytes / 4;
 	assert(numTriangles % 8 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
@@ -333,16 +349,16 @@ void TriangleMesh::SetSoA8(const float *vertexData, int numTriangles)
 		for(int j = 0; j < 9; ++j)
 		{
 			*o++ = vertexData[0];
-			*o++ = vertexData[9];
-			*o++ = vertexData[18];
-			*o++ = vertexData[27];
-			*o++ = vertexData[36];
-			*o++ = vertexData[45];
-			*o++ = vertexData[54];
-			*o++ = vertexData[63];
+			*o++ = vertexData[3 * strideFloats];
+			*o++ = vertexData[6 * strideFloats];
+			*o++ = vertexData[9 * strideFloats];
+			*o++ = vertexData[12 * strideFloats];
+			*o++ = vertexData[15 * strideFloats];
+			*o++ = vertexData[18 * strideFloats];
+			*o++ = vertexData[21 * strideFloats];
 			++vertexData;
 		}
-		vertexData += 9 * 7;
+		vertexData += 21 * strideFloats;
 	}
 
 #ifdef SOA_HAS_EDGES
