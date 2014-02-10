@@ -730,6 +730,7 @@ MATH_BEGIN_NAMESPACE
 
 #ifdef MATH_AUTOMATIC_SSE
 bool EqualAbs(float a, float b, float epsilon);
+#define MATH_VEC_IS_FLOAT4
 typedef float4 vec;
 #define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
 #define DIR_VEC(...) float4(__VA_ARGS__, 0.f)

@@ -73,14 +73,14 @@ RANDOMIZED_TEST(Float3x4TransformFloat4)
 	float3x4 rot = Quat::RandomRotation(rng).ToFloat3x4();
 	float4 newDir = rot.Transform(DIR_TO_FLOAT4(l.dir));
 	assert(newDir.w == 0.f);
-	l.dir = DIR_TO_FLOAT4(newDir);
+	l.dir = FLOAT4_TO_DIR(newDir);
 	assert(l.dir.IsNormalized(1e-1f));
 	l.dir.Normalize();
 	pt = rot.Transform(pt);
 	assert(pt.w == 1.f);
-	float d = l.Distance(pt);
+	float d = l.Distance(FLOAT4_TO_POINT(pt));
 	assert(EqualAbs(d, 0.f));
-	assert(l.Contains(pt));
+	assert(l.Contains(FLOAT4_TO_POINT(pt)));
 }
 
 RANDOMIZED_TEST(Float3x4TransformPosDir)

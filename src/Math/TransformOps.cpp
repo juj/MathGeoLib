@@ -120,7 +120,7 @@ ScaleOp::ScaleOp(const float3 &scale)
 }
 
 ScaleOp::ScaleOp(const float4 &scale)
-:scale(scale)
+:scale(FLOAT4_TO_DIR(scale))
 {
 }
 
@@ -225,9 +225,9 @@ float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
 	ret.row[2] = _mm_mul_ps(rhs.row[2], z);
 	ret.row[3] = rhs.row[3];
 #else
-	ret[0][0] = rhs[0][0] * lhs.x; ret[0][1] = rhs[0][1] * lhs.x; ret[0][2] = rhs[0][2] * lhs.x; ret[0][3] = rhs[0][3] * lhs.x;
-	ret[1][0] = rhs[1][0] * lhs.y; ret[1][1] = rhs[1][1] * lhs.y; ret[1][2] = rhs[1][2] * lhs.y; ret[1][3] = rhs[1][3] * lhs.y;
-	ret[2][0] = rhs[2][0] * lhs.z; ret[2][1] = rhs[2][1] * lhs.z; ret[2][2] = rhs[2][2] * lhs.z; ret[2][3] = rhs[2][3] * lhs.z;
+	ret[0][0] = rhs[0][0] * lhs.scale.x; ret[0][1] = rhs[0][1] * lhs.scale.x; ret[0][2] = rhs[0][2] * lhs.scale.x; ret[0][3] = rhs[0][3] * lhs.scale.x;
+	ret[1][0] = rhs[1][0] * lhs.scale.y; ret[1][1] = rhs[1][1] * lhs.scale.y; ret[1][2] = rhs[1][2] * lhs.scale.y; ret[1][3] = rhs[1][3] * lhs.scale.y;
+	ret[2][0] = rhs[2][0] * lhs.scale.z; ret[2][1] = rhs[2][1] * lhs.scale.z; ret[2][2] = rhs[2][2] * lhs.scale.z; ret[2][3] = rhs[2][3] * lhs.scale.z;
 	ret[3][0] = rhs[3][0];         ret[3][1] = rhs[3][1];         ret[3][2] = rhs[3][2];         ret[3][3] = rhs[3][3];
 #endif
 	mathassert(ret.Equals(lhs.ToFloat4x4() * rhs));

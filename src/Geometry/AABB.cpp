@@ -547,9 +547,11 @@ OBB AABB::Transform(const Quat &transform) const
 
 vec AABB::ClosestPoint(const vec &targetPoint) const
 {
+#ifdef MATH_VEC_IS_FLOAT4
 	assume(EqualAbs(minPoint.w, 1.f));
 	assume(EqualAbs(maxPoint.w, 1.f));
 	assume(EqualAbs(targetPoint.w, 1.f));
+#endif
 	return targetPoint.Clamp(minPoint, maxPoint);
 }
 

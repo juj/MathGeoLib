@@ -347,9 +347,9 @@ vec Frustum::PointInside(float x, float y, float z) const
 
 vec Frustum::Project(const vec &point) const
 {
-	float4 projectedPoint = ViewProjMatrix().Mul(point);
+	float4 projectedPoint = ViewProjMatrix().Mul(POINT_TO_FLOAT4(point));
 	projectedPoint /= projectedPoint.w; // Post-projective perspective divide.
-	return projectedPoint;
+	return FLOAT4_TO_POINT(projectedPoint);
 }
 
 bool Frustum::Contains(const vec &point) const

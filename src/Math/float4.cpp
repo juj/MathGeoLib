@@ -1049,7 +1049,7 @@ bool float4::Equals(float x_, float y_, float z_, float w_, float epsilon) const
 
 float4 float4::RandomDir(LCG &lcg, float length)
 {
-	return Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg) - POINT_VEC_SCALAR(0.f);
+	return DIR_TO_FLOAT4(Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg) - POINT_VEC_SCALAR(0.f));
 }
 
 float4 MUST_USE_RESULT float4::RandomSphere(LCG &lcg, const float4 &center, float radius)
@@ -1059,12 +1059,12 @@ float4 MUST_USE_RESULT float4::RandomSphere(LCG &lcg, const float4 &center, floa
 
 float4 MUST_USE_RESULT float4::RandomBox(LCG &lcg, float xmin, float xmax, float ymin, float ymax, float zmin, float zmax)
 {
-	return RandomBox(lcg, POINT_VEC(xmin, ymin, zmin), POINT_VEC(xmax, ymax, zmax));
+	return RandomBox(lcg, float4(xmin, ymin, zmin, 1.f), float4(xmax, ymax, zmax, 1.f));
 }
 
 float4 MUST_USE_RESULT float4::RandomBox(LCG &lcg, float minElem, float maxElem)
 {
-	return RandomBox(lcg, POINT_VEC(minElem, minElem, minElem), POINT_VEC(maxElem, maxElem, maxElem));
+	return RandomBox(lcg, float4(minElem, minElem, minElem, 1.f), float4(maxElem, maxElem, maxElem, 1.f));
 }
 
 float4 MUST_USE_RESULT float4::RandomBox(LCG &lcg, const float4 &minValues, const float4 &maxValues)
