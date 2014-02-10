@@ -74,7 +74,7 @@ private:
 	int vertexDataLayout; // 0 - AoS, 1 - SoA4, 2 - SoA8
 #endif
 	int numTriangles;
-	void ReallocVertexBuffer(int numTriangles);
+	void ReallocVertexBuffer(int numTriangles, int vertexSizeBytes);
 };
 
 MATH_END_NAMESPACE
