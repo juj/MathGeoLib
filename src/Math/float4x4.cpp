@@ -1379,8 +1379,13 @@ bool float4x4::Inverse(float epsilon)
 
 float4x4 float4x4::Inverted() const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	float4x4 copy;
+	mat4x4_inverse(row, copy.row);
+#else
 	float4x4 copy = *this;
 	copy.Inverse();
+#endif
 	return copy;
 }
 
