@@ -205,7 +205,7 @@ public:
 		@param epsilon The comparison threshold to use to account for floating-point inaccuracies. */
 	static bool AreCollinear(const vec &p1, const vec &p2, const vec &p3, float epsilon = 1e-3f);
 
-	static vec ClosestPointLineLine(vec start0, vec end0, vec start1, vec end1, float *d, float *d2);
+	static vec ClosestPointLineLine(const vec &start0, const vec &end0, const vec &start1, const vec &end1, float *d, float *d2);
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Line.

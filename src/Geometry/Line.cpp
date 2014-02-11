@@ -40,27 +40,14 @@
 
 MATH_BEGIN_NAMESPACE
 
-/// A helper function to compute the line-line closest point.
-/** This code is adapted from http://paulbourke.net/geometry/lineline3d/ .
-	dmnop = (xm - xn)(xo - xp) + (ym - yn)(yo - yp) + (zm - zn)(zo - zp).
-	@param v An array of four floats: [0]: line 0 start. [1]: line 0 end. [2]: line 1 start. [3]: line 1 end.
-	@param m An index in the range [0, 3].
-	@param n An index in the range [0, 3].
-	@param o An index in the range [0, 3].
-	@param p An index in the range [0, 3]. */
-float Dmnop(const vec *v, int m, int n, int o, int p)
-{
-	return (v[m].x - v[n].x) * (v[o].x - v[p].x) + (v[m].y - v[n].y) * (v[o].y - v[p].y) + (v[m].z - v[n].z) * (v[o].z - v[p].z);
-}
-
 /// Computes the closest point pair on two lines.
 /** The first line is specified by two points start0 and end0. The second line is specified by
 	two points start1 and end1.
 	The implementation of this function follows http://paulbourke.net/geometry/lineline3d/ .
-	@param start0 The starting point of the first line.
-	@param end0 The ending point of the first line.
-	@param start1 The starting point of the second line.
-	@param end1 The ending point of the second line.
+	@param v0 The starting point of the first line.
+	@param v1 The ending point of the first line.
+	@param v2 The starting point of the second line.
+	@param v3 The ending point of the second line.
 	@param d [out] If specified, receives the normalized distance of the closest point along the first line.
 		This pointer may be left null.
 	@param d2 [out] If specified, receives the normalized distance of the closest point along the second line.
@@ -68,21 +55,21 @@ float Dmnop(const vec *v, int m, int n, int o, int p)
 	@return Returns the closest point on line start0<->end0 to the second line.
 	@note This is a low-level utility function. You probably want to use ClosestPoint() or Distance() instead.
 	@see ClosestPoint(), Distance(). */
-vec Line::ClosestPointLineLine(vec start0, vec end0, vec start1, vec end1, float *d, float *d2)
+vec Line::ClosestPointLineLine(const vec &v0, const vec &v1, const vec &v2, const vec &v3, float *d, float *d2)
 {
-	const vec v[4] = { start0, end0, start1, end1 };
-
-	float d0232 = Dmnop(v,0,2,3,2);
-	float d3210 = Dmnop(v,3,2,1,0);
-	float d3232 = Dmnop(v,3,2,3,2);
-	float mu = (d0232 * d3210 - Dmnop(v,0,2,1,0)*d3232) / (Dmnop(v,1,0,1,0)*Dmnop(v,3,2,3,2) - Dmnop(v,3,2,1,0)*Dmnop(v,3,2,1,0));
+#define DMNOP(m, n, o, p) ((v##m.x - v##n.x) * (v##o.x - v##p.x) + (v##m.y - v##n.y) * (v##o.y - v##p.y) + (v##m.z - v##n.z) * (v##o.z - v##p.z))
+	float d0232 = DMNOP(0,2,3,2);
+	float d3210 = DMNOP(3,2,1,0);
+	float d3232 = DMNOP(3,2,3,2);
+	float mu = (d0232 * d3210 - DMNOP(0,2,1,0)*d3232) / (DMNOP(1,0,1,0)*DMNOP(3,2,3,2) - DMNOP(3,2,1,0)*DMNOP(3,2,1,0));
+#undef DMNOP
 	if (d)
 		*d = mu;
 
 	if (d2)
 		*d2 = (d0232 + mu * d3210) / d3232;
 
-	return start0 + mu * (end0 - start0);
+	return v0 + mu * (v1 - v0);
 }
 
 Line::Line(const vec &pos_, const vec &dir_)
