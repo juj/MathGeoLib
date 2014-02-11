@@ -57,12 +57,16 @@ public:
 			nPoint.x = (p[i].normal.x < 0.f ? aabb.maxPoint.x : aabb.minPoint.x);
 			nPoint.y = (p[i].normal.y < 0.f ? aabb.maxPoint.y : aabb.minPoint.y);
 			nPoint.z = (p[i].normal.z < 0.f ? aabb.maxPoint.z : aabb.minPoint.z);
+#ifdef MATH_VEC_IS_FLOAT4
 			nPoint.w = 1.f;
+#endif
 
 			pPoint.x = (p[i].normal.x >= 0.f ? aabb.maxPoint.x : aabb.minPoint.x);
 			pPoint.y = (p[i].normal.y >= 0.f ? aabb.maxPoint.y : aabb.minPoint.y);
 			pPoint.z = (p[i].normal.z >= 0.f ? aabb.maxPoint.z : aabb.minPoint.z);
+#ifdef MATH_VEC_IS_FLOAT4
 			pPoint.w = 1.f;
+#endif
 
 			/*
 			// Find the n and p points of the aabb. (The nearest and farthest corners relative to the plane)
