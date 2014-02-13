@@ -764,7 +764,7 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 #else
 typedef float3 vec;
 typedef float3 vec_storage;
-typedef typename std::vector<float3> VecArray;
+typedef std::vector<float3> VecArray;
 #define POINT_VEC(...) float3(__VA_ARGS__)
 #define DIR_VEC(...) float3(__VA_ARGS__)
 #define POINT_TO_FLOAT3(x) x
