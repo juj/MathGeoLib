@@ -203,7 +203,7 @@ int KdTree<T>::NumLeaves() const
 template<typename T>
 int KdTree<T>::NumObjects() const
 {
-	return objects.size() / sizeof(T);
+	return (int)(objects.size() / sizeof(T));
 }
 
 /// Returns the total number of inner nodes in the tree.
