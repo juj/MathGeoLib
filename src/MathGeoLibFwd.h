@@ -100,10 +100,16 @@ template<class T, size_t Alignment>
 struct AlignedAllocator;
 
 struct Triangle_storage;
-typedef std::vector<Triangle_storage, AlignedAllocator<Triangle_storage, 16> > TriangleArray;
-
 struct LineSegment_storage;
+
+// VS2010/old C++ standard issue with aligning data inside a std::vector, work around it.
+#if defined(_MSC_VER) && _MSC_VER < 1700 /*VS2012*/
+typedef std::vector<Triangle_storage, AlignedAllocator<Triangle_storage, 16> > TriangleArray;
 typedef std::vector<LineSegment_storage, AlignedAllocator<LineSegment_storage, 16> > LineSegmentArray;
+#else
+typedef std::vector<Triangle> TriangleArray;
+typedef std::vector<LineSegment> LineSegmentArray;
+#endif
 
 MATH_END_NAMESPACE
 

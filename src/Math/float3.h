@@ -733,7 +733,13 @@ bool EqualAbs(float a, float b, float epsilon);
 #define MATH_VEC_IS_FLOAT4
 typedef float4 vec;
 typedef float4_storage vec_storage;
+// VS2010/old C++ standard issue with aligning data inside a std::vector, work around it.
+#if defined(_MSC_VER) && _MSC_VER < 1700 /*VS2012*/
 typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > VecArray;
+#else
+typedef std::vector<float4> VecArray;
+#endif
+
 #define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
 #define DIR_VEC(...) float4(__VA_ARGS__, 0.f)
 
