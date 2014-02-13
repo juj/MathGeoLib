@@ -200,6 +200,8 @@ TriangleMesh &TriangleMesh::operator =(const TriangleMesh &rhs)
 #endif
 	ReallocVertexBuffer(rhs.numTriangles, rhs.vertexSizeBytes);
 	memcpy(data, rhs.data, numTriangles*3*vertexSizeBytes);
+
+	return *this;
 }
 
 void TriangleMesh::Set(const Polyhedron &polyhedron)
