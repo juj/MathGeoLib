@@ -168,7 +168,7 @@ SIMDCapability DetectSIMDCapability()
 const int simdCapability = DetectSIMDCapability();
 
 TriangleMesh::TriangleMesh()
-:data(0), numTriangles(0)
+:data(0), numTriangles(0), vertexSizeBytes(0), vertexDataLayout(0)
 {
 
 }
@@ -176,6 +176,24 @@ TriangleMesh::TriangleMesh()
 TriangleMesh::~TriangleMesh()
 {
 	AlignedFree(data);
+}
+
+TriangleMesh::TriangleMesh(const TriangleMesh &rhs)
+:data(0), numTriangles(0), vertexSizeBytes(0), vertexDataLayout(0)
+{
+	*this = rhs;
+}
+
+TriangleMesh &TriangleMesh::operator =(const TriangleMesh &rhs)
+{
+	if (this == &rhs)
+		return *this;
+
+#ifdef _DEBUG
+	vertexDataLayout = rhs.vertexDataLayout;
+#endif
+	ReallocVertexBuffer(rhs.numTriangles, rhs.vertexSizeBytes);
+	memcpy(data, rhs.data, numTriangles*3*vertexSizeBytes);
 }
 
 void TriangleMesh::Set(const Polyhedron &polyhedron)
@@ -265,9 +283,10 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV(const Ray &ray, int &outTriang
 	return IntersectRay_TriangleIndex_UV_CPP(ray, outTriangleIndex, outU, outV);
 }
 
-void TriangleMesh::ReallocVertexBuffer(int numTris, int vertexSizeBytes)
+void TriangleMesh::ReallocVertexBuffer(int numTris, int vertexSizeBytes_)
 {
 	AlignedFree(data);
+	vertexSizeBytes = vertexSizeBytes_;
 	data = (float*)AlignedMalloc(numTris * 3 * vertexSizeBytes, 32);
 	numTriangles = numTris;
 }

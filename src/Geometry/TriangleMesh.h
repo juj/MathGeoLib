@@ -31,6 +31,9 @@ public:
 	TriangleMesh();
 	~TriangleMesh();
 
+	TriangleMesh(const TriangleMesh &rhs);
+	TriangleMesh &operator =(const TriangleMesh &rhs);
+
 	/// Specifies the vertex data of this triangle mesh. Replaces any old
 	/// specified geometry.
 	/// @param vertexSizeBytes The size (stride) of a single vertex in memory.
@@ -69,7 +72,8 @@ public:
 #endif
 
 private:
-	float *data;
+	float *data; // This is always allocated to tightly-packed numTriangles*3*vertexSizeBytes bytes.
+	int vertexSizeBytes;
 #ifdef _DEBUG
 	int vertexDataLayout; // 0 - AoS, 1 - SoA4, 2 - SoA8
 #endif
