@@ -49,7 +49,7 @@ public:
 	};
 
 	/// Specifies the vertices of this polyhedron.
-	std::vector<vec> v;
+	VecArray v;
 
 	/// Specifies the individual faces of this polyhedron.  [similarOverload: v]
 	/** Each face is described by a list of indices to the vertex array. The indices define a
@@ -79,8 +79,8 @@ public:
 
 	/// Returns a pointer to an array of vertices of this polyhedron. The array contains NumVertices() elements.
 	/// @note Do NOT hold on to this pointer, since it is an alias to the underlying std::vector owned by this polyhedron. Calling any non-const Polyhedron member function may invalidate the pointer!
-	vec *VertexArrayPtr() { return !v.empty() ? &v[0] : 0; }
-	const vec *VertexArrayPtr() const { return !v.empty() ? &v[0] : 0; }
+	vec *VertexArrayPtr() { return !v.empty() ? (vec*)&v[0] : 0; }
+	const vec *VertexArrayPtr() const { return !v.empty() ? (vec*)&v[0] : 0; }
 
 	/// Returns the <i>i</i>th vertex of this polyhedron.
 	/** @param vertexIndex The vertex to get, in the range [0, NumVertices()-1].
@@ -99,7 +99,7 @@ public:
 	/** Has complexity of O(|V|log|V|), where |V| is the number of vertices in the polyhedron.
 		@todo Support this in linear time.
 		@see NumEdges(), Edge(), EdgeIndices(). */
-	std::vector<LineSegment> Edges() const;
+	LineSegmentArray Edges() const;
 
 	std::vector<Polygon> Faces() const;
 
@@ -358,7 +358,7 @@ public:
 	static Polyhedron Icosahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Dodecahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 
-	std::vector<Triangle> Triangulate() const;
+	TriangleArray Triangulate() const;
 
 	std::string ToString() const;
 

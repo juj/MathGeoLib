@@ -732,6 +732,8 @@ MATH_BEGIN_NAMESPACE
 bool EqualAbs(float a, float b, float epsilon);
 #define MATH_VEC_IS_FLOAT4
 typedef float4 vec;
+typedef float4_storage vec_storage;
+typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > VecArray;
 #define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
 #define DIR_VEC(...) float4(__VA_ARGS__, 0.f)
 
@@ -761,6 +763,8 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 */
 #else
 typedef float3 vec;
+typedef float3 vec_storage;
+typedef typename std::vector<float3> VecArray;
 #define POINT_VEC(...) float3(__VA_ARGS__)
 #define DIR_VEC(...) float3(__VA_ARGS__)
 #define POINT_TO_FLOAT3(x) x

@@ -100,6 +100,9 @@ public:
 	T &Object(int objectIndex);
 	const T &Object(int objectIndex) const;
 
+	/// Returns the total number of objects stored in this tree.
+	int NumObjects() const;
+
 	/// Returns the total number of nodes (all nodes, i.e. inner nodes + leaves) in the tree.
 	int NumNodes() const;
 
@@ -177,7 +180,7 @@ private:
 	static const int maxTreeDepth = 30;
 
 	std::vector<KdTreeNode> nodes;
-	std::vector<T> objects;
+	std::vector<u8, AlignedAllocator<u8, 16> > objects;
 	std::vector<u32*> buckets;
 
 	int AllocateNodePair();

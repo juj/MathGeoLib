@@ -21,6 +21,7 @@
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
+#include <vector>
 #endif
 #include "../MathGeoLibFwd.h"
 #include "float3.h"
@@ -779,6 +780,17 @@ public:
 #endif
 };
 
+struct float4_storage
+{
+	float x,y,z,w;
+	float4_storage(){}
+	float4_storage(const float4 &rhs)
+	{
+		*(float4*)this = rhs;
+	}
+	operator float4() const { return *(float4*)this; }
+};
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 /// Prints this float4 to the given stream.
 std::ostream &operator <<(std::ostream &out, const float4 &rhs);
@@ -812,6 +824,10 @@ inline float4 Lerp(const float4 &a, const float4 &b, float t) { return a.Lerp(b,
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float4)
 Q_DECLARE_METATYPE(float4*)
+#endif
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > Float4Array;
 #endif
 
 MATH_END_NAMESPACE

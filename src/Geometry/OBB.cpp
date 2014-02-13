@@ -467,7 +467,7 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 	pts.resize(numPoints);
 	///\todo Convex hull'ize.
 
-	std::vector<vec> dirs;
+	VecArray dirs;
 	dirs.reserve((numPoints * numPoints-1) / 2);
 	for(int i = 0; i < numPoints; ++i)
 		for(int j = i+1; j < numPoints; ++j)

@@ -230,6 +230,17 @@ public:
 #endif
 };
 
+struct LineSegment_storage
+{
+	vec_storage a,b;
+	LineSegment_storage(){}
+	LineSegment_storage(const LineSegment &rhs)
+	{
+		*(LineSegment*)this = rhs;
+	}
+	operator LineSegment() const { return *(LineSegment*)this; }
+};
+
 LineSegment operator *(const float3x3 &transform, const LineSegment &line);
 LineSegment operator *(const float3x4 &transform, const LineSegment &line);
 LineSegment operator *(const float4x4 &transform, const LineSegment &line);

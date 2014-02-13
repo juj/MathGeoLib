@@ -1495,9 +1495,9 @@ RANDOMIZED_TEST(RayKdTreeNoIntersect)
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	KdTree<Triangle> t;
-	std::vector<Triangle> tris = a.Triangulate();
+	TriangleArray tris = a.Triangulate();
 	if (!tris.empty())
-		t.AddObjects(&tris[0], (int)tris.size());
+		t.AddObjects((Triangle*)&tris[0], (int)tris.size());
 	t.Build();
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);

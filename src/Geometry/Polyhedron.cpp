@@ -79,7 +79,7 @@ vec Polyhedron::Vertex(int vertexIndex) const
 LineSegment Polyhedron::Edge(int edgeIndex) const
 {
 	assume(edgeIndex >= 0);
-	std::vector<LineSegment> edges = Edges();
+	LineSegmentArray edges = Edges();
 	assume(edgeIndex < (int)edges.size());
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (edgeIndex < 0 || edgeIndex >= (int)edges.size())
@@ -88,10 +88,10 @@ LineSegment Polyhedron::Edge(int edgeIndex) const
 	return edges[edgeIndex];
 }
 
-std::vector<LineSegment> Polyhedron::Edges() const
+LineSegmentArray Polyhedron::Edges() const
 {
 	std::vector<std::pair<int, int> > edges = EdgeIndices();
-	std::vector<LineSegment> edgeLines;
+	LineSegmentArray edgeLines;
 	edgeLines.reserve(edges.size());
 	for(size_t i = 0; i < edges.size(); ++i)
 		edgeLines.push_back(LineSegment(Vertex(edges[i].first), Vertex(edges[i].second)));
@@ -152,7 +152,7 @@ Plane Polyhedron::FacePlane(int faceIndex) const
 	if (face.v.size() >= 3)
 		return Plane(v[face.v[0]], v[face.v[1]], v[face.v[2]]);
 	else if (face.v.size() == 2)
-		return Plane(Line(v[face.v[0]], v[face.v[1]]), (v[face.v[0]]-v[face.v[1]]).Perpendicular());
+		return Plane(Line(v[face.v[0]], v[face.v[1]]), ((vec)v[face.v[0]]-(vec)v[face.v[1]]).Perpendicular());
 	else if (face.v.size() == 1)
 		return Plane(v[face.v[0]], DIR_VEC(0,1,0));
 	else
@@ -163,9 +163,9 @@ vec Polyhedron::FaceNormal(int faceIndex) const
 {
 	const Face &face = f[faceIndex];
 	if (face.v.size() >= 3)
-		return (v[face.v[1]]-v[face.v[0]]).Cross(v[face.v[2]]-v[face.v[0]]).Normalized();
+		return ((vec)v[face.v[1]]-(vec)v[face.v[0]]).Cross((vec)v[face.v[2]]-(vec)v[face.v[0]]).Normalized();
 	else if (face.v.size() == 2)
-		return (v[face.v[1]]-v[face.v[0]]).Cross((v[face.v[0]]-v[face.v[1]]).Perpendicular()-v[face.v[0]]).Normalized();
+		return ((vec)v[face.v[1]]-(vec)v[face.v[0]]).Cross(((vec)v[face.v[0]]-(vec)v[face.v[1]]).Perpendicular()-v[face.v[0]]).Normalized();
 	else if (face.v.size() == 1)
 		return DIR_VEC(0,1,0);
 	else
@@ -380,7 +380,7 @@ bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float p
 
 	int numIntersections = 0;
 
-	vec basisU = v[vertices[1]] - v[vertices[0]];
+	vec basisU = (vec)v[vertices[1]] - (vec)v[vertices[0]];
 	basisU.Normalize();
 	vec basisV = Cross(p.normal, basisU).Normalized();
 	mathassert(basisU.IsNormalized());
@@ -435,7 +435,7 @@ bool Polyhedron::Contains(const vec &point) const
 	int numIntersections = 0;
 	for(int i = 0; i < (int)f.size(); ++i)
 	{
-		Plane p(v[f[i].v[0]] - point, v[f[i].v[1]] - point, v[f[i].v[2]] - point);
+		Plane p((vec)v[f[i].v[0]] - point, (vec)v[f[i].v[1]] - point, (vec)v[f[i].v[2]] - point);
 
 		// Find the intersection of the plane and the ray (0,0,0) -> (t,0,0), t >= 0.
 		// <normal, point_on_ray> == d
@@ -1013,19 +1013,19 @@ void Polyhedron::MergeConvex(const vec &point)
 void Polyhedron::Translate(const vec &offset)
 {
 	for(size_t i = 0; i < v.size(); ++i)
-		v[i] += offset;
+		v[i] = (vec)v[i] + offset;
 }
 
 void Polyhedron::Transform(const float3x3 &transform)
 {
 	if (!v.empty())
-		transform.BatchTransform(&v[0], (int)v.size());
+		transform.BatchTransform((vec*)&v[0], (int)v.size());
 }
 
 void Polyhedron::Transform(const float3x4 &transform)
 {
 	if (!v.empty())
-		transform.BatchTransformPos(&v[0], (int)v.size());
+		transform.BatchTransformPos((vec*)&v[0], (int)v.size());
 }
 
 void Polyhedron::Transform(const float4x4 &transform)
@@ -1429,13 +1429,13 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 
 }
 
-std::vector<Triangle> Polyhedron::Triangulate() const
+TriangleArray Polyhedron::Triangulate() const
 {
-	std::vector<Triangle> outTriangleList;
+	TriangleArray outTriangleList;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
 		Polygon p = FacePolygon(i);
-		std::vector<Triangle> tris = p.Triangulate();
+		TriangleArray tris = p.Triangulate();
 		outTriangleList.insert(outTriangleList.end(), tris.begin(), tris.end());
 	}
 	return outTriangleList;
@@ -1464,7 +1464,7 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 	for(int i = 0; i < NumFaces(); ++i)
 	{
 		Polygon p = FacePolygon(i);
-		std::vector<Triangle> tris = p.Triangulate();
+		TriangleArray tris = p.Triangulate();
 		int idx = vb.AppendVertices(3*(int)tris.size());
 		for(size_t j = 0; j < tris.size(); ++j)
 		{

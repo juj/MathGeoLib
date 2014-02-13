@@ -371,6 +371,17 @@ Triangle operator *(const float3x4 &transform, const Triangle &t);
 Triangle operator *(const float4x4 &transform, const Triangle &t);
 Triangle operator *(const Quat &transform, const Triangle &t);
 
+struct Triangle_storage
+{
+	vec_storage v0, v1, v2;
+	Triangle_storage(const Triangle &rhs)
+	{
+		*(Triangle*)this = rhs;
+	}
+	operator Triangle() const { return *(Triangle*)this; }
+};
+#define TRIANGLE(x) (*(Triangle*)&x)
+
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Triangle)
 Q_DECLARE_METATYPE(Triangle*)

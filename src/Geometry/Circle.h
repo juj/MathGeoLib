@@ -187,11 +187,11 @@ public:
 		@return A vector that contains all the detected points of intersection for this circle and the given OBB. If the circle is fully
 			contained inside the OBB, or is fully outside the OBB, no intersection occurs, and the returned vector has zero elements.
 		@see Intersects(), IntersectsDisc(). */
-	std::vector<vec> IntersectsFaces(const OBB &obb) const;
+	VecArray IntersectsFaces(const OBB &obb) const;
 
-	std::vector<vec> IntersectsFaces(const AABB &aabb) const;
+	VecArray IntersectsFaces(const AABB &aabb) const;
 
-    /// Returns a human-readable representation of this circle. Most useful for debugging purposes.
+	/// Returns a human-readable representation of this circle. Most useful for debugging purposes.
 	/** The returned string specifies the center position, normal direction and the radius of this circle. */
 	std::string ToString() const;
 #endif

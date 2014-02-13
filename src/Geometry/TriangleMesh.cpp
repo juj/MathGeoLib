@@ -206,7 +206,7 @@ TriangleMesh &TriangleMesh::operator =(const TriangleMesh &rhs)
 
 void TriangleMesh::Set(const Polyhedron &polyhedron)
 {
-	std::vector<Triangle> tris = polyhedron.Triangulate();
+	TriangleArray tris = polyhedron.Triangulate();
 	if (!tris.empty())
 	{
 		int alignment = (simdCapability == SIMD_AVX) ? 8 : ((simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2) ? 4 : 1);
@@ -214,7 +214,7 @@ void TriangleMesh::Set(const Polyhedron &polyhedron)
 		Triangle degent(degen, degen, degen);
 		while(tris.size() % alignment != 0)
 			tris.push_back(degent);
-		Set(&tris[0], (int)tris.size());
+		Set((Triangle*)&tris[0], (int)tris.size());
 	}
 }
 

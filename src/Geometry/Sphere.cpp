@@ -753,7 +753,7 @@ int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVerti
 		return 0;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-	std::vector<Triangle> temp;
+	TriangleArray temp;
 #else
 	Array<Triangle> temp;
 #endif
@@ -808,25 +808,25 @@ int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVerti
 
 	for(size_t i = oldEnd, j = 0; i < temp.size(); ++i, ++j)
 	{
-		outPos[3*j] = this->pos + temp[i].a;
-		outPos[3*j+1] = this->pos + temp[i].b;
-		outPos[3*j+2] = this->pos + temp[i].c;
+		outPos[3*j] = this->pos + TRIANGLE(temp[i]).a;
+		outPos[3*j+1] = this->pos + TRIANGLE(temp[i]).b;
+		outPos[3*j+2] = this->pos + TRIANGLE(temp[i]).c;
 	}
 
 	if (outNormal)
 		for(size_t i = oldEnd, j = 0; i < temp.size(); ++i, ++j)
 		{
-			outNormal[3*j] = temp[i].a.Normalized();
-			outNormal[3*j+1] = temp[i].b.Normalized();
-			outNormal[3*j+2] = temp[i].c.Normalized();
+			outNormal[3*j] = TRIANGLE(temp[i]).a.Normalized();
+			outNormal[3*j+1] = TRIANGLE(temp[i]).b.Normalized();
+			outNormal[3*j+2] = TRIANGLE(temp[i]).c.Normalized();
 		}
 
 	if (outUV)
 		for(size_t i = oldEnd, j = 0; i < temp.size(); ++i, ++j)
 		{
-			outUV[3*j] = float2(atan2(temp[i].a.y, temp[i].a.x) / (2.f * 3.141592654f) + 0.5f, (temp[i].a.z + r) / (2.f * r));
-			outUV[3*j+1] = float2(atan2(temp[i].b.y, temp[i].b.x) / (2.f * 3.141592654f) + 0.5f, (temp[i].b.z + r) / (2.f * r));
-			outUV[3*j+2] = float2(atan2(temp[i].c.y, temp[i].c.x) / (2.f * 3.141592654f) + 0.5f, (temp[i].c.z + r) / (2.f * r));
+			outUV[3*j] = float2(atan2(TRIANGLE(temp[i]).a.y, TRIANGLE(temp[i]).a.x) / (2.f * 3.141592654f) + 0.5f, (TRIANGLE(temp[i]).a.z + r) / (2.f * r));
+			outUV[3*j+1] = float2(atan2(TRIANGLE(temp[i]).b.y, TRIANGLE(temp[i]).b.x) / (2.f * 3.141592654f) + 0.5f, (TRIANGLE(temp[i]).b.z + r) / (2.f * r));
+			outUV[3*j+2] = float2(atan2(TRIANGLE(temp[i]).c.y, TRIANGLE(temp[i]).c.x) / (2.f * 3.141592654f) + 0.5f, (TRIANGLE(temp[i]).c.z + r) / (2.f * r));
 		}
 
 	return ((int)temp.size() - oldEnd) * 3;

@@ -24,6 +24,8 @@
 #include <cstddef>
 #include "Reinterpret.h"
 #include "simd.h"
+#include <memory>
+#include <stdexcept>
 
 MATH_BEGIN_NAMESPACE
 
@@ -40,5 +42,37 @@ inline T *AlignedNew(size_t numElements) { return AlignedNew<T>(numElements, 16)
 
 /// Frees memory allocated by AlignedMalloc.
 void AlignedFree(void *ptr);
+
+template<class T, size_t Alignment>
+struct AlignedAllocator : std::allocator<T>
+{
+	template<class U>
+	struct rebind { typedef AlignedAllocator<U, Alignment> other; };
+
+	typedef std::allocator<T> base;
+
+	typedef typename base::const_pointer const_pointer;
+	typedef typename base::pointer pointer;
+	typedef typename base::reference reference;
+	typedef typename base::const_reference const_reference;
+	typedef typename base::value_type value_type;
+	typedef typename base::size_type size_type;
+	typedef typename base::difference_type difference_type;
+
+	AlignedAllocator(){}
+	AlignedAllocator(const AlignedAllocator &){}
+	template<typename U>
+	AlignedAllocator(const AlignedAllocator<U, Alignment> &){}
+
+	pointer allocate(size_type n, const void * = 0)
+	{
+		return (pointer)AlignedMalloc(n*sizeof(T), Alignment);
+	}
+
+	void deallocate(pointer ptr, size_type)
+	{
+		AlignedFree(ptr);
+	}
+};
 
 MATH_END_NAMESPACE

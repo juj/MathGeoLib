@@ -230,14 +230,14 @@ bool Circle::IntersectsDisc(const Ray &ray) const
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-std::vector<vec> Circle::IntersectsFaces(const AABB &aabb) const
+VecArray Circle::IntersectsFaces(const AABB &aabb) const
 {
     return IntersectsFaces(aabb.ToOBB());
 }
 
-std::vector<vec> Circle::IntersectsFaces(const OBB &obb) const
+VecArray Circle::IntersectsFaces(const OBB &obb) const
 {
-	std::vector<vec> intersectionPoints;
+	VecArray intersectionPoints;
 	for(int i = 0; i < 6; ++i)
 	{		
 		Plane p = obb.FacePlane(i);

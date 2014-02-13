@@ -118,7 +118,7 @@ vec Polygon::BasisU() const
 {
 	if (p.size() < 2)
 		return vec::unitX;
-	vec u = p[1] - p[0];
+	vec u = (vec)p[1] - (vec)p[0];
 	u.Normalize(); // Always succeeds, even if u was zero (generates (1,0,0)).
 	return u;
 }
@@ -199,7 +199,7 @@ vec Polygon::MapFrom2D(const float2 &point) const
 	if (p.empty())
 		return vec::nan;
 #endif
-	return p[0] + point.x * BasisU() + point.y * BasisV();
+	return (vec)p[0] + point.x * BasisU() + point.y * BasisV();
 }
 
 bool Polygon::IsPlanar(float epsilon) const
@@ -242,7 +242,7 @@ bool Polygon::IsNull() const
 bool Polygon::IsFinite() const
 {
 	for(size_t i = 0; i < p.size(); ++i)
-		if (!p[i].IsFinite())
+		if (!((vec)p[i]).IsFinite())
 			return false;
 
 	return true;
@@ -277,12 +277,12 @@ Plane Polygon::PlaneCCW() const
 
 		// Polygon contains multiple points, but they are all collinear.
 		// Pick an arbitrary plane along the line as the polygon plane (as if the polygon had only two points)
-		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
+		return Plane(Line(p[0], p[1]), ((vec)p[0]-(vec)p[1]).Perpendicular());
 	}
 	if (p.size() == 3)
 		return Plane(p[0], p[1], p[2]);
 	if (p.size() == 2)
-		return Plane(Line(p[0], p[1]), (p[0]-p[1]).Perpendicular());
+		return Plane(Line(p[0], p[1]), ((vec)p[0]-(vec)p[1]).Perpendicular());
 	if (p.size() == 1)
 		return Plane(p[0], DIR_VEC(0,1,0));
 	return Plane();
@@ -298,19 +298,19 @@ Plane Polygon::PlaneCW() const
 void Polygon::Translate(const vec &offset)
 {
 	for(size_t i = 0; i < p.size(); ++i)
-		p[i] += offset;
+		p[i] = (vec)p[i] + offset;
 }
 
 void Polygon::Transform(const float3x3 &transform)
 {
 	if (!p.empty())
-		transform.BatchTransform(&p[0], (int)p.size());
+		transform.BatchTransform((vec*)&p[0], (int)p.size());
 }
 
 void Polygon::Transform(const float3x4 &transform)
 {
 	if (!p.empty())
-		transform.BatchTransformPos(&p[0], (int)p.size());
+		transform.BatchTransformPos((vec*)&p[0], (int)p.size());
 }
 
 void Polygon::Transform(const float4x4 &transform)
@@ -516,9 +516,9 @@ bool Polygon::Intersects(const Polyhedron &polyhedron) const
 bool Polygon::Intersects(const Sphere &sphere) const
 {
 	///@todo Optimize.
-	std::vector<Triangle> tris = Triangulate();
+	TriangleArray tris = Triangulate();
 	for(size_t i = 0; i < tris.size(); ++i)
-		if (tris[i].Intersects(sphere))
+		if (TRIANGLE(tris[i]).Intersects(sphere))
 			return true;
 
 	return false;
@@ -527,9 +527,9 @@ bool Polygon::Intersects(const Sphere &sphere) const
 bool Polygon::Intersects(const Capsule &capsule) const
 {
 	///@todo Optimize.
-	std::vector<Triangle> tris = Triangulate();
+	TriangleArray tris = Triangulate();
 	for(size_t i = 0; i < tris.size(); ++i)
-		if (tris[i].Intersects(capsule))
+		if (TRIANGLE(tris[i]).Intersects(capsule))
 			return true;
 
 	return false;
@@ -539,12 +539,12 @@ vec Polygon::ClosestPoint(const vec &point) const
 {
 	assume(IsPlanar());
 
-	std::vector<Triangle> tris = Triangulate();
+	TriangleArray tris = Triangulate();
 	vec closestPt = vec::nan;
 	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
-		vec pt = tris[i].ClosestPoint(point);
+		vec pt = TRIANGLE(tris[i]).ClosestPoint(point);
 		float d = pt.DistanceSq(point);
 		if (d < closestDist)
 		{
@@ -562,14 +562,14 @@ vec Polygon::ClosestPoint(const LineSegment &lineSegment) const
 
 vec Polygon::ClosestPoint(const LineSegment &lineSegment, vec *lineSegmentPt) const
 {
-	std::vector<Triangle> tris = Triangulate();
+	TriangleArray tris = Triangulate();
 	vec closestPt = vec::nan;
 	vec closestLineSegmentPt = vec::nan;
 	float closestDist = FLT_MAX;
 	for(size_t i = 0; i < tris.size(); ++i)
 	{
 		vec lineSegPt;
-		vec pt = tris[i].ClosestPoint(lineSegment, &lineSegPt);
+		vec pt = TRIANGLE(tris[i]).ClosestPoint(lineSegment, &lineSegPt);
 		float d = pt.DistanceSq(lineSegPt);
 		if (d < closestDist)
 		{
@@ -704,11 +704,11 @@ vec Polygon::RandomPointOnEdge(LCG &rng) const
 
 vec Polygon::FastRandomPointInside(LCG &rng) const
 {
-	std::vector<Triangle> tris = Triangulate();
+	TriangleArray tris = Triangulate();
 	if (tris.empty())
 		return vec::nan;
 	int i = rng.Int(0, (int)tris.size()-1);
-	return tris[i].RandomPointInside(rng);
+	return TRIANGLE(tris[i]).RandomPointInside(rng);
 }
 
 Polyhedron Polygon::ToPolyhedron() const
@@ -775,11 +775,11 @@ bool IsAnEar(const std::vector<float2> &poly, int i, int j)
 	"Kong, Everett, Toussant. The Graham Scan Triangulates Simple Polygons."
 	See also p. 772-775 of Geometric Tools for Computer Graphics.
 	The running time of this function is O(n^2). */
-std::vector<Triangle> Polygon::Triangulate() const
+TriangleArray Polygon::Triangulate() const
 {
 	assume(IsPlanar());
 
-	std::vector<Triangle> t;
+	TriangleArray t;
 	// Handle degenerate cases.
 	if (NumVertices() < 3)
 		return t;

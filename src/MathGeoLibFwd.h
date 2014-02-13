@@ -20,6 +20,10 @@
 #include "MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 
+// Very annoying to have to do this, but <iosfwd> doesn't have a fwddecl for std::vector,
+// and forward-declaring it manually is not allowed, see http://stackoverflow.com/questions/307343/forward-declare-an-stl-container
+#include <vector>
+
 // The CONST_WIN32 is a #define which resolves to 'const' on Windows, and null on other
 // platforms. This #define is used on Windows to detect accidental programming errors
 // occurring from an expression "const float3 vec; vec[1] = 5;". Trying to return
@@ -89,6 +93,17 @@ class Torus;
 class ScaleOp;
 class Triangle;
 class LCG;
+
+struct float4_storage;
+
+template<class T, size_t Alignment>
+struct AlignedAllocator;
+
+struct Triangle_storage;
+typedef std::vector<Triangle_storage, AlignedAllocator<Triangle_storage, 16> > TriangleArray;
+
+struct LineSegment_storage;
+typedef std::vector<LineSegment_storage, AlignedAllocator<LineSegment_storage, 16> > LineSegmentArray;
 
 MATH_END_NAMESPACE
 
