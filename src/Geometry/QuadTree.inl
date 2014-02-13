@@ -42,7 +42,7 @@ void QuadTree<T>::Clear(const float2 &minXY, const float2 &maxXY)
 template<typename T>
 void QuadTree<T>::Add(const T &object)
 {
-	PROFILE(QuadTree_Add);
+	MGL_PROFILE(QuadTree_Add);
 	Node *n = Root();
 	assert(n && "Error: QuadTree has not been initialized with a root node! Call QuadTree::Clear() to initialize the root node.");
 
@@ -299,7 +299,7 @@ template<typename T>
 template<typename Func>
 inline void QuadTree<T>::AABBQuery(const AABB2D &aabb, Func &callback)
 {
-	PROFILE(QuadTree_AABBQuery);
+	MGL_PROFILE(QuadTree_AABBQuery);
 	std::vector<TraversalStackItem> stack;
 	TraversalStackItem n;
 	n.aabb = BoundingAABB();
@@ -412,7 +412,7 @@ template<typename T>
 template<typename Func>
 inline void QuadTree<T>::CollidingPairsQuery(const AABB2D &aabb, Func &callback)
 {
-	PROFILE(QuadTree_CollidingPairsQuery);
+	MGL_PROFILE(QuadTree_CollidingPairsQuery);
 	FindCollidingPairs<T, Func> func;
 	func.collisionCallback = &callback;
 	AABBQuery(aabb, func);

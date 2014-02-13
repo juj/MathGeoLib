@@ -20,7 +20,7 @@
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "Time/Profiler.h"
 #else
-#define PROFILE(x)
+#define MGL_PROFILE(x)
 #endif
 #include "../Math/float2.h"
 #include "AABB2D.h"
