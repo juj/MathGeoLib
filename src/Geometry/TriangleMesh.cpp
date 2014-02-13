@@ -168,7 +168,10 @@ SIMDCapability DetectSIMDCapability()
 const int simdCapability = DetectSIMDCapability();
 
 TriangleMesh::TriangleMesh()
-:data(0), numTriangles(0), vertexSizeBytes(0), vertexDataLayout(0)
+:data(0), numTriangles(0), vertexSizeBytes(0)
+#ifdef _DEBUG
+, vertexDataLayout(0)
+#endif
 {
 
 }
@@ -179,7 +182,10 @@ TriangleMesh::~TriangleMesh()
 }
 
 TriangleMesh::TriangleMesh(const TriangleMesh &rhs)
-:data(0), numTriangles(0), vertexSizeBytes(0), vertexDataLayout(0)
+:data(0), numTriangles(0), vertexSizeBytes(0)
+#ifdef _DEBUG
+, vertexDataLayout(0)
+#endif
 {
 	*this = rhs;
 }
