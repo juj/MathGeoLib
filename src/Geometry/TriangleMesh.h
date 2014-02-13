@@ -73,11 +73,11 @@ public:
 
 private:
 	float *data; // This is always allocated to tightly-packed numTriangles*3*vertexSizeBytes bytes.
+	int numTriangles;
 	int vertexSizeBytes;
 #ifdef _DEBUG
 	int vertexDataLayout; // 0 - AoS, 1 - SoA4, 2 - SoA8
 #endif
-	int numTriangles;
 	void ReallocVertexBuffer(int numTriangles, int vertexSizeBytes);
 };
 

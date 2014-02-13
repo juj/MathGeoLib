@@ -60,7 +60,7 @@ struct AlignedAllocator : std::allocator<T>
 	typedef typename base::difference_type difference_type;
 
 	AlignedAllocator(){}
-	AlignedAllocator(const AlignedAllocator &){}
+	AlignedAllocator(const AlignedAllocator &):std::allocator<T>(){}
 	template<typename U>
 	AlignedAllocator(const AlignedAllocator<U, Alignment> &){}
 
