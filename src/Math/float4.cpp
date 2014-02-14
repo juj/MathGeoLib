@@ -1047,7 +1047,7 @@ bool float4::Equals(float x_, float y_, float z_, float w_, float epsilon) const
 		   fabs(w - w_) < epsilon;
 }
 
-float4 float4::RandomDir(LCG &lcg, float length)
+float4 MUST_USE_RESULT float4::RandomDir(LCG &lcg, float length)
 {
 	return DIR_TO_FLOAT4(Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg) - POINT_VEC_SCALAR(0.f));
 }

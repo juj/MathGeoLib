@@ -745,8 +745,8 @@ BENCHMARK(matrix_copy2, "matrix-copy-for-loop")
 {
 	float *dst = (float*)&m2[i];
 	float *src = (float*)&m[i];
-	for(int i = 0; i < 16; ++i)
-		dst[i] = src[i];
+	for(int j = 0; j < 16; ++j)
+		dst[J] = src[j];
 }
 BENCHMARK_END;
 
