@@ -826,15 +826,4 @@ Q_DECLARE_METATYPE(float4)
 Q_DECLARE_METATYPE(float4*)
 #endif
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-
-// VS2010/old C++ standard issue with aligning data inside a std::vector, work around it.
-#if defined(_MSC_VER) && _MSC_VER < 1700 /*VS2012*/
-typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > Float4Array;
-#else
-typedef std::vector<float4> Float4Array;
-#endif
-
-#endif
-
 MATH_END_NAMESPACE

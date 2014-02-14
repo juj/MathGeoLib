@@ -104,13 +104,25 @@ struct AlignedAllocator;
 struct Triangle_storage;
 struct LineSegment_storage;
 
-// VS2010/old C++ standard issue with aligning data inside a std::vector, work around it.
-#if defined(_MSC_VER) && _MSC_VER < 1700 /*VS2012*/
+// VS2010+VS2012/old C++ standard issue with aligning data inside a std::vector, work around it.
+#if defined(_MSC_VER) && _MSC_VER < 1800 /*VS2013*/
 typedef std::vector<Triangle_storage, AlignedAllocator<Triangle_storage, 16> > TriangleArray;
 typedef std::vector<LineSegment_storage, AlignedAllocator<LineSegment_storage, 16> > LineSegmentArray;
+typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > Float4Array;
+#ifdef MATH_AUTOMATIC_SSE
+typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > VecArray;
+#endif
 #else
 typedef std::vector<Triangle> TriangleArray;
 typedef std::vector<LineSegment> LineSegmentArray;
+typedef std::vector<float4> Float4Array;
+#ifdef MATH_AUTOMATIC_SSE
+typedef std::vector<float4> VecArray;
+#endif
+#endif
+
+#if !defined(MATH_AUTOMATIC_SSE)
+typedef std::vector<float3> VecArray;
 #endif
 
 MATH_END_NAMESPACE
