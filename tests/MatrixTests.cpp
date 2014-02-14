@@ -778,8 +778,8 @@ BENCHMARK(matrix_copy4, "matrix-copy-sse")
 {
 	simd4f *dst = (simd4f *)&m2[i];
 	simd4f *src = (simd4f *)&m[i];
-	for (int i = 0; i < 4; ++i)
-		dst[i] = src[i];
+	for (int j = 0; j < 4; ++j)
+		dst[j] = src[j];
 }
 BENCHMARK_END;
 
@@ -800,8 +800,8 @@ BENCHMARK(matrix_copy6, "matrix-copy-avx")
 {
 	__m256 *dst = (__m256 *)&m2[i];
 	__m256 *src = (__m256 *)&m[i];
-	for (int i = 0; i < 2; ++i)
-		dst[i] = src[i];
+	for (int j = 0; j < 2; ++j)
+		dst[j] = src[j];
 }
 BENCHMARK_END;
 
