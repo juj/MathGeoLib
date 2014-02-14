@@ -20,6 +20,8 @@
 #include "MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 
+#include <stddef.h>
+
 // Very annoying to have to do this, but <iosfwd> doesn't have a fwddecl for std::vector,
 // and forward-declaring it manually is not allowed, see http://stackoverflow.com/questions/307343/forward-declare-an-stl-container
 #include <vector>
