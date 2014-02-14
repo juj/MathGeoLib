@@ -119,7 +119,7 @@ void Plane::ReverseNormal()
 vec Plane::PointOnPlane() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return normal * d + float4(POINT_VEC_SCALAR(0.f));
+	return normal * d + vec(POINT_VEC_SCALAR(0.f));
 #else
 	return normal * d;
 #endif
