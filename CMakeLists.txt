@@ -24,6 +24,10 @@ endif()
 #	SET(GENERATE_ASM_LISTING FALSE)
 #endif()
 
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+	set(LINUX TRUE)
+endif()
+
 include(CommonOptions.cmake)
 
 # If requested from the command line, run Visual Studio 2012 static code analysis. Warning: this is very slow!
