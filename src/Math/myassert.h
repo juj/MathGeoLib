@@ -43,6 +43,10 @@
 #define asserteq(x,y) ((void)0)
 #define assertcmp(x, cmp, y) ((void)0)
 
+// If defined in a compilation unit, MATH_IGNORE_UNUSED_VARS_WARNING will kill all subsequent warnings about variables going unused.
+// This occurs commonly in unit tests that are also doubled as benchmarks - killing the use of assert() macro will leave variables
+// that were otherwise not used, except when assert()ing a condition. As a simplest measure, MATH_IGNORE_UNUSED_VARS_WARNING will
+// operate only when assert() is a no-op, so that in debug builds etc. real instances of unused variables are still caught.
 #ifdef _MSC_VER
 #define MATH_IGNORE_UNUSED_VARS_WARNING __pragma(warning(disable:4189)) // C4189: 'variableName' : local variable is initialized but not referenced
 #else
