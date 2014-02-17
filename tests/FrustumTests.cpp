@@ -5,6 +5,8 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 Frustum GenIdFrustum(FrustumHandedness h, FrustumProjectiveSpace p)
 {
 	Frustum f;

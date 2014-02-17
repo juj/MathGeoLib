@@ -10,6 +10,8 @@
 #include "../src/Math/float4x4_sse.h"
 #include "../src/Math/float4x4_neon.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 using namespace TestData;
 
 TEST(Float3x4ScaleRow)

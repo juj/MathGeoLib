@@ -10,6 +10,8 @@
 
 using namespace TestData;
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 TEST(Float4Swizzled)
 {
 	float4 f(float2(1,2),3,4);

@@ -12,6 +12,8 @@
 
 #include "../src/Math/SSEMath.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 using namespace TestData;
 
 char int_to_string[64];

@@ -5,6 +5,8 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength)
 {
 	float w = rng.Float(1e-2f, maxSideLength);

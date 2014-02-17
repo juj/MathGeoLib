@@ -15,6 +15,8 @@
 #include "../src/Math/sse_mathfun.h"
 #endif
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 using namespace TestData;
 
 bool TrueCondition() // This is a function that always returns true, but it is impossible for compiler to know that.

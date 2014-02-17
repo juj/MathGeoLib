@@ -5,6 +5,8 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 {
 	float w = rng.Float(0, maxSideLength);

@@ -43,7 +43,15 @@
 #define asserteq(x,y) ((void)0)
 #define assertcmp(x, cmp, y) ((void)0)
 
+#ifdef _MSC_VER
+#define MATH_IGNORE_UNUSED_VARS_WARNING __pragma(warning(disable:4189)) // C4189: 'variableName' : local variable is initialized but not referenced
 #else
+#define MATH_IGNORE_UNUSED_VARS_WARNING _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")
+#endif
+
+#else
+
+#define MATH_IGNORE_UNUSED_VARS_WARNING
 
 #define assert(x) \
 	MULTI_LINE_MACRO_BEGIN \

@@ -2,6 +2,8 @@
 #include "../src/MathGeoLib.h"
 #include "../tests/TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 RANDOMIZED_TEST(LCG_IntFast)
 {
 	LCG lcg;

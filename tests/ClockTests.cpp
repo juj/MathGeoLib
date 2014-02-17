@@ -3,6 +3,8 @@
 #include "../tests/TestRunner.h"
 #include "SystemInfo.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 TEST(MonotonousClock)
 {
 	tick_t maxDiff = 0;
