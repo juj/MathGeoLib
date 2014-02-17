@@ -17,4 +17,6 @@ GOTO END
 echo Could not find the cppcheck executable! Please add it to system PATH and try again!
 
 :END
+set PATH=%OLDPATH%
+
 pause
