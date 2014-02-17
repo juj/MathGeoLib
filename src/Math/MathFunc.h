@@ -156,17 +156,26 @@ float Cosh(float x);
 float Tanh(float x);
 
 /// Returns true if the given number is a power of 2.
-/** @see RoundUpPow2(), RoundDownPow2(). */
-bool IsPow2(unsigned int number);
+/** @note IsPow2(0) == true.
+	@see RoundUpPow2(), RoundDownPow2(). */
+bool IsPow2(u32 number);
 bool IsPow2(u64 number);
+FORCE_INLINE bool IsPow2(s32 number) { assert(number >= 0); return IsPow2((u32)number); }
+FORCE_INLINE bool IsPow2(s64 number) { assert(number >= 0); return IsPow2((u64)number); }
 /// Returns the smallest power-of-2 number (1,2,4,8,16,32,...) greater or equal than the given number.
-/** @see IsPow2(), RoundDownPow2(). */
-unsigned int RoundUpPow2(unsigned int number);
+/** @note RoundUpPow2(0) == 0. Also, note that RoundUpPow2(x) == 0 if x >= 0x80000001 for the u32 version, or if x >= 0x8000000000000001 for the u64 version.
+	@see IsPow2(), RoundDownPow2(). */
+u32 RoundUpPow2(u32 number);
 u64 RoundUpPow2(u64 number);
+FORCE_INLINE s32 RoundUpPow2(s32 number) { assert(number >= 0); return (s32)RoundUpPow2((u32)number); }
+FORCE_INLINE s64 RoundUpPow2(s64 number) { assert(number >= 0); return (s64)RoundUpPow2((u64)number); }
 /// Returns the largest power-of-2 number (1,2,4,8,16,32,...) smaller or equal than the given number.
-/** @see IsPow2(), RoundUpPow2(). */
-unsigned int RoundDownPow2(unsigned int number);
-u64 RoundUpPow2(u64 number);
+/** @note RoundDownPow2(0) == 0.
+	@see IsPow2(), RoundUpPow2(). */
+u32 RoundDownPow2(u32 number);
+u64 RoundDownPow2(u64 number);
+FORCE_INLINE s32 RoundDownPow2(s32 number) { assert(number >= 0); return (s32)RoundDownPow2((u32)number); }
+FORCE_INLINE s64 RoundDownPow2(s64 number) { assert(number >= 0); return (s64)RoundDownPow2((u64)number); }
 
 /// Returns the given number rounded up to the next multiple of n.
 /** @param x The number to round up.

@@ -968,3 +968,115 @@ BENCHMARK(Min_fmin, "C99/C++11 fmin")
 }
 BENCHMARK_END;
 #endif
+
+UNIQUE_TEST(IsPow2)
+{
+	assert(IsPow2(0));
+	assert(IsPow2(1));
+	assert(IsPow2(2));
+	assert(!IsPow2(3));
+	assert(IsPow2(4));
+	assert(!IsPow2(6));
+	assert(IsPow2(8));
+	assert(IsPow2(65536));
+	assert(!IsPow2(3423626));
+	assert(!IsPow2((unsigned int)-1));
+	assert(!IsPow2(0xFFFFFFFFU));
+	assert(IsPow2(0x40000000U));
+	assert(IsPow2(0x80000000U));
+}
+
+UNIQUE_TEST(IsPow2_u64)
+{
+	assert(IsPow2(0ULL));
+	assert(IsPow2(1ULL));
+	assert(IsPow2(2ULL));
+	assert(!IsPow2(3ULL));
+	assert(IsPow2(4ULL));
+	assert(!IsPow2(6ULL));
+	assert(IsPow2(8ULL));
+	assert(IsPow2(65536ULL));
+	assert(!IsPow2(3423626ULL));
+	assert(!IsPow2((u64)-1));
+	assert(!IsPow2(0xFFFFFFFFULL));
+	assert(!IsPow2(0xFFFFFFFFFFFFFFFFULL));
+	assert(IsPow2(0x40000000ULL));
+	assert(IsPow2(0x80000000ULL));
+	assert(IsPow2(0x100000000ULL));
+	assert(IsPow2(0x4000000000000000ULL));
+	assert(IsPow2(0x8000000000000000ULL));
+}
+
+UNIQUE_TEST(RoundUpPow2)
+{
+	asserteq(RoundUpPow2(0), 0);
+	asserteq(RoundUpPow2(1), 1);
+	asserteq(RoundUpPow2(2), 2);
+	asserteq(RoundUpPow2(3), 4);
+	asserteq(RoundUpPow2(4), 4);
+	asserteq(RoundUpPow2(5), 8);
+	asserteq(RoundUpPow2(64241), 65536);
+	asserteq(RoundUpPow2(0x7FFFFFFFU), 0x80000000U);
+	asserteq(RoundUpPow2(0x80000000U), 0x80000000U);
+	asserteq(RoundUpPow2(0x80000001U), 0);
+	asserteq(RoundUpPow2(0xFE873210U), 0);
+	asserteq(RoundUpPow2(0xFFFFFFFFU), 0);
+}
+
+UNIQUE_TEST(RoundUpPow2_u64)
+{
+	asserteq(RoundUpPow2(0ULL), 0);
+	asserteq(RoundUpPow2(1ULL), 1);
+	asserteq(RoundUpPow2(2ULL), 2);
+	asserteq(RoundUpPow2(3ULL), 4);
+	asserteq(RoundUpPow2(4ULL), 4);
+	asserteq(RoundUpPow2(5ULL), 8);
+	asserteq(RoundUpPow2(64241ULL), 65536);
+	asserteq(RoundUpPow2(0x7FFFFFFFULL), 0x80000000U);
+	asserteq(RoundUpPow2(0x80000000ULL), 0x80000000U);
+	asserteq(RoundUpPow2(0x80000001ULL), 0x100000000ULL);
+	asserteq(RoundUpPow2(0xFE873210ULL), 0x100000000ULL);
+	asserteq(RoundUpPow2(0xFFFFFFFFULL), 0x100000000ULL);
+	asserteq(RoundUpPow2(0x7FFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
+	asserteq(RoundUpPow2(0x8000000000000000ULL), 0x8000000000000000ULL);
+	asserteq(RoundUpPow2(0x8000000000000001ULL), 0);
+	asserteq(RoundUpPow2(0xFE87321084208274ULL), 0);
+	asserteq(RoundUpPow2(0xFFFFFFFFFFFFFFFFULL), 0);
+}
+
+UNIQUE_TEST(RoundDownPow2)
+{
+	asserteq(RoundDownPow2(0), 0);
+	asserteq(RoundDownPow2(1), 1);
+	asserteq(RoundDownPow2(2), 2);
+	asserteq(RoundDownPow2(3), 2);
+	asserteq(RoundDownPow2(4), 4);
+	asserteq(RoundDownPow2(5), 4);
+	asserteq(RoundDownPow2(64241), 32768);
+	asserteq(RoundDownPow2(0x7FFFFFFFU), 0x40000000U);
+	asserteq(RoundDownPow2(0x80000000U), 0x80000000U);
+	asserteq(RoundDownPow2(0x80000001U), 0x80000000U);
+	asserteq(RoundDownPow2(0xFE873210U), 0x80000000U);
+	asserteq(RoundDownPow2(0xFFFFFFFFU), 0x80000000U);
+}
+
+UNIQUE_TEST(RoundDownPow2_u64)
+{
+	asserteq(RoundDownPow2(0ULL), 0);
+	asserteq(RoundDownPow2(1ULL), 1);
+	asserteq(RoundDownPow2(2ULL), 2);
+	asserteq(RoundDownPow2(3ULL), 2);
+	asserteq(RoundDownPow2(4ULL), 4);
+	asserteq(RoundDownPow2(5ULL), 4);
+	asserteq(RoundDownPow2(64241ULL), 32768);
+	asserteq(RoundDownPow2(0x7FFFFFFFULL), 0x40000000U);
+	asserteq(RoundDownPow2(0x80000000ULL), 0x80000000U);
+	asserteq(RoundDownPow2(0x80000001ULL), 0x80000000ULL);
+	asserteq(RoundDownPow2(0xFE873210ULL), 0x80000000ULL);
+	asserteq(RoundDownPow2(0xFFFFFFFFULL), 0x80000000ULL);
+	asserteq(RoundDownPow2(0x7FFFFFFFFFFFFFFFULL), 0x4000000000000000ULL);
+	asserteq(RoundDownPow2(0x8000000000000000ULL), 0x8000000000000000ULL);
+	asserteq(RoundDownPow2(0x8000000000000001ULL), 0x8000000000000000ULL);
+	asserteq(RoundDownPow2(0xFE87321084208274ULL), 0x8000000000000000ULL);
+	asserteq(RoundDownPow2(0xFFFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
+}

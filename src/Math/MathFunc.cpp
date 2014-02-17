@@ -137,19 +137,19 @@ float Tanh(float x)
 	return tanhf(x);
 }
 
-bool IsPow2(unsigned int number)
+bool IsPow2(u32 number)
 {
 	return (number & (number-1)) == 0;
 }
 
 bool IsPow2(u64 number)
 {
-    return (number & (number-1)) == 0;
+	return (number & (number-1)) == 0;
 }
 
-unsigned int RoundUpPow2(unsigned int x)
+u32 RoundUpPow2(u32 x)
 {
-	assert(sizeof(unsigned int) <= 4);
+	assert(sizeof(u32) == 4);
 	--x;
 	x |= x >> 1;
 	x |= x >> 2;
@@ -163,7 +163,7 @@ unsigned int RoundUpPow2(unsigned int x)
 
 u64 RoundUpPow2(u64 x)
 {
-	assert(sizeof(u64) <= 8);
+	assert(sizeof(u64) == 8);
 	--x;
 	x |= x >> 1;
 	x |= x >> 2;
@@ -176,9 +176,9 @@ u64 RoundUpPow2(u64 x)
 	return x;
 }
 
-unsigned int RoundDownPow2(unsigned int x)
+u32 RoundDownPow2(u32 x)
 {
-	assert(sizeof(unsigned int) <= 4);
+	assert(sizeof(u32) == 4);
 	x |= x >> 1;
 	x |= x >> 2;
 	x |= x >> 4;
@@ -189,7 +189,7 @@ unsigned int RoundDownPow2(unsigned int x)
 
 u64 RoundDownPow2(u64 x)
 {
-	assert(sizeof(u64) <= 8);
+	assert(sizeof(u64) == 8);
 	x |= x >> 1;
 	x |= x >> 2;
 	x |= x >> 4;
