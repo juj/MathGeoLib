@@ -142,6 +142,11 @@ bool IsPow2(unsigned int number)
 	return (number & (number-1)) == 0;
 }
 
+bool IsPow2(u64 number)
+{
+    return (number & (number-1)) == 0;
+}
+
 unsigned int RoundUpPow2(unsigned int x)
 {
 	assert(sizeof(unsigned int) <= 4);
@@ -151,6 +156,21 @@ unsigned int RoundUpPow2(unsigned int x)
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
+	++x;
+
+	return x;
+}
+
+u64 RoundUpPow2(u64 x)
+{
+	assert(sizeof(u64) <= 8);
+	--x;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
 	++x;
 
 	return x;
@@ -167,9 +187,27 @@ unsigned int RoundDownPow2(unsigned int x)
 	return x - (x >> 1);
 }
 
+u64 RoundDownPow2(u64 x)
+{
+	assert(sizeof(u64) <= 8);
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
+	return x - (x >> 1);
+}
+
 int RoundIntUpToMultipleOfPow2(int x, int n)
 {
-	assert(IsPow2(n));
+	assert(IsPow2((unsigned int)n));
+	return (x + n-1) & ~(n-1);
+}
+
+s64 RoundIntUpToMultipleOfPow2(s64 x, s64 n)
+{
+	assert(IsPow2((u64)n));
 	return (x + n-1) & ~(n-1);
 }
 

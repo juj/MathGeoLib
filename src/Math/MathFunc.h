@@ -158,17 +158,21 @@ float Tanh(float x);
 /// Returns true if the given number is a power of 2.
 /** @see RoundUpPow2(), RoundDownPow2(). */
 bool IsPow2(unsigned int number);
+bool IsPow2(u64 number);
 /// Returns the smallest power-of-2 number (1,2,4,8,16,32,...) greater or equal than the given number.
 /** @see IsPow2(), RoundDownPow2(). */
 unsigned int RoundUpPow2(unsigned int number);
+u64 RoundUpPow2(u64 number);
 /// Returns the largest power-of-2 number (1,2,4,8,16,32,...) smaller or equal than the given number.
 /** @see IsPow2(), RoundUpPow2(). */
 unsigned int RoundDownPow2(unsigned int number);
+u64 RoundUpPow2(u64 number);
 
 /// Returns the given number rounded up to the next multiple of n.
 /** @param x The number to round up.
 	@param n The multiple to round x to. The value n must be a power-of-2. */
 int RoundIntUpToMultipleOfPow2(int x, int n);
+s64 RoundIntUpToMultipleOfPow2(s64 x, s64 n);
 
 /// Raises the given base to an integral exponent.
 /** @see Pow(), Exp(). */
