@@ -4,9 +4,17 @@
 :: The warning noConstructor: 'The class 'classname' does not have a constructor is suppressed because MathGeoLib uses the keyword 'class' for POD-like objects as well.
 :: The warning ConfigurationNotChecked: 'Skipping configuration 'Complex' because it seems to be invalid. Use -D if you want to check it.' is suppressed because cppcheck runs through combinations that are not needed.
 
-"C:\Program Files (x86)\Cppcheck\cppcheck" --version
+set OLDPATH=%PATH%
+set PATH=%PATH%;C:\Program Files (x86)\Cppcheck
 
-"C:\Program Files (x86)\Cppcheck\cppcheck" --template "{file}({line}): ({severity}) ({id}): {message}" -UMATH_QT_INTEROP -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=noConstructor --suppress=uninitMemberVar --suppress=ConfigurationNotChecked --suppress=incorrectStringBooleanError --error-exitcode=1 --force --suppressions suppressions.txt ../src
+call cppcheck --version
+IF ERRORLEVEL 1 GOTO NO_CPPCHECK
 
+call cppcheck --template "{file}({line}): ({severity}) ({id}): {message}" -UMATH_QT_INTEROP -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=noConstructor --suppress=uninitMemberVar --suppress=ConfigurationNotChecked --suppress=incorrectStringBooleanError --error-exitcode=1 --force --suppressions suppressions.txt ../src
+GOTO END
+
+:NO_CPPCHECK
+echo Could not find the cppcheck executable! Please add it to system PATH and try again!
+
+:END
 pause
-
