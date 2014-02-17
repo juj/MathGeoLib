@@ -63,6 +63,7 @@
 		{ \
 			const char *error = #x " in " __FILE__ ":" STRINGIZE(__LINE__); \
 			RuntimeFailure(error); \
+			MARK_UNUSED(error); /* Appease cppcheck to not complain that error is unused. */ \
 		} \
 	MULTI_LINE_MACRO_END
 

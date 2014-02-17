@@ -786,9 +786,9 @@ struct float4_storage
 	float4_storage(){}
 	float4_storage(const float4 &rhs)
 	{
-		*(float4*)this = rhs;
+		*reinterpret_cast<float4*>(this) = rhs;
 	}
-	operator float4() const { return *(float4*)this; }
+	operator float4() const { return *reinterpret_cast<const float4*>(this); }
 };
 
 #ifdef MATH_ENABLE_STL_SUPPORT

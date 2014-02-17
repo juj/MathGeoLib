@@ -236,9 +236,9 @@ struct LineSegment_storage
 	LineSegment_storage(){}
 	LineSegment_storage(const LineSegment &rhs)
 	{
-		*(LineSegment*)this = rhs;
+		*reinterpret_cast<LineSegment*>(this) = rhs;
 	}
-	operator LineSegment() const { return *(LineSegment*)this; }
+	operator LineSegment() const { return *reinterpret_cast<const LineSegment*>(this); }
 };
 
 LineSegment operator *(const float3x3 &transform, const LineSegment &line);

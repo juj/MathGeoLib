@@ -376,9 +376,9 @@ struct Triangle_storage
 	vec_storage v0, v1, v2;
 	Triangle_storage(const Triangle &rhs)
 	{
-		*(Triangle*)this = rhs;
+		*reinterpret_cast<Triangle*>(this) = rhs;
 	}
-	operator Triangle() const { return *(Triangle*)this; }
+	operator Triangle() const { return *reinterpret_cast<const Triangle*>(this); }
 };
 #define TRIANGLE(x) (*(Triangle*)&x)
 
