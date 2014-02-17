@@ -203,7 +203,7 @@ if (MATH_AVX)
 	endif()
 elseif (MATH_SSE41)
 	add_definitions(-DMATH_SSE41)
-	if (MSVC)
+	if (MSVC AND MSVC_VERSION LESS 1800) # VS2013 no longer has /arch:SSE2, it's always enabled.
 		add_definitions(/arch:SSE2) # No equivalent for Visual Studio, after SSE2, arch jumps to AVX.
 	elseif (IS_GCC_LIKE)
 		# Note: corei7 also requires SSE 4.2
@@ -211,14 +211,14 @@ elseif (MATH_SSE41)
 	endif()
 elseif (MATH_SSE3)
 	add_definitions(-DMATH_SSE3)
-	if (MSVC)
+	if (MSVC AND MSVC_VERSION LESS 1800) # VS2013 no longer has /arch:SSE2, it's always enabled.
 		add_definitions(/arch:SSE2) # No equivalent for Visual Studio, after SSE2, arch jumps to AVX.
 	elseif (IS_GCC_LIKE)
 		add_definitions(-msse3 -march=core2 -mtune=core2)
 	endif()
 elseif (MATH_SSE2)
 	add_definitions(-DMATH_SSE2)
-	if (MSVC)
+	if (MSVC AND MSVC_VERSION LESS 1800) # VS2013 no longer has /arch:SSE2, it's always enabled.
 		add_definitions(/arch:SSE2)
 	elseif (IS_GCC_LIKE)
 		add_definitions(-msse2 -march=pentium4 -mtune=pentium4)
