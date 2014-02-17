@@ -10,6 +10,8 @@
 #include "../src/Math/SSEMath.h"
 #include "../src/Math/quat_simd.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 using namespace TestData;
 
 BENCHMARK(Quat_Transform_float3, "Quat::Transform(float3)")

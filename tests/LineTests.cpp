@@ -5,6 +5,8 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 Line RandomLineContainingPoint(const vec &pt);
 Ray RandomRayContainingPoint(const vec &pt);
 LineSegment RandomLineSegmentContainingPoint(const vec &pt);

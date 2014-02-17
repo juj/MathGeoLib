@@ -6,6 +6,8 @@
 #include "TestRunner.h"
 #include "TestData.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength);
 
 MATH_BEGIN_NAMESPACE

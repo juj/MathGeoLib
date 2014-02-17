@@ -2,6 +2,8 @@
 #include "../src/MathGeoLib.h"
 #include "../tests/TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 TEST(TranslateOp)
 {
 	float3x4 tm = float3x4::Translate(1,2,3);
