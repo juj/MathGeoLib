@@ -201,13 +201,13 @@ u64 RoundDownPow2(u64 x)
 
 int RoundIntUpToMultipleOfPow2(int x, int n)
 {
-	assert(IsPow2((unsigned int)n));
+	assert(IsPow2(n));
 	return (x + n-1) & ~(n-1);
 }
 
 s64 RoundIntUpToMultipleOfPow2(s64 x, s64 n)
 {
-	assert(IsPow2((u64)n));
+	assert(IsPow2(n));
 	return (x + n-1) & ~(n-1);
 }
 
