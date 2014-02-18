@@ -35,9 +35,9 @@ MATH_BEGIN_NAMESPACE
 #define ALIGN32 __declspec(align(32))
 #define ALIGN64 __declspec(align(64))
 #else
-#define ALIGN16 __attribute((aligned(16)))
-#define ALIGN32 __attribute((aligned(32)))
-#define ALIGN64 __attribute((aligned(64)))
+#define ALIGN16 __attribute__((aligned(16)))
+#define ALIGN32 __attribute__((aligned(32)))
+#define ALIGN64 __attribute__((aligned(64)))
 #endif
 
 #define IS16ALIGNED(x) ((((uintptr_t)(x)) & 0xF) == 0)
