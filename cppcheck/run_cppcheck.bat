@@ -4,6 +4,9 @@
 :: The warning noConstructor: 'The class 'classname' does not have a constructor is suppressed because MathGeoLib uses the keyword 'class' for POD-like objects as well.
 :: The warning ConfigurationNotChecked: 'Skipping configuration 'Complex' because it seems to be invalid. Use -D if you want to check it.' is suppressed because cppcheck runs through combinations that are not needed.
 
+:: In suppressions.txt:
+:: unusedPrivateFunction:Math/Quat.h: cppcheck does not see that the functions 'Quat::operator*/+-()' are being used.
+
 set OLDPATH=%PATH%
 set PATH=%PATH%;C:\Program Files (x86)\Cppcheck
 

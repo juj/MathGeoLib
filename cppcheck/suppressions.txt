@@ -1,6 +1,1 @@
-duplicateExpression:Math/MathFunc.h
-uninitvar:Geometry/Triangle.cpp
-unassignedVariable:Geometry/TriangleMesh_IntersectRay_SSE.inl
-unassignedVariable:Geometry/TriangleMesh_IntersectRay_AVX.inl
-operatorEqVarError:Math/float3x4.cpp
-operatorEqVarError:Math/float4x4.cpp
+unusedPrivateFunction:Math/Quat.h
