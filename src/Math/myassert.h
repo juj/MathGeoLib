@@ -50,7 +50,7 @@
 #ifdef _MSC_VER
 #define MATH_IGNORE_UNUSED_VARS_WARNING __pragma(warning(disable:4189)) // C4189: 'variableName' : local variable is initialized but not referenced
 #else
-#define MATH_IGNORE_UNUSED_VARS_WARNING _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")
+#define MATH_IGNORE_UNUSED_VARS_WARNING _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") _Pragma("GCC diagnostic ignored \"-Wunused-but-set-variable\"")
 #endif
 
 #else
