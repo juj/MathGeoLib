@@ -312,7 +312,7 @@ public:
 
 	/// Computes a left-handed perspective projection matrix for OpenGL.
 	/// @note Use the M*v multiplication order to project points with this matrix.
-	static float4x4 OpenGLPerspProjLH(float n, float f, float h, float v);
+	static float4x4 OpenGLPerspProjLH(float nearPlaneDistance, float farPlaneDistance, float horizontalViewportSize, float verticalViewportSize);
 	/// Identical to http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml , except uses viewport sizes instead of FOV to set up the
 	/// projection matrix.
 	/// @note Use the M*v multiplication order to project points with this matrix.
