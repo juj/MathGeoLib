@@ -980,10 +980,10 @@ UNIQUE_TEST(IsPow2)
 	assert(IsPow2(8));
 	assert(IsPow2(65536));
 	assert(!IsPow2(3423626));
-	assert(!IsPow2((unsigned int)-1));
-	assert(!IsPow2(0xFFFFFFFFU));
-	assert(IsPow2(0x40000000U));
-	assert(IsPow2(0x80000000U));
+	assert(!IsPow2((u32)-1));
+	assert(!IsPow2((u32)0xFFFFFFFFU));
+	assert(IsPow2((u32)0x40000000U));
+	assert(IsPow2((u32)0x80000000U));
 }
 
 UNIQUE_TEST(IsPow2_u64)
@@ -1016,11 +1016,11 @@ UNIQUE_TEST(RoundUpPow2)
 	asserteq(RoundUpPow2(4), 4);
 	asserteq(RoundUpPow2(5), 8);
 	asserteq(RoundUpPow2(64241), 65536);
-	asserteq(RoundUpPow2(0x7FFFFFFFU), 0x80000000U);
-	asserteq(RoundUpPow2(0x80000000U), 0x80000000U);
-	asserteq(RoundUpPow2(0x80000001U), 0);
-	asserteq(RoundUpPow2(0xFE873210U), 0);
-	asserteq(RoundUpPow2(0xFFFFFFFFU), 0);
+	asserteq(RoundUpPow2((u32)0x7FFFFFFFU), 0x80000000U);
+	asserteq(RoundUpPow2((u32)0x80000000U), 0x80000000U);
+	asserteq(RoundUpPow2((u32)0x80000001U), 0);
+	asserteq(RoundUpPow2((u32)0xFE873210U), 0);
+	asserteq(RoundUpPow2((u32)0xFFFFFFFFU), 0);
 }
 
 UNIQUE_TEST(RoundUpPow2_u64)
@@ -1053,11 +1053,11 @@ UNIQUE_TEST(RoundDownPow2)
 	asserteq(RoundDownPow2(4), 4);
 	asserteq(RoundDownPow2(5), 4);
 	asserteq(RoundDownPow2(64241), 32768);
-	asserteq(RoundDownPow2(0x7FFFFFFFU), 0x40000000U);
-	asserteq(RoundDownPow2(0x80000000U), 0x80000000U);
-	asserteq(RoundDownPow2(0x80000001U), 0x80000000U);
-	asserteq(RoundDownPow2(0xFE873210U), 0x80000000U);
-	asserteq(RoundDownPow2(0xFFFFFFFFU), 0x80000000U);
+	asserteq(RoundDownPow2((u32)0x7FFFFFFFU), 0x40000000U);
+	asserteq(RoundDownPow2((u32)0x80000000U), 0x80000000U);
+	asserteq(RoundDownPow2((u32)0x80000001U), 0x80000000U);
+	asserteq(RoundDownPow2((u32)0xFE873210U), 0x80000000U);
+	asserteq(RoundDownPow2((u32)0xFFFFFFFFU), 0x80000000U);
 }
 
 UNIQUE_TEST(RoundDownPow2_u64)

@@ -39,6 +39,7 @@
 #include "../Math/float4x4.h"
 #include "../Math/Quat.h"
 #include "../Math/float2.h"
+#include "../Math/MathConstants.h"
 
 MATH_BEGIN_NAMESPACE
 
