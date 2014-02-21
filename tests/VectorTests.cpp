@@ -576,6 +576,31 @@ BENCHMARK_END;
 
 #endif
 
+// Benchmark scalar ops so that we can compare scalar vs vector primitive ops costs.
+BENCHMARK(FloatAdd, "float + float")
+{
+	f[i] = pf[i] + uf[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(FloatSub, "float - float")
+{
+	f[i] = pf[i] - uf[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(FloatMul, "float * float")
+{
+	f[i] = pf[i] * uf[i];
+}
+BENCHMARK_END;
+
+BENCHMARK(FloatDiv, "float / float")
+{
+	f[i] = uf[i] / pf[i];
+}
+BENCHMARK_END;
+
 BENCHMARK(Float4_Add, "float4 + float4")
 {
 	v3[i] = v[i] + v2[i];
