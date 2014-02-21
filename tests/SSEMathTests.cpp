@@ -9,6 +9,8 @@
 #include "../src/Math/SSEMath.h"
 #include "../src/Math/float4x4_sse.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 using namespace MATH_NS::TestData;
 
 // In debug mode, we test the correctness of the SSE code. In release mode, we benchmark performance.
