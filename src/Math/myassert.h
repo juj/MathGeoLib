@@ -49,8 +49,11 @@
 // operate only when assert() is a no-op, so that in debug builds etc. real instances of unused variables are still caught.
 #ifdef _MSC_VER
 #define MATH_IGNORE_UNUSED_VARS_WARNING __pragma(warning(disable:4189)) // C4189: 'variableName' : local variable is initialized but not referenced
-#else
+#elif defined(__GNUC__) && (__GNUC__*10000+__GNUC_MINOR*100) >= 40600
+// GCC 4.6 introduced a new warning "-Wunused-but-set-variable", so suppress that on those compilers.
 #define MATH_IGNORE_UNUSED_VARS_WARNING _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") _Pragma("GCC diagnostic ignored \"-Wunused-but-set-variable\"")
+#else
+#define MATH_IGNORE_UNUSED_VARS_WARNING _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")
 #endif
 
 #else
