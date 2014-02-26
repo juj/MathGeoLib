@@ -486,8 +486,8 @@ std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment)
 void LineSegment::ToLineList(VertexBuffer &vb) const
 {
 	int startIndex = vb.AppendVertices(2);
-	vb.Set(startIndex, VDPosition, float4(a, 1.f));
-	vb.Set(startIndex+1, VDPosition, float4(b, 1.f));
+	vb.Set(startIndex, VDPosition, POINT_TO_FLOAT4(a));
+	vb.Set(startIndex+1, VDPosition, POINT_TO_FLOAT4(b));
 }
 
 #endif

@@ -313,10 +313,10 @@ float2 Frustum::ScreenToViewportSpace(const float2 &point, int screenWidth, int 
 
 Ray Frustum::UnProject(float x, float y) const
 {
-	assume(x >= -1.f);
-	assume(x <= 1.f);
-	assume(y >= -1.f);
-	assume(y <= 1.f);
+	assume1(x >= -1.f, x);
+	assume1(x <= 1.f, x);
+	assume1(y >= -1.f, y);
+	assume1(y <= 1.f, y);
 	if (type == PerspectiveFrustum)
 	{
 		vec nearPlanePos = NearPlanePos(x, y);

@@ -1141,8 +1141,8 @@ AABB AABB::Intersection(const AABB &aabb) const
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const
 {
-	Array<float3> pos;
-	Array<float3> normal;
+	Array<vec> pos;
+	Array<vec> normal;
 	Array<float2> uv;
 	int numVertices = (numFacesX*numFacesY + numFacesY*numFacesZ + numFacesX*numFacesZ)*2*6;
 	pos.Resize_pod(numVertices);
@@ -1152,9 +1152,9 @@ void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFa
 	int startIndex = vb.AppendVertices(numVertices);
 	for(int i = 0; i < (int)pos.size(); ++i)
 	{
-		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
-			vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+			vb.Set(startIndex+i, VDNormal, DIR_TO_FLOAT4(normal[i]));
 		if (vb.Declaration()->TypeOffset(VDUV) >= 0)
 			vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
 	}
@@ -1162,12 +1162,12 @@ void AABB::Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFa
 
 void AABB::ToLineList(VertexBuffer &vb) const
 {
-	Array<float3> pos;
+	Array<vec> pos;
 	pos.Resize_pod(NumVerticesInEdgeList());
 	ToEdgeList(&pos[0]);
 	int startIndex = vb.AppendVertices((int)pos.size());
 	for(int i = 0; i < (int)pos.size(); ++i)
-		vb.Set(startIndex+i, VDPosition, float4(pos[i], 1.f));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
 }
 
 #endif

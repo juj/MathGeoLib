@@ -134,7 +134,7 @@ bool OBB::SetFrom(const Polyhedron &polyhedron)
 {
 	if (!polyhedron.v.empty())
 	{
-		*this = OBB::OptimalEnclosingOBB(&polyhedron.v[0], (int)polyhedron.v.size());
+		*this = OBB::OptimalEnclosingOBB((vec*)&polyhedron.v[0], (int)polyhedron.v.size());
 		return true;
 	}
 	else
@@ -488,7 +488,7 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 			float distX = dirs[i].x - dirs[j].x;
 			if (distX > 1e-1f)
 				break;
-			if (dirs[i].DistanceSq(dirs[j]) < 1e-3f)
+			if (vec(dirs[i]).DistanceSq(dirs[j]) < 1e-3f)
 			{
 				dirs.erase(dirs.begin() + j);
 				--i;
@@ -1054,9 +1054,9 @@ void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFaci
 	int startIndex = vb.AppendVertices(numVertices);
 	for(int i = 0; i < (int)pos.size(); ++i)
 	{
-		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
-			vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+			vb.Set(startIndex+i, VDNormal, DIR_TO_FLOAT4(normal[i]));
 		if (vb.Declaration()->TypeOffset(VDUV) >= 0)
 			vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
 	}
@@ -1069,7 +1069,7 @@ void OBB::ToLineList(VertexBuffer &vb) const
 	ToEdgeList(&pos[0]);
 	int startIndex = vb.AppendVertices((int)pos.size());
 	for(int i = 0; i < (int)pos.size(); ++i)
-		vb.Set(startIndex+i, VDPosition, float4(pos[i], 1.f));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
 }
 
 #endif

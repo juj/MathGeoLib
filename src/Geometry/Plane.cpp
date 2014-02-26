@@ -928,10 +928,10 @@ void Plane::Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const vec
 	for(int y = 0; y < numFacesV; ++y)
 		for(int x = 0; x < numFacesU; ++x)
 		{
-			float4 tl = float4(topLeft + uEdge * (float)x + vEdge * (float)y, 1.f);
-			float4 tr = float4(topLeft + uEdge * (float)(x+1) + vEdge * (float)y, 1.f);
-			float4 bl = float4(topLeft + uEdge * (float)x + vEdge * (float)(y+1), 1.f);
-			float4 br = float4(topLeft + uEdge * (float)(x+1) + vEdge * (float)(y+1), 1.f);
+			float4 tl = POINT_TO_FLOAT4(topLeft + uEdge * (float)x + vEdge * (float)y);
+			float4 tr = POINT_TO_FLOAT4(topLeft + uEdge * (float)(x+1) + vEdge * (float)y);
+			float4 bl = POINT_TO_FLOAT4(topLeft + uEdge * (float)x + vEdge * (float)(y+1));
+			float4 br = POINT_TO_FLOAT4(topLeft + uEdge * (float)(x+1) + vEdge * (float)(y+1));
 			int i0 = ccwIsFrontFacing ? i : i+5;
 			int i1 = ccwIsFrontFacing ? i+5 : i;
 			vb.Set(i0, VDPosition, tl);
@@ -959,7 +959,7 @@ void Plane::Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const vec
 			if (vb.Declaration()->HasType(VDNormal))
 			{
 				for(int k = 0; k < 6; ++k)
-					vb.Set(i+k, VDNormal, float4(normal, 0.f));
+					vb.Set(i+k, VDNormal, DIR_TO_FLOAT4(normal));
 			}
 
 			i += 6;
@@ -975,8 +975,8 @@ void Plane::ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const vec 
 	int i = vb.AppendVertices((numLinesU + numLinesV) * 2);
 	for(int y = 0; y < numLinesV; ++y)
 	{
-		float4 start = float4(topLeft + vEdge * (float)y, 1.f);
-		float4 end   = float4(topLeft + uWidth * uEdge + vEdge * (float)y, 1.f);
+		float4 start = POINT_TO_FLOAT4(topLeft + vEdge * (float)y);
+		float4 end   = POINT_TO_FLOAT4(topLeft + uWidth * uEdge + vEdge * (float)y);
 		vb.Set(i, VDPosition, start);
 		vb.Set(i+1, VDPosition, end);
 		i += 2;
@@ -984,8 +984,8 @@ void Plane::ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const vec 
 
 	for(int x = 0; x < numLinesU; ++x)
 	{
-		float4 start = float4(topLeft + uEdge * (float)x, 1.f);
-		float4 end   = float4(topLeft + vHeight * vEdge + uEdge * (float)x, 1.f);
+		float4 start = POINT_TO_FLOAT4(topLeft + uEdge * (float)x);
+		float4 end   = POINT_TO_FLOAT4(topLeft + vHeight * vEdge + uEdge * (float)x);
 		vb.Set(i, VDPosition, start);
 		vb.Set(i+1, VDPosition, end);
 		i += 2;

@@ -1342,9 +1342,9 @@ void Sphere::Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacin
 	int startIndex = vb.AppendVertices(numVertices);
 	for(int i = 0; i < (int)pos.size(); ++i)
 	{
-		vb.Set(startIndex+i, VDPosition, float4(pos[i],1.f));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
-			vb.Set(startIndex+i, VDNormal, float4(normal[i],0.f));
+			vb.Set(startIndex+i, VDNormal, DIR_TO_FLOAT4(normal[i]));
 		if (vb.Declaration()->TypeOffset(VDUV) >= 0)
 			vb.SetFloat2(startIndex+i, VDUV, 0, uv[i]);
 	}

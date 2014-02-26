@@ -242,7 +242,7 @@ AABB Polyhedron::MinimalEnclosingAABB() const
 #ifdef MATH_CONTAINERLIB_SUPPORT
 OBB Polyhedron::MinimalEnclosingOBB() const
 {
-	return OBB::OptimalEnclosingOBB(&v[0], (int)v.size());
+	return OBB::OptimalEnclosingOBB((vec*)&v[0], (int)v.size());
 }
 #endif
 
@@ -1468,24 +1468,24 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 		int idx = vb.AppendVertices(3*(int)tris.size());
 		for(size_t j = 0; j < tris.size(); ++j)
 		{
-			vb.Set(idx, VDPosition, float4(tris[j].a, 1.f));
+			vb.Set(idx, VDPosition, POINT_TO_FLOAT4(TRIANGLE(tris[j]).a));
 			if (ccwIsFrontFacing)
 			{
-				vb.Set(idx+1, VDPosition, float4(tris[j].c, 1.f));
-				vb.Set(idx+2, VDPosition, float4(tris[j].b, 1.f));
+				vb.Set(idx+1, VDPosition, POINT_TO_FLOAT4(TRIANGLE(tris[j]).c));
+				vb.Set(idx+2, VDPosition, POINT_TO_FLOAT4(TRIANGLE(tris[j]).b));
 			}
 			else
 			{
-				vb.Set(idx+1, VDPosition, float4(tris[j].b, 1.f));
-				vb.Set(idx+2, VDPosition, float4(tris[j].c, 1.f));
+				vb.Set(idx+1, VDPosition, POINT_TO_FLOAT4(TRIANGLE(tris[j]).b));
+				vb.Set(idx+2, VDPosition, POINT_TO_FLOAT4(TRIANGLE(tris[j]).c));
 			}
 			// Generate flat normals if VB has space for normals.
 			if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
 			{
-				vec normal = ccwIsFrontFacing ? tris[j].NormalCCW() : tris[j].NormalCW();
-				vb.Set(idx, VDNormal, float4(normal, 0.f));
-				vb.Set(idx+1, VDNormal, float4(normal, 0.f));
-				vb.Set(idx+2, VDNormal, float4(normal, 0.f));
+				vec normal = ccwIsFrontFacing ? TRIANGLE(tris[j]).NormalCCW() : TRIANGLE(tris[j]).NormalCW();
+				vb.Set(idx, VDNormal, DIR_TO_FLOAT4(normal));
+				vb.Set(idx+1, VDNormal, DIR_TO_FLOAT4(normal));
+				vb.Set(idx+2, VDNormal, DIR_TO_FLOAT4(normal));
 			}
 			idx += 3;
 		}
@@ -1494,13 +1494,13 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
 
 void Polyhedron::ToLineList(VertexBuffer &vb) const
 {
-	std::vector<LineSegment> edges = Edges();
+	LineSegmentArray edges = Edges();
 
 	int startIndex = vb.AppendVertices((int)edges.size()*2);
 	for(int i = 0; i < (int)edges.size(); ++i)
 	{
-		vb.Set(startIndex+2*i, VDPosition, float4(edges[i].a, 1.f));
-		vb.Set(startIndex+2*i+1, VDPosition, float4(edges[i].b, 1.f));
+		vb.Set(startIndex+2*i, VDPosition, POINT_TO_FLOAT4(edges[i].a));
+		vb.Set(startIndex+2*i+1, VDPosition, POINT_TO_FLOAT4(edges[i].b));
 	}
 }
 #endif
