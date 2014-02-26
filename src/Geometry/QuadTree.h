@@ -64,7 +64,11 @@ public:
 		/// Indicates the quad of child nodes for this node, or 0xFFFFFFFF if this node is a leaf.
 		u32 childIndex;
 		/// Stores the actual objects in this node/leaf.
+#ifdef MATH_CONTAINERLIB_SUPPORT
+		Array<T> objects;
+#else
 		std::vector<T> objects;
+#endif
 
 		bool IsLeaf() const { return childIndex == 0xFFFFFFFF; }
 
@@ -247,7 +251,11 @@ private:
 
 	void SplitLeaf(Node *leaf, const AABB2D &leafAABB);
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
+	Array<Node> nodes;
+#else
 	std::vector<Node> nodes;
+#endif
 
 	/// Specifies the index to the root node, or -1 if there is no root (nodes.size() == 0).
 	int rootNodeIndex;

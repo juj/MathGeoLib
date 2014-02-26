@@ -131,11 +131,14 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 		float halfY = (aabb.minPoint.y + aabb.maxPoint.y) * 0.5f;
 		// Traverse the QuadTree to decide which quad to place this object into.
 		assert(MinX(object) <= MaxX(object));
-		bool left = MinX(object) < halfX;
-		bool right = MaxX(object) > halfX;
+		float left = halfX - MinX(object); // If left > 0.f, then the object overlaps with the left quadrant.
+		float right = MaxX(object) - halfX; // If right > 0.f, then the object overlaps with the right quadrant.
 		assert(MinY(object) <= MaxY(object));
-		bool top = MinY(object) < halfY;
-		bool bottom = MaxY(object) > halfY;
+		float top = halfY - MinY(object); // If top > 0.f, then the object overlaps with the top quadrant.
+		float bottom = MaxY(object) - halfY; // If bottom > 0.f, then the object overlaps with the bottom quadrant.
+		float leftAndRight = Min(left, right); // If > 0.f, then the object straddles left-right halves.
+		float topAndBottom = Min(top, bottom); // If > 0.f, then the object straddles top-bottom halves.
+		float straddledEitherOne = Max(leftAndRight, topAndBottom); // If > 0.f, then the object is in two or more quadrants.
 
 		// Note: It can happen that !left && !right, or !top && !bottom,
 		// but the if()s below are set up so that right/bottom is taken if no left/top, so that is ok.
@@ -143,19 +146,25 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 		// We must put the object onto this node if
 		// a) the object straddled the parent->child split lines.
 		// b) this object is a leaf.
-		if (n->IsLeaf() || (left && right) || (top && bottom))
+		if (straddledEitherOne > 0.f)
 		{
-//			n->bucket.push_back(objectId);
 			n->objects.push_back(object);
 			AssociateQuadTreeNode(object, n);
-			if (n->IsLeaf() && (int)n->objects.size() > minQuadTreeNodeObjectCount && aabb.Width() >= minQuadTreeQuadrantSize && aabb.Height() >= minQuadTreeQuadrantSize)
+			return;
+		}
+		if (n->IsLeaf())
+		{
+			n->objects.push_back(object);
+			AssociateQuadTreeNode(object, n);
+			assert(EqualAbs(aabb.Width(), aabb.Height()));
+			if ((int)n->objects.size() > minQuadTreeNodeObjectCount && aabb.Width() >= minQuadTreeQuadrantSize)
 				SplitLeaf(n, aabb);
 			return;
 		}
-		if (left)
+		if (left > 0.f)
 		{
 			aabb.maxPoint.x = halfX;
-			if (top)
+			if (top > 0.f)
 			{
 				aabb.maxPoint.y = halfY;
 				assert(nodes[n->TopLeftChildIndex()].parent == n);
@@ -171,7 +180,7 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 		else
 		{
 			aabb.minPoint.x = halfX;
-			if (top)
+			if (top > 0.f)
 			{
 				aabb.maxPoint.y = halfY;
 				assert(nodes[n->TopRightChildIndex()].parent == n);
@@ -237,28 +246,31 @@ void QuadTree<T>::SplitLeaf(Node *leaf, const AABB2D &leafAABB)
 
 		// Traverse the QuadTree to decide which quad to place this object into.
 		assert(MinX(object) <= MaxX(object));
-		bool left = MinX(object) < halfX;
-		bool right = MaxX(object) > halfX;
+		float left = halfX - MinX(object); // If left > 0.f, then the object overlaps with the left quadrant.
+		float right = MaxX(object) - halfX; // If right > 0.f, then the object overlaps with the right quadrant.
 		assert(MinY(object) <= MaxY(object));
-		bool top = MinY(object) < halfY;
-		bool bottom = MaxY(object) > halfY;
+		float top = halfY - MinY(object); // If top > 0.f, then the object overlaps with the top quadrant.
+		float bottom = MaxY(object) - halfY; // If bottom > 0.f, then the object overlaps with the bottom quadrant.
+		float leftAndRight = Min(left, right); // If > 0.f, then the object straddles left-right halves.
+		float topAndBottom = Min(top, bottom); // If > 0.f, then the object straddles top-bottom halves.
+		float straddledEitherOne = Max(leftAndRight, topAndBottom); // If > 0.f, then the object is in two or more quadrants.
 
 		// Note: It can happen that !left && !right, or !top && !bottom,
 		// but the if()s below are set up so that right/bottom is taken if no left/top, so that is ok.
 
 		// We must leave this object in this node if the object straddled the parent->child split lines.
-		if ((left && right) || (top && bottom))
+		if (straddledEitherOne > 0.f)
 		{
 			++i;
 			continue;
 		}
 
 		AABB2D child;
-		if (left)
+		if (left > 0.f)
 		{
 			child.minPoint.x = leafAABB.minPoint.x;
 			child.maxPoint.x = halfX;
-			if (top)
+			if (top > 0.f)
 			{
 				child.minPoint.y = leafAABB.minPoint.y;
 				child.maxPoint.y = halfY;
@@ -275,7 +287,7 @@ void QuadTree<T>::SplitLeaf(Node *leaf, const AABB2D &leafAABB)
 		{
 			child.minPoint.x = halfX;
 			child.maxPoint.x = leafAABB.maxPoint.x;
-			if (top)
+			if (top > 0.f)
 			{
 				child.minPoint.y = leafAABB.minPoint.y;
 				child.maxPoint.y = halfY;
