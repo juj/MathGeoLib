@@ -774,6 +774,8 @@ float4 float4::Cross3(const float3 &rhs) const
 float4 float4::Cross3(const float4 &rhs) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	assert((((uintptr_t)&rhs) & 15) == 0); // For SSE ops we must be 16-byte aligned.
+	assert((((uintptr_t)this) & 15) == 0);
 	return float4(cross_ps(v, rhs.v));
 #else
 	return Cross3(rhs.xyz());
