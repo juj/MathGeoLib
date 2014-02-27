@@ -156,8 +156,7 @@ void QuadTree<T>::Add(const T &object, Node *n, AABB2D aabb)
 		{
 			n->objects.push_back(object);
 			AssociateQuadTreeNode(object, n);
-			assert(EqualAbs(aabb.Width(), aabb.Height()));
-			if ((int)n->objects.size() > minQuadTreeNodeObjectCount && aabb.Width() >= minQuadTreeQuadrantSize)
+			if ((int)n->objects.size() > minQuadTreeNodeObjectCount && Min(aabb.Width(), aabb.Height()) >= minQuadTreeQuadrantSize)
 				SplitLeaf(n, aabb);
 			return;
 		}
@@ -439,6 +438,9 @@ struct TraversalNode
 	AABB2D aabb;
 	typename QuadTree<T>::Node *node;
 
+	struct TriCmp { float operator()(const TraversalNode &a, const TraversalNode &b) { return b.d - a.d; } };
+	struct EqualCmp { bool operator()(const TraversalNode &a, const TraversalNode &b) { return b.d == a.d; } };
+
 	/// We compare in reverse order, since we want the node with the smallest distance to be visited first,
 	/// and MaxHeap stores the node that compares largest in the root.
 	bool operator <(const TraversalNode &t) const { return d > t.d; }
@@ -450,17 +452,18 @@ template<typename T>
 template<typename Func>
 inline void QuadTree<T>::NearestNeighborNodes(const float2 &point, Func &leafCallback)
 {
-	MaxHeap<TraversalNode<T> > queue;
-	TraversalNode<T> t;
-	t.d = 0.f;
-	t.aabb = BoundingAABB();
-	t.node = Root();
-	queue.Insert(t);
+	MaxHeap<TraversalNode<T>, typename TraversalNode<T>::TriCmp, typename TraversalNode<T>::EqualCmp > queue;
+	{
+		TraversalNode<T> &rootNode = queue.BeginInsert();
+		rootNode.d = 0.f;
+		rootNode.aabb = BoundingAABB();
+		rootNode.node = Root();
+		queue.FinishInsert();
+	}
 
 	while(queue.Size() > 0)
 	{
-		t = queue.Front();
-		queue.PopFront();
+		const TraversalNode<T> &t = queue.Front();
 
 		if (t.node->objects.size() > 0)
 		{
@@ -468,44 +471,66 @@ inline void QuadTree<T>::NearestNeighborNodes(const float2 &point, Func &leafCal
 			if (stopIteration)
 				return;
 		}
-		
+
 		if (!t.node->IsLeaf())
 		{
-			TraversalNode<T> n;
+			AABB2D taabb = t.aabb;
+			typename QuadTree<T>::Node *childNode = &nodes[t.node->childIndex];
+			queue.PopFront();
 
-			float halfX = (t.aabb.minPoint.x + t.aabb.maxPoint.x) * 0.5f;
-			float halfY = (t.aabb.minPoint.y + t.aabb.maxPoint.y) * 0.5f;
-
-			// Insert bottom-left child node to the traversal queue.
-			n.aabb.minPoint.x = t.aabb.minPoint.x;
-			n.aabb.maxPoint.x = halfX;
-			n.aabb.minPoint.y = halfY;
-			n.aabb.maxPoint.y = t.aabb.maxPoint.y;
-			n.node = &nodes[t.node->BottomLeftChildIndex()];
-			n.d = n.aabb.DistanceSq(point);
-			queue.Insert(n);
-
-			// Insert bottom-right child node to the traversal queue.
-			n.aabb.minPoint.x = halfX;
-			n.aabb.maxPoint.x = t.aabb.maxPoint.x;
-			n.node = &nodes[t.node->BottomRightChildIndex()];
-			n.d = n.aabb.DistanceSq(point);
-			queue.Insert(n);
-
-			// Insert top-right child node to the traversal queue.
-			n.aabb.minPoint.y = t.aabb.minPoint.y;
-			n.aabb.maxPoint.y = halfY;
-			n.node = &nodes[t.node->TopRightChildIndex()];
-			n.d = n.aabb.DistanceSq(point);
-			queue.Insert(n);
+			float halfX = (taabb.minPoint.x + taabb.maxPoint.x) * 0.5f;
+			float halfY = (taabb.minPoint.y + taabb.maxPoint.y) * 0.5f;
 
 			// Insert top-left child node to the traversal queue.
-			n.aabb.minPoint.x = t.aabb.minPoint.x;
-			n.aabb.maxPoint.x = halfX;
-			n.node = &nodes[t.node->TopLeftChildIndex()];
-			n.d = n.aabb.DistanceSq(point);
-			queue.Insert(n);
+			{
+				TraversalNode<T> &n = queue.BeginInsert();
+				n.aabb.minPoint.x = taabb.minPoint.x;
+				n.aabb.maxPoint.x = halfX;
+				n.aabb.minPoint.y = taabb.minPoint.y;
+				n.aabb.maxPoint.y = halfY;
+				n.node = childNode; // t.node->TopLeftChildIndex()
+				n.d = n.aabb.DistanceSq(point);
+				queue.FinishInsert();
+			}
+
+			// Insert top-right child node to the traversal queue.
+			{
+				TraversalNode<T> &n = queue.BeginInsert();
+				n.aabb.minPoint.x = halfX;
+				n.aabb.maxPoint.x = taabb.maxPoint.x;
+				n.aabb.minPoint.y = taabb.minPoint.y;
+				n.aabb.maxPoint.y = halfY;
+				n.node = childNode + 1; // t.node->TopRightChildIndex()
+				n.d = n.aabb.DistanceSq(point);
+				queue.FinishInsert();
+			}
+
+			// Insert bottom-left child node to the traversal queue.
+			{
+				TraversalNode<T> &n = queue.BeginInsert();
+				n.aabb.minPoint.x = taabb.minPoint.x;
+				n.aabb.maxPoint.x = halfX;
+				n.aabb.minPoint.y = halfY;
+				n.aabb.maxPoint.y = taabb.maxPoint.y;
+				n.node = childNode + 2; // t.node->BottomLeftChildIndex()
+				n.d = n.aabb.DistanceSq(point);
+				queue.FinishInsert();
+			}
+
+			// Insert bottom-right child node to the traversal queue.
+			{
+				TraversalNode<T> &n = queue.BeginInsert();
+				n.aabb.minPoint.x = halfX;
+				n.aabb.maxPoint.x = taabb.maxPoint.x;
+				n.aabb.minPoint.y = halfY;
+				n.aabb.maxPoint.y = taabb.maxPoint.y;
+				n.node = childNode + 3; // t.node->BottomRightChildIndex()
+				n.d = n.aabb.DistanceSq(point);
+				queue.FinishInsert();
+			}
 		}
+		else
+			queue.PopFront();
 	}
 }
 
@@ -533,13 +558,16 @@ struct NearestNeighborObjectSearch
 
 		T *object;
 
+		struct TriCmp { float operator()(const NearestObject &a, const NearestObject &b) { return b.d - a.d; } };
+		struct EqualCmp { bool operator()(const NearestObject &a, const NearestObject &b) { return b.d == a.d; } };
+
 		/// We compare in reverse order, since we want the object with the smallest distance to be visited first,
 		/// and MaxHeap stores the object that compares largest in the root.
 		bool operator <(const NearestObject &t) const { return d > t.d; }
 		bool operator ==(const NearestObject &t) const { return d == t.d; }
 	};
 
-	MaxHeap<NearestObject> queue;
+	MaxHeap<NearestObject, typename NearestObject::TriCmp, typename NearestObject::EqualCmp> queue;
 
 	int numObjectsOutputted;
 
@@ -576,12 +604,12 @@ struct NearestNeighborObjectSearch
 		// Queue up all points in the new AABB node.
 		for(size_t i = 0; i < leaf.objects.size(); ++i)
 		{
-			NearestObject obj;
+			NearestObject &obj = queue.BeginInsert();
 			obj.d = leaf.objects[i].DistanceSq(point);
 			obj.aabb = aabb;
 			obj.node = &leaf;
 			obj.object = &leaf.objects[i];
-			queue.Insert(obj);
+			queue.FinishInsert();
 		}
 
 		return false;
