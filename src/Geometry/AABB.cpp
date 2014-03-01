@@ -126,7 +126,13 @@ Polyhedron AABB::ToPolyhedron() const
 			face.v.push_back(faces[f][v]);
 		p.f.push_back(face);
 	}
-
+	
+	assume(p.IsClosed());
+	assume(p.IsConvex());
+	assume(p.EulerFormulaHolds());
+	assume(p.FaceIndicesValid());
+	assume(p.FacesAreNondegeneratePlanar());
+	assume(p.Contains(this->CenterPoint()));
 	return p;
 }
 
@@ -432,7 +438,8 @@ void AABB::Translate(const vec &offset)
 
 void AABB::Scale(const vec &centerPoint, float scaleFactor)
 {
-	return Scale(centerPoint, DIR_VEC(float3(scaleFactor, scaleFactor, scaleFactor)));
+	minPoint = (minPoint - centerPoint) * scaleFactor + centerPoint;
+	maxPoint = (maxPoint - centerPoint) * scaleFactor + centerPoint;
 }
 
 void AABB::Scale(const vec &centerPoint, const vec &scaleFactor)
