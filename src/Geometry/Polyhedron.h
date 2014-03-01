@@ -266,6 +266,12 @@ public:
 	/// Tests if the given face of this Polyhedron contains the given point.
 	bool FaceContains(int faceIndex, const vec &worldSpacePoint, float polygonThickness = 1e-3f) const;
 
+	/// A helper for Contains() and FaceContains() tests: Returns a positive value if the given point is contained in the given face,
+	/// and a negative value if the given point is outside the face. The magnitude of the return value reports a pseudo-distance
+	/// from the point to the nearest edge of the face polygon. This is used as a robustness/stability criterion to estimate how
+	/// numerically believable the result is.
+	float FaceContainmentDistance2D(int faceIndex, const vec &worldSpacePoint, float polygonThickness = 1e-3f) const;
+
 	/// Tests if the given object is fully contained inside this <b>convex</b> polyhedron.
 	/** This function behaves exactly like Contains(), except this version of the containment test
 		assumes this polyhedron is convex, and uses a faster method of testing containment.
@@ -363,7 +369,7 @@ public:
 	std::string ToString() const;
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const;
+	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart = 0, int faceEnd = 0x7FFFFFFF) const;
 	void ToLineList(VertexBuffer &vb) const;
 #endif
 };

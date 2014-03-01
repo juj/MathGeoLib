@@ -361,7 +361,7 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 	return true;
 }
 
-bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float polygonThickness) const
+float Polyhedron::FaceContainmentDistance2D(int faceIndex, const vec &worldSpacePoint, float polygonThickness) const
 {
 	// N.B. This implementation is a duplicate of Polygon::Contains, but adapted to avoid dynamic memory allocation
 	// related to converting the face of a Polyhedron to a Polygon object.
@@ -372,11 +372,11 @@ bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float p
 	const std::vector<int> &vertices = face.v;
 
 	if (vertices.size() < 3)
-		return false;
+		return -FLOAT_INF; // Certainly not intersecting, so return -inf denoting "strongly not contained"
 
 	Plane p = FacePlane(faceIndex);
 	if (FacePlane(faceIndex).Distance(worldSpacePoint) > polygonThickness)
-		return false;
+		return -FLOAT_INF;
 
 	int numIntersections = 0;
 
@@ -391,6 +391,10 @@ bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float p
 
 	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
 
+	// Tracks a pseudo-distance of the point to the ~nearest edge of the polygon. If the point is very close to the polygon
+	// edge, this is very small, and it's possible that due to numerical imprecision we cannot rely on the result in higher-level
+	// algorithms that invoke this function.
+	float faceContainmentDistance = FLOAT_INF;
 	const float epsilon = 1e-4f;
 
 	float2 p0 = float2(Dot(v[vertices.back()], basisU), Dot(v[vertices.back()], basisV)) - localSpacePoint;
@@ -415,44 +419,97 @@ bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float p
 
 				// Test whether the lines (0,0) -> (+inf,0) and p0 -> p1 intersect at a positive X-coordinate.
 				float2 d = p1 - p0;
-				if (Abs(d.y) > 1e-5f)
+				if (d.y != 0.f)
 				{
 					float t = -p0.y / d.y;
 					float x = p0.x + t * d.x;
-					if (t >= 0.f && t <= 1.f && x > 1e-6f)
-						++numIntersections;
+					if (t >= 0.f && t <= 1.f)
+					{
+						// Remember how close the point was to the edge, for tracking robustness/goodness of the result.
+						// If this is very large, then we can conclude that the point was contained or not contained in the face.
+						faceContainmentDistance = Min(faceContainmentDistance, Abs(x));
+						if (x >= 0.f)
+							++numIntersections;
+					}
 				}
 			}
 		}
 		p0 = p1;
 	}
 
-	return numIntersections % 2 == 1;
+	// Positive return value: face contains the point. Negative: face did not contain the point.
+	return (numIntersections % 2 == 1) ? faceContainmentDistance : -faceContainmentDistance;
+}
+
+bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float polygonThickness) const
+{
+	float faceContainmentDistance = FaceContainmentDistance2D(faceIndex, worldSpacePoint, polygonThickness);
+	return faceContainmentDistance >= 0.f;
 }
 
 bool Polyhedron::Contains(const vec &point) const
 {
-	int numIntersections = 0;
-	for(int i = 0; i < (int)f.size(); ++i)
-	{
-		Plane p((vec)v[f[i].v[0]] - point, (vec)v[f[i].v[1]] - point, (vec)v[f[i].v[2]] - point);
+	int bestNumIntersections = 0;
+	float bestFaceContainmentDistance = 0.f;
 
-		// Find the intersection of the plane and the ray (0,0,0) -> (t,0,0), t >= 0.
-		// <normal, point_on_ray> == d
-		// n.x * t == d
-		//       t == d / n.x
-		if (Abs(p.normal.x) > 1e-5f)
+	// General strategy: pick a ray from the query point to a random direction, and count the number of times the ray intersects
+	// a face. If it intersects an odd number of times, the given point must have been inside the polyhedron.
+	// But unfortunately for numerical stability, we must be smart with the choice of the ray direction. If we pick a ray direction
+	// which exits the polyhedron precisely at a vertex, or at an edge of two adjoining faces, we might count those twice. Therefore
+	// try to pick a ray direction that passes safely through a center of some face. If we detect that there was a tricky face that
+	// the ray passed too close to an edge, we have no choice but to pick another ray direction and hope that it passes through
+	// the polyhedron in a safer manner.
+
+	// Loop through each face to choose the ray direction. If our choice was good, we only do this once and the algorithm can exit
+	// after the first iteration at j == 0. If not, we iterate more faces of the polyhedron to try to find one that is safe for
+	// ray-polyhedron examination.
+	for(int j = 0; j < (int)f.size(); ++j)
+	{
+		if (f[j].v.size() < 3)
+			continue;
+
+		// Accumulate how many times the ray intersected a face of the polyhedron.
+		int numIntersections = 0;
+		// Track a pseudo-distance of the closest edge of a face that the ray passed through. If this distance ends up being too
+		// small, we decide to not trust the result we got, and proceed to another iteration of j, hoping to guess a better-behaving
+		// direction for the test ray.
+		float faceContainmentDistance = FLOAT_INF;
+
+		vec dir = ((vec)v[f[j].v[0]] + (vec)v[f[j].v[1]] + (vec)v[f[j].v[2]]) * 0.33333333333f - point;
+#ifdef MATH_VEC_IS_FLOAT4
+		dir.w = 0.f;
+#endif
+		if (dir.Normalize() <= 0.f)
+			continue;
+		Ray r(POINT_VEC_SCALAR(0.f), dir);
+
+		for(int i = 0; i < (int)f.size(); ++i)
 		{
-			float t = p.d / p.normal.x;
-			// If t >= 0, the plane and the ray intersect, and the ray potentially also intersects the polygon.
-			// Finish the test by checking whether the point of intersection is contained in the polygon, in
-			// which case the ray-polygon intersection occurs.
-			if (t >= 0.f && FaceContains(i, point + DIR_VEC(t,0,0)))
-				++numIntersections;
+			Plane p((vec)v[f[i].v[0]] - point, (vec)v[f[i].v[1]] - point, (vec)v[f[i].v[2]] - point);
+
+			float d;
+			// Find the intersection of the plane and the ray.
+			if (p.Intersects(r, &d))
+			{
+				float containmentDistance2D = FaceContainmentDistance2D(i, r.GetPoint(d) + point);
+				if (containmentDistance2D >= 0.f)
+					++numIntersections;
+				faceContainmentDistance = Min(faceContainmentDistance, Abs(containmentDistance2D));
+			}
+		}
+		if (faceContainmentDistance > 1e-2f) // The nearest edge was far enough, we conclude the result is believable.
+			return (numIntersections % 2) == 1;
+		else if (faceContainmentDistance >= bestFaceContainmentDistance)
+		{
+			// The ray passed too close to a face edge. Remember this result, but proceed to another test iteration to see if we can
+			// find a more plausible test ray.
+			bestNumIntersections = numIntersections;
+			bestFaceContainmentDistance = faceContainmentDistance;
 		}
 	}
-
-	return numIntersections % 2 == 1;
+	// We tested rays through each face of the polyhedron, but all rays passed too close to edges of the polyhedron faces. Return
+	// the result from the test that was farthest to any of the face edges.
+	return (bestNumIntersections % 2) == 1;
 }
 
 bool Polyhedron::Contains(const LineSegment &lineSegment) const
@@ -703,9 +760,11 @@ bool Polyhedron::Intersects(const Plane &plane) const
 	As noted by the author, the algorithm is very naive (and here unoptimized), and better methods exist. [groupSyntax] */
 bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 {
-	if (polyhedron.Contains(this->Centroid()))
+	vec c = this->Centroid();
+	if (polyhedron.Contains(c) && this->Contains(c))
 		return true;
-	if (this->Contains(polyhedron.Centroid()))
+	c = polyhedron.Centroid();
+	if (polyhedron.Contains(c) && this->Contains(c))
 		return true;
 
 	// This test assumes that both this and the other polyhedron are closed.
@@ -1170,8 +1229,12 @@ Polyhedron Polyhedron::Tetrahedron(const vec &centerPos, float scale, bool ccwIs
 		p.f.push_back(f);
 	}
 
+	assume(p.Contains(centerPos));
+
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
+
+	assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -1211,8 +1274,12 @@ Polyhedron Polyhedron::Octahedron(const vec &centerPos, float scale, bool ccwIsF
 		p.f.push_back(f);
 	}
 
+	assume(p.Contains(centerPos));
+
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
+
+	assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -1221,11 +1288,17 @@ Polyhedron Polyhedron::Octahedron(const vec &centerPos, float scale, bool ccwIsF
 Polyhedron Polyhedron::Hexahedron(const vec &centerPos, float scale, bool ccwIsFrontFacing)
 {
 	AABB aabb(DIR_VEC(-1, -1, -1), DIR_VEC(1, 1, 1));
-	aabb.Scale(POINT_VEC_SCALAR(0.f), scale * 0.5f);
+	aabb.Scale(DIR_VEC_SCALAR(0.f), scale * 0.5f);
 	aabb.Translate(centerPos);
 	Polyhedron p = aabb.ToPolyhedron();
+
+	assume(p.Contains(centerPos));
+
 	if (ccwIsFrontFacing)
 		p.FlipWindingOrder();
+
+	assume(p.Contains(centerPos));
+
 	return p;
 }
 
@@ -1282,8 +1355,12 @@ Polyhedron Polyhedron::Icosahedron(const vec &centerPos, float scale, bool ccwIs
 		p.f.push_back(f);
 	}
 
+	assume(p.Contains(centerPos));
+
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
+
+	assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -1343,8 +1420,12 @@ Polyhedron Polyhedron::Dodecahedron(const vec &centerPos, float scale, bool ccwI
 		p.f.push_back(f);
 	}
 
+	assume(p.Contains(centerPos));
+
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
+
+	assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -1459,9 +1540,9 @@ std::string Polyhedron::ToString() const
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing) const
+void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart, int faceEnd) const
 {
-	for(int i = 0; i < NumFaces(); ++i)
+	for(int i = faceStart; i < Min(NumFaces(), faceEnd); ++i)
 	{
 		Polygon p = FacePolygon(i);
 		TriangleArray tris = p.Triangulate();
