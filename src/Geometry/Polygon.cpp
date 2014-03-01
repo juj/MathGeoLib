@@ -278,12 +278,16 @@ Plane Polygon::PlaneCCW() const
 
 		// Polygon contains multiple points, but they are all collinear.
 		// Pick an arbitrary plane along the line as the polygon plane (as if the polygon had only two points)
-		return Plane(Line(p[0], p[1]), ((vec)p[0]-(vec)p[1]).Perpendicular());
+		vec dir = (vec(p[1])-vec(p[0])).Normalized();
+		return Plane(Line(p[0], dir), dir.Perpendicular());
 	}
 	if (p.size() == 3)
 		return Plane(p[0], p[1], p[2]);
 	if (p.size() == 2)
-		return Plane(Line(p[0], p[1]), ((vec)p[0]-(vec)p[1]).Perpendicular());
+	{
+		vec dir = (vec(p[1])-vec(p[0])).Normalized();
+		return Plane(Line(p[0], dir), dir.Perpendicular());
+	}
 	if (p.size() == 1)
 		return Plane(p[0], DIR_VEC(0,1,0));
 	return Plane();
@@ -348,11 +352,11 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThickness) const
 
 	vec basisU = BasisU();
 	vec basisV = BasisV();
-	mathassert(basisU.IsNormalized());
-	mathassert(basisV.IsNormalized());
-	mathassert(basisU.IsPerpendicular(basisV));
-	mathassert(basisU.IsPerpendicular(PlaneCCW().normal));
-	mathassert(basisV.IsPerpendicular(PlaneCCW().normal));
+	assert1(basisU.IsNormalized(), basisU);
+	assert1(basisV.IsNormalized(), basisV);
+	assert2(basisU.IsPerpendicular(basisV), basisU, basisV);
+	assert3(basisU.IsPerpendicular(PlaneCCW().normal), basisU, PlaneCCW().normal, basisU.Dot(PlaneCCW().normal));
+	assert3(basisV.IsPerpendicular(PlaneCCW().normal), basisV, PlaneCCW().normal, basisV.Dot(PlaneCCW().normal));
 
 	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
 
