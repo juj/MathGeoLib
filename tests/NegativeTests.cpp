@@ -9,9 +9,9 @@ MATH_IGNORE_UNUSED_VARS_WARNING
 
 AABB RandomAABBInHalfspace(const Plane &plane, float maxSideLength)
 {
-	float w = rng.Float(0, maxSideLength);
-	float h = rng.Float(0, maxSideLength);
-	float d = rng.Float(0, maxSideLength);
+	float w = rng.Float(1e-3f, maxSideLength);
+	float h = rng.Float(1e-3f, maxSideLength);
+	float d = rng.Float(1e-3f, maxSideLength);
 
 	AABB a(DIR_VEC(0, 0, 0), DIR_VEC(w, h, d)); // Store with w == 0, the translate below will set the origin and w=1.
 
