@@ -280,7 +280,7 @@ vec Plane::Mirror(const vec &point) const
 #endif
 	assume(normal.IsNormalized());
 	vec reflected = point - 2.f * (point.Dot(normal) - d) * normal;
-	mathassert(EqualAbs(signedDistance, -SignedDistance(reflected)));
+	mathassert(EqualAbs(signedDistance, -SignedDistance(reflected), 1e-2f));
 	mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));
 	return reflected;
 }
