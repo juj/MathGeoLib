@@ -106,14 +106,6 @@ inline std::string ObjToString<u32>(const u32 &obj)
 	return ss.str();
 }
 
-template<>
-inline std::string ObjToString<size_t>(const size_t &obj)
-{
-	std::stringstream ss;
-	ss << obj;
-	return ss.str();
-}
-
 MATH_END_NAMESPACE
 
 // If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will

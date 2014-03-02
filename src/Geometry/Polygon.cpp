@@ -834,7 +834,7 @@ TriangleArray Polygon::Triangulate() const
 		}
 	}
 
-	assume3(p2d.size() == 3, p2d.size(), polyIndices.size(), NumVertices());
+	assume3(p2d.size() == 3, (int)p2d.size(), (int)polyIndices.size(), (int)NumVertices());
 	if (p2d.size() > 3) // If this occurs, then the polygon is NOT counter-clockwise oriented.
 		return t;
 /*
