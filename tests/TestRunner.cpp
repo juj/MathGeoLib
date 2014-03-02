@@ -323,6 +323,20 @@ void PrintTestRunSummary()
 				LOGE("   %s", tests[i].name.c_str());
 		}
 	}
+	if (numTestsWarnings > 0)
+	{
+		LOGW("The following tests had some failures:");
+		std::vector<Test> &tests = Tests();
+		for (size_t i = 0; i < tests.size(); ++i)
+		{
+			Test &t = tests[i];
+			if (t.numFails > 0 && t.numPasses > 0)
+			{
+				float successRate = (t.numPasses + t.numFails > 0) ? (float)t.numPasses * 100.f / (t.numPasses + t.numFails) : 0.f;
+				LOGW("   %s: %d failures, %d passes (%.2f%% success rate).", tests[i].name.c_str(), tests[i].numFails, tests[i].numPasses, successRate);
+			}
+		}
+	}
 }
 
 #ifdef MATH_TESTS_EXECUTABLE
