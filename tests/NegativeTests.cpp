@@ -434,6 +434,8 @@ RANDOMIZED_TEST(AABBTriangleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -670,6 +672,8 @@ RANDOMIZED_TEST(OBBTriangleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1001,6 +1005,8 @@ RANDOMIZED_TEST(FrustumTriangleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1556,6 +1562,8 @@ RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 	assert(a.Contains(a.ClosestPoint(b)));

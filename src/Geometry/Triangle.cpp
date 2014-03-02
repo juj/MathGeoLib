@@ -664,6 +664,20 @@ void Triangle::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 	dMax = Max(t, dMax);
 }
 
+int Triangle::UniqueFaceNormals(vec *out) const
+{
+	*out = Cross(b-a, c-a);
+	return 1;
+}
+
+int Triangle::UniqueEdgeDirections(vec *out) const
+{
+	out[0] = b-a;
+	out[1] = c-a;
+	out[2] = c-b;
+	return 3;
+}
+
 /// [groupSyntax]
 vec Triangle::ClosestPoint(const vec &p) const
 {

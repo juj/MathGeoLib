@@ -306,6 +306,9 @@ public:
 		@param dMax [out] Returns the maximum extent of this triangle on the given axis. */
 	void ProjectToAxis(const vec &axis, float &dMin, float &dMax) const;
 
+	int UniqueFaceNormals(vec *out) const;
+	int UniqueEdgeDirections(vec *out) const;
+
 	/// Computes the closest point on this triangle to the given object.
 	/** If the other object intersects this triangle, this function will return an arbitrary point inside
 		the region of intersection.
