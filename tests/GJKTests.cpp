@@ -6,6 +6,8 @@
 #include "TestRunner.h"
 #include "../src/Algorithm/GJK.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius);
 Sphere RandomSphereInHalfspace(const Plane &plane, float maxRadius);
 AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength);
