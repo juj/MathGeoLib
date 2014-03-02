@@ -37,10 +37,15 @@ if (MSVC)
 	# Floating Point Model: Fast (/fp:fast)
 	# Enable Floating Point Exceptions: No (/fp:except-)
 	# Build with Multiple Processes (/MP)
-	set(relFlags "/MT /Ox /Ob2 /Oi /Ot /GT /GF /GS- /fp:fast /fp:except- /MP")
+	set(relFlags "/Ox /Ob2 /Oi /Ot /GT /GF /GS- /fp:fast /fp:except- /MP")
 
-	# Disable all forms of MSVC debug iterator checking in new and old Visual Studios.
-	set(relFlags "${relFlags} /D_SECURE_SCL=0 /D_SCL_SECURE_NO_WARNINGS /D_ITERATOR_DEBUG_LEVEL=0 /D_HAS_ITERATOR_DEBUGGING=0")
+	# Set up flags that affect ABI and linking to other projects as well, but only in unit test runner:
+	if (MATH_TESTS_EXECUTABLE)
+		set(relFlags "${relFlags} /MT")
+
+		# Disable all forms of MSVC debug iterator checking in new and old Visual Studios.
+		set(relFlags "${relFlags} /D_SECURE_SCL=0 /D_SCL_SECURE_NO_WARNINGS /D_ITERATOR_DEBUG_LEVEL=0 /D_HAS_ITERATOR_DEBUGGING=0")
+	endif()
 
 	# Since Visual Studio 2012 the IDE has an option: Secure Development Lifecycle (SDL) flags: No (/sdl-)
 	# but that is implied by /GS- already above, so no need to set that.
