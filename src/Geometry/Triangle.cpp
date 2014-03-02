@@ -1101,10 +1101,11 @@ vec Triangle::ClosestPointToTriangleEdge(const Line &other, float *outU, float *
 {
 	///@todo Optimize!
 	// The line is parallel to the triangle.
+	float unused1, unused2, unused3;
 	float d1, d2, d3;
-	vec pt1 = other.ClosestPoint(Edge(0), d1);
-	vec pt2 = other.ClosestPoint(Edge(1), d2);
-	vec pt3 = other.ClosestPoint(Edge(2), d3);
+	vec pt1 = Edge(0).ClosestPoint(other, unused1, d1);
+	vec pt2 = Edge(1).ClosestPoint(other, unused2, d2);
+	vec pt3 = Edge(2).ClosestPoint(other, unused3, d3);
 	float dist1 = pt1.DistanceSq(other.GetPoint(d1));
 	float dist2 = pt2.DistanceSq(other.GetPoint(d2));
 	float dist3 = pt3.DistanceSq(other.GetPoint(d3));
@@ -1135,10 +1136,11 @@ vec Triangle::ClosestPointToTriangleEdge(const LineSegment &lineSegment, float *
 {
 	///@todo Optimize!
 	// The line is parallel to the triangle.
+	float unused1, unused2, unused3;
 	float d1, d2, d3;
-	vec pt1 = lineSegment.ClosestPoint(Edge(0), d1);
-	vec pt2 = lineSegment.ClosestPoint(Edge(1), d2);
-	vec pt3 = lineSegment.ClosestPoint(Edge(2), d3);
+	vec pt1 = Edge(0).ClosestPoint(lineSegment, unused1, d1);
+	vec pt2 = Edge(1).ClosestPoint(lineSegment, unused2, d2);
+	vec pt3 = Edge(2).ClosestPoint(lineSegment, unused3, d3);
 	float dist1 = pt1.DistanceSq(lineSegment.GetPoint(d1));
 	float dist2 = pt2.DistanceSq(lineSegment.GetPoint(d2));
 	float dist3 = pt3.DistanceSq(lineSegment.GetPoint(d3));
