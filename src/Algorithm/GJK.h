@@ -36,7 +36,9 @@ bool GJKIntersect(const A &a, const B &b)
 	while(nIterations-- > 0)
 	{
 		vec newSupport = SUPPORT(d);
+#ifdef MATH_VEC_IS_FLOAT4
 		newSupport.w = 0.f;
+#endif
 		if (Dot(newSupport, d) < 0.f)
 			return false;
 //		if (maxS < 0.f)
