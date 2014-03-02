@@ -201,6 +201,8 @@ public:
 		@see Volume(), SurfaceArea(). */
 	vec Centroid() const { return CenterPoint(); }
 
+	inline vec AnyPointFast() const { return pos; }
+
 	/// Computes the volume of this OBB.
 	/** @see CenterPoint(), SurfaceArea(). */
 	float Volume() const;
@@ -240,6 +242,7 @@ public:
 			corner point of this OBB.
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Projects this OBB onto the given 1D axis direction vector.
 	/** This function collapses this OBB onto an 1D axis for the purposes of e.g. separate axis test computations.

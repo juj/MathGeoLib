@@ -84,6 +84,13 @@ vec LineSegment::ExtremePoint(const vec &direction) const
 	return Dot(direction, b-a) >= 0.f ? b : a;
 }
 
+vec LineSegment::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 void LineSegment::Translate(const vec &offset)
 {
 	a += offset;

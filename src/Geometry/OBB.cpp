@@ -294,6 +294,13 @@ vec OBB::ExtremePoint(const vec &direction) const
 	return pt;
 }
 
+vec OBB::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 void OBB::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	float x = Abs(Dot(direction, axis[0]) * r.x);

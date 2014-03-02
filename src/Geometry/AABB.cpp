@@ -246,6 +246,13 @@ vec AABB::ExtremePoint(const vec &direction) const
 	return POINT_VEC(pt);
 }
 
+vec AABB::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 vec AABB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);

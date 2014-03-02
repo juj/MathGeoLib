@@ -262,6 +262,13 @@ vec Triangle::ExtremePoint(const vec &direction) const
 	return mostExtreme;
 }
 
+vec Triangle::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 Polygon Triangle::ToPolygon() const
 {
 	Polygon p;

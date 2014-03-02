@@ -239,6 +239,9 @@ public:
 			of this Frustum. This pointer may not be null. */
 	void GetCornerPoints(vec *outPointArray) const;
 
+	/// Quickly returns an arbitrary point inside this Frustum. Used in GJK intersection test.
+	inline vec AnyPointFast() const { return CornerPoint(0); }
+
 	/// Computes an extreme point of this Frustum in the given direction.
 	/** An extreme point is a farthest point of this Frustum in the given direction. Given a direction,
 		this point is not necessarily unique.
@@ -248,6 +251,7 @@ public:
 			corner point of this Frustum.
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Projects this Frustum onto the given 1D axis direction vector.
 	/** This function collapses this Frustum onto an 1D axis for the purposes of e.g. separate axis test computations.

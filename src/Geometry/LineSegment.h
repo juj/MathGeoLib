@@ -80,6 +80,9 @@ public:
 		@see a, b. */
 	vec Dir() const;
 
+	/// Quickly returns an arbitrary point inside this LineSegment. Used in GJK intersection test.
+	inline vec AnyPointFast() const { return a; }
+
 	/// Computes an extreme point of this LineSegment in the given direction.
 	/** An extreme point is a farthest point along this LineSegment in the given direction. Given a direction,
 		this point is not necessarily unique.
@@ -89,6 +92,7 @@ public:
 			either a or b.
 		@see a, b.*/
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Translates this LineSegment in world space.
 	/** @param offset The amount of displacement to apply to this LineSegment, in world space coordinates.

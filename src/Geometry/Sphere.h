@@ -104,6 +104,9 @@ public:
 		@see pos */
 	vec Centroid() const { return pos; }
 
+	/// Quickly returns an arbitrary point inside this Sphere. Used in GJK intersection test.
+	vec AnyPointFast() const { return pos; }
+
 	/// Computes the extreme point of this Sphere in the given direction.
 	/** An extreme point is a farthest point of this Sphere in the given direction. For
 		a Sphere, this point is unique.
@@ -111,6 +114,7 @@ public:
 			be unnormalized, but may not be null.
 		@return The extreme point of this Sphere in the given direction. */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Projects this Sphere onto the given 1D axis direction vector.
 	/** This function collapses this Sphere onto an 1D axis for the purposes of e.g. separate axis test computations.

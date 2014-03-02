@@ -94,6 +94,13 @@ vec Capsule::ExtremePoint(const vec &direction) const
 	return (Dot(direction, l.b - l.a) >= 0.f ? l.b : l.a) + direction.ScaledToLength(r);
 }
 
+vec Capsule::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 void Capsule::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	outMin = Dot(direction, l.a);

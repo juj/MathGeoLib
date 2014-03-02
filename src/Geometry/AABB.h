@@ -161,6 +161,9 @@ public:
 	/// [similarOverload: CenterPoint]
 	vec Centroid() const { return CenterPoint(); }
 
+	/// Quickly returns an arbitrary point inside this AABB. Used in GJK intersection test.
+	vec AnyPointFast() const { return minPoint; }
+
 	/// Generates a point inside this AABB.
 	/** @param x A normalized value between [0,1]. This specifies the point position along the world x axis.
 		@param y A normalized value between [0,1]. This specifies the point position along the world y axis.
@@ -192,6 +195,7 @@ public:
 			corner point of this AABB.
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Returns a point on an edge of this AABB.
 	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.

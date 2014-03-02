@@ -140,6 +140,13 @@ vec Sphere::ExtremePoint(const vec &direction) const
 	return pos + direction.ScaledToLength(r);
 }
 
+vec Sphere::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 void Sphere::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	float d = Dot(direction, pos);

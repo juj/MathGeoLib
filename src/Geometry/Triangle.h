@@ -183,6 +183,9 @@ public:
 		@see PlaneCCW(), PlaneCW(), NormalCCW(), NormalCW(). */
 	vec UnnormalizedNormalCW() const;
 
+	/// Quickly returns an arbitrary point inside this Triangle. Used in GJK intersection test.
+	inline vec AnyPointFast() const { return a; }
+
 	/// Computes an extreme point of this Triangle in the given direction.
 	/** An extreme point is a farthest point of this Triangle in the given direction. Given a direction,
 		this point is not necessarily unique.
@@ -192,6 +195,7 @@ public:
 			vertex of this Triangle.
 		@see Vertex(). */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Returns a Polygon representation of this Triangle.
 	/** The returned polygon is identical to this Triangle. It has three vertices a, b and c which wind in the same

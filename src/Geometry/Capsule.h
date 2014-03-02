@@ -94,6 +94,9 @@ public:
 	vec Center() const;
 	vec Centroid() const { return l.CenterPoint(); } ///< [similarOverload: Center]
 
+	/// Quickly returns an arbitrary point inside this Capsule. Used in GJK intersection test.
+	inline vec AnyPointFast() const { return l.a; }
+
 	/// Computes the extreme point of this Capsule in the given direction.
 	/** An extreme point is a farthest point of this Capsule in the given direction. Given a direction,
 		this point is not necessarily unique.
@@ -101,6 +104,7 @@ public:
 			be unnormalized, but may not be null.
 		@return The extreme point of this Capsule in the given direction. */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Projects this Capsule onto the given 1D axis direction vector.
 	/** This function collapses this Capsule onto an 1D axis for the purposes of e.g. separate axis test computations.

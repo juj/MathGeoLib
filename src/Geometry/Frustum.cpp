@@ -631,6 +631,13 @@ vec Frustum::ExtremePoint(const vec &direction) const
 	return mostExtreme;
 }
 
+vec Frustum::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 void Frustum::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	///\todo Optimize!
