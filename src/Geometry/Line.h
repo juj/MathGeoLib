@@ -103,18 +103,20 @@ public:
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
 		@param d [out] If specified, receives the parametric distance along this line that
 			specifies the closest point on this line to the given object. The value returned here can be negative.
-			This pointer may be null.
 		@see Contains(), Intersects(), ClosestPoint(), GetPoint(). */
-	float Distance(const vec &point, float *d = 0) const;
+	float Distance(const vec &point) const { float d; return Distance(point, d); }
+	float Distance(const vec &point, float &d) const;
 	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
-		closest point on that line to this line. The value returned here can be negative. This pointer may
-		be null. */
-	float Distance(const Ray &other, float *d, float *d2 = 0) const;
-	float Distance(const Ray &other) const;
-	float Distance(const Line &other, float *d, float *d2 = 0) const;
-	float Distance(const Line &other) const;
-	float Distance(const LineSegment &other, float *d, float *d2 = 0) const;
-	float Distance(const LineSegment &other) const;
+		closest point on that line to this line. The value returned here can be negative. */
+	float Distance(const Ray &other) const { float d, d2; return Distance(other, d, d2); }
+	float Distance(const Ray &other, float &d) const { float d2; return Distance(other, d, d2); }
+	float Distance(const Ray &other, float &d, float &d2) const;
+	float Distance(const Line &other) const { float d, d2; return Distance(other, d, d2); }
+	float Distance(const Line &other, float &d) const { float d2; return Distance(other, d, d2); }
+	float Distance(const Line &other, float &d, float &d2) const;
+	float Distance(const LineSegment &other) const { float d, d2; return Distance(other, d, d2); }
+	float Distance(const LineSegment &other, float &d) const { float d2; return Distance(other, d, d2); }
+	float Distance(const LineSegment &other, float &d, float &d2) const;
 	float Distance(const Sphere &other) const;
 	float Distance(const Capsule &other) const;
 
@@ -123,21 +125,26 @@ public:
 		the region of intersection.
 		@param d [out] If specified, receives the parametric distance along this line that
 			specifies the closest point on this line to the given object. The value returned here can be negative.
-			This pointer may be null.
 		@see Contains(), Distance(), Intersects(), GetPoint(). */
-	vec ClosestPoint(const vec &targetPoint, float *d = 0) const;
+	vec ClosestPoint(const vec &targetPoint) const { float d; return ClosestPoint(targetPoint, d); }
+	vec ClosestPoint(const vec &targetPoint, float &d) const;
 	/** @param d2 [out] If specified, receives the parametric distance along the other line that specifies the
-		closest point on that line to this line. The value returned here can be negative. This pointer may
-		be null. */
-	vec ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
-	vec ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
-	vec ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
-	/** @param outU [out] If specified, receives the barycentric U-coordinate (in two-coordinate barycentric UV convention)
-			representing the closest point on the triangle to this line. This pointer may be null.
-		@param outV [out] If specified, receives the barycentric V-coordinate (in two-coordinate barycentric UV convention)
-			representing the closest point on the triangle to this line. This pointer may be null.
+		closest point on that line to this line. The value returned here can be negative. */
+	vec ClosestPoint(const Ray &other) const { float d, d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Ray &other, float &d) const { float d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Ray &other, float &d, float &d2) const;
+	vec ClosestPoint(const Line &other) const { float d, d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Line &other, float &d) const { float d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Line &other, float &d, float &d2) const;
+	vec ClosestPoint(const LineSegment &other) const { float d, d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const LineSegment &other, float &d) const { float d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const LineSegment &other, float &d, float &d2) const;
+	/** @param outBarycentricUV [out] If specified, receives the barycentric UV coordinates (in two-coordinate barycentric UV convention)
+			representing the closest point on the triangle to this line.
 		@see Contains(), Distance(), Intersects(), GetPoint(), Triangle::Point(float u, float v). */
-	vec ClosestPoint(const Triangle &triangle, float *outU = 0, float *outV = 0, float *d = 0) const;
+	vec ClosestPoint(const Triangle &triangle) const { float d; return ClosestPoint(triangle, d); }
+	vec ClosestPoint(const Triangle &triangle, float &d) const;
+	vec ClosestPoint(const Triangle &triangle, float &d, float2 &outBarycentricUV) const;
 
 	/// Tests whether this line and the given object intersect.	
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
@@ -205,7 +212,7 @@ public:
 		@param epsilon The comparison threshold to use to account for floating-point inaccuracies. */
 	static bool AreCollinear(const vec &p1, const vec &p2, const vec &p3, float epsilon = 1e-3f);
 
-	static vec ClosestPointLineLine(const vec &start0, const vec &end0, const vec &start1, const vec &end1, float *d, float *d2);
+	static void ClosestPointLineLine(const vec &start0, const vec &dir0, const vec &start1, const vec &dir1, float &d, float &d2);
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Line.

@@ -144,195 +144,143 @@ bool LineSegment::Equals(const LineSegment &rhs, float e) const
 	return (a.Equals(rhs.a, e) && b.Equals(rhs.b, e)) || (a.Equals(rhs.b, e) && b.Equals(rhs.a, e));
 }
 
-vec LineSegment::ClosestPoint(const vec &point, float *d) const
+vec LineSegment::ClosestPoint(const vec &point, float &d) const
 {
 	vec dir = b - a;
-	float u = Clamp01(Dot(point - a, dir) / dir.LengthSq());
-	if (d)
-		*d = u;
-	return a + u * dir;
+	d = Clamp01(Dot(point - a, dir) / dir.LengthSq());
+	return a + d * dir;
 }
 
-vec LineSegment::ClosestPoint(const Ray &other, float *d, float *d2) const
+vec LineSegment::ClosestPoint(const Ray &other, float &d, float &d2) const
 {
-	float u, u2;
-	other.ClosestPoint(*this, &u, &u2);
-	if (d)
-		*d = u2;
-	if (d2)
-		*d2 = u;
-	return GetPoint(u2);
+	other.ClosestPoint(*this, d2, d);
+	return GetPoint(d);
 }
 
-vec LineSegment::ClosestPoint(const Line &other, float *d, float *d2) const
+vec LineSegment::ClosestPoint(const Line &other, float &d, float &d2) const
 {
-	float t;
-	Line::ClosestPointLineLine(other.pos, other.pos + other.dir, a, b, d2, &t);
-	if (t <= 0.f)
+	Line::ClosestPointLineLine(other.pos, other.dir, a, b - a, d2, d);
+	if (d < 0.f)
 	{
-		if (d)
-			*d = 0.f;
-		if (d2)
-			other.ClosestPoint(a, d2);
+		d = 0.f;
+		other.ClosestPoint(a, d2);
 		return a;
 	}
-	else if (t >= 1.f)
+	else if (d > 1.f)
 	{
-		if (d)
-			*d = 1.f;
-		if (d2)
-			other.ClosestPoint(b, d2);
+		d = 1.f;
+		other.ClosestPoint(b, d2);
 		return b;
 	}
 	else
-	{
-		if (d)
-			*d = t;
-		return GetPoint(t);
-	}
+		return GetPoint(d);
 }
 
-vec LineSegment::ClosestPoint(const LineSegment &other, float *d, float *d2) const
+vec LineSegment::ClosestPoint(const LineSegment &other, float &d, float &d2) const
 {
-	float u, u2;
-	vec closestPoint = Line::ClosestPointLineLine(a, b, other.a, other.b, &u, &u2);
-	if (u >= 0.f && u <= 1.f && u2 >= 0.f && u2 <= 1.f)
-	{
-		if (d)
-			*d = u;
-		if (d2)
-			*d2 = u2;
-		return closestPoint;
-	}
-	else if (u >= 0.f && u <= 1.f) // Only u2 is out of bounds.
+	vec dir = b - a;
+	Line::ClosestPointLineLine(a, b - a, other.a, other.b - other.a, d, d2);
+	if (d >= 0.f && d <= 1.f && d2 >= 0.f && d2 <= 1.f)
+		return a + d * dir;
+	else if (d >= 0.f && d <= 1.f) // Only d2 is out of bounds.
 	{
 		vec p;
-		if (u2 < 0.f)
+		if (d2 < 0.f)
 		{
+			d2 = 0.f;
 			p = other.a;
-			if (d2)
-				*d2 = 0.f;
 		}
 		else
 		{
+			d2 = 1.f;
 			p = other.b;
-			if (d2)
-				*d2 = 1.f;
 		}
-
 		return ClosestPoint(p, d);
 	}
-	else if (u2 >= 0.f && u2 <= 1.f) // Only u is out of bounds.
+	else if (d2 >= 0.f && d2 <= 1.f) // Only d is out of bounds.
 	{
 		vec p;
-		if (u < 0.f)
+		if (d < 0.f)
 		{
+			d = 0.f;
 			p = a;
-			if (d)
-				*d = 0.f;
 		}
 		else
 		{
+			d = 1.f;
 			p = b;
-			if (d)
-				*d = 1.f;
 		}
 
-		if (d2)
-			other.ClosestPoint(p, d2);
+		other.ClosestPoint(p, d2);
 		return p;
 	}
 	else // Both u and u2 are out of bounds.
 	{
 		vec p;
-		float t;
-		if (u < 0.f)
+		if (d < 0.f)
 		{
 			p = a;
-			t = 0.f;
+			d = 0.f;
 		}
 		else
 		{
 			p = b;
-			t = 1.f;
+			d = 1.f;
 		}
 
 		vec p2;
-		float t2;
-		if (u2 < 0.f)
+		if (d2 < 0.f)
 		{
 			p2 = other.a;
-			t2 = 0.f;
+			d2 = 0.f;
 		}
 		else
 		{
 			p2 = other.b;
-			t2 = 1.f;
+			d2 = 1.f;
 		}
 
 		float T, T2;
-		closestPoint = ClosestPoint(p2, &T);
-		vec closestPoint2 = other.ClosestPoint(p, &T2);
+		vec closestPoint = ClosestPoint(p2, T);
+		vec closestPoint2 = other.ClosestPoint(p, T2);
 
 		if (closestPoint.DistanceSq(p2) <= closestPoint2.DistanceSq(p))
 		{
-			if (d)
-				*d = T;
-			if (d2)
-				*d2 = t2;
+			d = T;
 			return closestPoint;
 		}
 		else
 		{
-			if (d)
-				*d = t;
-			if (d2)
-				*d2 = T2;
+			d2 = T2;
 			return p;
 		}
 	}
 }
 
-float LineSegment::Distance(const vec &point, float *d) const
+float LineSegment::Distance(const vec &point, float &d) const
 {
-	///@todo This function could be slightly optimized.
 	/// See Christer Ericson's Real-Time Collision Detection, p.130.
 	vec closestPoint = ClosestPoint(point, d);
 	return closestPoint.Distance(point);
 }
 
-float LineSegment::Distance(const Ray &other, float *d, float *d2) const
+float LineSegment::Distance(const Ray &other, float &d, float &d2) const
 {
-	float u, u2;
-	ClosestPoint(other, &u, &u2);
-	if (d)
-		*d = u;
-	if (d2)
-		*d2 = u2;
-	return GetPoint(u).Distance(other.GetPoint(u2));
+	ClosestPoint(other, d, d2);
+	return GetPoint(d).Distance(other.GetPoint(d2));
 }
 
-float LineSegment::Distance(const Line &other, float *d, float *d2) const
+float LineSegment::Distance(const Line &other, float &d, float &d2) const
 {
-	float u, u2;
-	vec closestPoint2 = other.ClosestPoint(*this, &u, &u2);
-	if (d)
-		*d = u2;
-	if (d2)
-		*d2 = u;
-	vec closestPoint = GetPoint(u2);
+	vec closestPoint2 = other.ClosestPoint(*this, d, d2);
+	vec closestPoint = GetPoint(d2);
 	return closestPoint.Distance(closestPoint2);
 }
 
-float LineSegment::Distance(const LineSegment &other, float *d, float *d2) const
+float LineSegment::Distance(const LineSegment &other, float &d, float &d2) const
 {
-	float u, u2;
-	ClosestPoint(other, &u, &u2);
-	if (d)
-		*d = u;
-	if (d2)
-		*d2 = u2;
-	return GetPoint(u).Distance(other.GetPoint(u2));
+	ClosestPoint(other, d, d2);
+	return GetPoint(d).Distance(other.GetPoint(d2));
 }
 
 float LineSegment::Distance(const Plane &other) const

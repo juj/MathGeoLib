@@ -137,30 +137,44 @@ public:
 	/// Computes the closest point on this line segment to the given object.
 	/** @param d [out] If specified, this parameter receives the normalized distance along
 			this line segment which specifies the closest point on this line segment to
-			the specified point. This pointer may be null.
+			the specified point.
 		@return The closest point on this line segment to the given object.
 		@see Contains(), Distance(), Intersects(). */
-	vec ClosestPoint(const vec &point, float *d = 0) const;
+	vec ClosestPoint(const vec &point) const { float d; return ClosestPoint(point, d); }
+	vec ClosestPoint(const vec &point, float &d) const;
 	/** @param d2 [out] If specified, this parameter receives the (normalized, in case of line segment)
 			distance along the other line object which specifies the closest point on that line to
-			this line segment. This pointer may be null. */
-	vec ClosestPoint(const Ray &other, float *d = 0, float *d2 = 0) const;
-	vec ClosestPoint(const Line &other, float *d = 0, float *d2 = 0) const;
-	vec ClosestPoint(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+			this line segment. */
+	vec ClosestPoint(const Ray &other) const { float d, d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Ray &other, float &d) const { float d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Ray &other, float &d, float &d2) const;
+	vec ClosestPoint(const Line &other) const { float d, d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Line &other, float &d) const { float d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const Line &other, float &d, float &d2) const;
+	vec ClosestPoint(const LineSegment &other) const { float d, d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const LineSegment &other, float &d) const { float d2; return ClosestPoint(other, d, d2); }
+	vec ClosestPoint(const LineSegment &other, float &d, float &d2) const;
 
 	/// Computes the distance between this line segment and the given object.
 	/** @param d [out] If specified, this parameter receives the normalized distance along
 			this line segment which specifies the closest point on this line segment to
-			the specified point. This pointer may be null.
+			the specified point.
 		@return The distance between this line segment and the given object.
 		@see Constains(), ClosestPoint(), Intersects(). */
-	float Distance(const vec &point, float *d = 0) const;
+	float Distance(const vec &point) const { float d; return Distance(point, d); }
+	float Distance(const vec &point, float &d) const;
 	/** @param d2 [out] If specified, this parameter receives the (normalized, in case of line segment)
 			distance along the other line object which specifies the closest point on that line to
-			this line segment. This pointer may be null. */
-	float Distance(const Ray &other, float *d = 0, float *d2 = 0) const;
-	float Distance(const Line &other, float *d = 0, float *d2 = 0) const;
-	float Distance(const LineSegment &other, float *d = 0, float *d2 = 0) const;
+			this line segment. */
+	float Distance(const Ray &other) const { float d, d2; return Distance(other, d, d2); }
+	float Distance(const Ray &other, float &d) const { float d2; return Distance(other, d, d2); }
+	float Distance(const Ray &other, float &d, float &d2) const;
+	float Distance(const Line &other) const { float d, d2; return Distance(other, d, d2); }
+	float Distance(const Line &other, float &d) const { float d2; return Distance(other, d, d2); }
+	float Distance(const Line &other, float &d, float &d2) const;
+	float Distance(const LineSegment &other) const { float d, d2; return Distance(other, d, d2); }
+	float Distance(const LineSegment &other, float &d) const { float d2; return Distance(other, d, d2); }
+	float Distance(const LineSegment &other, float &d, float &d2) const;
 	float Distance(const Plane &other) const;
 	float Distance(const Sphere &other) const;
 	float Distance(const Capsule &other) const;

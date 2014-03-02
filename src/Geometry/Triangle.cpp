@@ -553,10 +553,10 @@ bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 
 	// Find the projection intervals on the intersection line.
 	float d1a, d1b, d2a, d2b;
-	l.Distance(l1a, &d1a);
-	l.Distance(l1b, &d1b);
-	l.Distance(l2a, &d2a);
-	l.Distance(l2b, &d2b);
+	l.Distance(l1a, d1a);
+	l.Distance(l1b, d1b);
+	l.Distance(l2a, d2a);
+	l.Distance(l2b, d2b);
 	if (d1a > d1b)
 		Swap(d1a, d1b);
 	if (d2a > d2b)
@@ -1102,9 +1102,9 @@ vec Triangle::ClosestPointToTriangleEdge(const Line &other, float *outU, float *
 	///@todo Optimize!
 	// The line is parallel to the triangle.
 	float d1, d2, d3;
-	vec pt1 = Edge(0).ClosestPoint(other, 0, &d1);
-	vec pt2 = Edge(1).ClosestPoint(other, 0, &d2);
-	vec pt3 = Edge(2).ClosestPoint(other, 0, &d3);
+	vec pt1 = other.ClosestPoint(Edge(0), d1);
+	vec pt2 = other.ClosestPoint(Edge(1), d2);
+	vec pt3 = other.ClosestPoint(Edge(2), d3);
 	float dist1 = pt1.DistanceSq(other.GetPoint(d1));
 	float dist2 = pt2.DistanceSq(other.GetPoint(d2));
 	float dist3 = pt3.DistanceSq(other.GetPoint(d3));
@@ -1136,9 +1136,9 @@ vec Triangle::ClosestPointToTriangleEdge(const LineSegment &lineSegment, float *
 	///@todo Optimize!
 	// The line is parallel to the triangle.
 	float d1, d2, d3;
-	vec pt1 = Edge(0).ClosestPoint(lineSegment, 0, &d1);
-	vec pt2 = Edge(1).ClosestPoint(lineSegment, 0, &d2);
-	vec pt3 = Edge(2).ClosestPoint(lineSegment, 0, &d3);
+	vec pt1 = lineSegment.ClosestPoint(Edge(0), d1);
+	vec pt2 = lineSegment.ClosestPoint(Edge(1), d2);
+	vec pt3 = lineSegment.ClosestPoint(Edge(2), d3);
 	float dist1 = pt1.DistanceSq(lineSegment.GetPoint(d1));
 	float dist2 = pt2.DistanceSq(lineSegment.GetPoint(d2));
 	float dist3 = pt3.DistanceSq(lineSegment.GetPoint(d3));
@@ -1549,7 +1549,7 @@ vec Triangle::ClosestPoint(const Triangle &other, vec *otherPt) const
 	for(int i = 0; i < 3; ++i)
 		for(int j = 0; j < 3; ++j)
 		{
-			float dist = l1[i].Distance(l2[j], &d, &d2);
+			float dist = l1[i].Distance(l2[j], d, d2);
 			if (dist*dist < closestDSq)
 			{
 				closestThis = l1[i].GetPoint(d);

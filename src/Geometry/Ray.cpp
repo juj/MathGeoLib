@@ -112,53 +112,27 @@ bool Ray::Equals(const Ray &rhs, float epsilon) const
 	return pos.Equals(rhs.pos, epsilon) && dir.Equals(rhs.dir, epsilon);
 }
 
-float Ray::Distance(const vec &point, float *d) const
+float Ray::Distance(const vec &point, float &d) const
 {
 	return ClosestPoint(point, d).Distance(point);
 }
 
-float Ray::Distance(const vec &point) const
+float Ray::Distance(const Ray &other, float &d, float &d2) const
 {
-	return Distance(point, 0);
+	vec c = ClosestPoint(other, d, d2);
+	return c.Distance(other.GetPoint(d2));
 }
 
-float Ray::Distance(const Ray &other, float *d, float *d2) const
+float Ray::Distance(const Line &other, float &d, float &d2) const
 {
-	float u2;
-	vec c = ClosestPoint(other, d, &u2);
-	if (d2) *d2 = u2;
-	return c.Distance(other.GetPoint(u2));
+	vec c = ClosestPoint(other, d, d2);
+	return c.Distance(other.GetPoint(d2));
 }
 
-float Ray::Distance(const Ray &ray) const
+float Ray::Distance(const LineSegment &other, float &d, float &d2) const
 {
-	return Distance(ray, 0, 0);
-}
-
-float Ray::Distance(const Line &other, float *d, float *d2) const
-{
-	float u2;
-	vec c = ClosestPoint(other, d, &u2);
-	if (d2) *d2 = u2;
-	return c.Distance(other.GetPoint(u2));
-}
-
-float Ray::Distance(const Line &line) const
-{
-	return Distance(line, 0, 0);
-}
-
-float Ray::Distance(const LineSegment &other, float *d, float *d2) const
-{
-	float u2;
-	vec c = ClosestPoint(other, d, &u2);
-	if (d2) *d2 = u2;
-	return c.Distance(other.GetPoint(u2));
-}
-
-float Ray::Distance(const LineSegment &lineSegment) const
-{
-	return Distance(lineSegment, 0, 0);
+	vec c = ClosestPoint(other, d, d2);
+	return c.Distance(other.GetPoint(d2));
 }
 
 float Ray::Distance(const Sphere &sphere) const
@@ -171,110 +145,79 @@ float Ray::Distance(const Capsule &capsule) const
 	return Max(0.f, Distance(capsule.l) - capsule.r);
 }
 
-vec Ray::ClosestPoint(const vec &targetPoint, float *d) const
+vec Ray::ClosestPoint(const vec &targetPoint, float &d) const
 {
-	float u = Max(0.f, Dot(targetPoint - pos, dir));
-	if (d)
-		*d = u;
-	return GetPoint(u);
+	d = Max(0.f, Dot(targetPoint - pos, dir));
+	return GetPoint(d);
 }
 
-vec Ray::ClosestPoint(const Ray &other, float *d, float *d2) const
+vec Ray::ClosestPoint(const Ray &other, float &d, float &d2) const
 {
-	float u, u2;
-	vec closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &u, &u2);
-	if (u < 0.f && u2 < 0.f)
+	Line::ClosestPointLineLine(pos, dir, other.pos, other.dir, d, d2);
+	if (d < 0.f && d2 < 0.f)
 	{
-		closestPoint = ClosestPoint(other.pos, &u);
-
-		vec closestPoint2 = other.ClosestPoint(pos, &u2);
+		vec closestPoint = ClosestPoint(other.pos, d);
+		vec closestPoint2 = other.ClosestPoint(pos, d2);
 		if (closestPoint.DistanceSq(other.pos) <= closestPoint2.DistanceSq(pos))
 		{
-			if (d)
-				*d = u;
-			if (d2)
-				*d2 = 0.f;
+			d2 = 0.f;
 			return closestPoint;
 		}
 		else
 		{
-			if (d)
-				*d = 0.f;
-			if (d2)
-				*d2 = u2;
+			d = 0.f;
 			return pos;
 		}
 	}
-	else if (u < 0.f)
+	else if (d < 0.f)
 	{
-		if (d)
-			*d = 0.f;
-		if (d2)
-		{
-			other.ClosestPoint(pos, &u2);
-			*d2 = Max(0.f, u2);
-		}
+		d = 0.f;
+		other.ClosestPoint(pos, d2);
+		d2 = Max(0.f, d2);
 		return pos;
 	}
-	else if (u2 < 0.f)
+	else if (d2 < 0.f)
 	{
-		vec pt = ClosestPoint(other.pos, &u);
-		u = Max(0.f, u);
-		if (d)
-			*d = u;
-		if (d2)
-			*d2 = 0.f;
+		vec pt = ClosestPoint(other.pos, d);
+		d = Max(0.f, d);
+		d2 = 0.f;
 		return pt;
 	}
 	else
 	{
-		if (d)
-			*d = u;
-		if (d2)
-			*d2 = u2;
-		return closestPoint;
+		return GetPoint(d);
 	}
 }
 
-vec Ray::ClosestPoint(const Line &other, float *d, float *d2) const
+vec Ray::ClosestPoint(const Line &other, float &d, float &d2) const
 {
-	float t;
-	vec closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, &t, d2);
-	if (t <= 0.f)
+	Line::ClosestPointLineLine(pos, dir, other.pos, other.dir, d, d2);
+	if (d < 0.f)
 	{
-		if (d)
-			*d = 0.f;
-		if (d2)
-			other.ClosestPoint(pos, d2);
+		d = 0.f;
+		other.ClosestPoint(pos, d2);
 		return pos;
 	}
 	else
-	{
-		if (d)
-			*d = t;
-		return closestPoint;
-	}
+		return GetPoint(d);
 }
 
-vec Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
+vec Ray::ClosestPoint(const LineSegment &other, float &d, float &d2) const
 {
-	float u, u2;
-	vec closestPoint = Line::ClosestPointLineLine(pos, pos + dir, other.a, other.b, &u, &u2);
-	if (u < 0.f)
+	Line::ClosestPointLineLine(pos, dir, other.a, other.b - other.a, d, d2);
+	if (d < 0.f)
 	{
-		if (u2 >= 0.f && u2 <= 1.f)
+		d = 0.f;
+		if (d2 >= 0.f && d2 <= 1.f)
 		{
-			if (d)
-				*d = 0.f;
-			if (d2)
-				other.ClosestPoint(pos, d2);
+			other.ClosestPoint(pos, d2);
 			return pos;
 		}
 
 		vec p;
 		float t2;
 
-		if (u2 < 0.f)
+		if (d2 < 0.f)
 		{
 			p = other.a;
 			t2 = 0.f;
@@ -285,47 +228,31 @@ vec Ray::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 			t2 = 1.f;
 		}
 
-		closestPoint = ClosestPoint(p, &u);
-		vec closestPoint2 = other.ClosestPoint(pos, &u2);
+		vec closestPoint = ClosestPoint(p, d);
+		vec closestPoint2 = other.ClosestPoint(pos, d2);
 		if (closestPoint.DistanceSq(p) <= closestPoint2.DistanceSq(pos))
 		{
-			if (d)
-				*d = u;
-			if (d2)
-				*d2 = t2;
+			d2 = t2;
 			return closestPoint;
 		}
 		else
 		{
-			if (d)
-				*d = 0.f;
-			if (d2)
-				*d2 = u2;
+			d = 0.f;
 			return pos;
 		}
 	}
-	else if (u2 < 0.f)
+	else if (d2 < 0.f)
 	{
-		closestPoint = ClosestPoint(other.a, d);
-		if (d2)
-			*d2 = 0.f;
-		return closestPoint;
+		d2 = 0.f;
+		return ClosestPoint(other.a, d);
 	}
-	else if (u2 > 1.f)
+	else if (d2 > 1.f)
 	{
-		closestPoint = ClosestPoint(other.b, d);
-		if (d2)
-			*d2 = 1.f;
-		return closestPoint;
+		d2 = 1.f;
+		return ClosestPoint(other.b, d);
 	}
 	else
-	{
-		if (d)
-			*d = u;
-		if (d2)
-			*d2 = u2;
-		return closestPoint;
-	}
+		return GetPoint(d);
 }
 
 bool Ray::Intersects(const Triangle &triangle, float *d, vec *intersectionPoint) const
