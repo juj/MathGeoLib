@@ -636,7 +636,7 @@ void Sphere::Enclose(const vec &point, float epsilon)
 	float dist2 = d.LengthSq();
 	if (dist2 + epsilon > r*r)
 	{
-#ifndef MATH_SILENT_ASSUME
+#ifdef MATH_ASSERT_CORRECTNESS
 		Sphere copy = *this;
 #endif
 		float dist = Sqrt(dist2);
@@ -646,7 +646,9 @@ void Sphere::Enclose(const vec &point, float epsilon)
 		// the whole missing distance were just added to radius.
 		pos += d * halfDist / dist;
 		r += halfDist + 1e-4f; // Use a fixed epsilon deliberately, the param is a squared epsilon, so different order of magnitude.
-		assume(this->Contains(copy, epsilon));
+#ifdef MATH_ASSERT_CORRECTNESS
+		mathassert(this->Contains(copy, epsilon));
+#endif
 	}
 	assume(this->Contains(point));
 }
