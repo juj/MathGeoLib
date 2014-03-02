@@ -26,6 +26,7 @@
 #include "Polygon.h"
 #include "Ray.h"
 #include "Sphere.h"
+#include "Capsule.h"
 #include "Triangle.h"
 #include "LineSegment.h"
 #include "../Math/float2.h"
@@ -773,14 +774,12 @@ bool Frustum::Intersects(const LineSegment &lineSegment) const
 
 bool Frustum::Intersects(const AABB &aabb) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(aabb);
+	return GJKIntersect(*this, aabb);
 }
 
 bool Frustum::Intersects(const OBB &obb) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(obb);
+	return GJKIntersect(*this, obb);
 }
 
 bool Frustum::Intersects(const Plane &plane) const
@@ -790,8 +789,7 @@ bool Frustum::Intersects(const Plane &plane) const
 
 bool Frustum::Intersects(const Triangle &triangle) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(triangle);
+	return GJKIntersect(*this, triangle);
 }
 
 bool Frustum::Intersects(const Polygon &polygon) const
@@ -802,14 +800,12 @@ bool Frustum::Intersects(const Polygon &polygon) const
 
 bool Frustum::Intersects(const Sphere &sphere) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(sphere);
+	return GJKIntersect(*this, sphere);
 }
 
 bool Frustum::Intersects(const Capsule &capsule) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(capsule);
+	return GJKIntersect(*this, capsule);
 }
 
 bool Frustum::Intersects(const Frustum &frustum) const
