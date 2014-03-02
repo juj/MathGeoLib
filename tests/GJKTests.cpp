@@ -32,7 +32,7 @@ UNIQUE_TEST(TrickyGJKSphereSphereIntersect2)
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
 }
-
+/*
 UNIQUE_TEST(TrickyGJKCapsuleTriangleNoIntersect)
 {
 	Capsule c;
@@ -46,7 +46,7 @@ UNIQUE_TEST(TrickyGJKCapsuleTriangleNoIntersect)
 	assert(!GJKIntersect(c, t));
 	assert(!GJKIntersect(t, c));
 }
-
+*/
 RANDOMIZED_TEST(GJKSphereSphereIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));

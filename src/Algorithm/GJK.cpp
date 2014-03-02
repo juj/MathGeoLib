@@ -153,7 +153,10 @@ vec UpdateSimplex(vec *s, int &n)
 		if (Dot(triNormal, zeroDir) >= 0.f)
 			return triNormal;
 		else
+		{
+			std::swap(s[0], s[1]);
 			return -triNormal;
+		}
 	}
 	else
 	{
@@ -166,21 +169,20 @@ vec UpdateSimplex(vec *s, int &n)
 		vec d12 = s[2] - s[1];
 		vec d13 = s[3] - s[1];
 		vec d23 = s[3] - s[2];
-		vec tri013Normal = Cross(d03, d01);
-		if (Dot(tri013Normal, d02) > 0.f)
-			tri013Normal = -tri013Normal; ///\TODO REMOVE THIS!
+		vec tri013Normal = Cross(d01, d03);
 		assert(Dot(tri013Normal, d02) <= 0.f);
-		vec tri023Normal = Cross(d02, d03);
-		if (Dot(tri023Normal, d01) > 0.f)
-			tri023Normal = -tri023Normal; ///\TODO REMOVE THIS!
+		vec tri023Normal = Cross(d03, d02);
 		assert(Dot(tri023Normal, d01) <= 0.f);
-		vec tri123Normal = Cross(d13, d12);
-		if (Dot(tri123Normal, -d02) > 0.f)
-			tri123Normal = -tri123Normal; ///\TODO REMOVE THIS!
+		vec tri123Normal = Cross(d12, d13);
 		assert(Dot(tri123Normal, -d02) <= 0.f);
 		float inTri013 = Dot(zeroDir, tri013Normal);
 		float inTri023 = Dot(zeroDir, tri023Normal);
 		float inTri123 = Dot(zeroDir, tri123Normal);
+
+		vec tri012Normal = Cross(d02, d01);
+		assert(Dot(tri012Normal, d03) <= 0.f);
+//		assert(Dot(zeroDir, tri012Normal) <= 0.f);
+
 		if (inTri013 > 0.f && inTri023 > 0.f && inTri123 > 0.f)
 		{
 			// The new point 3 is closest. Simplex degenerates back to a single point.
@@ -225,7 +227,8 @@ vec UpdateSimplex(vec *s, int &n)
 		}
 		if (inTri023 > 0.f)
 		{
-			s[1] = s[2];
+			s[1] = s[0];
+			s[0] = s[2];
 			s[2] = s[3];
 			n = 3;
 			return tri023Normal;
