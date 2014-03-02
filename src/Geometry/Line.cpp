@@ -61,7 +61,7 @@ vec Line::ClosestPointLineLine(const vec &v0, const vec &v1, const vec &v2, cons
 	float d0232 = DMNOP(0,2,3,2);
 	float d3210 = DMNOP(3,2,1,0);
 	float d3232 = DMNOP(3,2,3,2);
-	float mu = (d0232 * d3210 - DMNOP(0,2,1,0)*d3232) / (DMNOP(1,0,1,0)*DMNOP(3,2,3,2) - DMNOP(3,2,1,0)*DMNOP(3,2,1,0));
+	float mu = (d0232*d3210 - DMNOP(0,2,1,0)*d3232) / (DMNOP(1,0,1,0)*d3232 - d3210*d3210);
 #undef DMNOP
 	if (d)
 		*d = mu;
