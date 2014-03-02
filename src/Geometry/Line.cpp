@@ -57,12 +57,15 @@ MATH_BEGIN_NAMESPACE
 	@see ClosestPoint(), Distance(). */
 vec Line::ClosestPointLineLine(const vec &v0, const vec &v1, const vec &v2, const vec &v3, float *d, float *d2)
 {
-#define DMNOP(m, n, o, p) ((v##m.x - v##n.x) * (v##o.x - v##p.x) + (v##m.y - v##n.y) * (v##o.y - v##p.y) + (v##m.z - v##n.z) * (v##o.z - v##p.z))
-	float d0232 = DMNOP(0,2,3,2);
-	float d3210 = DMNOP(3,2,1,0);
-	float d3232 = DMNOP(3,2,3,2);
-	float mu = (d0232*d3210 - DMNOP(0,2,1,0)*d3232) / (DMNOP(1,0,1,0)*d3232 - d3210*d3210);
-#undef DMNOP
+	vec v02 = v0 - v2;
+	vec v32 = v3 - v2;
+	vec v10 = v1 - v0;
+	float d0232 = v02.Dot(v32);
+	float d3210 = v32.Dot(v10);
+	float d3232 = v32.Dot(v32);
+	float d0210 = v02.Dot(v10);
+	float d1010 = v10.Dot(v10);
+	float mu = (d0232*d3210 - d0210*d3232) / (d1010*d3232 - d3210*d3210);
 	if (d)
 		*d = mu;
 
