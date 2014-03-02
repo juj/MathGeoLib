@@ -233,6 +233,11 @@ bool Sphere::Contains(const Sphere &sphere) const
 	return pos.Distance(sphere.pos) + sphere.r <= r;
 }
 
+bool Sphere::Contains(const Sphere &sphere, float epsilon) const
+{
+	return pos.Distance(sphere.pos) + sphere.r -r <= epsilon;
+}
+
 bool Sphere::Contains(const Capsule &capsule) const
 {
 	return pos.Distance(capsule.l.a) + capsule.r <= r &&
@@ -628,14 +633,22 @@ bool Sphere::Intersects(const Polyhedron &polyhedron) const
 void Sphere::Enclose(const vec &point, float epsilon)
 {
 	vec d = point - pos;
-	float dist2 = d.LengthSq() + epsilon;
-	if (dist2 > r*r)
+	float dist2 = d.LengthSq();
+	if (dist2 + epsilon > r*r)
 	{
+#ifndef MATH_SILENT_ASSUME
+		Sphere copy = *this;
+#endif
 		float dist = Sqrt(dist2);
-		float newRadius = (r + dist) * 0.5f;
-		pos += d * (newRadius - r) / dist;
-		r = newRadius;
+		float halfDist = (dist - r) * 0.5f;
+		// Nudge this Sphere towards the target point. Add half the missing distance to radius,
+		// and the other half to position. This gives a tighter enclosure, instead of if
+		// the whole missing distance were just added to radius.
+		pos += d * halfDist / dist;
+		r += halfDist + 1e-4f; // Use a fixed epsilon deliberately, the param is a squared epsilon, so different order of magnitude.
+		assume(this->Contains(copy, epsilon));
 	}
+	assume(this->Contains(point));
 }
 
 void Sphere::Enclose(const AABB &aabb)

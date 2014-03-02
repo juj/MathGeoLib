@@ -150,6 +150,7 @@ public:
 	bool Contains(const Frustum &frustum) const;
 	bool Contains(const Polyhedron &polyhedron) const;
 	bool Contains(const Sphere &sphere) const;
+	bool Contains(const Sphere &sphere, float epsilon) const;
 	bool Contains(const Capsule &capsule) const;
 
 	/// Computes a Sphere that bounds the given point array.
@@ -285,7 +286,7 @@ public:
 			This can be set to zero, but it may cause that Sphere::Contains(point) may return false.
 		@note This function will not produce the optimal enclosure.
 		@see FastEnclosingSphere(), OptimalEnclosingSphere(). */
-	void Enclose(const vec &point, float epsilon = 1e-2f);
+	void Enclose(const vec &point, float epsilon = 1e-4f);
 	void Enclose(const vec *pointArray, int numPoints);
 	void Enclose(const LineSegment &lineSegment);
 	void Enclose(const AABB &aabb);

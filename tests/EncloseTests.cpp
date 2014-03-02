@@ -172,7 +172,7 @@ RANDOMIZED_TEST(Sphere_Enclose_point)
 	vec pt = RandomPointNearOrigin(DISTSCALE);
 	s.Enclose(pt);
 
-	assert(s.Contains(pt));
+	assert3(s.Contains(pt), s, pt, s.Distance(pt));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_LineSegment)
