@@ -969,6 +969,22 @@ void AABB::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 		Swap(dMin, dMax);
 }
 
+int AABB::UniqueFaceNormals(vec *out) const
+{
+	out[0] = DIR_VEC(1,0,0);
+	out[1] = DIR_VEC(0,1,0);
+	out[2] = DIR_VEC(0,0,1);
+	return 3;
+}
+
+int AABB::UniqueEdgeDirections(vec *out) const
+{
+	out[0] = DIR_VEC(1,0,0);
+	out[1] = DIR_VEC(0,1,0);
+	out[2] = DIR_VEC(0,0,1);
+	return 3;
+}
+
 void AABB::Enclose(const vec &point)
 {
 	minPoint = Min(minPoint, point);

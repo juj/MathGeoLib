@@ -289,6 +289,8 @@ RANDOMIZED_TEST(AABBAABBNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -305,6 +307,8 @@ RANDOMIZED_TEST(AABBOBBNoIntersect)
 	OBB b = RandomOBBInHalfspace(p, 10.f);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -446,6 +450,10 @@ RANDOMIZED_TEST(AABBFrustumNoIntersect)
 	Frustum b = RandomFrustumInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
+	assert(!GJKIntersect(a, b));
+	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -499,6 +507,8 @@ RANDOMIZED_TEST(OBBOBBNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -506,6 +516,47 @@ RANDOMIZED_TEST(OBBOBBNoIntersect)
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
+
+extern int xxxxx;
+
+BENCHMARK(OBBOBBNoIntersect, "OBB-OBB No Intersection")
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	OBB b = RandomOBBInHalfspace(p, 10.f);
+	if (!a.Intersects(b))
+		++xxxxx;
+	if (!b.Intersects(a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(OBBOBBNoIntersect_SAT, "OBB-OBB SAT No Intersection")
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	OBB b = RandomOBBInHalfspace(p, 10.f);
+	if (!SATIntersect(a, b))
+		++xxxxx;
+	if (!SATIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(OBBOBBNoIntersect_GJK, "OBB-OBB GJK No Intersection")
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	OBB b = RandomOBBInHalfspace(p, 10.f);
+	if (!GJKIntersect(a, b))
+		++xxxxx;
+	if (!GJKIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
 
 RANDOMIZED_TEST(OBBLineNoIntersect)
 {
@@ -637,6 +688,8 @@ RANDOMIZED_TEST(OBBFrustumNoIntersect)
 	assert(!b.Intersects(a));
 	assert(!GJKIntersect(a, b));
 	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));

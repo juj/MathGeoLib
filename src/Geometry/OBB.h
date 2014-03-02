@@ -253,6 +253,9 @@ public:
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
 	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
+	int UniqueFaceNormals(vec *out) const;
+	int UniqueEdgeDirections(vec *out) const;
+
 	/// Returns a point on an edge of this OBB.
 	/** @param edgeIndex The index of the edge to generate a point to, in the range [0, 11]. @todo Document which index generates which one.
 		@param u A normalized value between [0,1]. This specifies the relative distance of the point along the edge.

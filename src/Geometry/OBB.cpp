@@ -311,6 +311,22 @@ void OBB::ProjectToAxis(const vec &direction, float &outMin, float &outMax) cons
 	outMax = pt + x + y + z;
 }
 
+int OBB::UniqueFaceNormals(vec *out) const
+{
+	out[0] = axis[0];
+	out[1] = axis[1];
+	out[2] = axis[2];
+	return 3;
+}
+
+int OBB::UniqueEdgeDirections(vec *out) const
+{
+	out[0] = axis[0];
+	out[1] = axis[1];
+	out[2] = axis[2];
+	return 3;
+}
+
 vec OBB::PointOnEdge(int edgeIndex, float u) const
 {
 	assume(0 <= edgeIndex && edgeIndex <= 11);

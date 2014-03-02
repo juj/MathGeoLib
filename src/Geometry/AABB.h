@@ -428,6 +428,9 @@ public:
 		@param dMax [out] Returns the maximum extent of this AABB on the given axis. */
 	void ProjectToAxis(const vec &axis, float &dMin, float &dMax) const;
 
+	int UniqueFaceNormals(vec *out) const;
+	int UniqueEdgeDirections(vec *out) const;
+
 	/// Expands this AABB to enclose the given object.
 	/** This function computes an AABB that encloses both this AABB and the specified object, and stores the resulting
 		AABB into this.

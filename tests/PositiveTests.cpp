@@ -263,6 +263,8 @@ RANDOMIZED_TEST(AABBAABBIntersect)
 	assert(b.Intersects(a));
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
+	assert(SATIntersect(a, b));
+	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -280,6 +282,8 @@ RANDOMIZED_TEST(AABBOBBIntersect)
 	assert(b.Intersects(a));
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
+	assert(SATIntersect(a, b));
+	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -408,6 +412,8 @@ RANDOMIZED_TEST(AABBFrustumIntersect)
 	assert(b.Intersects(a));
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
+	assert(SATIntersect(a, b));
+	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -458,6 +464,8 @@ RANDOMIZED_TEST(OBBOBBIntersect)
 	assert(b.Intersects(a));
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
+	assert(SATIntersect(a, b));
+	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -465,6 +473,44 @@ RANDOMIZED_TEST(OBBOBBIntersect)
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
+
+int xxxxx = 0;
+
+BENCHMARK(OBBOBBIntersect, "OBB-OBB Intersects")
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	OBB b = RandomOBBContainingPoint(pt, 10.f);
+	if (a.Intersects(b))
+		++xxxxx;
+	if (b.Intersects(a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(OBBOBBIntersect_SAT, "OBB-OBB SAT Intersection")
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	OBB b = RandomOBBContainingPoint(pt, 10.f);
+	if (SATIntersect(a, b))
+		++xxxxx;
+	if (SATIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(OBBOBBIntersect_GJK, "OBB-OBB GJK Intersection")
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	OBB b = RandomOBBContainingPoint(pt, 10.f);
+	if (GJKIntersect(a, b))
+		++xxxxx;
+	if (GJKIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
 
 RANDOMIZED_TEST(OBBLineIntersect)
 {
@@ -588,6 +634,8 @@ RANDOMIZED_TEST(OBBFrustumIntersect)
 	assert(b.Intersects(a));
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
+	assert(SATIntersect(a, b));
+	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -907,8 +955,6 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-
-int xxxxx = 0;
 
 BENCHMARK(FrustumFrustumIntersect, "Frustum-Frustum Intersects")
 {
