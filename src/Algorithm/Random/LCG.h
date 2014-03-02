@@ -106,8 +106,16 @@ public:
 	/// Returns a float in the range [a, b[.
 	/** @param a Lower bound, inclusive.
 	    @param b Upper bound, exclusive.
-	    @return A float in the range [a, b[ */
+	    @return A float in the range [a, b[
+	    @Note This function is slower than LCG::FloatIncl(). If you do not care about the open/closed interval, prefer calling FloatIncl() instead.
+	    @see Float(), FloatIncl(). */
 	float Float(float a, float b);
+
+	/// Returns a float in the range [a, b].
+	/** @param a Lower bound, inclusive.
+	    @param b Upper bound, inclusive.
+	    @return A float in the range [a, b] */
+	float FloatIncl(float a, float b);
 
 	u32 multiplier;
 	u32 increment;

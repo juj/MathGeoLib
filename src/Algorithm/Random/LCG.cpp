@@ -120,6 +120,8 @@ float LCG::Float()
 	u32 i = ((u32)Int() & 0x007FFFFF /* random mantissa */) | 0x3F800000 /* fixed exponent */;
 	float f = ReinterpretAsFloat(i); // f is now in range [1, 2[
 	f -= 1.f; // Map to range [0, 1[
+	assert1(f >= 0.f, f);
+	assert1(f < 1.f, f);
 	return f;
 }
 
@@ -135,7 +137,10 @@ float LCG::Float01Incl()
 		else
 		{
 			val |= 0x3F800000;
-			return ReinterpretAsFloat(val) - 1.f;
+			float f = ReinterpretAsFloat(val) - 1.f;
+			assert1(f >= 0.f, f);
+			assert1(f <= 1.f, f);
+			return f;
 		}
 	}
 	return Float();
@@ -148,14 +153,40 @@ float LCG::FloatNeg1_1()
 	i = one | (i & 0x007FFFFF) /* random mantissa */;
 	float f = ReinterpretAsFloat(i); // f is now in range ]-2, -1[ union [1, 2].
 	float fone = ReinterpretAsFloat(one); // +/- 1, of same sign as f.
-	return f - fone;
+	f -= fone;
+	assert1(f > -1.f, f);
+	assert1(f < 1.f, f);
+	return f;
 }
 
 float LCG::Float(float a, float b)
 {
 	assume(a <= b && "LCG::Float(a,b): Error in range: b < a!");
 
-	return Float()*(b-a)+a;
+	if (a == b)
+		return a;
+
+	for(int i = 0; i < 10; ++i)
+	{
+		float f = a + Float() * (b-a);
+		if (f != b)
+		{
+			assume2(a <= f, a, b);
+			assume2(f < b || a == b, f, b);
+			return f;
+		}
+	}
+	return a;
+}
+
+float LCG::FloatIncl(float a, float b)
+{
+	assume(a <= b && "LCG::Float(a,b): Error in range: b < a!");
+
+	float f = a + Float() * (b-a);
+	assume2(a <= f, a, b);
+	assume2(f <= b, f, b);
+	return f;
 }
 
 MATH_END_NAMESPACE

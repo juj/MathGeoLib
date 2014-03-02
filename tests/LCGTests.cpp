@@ -105,11 +105,29 @@ RANDOMIZED_TEST(LCG_Float_A_B)
 	{
 		float a = lcg.Float();
 		float b = lcg.Float();
+		if (a == b)
+			continue;
 		if (b < a)
 			Swap(a, b);
 
 		float f = lcg.Float(a, b);
 		assert2(a <= f, a, b);
 		assert2(f < b, f, b);
+	}
+}
+
+RANDOMIZED_TEST(LCG_Float_A_B_Incl)
+{
+	LCG lcg;
+	for(int i = 0; i < 1000; ++i)
+	{
+		float a = lcg.Float();
+		float b = lcg.Float();
+		if (b < a)
+			Swap(a, b);
+
+		float f = lcg.FloatIncl(a, b);
+		assert2(a <= f, a, b);
+		assert2(f <= b, f, b);
 	}
 }
