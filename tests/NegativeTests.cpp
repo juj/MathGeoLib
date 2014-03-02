@@ -5,6 +5,7 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 #include "../src/Algorithm/GJK.h"
+#include "../src/Algorithm/SAT.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
@@ -963,6 +964,10 @@ RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 	Frustum b = RandomFrustumInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
+	assert(!GJKIntersect(a, b));
+	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -970,6 +975,50 @@ RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
+
+extern int xxxxx;
+
+BENCHMARK(FrustumFrustumNoIntersect, "Frustum-Frustum No Intersection")
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
+
+	if (!a.Intersects(b))
+		++xxxxx;
+	if (!b.Intersects(a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(FrustumFrustumNoIntersect_SAT, "Frustum-Frustum SAT No Intersection")
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
+
+	if (!SATIntersect(a, b))
+		++xxxxx;
+	if (!SATIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(FrustumFrustumNoIntersect_GJK, "Frustum-Frustum GJK No Intersection")
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
+
+	if (!GJKIntersect(a, b))
+		++xxxxx;
+	if (!GJKIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
 
 RANDOMIZED_TEST(FrustumPolyhedronNoIntersect)
 {

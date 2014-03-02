@@ -262,6 +262,9 @@ public:
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
 	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
+	int UniqueFaceNormals(vec *out) const;
+	int UniqueEdgeDirections(vec *out) const;
+
 	/// Sets the pos, front and up members of this frustum from the given world transform.
 	/** This function sets the 'front' parameter of this Frustum to look towards the -Z/+Z axis of the given matrix
 		depending on the handedness set to the Frustum,

@@ -5,6 +5,7 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 #include "../src/Algorithm/GJK.h"
+#include "../src/Algorithm/SAT.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
@@ -897,6 +898,8 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 	assert(b.Intersects(a));
 	assert(GJKIntersect(a, b));
 	assert(GJKIntersect(b, a));
+	assert(SATIntersect(a, b));
+	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -904,6 +907,44 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
+
+int xxxxx = 0;
+
+BENCHMARK(FrustumFrustumIntersect, "Frustum-Frustum Intersects")
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	if (a.Intersects(b))
+		++xxxxx;
+	if (b.Intersects(a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(FrustumFrustumIntersect_SAT, "Frustum-Frustum SAT")
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	if (SATIntersect(a, b))
+		++xxxxx;
+	if (SATIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
+
+BENCHMARK(FrustumFrustumIntersect_GJK, "Frustum-Frustum GJK")
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	if (GJKIntersect(a, b))
+		++xxxxx;
+	if (GJKIntersect(b, a))
+		++xxxxx;
+}
+BENCHMARK_END;
 
 RANDOMIZED_TEST(FrustumPolyhedronIntersect)
 {

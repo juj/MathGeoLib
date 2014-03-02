@@ -35,6 +35,7 @@
 #include "../Math/float4.h"
 #include "../Math/Quat.h"
 #include "../Algorithm/Random/LCG.h"
+#include "../Algorithm/GJK.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
@@ -647,6 +648,47 @@ void Frustum::ProjectToAxis(const vec &direction, float &outMin, float &outMax) 
 	outMax = Dot(maxPt, direction);
 }
 
+int Frustum::UniqueFaceNormals(vec *out) const
+{
+	if (type == PerspectiveFrustum)
+	{
+		out[0] = front;
+		out[1] = LeftPlane().normal;
+		out[2] = RightPlane().normal;
+		out[3] = TopPlane().normal;
+		out[4] = BottomPlane().normal;
+		return 5;
+	}
+	else
+	{
+		out[0] = front;
+		out[1] = up;
+		out[2] = Cross(front, up);
+		return 3;
+	}
+}
+
+int Frustum::UniqueEdgeDirections(vec *out) const
+{
+	if (type == PerspectiveFrustum)
+	{
+		out[0] = NearPlanePos(-1, -1) - NearPlanePos(1, -1);
+		out[1] = NearPlanePos(-1, -1) - NearPlanePos(-1, 1);
+		out[2] = FarPlanePos(-1, -1) - NearPlanePos(-1, -1);
+		out[3] = FarPlanePos( 1, -1) - NearPlanePos( 1, -1);
+		out[4] = FarPlanePos(-1,  1) - NearPlanePos(-1,  1);
+		out[5] = FarPlanePos( 1,  1) - NearPlanePos( 1,  1);
+		return 6;
+	}
+	else
+	{
+		out[0] = front;
+		out[1] = up;
+		out[2] = Cross(front, up);
+		return 3;
+	}
+}
+
 AABB Frustum::MinimalEnclosingAABB() const
 {
 	AABB aabb;
@@ -772,8 +814,7 @@ bool Frustum::Intersects(const Capsule &capsule) const
 
 bool Frustum::Intersects(const Frustum &frustum) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(frustum);
+	return GJKIntersect(*this, frustum);
 }
 
 bool Frustum::Intersects(const Polyhedron &polyhedron) const
