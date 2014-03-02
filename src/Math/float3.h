@@ -377,11 +377,11 @@ public:
 
 	/// Tests if the length of this vector is one, up to the given epsilon.
 	/** @see IsZero(), IsFinite(), IsPerpendicular(). */
-	bool IsNormalized(float epsilonSq = 1e-6f) const;
+	bool IsNormalized(float epsilonSq = 1e-5f) const;
 
 	/// Tests if this is the null vector, up to the given epsilon.
 	/** @see IsNormalized(), IsFinite(), IsPerpendicular(). */
-	bool IsZero(float epsilonSq = 1e-6f) const;
+	bool IsZero(float epsilonSq = 1e-5f) const;
 
 	/// Tests if this vector contains valid finite elements.
 	/** @see IsNormalized(), IsZero(), IsPerpendicular(). */
@@ -389,7 +389,7 @@ public:
 
 	/// Tests if two vectors are perpendicular to each other.
 	/** @see IsNormalized(), IsZero(), IsPerpendicular(), Equals(). */
-	bool IsPerpendicular(const float3 &other, float epsilon = 1e-3f) const;
+	bool IsPerpendicular(const float3 &other, float epsilon = 1e-4f) const;
 
 	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
 	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
