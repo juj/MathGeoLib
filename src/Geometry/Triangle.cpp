@@ -666,8 +666,17 @@ void Triangle::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 
 int Triangle::UniqueFaceNormals(vec *out) const
 {
-	*out = Cross(b-a, c-a);
-	return 1;
+	out[0] = Cross(b-a, c-a);
+	// If testing a pair of coplanar triangles for SAT intersection,
+	// the common face normal will not be a separating axis, and neither will
+	// the cross products of the pairwise edges, since those all coincide with the face normals.
+	// Therefore to make SAT test work properly in that case, also report all the edge normals
+	// as possible separation test directions, which fixes the coplanar case.
+	// For more info, see Geometric Tools for Computer Graphics, 11.11.1, p. 612.
+	out[1] = Cross(out[1], b-a);
+	out[2] = Cross(out[2], c-a);
+	out[3] = Cross(out[3], c-b);
+	return 4;
 }
 
 int Triangle::UniqueEdgeDirections(vec *out) const

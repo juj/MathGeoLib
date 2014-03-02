@@ -1552,6 +1552,23 @@ RANDOMIZED_TEST(TrianglePlaneNoIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(TrickyTriangleTriangleSATNoIntersect)
+{
+	Triangle a, b;
+	a.a = POINT_VEC(-19.234608f, 175.11060f, -65.702095f);
+	a.b = POINT_VEC(-41.996265f, 86.449524f, 61.047047f);
+	a.c = POINT_VEC(-40.166401f, 83.222511f, -7.1153078f);
+	b.a = POINT_VEC(-23.087940f, 13.051629f, -21.682280f);
+	b.b = POINT_VEC(-90.890396f, -61.371635f, -44.296501f);
+	b.c = POINT_VEC(85.991585f, 38.734276f, 29.707987f);
+	assert(!a.Intersects(b));
+	assert(!b.Intersects(a));
+	assert(!GJKIntersect(a, b));
+	assert(!GJKIntersect(b, a));
+	assert(!SATIntersect(a, b));
+	assert(!SATIntersect(b, a));
+}
+
 RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 {
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
