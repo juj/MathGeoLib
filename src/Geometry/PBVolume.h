@@ -25,16 +25,23 @@
 
 MATH_BEGIN_NAMESPACE
 
-enum TestResult
+/// Reports a result from an approximate culling operation.
+enum CullTestResult
 {
-	TestOutside, // The tested objects don't touch.
-//	TestIntersect, // The tested objects intersect, but neither is contained inside each other.
-	TestNotContained, // The tested object is not contained inside the other object, but no other information is known.
-	TestInside // The tested object is contained inside the other object.
+	// The tested objects don't intersect - they are fully disjoint.
+	TestOutside,
+
+	// The tested object is at least not fully contained inside the other object, but no other information is known.
+	// The objects might intersect or be disjoint.
+	TestNotContained,
+
+	// The tested object is fully contained inside the other object.
+	TestInside
 };
 
 /// PBVolume is a "plane bounded volume", a convex polyhedron represented by a set
-/// of planes.
+/// of planes. The number of planes is fixed at compile time so that compilers are able to perfectly unroll the loops for
+/// best performance.
 template<int N>
 class PBVolume
 {
@@ -43,17 +50,19 @@ public:
 
 	int NumPlanes() const { return N; }
 
-	/// Returns TestOutside, TestInside or TestNotContained.
-	TestResult InsideOrIntersects(const AABB &aabb) const
+	/// Performs an *approximate* intersection test between this PBVolume and the given AABB.
+	/** This function is best used for high-performance object culling purposes, e.g. for frustum-aabb culling, when
+		a small percentage of false positives do not matter.
+		@return An enum denoting whether the given object is inside or intersects this PBVolume. See the CullTestResult enum 
+			for the interpretation of the return values. */
+	CullTestResult InsideOrIntersects(const AABB &aabb) const
 	{
-		TestResult result = TestInside;
+		CullTestResult result = TestInside;
 
-		//vec r = (aabb.maxPoint - aabb.minPoint) * 0.5f;
-		//vec c = aabb.minPoint + r;
 		for(int i = 0; i < N; ++i)
 		{
-			vec nPoint;// = aabb.minPoint;
-			vec pPoint;// = aabb.maxPoint;
+			vec nPoint;
+			vec pPoint;
 			nPoint.x = (p[i].normal.x < 0.f ? aabb.maxPoint.x : aabb.minPoint.x);
 			nPoint.y = (p[i].normal.y < 0.f ? aabb.maxPoint.y : aabb.minPoint.y);
 			nPoint.z = (p[i].normal.z < 0.f ? aabb.maxPoint.z : aabb.minPoint.z);
@@ -79,20 +88,20 @@ public:
 
 			float a = p[i].SignedDistance(nPoint);
 			if (a >= 0.f)
-				return TestOutside; // The AABB is certainly outside the frustum.
+				return TestOutside; // The AABB is certainly outside this PBVolume.
 			a = p[i].SignedDistance(pPoint);
 			if (a >= 0.f)
-				result = TestNotContained; // At least one vertex is outside this frustum. The whole AABB can't possibly be contained in this frustum.
+				result = TestNotContained; // At least one vertex is outside this PBVolume. The whole AABB can't possibly be contained in this PBVolume.
 		}
 
-		// We can return here either TestInside or TestNotContained, but it's possible that the AABB was outside the frustum, and we failed to find
-		// a separating axis.
+		// We can return here either TestInside or TestNotContained, but it's possible that the AABB was outside the frustum, and we
+		// just failed to find a separating axis.
 		return result;
 	}
 
-	TestResult InsideOrIntersects(const Sphere &sphere) const
+	CullTestResult InsideOrIntersects(const Sphere &sphere) const
 	{
-		TestResult result = TestInside;
+		CullTestResult result = TestInside;
 		for(int i = 0; i < N; ++i)
 		{
 			float d = p[i].SignedDistance(sphere.pos);
