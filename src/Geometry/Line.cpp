@@ -281,7 +281,7 @@ vec Line::ClosestPoint(const Ray &other, float *d, float *d2) const
 {
 	float t2;
 	vec closestPoint = ClosestPointLineLine(pos, pos + dir, other.pos, other.pos + other.dir, d, &t2);
-	if (t2 <= 0.f)
+	if (t2 < 0.f)
 	{
 		if (d2)
 			*d2 = 0.f;
@@ -304,13 +304,13 @@ vec Line::ClosestPoint(const LineSegment &other, float *d, float *d2) const
 {
 	float t2;
 	vec closestPoint = ClosestPointLineLine(pos, pos + dir, other.a, other.b, d, &t2);
-	if (t2 <= 0.f)
+	if (t2 < 0.f)
 	{
 		if (d2)
 			*d2 = 0.f;
 		return ClosestPoint(other.a, d);
 	}
-	else if (t2 >= 1.f)
+	else if (t2 > 1.f)
 	{
 		if (d2)
 			*d2 = 1.f;
