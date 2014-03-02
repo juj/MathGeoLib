@@ -4,6 +4,7 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "../src/Algorithm/GJK.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
@@ -259,6 +260,8 @@ RANDOMIZED_TEST(AABBAABBIntersect)
 	AABB b = RandomAABBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -274,6 +277,8 @@ RANDOMIZED_TEST(AABBOBBIntersect)
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -319,6 +324,8 @@ RANDOMIZED_TEST(AABBLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -351,6 +358,8 @@ RANDOMIZED_TEST(AABBSphereIntersect)
 	assert(b.Intersects(a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(b.Contains(a.ClosestPoint(b)));
 //	assert(a.Contains(b.ClosestPoint(a)));
@@ -379,6 +388,8 @@ RANDOMIZED_TEST(AABBTriangleIntersect)
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -394,6 +405,8 @@ RANDOMIZED_TEST(AABBFrustumIntersect)
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -442,6 +455,8 @@ RANDOMIZED_TEST(OBBOBBIntersect)
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -487,6 +502,8 @@ RANDOMIZED_TEST(OBBLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -517,6 +534,8 @@ RANDOMIZED_TEST(OBBSphereIntersect)
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -532,6 +551,8 @@ RANDOMIZED_TEST(OBBCapsuleIntersect)
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -547,6 +568,8 @@ RANDOMIZED_TEST(OBBTriangleIntersect)
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -562,6 +585,8 @@ RANDOMIZED_TEST(OBBFrustumIntersect)
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -611,6 +636,8 @@ RANDOMIZED_TEST(SphereSphereIntersect)
 	Sphere b = RandomSphereContainingPoint(pt, 10.f);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -656,6 +683,8 @@ RANDOMIZED_TEST(SphereLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -686,6 +715,8 @@ RANDOMIZED_TEST(SphereCapsuleIntersect)
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -701,6 +732,8 @@ RANDOMIZED_TEST(SphereTriangleIntersect)
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -716,6 +749,8 @@ RANDOMIZED_TEST(SphereFrustumIntersect)
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -794,6 +829,8 @@ RANDOMIZED_TEST(FrustumLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -824,6 +861,8 @@ RANDOMIZED_TEST(FrustumCapsuleIntersect)
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -839,6 +878,8 @@ RANDOMIZED_TEST(FrustumTriangleIntersect)
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -854,6 +895,8 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 	Frustum b = RandomFrustumContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -932,6 +975,8 @@ RANDOMIZED_TEST(CapsuleLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -962,6 +1007,8 @@ RANDOMIZED_TEST(CapsuleCapsuleIntersect)
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -977,6 +1024,8 @@ RANDOMIZED_TEST(CapsuleTriangleIntersect)
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1258,6 +1307,8 @@ RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(a.Intersects(b));
 //	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 	assert(a.Contains(a.ClosestPoint(b)));
@@ -1288,6 +1339,8 @@ RANDOMIZED_TEST(TriangleTriangleIntersect)
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(a.Intersects(b));
 	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 	assert(a.Contains(a.ClosestPoint(b)));
