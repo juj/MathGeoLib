@@ -1626,6 +1626,14 @@ RANDOMIZED_TEST(PlaneLineNoIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(TrickyPlaneRayClosestPoint)
+{
+	Plane p(DIR_VEC(0.50561136f,-0.753886223f,0.419538707f),83.6198273f);
+	Ray r(POINT_VEC(-34.2622185f,97.5630875f,14.6553354f),DIR_VEC(-0.433765054f,-0.636341155f,-0.637901187f));
+	vec cp = p.ClosestPoint(r);
+	assert(p.Contains(cp));
+}
+
 RANDOMIZED_TEST(PlaneRayNoIntersect)
 {
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
@@ -1636,7 +1644,7 @@ RANDOMIZED_TEST(PlaneRayNoIntersect)
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert3(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString());
 	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));

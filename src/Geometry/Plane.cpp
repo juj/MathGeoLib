@@ -357,12 +357,16 @@ vec Plane::ClosestPoint(const Ray &ray) const
 	assume(ray.IsFinite());
 	assume(!IsDegenerate());
 
+	// The plane and a ray have three configurations:
+	// 1) the ray direction faces away from the plane: the closest point is the ray origin point.
+	// 2) the ray faces towards the plane: the closest point is the intersection point.
+	// 3) the ray is parallel to the plane: any point on the ray projected to the plane
+	//    is a closest point, so can treat this as case 1).
 	float denom = Dot(normal, ray.dir);
-	if (EqualAbs(denom, 0.f))
-		return Project(ray.pos); // Output t == 0.
-	else
+	if (denom <= 0.f)
+		return Project(ray.pos); // cases 1) and 3)
+	else // case 2)
 	{
-		///@todo Output parametric t along the ray as well.
 		float t = (d - Dot(normal, ray.pos)) / denom;
 		return ray.GetPoint(t);
 	}
