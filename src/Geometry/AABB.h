@@ -491,6 +491,9 @@ public:
 	/** The returned string specifies the center point and the half-axes of this AABB. */
 	std::string ToString() const;
 	std::string SerializeToString() const;
+
+	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
+	std::string SerializeToCodeString() const;
 #endif
 
 	static AABB FromString(const char *str, const char **outEndStr = 0);

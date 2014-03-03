@@ -648,8 +648,13 @@ std::string MUST_USE_RESULT Quat::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%.9g %.9g %.9g %.9g", x, y, z, w);
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g", x, y, z, w);
 	return std::string(str);
+}
+
+std::string Quat::SerializeToCodeString() const
+{
+	return "Quat(" + SerializeToString() + ")";
 }
 #endif
 
@@ -659,8 +664,8 @@ Quat MUST_USE_RESULT Quat::FromString(const char *str, const char **outEndStr)
 	assume(str);
 	if (!str)
 		return float4::nan;
-	if (*str == '(')
-		++str;
+	MATH_SKIP_WORD(str, "Quat");
+	MATH_SKIP_WORD(str, "(");
 	Quat f;
 	f.x = DeserializeFloat(str, &str);
 	f.y = DeserializeFloat(str, &str);

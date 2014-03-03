@@ -404,8 +404,11 @@ public:
 	/// Returns "(x, y, z)".
 	std::string ToString() const;
 
-	/// Returns "x y z". This is the preferred format for the float3 if it has to be serialized to a string for machine transfer.
+	/// Returns "x,y,z". This is the preferred format for the float3 if it has to be serialized to a string for machine transfer.
 	std::string SerializeToString() const;
+
+	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
+	std::string SerializeToCodeString() const;
 #endif
 
 	/// Parses a string that is of form "x,y,z" or "(x,y,z)" or "(x;y;z)" or "x y z" to a new float3.

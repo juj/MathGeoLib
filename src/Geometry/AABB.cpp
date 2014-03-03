@@ -1158,8 +1158,13 @@ std::string AABB::ToString() const
 std::string AABB::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g %.9g %.9g %.9g %.9g %.9g", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
 	return str;
+}
+
+std::string AABB::SerializeToCodeString() const
+{
+	return "AABB(" + minPoint.SerializeToCodeString() + "," + maxPoint.SerializeToCodeString() + ")";
 }
 
 AABB AABB::FromString(const char *str, const char **outEndStr)
@@ -1168,9 +1173,10 @@ AABB AABB::FromString(const char *str, const char **outEndStr)
 	if (!str)
 		return AABB(vec::nan, vec::nan);
 	AABB a;
-	if (!strncmp(str, "AABB(Min:(", strlen("AABB(Min:("))) str += strlen("AABB(Min:(");
+	MATH_SKIP_WORD(str, "AABB(");
+	MATH_SKIP_WORD(str, "Min:(");
 	a.minPoint = POINT_VEC(float3::FromString(str, &str));
-	if (!strncmp(str, " Max:(", strlen(" Max:("))) str += strlen(" Max:(");
+	MATH_SKIP_WORD(str, " Max:(");
 	a.maxPoint = POINT_VEC(float3::FromString(str, &str));
 	if (outEndStr)
 		*outEndStr = str;

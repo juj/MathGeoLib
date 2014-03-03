@@ -441,8 +441,13 @@ std::string float4::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%.9g %.9g %.9g %.9g", x, y, z, w);
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g", x, y, z, w);
 	return std::string(str);
+}
+
+std::string float4::SerializeToCodeString() const
+{
+	return "float4(" + SerializeToString() + ")";
 }
 #endif
 
@@ -452,8 +457,8 @@ float4 float4::FromString(const char *str, const char **outEndStr)
 	assume(str);
 	if (!str)
 		return float4::nan;
-	if (*str == '(')
-		++str;
+	MATH_SKIP_WORD(str, "float4");
+	MATH_SKIP_WORD(str, "(");
 	float4 f;
 	f.x = DeserializeFloat(str, &str);
 	f.y = DeserializeFloat(str, &str);

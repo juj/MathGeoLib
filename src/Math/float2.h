@@ -333,8 +333,11 @@ public:
 	/// Returns "(x, y)".
 	std::string ToString() const;
 
-	/// Returns "x y". This is the preferred format for the float2 if it has to be serialized to a string for machine transfer.
+	/// Returns "x,y". This is the preferred format for the float2 if it has to be serialized to a string for machine transfer.
 	std::string SerializeToString() const;
+
+	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
+	std::string SerializeToCodeString() const;
 #endif
 
 	/// Parses a string that is of form "x,y" or "(x,y)" or "(x;y)" or "x y" to a new float2.

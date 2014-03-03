@@ -530,4 +530,7 @@ FORCE_INLINE bool IsNan(long double value) { return IsNan((double)value); }
 		to advance to reading a next element in a sequence of multiple serialized entries. */
 float DeserializeFloat(const char *str, const char **outEndStr = 0);
 
+// A deserialization helper.
+#define MATH_SKIP_WORD(str, word) if (!strncmp(str, word, strlen(word))) str += strlen(word);
+
 MATH_END_NAMESPACE

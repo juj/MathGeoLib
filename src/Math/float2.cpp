@@ -249,8 +249,13 @@ std::string float2::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%.9g %.9g", x, y);
+	sprintf(str, "%.9g,%.9g", x, y);
 	return std::string(str);
+}
+
+std::string float2::SerializeToCodeString() const
+{
+	return "float2(" + SerializeToString() + ")";
 }
 #endif
 
@@ -260,8 +265,8 @@ float2 float2::FromString(const char *str, const char **outEndStr)
 	assume(str);
 	if (!str)
 		return float2::nan;
-	if (*str == '(')
-		++str;
+	MATH_SKIP_WORD(str, "float2");
+	MATH_SKIP_WORD(str, "(");
 	float2 f;
 	f.x = DeserializeFloat(str, &str);
 	f.y = DeserializeFloat(str, &str);

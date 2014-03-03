@@ -225,8 +225,13 @@ std::string float3::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%.9g %.9g %.9g", x, y, z);
+	sprintf(str, "%.9g,%.9g,%.9g", x, y, z);
 	return std::string(str);
+}
+
+std::string float3::SerializeToCodeString() const
+{
+	return "float3(" + SerializeToString() + ")";
 }
 #endif
 
@@ -236,8 +241,8 @@ float3 MUST_USE_RESULT float3::FromString(const char *str, const char **outEndSt
 	assume(str);
 	if (!str)
 		return float3::nan;
-	if (*str == '(')
-		++str;
+	MATH_SKIP_WORD(str, "float3");
+	MATH_SKIP_WORD(str, "(");
 	float3 f;
 	f.x = DeserializeFloat(str, &str);
 	f.y = DeserializeFloat(str, &str);
