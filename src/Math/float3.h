@@ -780,4 +780,7 @@ typedef float3 vec_storage;
 
 #endif
 
+vec PointVecFromString(const char *str, const char **outEndStr = 0);
+vec DirVecFromString(const char *str, const char **outEndStr = 0);
+
 MATH_END_NAMESPACE

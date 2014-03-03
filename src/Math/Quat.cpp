@@ -673,6 +673,8 @@ Quat MUST_USE_RESULT Quat::FromString(const char *str, const char **outEndStr)
 	f.w = DeserializeFloat(str, &str);
 	if (*str == ')')
 		++str;
+	if (*str == ',')
+		++str;
 	if (outEndStr)
 		*outEndStr = str;
 	return f;

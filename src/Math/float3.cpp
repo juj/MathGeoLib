@@ -249,9 +249,77 @@ float3 MUST_USE_RESULT float3::FromString(const char *str, const char **outEndSt
 	f.z = DeserializeFloat(str, &str);
 	if (*str == ')')
 		++str;
+	if (*str == ',')
+		++str;
 	if (outEndStr)
 		*outEndStr = str;
 	return f;
+}
+
+int CountCommas(const char *start, const char *end)
+{
+	int commas = 0;
+	while(start != end)
+		if (*start++ == ',')
+			++commas;
+	return commas;
+}
+
+const char *FindNext(const char *str, char ch)
+{
+	if (!str)
+		return str;
+	while(*str)
+	{
+		if (*str == ch)
+			break;
+		++str;
+	}
+	return str;
+}
+
+vec PointVecFromString(const char *str, const char **outEndStr)
+{
+	if (!str)
+		return vec::nan;
+	if (MATH_NEXT_WORD_IS(str, "float3"))
+		return POINT_VEC(float3::FromString(str, outEndStr));
+	if (MATH_NEXT_WORD_IS(str, "float4"))
+		return FLOAT4_TO_POINT(float4::FromString(str, outEndStr));
+	while(*str == ' ')
+		++str;
+	if (*str == '(')
+	{
+		const char *end = FindNext(str, ')');
+		int numCommas = CountCommas(str, end);
+		assume1(numCommas == 3 || numCommas == 4, numCommas);
+		if (numCommas == 4)
+			return FLOAT4_TO_POINT(float4::FromString(str, outEndStr));
+	}
+	// Default to assuming that the shorter form of serialization was used and there is three floats.
+	return POINT_VEC(float3::FromString(str, outEndStr));
+}
+
+vec DirVecFromString(const char *str, const char **outEndStr)
+{
+	if (!str)
+		return vec::nan;
+	if (MATH_NEXT_WORD_IS(str, "float3"))
+		return DIR_VEC(float3::FromString(str, outEndStr));
+	if (MATH_NEXT_WORD_IS(str, "float4"))
+		return FLOAT4_TO_DIR(float4::FromString(str, outEndStr));
+	while(*str == ' ')
+		++str;
+	if (*str == '(')
+	{
+		const char *end = FindNext(str, ')');
+		int numCommas = CountCommas(str, end);
+		assume1(numCommas == 3 || numCommas == 4, numCommas);
+		if (numCommas == 4)
+			return FLOAT4_TO_DIR(float4::FromString(str, outEndStr));
+	}
+	// Default to assuming that the shorter form of serialization was used and there is three floats.
+	return DIR_VEC(float3::FromString(str, outEndStr));
 }
 
 float float3::SumOfElements() const

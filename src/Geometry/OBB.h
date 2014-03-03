@@ -54,6 +54,10 @@ public:
 		@see pos, r, axis. */
 	OBB() {}
 
+	/// Constructs an OBB by explicitly specifying all its member values.
+	/** @see pos, r, axis. */
+	OBB(const vec &pos, const vec &r, const vec &axis0, const vec &axis1, const vec &axis2);
+
 	/// Constructs an OBB from an AABB.
 	/** Since the OBB is an AABB with arbirary rotations allowed, this conversion is exact, i.e. it does not loosen
 		the set of points represented by the AABB. Therefore this constructor is implicit, meaning that you
@@ -476,7 +480,17 @@ public:
 	/// Returns a human-readable representation of this OBB. Most useful for debugging purposes.
 	/** The returned string specifies the center point and the half-axes of this OBB. */
 	std::string ToString() const;
+	std::string SerializeToString() const;
+
+	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
+	std::string SerializeToCodeString() const;
 #endif
+
+	static OBB FromString(const char *str, const char **outEndStr = 0);
+#ifdef MATH_ENABLE_STL_SUPPORT
+	static OBB FromString(const std::string &str) { return FromString(str.c_str()); }
+#endif
+
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
@@ -499,6 +513,8 @@ public:
 	void Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb) const;
 #endif
+
+	bool Equals(const OBB &rhs, float epsilon = 1e-3f) const { return pos.Equals(rhs.pos, epsilon) && r.Equals(rhs.r, epsilon) && axis[0].Equals(rhs.axis[0], epsilon) && axis[1].Equals(rhs.axis[1], epsilon) && axis[2].Equals(rhs.axis[2], epsilon); }
 };
 
 OBB operator *(const float3x3 &transform, const OBB &obb);

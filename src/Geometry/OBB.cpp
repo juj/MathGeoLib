@@ -49,6 +49,14 @@
 
 MATH_BEGIN_NAMESPACE
 
+OBB::OBB(const vec &pos, const vec &r, const vec &axis0, const vec &axis1, const vec &axis2)
+:pos(pos), r(r)
+{
+	axis[0] = axis0;
+	axis[1] = axis1;
+	axis[2] = axis2;
+}
+
 OBB::OBB(const AABB &aabb)
 {
 	SetFrom(aabb);
@@ -1050,9 +1058,28 @@ bool OBB::Intersects(const Polyhedron &polyhedron) const
 std::string OBB::ToString() const
 {
 	char str[256];
-	sprintf(str, "OBB(Pos:(%.2f, %.2f, %.2f) Size:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))",
-		pos.x, pos.y, pos.z, r.x*2.f, r.y*2.f, r.z*2.f, axis[0].x, axis[0].y, axis[0].z, axis[1].x, axis[1].y, axis[1].z, axis[2].x, axis[2].y, axis[2].z);
+	sprintf(str, "OBB(Pos:(%.2f, %.2f, %.2f) Halfsize:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))",
+		pos.x, pos.y, pos.z, r.x, r.y, r.z, axis[0].x, axis[0].y, axis[0].z, axis[1].x, axis[1].y, axis[1].z, axis[2].x, axis[2].y, axis[2].z);
 	return str;
+}
+
+std::string OBB::SerializeToString() const
+{
+	std::string s = pos.xyz().SerializeToString() + " "
+	              + r.xyz().SerializeToString() + " "
+	              + axis[0].xyz().SerializeToString() + " "
+	              + axis[1].xyz().SerializeToString() + " "
+	              + axis[2].xyz().SerializeToString();
+	return s;
+}
+
+std::string OBB::SerializeToCodeString() const
+{
+	return "OBB(" + pos.SerializeToCodeString() + ","
+	              + r.SerializeToCodeString() + ","
+	              + axis[0].SerializeToCodeString() + ","
+	              + axis[1].SerializeToCodeString() + ","
+	              + axis[2].SerializeToCodeString() + ")";
 }
 
 std::ostream &operator <<(std::ostream &o, const OBB &obb)
@@ -1062,6 +1089,28 @@ std::ostream &operator <<(std::ostream &o, const OBB &obb)
 }
 
 #endif
+
+OBB OBB::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return OBB(vec::nan, vec::nan, vec::nan, vec::nan, vec::nan);
+	OBB o;
+	MATH_SKIP_WORD(str, "OBB(");
+	MATH_SKIP_WORD(str, "Pos:(");
+	o.pos = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " Halfsize:(");
+	o.r = DirVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " X:(");
+	o.axis[0] = DirVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " Y:(");
+	o.axis[1] = DirVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " Z:(");
+	o.axis[2] = DirVecFromString(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return o;
+}
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFacing) const

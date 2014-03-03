@@ -1175,9 +1175,9 @@ AABB AABB::FromString(const char *str, const char **outEndStr)
 	AABB a;
 	MATH_SKIP_WORD(str, "AABB(");
 	MATH_SKIP_WORD(str, "Min:(");
-	a.minPoint = POINT_VEC(float3::FromString(str, &str));
+	a.minPoint = PointVecFromString(str, &str);
 	MATH_SKIP_WORD(str, " Max:(");
-	a.maxPoint = POINT_VEC(float3::FromString(str, &str));
+	a.maxPoint = PointVecFromString(str, &str);
 	if (outEndStr)
 		*outEndStr = str;
 	return a;

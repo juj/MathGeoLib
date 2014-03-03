@@ -466,6 +466,8 @@ float4 float4::FromString(const char *str, const char **outEndStr)
 	f.w = DeserializeFloat(str, &str);
 	if (*str == ')')
 		++str;
+	if (*str == ',')
+		++str;
 	if (outEndStr)
 		*outEndStr = str;
 	return f;

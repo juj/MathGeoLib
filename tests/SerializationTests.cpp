@@ -221,7 +221,31 @@ RANDOMIZED_TEST(AABB_Serialize)
 	assert(o.Equals(o2));
 	assert(!memcmp(&o, &o2, sizeof(o)));
 
+	s = o.SerializeToCodeString();
+	o2 = AABB::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
 	s = o.ToString();
 	o2 = AABB::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(OBB_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-LARGESCALE), POINT_VEC_SCALAR(LARGESCALE));
+	OBB o = RandomOBBContainingPoint(pt, LARGESCALE);
+	std::string s = o.SerializeToString();
+	OBB o2 = OBB::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.SerializeToCodeString();
+	o2 = OBB::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = OBB::FromString(s);
 	assert(o.Equals(o2, 0.1f));
 }

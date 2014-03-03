@@ -532,5 +532,5 @@ float DeserializeFloat(const char *str, const char **outEndStr = 0);
 
 // A deserialization helper.
 #define MATH_SKIP_WORD(str, word) if (!strncmp(str, word, strlen(word))) str += strlen(word);
-
+#define MATH_NEXT_WORD_IS(str, word) !strncmp(str, word, strlen(word))
 MATH_END_NAMESPACE

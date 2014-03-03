@@ -272,6 +272,8 @@ float2 float2::FromString(const char *str, const char **outEndStr)
 	f.y = DeserializeFloat(str, &str);
 	if (*str == ')')
 		++str;
+	if (*str == ',')
+		++str;
 	if (outEndStr)
 		*outEndStr = str;
 	return f;
