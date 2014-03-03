@@ -51,7 +51,7 @@ bool SATIntersect(const A &a, const B &b)
 		for(int j = 0; j < m; ++j)
 		{
 			float amin, amax, bmin, bmax;
-			vec normal = Cross(normals[i], normals[j]);
+			vec normal = Cross(normals[i], normals2[j]);
 			a.ProjectToAxis(normal, amin, amax);
 			b.ProjectToAxis(normal, bmin, bmax);
 			if (amax < bmin || bmax < amin)
