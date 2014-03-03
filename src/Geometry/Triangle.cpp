@@ -673,9 +673,9 @@ int Triangle::UniqueFaceNormals(vec *out) const
 	// Therefore to make SAT test work properly in that case, also report all the edge normals
 	// as possible separation test directions, which fixes the coplanar case.
 	// For more info, see Geometric Tools for Computer Graphics, 11.11.1, p. 612.
-	out[1] = Cross(out[1], b-a);
-	out[2] = Cross(out[2], c-a);
-	out[3] = Cross(out[3], c-b);
+	out[1] = Cross(out[0], b-a);
+	out[2] = Cross(out[0], c-a);
+	out[3] = Cross(out[0], c-b);
 	return 4;
 }
 
