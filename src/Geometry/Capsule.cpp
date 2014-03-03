@@ -450,6 +450,20 @@ std::string Capsule::ToString() const
 	return str;
 }
 
+std::string Capsule::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", l.a.x, l.a.y, l.a.z, l.b.x, l.b.y, l.b.z, r);
+	return str;
+}
+
+std::string Capsule::SerializeToCodeString() const
+{
+	char str[256];
+	sprintf(str, "%.9g", r);
+	return "Capsule(" + l.SerializeToCodeString() + "," + str + ")";
+}
+
 std::ostream &operator <<(std::ostream &o, const Capsule &capsule)
 {
 	o << capsule.ToString();
@@ -457,6 +471,27 @@ std::ostream &operator <<(std::ostream &o, const Capsule &capsule)
 }
 
 #endif
+
+Capsule Capsule::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return Capsule(vec::nan, vec::nan, FLOAT_NAN);
+	Capsule c;
+	MATH_SKIP_WORD(str, "Capsule(");
+	MATH_SKIP_WORD(str, "a:(");
+	MATH_SKIP_WORD(str, "LineSegment(");
+	c.l.a = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " b:");
+	c.l.b = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, ")");
+	MATH_SKIP_WORD(str, ",");
+	MATH_SKIP_WORD(str, " r:");
+	c.r = DeserializeFloat(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return c;
+}
 
 Capsule operator *(const float3x3 &transform, const Capsule &capsule)
 {

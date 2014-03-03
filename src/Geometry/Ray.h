@@ -210,7 +210,17 @@ public:
 	/// Returns a human-readable representation of this Ray.
 	/** The returned string specifies the position and direction of this Ray. */
 	std::string ToString() const;
+	std::string SerializeToString() const;
+
+	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
+	std::string SerializeToCodeString() const;
 #endif
+
+	static Ray FromString(const char *str, const char **outEndStr = 0);
+#ifdef MATH_ENABLE_STL_SUPPORT
+	static Ray FromString(const std::string &str) { return FromString(str.c_str()); }
+#endif
+
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
@@ -220,7 +230,6 @@ public:
 	Ray(const Ogre::Ray &other):pos(other.getOrigin()), dir(other.getDirection()) {}
 	operator Ogre::Ray() const { return Ogre::Ray(pos, dir); }
 #endif
-
 };
 
 /// @note Assumes that transform may contain scaling, and re-normalizes the ray direction

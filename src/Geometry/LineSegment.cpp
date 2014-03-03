@@ -428,6 +428,18 @@ std::string LineSegment::ToString() const
 	return str;
 }
 
+std::string LineSegment::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", a.x, a.y, a.z, b.x, b.y, b.z);
+	return str;
+}
+
+std::string LineSegment::SerializeToCodeString() const
+{
+	return "LineSegment(" + a.SerializeToCodeString() + "," + b.SerializeToCodeString() + ")";
+}
+
 std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment)
 {
 	o << lineSegment.ToString();
@@ -435,6 +447,22 @@ std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment)
 }
 
 #endif
+
+LineSegment LineSegment::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return LineSegment(vec::nan, vec::nan);
+	LineSegment l;
+	MATH_SKIP_WORD(str, "LineSegment(");
+	MATH_SKIP_WORD(str, "a:(");
+	l.a = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " b:(");
+	l.b = PointVecFromString(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return l;
+}
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 

@@ -1329,6 +1329,14 @@ std::string Sphere::SerializeToCodeString() const
 	return "Sphere(" + pos.SerializeToCodeString() + "," + str + ")";
 }
 
+std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
+{
+	o << sphere.ToString();
+	return o;
+}
+
+#endif
+
 Sphere Sphere::FromString(const char *str, const char **outEndStr)
 {
 	assume(str);
@@ -1344,14 +1352,6 @@ Sphere Sphere::FromString(const char *str, const char **outEndStr)
 		*outEndStr = str;
 	return s;
 }
-
-std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
-{
-	o << sphere.ToString();
-	return o;
-}
-
-#endif
 
 Sphere operator *(const float3x3 &transform, const Sphere &sphere)
 {

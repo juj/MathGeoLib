@@ -291,9 +291,9 @@ vec PointVecFromString(const char *str, const char **outEndStr)
 	if (*str == '(')
 	{
 		const char *end = FindNext(str, ')');
-		int numCommas = CountCommas(str, end);
-		assume1(numCommas == 3 || numCommas == 4, numCommas);
-		if (numCommas == 4)
+		int numFields = CountCommas(str, end) + 1;
+		assume1(numFields == 3 || numFields == 4, numFields);
+		if (numFields == 4)
 			return FLOAT4_TO_POINT(float4::FromString(str, outEndStr));
 	}
 	// Default to assuming that the shorter form of serialization was used and there is three floats.
@@ -313,9 +313,9 @@ vec DirVecFromString(const char *str, const char **outEndStr)
 	if (*str == '(')
 	{
 		const char *end = FindNext(str, ')');
-		int numCommas = CountCommas(str, end);
-		assume1(numCommas == 3 || numCommas == 4, numCommas);
-		if (numCommas == 4)
+		int numFields = CountCommas(str, end) + 1;
+		assume1(numFields == 3 || numFields == 4, numFields);
+		if (numFields == 4)
 			return FLOAT4_TO_DIR(float4::FromString(str, outEndStr));
 	}
 	// Default to assuming that the shorter form of serialization was used and there is three floats.

@@ -353,9 +353,20 @@ Line operator *(const Quat &transform, const Line &l)
 std::string Line::ToString() const
 {
 	char str[256];
-	sprintf(str, "Line(pos:(%.2f, %.2f, %.2f) dir:(%.2f, %.2f, %.2f))",
-		pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	sprintf(str, "Line(Pos:(%.2f, %.2f, %.2f) Dir:(%.3f, %.3f, %.3f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
+}
+
+std::string Line::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	return str;
+}
+
+std::string Line::SerializeToCodeString() const
+{
+	return "Line(" + pos.SerializeToCodeString() + "," + dir.SerializeToCodeString() + ")";
 }
 
 std::ostream &operator <<(std::ostream &o, const Line &line)
@@ -365,5 +376,21 @@ std::ostream &operator <<(std::ostream &o, const Line &line)
 }
 
 #endif
+
+Line Line::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return Line(vec::nan, vec::nan);
+	Line l;
+	MATH_SKIP_WORD(str, "Line(");
+	MATH_SKIP_WORD(str, "Pos:(");
+	l.pos = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " Dir:(");
+	l.dir = DirVecFromString(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return l;
+}
 
 MATH_END_NAMESPACE

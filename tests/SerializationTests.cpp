@@ -287,3 +287,99 @@ RANDOMIZED_TEST(Plane_Serialize)
 	o2 = Plane::FromString(s);
 	assert(o.Equals(o2, 0.1f));
 }
+
+RANDOMIZED_TEST(Triangle_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Triangle o = RandomTriangleContainingPoint(pt);
+	std::string s = o.SerializeToString();
+	Triangle o2 = Triangle::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.SerializeToCodeString();
+	o2 = Triangle::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.ToString();
+	o2 = Triangle::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(Ray_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Ray o = RandomRayContainingPoint(pt);
+	std::string s = o.SerializeToString();
+	Ray o2 = Ray::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.SerializeToCodeString();
+	o2 = Ray::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.ToString();
+	o2 = Ray::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(LineSegment_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	LineSegment o = RandomLineSegmentContainingPoint(pt);
+	std::string s = o.SerializeToString();
+	LineSegment o2 = LineSegment::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.SerializeToCodeString();
+	o2 = LineSegment::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.ToString();
+	o2 = LineSegment::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(Line_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Line o = RandomLineContainingPoint(pt);
+	std::string s = o.SerializeToString();
+	Line o2 = Line::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.SerializeToCodeString();
+	o2 = Line::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.ToString();
+	o2 = Line::FromString(s);
+	o2.dir.Normalize();
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(Capsule_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Capsule o = RandomCapsuleContainingPoint(pt);
+	std::string s = o.SerializeToString();
+	Capsule o2 = Capsule::FromString(s);
+	assert2(o.Equals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.SerializeToCodeString();
+	o2 = Capsule::FromString(s);
+	assert2(o.Equals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.ToString();
+	o2 = Capsule::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}

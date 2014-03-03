@@ -365,8 +365,20 @@ void Ray::ProjectToAxis(const vec &direction, float &outMin, float &outMax) cons
 std::string Ray::ToString() const
 {
 	char str[256];
-	sprintf(str, "Ray(Pos:(%.2f, %.2f, %.2f) Dir:(%.2f, %.2f, %.2f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	sprintf(str, "Ray(Pos:(%.2f, %.2f, %.2f) Dir:(%.3f, %.3f, %.3f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
+}
+
+std::string Ray::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	return str;
+}
+
+std::string Ray::SerializeToCodeString() const
+{
+	return "Ray(" + pos.SerializeToCodeString() + "," + dir.SerializeToCodeString() + ")";
 }
 
 std::ostream &operator <<(std::ostream &o, const Ray &ray)
@@ -376,6 +388,22 @@ std::ostream &operator <<(std::ostream &o, const Ray &ray)
 }
 
 #endif
+
+Ray Ray::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return Ray(vec::nan, vec::nan);
+	Ray r;
+	MATH_SKIP_WORD(str, "Ray(");
+	MATH_SKIP_WORD(str, "Pos:(");
+	r.pos = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " Dir:(");
+	r.dir = DirVecFromString(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return r;
+}
 
 Ray operator *(const float3x3 &transform, const Ray &ray)
 {

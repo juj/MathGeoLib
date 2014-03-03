@@ -407,7 +407,6 @@ public:
 	void Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const vec &centerPoint, int numFacesU, int numFacesV, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const vec &centerPoint, int numLinesU, int numLinesV) const;
 #endif
-
 };
 
 Plane operator *(const float3x3 &transform, const Plane &plane);
