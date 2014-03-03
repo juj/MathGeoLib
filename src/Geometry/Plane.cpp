@@ -909,6 +909,36 @@ std::string Plane::ToString() const
 	return str;
 }
 
+std::string Plane::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g", normal.x, normal.y, normal.z, d);
+	return str;
+}
+
+std::string Plane::SerializeToCodeString() const
+{
+	char str[256];
+	sprintf(str, "%.9g", d);
+	return "Plane(" + normal.SerializeToCodeString() + "," + str + ")";
+}
+
+Plane Plane::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return Plane(vec::nan, FLOAT_NAN);
+	Plane p;
+	MATH_SKIP_WORD(str, "Plane(");
+	MATH_SKIP_WORD(str, "Normal:(");
+	p.normal = DirVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " d:");
+	p.d = DeserializeFloat(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return p;
+}
+
 std::ostream &operator <<(std::ostream &o, const Plane &plane)
 {
 	o << plane.ToString();

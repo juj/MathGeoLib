@@ -387,7 +387,17 @@ public:
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Plane. Most useful for debugging purposes.
 	std::string ToString() const;
+	std::string SerializeToString() const;
+
+	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
+	std::string SerializeToCodeString() const;
 #endif
+
+	static Plane FromString(const char *str, const char **outEndStr = 0);
+#ifdef MATH_ENABLE_STL_SUPPORT
+	static Plane FromString(const std::string &str) { return FromString(str.c_str()); }
+#endif
+
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }

@@ -268,3 +268,22 @@ RANDOMIZED_TEST(Sphere_Serialize)
 	o2 = Sphere::FromString(s);
 	assert(o.Equals(o2, 0.1f));
 }
+
+RANDOMIZED_TEST(Plane_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Plane o = RandomPlaneContainingPoint(pt);
+	std::string s = o.SerializeToString();
+	Plane o2 = Plane::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.SerializeToCodeString();
+	o2 = Plane::FromString(s);
+	assert(o.Equals(o2));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+
+	s = o.ToString();
+	o2 = Plane::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
