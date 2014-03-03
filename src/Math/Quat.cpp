@@ -648,37 +648,29 @@ std::string MUST_USE_RESULT Quat::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%f %f %f %f", x, y, z, w);
+	sprintf(str, "%.9g %.9g %.9g %.9g", x, y, z, w);
 	return std::string(str);
 }
 #endif
 
-Quat MUST_USE_RESULT Quat::FromString(const char *str)
+Quat MUST_USE_RESULT Quat::FromString(const char *str, const char **outEndStr)
 {
 	assert(IsNeutralCLocale());
 	assume(str);
 	if (!str)
-		return Quat();
+		return float4::nan;
 	if (*str == '(')
 		++str;
-	Quat q;
-	q.x = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+	Quat f;
+	f.x = DeserializeFloat(str, &str);
+	f.y = DeserializeFloat(str, &str);
+	f.z = DeserializeFloat(str, &str);
+	f.w = DeserializeFloat(str, &str);
+	if (*str == ')')
 		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	q.y = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t')
-		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	q.z = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t')
-		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	q.w = (float)strtod(str, const_cast<char**>(&str));
-	return q;
+	if (outEndStr)
+		*outEndStr = str;
+	return f;
 }
 
 Quat Quat::operator +(const Quat &rhs) const

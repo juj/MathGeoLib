@@ -338,7 +338,7 @@ public:
 #endif
 
 	/// Parses a string that is of form "x,y" or "(x,y)" or "(x;y)" or "x y" to a new float2.
-	static float2 FromString(const char *str);
+	static float2 FromString(const char *str, const char **outEndStr = 0);
 #ifdef MATH_ENABLE_STL_SUPPORT
 	static float2 FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif

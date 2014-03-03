@@ -409,7 +409,7 @@ public:
 #endif
 
 	/// Parses a string that is of form "x,y,z" or "(x,y,z)" or "(x;y;z)" or "x y z" to a new float3.
-	static MUST_USE_RESULT float3 FromString(const char *str);
+	static MUST_USE_RESULT float3 FromString(const char *str, const char **outEndStr = 0);
 #ifdef MATH_ENABLE_STL_SUPPORT
 	static MUST_USE_RESULT float3 FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif

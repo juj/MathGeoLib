@@ -334,7 +334,7 @@ public:
 	std::string MUST_USE_RESULT SerializeToString() const;
 #endif
 	/// Parses a string that is of form "x,y,z,w" or "(x,y,z,w)" or "(x;y;z;w)" or "x y z w" to a new quaternion.
-	static MUST_USE_RESULT Quat FromString(const char *str);
+	static MUST_USE_RESULT Quat FromString(const char *str, const char **outEndStr = 0);
 #ifdef MATH_ENABLE_STL_SUPPORT
 	static MUST_USE_RESULT Quat FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif

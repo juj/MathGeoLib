@@ -5,6 +5,7 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "ObjectGenerators.h"
 
 MATH_BEGIN_NAMESPACE
 bool IsNeutralCLocale();
@@ -130,4 +131,73 @@ TEST(QuatFromString)
 		assertveq(Quat::FromString("(1 +2 3.1  -4"), Quat(1,2,3.1f,-4));
 		assertveq(Quat::FromString("(1 +2 3.1  -4)"), Quat(1,2,3.1f,-4));
 	}
+}
+
+#define LARGESCALE 1e8f
+
+RANDOMIZED_TEST(float2_Serialize)
+{
+	float2 o = float2::RandomBox(rng, -LARGESCALE, LARGESCALE);
+	std::string s = o.SerializeToString();
+	float2 o2 = float2::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = float2::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(float3_Serialize)
+{
+	float3 o = float3::RandomBox(rng, float3::FromScalar(-LARGESCALE), float3::FromScalar(LARGESCALE));
+	std::string s = o.SerializeToString();
+	float3 o2 = float3::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = float3::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(float4_Serialize)
+{
+	float4 o = float4::RandomBox(rng, float4::FromScalar(-LARGESCALE), float4::FromScalar(LARGESCALE));
+	std::string s = o.SerializeToString();
+	float4 o2 = float4::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = float4::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(Quat_Serialize)
+{
+	float4 fo = float4::RandomBox(rng, float4::FromScalar(-LARGESCALE), float4::FromScalar(LARGESCALE));
+	Quat o(fo.x, fo.y, fo.z, fo.w);
+	std::string s = o.SerializeToString();
+	Quat o2 = Quat::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = Quat::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}
+
+RANDOMIZED_TEST(AABB_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-LARGESCALE), POINT_VEC_SCALAR(LARGESCALE));
+	AABB o = RandomAABBContainingPoint(pt, LARGESCALE);
+	std::string s = o.SerializeToString();
+	AABB o2 = AABB::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = AABB::FromString(s);
+	assert(o.Equals(o2, 0.1f));
 }

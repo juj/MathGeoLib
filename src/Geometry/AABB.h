@@ -490,7 +490,14 @@ public:
 	/// Returns a human-readable representation of this AABB. Most useful for debugging purposes.
 	/** The returned string specifies the center point and the half-axes of this AABB. */
 	std::string ToString() const;
+	std::string SerializeToString() const;
 #endif
+
+	static AABB FromString(const char *str, const char **outEndStr = 0);
+#ifdef MATH_ENABLE_STL_SUPPORT
+	static AABB FromString(const std::string &str) { return FromString(str.c_str()); }
+#endif
+
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }

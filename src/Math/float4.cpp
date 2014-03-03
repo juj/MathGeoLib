@@ -441,12 +441,12 @@ std::string float4::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%f %f %f %f", x, y, z, w);
+	sprintf(str, "%.9g %.9g %.9g %.9g", x, y, z, w);
 	return std::string(str);
 }
 #endif
 
-float4 float4::FromString(const char *str)
+float4 float4::FromString(const char *str, const char **outEndStr)
 {
 	assert(IsNeutralCLocale());
 	assume(str);
@@ -455,22 +455,14 @@ float4 float4::FromString(const char *str)
 	if (*str == '(')
 		++str;
 	float4 f;
-	f.x = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
+	f.x = DeserializeFloat(str, &str);
+	f.y = DeserializeFloat(str, &str);
+	f.z = DeserializeFloat(str, &str);
+	f.w = DeserializeFloat(str, &str);
+	if (*str == ')')
 		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	f.y = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
-		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	f.z = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t') ///\todo Propagate this to other FromString functions.
-		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	f.w = (float)strtod(str, const_cast<char**>(&str));
+	if (outEndStr)
+		*outEndStr = str;
 	return f;
 }
 

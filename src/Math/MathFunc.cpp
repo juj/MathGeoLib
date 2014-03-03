@@ -435,4 +435,24 @@ float PowInt(float base, int exponent)
 		return PowUInt(base, (u32)exponent);
 }
 
+float DeserializeFloat(const char *str, const char **outEndStr)
+{
+	if (!str)
+		return FLOAT_NAN;
+	while(*str > 0 && *str <= ' ')
+		++str;
+	if (*str == 0)
+		return FLOAT_NAN;
+	float f = (float)strtod(str, const_cast<char**>(&str));
+	while(*str > 0 && *str <= ' ')
+		++str;
+	if (*str == ',' || *str == ';')
+		++str;
+	while(*str > 0 && *str <= ' ')
+		++str;
+	if (outEndStr)
+		*outEndStr = str;
+	return f;
+}
+
 MATH_END_NAMESPACE

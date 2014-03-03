@@ -447,7 +447,7 @@ public:
 #endif
 
 	/// Parses a string that is of form "x,y,z,w" or "(x,y,z,w)" or "(x;y;z;w)" or "x y z w" to a new float4.
-	static float4 FromString(const char *str);
+	static float4 FromString(const char *str, const char **outEndStr = 0);
 #ifdef MATH_ENABLE_STL_SUPPORT
 	static float4 FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif

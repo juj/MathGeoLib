@@ -1155,6 +1155,28 @@ std::string AABB::ToString() const
 	return str;
 }
 
+std::string AABB::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g %.9g %.9g %.9g %.9g %.9g", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
+	return str;
+}
+
+AABB AABB::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return AABB(vec::nan, vec::nan);
+	AABB a;
+	if (!strncmp(str, "AABB(Min:(", strlen("AABB(Min:("))) str += strlen("AABB(Min:(");
+	a.minPoint = POINT_VEC(float3::FromString(str, &str));
+	if (!strncmp(str, " Max:(", strlen(" Max:("))) str += strlen(" Max:(");
+	a.maxPoint = POINT_VEC(float3::FromString(str, &str));
+	if (outEndStr)
+		*outEndStr = str;
+	return a;
+}
+
 std::ostream &operator <<(std::ostream &o, const AABB &aabb)
 {
 	o << aabb.ToString();

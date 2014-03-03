@@ -524,4 +524,10 @@ FORCE_INLINE bool IsInf(long double value) { return IsInf((double)value); }
 FORCE_INLINE bool IsNan(long double value) { return IsNan((double)value); }
 #endif
 
+/// Deserializes a float from the given string.
+/** @param str The source string buffer to deserialize. If this is a null pointer or an empty string, then NaN is returned.
+	@param outEndStr [out] Optional. If present, a pointer to the string position where reading ended is outputted. You can use this pointer
+		to advance to reading a next element in a sequence of multiple serialized entries. */
+float DeserializeFloat(const char *str, const char **outEndStr = 0);
+
 MATH_END_NAMESPACE

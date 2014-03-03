@@ -249,12 +249,12 @@ std::string float2::SerializeToString() const
 {
 	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%f %f", x, y);
+	sprintf(str, "%.9g %.9g", x, y);
 	return std::string(str);
 }
 #endif
 
-float2 float2::FromString(const char *str)
+float2 float2::FromString(const char *str, const char **outEndStr)
 {
 	assert(IsNeutralCLocale());
 	assume(str);
@@ -263,12 +263,12 @@ float2 float2::FromString(const char *str)
 	if (*str == '(')
 		++str;
 	float2 f;
-	f.x = (float)strtod(str, const_cast<char**>(&str));
-	while(*str == ' ' || *str == '\t')
+	f.x = DeserializeFloat(str, &str);
+	f.y = DeserializeFloat(str, &str);
+	if (*str == ')')
 		++str;
-	if (*str == ',' || *str == ';')
-		++str;
-	f.y = (float)strtod(str, const_cast<char**>(&str));
+	if (outEndStr)
+		*outEndStr = str;
 	return f;
 }
 
