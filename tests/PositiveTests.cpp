@@ -492,7 +492,7 @@ RANDOMIZED_TEST(OBBOBBIntersect)
 
 int xxxxx = 0;
 
-BENCHMARK(OBBOBBIntersect, "OBB-OBB Intersects")
+BENCHMARK(BM_OBBOBBIntersect, "OBB-OBB Intersects")
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -504,7 +504,7 @@ BENCHMARK(OBBOBBIntersect, "OBB-OBB Intersects")
 }
 BENCHMARK_END;
 
-BENCHMARK(OBBOBBIntersect_SAT, "OBB-OBB SAT Intersection")
+BENCHMARK(BM_OBBOBBIntersect_SAT, "OBB-OBB SAT Intersection")
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -516,7 +516,7 @@ BENCHMARK(OBBOBBIntersect_SAT, "OBB-OBB SAT Intersection")
 }
 BENCHMARK_END;
 
-BENCHMARK(OBBOBBIntersect_GJK, "OBB-OBB GJK Intersection")
+BENCHMARK(BM_OBBOBBIntersect_GJK, "OBB-OBB GJK Intersection")
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
@@ -976,19 +976,25 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
-BENCHMARK(FrustumFrustumIntersect, "Frustum-Frustum Intersects")
+BENCHMARK(BM_FrustumFrustumIntersect, "Frustum-Frustum Intersects")
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Frustum a = RandomFrustumContainingPoint(pt);
-	Frustum b = RandomFrustumContainingPoint(pt);
-	if (a.Intersects(b))
-		++xxxxx;
-	if (b.Intersects(a))
-		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+		Frustum a = RandomFrustumContainingPoint(pt);
+		Frustum b = RandomFrustumContainingPoint(pt);
+		if (a.Intersects(b))
+			++xxxxx;
+		if (b.Intersects(a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
-BENCHMARK(FrustumFrustumIntersect_SAT, "Frustum-Frustum SAT")
+BENCHMARK(BM_FrustumFrustumIntersect_SAT, "Frustum-Frustum SAT")
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
@@ -1000,15 +1006,21 @@ BENCHMARK(FrustumFrustumIntersect_SAT, "Frustum-Frustum SAT")
 }
 BENCHMARK_END;
 
-BENCHMARK(FrustumFrustumIntersect_GJK, "Frustum-Frustum GJK")
+BENCHMARK(BM_FrustumFrustumIntersect_GJK, "Frustum-Frustum GJK")
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Frustum a = RandomFrustumContainingPoint(pt);
-	Frustum b = RandomFrustumContainingPoint(pt);
-	if (GJKIntersect(a, b))
-		++xxxxx;
-	if (GJKIntersect(b, a))
-		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+		Frustum a = RandomFrustumContainingPoint(pt);
+		Frustum b = RandomFrustumContainingPoint(pt);
+		if (GJKIntersect(a, b))
+			++xxxxx;
+		if (GJKIntersect(b, a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 

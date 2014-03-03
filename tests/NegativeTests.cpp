@@ -1037,21 +1037,27 @@ RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 
 extern int xxxxx;
 
-BENCHMARK(FrustumFrustumNoIntersect, "Frustum-Frustum No Intersection")
+BENCHMARK(BM_FrustumFrustumNoIntersect, "Frustum-Frustum No Intersection")
 {
-	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
-	Frustum a = RandomFrustumInHalfspace(p);
-	p.ReverseNormal();
-	Frustum b = RandomFrustumInHalfspace(p);
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+		Frustum a = RandomFrustumInHalfspace(p);
+		p.ReverseNormal();
+		Frustum b = RandomFrustumInHalfspace(p);
 
-	if (!a.Intersects(b))
-		++xxxxx;
-	if (!b.Intersects(a))
-		++xxxxx;
+		if (!a.Intersects(b))
+			++xxxxx;
+		if (!b.Intersects(a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
-BENCHMARK(FrustumFrustumNoIntersect_SAT, "Frustum-Frustum SAT No Intersection")
+BENCHMARK(BM_FrustumFrustumNoIntersect_SAT, "Frustum-Frustum SAT No Intersection")
 {
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
@@ -1065,17 +1071,23 @@ BENCHMARK(FrustumFrustumNoIntersect_SAT, "Frustum-Frustum SAT No Intersection")
 }
 BENCHMARK_END;
 
-BENCHMARK(FrustumFrustumNoIntersect_GJK, "Frustum-Frustum GJK No Intersection")
+BENCHMARK(BM_FrustumFrustumNoIntersect_GJK, "Frustum-Frustum GJK No Intersection")
 {
-	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
-	Frustum a = RandomFrustumInHalfspace(p);
-	p.ReverseNormal();
-	Frustum b = RandomFrustumInHalfspace(p);
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+		Frustum a = RandomFrustumInHalfspace(p);
+		p.ReverseNormal();
+		Frustum b = RandomFrustumInHalfspace(p);
 
-	if (!GJKIntersect(a, b))
-		++xxxxx;
-	if (!GJKIntersect(b, a))
-		++xxxxx;
+		if (!GJKIntersect(a, b))
+			++xxxxx;
+		if (!GJKIntersect(b, a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
