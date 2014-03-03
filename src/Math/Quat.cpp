@@ -663,7 +663,7 @@ Quat MUST_USE_RESULT Quat::FromString(const char *str, const char **outEndStr)
 	assert(IsNeutralCLocale());
 	assume(str);
 	if (!str)
-		return float4::nan;
+		return Quat::nan;
 	MATH_SKIP_WORD(str, "Quat");
 	MATH_SKIP_WORD(str, "(");
 	Quat f;
