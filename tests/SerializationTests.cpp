@@ -257,12 +257,12 @@ RANDOMIZED_TEST(Sphere_Serialize)
 	std::string s = o.SerializeToString();
 	Sphere o2 = Sphere::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Sphere::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Sphere::FromString(s);
