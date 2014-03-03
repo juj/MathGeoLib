@@ -1059,6 +1059,9 @@ BENCHMARK_END;
 
 BENCHMARK(BM_FrustumFrustumNoIntersect_SAT, "Frustum-Frustum SAT No Intersection")
 {
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
@@ -1068,6 +1071,9 @@ BENCHMARK(BM_FrustumFrustumNoIntersect_SAT, "Frustum-Frustum SAT No Intersection
 		++xxxxx;
 	if (!SATIntersect(b, a))
 		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 

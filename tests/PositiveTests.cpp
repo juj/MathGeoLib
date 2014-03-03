@@ -996,6 +996,9 @@ BENCHMARK_END;
 
 BENCHMARK(BM_FrustumFrustumIntersect_SAT, "Frustum-Frustum SAT")
 {
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(pt);
 	Frustum b = RandomFrustumContainingPoint(pt);
@@ -1003,6 +1006,9 @@ BENCHMARK(BM_FrustumFrustumIntersect_SAT, "Frustum-Frustum SAT")
 		++xxxxx;
 	if (SATIntersect(b, a))
 		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
