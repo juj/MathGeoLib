@@ -28,6 +28,8 @@ vec UpdateSimplex(vec *s, int &n)
 		return vec::zero;
 	}
 
+//	for(int i = 0; i < n; ++i)
+//		LOGI("Simplex pt %d: %s", i, s[i].ToString().c_str());
 	if (n == 2)
 	{
 		assert(LineSegment(s[0], s[1]).Distance(vec::zero) <= s[0].Length());
@@ -68,10 +70,20 @@ vec UpdateSimplex(vec *s, int &n)
 			n = 0;
 		else
 			assert(Dot(newDir, zeroDir) >= 0.f);
-		return newDir;
+		vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
+//		newDir.Normalize();
+		newDir2.Normalize();
+		return newDir2;
 	}
 	else if (n == 3)
-	{
+	{/*
+		LOGI("s0: %f", s[0].Length());
+		LOGI("s1: %f", s[1].Length());
+		LOGI("s2: %f", s[2].Length());
+		LOGI("e01: %f", LineSegment(s[0], s[1]).Distance(vec::zero));
+		LOGI("e02: %f", LineSegment(s[0], s[2]).Distance(vec::zero));
+		LOGI("e12: %f", LineSegment(s[1], s[2]).Distance(vec::zero));
+		LOGI("t012: %f", Triangle(s[0], s[1], s[2]).Distance(vec::zero));*/
 		vec d01 = (s[1]-s[0]).Normalized();
 		vec d12 = (s[2]-s[1]).Normalized();
 		vec d02 = s[2]-s[0];
@@ -85,19 +97,22 @@ vec UpdateSimplex(vec *s, int &n)
 		vec triNormal = Cross(d02, d12).Normalized();
 		vec e01 = Cross(d01, triNormal);
 		assert(Dot(e01, s[2]-s[0]) <= 0.f);
+		assert(EqualAbs(Dot(e01, s[0]), Dot(e01, s[1])));
 		vec e02 = Cross(triNormal, d02).Normalized();
 		assert(Dot(e02, s[1]-s[0]) <= 0.f);
+		assert(EqualAbs(Dot(e02, s[0]), Dot(e02, s[2])));
 		vec e12 = Cross(d12, triNormal).Normalized();
 		assert(Dot(e12, s[0]-s[1]) <= 0.f);
+		assert(EqualAbs(Dot(e12, s[1]), Dot(e12, s[2])));
 
-		vec zeroDir = -s[2];
+//		vec zeroDir = -s[2];
 
-//		float t01 = Dot(zeroDir, e01);
-		float t02 = Dot(zeroDir, e02);
-		float t12 = Dot(zeroDir, e12);
+//		float t01 = Dot(-s[0], e01);
+		float t02 = Dot(-s[0], e02);
+		float t12 = Dot(-s[1], e12);
 
 		// We walked towards point s[2] to get to origin, so the origin cannot be on the side of edge 0->1.
-		//assert(t01 >= 0.f);
+//		assert(t01 <= 0.f);
 /*
 		if (t01 > 0.f && t02 > 0.f)
 		{
@@ -109,7 +124,8 @@ vec UpdateSimplex(vec *s, int &n)
 			s[0] = s[1];
 			n = 1;
 			return -s[0];
-		}*/
+		}
+	*/
 		if (t02 > 0.f && t12 > 0.f)
 		{
 			// Degenerated into a single point.
@@ -132,25 +148,31 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			s[1] = s[2];
 			n = 2;
-			vec newDir = Cross(e02, Cross(zeroDir, e02));
-			assert(Dot(newDir, zeroDir) >= 0.f);
-			return newDir;
+			vec newDir = Cross(e02, Cross(-s[0], e02));
+			assert(Dot(newDir, -s[0]) >= 0.f);
+			vec newDir2 = -LineSegment(s[0], s[2]).ClosestPoint(vec::zero);
+			newDir.Normalize();
+			newDir2.Normalize();
+			return newDir2;
 		}
 		if (t12 > 0.f)
 		{
 			s[0] = s[1];
 			s[1] = s[2];
 			n = 2;
-			vec newDir = Cross(e12, Cross(zeroDir, e12));
-			assert(Dot(newDir, zeroDir) >= 0.f);
-			return newDir;
+			vec newDir = Cross(e12, Cross(-s[1], e12));
+			assert(Dot(newDir, -s[1]) >= 0.f);
+			vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
+			newDir.Normalize();
+			newDir2.Normalize();
+			return newDir2;
 		}
 		Triangle t(s[0], s[1], s[2]);
 		vec cp = t.ClosestPoint(vec::zero);
 		assert(cp.LengthSq() <= s[0].LengthSq());
 		assert(cp.LengthSq() <= s[1].LengthSq());
 		assert(cp.LengthSq() <= s[2].LengthSq());
-		if (Dot(triNormal, zeroDir) >= 0.f)
+		if (Dot(triNormal, -s[2]) >= 0.f)
 			return triNormal;
 		else
 		{
@@ -161,7 +183,7 @@ vec UpdateSimplex(vec *s, int &n)
 	else
 	{
 		// Which direction is the origin at from the latest added point?
-		vec zeroDir = -s[3];
+//		vec zeroDir = -s[3];
 
 		vec d01 = s[1] - s[0];
 		vec d02 = s[2] - s[0];
@@ -175,29 +197,33 @@ vec UpdateSimplex(vec *s, int &n)
 		assert(Dot(tri023Normal, d01) <= 0.f);
 		vec tri123Normal = Cross(d12, d13);
 		assert(Dot(tri123Normal, -d02) <= 0.f);
-		float inTri013 = Dot(zeroDir, tri013Normal);
-		float inTri023 = Dot(zeroDir, tri023Normal);
-		float inTri123 = Dot(zeroDir, tri123Normal);
+		float inTri013 = Dot(-s[3], tri013Normal);
+		float inTri023 = Dot(-s[3], tri023Normal);
+		float inTri123 = Dot(-s[3], tri123Normal);
 
 		vec tri012Normal = Cross(d02, d01);
 		assert(Dot(tri012Normal, d03) <= 0.f);
-//		assert(Dot(zeroDir, tri012Normal) <= 0.f);
+//		float inTri012 = Dot(-s[0], tri012Normal);
+//		assert(inTri012 <= 0.f);
 
 		if (inTri013 > 0.f && inTri023 > 0.f && inTri123 > 0.f)
 		{
 			// The new point 3 is closest. Simplex degenerates back to a single point.
 			s[0] = s[3];
 			n = 1;
-			return zeroDir;
+			return -s[3];
 		}
 		if (inTri013 > 0.f && inTri023 > 0.f)
 		{
 			// Edge 0->3 is closest. Simplex degenerates to a line segment.
 			s[1] = s[3];
 			n = 2;
-			vec newDir = Cross(s[1]-s[0], Cross(zeroDir, s[1]-s[0]));
-			assert(Dot(newDir, zeroDir) >= 0.f);
-			return newDir;
+			vec newDir = Cross(s[1]-s[0], Cross(-s[0], s[1]-s[0]));
+			assert(Dot(newDir, -s[0]) >= 0.f);
+			vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
+			newDir.Normalize();
+			newDir2.Normalize();
+			return newDir2;
 		}
 		if (inTri013 > 0.f && inTri123 > 0.f)
 		{
@@ -205,9 +231,12 @@ vec UpdateSimplex(vec *s, int &n)
 			s[0] = s[1];
 			s[1] = s[3];
 			n = 2;
-			vec newDir = Cross(s[1]-s[0], Cross(zeroDir, s[1]-s[0]));
-			assert(Dot(newDir, zeroDir) >= 0.f);
-			return newDir;
+			vec newDir = Cross(s[1]-s[0], Cross(-s[0], s[1]-s[0]));
+			assert(Dot(newDir, -s[0]) >= 0.f);
+			vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
+			newDir.Normalize();
+			newDir2.Normalize();
+			return newDir2;
 		}
 		if (inTri123 > 0.f && inTri023 > 0.f)
 		{
@@ -215,9 +244,12 @@ vec UpdateSimplex(vec *s, int &n)
 			s[0] = s[2];
 			s[1] = s[3];
 			n = 2;
-			vec newDir = Cross(s[1]-s[0], Cross(zeroDir, s[1]-s[0]));
-			assert(Dot(newDir, zeroDir) >= 0.f);
-			return newDir;
+			vec newDir = Cross(s[1]-s[0], Cross(-s[0], s[1]-s[0]));
+			assert(Dot(newDir, -s[0]) >= 0.f);
+			vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
+			newDir.Normalize();
+			newDir2.Normalize();
+			return newDir2;
 		}
 		if (inTri013 > 0.f)
 		{

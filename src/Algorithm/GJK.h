@@ -30,7 +30,9 @@ bool GJKIntersect(const A &a, const B &b)
 	vec support[4];
 	float maxS, minS;
 	support[0] = a.AnyPointFast() - b.AnyPointFast();
+//	LOGI("First support: %s", support[0].ToString().c_str());
 	vec d = -support[0].Normalized();
+//	LOGI("First d: %s", d.ToString().c_str());
 	int n = 1;
 	int nIterations = 50;
 	while(nIterations-- > 0)
@@ -39,6 +41,7 @@ bool GJKIntersect(const A &a, const B &b)
 #ifdef MATH_VEC_IS_FLOAT4
 		newSupport.w = 0.f;
 #endif
+//		LOGI("New support: %s, dist: %f", newSupport.ToString().c_str(), Dot(newSupport, d));
 		if (Dot(newSupport, d) < 0.f)
 			return false;
 //		if (maxS < 0.f)
@@ -48,6 +51,7 @@ bool GJKIntersect(const A &a, const B &b)
 		d.Normalize();
 		if (n == 0)
 			return true;
+//		LOGI("New dir: %s", d.ToString().c_str());
 	}
 	assume2(false && "GJK intersection test did not converge to a result!", a, b);
 	return false; // Report no intersection.
