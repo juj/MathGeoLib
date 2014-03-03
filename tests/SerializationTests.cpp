@@ -249,3 +249,22 @@ RANDOMIZED_TEST(OBB_Serialize)
 	o2 = OBB::FromString(s);
 	assert(o.Equals(o2, 0.1f));
 }
+
+RANDOMIZED_TEST(Sphere_Serialize)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Sphere o = RandomSphereContainingPoint(pt, SCALE);
+	std::string s = o.SerializeToString();
+	Sphere o2 = Sphere::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.SerializeToCodeString();
+	o2 = Sphere::FromString(s);
+	assert(o.Equals(o2));
+	assert(!memcmp(&o, &o2, sizeof(o)));
+
+	s = o.ToString();
+	o2 = Sphere::FromString(s);
+	assert(o.Equals(o2, 0.1f));
+}

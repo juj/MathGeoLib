@@ -1315,6 +1315,36 @@ std::string Sphere::ToString() const
 	return str;
 }
 
+std::string Sphere::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g", pos.x, pos.y, pos.z, r);
+	return str;
+}
+
+std::string Sphere::SerializeToCodeString() const
+{
+	char str[256];
+	sprintf(str, "%.9g", r);
+	return "Sphere(" + pos.SerializeToCodeString() + "," + str + ")";
+}
+
+Sphere Sphere::FromString(const char *str, const char **outEndStr)
+{
+	assume(str);
+	if (!str)
+		return Sphere(vec::nan, FLOAT_NAN);
+	Sphere s;
+	MATH_SKIP_WORD(str, "Sphere(");
+	MATH_SKIP_WORD(str, "pos:(");
+	s.pos = PointVecFromString(str, &str);
+	MATH_SKIP_WORD(str, " r:");
+	s.r = DeserializeFloat(str, &str);
+	if (outEndStr)
+		*outEndStr = str;
+	return s;
+}
+
 std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
 {
 	o << sphere.ToString();
