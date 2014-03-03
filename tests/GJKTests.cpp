@@ -17,8 +17,6 @@ OBB RandomOBBInHalfspace(const Plane &plane, float maxSideLength);
 
 UNIQUE_TEST(TrickyGJKSphereSphereIntersect)
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-
 	Sphere a = Sphere(POINT_VEC(-14.740263f, 8.2647991f, 64.282227f), 7.6029987f);
 	Sphere b = Sphere(POINT_VEC(-23.840866f, 9.4233770f, 66.399742f), 1.9519407f);
 	assert(GJKIntersect(a, b));
@@ -27,8 +25,6 @@ UNIQUE_TEST(TrickyGJKSphereSphereIntersect)
 
 UNIQUE_TEST(TrickyGJKSphereSphereIntersect2)
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-
 	Sphere a = Sphere(POINT_VEC(57.166256f, 99.426201f, 75.735786f), 2.3808355f);
 	Sphere b = Sphere(POINT_VEC(54.087727f, 94.719139f, 75.188812f), 3.3114955f);
 	assert(GJKIntersect(a, b));
@@ -70,7 +66,6 @@ RANDOMIZED_TEST(GJKSphereSphereNoIntersect)
 
 UNIQUE_TEST(TrickyGJKAABBAABBIntersect)
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a(POINT_VEC_SCALAR(-10.f), POINT_VEC_SCALAR(10.f));
 	AABB b(POINT_VEC_SCALAR(8.f), POINT_VEC_SCALAR(20.f));
 	assert(GJKIntersect(a, b));

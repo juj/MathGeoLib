@@ -190,7 +190,7 @@ vec UpdateSimplex(vec *s, int &n)
 		vec d03 = s[3] - s[0];
 		vec d12 = s[2] - s[1];
 		vec d13 = s[3] - s[1];
-		vec d23 = s[3] - s[2];
+//		vec d23 = s[3] - s[2];
 		vec tri013Normal = Cross(d01, d03);
 		assert(Dot(tri013Normal, d02) <= 0.f);
 		vec tri023Normal = Cross(d03, d02);
