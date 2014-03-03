@@ -322,6 +322,20 @@ RANDOMIZED_TEST(AABBRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(TrickyAABBLineSegmentIntersectGJK)
+{
+	AABB a;
+	a.minPoint = POINT_VEC(-60.895836f, 18.743414f, -17.829493f);
+	a.maxPoint = POINT_VEC(-60.294441f, 23.510536f, -10.694467f);
+	LineSegment b;
+	b.a = POINT_VEC(-61.331539f, 16.955204f, -18.561975f);
+	b.b = POINT_VEC(-53.097103f, 40.628937f, 30.422394f);
+	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+	assert(GJKIntersect(a, b));
+	assert(GJKIntersect(b, a));
+}
+
 RANDOMIZED_TEST(AABBLineSegmentIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
