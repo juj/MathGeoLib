@@ -280,7 +280,7 @@ bool Polyhedron::IsClosed() const
 	std::set<std::pair<int, int> > uniqueEdges;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
-		assume(FacePolygon(i).IsPlanar());
+		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString());
 		assume(FacePolygon(i).IsSimple());
 		int x = f[i].v.back();
 		for(size_t j = 0; j < f[i].v.size(); ++j)
