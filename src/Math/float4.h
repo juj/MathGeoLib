@@ -422,7 +422,7 @@ public:
 
 	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
 	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
-	static MUST_USE_RESULT bool AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon = 1e-4f);
+	static MUST_USE_RESULT bool AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon = 1e-7f);
 
 	/// Makes the given vectors linearly independent and normalized in length.
 	/** This function directly follows the Gram-Schmidt procedure on the input vectors.
