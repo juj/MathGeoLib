@@ -276,6 +276,9 @@ Plane Polygon::PlaneCCW() const
 					if (!vec::AreCollinear(p[i], p[j], p[k]))
 						return Plane(p[i], p[j], p[k]);
 
+#ifndef MATH_SILENT_ASSUME
+		LOGW("Polygon contains %d points, but they are all collinear! Cannot form a plane for the Polygon using three points! %s", (int)p.size(), this->SerializeToString().c_str());
+#endif
 		// Polygon contains multiple points, but they are all collinear.
 		// Pick an arbitrary plane along the line as the polygon plane (as if the polygon had only two points)
 		vec dir = (vec(p[1])-vec(p[0])).Normalized();
