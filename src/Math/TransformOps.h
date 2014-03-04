@@ -51,6 +51,11 @@ public:
 	operator float3x4() const;
 	/// Converts this TranslateOp object to a matrix.
 	operator float4x4() const;
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+	/// Returns "(x, y, z)".
+	std::string ToString() const;
+#endif
 };
 
 float3x4 operator *(const TranslateOp &lhs, const float3x4 &rhs);
@@ -90,6 +95,11 @@ public:
 	float3x4 ToFloat3x4() const;
 	/// Converts this ScaleOp to a matrix.
 	float4x4 ToFloat4x4() const;
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+	/// Returns "(x, y, z)".
+	std::string ToString() const;
+#endif
 };
 
 float3x3 operator *(const ScaleOp &lhs, const float3x3 &rhs);

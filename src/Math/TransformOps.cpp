@@ -69,6 +69,15 @@ vec TranslateOp::Offset() const
 	return offset;
 }
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string TranslateOp::ToString() const
+{
+	char str[256];
+	sprintf(str, "(%.3f, %.3f, %.3f)", offset.x, offset.y, offset.z);
+	return std::string(str);
+}
+#endif
+
 float3x4 operator *(const TranslateOp &lhs, const float3x4 &rhs)
 {
 	float3x4 r = rhs;
@@ -85,7 +94,7 @@ float3x4 operator *(const float3x4 &lhs, const TranslateOp &rhs)
 	r.SetTranslatePart(lhs.TransformPos(DIR_TO_FLOAT3(rhs.Offset())));
 
 	// Our optimized form of multiplication must be the same as this.
-	mathassert(r.Equals(lhs * (float3x4)rhs));
+	assume4(r.Equals(lhs * (float3x4)rhs), lhs, rhs, r, lhs * (float3x4)rhs);
 	return r;
 }
 
@@ -272,5 +281,14 @@ vec ScaleOp::Offset() const
 {
 	return scale;
 }
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string ScaleOp::ToString() const
+{
+	char str[256];
+	sprintf(str, "(%.3f, %.3f, %.3f)", scale.x, scale.y, scale.z);
+	return std::string(str);
+}
+#endif
 
 MATH_END_NAMESPACE
