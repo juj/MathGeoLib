@@ -670,22 +670,35 @@ struct PointWithDistance
 	bool operator <(const PointWithDistance &rhs) const { return d < rhs.d; }
 };
 
+// A quick and dirty RAII container for allocated AlignedNew-AlignedFree array to avoid leaking
+// memory if a test throws an exception.
+template<typename T>
+class AutoArrayPtr
+{
+public:
+	T *ptr;
+	AutoArrayPtr(T *ptr):ptr(ptr) {}
+	~AutoArrayPtr() { AlignedFree(ptr); }
+private:
+	AutoArrayPtr(const AutoArrayPtr&);
+	void operator=(const AutoArrayPtr&);
+};
+
 // Encloses n points into the Sphere s, in the order of farthest first, in order to
 // generate the tightest resulting enclosure.
 void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
 {
-	std::vector<PointWithDistance> corners;
-	corners.reserve(n);
+	AutoArrayPtr<PointWithDistance> cornersPtr = AlignedNew<PointWithDistance>(n, 16);
+	PointWithDistance *corners = cornersPtr.ptr;
+
 	for(int i = 0; i < n; ++i)
 	{
-		PointWithDistance pwd;
-		pwd.pt = pts[i];
-		pwd.d = s.pos.Distance(pwd.pt);
-		corners.push_back(pwd);
+		corners[i].pt = pts[i];
+		corners[i].d = s.pos.DistanceSq(corners[i].pt);
 	}
-	std::sort(corners.begin(), corners.end());
+	std::sort(corners, corners+n);
 
-	for(int i = (int)corners.size()-1; i >= 0; --i)
+	for(int i = n-1; i >= 0; --i)
 		s.Enclose(corners[i].pt);
 }
 
@@ -700,7 +713,7 @@ void Sphere_Enclose(Sphere &s, const T &obj)
 		corners[i].pt = obj.CornerPoint(i);
 		corners[i].d = s.pos.DistanceSq(corners[i].pt);
 	}
-	std::sort(&corners[0], &corners[n]);
+	std::sort(corners, corners+n);
 
 	for(int i = n-1; i >= 0; --i)
 		s.Enclose(corners[i].pt);
