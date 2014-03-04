@@ -220,6 +220,7 @@ float Plane::Distance(const Capsule &capsule) const
 
 float Plane::SignedDistance(const vec &point) const
 {
+	assume2(normal.IsNormalized(), normal, normal.Length());
 	return normal.Dot(point) - d;
 }
 
