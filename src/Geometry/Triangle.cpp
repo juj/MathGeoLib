@@ -154,7 +154,10 @@ bool Triangle::BarycentricInsideTriangle(const float3 &barycentric)
 
 vec Triangle::Point(float u, float v) const
 {
-	return a + (b-a) * u + (c-a) * v;
+	// In case the triangle is far away from the origin but is small in size, the elements of 'a' will have large magnitudes,
+	// and the elements of (b-a) and (c-a) will be much smaller quantities. Therefore be extra careful with the
+	// parentheses and first sum the small floats together before adding it to the large one.
+	return a + ((b-a) * u + (c-a) * v);
 }
 
 vec Triangle::Point(float u, float v, float w) const
