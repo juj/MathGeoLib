@@ -786,7 +786,7 @@ bool IsAnEar(const std::vector<float2> &poly, int i, int j)
 	The running time of this function is O(n^2). */
 TriangleArray Polygon::Triangulate() const
 {
-	assume(IsPlanar());
+	assume1(IsPlanar(), this->SerializeToString());
 
 	TriangleArray t;
 	// Handle degenerate cases.
