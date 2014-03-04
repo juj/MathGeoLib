@@ -207,7 +207,7 @@ const int testrunner_numTimerTests = 1;
 const int testrunner_numItersPerTest = 1;
 #else
 const int testrunner_numTimerTests = 10;
-const int testrunner_numItersPerTest = 100;
+const int testrunner_numItersPerTest = 10;
 #endif
 #else
 const int testrunner_numTimerTests = 100;
