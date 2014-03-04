@@ -1503,8 +1503,8 @@ RANDOMIZED_TEST(PlaneRayIntersect)
 	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
+	assert2(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
+	assert2(b.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }

@@ -293,7 +293,6 @@ vec Plane::Refract(const vec &vec, float negativeSideRefractionIndex, float posi
 vec Plane::Project(const vec &point) const
 {
 	vec projected = point - (normal.Dot(point) - d) * normal;
-	mathassert(projected.Equals(OrthoProjection().MulPos(point)));
 	return projected;
 }
 
@@ -358,18 +357,17 @@ vec Plane::ClosestPoint(const Ray &ray) const
 	assume(!IsDegenerate());
 
 	// The plane and a ray have three configurations:
-	// 1) the ray direction faces away from the plane: the closest point is the ray origin point.
-	// 2) the ray faces towards the plane: the closest point is the intersection point.
-	// 3) the ray is parallel to the plane: any point on the ray projected to the plane
-	//    is a closest point, so can treat this as case 1).
+	// 1) the ray and the plane don't intersect: the closest point is the ray origin point.
+	// 2) the ray and the plane do intersect: the closest point is the intersection point.
+	// 3) the ray is parallel to the plane: any point on the ray projected to the plane is a closest point.
 	float denom = Dot(normal, ray.dir);
-	if (denom <= 0.f)
-		return Project(ray.pos); // cases 1) and 3)
-	else // case 2)
-	{
-		float t = (d - Dot(normal, ray.pos)) / denom;
-		return ray.GetPoint(t);
-	}
+	if (denom == 0.f)
+		return Project(ray.pos); // case 3)
+	float t = (d - Dot(normal, ray.pos)) / denom;
+	if (t >= 0.f && t < 1e6f) // Numerical stability check: Instead of checking denom against epsilon, check the resulting t for very large values.
+		return ray.GetPoint(t); // case 2)
+	else
+		return Project(ray.pos); // case 1)
 }
 
 vec Plane::ClosestPoint(const LineSegment &lineSegment) const
