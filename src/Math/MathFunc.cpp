@@ -435,6 +435,21 @@ float PowInt(float base, int exponent)
 		return PowUInt(base, (u32)exponent);
 }
 
+char *SerializeFloat(float f, char *dstStr)
+{
+	if (!IsNan(f))
+	{
+		int numChars = sprintf(dstStr, "%.9g", f);
+		return dstStr + numChars;
+	}
+	else
+	{
+		u32 u = ReinterpretAsU32(f);
+		int numChars = sprintf(dstStr, "NaN(%8X)", u);
+		return dstStr + numChars;
+	}
+}
+
 float DeserializeFloat(const char *str, const char **outEndStr)
 {
 	if (!str)
@@ -443,6 +458,26 @@ float DeserializeFloat(const char *str, const char **outEndStr)
 		++str;
 	if (*str == 0)
 		return FLOAT_NAN;
+	if (MATH_NEXT_WORD_IS(str, "NaN("))
+	{
+		MATH_SKIP_WORD(str, "NaN(");
+		u32 x;
+		int n = sscanf(str, "%X", &x);
+		if (n != 1)
+			return FLOAT_NAN;
+		while(*str != 0)
+		{
+			++str;
+			if (*str == ')')
+			{
+				++str;
+				break;
+			}
+		}
+		if (outEndStr)
+			*outEndStr = str;
+		return ReinterpretAsFloat(x);
+	}
 	float f = (float)strtod(str, const_cast<char**>(&str));
 	while(*str > 0 && *str <= ' ')
 		++str;

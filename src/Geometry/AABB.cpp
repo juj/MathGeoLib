@@ -1158,7 +1158,13 @@ std::string AABB::ToString() const
 std::string AABB::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
+	char *s = SerializeFloat(minPoint.x, str); *s = ','; ++s;
+	s = SerializeFloat(minPoint.y, s); *s = ','; ++s;
+	s = SerializeFloat(minPoint.z, s); *s = ','; ++s;
+	s = SerializeFloat(maxPoint.x, s); *s = ','; ++s;
+	s = SerializeFloat(maxPoint.y, s); *s = ','; ++s;
+	s = SerializeFloat(maxPoint.z, s);
+	assert(s+1 - str < 256);
 	return str;
 }
 

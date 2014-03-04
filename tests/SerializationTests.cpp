@@ -133,6 +133,17 @@ TEST(QuatFromString)
 	}
 }
 
+RANDOMIZED_TEST(SerializeFloat)
+{
+	u32 u = rng.Int() ^ (rng.Int() << 16);
+	float f = ReinterpretAsFloat(u);
+	char str[256];
+	SerializeFloat(f, str);
+	float f2 = DeserializeFloat(str);
+	u32 u2 = ReinterpretAsU32(f2);
+	assert4(u == u2, u, u2, f, f2);
+}
+
 #define LARGESCALE 1e8f
 
 RANDOMIZED_TEST(float2_Serialize)
