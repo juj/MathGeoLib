@@ -32,10 +32,20 @@ AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength)
 
 OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength)
 {
-	AABB a = RandomAABBContainingPoint(pt, maxSideLength);
+	float w = rng.Float(1e-2f, maxSideLength);
+	float h = rng.Float(1e-2f, maxSideLength);
+	float d = rng.Float(1e-2f, maxSideLength);
 	float3x4 rot = float3x4::RandomRotation(rng);
-	float3x4 tm = float3x4::Translate(pt) * rot * float3x4::Translate(-pt);
-	OBB o = a.Transform(tm);
+	OBB o;
+	o.pos = pt;
+	o.axis[0] = DIR_VEC(rot.Col(0));
+	o.axis[1] = DIR_VEC(rot.Col(1));
+	o.axis[2] = DIR_VEC(rot.Col(2));
+	o.r = DIR_VEC(w, h, d);
+	const float epsilon = 1e-4f;
+	o.pos += rng.Float(-w+epsilon, w-epsilon) * o.axis[0];
+	o.pos += rng.Float(-h+epsilon, h-epsilon) * o.axis[1];
+	o.pos += rng.Float(-d+epsilon, d-epsilon) * o.axis[2];
 	assert1(!o.IsDegenerate(), o);
 	assert(o.IsFinite());
 	assert(o.Contains(pt));
