@@ -755,6 +755,13 @@ bool float3::Equals(float x_, float y_, float z_, float epsilon) const
 	       fabs(z - z_) < epsilon;
 }
 
+bool float3::BitEquals(const float3 &other) const
+{
+	return ReinterpretAsU32(x) == ReinterpretAsU32(other.x) &&
+		ReinterpretAsU32(y) == ReinterpretAsU32(other.y) && 
+		ReinterpretAsU32(z) == ReinterpretAsU32(other.z);
+}
+
 float4 float3::ToPos4() const
 {
 	return float4(*this, 1.f);

@@ -153,12 +153,12 @@ RANDOMIZED_TEST(float2_Serialize)
 	std::string s = o.SerializeToString();
 	float2 o2 = float2::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.SerializeToCodeString();
 	o2 = float2::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.ToString();
 	o2 = float2::FromString(s);
@@ -172,12 +172,12 @@ RANDOMIZED_TEST(float3_Serialize)
 	std::string s = o.SerializeToString();
 	float3 o2 = float3::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.SerializeToCodeString();
 	o2 = float3::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.ToString();
 	o2 = float3::FromString(s);
@@ -191,12 +191,12 @@ RANDOMIZED_TEST(float4_Serialize)
 	std::string s = o.SerializeToString();
 	float4 o2 = float4::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.SerializeToCodeString();
 	o2 = float4::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.ToString();
 	o2 = float4::FromString(s);
@@ -211,12 +211,12 @@ RANDOMIZED_TEST(Quat_Serialize)
 	std::string s = o.SerializeToString();
 	Quat o2 = Quat::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.SerializeToCodeString();
 	o2 = Quat::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.ToString();
 	o2 = Quat::FromString(s);
@@ -230,12 +230,12 @@ RANDOMIZED_TEST(AABB_Serialize)
 	std::string s = o.SerializeToString();
 	AABB o2 = AABB::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.SerializeToCodeString();
 	o2 = AABB::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.ToString();
 	o2 = AABB::FromString(s);
@@ -249,12 +249,12 @@ RANDOMIZED_TEST(OBB_Serialize)
 	std::string s = o.SerializeToString();
 	OBB o2 = OBB::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.SerializeToCodeString();
 	o2 = OBB::FromString(s);
 	assert(o.Equals(o2));
-	assert(!memcmp(&o, &o2, sizeof(o)));
+	assert(o.BitEquals(o2));
 
 	s = o.ToString();
 	o2 = OBB::FromString(s);
@@ -268,12 +268,12 @@ RANDOMIZED_TEST(Sphere_Serialize)
 	std::string s = o.SerializeToString();
 	Sphere o2 = Sphere::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Sphere::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Sphere::FromString(s);
@@ -287,12 +287,12 @@ RANDOMIZED_TEST(Plane_Serialize)
 	std::string s = o.SerializeToString();
 	Plane o2 = Plane::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Plane::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Plane::FromString(s);
@@ -306,12 +306,12 @@ RANDOMIZED_TEST(Triangle_Serialize)
 	std::string s = o.SerializeToString();
 	Triangle o2 = Triangle::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Triangle::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Triangle::FromString(s);
@@ -325,12 +325,12 @@ RANDOMIZED_TEST(Ray_Serialize)
 	std::string s = o.SerializeToString();
 	Ray o2 = Ray::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Ray::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Ray::FromString(s);
@@ -344,12 +344,12 @@ RANDOMIZED_TEST(LineSegment_Serialize)
 	std::string s = o.SerializeToString();
 	LineSegment o2 = LineSegment::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = LineSegment::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = LineSegment::FromString(s);
@@ -363,12 +363,12 @@ RANDOMIZED_TEST(Line_Serialize)
 	std::string s = o.SerializeToString();
 	Line o2 = Line::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Line::FromString(s);
 	assert(o.Equals(o2));
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Line::FromString(s);
@@ -383,12 +383,12 @@ RANDOMIZED_TEST(Capsule_Serialize)
 	std::string s = o.SerializeToString();
 	Capsule o2 = Capsule::FromString(s);
 	assert2(o.Equals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.SerializeToCodeString();
 	o2 = Capsule::FromString(s);
 	assert2(o.Equals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
-	assert2(!memcmp(&o, &o2, sizeof(o)), o.SerializeToCodeString(), o2.SerializeToCodeString());
+	assert2(o.BitEquals(o2), o.SerializeToCodeString(), o2.SerializeToCodeString());
 
 	s = o.ToString();
 	o2 = Capsule::FromString(s);

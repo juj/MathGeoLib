@@ -561,6 +561,10 @@ public:
 #endif
 
 	bool Equals(const AABB &rhs, float epsilon = 1e-3f) const { return minPoint.Equals(rhs.minPoint, epsilon) && maxPoint.Equals(rhs.maxPoint, epsilon); }
+
+	/// Compares whether this AABB and the given AABB are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const AABB &other) const { return minPoint.BitEquals(other.minPoint) && maxPoint.BitEquals(other.maxPoint); }
 };
 
 OBB operator *(const float3x3 &transform, const AABB &aabb);

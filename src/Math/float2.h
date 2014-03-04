@@ -329,6 +329,10 @@ public:
 	bool Equals(const float2 &other, float epsilon = 1e-3f) const;
 	bool Equals(float x, float y, float epsilon = 1e-3f) const;
 
+	/// Compares whether this float2 and the given float2 are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const float2 &other) const;
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x, y)".
 	std::string ToString() const;

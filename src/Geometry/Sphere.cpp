@@ -1353,6 +1353,11 @@ Sphere Sphere::FromString(const char *str, const char **outEndStr)
 	return s;
 }
 
+bool Sphere::BitEquals(const Sphere &other) const
+{
+	return pos.BitEquals(other.pos) && ReinterpretAsU32(r) == ReinterpretAsU32(other.r);
+}
+
 Sphere operator *(const float3x3 &transform, const Sphere &sphere)
 {
 	Sphere s(sphere);

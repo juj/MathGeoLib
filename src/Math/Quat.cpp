@@ -179,6 +179,14 @@ bool Quat::Equals(const Quat &rhs, float epsilon) const
 	return EqualAbs(x, rhs.x, epsilon) && EqualAbs(y, rhs.y, epsilon) && EqualAbs(z, rhs.z, epsilon) && EqualAbs(w, rhs.w, epsilon);
 }
 
+bool Quat::BitEquals(const Quat &other) const
+{
+	return ReinterpretAsU32(x) == ReinterpretAsU32(other.x) &&
+		ReinterpretAsU32(y) == ReinterpretAsU32(other.y) &&
+		ReinterpretAsU32(z) == ReinterpretAsU32(other.z) &&
+		ReinterpretAsU32(w) == ReinterpretAsU32(other.w);
+}
+
 float *Quat::ptr()
 {
 	return &x;

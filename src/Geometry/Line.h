@@ -98,6 +98,10 @@ public:
 		@return True if this and the given Line represent the same set of points, up to the given epsilon. */
 	bool Equals(const Line &line, float epsilon = 1e-3f) const;
 
+	/// Compares whether this Line and the given Line are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const Line &other) const { return pos.BitEquals(other.pos) && dir.BitEquals(other.dir); }
+
 	/// Computes the distance between this line and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.

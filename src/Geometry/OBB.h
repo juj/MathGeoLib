@@ -515,6 +515,10 @@ public:
 #endif
 
 	bool Equals(const OBB &rhs, float epsilon = 1e-3f) const { return pos.Equals(rhs.pos, epsilon) && r.Equals(rhs.r, epsilon) && axis[0].Equals(rhs.axis[0], epsilon) && axis[1].Equals(rhs.axis[1], epsilon) && axis[2].Equals(rhs.axis[2], epsilon); }
+
+	/// Compares whether this OBB and the given OBB  are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const OBB &other) const { return pos.BitEquals(other.pos) && r.BitEquals(other.r) && axis[0].BitEquals(other.axis[0]) && axis[1].BitEquals(other.axis[1]) && axis[2].BitEquals(other.axis[2]); }
 };
 
 OBB operator *(const float3x3 &transform, const OBB &obb);

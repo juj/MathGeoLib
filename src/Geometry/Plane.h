@@ -278,6 +278,10 @@ public:
 	/** @see SetEquals(), IsParallel(), DihedralAngle(). */
 	bool Equals(const Plane &other, float epsilon = 1e-3f) const;
 
+	/// Compares whether this Plane and the given Plane are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const Plane &other) const { return normal.BitEquals(other.normal) && ReinterpretAsU32(d) == ReinterpretAsU32(other.d); }
+
 	/// Tests if two planes are parallel.
 	/** @see SetEquals(), Equals(), DihedralAngle(). */
 	bool IsParallel(const Plane &plane, float epsilon = 1e-3f) const;

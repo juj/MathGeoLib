@@ -299,6 +299,10 @@ public:
 #endif
 
 	bool Equals(const Capsule &rhs, float epsilon = 1e-3f) const { return l.Equals(rhs.l, epsilon) && EqualAbs(r, rhs.r, epsilon); }
+
+	/// Compares whether this Capsule and the given Capsule are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const Capsule &other) const;
 };
 
 Capsule operator *(const float3x3 &transform, const Capsule &capsule);

@@ -383,6 +383,10 @@ public:
 #endif
 
 	bool Equals(const Triangle &rhs, float epsilon = 1e-3f) const { return a.Equals(rhs.a, epsilon) && b.Equals(rhs.b, epsilon) && c.Equals(rhs.c, epsilon); }
+
+	/// Compares whether this Triangle and the given Triangle are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const Triangle &other) const { return a.BitEquals(other.a) && b.BitEquals(other.b) && c.BitEquals(other.c); }
 };
 
 Triangle operator *(const float3x3 &transform, const Triangle &t);

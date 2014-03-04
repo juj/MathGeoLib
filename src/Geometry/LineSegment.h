@@ -129,6 +129,10 @@ public:
 		@return True if a == rhs.a && b == rhs.b, or, a == rhs.b && b = rhs.a, within the given epsilon. */
 	bool Equals(const LineSegment &rhs, float distanceThreshold = 1e-3f) const;
 
+	/// Compares whether this LineSegment and the given LineSegment are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const LineSegment &other) const { return a.BitEquals(other.a) && b.BitEquals(other.b); }
+
 	/// Tests if the given point or line segment is contained on this line segment.
 	/** @param distanceThreshold Because a line segment is an one-dimensional object in 3D space, an epsilon value
 			is used as a threshold for this test. This effectively transforms this line segment to a capsule with

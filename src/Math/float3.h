@@ -400,6 +400,10 @@ public:
 	bool Equals(const float3 &other, float epsilon = 1e-3f) const;
 	bool Equals(float x, float y, float z, float epsilon = 1e-3f) const;
 
+	/// Compares whether this float3 and the given float3 are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const float3 &other) const;
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x, y, z)".
 	std::string ToString() const;

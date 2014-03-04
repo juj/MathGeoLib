@@ -1048,6 +1048,14 @@ bool float4::Equals(float x_, float y_, float z_, float w_, float epsilon) const
 		   fabs(w - w_) < epsilon;
 }
 
+bool float4::BitEquals(const float4 &other) const
+{
+	return ReinterpretAsU32(x) == ReinterpretAsU32(other.x) &&
+		ReinterpretAsU32(y) == ReinterpretAsU32(other.y) &&
+		ReinterpretAsU32(z) == ReinterpretAsU32(other.z) &&
+		ReinterpretAsU32(w) == ReinterpretAsU32(other.w);
+}
+
 float4 MUST_USE_RESULT float4::RandomDir(LCG &lcg, float length)
 {
 	return DIR_TO_FLOAT4(Sphere(POINT_VEC_SCALAR(0.f), length).RandomPointOnSurface(lcg) - vec(POINT_VEC_SCALAR(0.f)));

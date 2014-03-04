@@ -493,6 +493,11 @@ Capsule Capsule::FromString(const char *str, const char **outEndStr)
 	return c;
 }
 
+bool Capsule::BitEquals(const Capsule &other) const
+{
+	return l.BitEquals(other.l) && ReinterpretAsU32(r) == ReinterpretAsU32(other.r);
+}
+
 Capsule operator *(const float3x3 &transform, const Capsule &capsule)
 {
 	Capsule c(capsule);

@@ -222,6 +222,12 @@ bool float2::Equals(float x_, float y_, float epsilon) const
 	return EqualAbs(x, x_, epsilon) && EqualAbs(y, y_, epsilon);
 }
 
+bool float2::BitEquals(const float2 &other) const
+{
+	return ReinterpretAsU32(x) == ReinterpretAsU32(other.x) &&
+		ReinterpretAsU32(y) == ReinterpretAsU32(other.y);
+}
+
 /// It is too performance-heavy to set the locale in each serialization and deserialization function call.
 /// Therefore expect the user to has a proper locale set up for the application at startup. This is assert()ed
 /// at debug runs.

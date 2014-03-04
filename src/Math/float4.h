@@ -666,6 +666,10 @@ public:
 	bool Equals(const float4 &other, float epsilon = 1e-3f) const;
 	bool Equals(float x, float y, float z, float w, float epsilon = 1e-3f) const;
 
+	/// Compares whether this float4 and the given float4 are identical bit-by-bit in the underlying representation.
+	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
+	bool BitEquals(const float4 &other) const;
+
 	/// Generates a direction vector of the given length pointing at a uniformly random direction.
 	/* The w-component for the returned vector is 0.
 	@see RandomSphere(), RandomBox(). */
