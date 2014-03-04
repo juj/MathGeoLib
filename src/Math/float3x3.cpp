@@ -865,7 +865,7 @@ bool float3x3::SolveAxb(float3 b, float3 &x) const
 		Swap(v02, v12);
 		Swap(b[0], b[1]);
 	}
-	else if (v20 >= v00)
+	else if (av20 >= av00)
 	{
 		Swap(v00, v20);
 		Swap(v01, v21);
