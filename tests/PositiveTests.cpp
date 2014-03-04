@@ -505,37 +505,55 @@ int xxxxx = 0;
 
 BENCHMARK(BM_OBBOBBIntersect, "OBB-OBB Intersects")
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	if (a.Intersects(b))
-		++xxxxx;
-	if (b.Intersects(a))
-		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+		OBB a = RandomOBBContainingPoint(pt, 10.f);
+		OBB b = RandomOBBContainingPoint(pt, 10.f);
+		if (a.Intersects(b))
+			++xxxxx;
+		if (b.Intersects(a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
 BENCHMARK(BM_OBBOBBIntersect_SAT, "OBB-OBB SAT Intersection")
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	if (SATIntersect(a, b))
-		++xxxxx;
-	if (SATIntersect(b, a))
-		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+		OBB a = RandomOBBContainingPoint(pt, 10.f);
+		OBB b = RandomOBBContainingPoint(pt, 10.f);
+		if (SATIntersect(a, b))
+			++xxxxx;
+		if (SATIntersect(b, a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
 BENCHMARK(BM_OBBOBBIntersect_GJK, "OBB-OBB GJK Intersection")
 {
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	if (GJKIntersect(a, b))
-		++xxxxx;
-	if (GJKIntersect(b, a))
-		++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
+		vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+		OBB a = RandomOBBContainingPoint(pt, 10.f);
+		OBB b = RandomOBBContainingPoint(pt, 10.f);
+		if (GJKIntersect(a, b))
+			++xxxxx;
+		if (GJKIntersect(b, a))
+			++xxxxx;
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
 
