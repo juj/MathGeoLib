@@ -688,7 +688,7 @@ private:
 // generate the tightest resulting enclosure.
 void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
 {
-	AutoArrayPtr<PointWithDistance> cornersPtr = AlignedNew<PointWithDistance>(n, 16);
+	AutoArrayPtr<PointWithDistance> cornersPtr(AlignedNew<PointWithDistance>(n, 16));
 	PointWithDistance *corners = cornersPtr.ptr;
 
 	for(int i = 0; i < n; ++i)
