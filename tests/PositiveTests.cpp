@@ -1426,6 +1426,20 @@ RANDOMIZED_TEST(TriangleRayIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(TriangleLineSegmentIntersectCase)
+{
+	Triangle a(POINT_VEC(-45.7166939f,-104.675713f,17.1150723f),POINT_VEC(-20.9888325f,-89.1524963f,-31.5042286f),POINT_VEC(-1.45244789f,-76.914505f,-69.9231262f));
+	LineSegment b(POINT_VEC(-19.0950012f,-134.222748f,-33.7456589f),POINT_VEC(-52.5003471f,-49.3652039f,28.5405655f));
+
+	assert(a.Intersects(b));
+	vec cp = a.ClosestPoint(b);
+	Plane p = a.PlaneCCW();
+	float dplane = p.Distance(cp);
+	float3 uvw = a.BarycentricUVW(cp);
+	assert(a.Contains(cp));
+//	assert(b.Contains(cp));
+}
+
 RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));

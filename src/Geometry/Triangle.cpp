@@ -385,17 +385,14 @@ float Triangle::IntersectLineTri(const vec &linePos, const vec &lineDir,
 		const vec &v0, const vec &v1, const vec &v2,
 		float &u, float &v)
 {
-	vec vE1, vE2;
-	vec vT, vP, vQ;
-
 	const float epsilon = 1e-4f;
 
 	// Edge vectors
-	vE1 = v1 - v0;
-	vE2 = v2 - v0;
+	vec vE1 = v1 - v0;
+	vec vE2 = v2 - v0;
 
 	// begin calculating determinant - also used to calculate U parameter
-	vP = lineDir.Cross(vE2);
+	vec vP = lineDir.Cross(vE2);
 
 	// If det < 0, intersecting backfacing tri, > 0, intersecting frontfacing tri, 0, parallel to plane.
 	const float det = vE1.Dot(vP);
@@ -406,7 +403,7 @@ float Triangle::IntersectLineTri(const vec &linePos, const vec &lineDir,
 	const float recipDet = 1.f / det;
 
 	// Calculate distance from v0 to ray origin
-	vT = linePos - v0;
+	vec vT = linePos - v0;
 
 	// Output barycentric u
 	u = vT.Dot(vP) * recipDet;
@@ -414,7 +411,7 @@ float Triangle::IntersectLineTri(const vec &linePos, const vec &lineDir,
 		return FLOAT_INF; // Barycentric U is outside the triangle - early out.
 
 	// Prepare to test V parameter
-	vQ = vT.Cross(vE1);
+	vec vQ = vT.Cross(vE1);
 
 	// Output barycentric v
 	v = lineDir.Dot(vQ) * recipDet;
@@ -435,23 +432,14 @@ bool Triangle::Intersects(const LineSegment &l, float *d, vec *intersectionPoint
 		"T. M&ouml;ller, B. Trumbore. Fast, Minimum Storage Ray/Triangle Intersection. 2005."
 		http://jgt.akpeters.com/papers/MollerTrumbore97/. */
 	float u, v;
-	float t = IntersectLineTri(l.a, l.Dir(), a, b, c, u, v);
-	bool success = (t >= 0 && t != FLOAT_INF);
+	float t = IntersectLineTri(l.a, l.b - l.a, a, b, c, u, v);
+	bool success = (t >= 0.0f && t <= 1.0f);
 	if (!success)
 		return false;
-	float length = l.LengthSq();
-	if (t < 0.f || t*t >= length)
-		return false;
-	length = Sqrt(length);
 	if (d)
-	{
-		float len = t / length;
-		*d = len;
-		if (intersectionPoint)
-			*intersectionPoint = l.GetPoint(len);
-	}
-	else if (intersectionPoint)
-		*intersectionPoint = l.GetPoint(t / length);
+		*d = t;
+	if (intersectionPoint)
+		*intersectionPoint = l.GetPoint(t);
 	return true;
 }
 
@@ -749,12 +737,15 @@ vec Triangle::ClosestPoint(const vec &p) const
 vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 {
 	///\todo Optimize.
-	vec intersectionPoint;
-	if (Intersects(lineSegment, 0, &intersectionPoint))
+	float u, v;
+	float t = IntersectLineTri(lineSegment.a, lineSegment.b - lineSegment.a, a, b, c, u, v);
+	bool intersects = (t >= 0.0f && t <= 1.0f);
+	if (intersects)
 	{
+//		assume3(lineSegment.GetPoint(t).Equals(this->Point(u, v)), lineSegment.GetPoint(t).SerializeToCodeString(), this->Point(u, v).SerializeToCodeString(), lineSegment.GetPoint(t).Distance(this->Point(u, v)));
 		if (otherPt)
-			*otherPt = intersectionPoint;
-		return intersectionPoint;
+			*otherPt = lineSegment.GetPoint(t);
+		return this->Point(u, v);
 	}
 
 	float u1,v1,d1;
