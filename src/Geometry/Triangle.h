@@ -142,6 +142,7 @@ public:
 		@note If an index outside [0, 2] is passed, an assume() failure occurs and a NaN vector is returned.
 		@see Edge(). */
 	vec Vertex(int i) const;
+	vec CornerPoint(int i) const { return Vertex(i); } // An alias for Vertex() to be able to mash Triangle into templatized algorithms.
 
 	/// Returns an edge of this triangle.
 	/** @param i The index of the edge to generate: 0, 1 or 2.

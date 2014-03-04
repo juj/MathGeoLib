@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #else
 #include "Container/Array.h"
 #endif
@@ -657,37 +658,88 @@ void Sphere::Enclose(const vec &point, float epsilon)
 		mathassert(this->Contains(copy, epsilon));
 #endif
 	}
+
 	assume(this->Contains(point));
+}
+
+struct PointWithDistance
+{
+	vec pt;
+	float d;
+
+	bool operator <(const PointWithDistance &rhs) const { return d < rhs.d; }
+};
+
+void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
+{
+	std::vector<PointWithDistance> corners;
+	corners.reserve(n);
+	for(int i = 0; i < n; ++i)
+	{
+		PointWithDistance pwd;
+		pwd.pt = pts[i];
+		pwd.d = s.pos.Distance(pwd.pt);
+		corners.push_back(pwd);
+	}
+	std::sort(corners.begin(), corners.end());
+
+	for(int i = (int)corners.size()-1; i >= 0; --i)
+		s.Enclose(corners[i].pt);
+}
+
+template<typename T, int n>
+void Sphere_Enclose(Sphere &s, const T &obj)
+{
+	PointWithDistance corners[n];
+	for(int i = 0; i < n; ++i)
+	{
+		corners[i].pt = obj.CornerPoint(i);
+		corners[i].d = s.pos.DistanceSq(corners[i].pt);
+	}
+	std::sort(&corners[0], &corners[n]);
+
+	for(int i = n-1; i >= 0; --i)
+		s.Enclose(corners[i].pt);
 }
 
 void Sphere::Enclose(const AABB &aabb)
 {
-	///@todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
-	for(int i = 0; i < 8; ++i)
-		Enclose(aabb.CornerPoint(i));
+	Sphere_Enclose<AABB, 8>(*this, aabb);
+
+	assume(this->Contains(aabb));
 }
 
 void Sphere::Enclose(const OBB &obb)
 {
-	///@todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
-	for(int i = 0; i < 8; ++i)
-		Enclose(obb.CornerPoint(i));
+	Sphere_Enclose<OBB, 8>(*this, obb);
+
+	assume(this->Contains(obb));
 }
 
 void Sphere::Enclose(const Sphere &sphere)
 {
-	// To enclose another sphere into this sphere, we can simply enclose the farthest point
-	// of that sphere to this sphere.
-	vec farthestPoint = sphere.pos - pos;
-	farthestPoint = sphere.pos + farthestPoint * (sphere.r / farthestPoint.Length());
-	Enclose(farthestPoint);
+	// To enclose another sphere into this sphere, we only need to enclose two points:
+	// 1) Enclose the farthest point on the other sphere into this sphere.
+	// 2) Enclose the opposite point of the farthest point into this sphere.
+	vec toFarthestPoint = (sphere.pos - pos).ScaledToLength(sphere.r);
+	Enclose(sphere.pos + toFarthestPoint);
+	Enclose(sphere.pos - toFarthestPoint);
+
+	assume(this->Contains(sphere));
 }
 
 void Sphere::Enclose(const LineSegment &lineSegment)
 {
-	///@todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
-	Enclose(lineSegment.a);
-	Enclose(lineSegment.b);
+	if (pos.DistanceSq(lineSegment.a) > pos.DistanceSq(lineSegment.b))
+	{
+		Enclose(lineSegment.a);
+		Enclose(lineSegment.b);
+	}
+	else
+	{
+		Enclose(lineSegment.b);
+		Enclose(lineSegment.a);
+	}
 }
 
 void Sphere::Enclose(const vec *pointArray, int numPoints)
@@ -697,16 +749,12 @@ void Sphere::Enclose(const vec *pointArray, int numPoints)
 	if (!pointArray)
 		return;
 #endif
-	///@todo This might not be very optimal at all. Perhaps better to enclose the farthest point first.
-	for(int i = 0; i < numPoints; ++i)
-		Enclose(pointArray[i]);
+	Sphere_Enclose_pts(*this, pointArray, numPoints);
 }
 
 void Sphere::Enclose(const Triangle &triangle)
 {
-	Enclose(triangle.a);
-	Enclose(triangle.b);
-	Enclose(triangle.c);
+	Sphere_Enclose<Triangle, 3>(*this, triangle);
 }
 
 void Sphere::Enclose(const Polygon &polygon)
@@ -721,8 +769,7 @@ void Sphere::Enclose(const Polyhedron &polyhedron)
 
 void Sphere::Enclose(const Frustum &frustum)
 {
-	for(int i = 0; i < 8; ++i)
-		Enclose(frustum.CornerPoint(i));
+	Sphere_Enclose<Frustum, 8>(*this, frustum);
 }
 
 void Sphere::Enclose(const Capsule &capsule)
@@ -733,17 +780,16 @@ void Sphere::Enclose(const Capsule &capsule)
 	float da = pos.DistanceSq(capsule.l.a);
 	float db = pos.DistanceSq(capsule.l.b);
 
-	// Enclose the farther Sphere of the Capsule, and expand the radius so that it contains the closer Sphere.
-	// If we Enclose()d both, the second enclosure might move the sphere center so it no longer contains the first enclosed Sphere.
+	// Enclose the farther Sphere of the Capsule first, and the closer one second to retain the tightest fit.
 	if (da > db) 
 	{
 		Enclose(capsule.SphereA());
-		ExtendRadiusToContain(capsule.SphereB());
+		Enclose(capsule.SphereB());
 	}
 	else
 	{
 		Enclose(capsule.SphereB());
-		ExtendRadiusToContain(capsule.SphereA());
+		Enclose(capsule.SphereA());
 	}
 }
 

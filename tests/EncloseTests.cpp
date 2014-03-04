@@ -226,7 +226,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Capsule)
 	Capsule c = RandomCapsuleNearOrigin(DISTSCALE);
 	s.Enclose(c);
 
-	assert(s.Contains(c));
+	assert2(s.Contains(c), s.SerializeToCodeString(), c.SerializeToCodeString());
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Frustum)
