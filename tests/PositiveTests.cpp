@@ -188,10 +188,10 @@ Triangle RandomTriangleContainingPoint(const vec &pt)
 	vec b = p.Point(f1, f2);
 	vec c = p.Point(f3, f4);
 	Triangle t(a,b,c);
-	assert(t.Contains(pt));
+	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
 
 	vec d = t.RandomPointInside(rng);
-	assert(t.Contains(d));
+	assert3(t.Contains(d), t.SerializeToCodeString(), d.SerializeToCodeString(), t.Distance(d));
 	d = d - t.a;
 	t.a -= d;
 	t.b -= d;
@@ -199,7 +199,7 @@ Triangle RandomTriangleContainingPoint(const vec &pt)
 
 	assert1(t.IsFinite(), t);
 	assert1(!t.IsDegenerate(), t);
-	assert3(t.Contains(pt), t, pt, t.Distance(pt));
+	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
 #ifdef MATH_AUTOMATIC_SSE
 	asserteq(t.a.w, 1.f);
 	asserteq(t.b.w, 1.f);
@@ -229,7 +229,7 @@ Polyhedron RandomPolyhedronContainingPoint(const vec &pt)
 	return p;
 //	assert1(t.IsFinite(), t);
 //	assert1(!t.IsDegenerate(), t);
-//	assert3(t.Contains(pt), t, pt, t.Distance(pt));
+//	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
 }
 
 Polygon RandomPolygonContainingPoint(const vec &pt)
@@ -1232,7 +1232,7 @@ RANDOMIZED_TEST(PolyhedronLineSegmentIntersect)
 	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
-	assert(a.Distance(a.ClosestPoint(b)) < 1e-3f);
+	assert4(a.Distance(a.ClosestPoint(b)) < 1e-3f, a, b, a.ClosestPoint(b), a.Distance(a.ClosestPoint(b)));
 //	TODO: The following is problematic due to numerical
 //	stability issues at the surface of the Polyhedron.
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1342,7 +1342,7 @@ RANDOMIZED_TEST(PolygonLineSegmentIntersect)
 	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a, b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(b.Contains(a.ClosestPoint(b)));
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
@@ -1404,7 +1404,7 @@ RANDOMIZED_TEST(TriangleLineIntersect)
 //	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(b.Contains(a.ClosestPoint(b)));
 	assert(a.Contains(b.ClosestPoint(a)));
 	assert(b.Contains(b.ClosestPoint(a)));
@@ -1436,7 +1436,7 @@ RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 	assert(GJKIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(b.Contains(a.ClosestPoint(b)));
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
@@ -1470,7 +1470,7 @@ RANDOMIZED_TEST(TriangleTriangleIntersect)
 	assert(SATIntersect(b, a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(b.Contains(a.ClosestPoint(b)));
 	assert(a.Contains(b.ClosestPoint(a)));
 	assert(b.Contains(b.ClosestPoint(a)));
@@ -1518,7 +1518,7 @@ RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 	assert(b.Intersects(a));
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(b.Contains(a.ClosestPoint(b)));
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));

@@ -1312,7 +1312,7 @@ RANDOMIZED_TEST(PolyhedronLineSegmentNoIntersect)
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-	assert(a.Distance(a.ClosestPoint(b)) < 1e-3f);
+	assert4(a.Distance(a.ClosestPoint(b)) < 1e-3f, a, b, a.ClosestPoint(b), a.Distance(a.ClosestPoint(b)));
 //	TODO: The following is problematic due to numerical
 //	stability issues at the surface of the Polyhedron.
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1445,7 +1445,7 @@ RANDOMIZED_TEST(PolygonLineSegmentNoIntersect)
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-	assert(a.Distance(a.ClosestPoint(b)) < 1e-3f);
+	assert4(a.Distance(a.ClosestPoint(b)) < 1e-3f, a, b, a.ClosestPoint(b), a.Distance(a.ClosestPoint(b)));
 //	TODO: The following is problematic due to numerical
 //	stability issues at the surface of the Polygon.
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1514,7 +1514,7 @@ RANDOMIZED_TEST(TriangleLineNoIntersect)
 //	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
@@ -1548,7 +1548,7 @@ RANDOMIZED_TEST(TriangleLineSegmentNoIntersect)
 	assert(!GJKIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
@@ -1601,7 +1601,7 @@ RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 	assert(!SATIntersect(b, a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(!b.Contains(a.ClosestPoint(b)));
 	assert(!a.Contains(b.ClosestPoint(a)));
 	assert(b.Contains(b.ClosestPoint(a)));
@@ -1660,7 +1660,7 @@ RANDOMIZED_TEST(PlaneLineSegmentNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(a.Contains(a.ClosestPoint(b)));
+	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
 	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
