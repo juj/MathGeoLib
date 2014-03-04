@@ -362,6 +362,10 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThickness) const
 
 	const float epsilon = 1e-4f;
 
+	// General strategy: transform all points on the polygon onto 2D face plane of the polygon, where the target query point is 
+	// centered to lie in the origin.
+	// If the test ray (0,0) -> (+inf, 0) intersects exactly an odd number of polygon edge segments, then the query point must have been
+	// inside the polygon. The test ray is chosen like that to avoid all extra per-edge computations.
 	float2 p0 = float2(Dot(p[p.size()-1], basisU), Dot(p[p.size()-1], basisV)) - localSpacePoint;
 	if (Abs(p0.y) < epsilon)
 		p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
@@ -371,24 +375,24 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThickness) const
 		if (Abs(p1.y) < epsilon)
 			p1.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
 
-		if (p0.y * p1.y < 0.f)
+		if (p0.y * p1.y < 0.f) // If the line segment p0 -> p1 straddles the line x=0, it could intersect the ray (0,0) -> (+inf, 0)
 		{
-			if (p0.x > 1e-3f && p1.x > 1e-3f)
+			if (Min(p0.x, p1.x) > 0.f) // If both x-coordinates are positive, then there certainly is an intersection with the ray.
 				++numIntersections;
-			else
+			else if (Max(p0.x, p1.x) > 0.f) // If one of them is positive, there could be. (otherwise both are negative and they can't intersect ray)
 			{
 				// P = p0 + t*(p1-p0) == (x,0)
 				//     p0.x + t*(p1.x-p0.x) == x
 				//     p0.y + t*(p1.y-p0.y) == 0
 				//                 t == -p0.y / (p1.y - p0.y)
 
-				// Test whether the lines (0,0) -> (+inf,0) and p0 -> p1 intersect at a positive X-coordinate.
+				// Test whether the lines (0,0) -> (+inf,0) and p0 -> p1 intersect at a positive X-coordinate?
 				float2 d = p1 - p0;
-				if (Abs(d.y) > 1e-5f)
+				if (d.y != 0.f)
 				{
-					float t = -p0.y / d.y;
-					float x = p0.x + t * d.x;
-					if (t >= 0.f && t <= 1.f && x > 1e-3f)
+					float t = -p0.y / d.y; // The line segment parameter, t \in [0,1] forms the line segment p0->p1.
+					float x = p0.x + t * d.x; // The x-coordinate of intersection with the ray.
+					if (t >= 0.f && t <= 1.f && x > 0.f)
 						++numIntersections;
 				}
 			}
@@ -877,6 +881,59 @@ std::string Polygon::ToString() const
 	}
 	ss << ")";
 	return ss.str();
+}
+
+std::string Polygon::SerializeToString() const
+{
+	std::stringstream ss;
+	ss << "(";
+	for(size_t i = 0; i < p.size(); ++i)
+		ss << "(" << vec(p[i]).xyz().SerializeToString() + (i+1 != p.size() ? ")," : ")");
+	ss << ")";
+	return ss.str();
+}
+
+Polygon Polygon::FromString(const char *str, const char **outEndStr)
+{
+	MATH_SKIP_WORD(str, "Polygon");
+	MATH_SKIP_WORD(str, "(");
+	Polygon p;
+	while(*str == '(' || *str == ',')
+	{
+		MATH_SKIP_WORD(str, ",");
+		float3 pt = float3::FromString(str, &str);
+		p.p.push_back(POINT_VEC(pt));
+	}
+	MATH_SKIP_WORD(str, ")");
+
+	if (outEndStr)
+		*outEndStr = str;
+
+	return p;
+}
+
+bool Polygon::Equals(const Polygon &other) const
+{
+	if (p.size() != other.p.size())
+		return false;
+
+	for(size_t i = 0; i < p.size(); ++i)
+		if (!Vertex(i).Equals(other.Vertex(i)))
+			return false;
+
+	return true;
+}
+
+bool Polygon::BitEquals(const Polygon &other) const
+{
+	if (p.size() != other.p.size())
+		return false;
+
+	for(size_t i = 0; i < p.size(); ++i)
+		if (!Vertex(i).BitEquals(other.Vertex(i)))
+			return false;
+
+	return true;
 }
 
 /*

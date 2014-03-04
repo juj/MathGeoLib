@@ -243,13 +243,26 @@ Polyhedron RandomPolyhedronContainingPoint(const vec &pt)
 //	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
 }
 
+UNIQUE_TEST(Polygon_Contains_PointCase)
+{
+	Polygon p;
+
+	p.p.push_back(POINT_VEC(1.f, 0.f, 1.f));
+	p.p.push_back(POINT_VEC(1.f, 0.f, 0.f));
+	p.p.push_back(POINT_VEC(0.f, 0.f, 0.f));
+	p.p.push_back(POINT_VEC(0.f, 0.f, 1.f));
+	vec pt = POINT_VEC(0.5f, 0.f, 0.0007f);
+
+	assert(p.Contains(pt));
+}
+
 Polygon RandomPolygonContainingPoint(const vec &pt)
 {
 	Polyhedron p = RandomPolyhedronContainingPoint(pt);
 	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
 
 	vec pt2 = poly.FastRandomPointInside(rng);
-	assert3(poly.Contains(pt2), poly, pt2, poly.Distance(pt2));
+	assert3(poly.Contains(pt2), poly.SerializeToString(), pt2.SerializeToString(), poly.Distance(pt2));
 	poly.Translate(pt - pt2);
 
 	assert1(!poly.IsDegenerate(), poly);

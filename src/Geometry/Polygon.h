@@ -370,6 +370,14 @@ public:
 
 	std::string ToString() const;
 
+	std::string SerializeToString() const;
+
+	static Polygon FromString(const char *str, const char **outEndStr = 0);
+	static Polygon FromString(const std::string &str) { return FromString(str.c_str()); }
+
+	bool Equals(const Polygon &other) const;
+	bool BitEquals(const Polygon &other) const;
+
 	// Returns true if the given vertex is a concave vertex. Otherwise the vertex is a convex vertex.
 //	bool IsConcaveVertex(int i) const;
 
