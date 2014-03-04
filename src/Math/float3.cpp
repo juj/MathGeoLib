@@ -532,7 +532,7 @@ float MUST_USE_RESULT float3::ScalarTripleProduct(const float3 &u, const float3 
 
 float3 float3::Reflect(const float3 &normal) const
 {
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	return 2.f * this->ProjectToNorm(normal) - *this;
 }
 

@@ -169,6 +169,7 @@ Capsule RandomCapsuleContainingPoint(const vec &pt)
 Plane RandomPlaneContainingPoint(const vec &pt)
 {
 	vec dir = vec::RandomDir(rng);
+	assume2(dir.IsNormalized(), dir.SerializeToCodeString(), dir.Length());
 	Plane p(pt, dir);
 	assert(!p.IsDegenerate());
 #ifdef MATH_AUTOMATIC_SSE
@@ -1524,6 +1525,14 @@ RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(PlanePlaneIntersectCase)
+{
+	Plane a(DIR_VEC(-9.31284958e-005f,0.896122217f,-0.44380734f).Normalized(),-63.5531387f);
+	Plane b(DIR_VEC(0.0797545761f,-0.9964259f,0.0185146127f).Normalized(),45.0416794f);
+	assert(a.Intersects(b));
+	assert(b.Intersects(a));
+}
+
 RANDOMIZED_TEST(PlanePlaneIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
@@ -1533,8 +1542,8 @@ RANDOMIZED_TEST(PlanePlaneIntersect)
 		a.d = b.d; // Avoid floating-point imprecision issues in the test: if plane normals are equal, make sure the planes are parallel.
 	if (a.normal.Equals(-b.normal))
 		a.d = -b.d;
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));

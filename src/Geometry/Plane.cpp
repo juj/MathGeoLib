@@ -49,7 +49,7 @@ MATH_BEGIN_NAMESPACE
 Plane::Plane(const vec &normal_, float d_)
 :normal(normal_), d(d_)
 {
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 }
 
 Plane::Plane(const vec &v1, const vec &v2, const vec &v3)
@@ -101,7 +101,7 @@ void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 void Plane::Set(const vec &point, const vec &normal_)
 {
 	normal = normal_;
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	d = point.Dot(normal);
 
 #ifdef MATH_ASSERT_CORRECTNESS
@@ -278,7 +278,7 @@ vec Plane::Mirror(const vec &point) const
 #ifdef MATH_ASSERT_CORRECTNESS
 	float signedDistance = SignedDistance(point);
 #endif
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	vec reflected = point - 2.f * (point.Dot(normal) - d) * normal;
 	mathassert(EqualAbs(signedDistance, -SignedDistance(reflected), 1e-2f));
 	mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));

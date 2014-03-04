@@ -399,7 +399,7 @@ float float2::PerpDot(const float2 &rhs) const
 
 float2 float2::Reflect(const float2 &normal) const
 {
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	return 2.f * this->ProjectToNorm(normal) - *this;
 }
 

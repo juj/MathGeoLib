@@ -840,14 +840,14 @@ float4 float4::RandomPerpendicular(LCG &rng) const
 
 float4 float4::Reflect3(const float3 &normal) const
 {
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	assume(EqualAbs(w, 0));
 	return 2.f * this->ProjectToNorm3(normal) - *this;
 }
 
 float4 float4::Reflect(const float4 &normal) const
 {
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	assume(EqualAbs(w, 0));
 	return 2.f * this->ProjectToNorm(normal) - *this;
 }
