@@ -271,6 +271,14 @@ float LineSegment::Distance(const vec &point, float &d) const
 	return closestPoint.Distance(point);
 }
 
+float LineSegment::DistanceSq(const vec &point) const
+{
+	float d;
+	/// See Christer Ericson's Real-Time Collision Detection, p.130.
+	vec closestPoint = ClosestPoint(point, d);
+	return closestPoint.DistanceSq(point);
+}
+
 float LineSegment::Distance(const Ray &other, float &d, float &d2) const
 {
 	ClosestPoint(other, d, d2);
@@ -288,6 +296,13 @@ float LineSegment::Distance(const LineSegment &other, float &d, float &d2) const
 {
 	ClosestPoint(other, d, d2);
 	return GetPoint(d).Distance(other.GetPoint(d2));
+}
+
+float LineSegment::DistanceSq(const LineSegment &other) const
+{
+	float d, d2;
+	ClosestPoint(other, d, d2);
+	return GetPoint(d).DistanceSq(other.GetPoint(d2));
 }
 
 float LineSegment::Distance(const Plane &other) const

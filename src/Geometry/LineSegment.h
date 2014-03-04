@@ -187,6 +187,9 @@ public:
 	float Distance(const Sphere &other) const;
 	float Distance(const Capsule &other) const;
 
+	float DistanceSq(const vec &point) const;
+	float DistanceSq(const LineSegment &other) const;
+
 	/// Tests whether this line segment and the given object intersect.	
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true. (for example, if this line segment is contained inside a sphere)

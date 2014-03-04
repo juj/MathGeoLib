@@ -35,6 +35,7 @@
 #include "Circle.h"
 #include "Triangle.h"
 #include "../Algorithm/Random/LCG.h"
+#include "../Algorithm/GJK.h"
 #include "../Math/assume.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -398,26 +399,26 @@ bool Capsule::Intersects(const Plane &plane) const
 
 bool Capsule::Intersects(const AABB &aabb) const
 {
-	return Intersects(aabb.ToPolyhedron());
+	return GJKIntersect(*this, aabb);
 }
 
 bool Capsule::Intersects(const OBB &obb) const
 {
-	return Intersects(obb.ToPolyhedron());
+	return GJKIntersect(*this, obb);
 }
 
 /// [groupSyntax]
 bool Capsule::Intersects(const Sphere &sphere) const
 {
-	///@todo Optimize to avoid square roots.
-	return l.Distance(sphere.pos) <= r + sphere.r;
+	float R = r + sphere.r;
+	return l.DistanceSq(sphere.pos) <= R*R;
 }
 
 /// [groupSyntax]
 bool Capsule::Intersects(const Capsule &capsule) const
 {
-	///@todo Optimize to avoid square roots.
-	return l.Distance(capsule.l) <= r + capsule.r;
+	float R = r + capsule.r;
+	return l.DistanceSq(capsule.l) <= R*R;
 }
 
 bool Capsule::Intersects(const Triangle &triangle) const
