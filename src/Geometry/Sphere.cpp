@@ -670,6 +670,8 @@ struct PointWithDistance
 	bool operator <(const PointWithDistance &rhs) const { return d < rhs.d; }
 };
 
+// Encloses n points into the Sphere s, in the order of farthest first, in order to
+// generate the tightest resulting enclosure.
 void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
 {
 	std::vector<PointWithDistance> corners;
@@ -687,6 +689,8 @@ void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
 		s.Enclose(corners[i].pt);
 }
 
+// Optimize/reimplement the above function in the case when enclosing geometric objects where the number of 
+// points to enclose is fixed at compile-time. This avoids dynamic memory allocation.
 template<typename T, int n>
 void Sphere_Enclose(Sphere &s, const T &obj)
 {
