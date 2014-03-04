@@ -26,3 +26,13 @@ UNIQUE_TEST(Polygon_collinear_points_Plane)
 	for(size_t i = 0; i < poly.p.size(); ++i)
 		assert(plane.Contains(poly.p[i]));
 }
+
+UNIQUE_TEST(Polygon_IsPlanarCase)
+{
+	Polygon p;
+	p.p.push_back(POINT_VEC(0.001175f, 0.f, 0.f));
+	p.p.push_back(POINT_VEC(0.f,       0.f, 0.f));
+	p.p.push_back(POINT_VEC(0.f,       0.f, 1.f));
+	p.p.push_back(POINT_VEC(0.001175f, 0.f, 1.f));
+	assert(p.IsPlanar());
+}
