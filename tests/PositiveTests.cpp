@@ -190,23 +190,17 @@ Plane RandomPlaneContainingPoint(const vec &pt)
 
 Triangle RandomTriangleContainingPoint(const vec &pt)
 {
-	Plane p = RandomPlaneContainingPoint(pt);
-	vec a = pt;
-	float f1 = rng.Float(-SCALE, SCALE);
-	float f2 = rng.Float(-SCALE, SCALE);
-	float f3 = rng.Float(-SCALE, SCALE);
-	float f4 = rng.Float(-SCALE, SCALE);
-	vec b = p.Point(f1, f2);
-	vec c = p.Point(f3, f4);
-	Triangle t(a,b,c);
-	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
-
-	vec d = t.RandomPointInside(rng);
-	assert3(t.Contains(d), t.SerializeToCodeString(), d.SerializeToCodeString(), t.Distance(d));
-	d = d - t.a;
-	t.a -= d;
-	t.b -= d;
-	t.c -= d;
+	Triangle t;
+	t.a = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	t.b = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	t.c = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec p = t.RandomPointInside(rng);
+	t.a -= p;
+	t.b -= p;
+	t.c -= p;
+	t.a += pt;
+	t.b += pt;
+	t.c += pt;
 
 	assert1(t.IsFinite(), t);
 	assert1(!t.IsDegenerate(), t);
