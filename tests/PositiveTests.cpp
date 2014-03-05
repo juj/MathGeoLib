@@ -1468,7 +1468,6 @@ UNIQUE_TEST(TriangleLineSegmentIntersectCase)
 
 	assert(a.Intersects(b));
 	vec cp = a.ClosestPoint(b);
-	Plane p = a.PlaneCCW();
 	assert(a.Contains(cp));
 //	assert(b.Contains(cp));
 }
