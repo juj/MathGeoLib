@@ -161,13 +161,17 @@ TEST(CXX11StdFinite)
 #if !defined(EMSCRIPTEN)
 struct U80
 {
-	u8 data[16];
+	union
+	{
+		u8 data[16];
+		long double ld;
+	};
 
 	explicit U80(long double d)
 	{
+		ld = d;
 		assert(sizeof(long double) <= 16);
-		memset(data, 0, sizeof(data));
-		memcpy(data, &d, sizeof(d));
+		assert(sizeof(d) <= 16);
 	}
 
 	std::string ToString() const
