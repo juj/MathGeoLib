@@ -169,6 +169,8 @@ struct U80
 
 	explicit U80(long double d)
 	{
+		for(int i = 0; i < 16; ++i)
+			data[i] = 0;
 		ld = d;
 		assert(sizeof(long double) <= 16);
 		assert(sizeof(d) <= 16);
