@@ -6,6 +6,11 @@ if (WIN32 AND IS_GCC_LIKE)
 	add_definitions(-DWIN32)
 endif()
 
+# Add the global _DEBUG flag from WIN32 platform to all others, which is universally used in MGL to
+# perform debug-mode-specific compilation.
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+
 if (MINGW)
 	set(CMAKE_C_FLAGS_RELEASE   "-O3")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
