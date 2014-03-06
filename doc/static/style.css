@@ -301,3 +301,9 @@ dt,
     color: #0060FF;
     font-weight: bold;
 }
+
+.underline_on_hover {
+  text-decoration: none;
+}
+
+.underline_on_hover:hover { text-decoration: underline; } 
