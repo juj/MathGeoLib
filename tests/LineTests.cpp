@@ -11,6 +11,130 @@ Line RandomLineContainingPoint(const vec &pt);
 Ray RandomRayContainingPoint(const vec &pt);
 LineSegment RandomLineSegmentContainingPoint(const vec &pt);
 
+RANDOMIZED_TEST(ParallelLineLineClosestPoint)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Line a = RandomLineContainingPoint(pt);
+	Line b = a;
+	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	b.pos += displacement;
+	if (rng.Int()%2) b.dir = -b.dir;
+	float d, d2;
+	vec closestPointA = a.ClosestPoint(b, d, d2);
+	vec closestPointB = b.GetPoint(d2);
+	vec perpDistance = displacement - displacement.ProjectTo(a.dir);
+	assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
+}
+
+RANDOMIZED_TEST(ParallelLineRayClosestPoint)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Line a = RandomLineContainingPoint(pt);
+	Ray b;
+	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	b.pos = a.pos + displacement;
+	b.dir = a.dir;
+	if (rng.Int()%2) b.dir = -b.dir;
+	float d, d2;
+	vec closestPointA = a.ClosestPoint(b, d, d2);
+	vec closestPointB = b.GetPoint(d2);
+	vec perpDistance = displacement - displacement.ProjectTo(a.dir);
+	assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
+}
+
+RANDOMIZED_TEST(ParallelLineLineSegmentClosestPoint)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Line a = RandomLineContainingPoint(pt);
+	LineSegment b;
+	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	b.a = a.pos + displacement;
+	b.b = b.a + rng.Float(-SCALE, SCALE) * a.dir;
+
+	float d, d2;
+	vec closestPointA = a.ClosestPoint(b, d, d2);
+	vec closestPointB = b.GetPoint(d2);
+	vec perpDistance = displacement - displacement.ProjectTo(a.dir);
+	assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
+}
+
+RANDOMIZED_TEST(ParallelRayRayClosestPoint)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Ray a = RandomRayContainingPoint(pt);
+	Ray b = a;
+	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	b.pos += displacement;
+	if (rng.Int()%2) b.dir = -b.dir;
+	float d, d2;
+	vec closestPointA = a.ClosestPoint(b, d, d2);
+	vec closestPointB = b.GetPoint(d2);
+	float cpd = closestPointA.Distance(closestPointB);
+	assert(cpd <= displacement.Length()+1e-4f);
+
+	float t = a.pos.Distance(b.pos);
+	assert(cpd <= t+1e-4f);
+}
+
+RANDOMIZED_TEST(ParallelRayLineSegmentClosestPoint)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Ray a = RandomRayContainingPoint(pt);
+	LineSegment b;
+	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	b.a = a.pos + displacement;
+	vec dir = rng.Float(1e-3f, SCALE) * a.dir;
+	if (rng.Int()%2) dir = -dir;
+	b.b = b.a + dir;
+
+	float d, d2;
+	vec closestPointA = a.ClosestPoint(b, d, d2);
+	vec closestPointB = b.GetPoint(d2);
+	float cpd = closestPointA.Distance(closestPointB);
+	assert(cpd <= displacement.Length()+1e-4f);
+
+	float t1 = a.pos.Distance(b.a);
+	float t2 = a.pos.Distance(b.b);
+	assert(cpd <= t1+1e-4f);
+	assert(cpd <= t2+1e-4f);
+}
+
+RANDOMIZED_TEST(ParallelLineSegmentLineSegmentClosestPoint)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	LineSegment a = RandomLineSegmentContainingPoint(pt);
+	LineSegment b;
+	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	b.a = a.a + displacement;
+	if (rng.Int()%2)
+	{
+		vec dir = (b.a - a.a).ScaledToLength(rng.Float(1e-3f, SCALE));
+		if (rng.Int()%2) dir = -dir;
+		b.b = b.a + dir;
+	}
+	else
+	{
+		b.b = a.b + displacement;
+	}
+	if (rng.Int()%2)
+		std::swap(b.a, b.b);
+
+	float d, d2;
+	vec closestPointA = a.ClosestPoint(b, d, d2);
+	vec closestPointB = b.GetPoint(d2);
+	float cpd = closestPointA.Distance(closestPointB);
+	assert(cpd <= displacement.Length()+1e-4f);
+
+	float t1 = a.a.Distance(b.a);
+	float t2 = a.a.Distance(b.b);
+	float t3 = a.b.Distance(b.a);
+	float t4 = a.b.Distance(b.b);
+	assert(cpd <= t1+1e-4f);
+	assert(cpd <= t2+1e-4f);
+	assert(cpd <= t3+1e-4f);
+	assert(cpd <= t4+1e-4f);
+}
+
 RANDOMIZED_TEST(LineLineClosestPoint)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));

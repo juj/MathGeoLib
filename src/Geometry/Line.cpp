@@ -55,13 +55,20 @@ MATH_BEGIN_NAMESPACE
 	@see ClosestPoint(), Distance(). */
 void Line::ClosestPointLineLine(const vec &v0, const vec &v10, const vec &v2, const vec &v32, float &d, float &d2)
 {
+	assume(!v10.IsZero());
+	assume(!v32.IsZero());
 	vec v02 = v0 - v2;
 	float d0232 = v02.Dot(v32);
 	float d3210 = v32.Dot(v10);
 	float d3232 = v32.Dot(v32);
+	assume(d3232 != 0.f); // Don't call with a zero direction vector.
 	float d0210 = v02.Dot(v10);
 	float d1010 = v10.Dot(v10);
-	d = (d0232*d3210 - d0210*d3232) / (d1010*d3232 - d3210*d3210);
+	float denom = d1010*d3232 - d3210*d3210;
+	if (denom != 0.f)
+		d = (d0232*d3210 - d0210*d3232) / denom;
+	else
+		d = 0.f;
 	d2 = (d0232 + d * d3210) / d3232;
 }
 
