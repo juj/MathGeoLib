@@ -1413,7 +1413,7 @@ RANDOMIZED_TEST(PolygonTriangleIntersect)
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
-#if 0 ///TODO
+
 UNIQUE_TEST(PolygonPolygonIntersectCase)
 {
 	for(int i = 0; i < 2; ++i)
@@ -1430,13 +1430,13 @@ UNIQUE_TEST(PolygonPolygonIntersectCase)
 					POINT_VEC(   0, 1.f, 1e-6f));
 			break;
 		case 1:
-			t1 = Triangle(POINT_VEC(-18.8999062,7.59376526,25.2815018),
-				POINT_VEC(12.0017948,26.6920624,75.2815018),
-				POINT_VEC(-49.801609,26.6920624,75.2815018));
+			t1 = Triangle(POINT_VEC(-18.8999062f,7.59376526f,25.2815018f),
+				POINT_VEC(12.0017948f,26.6920624f,75.2815018f),
+				POINT_VEC(-49.801609f,26.6920624f,75.2815018f));
 
-			t2 = Triangle(POINT_VEC(-44.9369545,11.4193268,35.2969398),
-				POINT_VEC(-14.0352535,30.5176239,85.296936),
-				POINT_VEC(-75.8386536,30.5176239,85.296936));
+			t2 = Triangle(POINT_VEC(-44.9369545f,11.4193268f,35.2969398f),
+				POINT_VEC(-14.0352535f,30.5176239f,85.296936f),
+				POINT_VEC(-75.8386536f,30.5176239f,85.296936f));
 			break;
 		}
 
@@ -1453,7 +1453,36 @@ UNIQUE_TEST(PolygonPolygonIntersectCase)
 		assert(a.Intersects(b));
 	}
 }
-#endif
+
+UNIQUE_TEST(PolygonPolygonIntersectCase2)
+{
+	Polygon a;
+	a.p.push_back(POINT_VEC(40.6926041f,-36.1174965f, 0.f));
+	a.p.push_back(POINT_VEC(40.6926041f,-9.93014526f, 0.f));
+	a.p.push_back(POINT_VEC(43.8726807f,-9.93014526f, 0.f));
+	a.p.push_back(POINT_VEC(43.8726807f,-36.1174965f, 0.f));
+
+	Polygon b;
+	b.p.push_back(POINT_VEC(70.9185791f,-46.9780273f, 0.f));
+	b.p.push_back(POINT_VEC(70.9185791f, 53.0219727f, 0.f));
+	b.p.push_back(POINT_VEC(-29.0814209f,53.0219727f, 0.f));
+	b.p.push_back(POINT_VEC(-29.0814209f,-46.9780273f, 0.f));
+
+	assert(a.Intersects(b));
+}
+
+UNIQUE_TEST(PolygonContainsPointCase)
+{
+	Polygon a;
+	a.p.push_back(POINT_VEC(-27.6082363,-17.8272648,116.150414));
+	a.p.push_back(POINT_VEC(15.0997639,-67.2276688,12.971736));
+	a.p.push_back(POINT_VEC(15.062994,-67.2823105,12.9826784));
+	a.p.push_back(POINT_VEC(-27.6450062,-17.8819065,116.161354));
+	
+	vec pt = POINT_VEC(12.1201611,-63.8624725,20.105011);
+	assert(a.Contains(pt));
+}
+
 RANDOMIZED_TEST(PolygonPolygonIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));

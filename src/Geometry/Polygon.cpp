@@ -505,14 +505,93 @@ bool Polygon::Intersects(const OBB &obb) const
 	return obb.Intersects(*this);
 }
 
-bool Polygon::Intersects(const Triangle &triangle) const
+template<typename T /* = Polygon or Triangle */>
+bool Polygon_Intersects_Polygon(const Polygon &poly, const T &other, float polygonThickness)
 {
-	return ToPolyhedron().Intersects(triangle);
+	Plane plane = poly.PlaneCCW();
+	Plane plane2 = other.PlaneCCW();
+
+	if (!plane.normal.Cross(plane2.normal).IsZero())
+	{
+		// General strategy: If two polygon/triangle objects intersect, one 
+		// of them must have an edge that passes through the interior of the other object.
+		// Test each edge of the this object against intersection of the interior of the other polygon,
+		// and vice versa.
+		for(int i = 0; i < other.NumEdges(); ++i)
+		{
+			LineSegment lineSegment = other.Edge(i);
+			float t;
+			bool intersects = Plane::IntersectLinePlane(plane.normal, plane.d, lineSegment.a, lineSegment.b - lineSegment.a, t);
+			if (!intersects || t < 0.f || t > 1.f)
+				continue;
+
+			if (poly.Contains(lineSegment.GetPoint(t)))
+				return true;
+		}
+	
+		for(int i = 0; i < poly.NumEdges(); ++i)
+		{
+			LineSegment lineSegment = poly.Edge(i);
+			float t;
+			bool intersects = Plane::IntersectLinePlane(plane2.normal, plane2.d, lineSegment.a, lineSegment.b - lineSegment.a, t);
+			if (!intersects || t < 0.f || t > 1.f)
+				continue;
+
+			if (other.Contains(lineSegment.GetPoint(t)))
+				return true;
+		}
+		return false;
+	}
+	else // The two polygons are coplanar. Perform the intersection test in 2D.
+	{
+		float poly0Pos = plane.normal.Dot(poly.Vertex(0));
+		float poly1Pos = plane.normal.Dot(other.Vertex(0));
+		if (Abs(poly0Pos-poly1Pos) > polygonThickness)
+			return false;
+
+		if (other.Contains(poly.Vertex(0), FLOAT_INF) || poly.Contains(other.Vertex(0), FLOAT_INF))
+			return true;
+
+		vec basisU = plane.normal.Perpendicular();
+		vec basisV = plane.normal.AnotherPerpendicular();
+
+		vec pivot = poly.Vertex(0);
+		vec pt = poly.Vertex(poly.NumVertices()-1)-pivot;
+		float2 a1 = float2(basisU.Dot(pt), basisV.Dot(pt));
+		for(int i = 0; i < poly.NumVertices(); ++i)
+		{
+			pt = poly.Vertex(i)-pivot;
+			float2 a2 = float2(basisU.Dot(pt), basisV.Dot(pt));
+
+			pt = other.Vertex(other.NumVertices()-1)-pivot;
+			float2 b1 = float2(basisU.Dot(pt), basisV.Dot(pt));
+			for(int j = 0; j < other.NumVertices(); ++j)
+			{
+				pt = other.Vertex(j)-pivot;
+				float2 b2 = float2(basisU.Dot(pt), basisV.Dot(pt));
+
+				float s, t;
+				if (LineSegment2DLineSegment2DIntersect(a1, a2-a1, b1, b2-b1, s, t))
+					return true;
+
+				b1 = b2;
+			}
+			a1 = a2;
+		}
+
+		return false;
+	}
 }
 
-bool Polygon::Intersects(const Polygon &polygon) const
+
+bool Polygon::Intersects(const Triangle &triangle, float polygonThickness) const
 {
-	return ToPolyhedron().Intersects(polygon);
+	return Polygon_Intersects_Polygon(*this, triangle, polygonThickness);
+}
+
+bool Polygon::Intersects(const Polygon &polygon, float polygonThickness) const
+{
+	return Polygon_Intersects_Polygon(*this, polygon, polygonThickness);
 }
 
 bool Polygon::Intersects(const Frustum &frustum) const
@@ -921,7 +1000,7 @@ bool Polygon::Equals(const Polygon &other) const
 		return false;
 
 	for(size_t i = 0; i < p.size(); ++i)
-		if (!Vertex(i).Equals(other.Vertex(i)))
+		if (!Vertex((int)i).Equals(other.Vertex((int)i)))
 			return false;
 
 	return true;
@@ -933,7 +1012,7 @@ bool Polygon::BitEquals(const Polygon &other) const
 		return false;
 
 	for(size_t i = 0; i < p.size(); ++i)
-		if (!Vertex(i).BitEquals(other.Vertex(i)))
+		if (!Vertex((int)i).BitEquals(other.Vertex((int)i)))
 			return false;
 
 	return true;

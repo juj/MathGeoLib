@@ -415,4 +415,6 @@ Q_DECLARE_METATYPE(Triangle*)
 std::ostream &operator <<(std::ostream &o, const Triangle &triangle);
 #endif
 
+bool LineSegment2DLineSegment2DIntersect(const float2 &p0, const float2 &dir0, const float2 &p1, const float2 &dir1, float &s, float &t);
+
 MATH_END_NAMESPACE
