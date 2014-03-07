@@ -515,59 +515,160 @@ static void FindIntersectingLineSegments(const Triangle &t, float da, float db, 
 	}
 }
 
+int IntervalIntersection(float u0, float u1, float v0, float v1, float &s, float &t)
+{
+	if (u1 < v0 || u0 > v1)
+		return 0;
+
+	if (u1 > v0)
+	{
+		if (u0 < v1)
+		{
+			s = Max(u0, v0);
+			t = Min(u1, v1);
+			return 2;
+		}
+		else // u0 == v1
+		{
+			s = u0;
+			return 1;
+		}
+	}
+	else
+	{
+		// u1 == v0
+		s = u1;
+		return 1;
+	}
+}
+
+/// 2D line segment-line segment intersection from Geometric Tools for Computer Graphics, pp. 807-813, by Schneider and Eberly.
+bool LineSegment2DLineSegment2DIntersect(const float2 &p0, const float2 &dir0, const float2 &p1, const float2 &dir1, float &s, float &t)
+{
+	float2 e = p1 - p0;
+	float cross = dir0.PerpDot(dir1);
+	float sqrCross = cross*cross;
+	float sqrLen0 = dir0.LengthSq();
+	float sqrLen1 = dir1.LengthSq();
+	const float sqrEpsilon = 1e-8f;
+	if (sqrCross > sqrEpsilon * sqrLen0 * sqrLen1)
+	{
+		// The lines are not parallel
+		s = e.PerpDot(dir1) / cross;
+		if (s < 0.f || s > 1.f)
+			return false;
+
+		t = e.PerpDot(dir0) / cross;
+		if (t < 0.f || t > 1.f)
+			return false;
+
+		// The intersection point is p0 + s * dir0;
+		return true;
+	}
+
+	// The line segments are parallel
+	float sqrLenE = e.LengthSq();
+	cross = e.PerpDot(dir0);
+	sqrCross = cross*cross;
+	if (sqrCross > sqrEpsilon * sqrLen0 * sqrLenE)
+	{
+		// The lines are at a positive distance, no intersection.
+		return false;
+	}
+
+	// The line segments are along the same line. Do an overlap test.
+	float s0 = Dot(dir0, e) / sqrLen0;
+	float s1 = s0 + Dot(dir0, dir1) / sqrLen0;
+	float smin = Min(s0, s1);
+	float smax = Max(s0, s1);
+
+	int nIntersections = IntervalIntersection(0.f, 1.f, smin, smax, s, t);
+	return nIntersections > 0.f;
+}
+
 /// [groupSyntax]
 /** The Triangle-Triangle test implementation is based on pseudo-code from Tomas M&ouml;ller's
 	"A Fast Triangle-Triangle Intersection Test": http://jgt.akpeters.com/papers/Moller97/.
 	See also Christer Ericson's Real-Time Collision Detection, p. 172. */
 bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 {
+	const float triangleThickness = 1e-4f;
 	// Is the triangle t2 completely on one side of the plane of this triangle?
 	Plane p1 = this->PlaneCCW();
-	float t2da = p1.SignedDistance(t2.a);
-	float t2db = p1.SignedDistance(t2.b);
-	float t2dc = p1.SignedDistance(t2.c);
-	if (t2da*t2db > 0.f && t2da*t2dc > 0.f)
-		return false;
-	// Is this triangle completely on one side of the plane of the triangle t2?
 	Plane p2 = t2.PlaneCCW();
-	float t1da = p2.SignedDistance(this->a);
-	float t1db = p2.SignedDistance(this->b);
-	float t1dc = p2.SignedDistance(this->c);
-	if (t1da*t1db > 0.f && t1da*t1dc > 0.f)
-		return false;
-
-	// Find the intersection line of the two planes.
-	Line l;
-	bool success = p1.Intersects(p2, &l);
-	assume(success); // We already determined the two triangles have intersecting planes, so this should always succeed.
-	if (!success)
-		return false;
-
-	// Find the two line segments of both triangles which straddle the intersection line.
-	LineSegment l1a, l1b;
-	LineSegment l2a, l2b;
-	FindIntersectingLineSegments(*this, t1da, t1db, t1dc, l1a, l1b);
-	FindIntersectingLineSegments(t2, t2da, t2db, t2dc, l2a, l2b);
-
-	// Find the projection intervals on the intersection line.
-	float d1a, d1b, d2a, d2b;
-	l.Distance(l1a, d1a);
-	l.Distance(l1b, d1b);
-	l.Distance(l2a, d2a);
-	l.Distance(l2b, d2b);
-	if (d1a > d1b)
-		Swap(d1a, d1b);
-	if (d2a > d2b)
-		Swap(d2a, d2b);
-	float rStart = Max(d1a, d2a);
-	float rEnd = Min(d1b, d2b);
-	if (rStart <= rEnd)
+	if (!p1.normal.Cross(p2.normal).IsZero())
 	{
-		if (outLine)
-			*outLine = LineSegment(l.GetPoint(rStart), l.GetPoint(rEnd));
-		return true;
+		float t2da = p1.SignedDistance(t2.a);
+		float t2db = p1.SignedDistance(t2.b);
+		float t2dc = p1.SignedDistance(t2.c);
+		float t2min = Min(Min(t2da, t2db), t2dc);
+		float t2max = Max(Max(t2da, t2db), t2dc);
+		if (t2max < -triangleThickness || t2min > triangleThickness)
+			return false;
+		// Is this triangle completely on one side of the plane of the triangle t2?
+		float t1da = p2.SignedDistance(this->a);
+		float t1db = p2.SignedDistance(this->b);
+		float t1dc = p2.SignedDistance(this->c);
+		float t1min = Min(Min(t1da, t1db), t1dc);
+		float t1max = Max(Max(t1da, t1db), t1dc);
+		if (t1max < -triangleThickness || t1min > triangleThickness)
+			return false;
+
+		// Find the intersection line of the two planes.
+		Line l;
+		bool success = p1.Intersects(p2, &l);
+		assume(success); // We already determined the two triangles have intersecting planes, so this should always succeed.
+		if (!success)
+			return false;
+
+		// Find the two line segments of both triangles which straddle the intersection line.
+		LineSegment l1a, l1b;
+		LineSegment l2a, l2b;
+		FindIntersectingLineSegments(*this, t1da, t1db, t1dc, l1a, l1b);
+		FindIntersectingLineSegments(t2, t2da, t2db, t2dc, l2a, l2b);
+
+		// Find the projection intervals on the intersection line.
+		float d1a, d1b, d2a, d2b;
+		l.Distance(l1a, d1a);
+		l.Distance(l1b, d1b);
+		l.Distance(l2a, d2a);
+		l.Distance(l2b, d2b);
+		if (d1a > d1b)
+			Swap(d1a, d1b);
+		if (d2a > d2b)
+			Swap(d2a, d2b);
+		float rStart = Max(d1a, d2a);
+		float rEnd = Min(d1b, d2b);
+		if (rStart <= rEnd)
+		{
+			if (outLine)
+				*outLine = LineSegment(l.GetPoint(rStart), l.GetPoint(rEnd));
+			return true;
+		}
+		return false;
 	}
-	return false;
+	else // The two triangles lie in the same plane. Perform the intersection test in 2D.
+	{
+		vec basisU = p1.normal.Perpendicular();
+		vec basisV = p1.normal.AnotherPerpendicular();
+		float2 a1 = float2::zero;
+		float2 a2 = float2(basisU.Dot(b-a), basisV.Dot(b-a));
+		float2 a3 = float2(basisU.Dot(c-a), basisV.Dot(c-a));
+		float2 b1 = float2(basisU.Dot(t2.a-a), basisV.Dot(t2.a-a));
+		float2 b2 = float2(basisU.Dot(t2.b-a), basisV.Dot(t2.b-a));
+		float2 b3 = float2(basisU.Dot(t2.c-a), basisV.Dot(t2.c-a));
+		float s, t;
+		if (LineSegment2DLineSegment2DIntersect(a1, a2-a1, b1, b2-b1, s, t)) { float2 pt = s*(a2-a1); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a1, a2-a1, b2, b3-b2, s, t)) { float2 pt = s*(a2-a1); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a1, a2-a1, b3, b1-b3, s, t)) { float2 pt = s*(a2-a1); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a2, a3-a2, b1, b2-b1, s, t)) { float2 pt = s*(a3-a2); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a2, a3-a2, b2, b3-b2, s, t)) { float2 pt = s*(a3-a2); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a2, a3-a2, b3, b1-b3, s, t)) { float2 pt = s*(a3-a2); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a3, a1-a3, b1, b2-b1, s, t)) { float2 pt = s*(a1-a3); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a3, a1-a3, b2, b3-b2, s, t)) { float2 pt = s*(a1-a3); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		if (LineSegment2DLineSegment2DIntersect(a3, a1-a3, b3, b1-b3, s, t)) { float2 pt = s*(a1-a3); vec pt3d = a+pt.x*basisU+pt.y*basisV; *outLine = LineSegment(pt3d, pt3d); return true; }
+		return false;
+	}
 }
 
 bool RangesOverlap(float start1, float end1, float start2, float end2)

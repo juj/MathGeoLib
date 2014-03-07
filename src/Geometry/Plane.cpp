@@ -615,7 +615,7 @@ bool Plane::IntersectLinePlane(const vec &planeNormal, float planeD, const vec &
 	is embedded on the plane, and infinitely many intersections occur. */
 
 	float denom = Dot(planeNormal, lineDir);
-	if (EqualAbs(denom, 0.f))
+	if (denom == 0.f)
 	{
 		t = 0.f;
 		return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-2f);
