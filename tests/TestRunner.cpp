@@ -328,17 +328,19 @@ void PrintTestRunSummary()
 		LOGW("The following tests had some failures:");
 		std::vector<Test> &tests = Tests();
 		int totalFailureCount = 0;
+		int totalPassCount = 0;
 		for (size_t i = 0; i < tests.size(); ++i)
 		{
 			Test &t = tests[i];
-			if (t.numFails > 0 && t.numPasses > 0)
+			if (t.numFails > 0 && tests[i].result != TestFailed)
 			{
 				float successRate = (t.numPasses + t.numFails > 0) ? (float)t.numPasses * 100.f / (t.numPasses + t.numFails) : 0.f;
 				LOGW("   %s: %d failures, %d passes (%.2f%% success rate).", tests[i].name.c_str(), tests[i].numFails, tests[i].numPasses, successRate);
 				totalFailureCount += t.numFails;
 			}
+			totalPassCount += t.numPasses;
 		}
-		LOGW("Total failure count: %d", totalFailureCount);
+		LOGW("Total failure count: %d/%d (%.2f%% of all iterations)", totalFailureCount, totalFailureCount + totalPassCount, totalFailureCount * 100.0 / (totalFailureCount+totalPassCount));
 	}
 }
 
