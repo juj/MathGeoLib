@@ -394,7 +394,7 @@ float2 float2::Perp() const
 
 float float2::PerpDot(const float2 &rhs) const
 {
-	return -y * rhs.x + x * rhs.y;
+	return x * rhs.y - y * rhs.x;
 }
 
 float2 float2::Reflect(const float2 &normal) const
