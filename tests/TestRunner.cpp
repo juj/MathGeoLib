@@ -340,7 +340,7 @@ void PrintTestRunSummary()
 			}
 			totalPassCount += t.numPasses;
 		}
-		LOGW("Total failure count: %d/%d (%.2f%% of all iterations)", totalFailureCount, totalFailureCount + totalPassCount, totalFailureCount * 100.0 / (totalFailureCount+totalPassCount));
+		LOGW("Total failure count: %d/%d (%f%% of all iterations)", totalFailureCount, totalFailureCount + totalPassCount, totalFailureCount * 100.0 / (totalFailureCount+totalPassCount));
 	}
 }
 
