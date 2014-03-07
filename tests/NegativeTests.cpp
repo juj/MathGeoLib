@@ -130,7 +130,7 @@ Line RandomLineInHalfspace(const Plane &plane)
 	vec dir = plane.normal.RandomPerpendicular(rng);
 	Line l(linePos, dir);
 	assert(l.IsFinite());
-	assert(!plane.Intersects(l));
+	assert2(!plane.Intersects(l), plane.SerializeToCodeString(), l.SerializeToCodeString());
 	assert(plane.SignedDistance(l) > 0.f);
 	return l;
 }
@@ -315,6 +315,13 @@ RANDOMIZED_TEST(AABBOBBNoIntersect)
 //	assert(!b.Contains(a.ClosestPoint(b)));
 //	assert(!a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
+}
+
+UNIQUE_TEST(AABBLineNoIntersectCase)
+{
+	Plane p(DIR_VEC(-0.72379446,0.652315021,-0.224959269),27.2405319);
+	Line l(POINT_VEC(-16.0996895,22.3687477,-5.59284782),DIR_VEC(-0.616314948,-0.757768512,-0.214342773));
+	assert(!p.Intersects(l));
 }
 
 RANDOMIZED_TEST(AABBLineNoIntersect)

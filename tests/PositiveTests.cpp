@@ -1474,13 +1474,13 @@ UNIQUE_TEST(PolygonPolygonIntersectCase2)
 UNIQUE_TEST(PolygonContainsPointCase)
 {
 	Polygon a;
-	a.p.push_back(POINT_VEC(-27.6082363,-17.8272648,116.150414));
-	a.p.push_back(POINT_VEC(15.0997639,-67.2276688,12.971736));
-	a.p.push_back(POINT_VEC(15.062994,-67.2823105,12.9826784));
-	a.p.push_back(POINT_VEC(-27.6450062,-17.8819065,116.161354));
+	a.p.push_back(POINT_VEC(-27.6082363f,-17.8272648f,116.150414f));
+	a.p.push_back(POINT_VEC(15.0997639f,-67.2276688f,12.971736f));
+	a.p.push_back(POINT_VEC(15.062994f,-67.2823105f,12.9826784f));
+	a.p.push_back(POINT_VEC(-27.6450062f,-17.8819065f,116.161354f));
 	
-	vec pt = POINT_VEC(12.1201611,-63.8624725,20.105011);
-	assert(a.Contains(pt));
+	vec pt = POINT_VEC(12.1201611f,-63.8624725f,20.105011f);
+	assert(a.Contains(pt, 1e-2f));
 }
 
 RANDOMIZED_TEST(PolygonPolygonIntersect)
