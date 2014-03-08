@@ -11,8 +11,8 @@ MATH_IGNORE_UNUSED_VARS_WARNING
 
 UNIQUE_TEST(TrickyAABBCapsuleNoIntersect)
 {
-	Capsule a(POINT_VEC(-37.3521881,-61.0987396,77.0996475), POINT_VEC(46.2122498,-61.2913399,15.9034805) ,53.990406);
-	AABB b(POINT_VEC(51.6529007,-28.0629959,65.9745636),POINT_VEC(59.8043518,-18.9434891,69.0897827));
+	Capsule a(POINT_VEC(-37.3521881f,-61.0987396f,77.0996475f), POINT_VEC(46.2122498f,-61.2913399f,15.9034805f) ,53.990406f);
+	AABB b(POINT_VEC(51.6529007f,-28.0629959f,65.9745636f),POINT_VEC(59.8043518f,-18.9434891f,69.0897827f));
 	for(int i = 0; i < 8; ++i)
 		LOGI("Distance: %f", a.Distance(b.CornerPoint(i)));
 	LOGI("D: %f", b.Distance(a.Centroid()));
@@ -51,24 +51,6 @@ UNIQUE_TEST(TrickyGJKCapsuleTriangleNoIntersect)
 	assert(!GJKIntersect(t, c));
 }
 */
-RANDOMIZED_TEST(GJKSphereSphereIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Sphere a = RandomSphereContainingPoint(pt, 10.f);
-	Sphere b = RandomSphereContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
-}
-
-RANDOMIZED_TEST(GJKSphereSphereNoIntersect)
-{
-	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
-	Sphere a = RandomSphereInHalfspace(p, 10.f);
-	p.ReverseNormal();
-	Sphere b = RandomSphereInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
-	assert(!GJKIntersect(b, a));
-}
 
 UNIQUE_TEST(TrickyGJKAABBAABBIntersect)
 {
@@ -78,88 +60,17 @@ UNIQUE_TEST(TrickyGJKAABBAABBIntersect)
 	assert(GJKIntersect(b, a));
 }
 
-RANDOMIZED_TEST(GJKAABBAABBIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	AABB a = RandomAABBContainingPoint(pt, 10.f);
-	AABB b = RandomAABBContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
-}
-
-RANDOMIZED_TEST(GJKAABBAABBNoIntersect)
-{
-	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
-
-	AABB a = RandomAABBInHalfspace(p, 10.f);
-	p.ReverseNormal();
-	AABB b = RandomAABBInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
-	assert(!GJKIntersect(b, a));
-}
-
 UNIQUE_TEST(GJKAABBSphereIntersectCase)
 {
-	AABB a(float4(37.1478767,-71.9611969,-51.1293259,1),float4(42.8975906,-67.3180618,-44.9161682,1));
-	Sphere b(float4(41.9271927,-71.1957016,-56.7100677,1),7.20756626);
+	AABB a(POINT_VEC(37.1478767f,-71.9611969f,-51.1293259f),POINT_VEC(42.8975906f,-67.3180618f,-44.9161682f));
+	Sphere b(POINT_VEC(41.9271927f,-71.1957016f,-56.7100677f),7.20756626f);
 	assert(GJKIntersect(a, b));
 }
 
 UNIQUE_TEST(GJKAABBSphereIntersectCase2)
 {
-	AABB a(float4(-6.17850494,-1.09283221,-85.2101898,1),float4(-3.21846271,-0.564386666,-84.2947693,1));
-	Sphere b(float4(-2.29130507,-1.87549007,-83.2377472,1),2.09292078);
-	assert(GJKIntersect(a, b));
-}
-
-RANDOMIZED_TEST(GJKAABBSphereIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	AABB a = RandomAABBContainingPoint(pt, 10.f);
-	Sphere b = RandomSphereContainingPoint(pt, 10.f);
-//	LOGI("%s", a.SerializeToCodeString().c_str());
-//	LOGI("%s", b.SerializeToCodeString().c_str());
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
-}
-
-RANDOMIZED_TEST(GJKAABBLineSegmentIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	AABB a = RandomAABBContainingPoint(pt, 10.f);
-	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
-}
-
-RANDOMIZED_TEST(GJKOBBLineSegmentIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
-}
-
-RANDOMIZED_TEST(GJKOBBTriangleIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
-}
-
-RANDOMIZED_TEST(GJKSphereCapsuleIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Sphere a = RandomSphereContainingPoint(pt, 10.f);
-	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
-}
-
-RANDOMIZED_TEST(GJKCapsuleLineSegmentIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Capsule a = RandomCapsuleContainingPoint(pt);
-	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	AABB a(POINT_VEC(-6.17850494f,-1.09283221f,-85.2101898f),POINT_VEC(-3.21846271f,-0.564386666f,-84.2947693f));
+	Sphere b(POINT_VEC(-2.29130507f,-1.87549007f,-83.2377472f),2.09292078f);
 	assert(GJKIntersect(a, b));
 }
 
@@ -174,12 +85,328 @@ RANDOMIZED_TEST(GJKAABBShereNoIntersect)
 	assert(!GJKIntersect(b, a));
 }
 
+RANDOMIZED_TEST(GJKAABBAABBIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	AABB b = RandomAABBContainingPoint(pt, 10.f);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBOBBIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	OBB b = RandomOBBContainingPoint(pt, 10.f);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBLineSegmentIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBSphereIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Sphere b = RandomSphereContainingPoint(pt, SCALE);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBCapsuleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Capsule b = RandomCapsuleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBTriangleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Triangle b = RandomTriangleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBFrustumIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	AABB a = RandomAABBContainingPoint(pt, 10.f);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBOBBIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	OBB b = RandomOBBContainingPoint(pt, 10.f);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBLineSegmentIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBSphereIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	Sphere b = RandomSphereContainingPoint(pt, SCALE);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBCapsuleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	Capsule b = RandomCapsuleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBTriangleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	Triangle b = RandomTriangleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBFrustumIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	OBB a = RandomOBBContainingPoint(pt, 10.f);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereSphereIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Sphere a = RandomSphereContainingPoint(pt, 10.f);
+	Sphere b = RandomSphereContainingPoint(pt, 10.f);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereLineSegmentIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Sphere a = RandomSphereContainingPoint(pt, 10.f);
+	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereCapsuleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Sphere a = RandomSphereContainingPoint(pt, 10.f);
+	Capsule b = RandomCapsuleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereTriangleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Sphere a = RandomSphereContainingPoint(pt, 10.f);
+	Triangle b = RandomTriangleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereFrustumIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Sphere a = RandomSphereContainingPoint(pt, 10.f);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumLineSegmentIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumCapsuleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	Capsule b = RandomCapsuleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumTriangleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	Triangle b = RandomTriangleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumFrustumIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKCapsuleLineSegmentIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Capsule a = RandomCapsuleContainingPoint(pt);
+	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKCapsuleCapsuleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Capsule a = RandomCapsuleContainingPoint(pt);
+	Capsule b = RandomCapsuleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKCapsuleTriangleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Capsule a = RandomCapsuleContainingPoint(pt);
+	Triangle b = RandomTriangleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKTriangleLineSegmentIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Triangle a = RandomTriangleContainingPoint(pt);
+	LineSegment b = RandomLineSegmentContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKTriangleTriangleIntersect)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Triangle a = RandomTriangleContainingPoint(pt);
+	Triangle b = RandomTriangleContainingPoint(pt);
+	assert(GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBAABBNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	AABB b = RandomAABBInHalfspace(p, 10.f);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBOBBNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	OBB b = RandomOBBInHalfspace(p, 10.f);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBLineSegmentNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBSphereNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Sphere b = RandomSphereInHalfspace(p, SCALE);
+	assert(!GJKIntersect(a, b));
+}
+
 RANDOMIZED_TEST(GJKAABBCapsuleNoIntersect)
 {
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBTriangleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKAABBFrustumNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	AABB a = RandomAABBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBOBBNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	OBB b = RandomOBBInHalfspace(p, 10.f);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBLineSegmentNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBSphereNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Sphere b = RandomSphereInHalfspace(p, SCALE);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBCapsuleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKOBBTriangleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	OBB a = RandomOBBInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
 	assert(!GJKIntersect(a, b));
 }
 
@@ -192,21 +419,128 @@ RANDOMIZED_TEST(GJKOBBFrustumNoIntersect)
 	assert(!GJKIntersect(a, b));
 }
 
-RANDOMIZED_TEST(GJKOBBOBBIntersect)
-{
-	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
-}
-
-RANDOMIZED_TEST(GJKOBBOBBNoIntersect)
+RANDOMIZED_TEST(GJKSphereSphereNoIntersect)
 {
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
-	OBB a = RandomOBBInHalfspace(p, 10.f);
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
-	OBB b = RandomOBBInHalfspace(p, 10.f);
+	Sphere b = RandomSphereInHalfspace(p, 10.f);
 	assert(!GJKIntersect(a, b));
-	assert(!GJKIntersect(b, a));
+}
+
+RANDOMIZED_TEST(GJKSphereLineSegmentNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereCapsuleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereTriangleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKSphereFrustumNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Sphere a = RandomSphereInHalfspace(p, 10.f);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumLineSegmentNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumCapsuleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumTriangleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKFrustumFrustumNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Frustum a = RandomFrustumInHalfspace(p);
+	p.ReverseNormal();
+	Frustum b = RandomFrustumInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKCapsuleLineSegmentNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKCapsuleCapsuleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Capsule b = RandomCapsuleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKCapsuleTriangleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Capsule a = RandomCapsuleInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKTriangleLineSegmentNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	LineSegment b = RandomLineSegmentInHalfspace(p);
+	assert(!GJKIntersect(a, b));
+}
+
+RANDOMIZED_TEST(GJKTriangleTriangleNoIntersect)
+{
+	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
+	Triangle a = RandomTriangleInHalfspace(p);
+	p.ReverseNormal();
+	Triangle b = RandomTriangleInHalfspace(p);
+	assert(!GJKIntersect(a, b));
 }

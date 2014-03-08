@@ -287,7 +287,7 @@ RANDOMIZED_TEST(AABBAABBNoIntersect)
 	AABB b = RandomAABBInHalfspace(p, 10.f);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -369,7 +369,7 @@ RANDOMIZED_TEST(AABBLineSegmentNoIntersect)
 	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -405,7 +405,7 @@ RANDOMIZED_TEST(AABBSphereNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -421,7 +421,7 @@ RANDOMIZED_TEST(AABBCapsuleNoIntersect)
 	Capsule b = RandomCapsuleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -439,7 +439,7 @@ RANDOMIZED_TEST(AABBTriangleNoIntersect)
 	Triangle b = RandomTriangleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -459,7 +459,7 @@ RANDOMIZED_TEST(AABBFrustumNoIntersect)
 	Frustum b = RandomFrustumInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -514,7 +514,7 @@ RANDOMIZED_TEST(OBBOBBNoIntersect)
 	OBB b = RandomOBBInHalfspace(p, 10.f);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -607,7 +607,7 @@ RANDOMIZED_TEST(OBBLineSegmentNoIntersect)
 	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -643,7 +643,7 @@ RANDOMIZED_TEST(OBBSphereNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 ////	assert(!b.Contains(a.ClosestPoint(b)));
@@ -659,7 +659,7 @@ RANDOMIZED_TEST(OBBCapsuleNoIntersect)
 	Capsule b = RandomCapsuleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -677,7 +677,7 @@ RANDOMIZED_TEST(OBBTriangleNoIntersect)
 	Triangle b = RandomTriangleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -697,7 +697,7 @@ RANDOMIZED_TEST(OBBFrustumNoIntersect)
 	Frustum b = RandomFrustumInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -755,7 +755,7 @@ RANDOMIZED_TEST(SphereSphereNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -805,7 +805,7 @@ RANDOMIZED_TEST(SphereLineSegmentNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -839,7 +839,7 @@ RANDOMIZED_TEST(SphereCapsuleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -857,7 +857,7 @@ RANDOMIZED_TEST(SphereTriangleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -873,7 +873,7 @@ RANDOMIZED_TEST(SphereFrustumNoIntersect)
 	Frustum b = RandomFrustumInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -958,7 +958,7 @@ RANDOMIZED_TEST(FrustumLineSegmentNoIntersect)
 	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -992,7 +992,7 @@ RANDOMIZED_TEST(FrustumCapsuleNoIntersect)
 	Capsule b = RandomCapsuleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1010,7 +1010,7 @@ RANDOMIZED_TEST(FrustumTriangleNoIntersect)
 	Triangle b = RandomTriangleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -1030,7 +1030,7 @@ RANDOMIZED_TEST(FrustumFrustumNoIntersect)
 	Frustum b = RandomFrustumInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -1181,7 +1181,7 @@ RANDOMIZED_TEST(CapsuleLineSegmentNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -1215,7 +1215,7 @@ RANDOMIZED_TEST(CapsuleCapsuleNoIntersect)
 	assert(!b.Intersects(a));
 	assert(a.Distance(b) > 0.f);
 	assert(b.Distance(a) > 0.f);
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Contains(a.ClosestPoint(b)));
 //	assert(!b.Contains(a.ClosestPoint(b)));
@@ -1231,7 +1231,7 @@ RANDOMIZED_TEST(CapsuleTriangleNoIntersect)
 	Triangle b = RandomTriangleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1551,7 +1551,7 @@ RANDOMIZED_TEST(TriangleLineSegmentNoIntersect)
 	LineSegment b = RandomLineSegmentInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 //	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);
@@ -1588,7 +1588,7 @@ UNIQUE_TEST(TrickyTriangleTriangleSATNoIntersect)
 	b.c = POINT_VEC(85.991585f, 38.734276f, 29.707987f);
 	assert(!a.Intersects(b));
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
@@ -1602,7 +1602,7 @@ RANDOMIZED_TEST(TriangleTriangleNoIntersect)
 	Triangle b = RandomTriangleInHalfspace(p);
 	assert2(!a.Intersects(b), a, b);
 	assert(!b.Intersects(a));
-	assert(!GJKIntersect(a, b));
+
 
 	assert(!SATIntersect(a, b));
 
