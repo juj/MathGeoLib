@@ -31,7 +31,10 @@ bool GJKIntersect(const A &a, const B &b)
 	float maxS, minS;
 	support[0] = a.AnyPointFast() - b.AnyPointFast();
 //	LOGI("First support: %s", support[0].ToString().c_str());
-	vec d = -support[0].Normalized();
+	vec d = -support[0];
+	float len = d.Normalize();
+	if (len < 1e-4f)
+		return true; // The first arbitrary point we guessed produced the zero vector we are looking for!
 //	LOGI("First d: %s", d.ToString().c_str());
 	int n = 1;
 	int nIterations = 50;
@@ -42,6 +45,8 @@ bool GJKIntersect(const A &a, const B &b)
 		newSupport.w = 0.f;
 #endif
 //		LOGI("New support: %s, dist: %f", newSupport.ToString().c_str(), Dot(newSupport, d));
+//		for(int i = 0; i < n; ++i)
+//			LOGI("Prev simplex pt %d: %f", i, Dot(support[i], d));
 		if (Dot(newSupport, d) < 0.f)
 			return false;
 //		if (maxS < 0.f)
@@ -53,6 +58,6 @@ bool GJKIntersect(const A &a, const B &b)
 			return true;
 //		LOGI("New dir: %s", d.ToString().c_str());
 	}
-	assume2(false && "GJK intersection test did not converge to a result!", a, b);
+	assume2(false && "GJK intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
 	return false; // Report no intersection.
 }

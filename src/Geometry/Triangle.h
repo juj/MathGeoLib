@@ -263,6 +263,8 @@ public:
 	float Distance(const Sphere &sphere) const;
 	float Distance(const Capsule &capsule) const;
 
+	float DistanceSq(const vec &point) const;
+
 	/// Tests whether this triangle and the given object intersect.	
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true. (e.g. in case a line segment is contained inside this triangle,

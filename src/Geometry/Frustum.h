@@ -492,6 +492,8 @@ public:
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.
 	std::string ToString() const;
+	 ///\todo Implement this properly.
+	std::string SerializeToString() const { return ToString(); }
 #endif
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }

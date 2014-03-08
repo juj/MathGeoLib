@@ -357,6 +357,11 @@ float Triangle::Distance(const vec &point) const
 	return ClosestPoint(point).Distance(point);
 }
 
+float Triangle::DistanceSq(const vec &point) const
+{
+	return ClosestPoint(point).DistanceSq(point);
+}
+
 float Triangle::Distance(const Sphere &sphere) const
 {
 	return Max(0.f, Distance(sphere.pos) - sphere.r);
