@@ -188,12 +188,12 @@ float3 float3::ScaledToLength(float newLength) const
 
 bool float3::IsNormalized(float epsilonSq) const
 {
-	return fabs(LengthSq()-1.f) <= epsilonSq;
+	return MATH_NS::Abs(LengthSq()-1.f) <= epsilonSq;
 }
 
 bool float3::IsZero(float epsilonSq) const
 {
-	return fabs(LengthSq()) <= epsilonSq;
+	return LengthSq() <= epsilonSq;
 }
 
 bool float3::IsFinite() const

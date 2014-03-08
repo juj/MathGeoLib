@@ -92,7 +92,9 @@ vec Capsule::Center() const
 
 vec Capsule::ExtremePoint(const vec &direction) const
 {
-	return (Dot(direction, l.b - l.a) >= 0.f ? l.b : l.a) + direction.ScaledToLength(r);
+	float len = direction.Length();
+	assume(len > 0.f);
+	return (Dot(direction, l.b - l.a) >= 0.f ? l.b : l.a) + direction * (r / len);
 }
 
 vec Capsule::ExtremePoint(const vec &direction, float &projectionDistance) const

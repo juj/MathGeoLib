@@ -138,7 +138,9 @@ float Sphere::SurfaceArea() const
 
 vec Sphere::ExtremePoint(const vec &direction) const
 {
-	return pos + direction.ScaledToLength(r);
+	float len = direction.Length();
+	assume(len > 0.f);
+	return pos + direction * (r / len);
 }
 
 vec Sphere::ExtremePoint(const vec &direction, float &projectionDistance) const
