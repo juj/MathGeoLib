@@ -42,64 +42,29 @@ vec UpdateSimplex(vec *s, int &n)
 		// 2) closest to line segment s[0]->s[1].
 		// 3) contained in the line segment s[0]->s[1], and our search is over and the algorithm is now finished.
 
-		// By construction of the simplex, the cases 1) and 2) can never occur.
+		// By construction of the simplex, the cases 0) and 1) can never occur.
 #ifdef MATH_ASSERT_CORRECTNESS
 		float d0 = s[0].DistanceSq(vec::zero);
 		float d1 = s[1].DistanceSq(vec::zero);
 		float d2 = LineSegment(s[0], s[1]).DistanceSq(vec::zero);
 		assert2(d2 <= d0, d2, d0);
 		assert2(d2 <= d1, d2, d1);
-#endif
-
 		// Cannot be in case 0: the step 0 -> 1 must have been toward the zero direction:
 		assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
 		// Cannot be in case 1: the zero direction cannot be in the voronoi region of vertex s[1].
 		assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
+#endif
 
 		vec d01 = s[1] - s[0];
-
-		// Which direction is the origin at from the latest added point?
-		vec zeroDir = -s[1];
-		float l = zeroDir.Normalize();
-		if (l < 1e-4f)
-		{
-			n = 0;
-			return zeroDir;
-		}
-		// Point s[0] was extended to point s[1] towards direction newDir, and it formed a line segment s[0] -> s[1].
-		l = d01.Normalize();
-		if (l < 1e-4f)
-		{
-			s[0] = s[1];
-			n = 1;
-			return zeroDir;
-		}
-
-		vec normal = Cross(zeroDir, d01);
-		vec newDir = Cross(d01, normal);
-		assert(newDir.IsPerpendicular(d01));
-		assert(newDir.IsPerpendicular(normal));
-		assert3(Dot(newDir, zeroDir) >= -1e8f, newDir, zeroDir, Dot(newDir, zeroDir));
-		float len = newDir.Normalize();
-//		vec newSearchDir = Cross(d01, Cross(-s[1], d01));
-//		if (newSearchDir.LengthSq() > 1e-7f)
-		if (len > 1e-4f)
-		{
-			// Case 2)
-			return newDir;
-		}
+		vec newSearchDir = Cross(d01, Cross(-s[1], d01));
+		if (newSearchDir.LengthSq() > 1e-7f)
+			return newSearchDir; // Case 2)
 		else
 		{
 			// Case 3)
 			n = 0;
 			return vec::zero;
 		}
-//		else
-//			assert(Dot(newDir, zeroDir) >= 0.f);
-//		vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
-//		newDir.Normalize();
-//		newDir2.Normalize();
-//		return newDir2;
 	}
 	else if (n == 3)
 	{
