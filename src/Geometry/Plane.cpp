@@ -93,8 +93,8 @@ void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 #ifdef MATH_ASSERT_CORRECTNESS
 	float d2 = normal.Dot(v2);
 	float d3 = normal.Dot(v3);
-	mathassert(EqualAbs(d, d2, 1e-2f));
-	mathassert(EqualAbs(d, d3, 1e-2f));
+	assume3(EqualAbs(d, d2, 1e-2f), d, d2, d3);
+	assume3(EqualAbs(d, d3, 1e-2f), d, d3, d3);
 #endif
 }
 

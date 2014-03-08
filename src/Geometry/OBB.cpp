@@ -614,9 +614,9 @@ float3x4 OBB::LocalToWorld() const
 	return m;
 	*/
 
-	assume(axis[0].IsNormalized());
-	assume(axis[1].IsNormalized());
-	assume(axis[2].IsNormalized());
+	assume2(axis[0].IsNormalized(), axis[0], axis[0].LengthSq());
+	assume2(axis[1].IsNormalized(), axis[1], axis[1].LengthSq());
+	assume2(axis[2].IsNormalized(), axis[2], axis[2].LengthSq());
 	float3x4 m; ///\todo sse-matrix
 	m.SetCol(0, axis[0].ptr());
 	m.SetCol(1, axis[1].ptr());
