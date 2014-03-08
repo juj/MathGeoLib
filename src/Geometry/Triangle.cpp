@@ -654,8 +654,6 @@ bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 	}
 	else // The two triangles lie in the same plane. Perform the intersection test in 2D.
 	{
-		const float triangleThickness = 1e-3f;
-
 		float tri0Pos = p1.normal.Dot(a);
 		float tri1Pos = p1.normal.Dot(t2.a);
 		if (Abs(tri0Pos-tri1Pos) > triangleThickness)
