@@ -102,10 +102,10 @@ vec UpdateSimplex(vec *s, int &n)
 				minDistIndex = i;
 			}
 
-		assert(isContainedInTriangle || dist <= d[0] + 1e-4f);
-		assert(isContainedInTriangle || dist <= d[1] + 1e-4f);
-		assert(isContainedInTriangle || dist <= d[2] + 1e-4f);
-		assert(isContainedInTriangle || dist <= d[3] + 1e-4f);
+		assert4(isContainedInTriangle || dist <= d[0] + 1e-4f, d[0], dist, isContainedInTriangle, minDistIndex);
+		assert4(isContainedInTriangle || dist <= d[1] + 1e-4f, d[1], dist, isContainedInTriangle, minDistIndex);
+		assert4(isContainedInTriangle || dist <= d[2] + 1e-4f, d[2], dist, isContainedInTriangle, minDistIndex);
+		assert4(isContainedInTriangle || dist <= d[3] + 1e-4f, d[3], dist, isContainedInTriangle, minDistIndex);
 #endif
 		vec d12 = s[2]-s[1];
 		vec d02 = s[2]-s[0];

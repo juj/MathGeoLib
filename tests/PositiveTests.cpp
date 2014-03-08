@@ -1444,8 +1444,6 @@ UNIQUE_TEST(PolygonPolygonIntersectCase)
 		assert(t2.Intersects(t2));
 		assert(t1.Intersects(t2));
 
-		Plane p1 = t1.PlaneCCW();
-		Plane p2 = t2.PlaneCCW();
 		Polygon a = t1.ToPolygon();
 		assert(a.Intersects(a));
 		Polygon b = t2.ToPolygon();
