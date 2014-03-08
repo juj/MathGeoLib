@@ -574,8 +574,51 @@ void Frustum::GetCornerPoints(vec *outPointArray) const
 	if (!outPointArray)
 		return;
 #endif
-	for(int i = 0; i < 8; ++i)
-		outPointArray[i] = CornerPoint(i);
+
+	if (type == PerspectiveFrustum)
+	{
+		float tanhfov = Tan(horizontalFov*0.5f);
+		float tanvfov = Tan(verticalFov*0.5f);
+		float frontPlaneHalfWidth = tanhfov*nearPlaneDistance;
+		float frontPlaneHalfHeight = tanvfov*nearPlaneDistance;
+		float farPlaneHalfWidth = tanhfov*farPlaneDistance;
+		float farPlaneHalfHeight = tanvfov*farPlaneDistance;
+
+		vec right = WorldRight();
+
+		vec nearCenter = pos + front * nearPlaneDistance;
+		vec nearHalfWidth = frontPlaneHalfWidth*right;
+		vec nearHalfHeight = frontPlaneHalfHeight*up;
+		outPointArray[0] = nearCenter - nearHalfWidth - nearHalfHeight;
+		outPointArray[1] = nearCenter + nearHalfWidth - nearHalfHeight;
+		outPointArray[2] = nearCenter - nearHalfWidth + nearHalfHeight;
+		outPointArray[3] = nearCenter + nearHalfWidth + nearHalfHeight;
+
+		vec farCenter = pos + front * farPlaneDistance;
+		vec farHalfWidth = farPlaneHalfWidth*right;
+		vec farHalfHeight = farPlaneHalfHeight*up;
+		outPointArray[4] = farCenter - farHalfWidth - farHalfHeight;
+		outPointArray[5] = farCenter + farHalfWidth - farHalfHeight;
+		outPointArray[6] = farCenter - farHalfWidth + farHalfHeight;
+		outPointArray[7] = farCenter + farHalfWidth + farHalfHeight;
+	}
+	else
+	{
+		vec right = WorldRight();
+		vec nearCenter = pos + front * nearPlaneDistance;
+		vec farCenter = pos + front * farPlaneDistance;
+		vec halfWidth = orthographicWidth * 0.5f * right;
+		vec halfHeight = orthographicHeight * 0.5f * up;
+
+		outPointArray[0] = nearCenter - halfWidth - halfHeight;
+		outPointArray[1] = nearCenter + halfWidth - halfHeight;
+		outPointArray[2] = nearCenter - halfWidth + halfHeight;
+		outPointArray[3] = nearCenter + halfWidth + halfHeight;
+		outPointArray[4] = farCenter - halfWidth - halfHeight;
+		outPointArray[5] = farCenter + halfWidth - halfHeight;
+		outPointArray[6] = farCenter - halfWidth + halfHeight;
+		outPointArray[7] = farCenter + halfWidth + halfHeight;
+	}
 }
 
 LineSegment Frustum::Edge(int edgeIndex) const
@@ -618,16 +661,17 @@ vec Frustum::CornerPoint(int cornerIndex) const
 
 vec Frustum::ExtremePoint(const vec &direction, float &projectionDistance) const
 {
+	vec corners[8];
+	GetCornerPoints(corners);
 	vec mostExtreme = vec::nan;
 	projectionDistance = -FLOAT_INF;
 	for(int i = 0; i < 8; ++i)
 	{
-		vec pt = CornerPoint(i);
-		float d = Dot(direction, pt);
+		float d = Dot(direction, corners[i]);
 		if (d > projectionDistance)
 		{
 			projectionDistance = d;
-			mostExtreme = pt;
+			mostExtreme = corners[i];
 		}
 	}
 	return mostExtreme;
@@ -635,11 +679,16 @@ vec Frustum::ExtremePoint(const vec &direction, float &projectionDistance) const
 
 void Frustum::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
-	///\todo Optimize!
-	vec minPt = ExtremePoint(-direction);
-	vec maxPt = ExtremePoint(direction);
-	outMin = Dot(minPt, direction);
-	outMax = Dot(maxPt, direction);
+	vec corners[8];
+	GetCornerPoints(corners);
+	outMax = -FLOAT_INF;
+	outMin = FLOAT_INF;
+	for(int i = 0; i < 8; ++i)
+	{
+		float d = Dot(direction, corners[i]);
+		outMax = Max(outMax, d);
+		outMin = Min(outMin, d);
+	}
 }
 
 int Frustum::UniqueFaceNormals(vec *out) const
