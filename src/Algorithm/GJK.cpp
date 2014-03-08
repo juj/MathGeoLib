@@ -117,7 +117,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 4: Edge 1->2 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist));
+			assert4(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist), d[4], dist, isContainedInTriangle, minDistIndex);
 #endif
 			vec newDir = Cross(d12, Cross(d12, s[1]));
 			s[0] = s[1];
@@ -131,7 +131,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 5: Edge 0->2 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist));
+			assert4(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist), d[5], dist, isContainedInTriangle, minDistIndex);
 #endif
 			vec newDir = Cross(d02, Cross(d02, s[0]));
 			s[1] = s[2];
@@ -140,7 +140,7 @@ vec UpdateSimplex(vec *s, int &n)
 		}
 		// Cases 6)-8):
 #ifdef MATH_ASSERT_CORRECTNESS
-		assert(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist));
+		assert4(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, isContainedInTriangle, minDistIndex);
 #endif
 		float scaledSignedDistToTriangle = triNormal.Dot(s[2]);
 		float distSq = scaledSignedDistToTriangle*scaledSignedDistToTriangle;
