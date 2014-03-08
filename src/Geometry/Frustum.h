@@ -250,7 +250,7 @@ public:
 		@return An extreme point of this Frustum in the given direction. The returned point is always a
 			corner point of this Frustum.
 		@see CornerPoint(). */
-	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction) const { float projectionDistance; return ExtremePoint(direction, projectionDistance); }
 	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Projects this Frustum onto the given 1D axis direction vector.

@@ -616,28 +616,21 @@ vec Frustum::CornerPoint(int cornerIndex) const
 	}
 }
 
-vec Frustum::ExtremePoint(const vec &direction) const
+vec Frustum::ExtremePoint(const vec &direction, float &projectionDistance) const
 {
 	vec mostExtreme = vec::nan;
-	float mostExtremeDist = -FLT_MAX;
+	projectionDistance = -FLOAT_INF;
 	for(int i = 0; i < 8; ++i)
 	{
 		vec pt = CornerPoint(i);
 		float d = Dot(direction, pt);
-		if (d > mostExtremeDist)
+		if (d > projectionDistance)
 		{
-			mostExtremeDist = d;
+			projectionDistance = d;
 			mostExtreme = pt;
 		}
 	}
 	return mostExtreme;
-}
-
-vec Frustum::ExtremePoint(const vec &direction, float &projectionDistance) const
-{
-	vec extremePoint = ExtremePoint(direction);
-	projectionDistance = extremePoint.Dot(direction);
-	return extremePoint;
 }
 
 void Frustum::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
