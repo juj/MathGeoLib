@@ -445,7 +445,7 @@ char *SerializeFloat(float f, char *dstStr)
 	else
 	{
 		u32 u = ReinterpretAsU32(f);
-		int numChars = sprintf(dstStr, "NaN(%8X)", u);
+		int numChars = sprintf(dstStr, "NaN(%8X)", (unsigned int)u);
 		return dstStr + numChars;
 	}
 }
@@ -462,7 +462,7 @@ float DeserializeFloat(const char *str, const char **outEndStr)
 	{
 		MATH_SKIP_WORD(str, "NaN(");
 		u32 x;
-		int n = sscanf(str, "%X", &x);
+		int n = sscanf(str, "%X", (unsigned int *)&x);
 		if (n != 1)
 			return FLOAT_NAN;
 		while(*str != 0)
