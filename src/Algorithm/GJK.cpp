@@ -37,22 +37,26 @@ vec UpdateSimplex(vec *s, int &n)
 	if (n == 2)
 	{
 		// Four voronoi regions that the origin could be in:
-		// 1) closest to vertex s[0].
-		// 2) closest to vertex s[1].
-		// 3) closest to line segment s[0]->s[1].
-		// 4) contained in the line segment s[0]->s[1], and our search is over and the algorithm is now finished.
+		// 0) closest to vertex s[0].
+		// 1) closest to vertex s[1].
+		// 2) closest to line segment s[0]->s[1].
+		// 3) contained in the line segment s[0]->s[1], and our search is over and the algorithm is now finished.
 
 		// By construction of the simplex, the cases 1) and 2) can never occur.
 #ifdef MATH_ASSERT_CORRECTNESS
-		float d1 = s[0].DistanceSq(vec::zero);
-		float d2 = s[1].DistanceSq(vec::zero);
-		float d3 = LineSegment(s[0], s[1]).DistanceSq(vec::zero);
-		assert2(d3 <= d1, d3, d1);
-		assert2(d3 <= d2, d3, d2);
+		float d0 = s[0].DistanceSq(vec::zero);
+		float d1 = s[1].DistanceSq(vec::zero);
+		float d2 = LineSegment(s[0], s[1]).DistanceSq(vec::zero);
+		assert2(d2 <= d0, d2, d0);
+		assert2(d2 <= d1, d2, d1);
 #endif
 
-		assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
+		// Cannot be in case 0: the step 0 -> 1 must have been toward the zero direction:
 		assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
+		// Cannot be in case 1: the zero direction cannot be in the voronoi region of vertex s[1].
+		assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
+
+		vec d01 = s[1] - s[0];
 
 		// Which direction is the origin at from the latest added point?
 		vec zeroDir = -s[1];
@@ -63,8 +67,7 @@ vec UpdateSimplex(vec *s, int &n)
 			return zeroDir;
 		}
 		// Point s[0] was extended to point s[1] towards direction newDir, and it formed a line segment s[0] -> s[1].
-		vec d = s[1] - s[0];
-		l = d.Normalize();
+		l = d01.Normalize();
 		if (l < 1e-4f)
 		{
 			s[0] = s[1];
@@ -72,41 +75,52 @@ vec UpdateSimplex(vec *s, int &n)
 			return zeroDir;
 		}
 
-		// Precondition: the step 0 -> 1 must have been toward the zero direction:
-		assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
-		// Precondition: the zero direction cannot be in the half-space defined by 0 -> 1.
-		assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
-
-		vec normal = Cross(zeroDir, d);
-		vec newDir = Cross(d, normal);
-		assert(newDir.IsPerpendicular(d));
+		vec normal = Cross(zeroDir, d01);
+		vec newDir = Cross(d01, normal);
+		assert(newDir.IsPerpendicular(d01));
 		assert(newDir.IsPerpendicular(normal));
 		assert3(Dot(newDir, zeroDir) >= -1e8f, newDir, zeroDir, Dot(newDir, zeroDir));
 		float len = newDir.Normalize();
-		if (len <= 1e-4f)
-			n = 0;
+//		vec newSearchDir = Cross(d01, Cross(-s[1], d01));
+//		if (newSearchDir.LengthSq() > 1e-7f)
+		if (len > 1e-4f)
+		{
+			// Case 2)
+			return newDir;
+		}
 		else
-			assert(Dot(newDir, zeroDir) >= 0.f);
-		vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
+		{
+			// Case 3)
+			n = 0;
+			return vec::zero;
+		}
+//		else
+//			assert(Dot(newDir, zeroDir) >= 0.f);
+//		vec newDir2 = -LineSegment(s[0], s[1]).ClosestPoint(vec::zero);
 //		newDir.Normalize();
-		newDir2.Normalize();
-		return newDir2;
+//		newDir2.Normalize();
+//		return newDir2;
 	}
 	else if (n == 3)
 	{
 		// Nine voronoi regions:
 		// 0) closest to vertex s[0].
 		// 1) closest to vertex s[1].
-		// 2) closest to vertex s[2].      XX
+		// 2) closest to vertex s[2].
 		// 3) closest to edge s[0]->s[1].
 		// 4) closest to edge s[1]->s[2].  XX
-		// 5) closest to edge s[2]->s[0].  XX
+		// 5) closest to edge s[0]->s[2].  XX
 		// 6) closest to the triangle s[0]->s[1]->s[2], in the positive side.  XX
 		// 7) closest to the triangle s[0]->s[1]->s[2], in the negative side.  XX
 		// 8) contained in the triangle s[0]->s[1]->s[2], and our search is over and the algorithm is now finished.  XX
 
-		// By construction of the simplex, the cases 0), 1) or 3) can never occur.
+		// By construction of the simplex, the origin must always be in a voronoi region that includes the point s[2], since that
+		// was the last added point. But it cannot be the case 2), since previous search took us deepest towards the direction s[1]->s[2],
+		// and case 2) implies we should have been able to go even deeper in that direction, or that the origin is not included in the simplex,
+		// a case which has been checked for already before. Therefore the cases 0)-3) can never occur.
 #ifdef MATH_ASSERT_CORRECTNESS
+		// Sanity-check that the above reasoning is valid by testing each voronoi region and assert()ing that the ones we assume never to
+		// happen never will.
 		float d[7];
 		d[0] = s[0].DistanceSq(vec::zero);
 		d[1] = s[1].DistanceSq(vec::zero);
@@ -116,36 +130,26 @@ vec UpdateSimplex(vec *s, int &n)
 		d[5] = LineSegment(s[2], s[0]).DistanceSq(vec::zero);
 		d[6] = Triangle(s[0], s[1], s[2]).DistanceSq(vec::zero);
 
-		bool isContained = (d[6] <= 1e-3f);
-		float dist = d[2];
-		int minDistIndex = 2;
-		for(int i = 3; i < 7; ++i)
-			if (i == 2 || i == 4 || i == 5 || i == 6)
-				if (d[i] < dist)
-				{
-					dist = d[i];
-					minDistIndex = i;
-				}
+		bool isContainedInTriangle = (d[6] <= 1e-3f); // Are we in case 8)?
+		float dist = FLOAT_INF;
+		int minDistIndex = -1;
+		for(int i = 4; i < 7; ++i)
+			if (d[i] < dist)
+			{
+				dist = d[i];
+				minDistIndex = i;
+			}
 
-		assert(isContained || dist <= d[0] + 1e-4f);
-		assert(isContained || dist <= d[1] + 1e-4f);
-		assert(isContained || dist <= d[3] + 1e-4f);
-//		LOGI("Distance to zero: %f", dist);
+		assert(isContainedInTriangle || dist <= d[0] + 1e-4f);
+		assert(isContainedInTriangle || dist <= d[1] + 1e-4f);
+		assert(isContainedInTriangle || dist <= d[2] + 1e-4f);
+		assert(isContainedInTriangle || dist <= d[3] + 1e-4f);
 		if (dist < 1e-5f)
 		{
 			n = 0;
 			return vec::zero;
 		}
 #endif
-		
-		/*
-		LOGI("s0: %f", s[0].Length());
-		LOGI("s1: %f", s[1].Length());
-		LOGI("s2: %f", s[2].Length());
-		LOGI("e01: %f", LineSegment(s[0], s[1]).Distance(vec::zero));
-		LOGI("e02: %f", LineSegment(s[0], s[2]).Distance(vec::zero));
-		LOGI("e12: %f", LineSegment(s[1], s[2]).Distance(vec::zero));
-		LOGI("t012: %f", Triangle(s[0], s[1], s[2]).Distance(vec::zero));*/
 		vec d01 = (s[1]-s[0]).Normalized();
 		vec d12 = (s[2]-s[1]).Normalized();
 		vec d02 = s[2]-s[0];
@@ -209,9 +213,8 @@ vec UpdateSimplex(vec *s, int &n)
 */
 		if (t02 > 0.f)
 		{
-			// Edge 0->2 is closest.
+			// Case 5: Edge 0->2 is closest.
 			assert(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist));
-//			assert(minDistIndex == 5);
 			s[1] = s[2];
 			n = 2;
 			vec newDir = Cross(e02, Cross(-s[0], e02));
@@ -223,9 +226,8 @@ vec UpdateSimplex(vec *s, int &n)
 		}
 		if (t12 > 0.f)
 		{
-			// Edge 1->2 is closest.
+			// Case 4: Edge 1->2 is closest.
 			assert(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist));
-//			assert(minDistIndex == 4);
 			s[0] = s[1];
 			s[1] = s[2];
 			n = 2;
@@ -236,7 +238,7 @@ vec UpdateSimplex(vec *s, int &n)
 			newDir2.Normalize();
 			return newDir2;
 		}
-//		assert(minDistIndex == 6);
+		// Cases 6)-8):
 		assert(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist));
 		Triangle t(s[0], s[1], s[2]);
 		vec cp = t.ClosestPoint(vec::zero);
@@ -245,12 +247,15 @@ vec UpdateSimplex(vec *s, int &n)
 		assert(cp.LengthSq() <= s[2].LengthSq());
 		if (Dot(triNormal, -s[2]) >= 0.f)
 		{
+			// Case 6:
 			assert(t.PlaneCCW().IsOnPositiveSide(vec::zero));
 			return triNormal;
 		}
 		else
 		{
+			// Case 7:
 			assert(t.PlaneCW().IsOnPositiveSide(vec::zero));
+			// Swap s[0] and s[1] so that the normal of Triangle(s[0],s[1],s[2]).PlaneCCW() will always point towards the new search direction.
 			std::swap(s[0], s[1]);
 			return -triNormal;
 		}
@@ -357,6 +362,7 @@ vec UpdateSimplex(vec *s, int &n)
 		//if (inD03 && inD13 && inD23)
 		if (!insideSimplex && minDistIndex == 3)
 		{
+			assert(inD03 >= 0.f && inD13 >= 0.f && inD23 >= 0.f);
 			// The new point 3 is closest. Simplex degenerates back to a single point.
 			assert(!insideSimplex);
 			assert(d[3] <= dist);
