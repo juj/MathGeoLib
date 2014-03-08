@@ -99,6 +99,14 @@ inline std::string ObjToString<int>(const int &obj)
 }
 
 template<>
+inline std::string ObjToString<bool>(const bool &obj)
+{
+	std::stringstream ss;
+	ss << obj;
+	return ss.str();
+}
+
+template<>
 inline std::string ObjToString<u32>(const u32 &obj)
 {
 	std::stringstream ss;
