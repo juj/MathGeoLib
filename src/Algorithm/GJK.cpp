@@ -136,20 +136,27 @@ vec UpdateSimplex(vec *s, int &n)
 		}
 		// Cases 6)-8):
 		assert(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist));
-		float distToTriangle = Plane(s[0], s[1], s[2]).Distance(vec::zero); ///\todo How to avoid this!
-		if (distToTriangle < 1e-3f)
+		float scaledSignedDistToTriangle = triNormal.Dot(s[2]);
+		float distSq = scaledSignedDistToTriangle*scaledSignedDistToTriangle;
+		float scaledEpsilonSq = 1e-6f*triNormal.LengthSq();
+
+		if (distSq > scaledEpsilonSq)
 		{
-			// Case 8)
+			// The origin is sufficiently far away from the triangle.
+			if (scaledSignedDistToTriangle <= 0.f)
+				return triNormal; // Case 6)
+			else
+			{
+				// Case 7) Swap s[0] and s[1] so that the normal of Triangle(s[0],s[1],s[2]).PlaneCCW() will always point towards the new search direction.
+				std::swap(s[0], s[1]);
+				return -triNormal;
+			}
+		}
+		else
+		{
+			// Case 8) The origin lies directly inside the triangle. For robustness, terminate the search here immediately with success.
 			n = 0;
 			return vec::zero;
-		}
-		if (Dot(triNormal, s[2]) <= 0.f)
-			return triNormal; // Case 6)
-		else // Case 7)
-		{
-			// Swap s[0] and s[1] so that the normal of Triangle(s[0],s[1],s[2]).PlaneCCW() will always point towards the new search direction.
-			std::swap(s[0], s[1]);
-			return -triNormal;
 		}
 	}
 	else // n == 4
