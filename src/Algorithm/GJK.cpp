@@ -34,10 +34,10 @@ vec UpdateSimplex(vec *s, int &n)
 		// Four voronoi regions that the origin could be in:
 		// 0) closest to vertex s[0].
 		// 1) closest to vertex s[1].
-		// 2) closest to line segment s[0]->s[1].
-		// 3) contained in the line segment s[0]->s[1], and our search is over and the algorithm is now finished.
+		// 2) closest to line segment s[0]->s[1]. XX
+		// 3) contained in the line segment s[0]->s[1], and our search is over and the algorithm is now finished. XX
 
-		// By construction of the simplex, the cases 0) and 1) can never occur.
+		// By construction of the simplex, the cases 0) and 1) can never occur. Then only the cases marked with XX need to be checked.
 #ifdef MATH_ASSERT_CORRECTNESS
 		// Sanity-check that the above reasoning is valid by testing each voronoi region and assert()ing that the ones we assume never to
 		// happen never will.
@@ -79,7 +79,7 @@ vec UpdateSimplex(vec *s, int &n)
 		// By construction of the simplex, the origin must always be in a voronoi region that includes the point s[2], since that
 		// was the last added point. But it cannot be the case 2), since previous search took us deepest towards the direction s[1]->s[2],
 		// and case 2) implies we should have been able to go even deeper in that direction, or that the origin is not included in the convex shape,
-		// a case which has been checked for already before. Therefore the cases 0)-3) can never occur.
+		// a case which has been checked for already before. Therefore the cases 0)-3) can never occur. Only the cases marked with XX need to be checked.
 #ifdef MATH_ASSERT_CORRECTNESS
 		// Sanity-check that the above reasoning is valid by testing each voronoi region and assert()ing that the ones we assume never to
 		// happen never will.
