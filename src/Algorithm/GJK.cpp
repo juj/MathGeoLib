@@ -240,7 +240,9 @@ vec UpdateSimplex(vec *s, int &n)
 		if (inE03_1 >= 0.f && inE03_2 >= 0.f)
 		{
 			// Case 6) Edge 0->3 is closest. Simplex degenerates to a line segment.
+#ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, insideSimplex, minDistIndex);
+#endif
 			vec newDir = Cross(d03, Cross(-s[3], d03));
 			s[1] = s[3];
 			n = 2;
@@ -258,7 +260,9 @@ vec UpdateSimplex(vec *s, int &n)
 		if (inE13_0 >= 0.f && inE13_2 >= 0.f)
 		{
 			// Case 8) Edge 1->3 is closest. Simplex degenerates to a line segment.
+#ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[8] <= dist + 1e-3f * Max(1.f, d[8], dist), d[8], dist, insideSimplex, minDistIndex);
+#endif
 			vec newDir = Cross(d13, Cross(-s[3], d13));
 			s[0] = s[1];
 			s[1] = s[3];
@@ -274,7 +278,9 @@ vec UpdateSimplex(vec *s, int &n)
 		if (inE23_0 >= 0.f && inE23_1 >= 0.f)
 		{
 			// Case 9) Edge 2->3 is closest. Simplex degenerates to a line segment.
+#ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[9] <= dist + 1e-3f * Max(1.f, d[9], dist), d[9], dist, insideSimplex, minDistIndex);
+#endif
 			vec newDir = Cross(d23, Cross(-s[3], d23));
 			s[0] = s[2];
 			s[1] = s[3];
@@ -286,7 +292,9 @@ vec UpdateSimplex(vec *s, int &n)
 		if (inTri013 > 0.f && inE13_0 <= 0.f && inE03_1 <= 0.f)
 		{
 			// Case 11) Triangle 0->1->3 is closest.
+#ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[11] <= dist + 1e-3f * Max(1.f, d[11], dist), d[11], dist, insideSimplex, minDistIndex);
+#endif
 			s[2] = s[3];
 			n = 3;
 			return tri013Normal;
@@ -295,7 +303,9 @@ vec UpdateSimplex(vec *s, int &n)
 		if (inTri023 > 0.f && inE23_0 <= 0.f && inE03_2 <= 0.f)
 		{
 			// Case 12) Triangle 0->2->3 is closest.
+#ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[12] <= dist + 1e-3f * Max(1.f, d[12], dist), d[12], dist, insideSimplex, minDistIndex);
+#endif
 			s[1] = s[0];
 			s[0] = s[2];
 			s[2] = s[3];
@@ -306,7 +316,9 @@ vec UpdateSimplex(vec *s, int &n)
 		if (inTri123 > 0.f && inE13_2 <= 0.f && inE23_1 <= 0.f)
 		{
 			// Case 13) Triangle 1->2->3 is closest.
+#ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[13] <= dist + 1e-3f * Max(1.f, d[13], dist), d[13], dist, insideSimplex, minDistIndex);
+#endif
 			s[0] = s[1];
 			s[1] = s[2];
 			s[2] = s[3];
