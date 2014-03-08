@@ -53,7 +53,7 @@ vec UpdateSimplex(vec *s, int &n)
 #endif
 
 		vec d01 = s[1] - s[0];
-		vec newSearchDir = Cross(d01, Cross(-s[1], d01));
+		vec newSearchDir = Cross(d01, Cross(d01, s[1]));
 		if (newSearchDir.LengthSq() > 1e-7f)
 			return newSearchDir; // Case 2)
 		else
@@ -112,24 +112,24 @@ vec UpdateSimplex(vec *s, int &n)
 		vec triNormal = Cross(d02, d12);
 
 		vec e12 = Cross(d12, triNormal);
-		float t12 = Dot(-s[1], e12);
-		if (t12 > 0.f)
+		float t12 = Dot(s[1], e12);
+		if (t12 < 0.f)
 		{
 			// Case 4: Edge 1->2 is closest.
 			assert(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist));
-			vec newDir = Cross(d12, Cross(-s[1], d12));
+			vec newDir = Cross(d12, Cross(d12, s[1]));
 			s[0] = s[1];
 			s[1] = s[2];
 			n = 2;
 			return newDir;
 		}
 		vec e02 = Cross(triNormal, d02);
-		float t02 = Dot(-s[0], e02);
-		if (t02 > 0.f)
+		float t02 = Dot(s[0], e02);
+		if (t02 < 0.f)
 		{
 			// Case 5: Edge 0->2 is closest.
 			assert(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist));
-			vec newDir = Cross(d02, Cross(-s[0], d02));
+			vec newDir = Cross(d02, Cross(d02, s[0]));
 			s[1] = s[2];
 			n = 2;
 			return newDir;
@@ -143,7 +143,7 @@ vec UpdateSimplex(vec *s, int &n)
 			n = 0;
 			return vec::zero;
 		}
-		if (Dot(triNormal, -s[2]) >= 0.f)
+		if (Dot(triNormal, s[2]) <= 0.f)
 			return triNormal; // Case 6)
 		else // Case 7)
 		{
@@ -235,15 +235,15 @@ vec UpdateSimplex(vec *s, int &n)
 
 		vec e03_1 = Cross(tri013Normal, d03); // The normal of edge 0->3 on triangle 013.
 		vec e03_2 = Cross(d03, tri023Normal); // The normal of edge 0->3 on triangle 023.
-		float inE03_1 = Dot(e03_1, -s[3]);
-		float inE03_2 = Dot(e03_2, -s[3]);
-		if (inE03_1 >= 0.f && inE03_2 >= 0.f)
+		float inE03_1 = Dot(e03_1, s[3]);
+		float inE03_2 = Dot(e03_2, s[3]);
+		if (inE03_1 <= 0.f && inE03_2 <= 0.f)
 		{
 			// Case 6) Edge 0->3 is closest. Simplex degenerates to a line segment.
 #ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, insideSimplex, minDistIndex);
 #endif
-			vec newDir = Cross(d03, Cross(-s[3], d03));
+			vec newDir = Cross(d03, Cross(d03, s[3]));
 			s[1] = s[3];
 			n = 2;
 			return newDir;
@@ -255,15 +255,15 @@ vec UpdateSimplex(vec *s, int &n)
 		assert(Dot(tri123Normal, -d02) <= 0.f);
 		vec e13_0 = Cross(d13, tri013Normal);
 		vec e13_2 = Cross(tri123Normal, d13);
-		float inE13_0 = Dot(e13_0, -s[3]);
-		float inE13_2 = Dot(e13_2, -s[3]);
-		if (inE13_0 >= 0.f && inE13_2 >= 0.f)
+		float inE13_0 = Dot(e13_0, s[3]);
+		float inE13_2 = Dot(e13_2, s[3]);
+		if (inE13_0 <= 0.f && inE13_2 <= 0.f)
 		{
 			// Case 8) Edge 1->3 is closest. Simplex degenerates to a line segment.
 #ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[8] <= dist + 1e-3f * Max(1.f, d[8], dist), d[8], dist, insideSimplex, minDistIndex);
 #endif
-			vec newDir = Cross(d13, Cross(-s[3], d13));
+			vec newDir = Cross(d13, Cross(d13, s[3]));
 			s[0] = s[1];
 			s[1] = s[3];
 			n = 2;
@@ -273,23 +273,23 @@ vec UpdateSimplex(vec *s, int &n)
 		vec d23 = s[3] - s[2];
 		vec e23_0 = Cross(tri023Normal, d23);
 		vec e23_1 = Cross(d23, tri123Normal);
-		float inE23_0 = Dot(e23_0, -s[3]);
-		float inE23_1 = Dot(e23_1, -s[3]);
-		if (inE23_0 >= 0.f && inE23_1 >= 0.f)
+		float inE23_0 = Dot(e23_0, s[3]);
+		float inE23_1 = Dot(e23_1, s[3]);
+		if (inE23_0 <= 0.f && inE23_1 <= 0.f)
 		{
 			// Case 9) Edge 2->3 is closest. Simplex degenerates to a line segment.
 #ifdef MATH_ASSERT_CORRECTNESS
 			assert4(!insideSimplex && d[9] <= dist + 1e-3f * Max(1.f, d[9], dist), d[9], dist, insideSimplex, minDistIndex);
 #endif
-			vec newDir = Cross(d23, Cross(-s[3], d23));
+			vec newDir = Cross(d23, Cross(d23, s[3]));
 			s[0] = s[2];
 			s[1] = s[3];
 			n = 2;
 			return newDir;
 		}
 
-		float inTri013 = Dot(-s[3], tri013Normal);
-		if (inTri013 > 0.f && inE13_0 <= 0.f && inE03_1 <= 0.f)
+		float inTri013 = Dot(s[3], tri013Normal);
+		if (inTri013 < 0.f && inE13_0 >= 0.f && inE03_1 >= 0.f)
 		{
 			// Case 11) Triangle 0->1->3 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
@@ -299,8 +299,8 @@ vec UpdateSimplex(vec *s, int &n)
 			n = 3;
 			return tri013Normal;
 		}
-		float inTri023 = Dot(-s[3], tri023Normal);
-		if (inTri023 > 0.f && inE23_0 <= 0.f && inE03_2 <= 0.f)
+		float inTri023 = Dot(s[3], tri023Normal);
+		if (inTri023 < 0.f && inE23_0 >= 0.f && inE03_2 >= 0.f)
 		{
 			// Case 12) Triangle 0->2->3 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
@@ -312,8 +312,8 @@ vec UpdateSimplex(vec *s, int &n)
 			n = 3;
 			return tri023Normal;
 		}
-		float inTri123 = Dot(-s[3], tri123Normal);
-		if (inTri123 > 0.f && inE13_2 <= 0.f && inE23_1 <= 0.f)
+		float inTri123 = Dot(s[3], tri123Normal);
+		if (inTri123 < 0.f && inE13_2 >= 0.f && inE23_1 >= 0.f)
 		{
 			// Case 13) Triangle 1->2->3 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
