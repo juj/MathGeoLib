@@ -136,6 +136,9 @@ TEST(QuatFromString)
 RANDOMIZED_TEST(SerializeFloat)
 {
 	u32 u = rng.Int() ^ (rng.Int() << 16);
+	// Make u a quiet NaN - since quiet vs signalling nans might not work on all platforms, and MGL
+	// is not interested in using or serializing sNans anyways.
+	u |= 0x400000;
 	float f = ReinterpretAsFloat(u);
 	char str[256];
 	SerializeFloat(f, str);
