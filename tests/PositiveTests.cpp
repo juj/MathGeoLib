@@ -1349,8 +1349,8 @@ RANDOMIZED_TEST(PolygonLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	assert(a.Intersects(b), a.SerializeToString(), b.SerializeToCodeString());
+	assert(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToString());
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
@@ -1618,8 +1618,8 @@ RANDOMIZED_TEST(PlaneRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	assert(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	assert(b.Intersects(a), a.SerializeToCodeString(), b.SerializeToCodeString());
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 	assert2(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
