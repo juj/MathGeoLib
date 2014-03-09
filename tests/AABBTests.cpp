@@ -54,7 +54,7 @@ RANDOMIZED_TEST(AABBTransformAsAABB_SIMD)
 	AABB x = a;
 	AABBTransformAsAABB_SIMD(x, m);
 	AABB y = o.MinimalEnclosingAABB();
-	assert(x.Equals(y));
+	assert2(x.Equals(y), x.SerializeToCodeString(), y.SerializeToCodeString());
 }
 
 BENCHMARK(AABBTransformAsAABB_SIMD_BM, "AABB::TransformAsAABB SIMD")
