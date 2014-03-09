@@ -320,8 +320,8 @@ RANDOMIZED_TEST(AABBLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 //	assert(a.Contains(a.ClosestPoint(b)));
