@@ -377,7 +377,7 @@ public:
 
 	/// Tests if the length of this vector is one, up to the given epsilon.
 	/** @see IsZero(), IsFinite(), IsPerpendicular(). */
-	bool IsNormalized(float epsilonSq = 1e-6f) const;
+	bool IsNormalized(float epsilonSq = 1e-5f) const;
 
 	/// Tests if this is the null vector, up to the given epsilon.
 	/** @see IsNormalized(), IsFinite(), IsPerpendicular(). */

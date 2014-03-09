@@ -159,9 +159,9 @@ Quat Quat::Normalized() const
 	return copy;
 }
 
-bool Quat::IsNormalized(float epsilon) const
+bool Quat::IsNormalized(float epsilonSq) const
 {
-	return EqualAbs(LengthSq(), 1.f, epsilon);
+	return EqualAbs(LengthSq(), 1.f, epsilonSq);
 }
 
 bool Quat::IsInvertible(float epsilon) const

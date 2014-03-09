@@ -375,13 +375,13 @@ public:
 
 	/// Tests if the length of the (x, y, z) part of this vector is one, up to the given epsilon.
 	/** @see NormalizeW(), IsWZeroOrOne(), IsZero3(), IsZero4(), IsNormalized4(). */
-	bool IsNormalized3(float epsilonSq = 1e-6f) const;
+	bool IsNormalized3(float epsilonSq = 1e-5f) const;
 
 	/// Returns true if the length of this vector is 1, up to the given epsilon.
 	/** This function takes into account all the four components of this vector when calculating the norm.
 		@see NormalizeW(), IsWZeroOrOne(), IsZero3(), IsZero4(), IsNormalized3(). */
-	bool IsNormalized4(float epsilonSq = 1e-6f) const;
-	bool IsNormalized(float epsilonSq = 1e-6f) const { return IsNormalized4(epsilonSq); }
+	bool IsNormalized4(float epsilonSq = 1e-5f) const;
+	bool IsNormalized(float epsilonSq = 1e-5f) const { return IsNormalized4(epsilonSq); }
 
 	/// Multiplies the (x, y, z) part of this vector by the given scalar.
 	/** Sets this vector to (x*scalar, y*scalar, z*scalar, w).

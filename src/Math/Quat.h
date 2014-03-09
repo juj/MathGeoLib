@@ -130,7 +130,7 @@ public:
 	Quat Normalized() const;
 
 	/// Returns true if the length of this quaternion is one.
-	bool IsNormalized(float epsilon = 1e-3f) const;
+	bool IsNormalized(float epsilon = 1e-5f) const;
 
 	bool IsInvertible(float epsilon = 1e-3f) const;
 
