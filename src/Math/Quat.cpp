@@ -380,7 +380,7 @@ void Quat::ToAxisAngle(float3 &axis, float &angle) const
 {
 	angle = Acos(w) * 2.f;
 	float sinz = Sin(angle * 0.5f);
-	if (fabs(sinz) > 1e-4f)
+	if (MATH_NS::Abs(sinz) > 1e-4f)
 	{
 		sinz = 1.f / sinz;
 		axis = float3(x * sinz, y * sinz, z * sinz);

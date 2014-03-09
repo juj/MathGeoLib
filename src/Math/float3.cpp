@@ -201,14 +201,15 @@ bool float3::IsFinite() const
 	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z);
 }
 
-bool float3::IsPerpendicular(const float3 &other, float epsilon) const
+bool float3::IsPerpendicular(const float3 &other, float epsilonSq) const
 {
-	return fabs(Dot(other)) <= epsilon * Length() * other.Length();
+	float dot = Dot(other);
+	return dot <= epsilonSq * LengthSq() * other.LengthSq();
 }
 
-bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilon)
+bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilonSq)
 {
-	return (p2-p1).Cross(p3-p1).LengthSq() <= epsilon;
+	return (p2-p1).Cross(p3-p1).LengthSq() <= epsilonSq;
 }
 
 bool IsNeutralCLocale();
@@ -365,7 +366,7 @@ int float3::MaxElementIndex() const
 
 float3 float3::Abs() const
 {
-	return float3(fabs(x), fabs(y), fabs(z));
+	return float3(MATH_NS::Abs(x), MATH_NS::Abs(y), MATH_NS::Abs(z));
 }
 
 float3 float3::Neg() const
@@ -743,16 +744,16 @@ float2 float3::ToSphericalCoordinatesNormalized() const
 
 bool float3::Equals(const float3 &other, float epsilon) const
 {
-	return fabs(x - other.x) < epsilon &&
-	       fabs(y - other.y) < epsilon &&
-	       fabs(z - other.z) < epsilon;
+	return MATH_NS::Abs(x - other.x) < epsilon &&
+	       MATH_NS::Abs(y - other.y) < epsilon &&
+	       MATH_NS::Abs(z - other.z) < epsilon;
 }
 
 bool float3::Equals(float x_, float y_, float z_, float epsilon) const
 {
-	return fabs(x - x_) < epsilon &&
-	       fabs(y - y_) < epsilon &&
-	       fabs(z - z_) < epsilon;
+	return MATH_NS::Abs(x - x_) < epsilon &&
+	       MATH_NS::Abs(y - y_) < epsilon &&
+	       MATH_NS::Abs(z - z_) < epsilon;
 }
 
 bool float3::BitEquals(const float3 &other) const

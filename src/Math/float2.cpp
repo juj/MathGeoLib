@@ -194,12 +194,12 @@ float2 float2::ScaledToLength(float newLength) const
 
 bool float2::IsNormalized(float epsilonSq) const
 {
-	return fabs(LengthSq()-1.f) <= epsilonSq;
+	return MATH_NS::Abs(LengthSq()-1.f) <= epsilonSq;
 }
 
 bool float2::IsZero(float epsilonSq) const
 {
-	return fabs(LengthSq()) <= epsilonSq;
+	return LengthSq() <= epsilonSq;
 }
 
 bool float2::IsFinite() const
@@ -209,7 +209,7 @@ bool float2::IsFinite() const
 
 bool float2::IsPerpendicular(const float2 &other, float epsilon) const
 {
-	return fabs(Dot(other)) <= epsilon;
+	return MATH_NS::Abs(Dot(other)) <= epsilon;
 }
 
 bool float2::Equals(const float2 &rhs, float epsilon) const
@@ -322,7 +322,7 @@ int float2::MaxElementIndex() const
 
 float2 float2::Abs() const
 {
-	return float2(fabs(x), fabs(y));
+	return float2(MATH_NS::Abs(x), MATH_NS::Abs(y));
 }
 
 float2 float2::Neg() const

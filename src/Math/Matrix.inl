@@ -772,7 +772,7 @@ bool InverseMatrix(Matrix &mat, float epsilon)
 		// find the row i with i >= j such that M has the largest absolute value.
 		int greatest = column;
 		for(int i = column; i < Matrix::Rows; i++)
-			if (fabs(mat[i][column]) > fabs(mat[greatest][column]))
+			if (Abs(mat[i][column]) > Abs(mat[greatest][column]))
 				greatest = i;
 
 		if (EqualAbs(mat[greatest][column], 0, epsilon))

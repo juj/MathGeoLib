@@ -406,7 +406,7 @@ float Triangle::IntersectLineTri(const vec &linePos, const vec &lineDir,
 	const float det = vE1.Dot(vP);
 
 	// If determinant is near zero, ray lies in plane of triangle.
-	if (fabs(det) <= epsilon)
+	if (Abs(det) <= epsilon)
 		return FLOAT_INF;
 	const float recipDet = 1.f / det;
 

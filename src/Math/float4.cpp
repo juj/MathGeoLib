@@ -322,7 +322,7 @@ void float4::NormalizeW()
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	NormalizeW_SSE();
 #else
-	if (fabs(w) > 1e-6f)
+	if (MATH_NS::Abs(w) > 1e-6f)
 	{
 		float invW = 1.f / w;
 		x *= invW;
@@ -350,12 +350,12 @@ bool float4::IsZero3(float epsilonSq) const
 
 bool float4::IsNormalized4(float epsilonSq) const
 {
-	return fabs(LengthSq4()-1.f) <= epsilonSq;
+	return MATH_NS::Abs(LengthSq4()-1.f) <= epsilonSq;
 }
 
 bool float4::IsNormalized3(float epsilonSq) const
 {
-	return fabs(LengthSq3()-1.f) <= epsilonSq;
+	return MATH_NS::Abs(LengthSq3()-1.f) <= epsilonSq;
 }
 
 void float4::Scale3(float scalar)
@@ -1034,18 +1034,18 @@ void float4::SetFromScalar(float scalar, float w_)
 
 bool float4::Equals(const float4 &other, float epsilon) const
 {
-	return fabs(x - other.x) < epsilon &&
-		   fabs(y - other.y) < epsilon &&
-		   fabs(z - other.z) < epsilon &&
-		   fabs(w - other.w) < epsilon;
+	return MATH_NS::Abs(x - other.x) < epsilon &&
+	       MATH_NS::Abs(y - other.y) < epsilon &&
+	       MATH_NS::Abs(z - other.z) < epsilon &&
+	       MATH_NS::Abs(w - other.w) < epsilon;
 }
 
 bool float4::Equals(float x_, float y_, float z_, float w_, float epsilon) const
 {
-	return fabs(x - x_) < epsilon &&
-		   fabs(y - y_) < epsilon &&
-		   fabs(z - z_) < epsilon &&
-		   fabs(w - w_) < epsilon;
+	return MATH_NS::Abs(x - x_) < epsilon &&
+	       MATH_NS::Abs(y - y_) < epsilon &&
+	       MATH_NS::Abs(z - z_) < epsilon &&
+	       MATH_NS::Abs(w - w_) < epsilon;
 }
 
 bool float4::BitEquals(const float4 &other) const

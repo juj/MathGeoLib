@@ -866,7 +866,7 @@ bool Plane::IsParallel(const Plane &plane, float epsilon) const
 
 bool Plane::PassesThroughOrigin(float epsilon) const
 {
-	return fabs(d) <= epsilon;
+	return MATH_NS::Abs(d) <= epsilon;
 }
 
 float Plane::DihedralAngle(const Plane &plane) const
