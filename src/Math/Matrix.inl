@@ -767,15 +767,23 @@ bool InverseMatrix(Matrix &mat, float epsilon)
 {
 	Matrix inversed = Matrix::identity; // will contain the inverse matrix
 
-	for(int column = 0; column < Min<int>(Matrix::Rows, Matrix::Cols); ++column)
+	const int nc = Min<int>(Matrix::Rows, Matrix::Cols);
+	for(int column = 0; column < nc; ++column)
 	{
 		// find the row i with i >= j such that M has the largest absolute value.
 		int greatest = column;
-		for(int i = column; i < Matrix::Rows; i++)
-			if (Abs(mat[i][column]) > Abs(mat[greatest][column]))
+		float greatestVal = Abs(mat[greatest][column]);
+		for(int i = column+1; i < Matrix::Rows; i++)
+		{
+			float val = Abs(mat[i][column]);
+			if (val > greatestVal)
+			{
 				greatest = i;
+				greatestVal = val;
+			}
+		}
 
-		if (EqualAbs(mat[greatest][column], 0, epsilon))
+		if (greatestVal < epsilon)
 		{
 			mat = inversed;
 			return false;
@@ -790,16 +798,21 @@ bool InverseMatrix(Matrix &mat, float epsilon)
 		
 		// multiply rows
 		assume(!EqualAbs(mat[column][column], 0.f, epsilon));
-		inversed.ScaleRow(column, 1.f / mat[column][column]);
-		mat.ScaleRow(column, 1.f / mat[column][column]);
+		float scale = 1.f / mat[column][column];
+		inversed.ScaleRow(column, scale);
+		mat.ScaleRow(column, scale);
 		
 		// add rows
-		for(int i = 0; i < Matrix::Rows; i++)
-			if (i != column)
-			{
-				inversed.SetRow(i, inversed.Row(i) - inversed.Row(column) * mat[i][column]);
-				mat.SetRow(i, mat.Row(i) - mat.Row(column) * mat[i][column]);
-			}
+		for(int i = 0; i < column; i++)
+		{
+			inversed.SetRow(i, inversed.Row(i) - inversed.Row(column) * mat[i][column]);
+			mat.SetRow(i, mat.Row(i) - mat.Row(column) * mat[i][column]);
+		}
+		for(int i = column+1; i < Matrix::Rows; i++)
+		{
+			inversed.SetRow(i, inversed.Row(i) - inversed.Row(column) * mat[i][column]);
+			mat.SetRow(i, mat.Row(i) - mat.Row(column) * mat[i][column]);
+		}
 	}
 	mat = inversed;
 

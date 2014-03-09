@@ -238,6 +238,13 @@ RANDOMIZED_TEST(Float3x3SolveAxb)
 	}
 }
 
+UNIQUE_TEST(Float3x3InverseCase)
+{
+	float3x3 m(-8.75243664f,6.71196938f,-5.95816374f,6.81996822f,-6.85106039f,2.38949537f,-0.856015682f,3.45762491f,3.311584f);
+	bool success = m.Inverse();
+	assert(success);
+}
+
 RANDOMIZED_TEST(Float3x3Inverse)
 {
 	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);

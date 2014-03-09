@@ -644,7 +644,7 @@ public:
 
 	/// Inverts this matrix using the generic Gauss's method.
 	/// @return Returns true on success, false otherwise.
-	bool Inverse(float epsilon = 1e-3f);
+	bool Inverse(float epsilon = 1e-6f);
 
 	/// Returns an inverted copy of this matrix.
 	/// If this matrix does not have an inverse, returns the matrix that was the result of running

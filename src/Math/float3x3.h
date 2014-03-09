@@ -410,11 +410,13 @@ public:
 	/// Returns the adjugate of this matrix.
 //	float3x3 Adjugate() const;
 
+	/// Inverts this matrix using numerically stable Gaussian elimination.
+	/// @return Returns true on success, false otherwise.
+	bool Inverse(float epsilon = 1e-6f);
+
 	/// Inverts this matrix using Cramer's rule.
 	/// @return Returns true on success, false otherwise.
-	bool Inverse(float epsilon = 1e-3f);
-
-	bool InverseFast(float epsilon = 1e-3f);
+	bool InverseFast(float epsilon = 1e-6f);
 
 	/// Solves the linear equation Ax=b.
 	/** The matrix A in the equations is this matrix. */
