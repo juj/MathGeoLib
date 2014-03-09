@@ -1538,7 +1538,7 @@ UNIQUE_TEST(TriangleLineSegmentIntersectCase)
 	Triangle a(POINT_VEC(-45.7166939f,-104.675713f,17.1150723f),POINT_VEC(-20.9888325f,-89.1524963f,-31.5042286f),POINT_VEC(-1.45244789f,-76.914505f,-69.9231262f));
 	LineSegment b(POINT_VEC(-19.0950012f,-134.222748f,-33.7456589f),POINT_VEC(-52.5003471f,-49.3652039f,28.5405655f));
 
-	assert(a.Intersects(b));
+	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
 	vec cp = a.ClosestPoint(b);
 	assert(a.Contains(cp));
 //	assert(b.Contains(cp));
@@ -1613,6 +1613,13 @@ RANDOMIZED_TEST(PlaneLineIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(PlaneRayIntersectCase)
+{
+	Plane p(DIR_VEC(-0.25385046f,-0.518036366f,-0.816822112f),91.5489655f);
+	Ray r(POINT_VEC(-70.5785141f,-19.6609783f,-77.6785507f),DIR_VEC(0.916250288f,0.141897082f,-0.374634057f));
+	assert(p.Intersects(r));
+}
+
 RANDOMIZED_TEST(PlaneRayIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
@@ -1633,8 +1640,8 @@ RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
 	assert(a.Distance(b) == 0.f);
 	assert(b.Distance(a) == 0.f);
 	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));

@@ -615,16 +615,16 @@ bool Plane::IntersectLinePlane(const vec &planeNormal, float planeD, const vec &
 	is embedded on the plane, and infinitely many intersections occur. */
 
 	float denom = Dot(planeNormal, lineDir);
-	if (EqualAbs(denom, 0.f))
-	{
-		t = 0.f;
-		return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-3f);
-	}
-	else
+	if (Abs(denom) > 1e-7f)
 	{
 		// Compute the distance from the line starting point to the point of intersection.
 		t = (planeD - Dot(planeNormal, linePos)) / denom;
-		return true;
+		return Abs(t) < 1e7f;
+	}
+	else
+	{
+		t = 0.f;
+		return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-3f);
 	}
 }
 
