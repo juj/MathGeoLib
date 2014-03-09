@@ -1441,6 +1441,13 @@ std::string float3x3::ToString() const
 	return std::string(str);
 }
 
+std::string float3x3::SerializeToString() const
+{
+	char str[256];
+	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]);
+	return std::string(str);
+}
+
 std::string float3x3::ToString2() const
 {
 	char str[256];
