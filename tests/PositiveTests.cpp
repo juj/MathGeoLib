@@ -1342,7 +1342,19 @@ RANDOMIZED_TEST(PolyhedronPolygonIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(PolygonLineIntersectCase)
+{
+	Polygon p;
+	p.p.push_back(POINT_VEC(-19.0257339f,93.0070877f,20.232048f));
+	p.p.push_back(POINT_VEC(-19.0257339f,131.203674f,20.232048f));
+	p.p.push_back(POINT_VEC(0.0725631714f,143.00708f,51.1337509f));
+	p.p.push_back(POINT_VEC(11.875967f,112.105385f,70.232048f));
+	p.p.push_back(POINT_VEC(0.0725631714f,81.2036819f,51.1337509f));
 
+	Line l(POINT_VEC(-51.2448387f,66.6799698f,-31.887619f),DIR_VEC(-0.494226635f,-0.341286302f,-0.799539685f));
+
+	assert(p.Intersects(l));
+}
 
 RANDOMIZED_TEST(PolygonLineIntersect)
 {
