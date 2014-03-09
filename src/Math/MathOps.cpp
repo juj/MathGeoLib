@@ -35,8 +35,7 @@ float RelativeError(float a, float b)
 bool EqualRel(float a, float b, float maxRelError)
 {
 	if (a == b) return true; // Handles the special case where a and b are both zero.
-	float relativeError = Abs((a-b)/Max(Abs(a), Abs(b)));
-	return relativeError <= maxRelError;
+	return Abs(a-b) <= maxRelError * Max(Abs(a), Abs(b));
 }
 
 inline int ReinterpretFloatAsInt(float a)
