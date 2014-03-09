@@ -87,15 +87,10 @@ bool Plane::IsDegenerate() const
 
 void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 {
-	normal = ((v2-v1).Cross(v3-v1)).Normalized();
+	normal = (v2-v1).Cross(v3-v1);
+	assume(!normal.IsZero());
+	normal.Normalize();
 	d = normal.Dot(v1);
-
-#ifdef MATH_ASSERT_CORRECTNESS
-	float d2 = normal.Dot(v2);
-	float d3 = normal.Dot(v3);
-	assume3(EqualAbs(d, d2, 1e-2f) || EqualRel(d, d2, 1e-3f), d, d2, d3);
-	assume3(EqualAbs(d, d3, 1e-2f) || EqualRel(d, d3, 1e-3f), d, d3, d3);
-#endif
 }
 
 void Plane::Set(const vec &point, const vec &normal_)
