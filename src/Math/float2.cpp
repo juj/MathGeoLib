@@ -207,9 +207,10 @@ bool float2::IsFinite() const
 	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y);
 }
 
-bool float2::IsPerpendicular(const float2 &other, float epsilon) const
+bool float2::IsPerpendicular(const float2 &other, float epsilonSq) const
 {
-	return MATH_NS::Abs(Dot(other)) <= epsilon;
+	float dot = Dot(other);
+	return dot*dot <= epsilonSq * LengthSq() * other.LengthSq();
 }
 
 bool float2::Equals(const float2 &rhs, float epsilon) const

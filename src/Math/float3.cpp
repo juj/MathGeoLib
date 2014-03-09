@@ -204,7 +204,7 @@ bool float3::IsFinite() const
 bool float3::IsPerpendicular(const float3 &other, float epsilonSq) const
 {
 	float dot = Dot(other);
-	return dot <= epsilonSq * LengthSq() * other.LengthSq();
+	return dot*dot <= epsilonSq * LengthSq() * other.LengthSq();
 }
 
 bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, const float3 &p3, float epsilonSq)

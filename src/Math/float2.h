@@ -322,7 +322,7 @@ public:
 
 	/// Tests if two vectors are perpendicular to each other.
 	/** @see IsNormalized(), IsZero(), IsPerpendicular(), Equals(). */
-	bool IsPerpendicular(const float2 &other, float epsilon = 1e-3f) const;
+	bool IsPerpendicular(const float2 &other, float epsilonSq = 1e-8f) const;
 
 	/// Tests if two vectors are equal, up to the given epsilon.
 	/** @see IsPerpendicular(). */

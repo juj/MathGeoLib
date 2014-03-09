@@ -417,14 +417,16 @@ bool float4::IsFinite() const
 	return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z) && MATH_NS::IsFinite(w);
 }
 
-bool float4::IsPerpendicular3(const float4 &other, float epsilon) const
+bool float4::IsPerpendicular3(const float4 &other, float epsilonSq) const
 {
-	return MATH_NS::Abs(this->Dot3(other)) < epsilon;
+	float dot = Dot3(other);
+	return dot*dot <= epsilonSq * LengthSq() * other.LengthSq();
 }
 
-bool float4::IsPerpendicular(const float4 &other, float epsilon) const
+bool float4::IsPerpendicular(const float4 &other, float epsilonSq) const
 {
-	return MATH_NS::Abs(this->Dot(other)) < epsilon;
+	float dot = Dot(other);
+	return dot*dot <= epsilonSq * LengthSq() * other.LengthSq();
 }
 
 bool IsNeutralCLocale();

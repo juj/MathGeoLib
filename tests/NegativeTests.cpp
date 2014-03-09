@@ -131,7 +131,7 @@ Line RandomLineInHalfspace(const Plane &plane)
 	Line l(linePos, dir);
 	assert(l.IsFinite());
 	assert2(!plane.Intersects(l), plane.SerializeToCodeString(), l.SerializeToCodeString());
-	assert(plane.SignedDistance(l) > 0.f);
+	assert1(plane.SignedDistance(l) > 0.f, plane.SignedDistance(l));
 	return l;
 }
 
