@@ -148,8 +148,8 @@ RANDOMIZED_TEST(LineLineClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2, 1e-2f), d, D2);
-	assert2(EqualAbs(D, d2, 1e-2f), D, d2);
+	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-3f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-3f), D, d2);
 	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
 	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
@@ -173,8 +173,8 @@ RANDOMIZED_TEST(LineRayClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2, 1e-1f), d, D2);
-	assert2(EqualAbs(D, d2, 1e-1f), D, d2);
+	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-3f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-3f), D, d2);
 	assert(closestPointB.Equals(closestPointB2, 1e-1f));
 	vec closestPointA2 = a.GetPoint(D2);
 	assert(closestPointA.Equals(closestPointA2, 1e-1f));
@@ -200,8 +200,8 @@ RANDOMIZED_TEST(LineLineSegmentClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2), d, D2);
-	assert2(EqualAbs(D, d2), D, d2);
+	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-3f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-3f), D, d2);
 	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
 	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
@@ -230,8 +230,8 @@ RANDOMIZED_TEST(RayRayClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2, 1e-1f), d, D2);
-	assert2(EqualAbs(D, d2, 1e-1f), D, d2);
+	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-3f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-3f), D, d2);
 	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	closestPointA2 = a.GetPoint(D2);
 	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
@@ -260,8 +260,8 @@ RANDOMIZED_TEST(RayLineSegmentClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2), d, D2);
-	assert2(EqualAbs(D, d2), D, d2);
+	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-3f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-3f), D, d2);
 	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
 	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
@@ -292,8 +292,8 @@ RANDOMIZED_TEST(LineSegmentLineSegmentClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2), d, D2);
-	assert2(EqualAbs(D, d2), D, d2);
+	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-3f), d, D2);
+	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-3f), D, d2);
 	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
 	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
