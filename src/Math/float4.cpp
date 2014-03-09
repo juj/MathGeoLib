@@ -951,12 +951,12 @@ float4 float4::Lerp(const float4 &a, const float4 &b, float t)
 	return a.Lerp(b, t);
 }
 
-bool float4::AreOrthogonal(const float4 &a, const float4 &b, float epsilon)
+bool MUST_USE_RESULT float4::AreOrthogonal(const float4 &a, const float4 &b, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon);
 }
 
-bool float4::AreOrthogonal(const float4 &a, const float4 &b, const float4 &c, float epsilon)
+bool MUST_USE_RESULT float4::AreOrthogonal(const float4 &a, const float4 &b, const float4 &c, float epsilon)
 {
 	return a.IsPerpendicular(b, epsilon) &&
 	       a.IsPerpendicular(c, epsilon) &&
