@@ -523,7 +523,10 @@ static void FindIntersectingLineSegments(const Triangle &t, float da, float db, 
 int IntervalIntersection(float u0, float u1, float v0, float v1, float &s, float &t)
 {
 	if (u1 < v0 || u0 > v1)
+	{
+		s = t = FLOAT_NAN;
 		return 0;
+	}
 
 	if (u1 > v0)
 	{
@@ -535,14 +538,14 @@ int IntervalIntersection(float u0, float u1, float v0, float v1, float &s, float
 		}
 		else // u0 == v1
 		{
-			s = u0;
+			s = t = u0;
 			return 1;
 		}
 	}
 	else
 	{
 		// u1 == v0
-		s = u1;
+		s = t = u1;
 		return 1;
 	}
 }
@@ -560,15 +563,9 @@ bool LineSegment2DLineSegment2DIntersect(const float2 &p0, const float2 &dir0, c
 	{
 		// The lines are not parallel
 		s = e.PerpDot(dir1) / cross;
-		if (s < 0.f || s > 1.f)
-			return false;
-
 		t = e.PerpDot(dir0) / cross;
-		if (t < 0.f || t > 1.f)
-			return false;
-
 		// The intersection point is p0 + s * dir0;
-		return true;
+		return s >= 0.f && s <= 1.f && t >= 0.f && t <= 1.f;
 	}
 
 	// The line segments are parallel
@@ -578,6 +575,7 @@ bool LineSegment2DLineSegment2DIntersect(const float2 &p0, const float2 &dir0, c
 	if (sqrCross > sqrEpsilon * sqrLen0 * sqrLenE)
 	{
 		// The lines are at a positive distance, no intersection.
+		s = t = FLOAT_NAN;
 		return false;
 	}
 
