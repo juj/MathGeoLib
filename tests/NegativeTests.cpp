@@ -1137,7 +1137,19 @@ RANDOMIZED_TEST(FrustumPolygonNoIntersect)
 }
 
 
+UNIQUE_TEST(PlaneLineNoIntersectCase)
+{
+	Plane p(DIR_VEC(-0.746312618f,0.586626351f,-0.31446299f),-35.7190437f);
+	Line l(POINT_VEC(45.1519928f,46.7459641f,92.9752197f),DIR_VEC(0.631202042f,0.773685277f,-0.0547275133f));
+	assert(!p.Intersects(l));
+}
 
+UNIQUE_TEST(PlaneLineNoIntersectCase2)
+{
+	Plane p(DIR_VEC(0.344275832f,-0.882686555f,0.31990397f),-56.7400818f);
+	Line l(POINT_VEC(36.2179184f,88.9618607f,29.178812f),DIR_VEC(0.775070965f,0.459497392f,0.433736295f));
+	assert(!p.Intersects(l));
+}
 
 RANDOMIZED_TEST(CapsuleLineNoIntersect)
 {

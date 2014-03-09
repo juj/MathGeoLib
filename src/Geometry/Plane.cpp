@@ -88,8 +88,10 @@ bool Plane::IsDegenerate() const
 void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 {
 	normal = (v2-v1).Cross(v3-v1);
-	assume(!normal.IsZero());
-	normal.Normalize();
+	float len = normal.Length();
+	assume(len > 1e-10f);
+	normal /= len;
+	assume(normal.IsNormalized());
 	d = normal.Dot(v1);
 }
 
@@ -610,17 +612,21 @@ bool Plane::IntersectLinePlane(const vec &planeNormal, float planeD, const vec &
 	is embedded on the plane, and infinitely many intersections occur. */
 
 	float denom = Dot(planeNormal, lineDir);
-	if (Abs(denom) > 1e-7f)
+	if (Abs(denom) > 1e-4f)
 	{
 		// Compute the distance from the line starting point to the point of intersection.
 		t = (planeD - Dot(planeNormal, linePos)) / denom;
-		return Abs(t) < 1e7f;
+		return true;
 	}
-	else
+
+	if (denom != 0.f)
 	{
-		t = 0.f;
-		return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-3f);
+		t = (planeD - Dot(planeNormal, linePos)) / denom;
+		if (Abs(t) < 1e4f)
+			return true;
 	}
+	t = 0.f;
+	return EqualAbs(Dot(planeNormal, linePos), planeD, 1e-3f);
 }
 
 
