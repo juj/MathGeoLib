@@ -1717,14 +1717,14 @@ vec Triangle::RandomPointInside(LCG &rng) const
 #ifdef MATH_ASSERT_CORRECTNESS
 	vec pt = Point(s, t);
 	float2 uv = BarycentricUV(pt);
-	assert(uv.x >= 0.f);
-	assert(uv.y >= 0.f);
-	assert(uv.x + uv.y <= 1.f);
+	assert1(uv.x >= 0.f, uv.x);
+	assert1(uv.y >= 0.f, uv.y);
+	assert3(uv.x + uv.y <= 1.f, uv.x, uv.y, uv.x + uv.y);
 	float3 uvw = BarycentricUVW(pt);
-	assert(uvw.x >= 0.f);
-	assert(uvw.y >= 0.f);
-	assert(uvw.z >= 0.f);
-	assert(EqualAbs(uvw.x + uvw.y + uvw.z, 1.f));
+	assert1(uvw.x >= 0.f, uvw.x);
+	assert1(uvw.y >= 0.f, uvw.y);
+	assert1(uvw.z >= 0.f, uvw.z);
+	assert4(EqualAbs(uvw.x + uvw.y + uvw.z, 1.f), uvw.x, uvw.y, uvw.z, uvw.x + uvw.y + uvw.z);
 #endif
 	return Point(s, t);
 }
