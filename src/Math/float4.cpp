@@ -951,6 +951,18 @@ float4 float4::Lerp(const float4 &a, const float4 &b, float t)
 	return a.Lerp(b, t);
 }
 
+bool float4::AreOrthogonal(const float4 &a, const float4 &b, float epsilon)
+{
+	return a.IsPerpendicular(b, epsilon);
+}
+
+bool float4::AreOrthogonal(const float4 &a, const float4 &b, const float4 &c, float epsilon)
+{
+	return a.IsPerpendicular(b, epsilon) &&
+	       a.IsPerpendicular(c, epsilon) &&
+	       b.IsPerpendicular(c, epsilon);
+}
+
 void float4::Orthonormalize(float4 &a, float4 &b)
 {
 	assume(!a.IsZero());

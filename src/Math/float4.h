@@ -420,6 +420,11 @@ public:
 	static void Orthogonalize(const float4 &a, float4 &b);
 	static void Orthogonalize(const float4 &a, float4 &b, float4 &c);
 
+	/// Returns true if the given vectors are orthogonal to each other.
+	/** @see Orthogonalize(), Orthonormalize(), AreOrthonormal(), AreCollinear(). */
+	static MUST_USE_RESULT bool AreOrthogonal(const float4 &a, const float4 &b, float epsilon = 1e-3f);
+	static MUST_USE_RESULT bool AreOrthogonal(const float4 &a, const float4 &b, const float4 &c, float epsilon = 1e-3f);
+
 	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
 	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */
 	static MUST_USE_RESULT bool AreCollinear(const float4 &p1, const float4 &p2, const float4 &p3, float epsilon = 1e-7f);
