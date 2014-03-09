@@ -44,6 +44,8 @@ OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength)
 	assume2(o.axis[0].IsNormalized(), o.axis[0], o.axis[0].LengthSq());
 	assume2(o.axis[1].IsNormalized(), o.axis[1], o.axis[1].LengthSq());
 	assume2(o.axis[2].IsNormalized(), o.axis[2], o.axis[2].LengthSq());
+	assume(vec::AreOrthogonal(o.axis[0], o.axis[1], o.axis[2]));
+//	assume(vec::AreOrthonormal(o.axis[0], o.axis[1], o.axis[2]));
 	o.r = DIR_VEC(w, h, d);
 	const float epsilon = 1e-4f;
 	o.pos += rng.Float(-w+epsilon, w-epsilon) * o.axis[0];

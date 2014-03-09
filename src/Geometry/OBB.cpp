@@ -864,8 +864,8 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 {
 	assume(pos.IsFinite());
 	assume(b.pos.IsFinite());
-	assume(vec::AreOrthonormal(axis[0], axis[1], axis[2]));
-	assume(vec::AreOrthonormal(b.axis[0], b.axis[1], b.axis[2]));
+	assume(vec::AreOrthogonal(axis[0], axis[1], axis[2]));
+	assume(vec::AreOrthogonal(b.axis[0], b.axis[1], b.axis[2]));
 
 	// Generate a rotation matrix that transforms from world space to this OBB's coordinate space.
 	float3x3 R;
