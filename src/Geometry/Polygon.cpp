@@ -373,7 +373,7 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 	assert3(basisV.IsPerpendicular(PlaneCCW().normal), basisV, PlaneCCW().normal, basisV.Dot(PlaneCCW().normal));
 
 	vec normal = basisU.Cross(basisV);
-	float lenSq = normal.LengthSq();
+//	float lenSq = normal.LengthSq(); ///\todo Could we treat basisU and basisV unnormalized here?
 	float d = normal.Dot(vec(p[0]) - worldSpacePoint);
 	if (d*d > polygonThicknessSq)
 		return false;
