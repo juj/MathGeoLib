@@ -47,9 +47,10 @@ RANDOMIZED_TEST(ParallelLineLineSegmentClosestPoint)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Line a = RandomLineContainingPoint(pt);
 	LineSegment b;
-	vec displacement = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	vec displacement = vec::RandomBox(rng, DIR_VEC_SCALAR(-SCALE), DIR_VEC_SCALAR(SCALE));
 	b.a = a.pos + displacement;
-	b.b = b.a + rng.Float(-SCALE, SCALE) * a.dir;
+	float len = rng.Float(1e-3f, SCALE) * (rng.Int(0,1) ? 1.f : -1.f);
+	b.b = b.a + len * a.dir;
 
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
