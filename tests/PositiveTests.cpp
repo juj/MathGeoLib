@@ -1396,7 +1396,7 @@ RANDOMIZED_TEST(PolygonLineSegmentIntersect)
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
 	assert4(a.Contains(a.ClosestPoint(b)), a, b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
+	assert3(b.Contains(a.ClosestPoint(b)), b.SerializeToCodeString(), a.SerializeToString(), b.Distance(a.ClosestPoint(b)));
 //	assert(a.Contains(b.ClosestPoint(a)));
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
