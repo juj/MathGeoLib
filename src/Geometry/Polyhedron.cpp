@@ -409,7 +409,6 @@ float Polyhedron::FaceContainmentDistance2D(int faceIndex, const vec &worldSpace
 
 		if (p0.y * p1.y < 0.f)
 		{
-			if (p0.x > 1e-3f && p1.x > 1e-3f)
 			float minX = Min(p0.x, p1.x);
 			if (minX > 0.f)
 			{
