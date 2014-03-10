@@ -1733,3 +1733,18 @@ TEST(PolygonContains2D)
 
 	assert(pol.Contains(point));
 }
+
+#if 0
+UNIQUE_TEST(PolygonContainsPointCase2)
+{
+	Polygon p;
+	p.p.push_back(POINT_VEC(0,0,0));
+	p.p.push_back(POINT_VEC(2.f,0,0));
+	p.p.push_back(POINT_VEC(2.f,0.0646286f,0));
+	p.p.push_back(POINT_VEC(0,0.0646286f,0));
+
+	vec pt = POINT_VEC(1.f,0.0645294f,0);
+
+	assert(p.Contains(pt));
+}
+#endif

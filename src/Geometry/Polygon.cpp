@@ -380,20 +380,21 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 
 	int numIntersections = 0;
 
-	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
-
 	const float epsilon = 1e-4f;
 
 	// General strategy: transform all points on the polygon onto 2D face plane of the polygon, where the target query point is 
 	// centered to lie in the origin.
 	// If the test ray (0,0) -> (+inf, 0) intersects exactly an odd number of polygon edge segments, then the query point must have been
 	// inside the polygon. The test ray is chosen like that to avoid all extra per-edge computations.
-	float2 p0 = float2(Dot(p[p.size()-1], basisU), Dot(p[p.size()-1], basisV)) - localSpacePoint;
+	vec vt = vec(p.back()) - worldSpacePoint;
+	float2 p0 = float2(Dot(vt, basisU), Dot(vt, basisV));
 	if (Abs(p0.y) < epsilon)
 		p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
+
 	for(int i = 0; i < (int)p.size(); ++i)
 	{
-		float2 p1 = float2(Dot(p[i], basisU), Dot(p[i], basisV)) - localSpacePoint;
+		vt = vec(p[i]) - worldSpacePoint;
+		float2 p1 = float2(Dot(vt, basisU), Dot(vt, basisV));
 		if (Abs(p1.y) < epsilon)
 			p1.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
 
@@ -401,7 +402,7 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 		{
 			if (Min(p0.x, p1.x) > 0.f) // If both x-coordinates are positive, then there certainly is an intersection with the ray.
 				++numIntersections;
-			else if (Max(p0.x, p1.x) > 0.f) // If one of them is positive, there could be. (otherwise both are negative and they can't intersect ray)
+			else if (Max(p0.x, p1.x) > 0.f) // If one of them is positive, there could be an intersection. (otherwise both are negative and they can't intersect ray)
 			{
 				// P = p0 + t*(p1-p0) == (x,0)
 				//     p0.x + t*(p1.x-p0.x) == x

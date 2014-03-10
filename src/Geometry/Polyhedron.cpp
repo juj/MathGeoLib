@@ -389,28 +389,34 @@ float Polyhedron::FaceContainmentDistance2D(int faceIndex, const vec &worldSpace
 	mathassert(basisU.IsPerpendicular(p.normal));
 	mathassert(basisV.IsPerpendicular(p.normal));
 
-	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
-
 	// Tracks a pseudo-distance of the point to the ~nearest edge of the polygon. If the point is very close to the polygon
 	// edge, this is very small, and it's possible that due to numerical imprecision we cannot rely on the result in higher-level
 	// algorithms that invoke this function.
 	float faceContainmentDistance = FLOAT_INF;
 	const float epsilon = 1e-4f;
 
-	float2 p0 = float2(Dot(v[vertices.back()], basisU), Dot(v[vertices.back()], basisV)) - localSpacePoint;
+	vec vt = vec(v[vertices.back()]) - worldSpacePoint;
+	float2 p0 = float2(Dot(vt, basisU), Dot(vt, basisV));
 	if (Abs(p0.y) < epsilon)
 		p0.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
+
 	for(size_t i = 0; i < vertices.size(); ++i)
 	{
-		float2 p1 = float2(Dot(v[vertices[i]], basisU), Dot(v[vertices[i]], basisV)) - localSpacePoint;
+		vt = vec(v[vertices[i]]) - worldSpacePoint;
+		float2 p1 = float2(Dot(vt, basisU), Dot(vt, basisV));
 		if (Abs(p1.y) < epsilon)
 			p1.y = -epsilon; // Robustness check - if the ray (0,0) -> (+inf, 0) would pass through a vertex, move the vertex slightly.
 
 		if (p0.y * p1.y < 0.f)
 		{
 			if (p0.x > 1e-3f && p1.x > 1e-3f)
+			float minX = Min(p0.x, p1.x);
+			if (minX > 0.f)
+			{
+				faceContainmentDistance = Min(faceContainmentDistance, minX);
 				++numIntersections;
-			else
+			}
+			else if (Max(p0.x, p1.x) > 0.f)
 			{
 				// P = p0 + t*(p1-p0) == (x,0)
 				//     p0.x + t*(p1.x-p0.x) == x
