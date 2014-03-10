@@ -266,11 +266,11 @@ public:
 		@param point The point to test for containment.
 		@param polygonThickness Since a polygon is a 2D object in a 3D space, a threshold value is used to
 			allow floating-point inaccuracies. This parameter defines how much "thickness" to give to the polygon
-			for the purposes of the test.
+			for the purposes of the test. polygonThicknessSq is this parameter squared.
 		@return True if the given object is fully contained inside this polygon (and the plane of this polygon).
 		@todo Add ContainsConvex(vec/etc.). See RTCD p. 202.
 		@todo Add Contains(Circle/Disc). */
-	bool Contains(const vec &point, float polygonThickness = 1e-3f) const;
+	bool Contains(const vec &point, float polygonThicknessSq = 1e-5f) const;
 	bool Contains(const LineSegment &lineSegment, float polygonThickness = 1e-3f) const;
 	bool Contains(const Triangle &triangle, float polygonThickness = 1e-3f) const;
 	bool Contains(const Polygon &polygon, float polygonThickness = 1e-3f) const;

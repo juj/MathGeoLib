@@ -357,17 +357,12 @@ bool Polygon::Contains(const Polygon &worldSpacePolygon, float polygonThickness)
 	return true;
 }
 
-bool Polygon::Contains(const vec &worldSpacePoint, float polygonThickness) const
+bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) const
 {
 	// Implementation based on the description from http://erich.realtimerendering.com/ptinpoly/
 
 	if (p.size() < 3)
 		return false;
-
-	if (PlaneCCW().Distance(worldSpacePoint) > polygonThickness)
-		return false;
-
-	int numIntersections = 0;
 
 	vec basisU = BasisU();
 	vec basisV = BasisV();
@@ -376,6 +371,14 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThickness) const
 	assert2(basisU.IsPerpendicular(basisV), basisU, basisV);
 	assert3(basisU.IsPerpendicular(PlaneCCW().normal), basisU, PlaneCCW().normal, basisU.Dot(PlaneCCW().normal));
 	assert3(basisV.IsPerpendicular(PlaneCCW().normal), basisV, PlaneCCW().normal, basisV.Dot(PlaneCCW().normal));
+
+	vec normal = basisU.Cross(basisV);
+	float lenSq = normal.LengthSq();
+	float d = normal.Dot(vec(p[0]) - worldSpacePoint);
+	if (d*d > polygonThicknessSq)
+		return false;
+
+	int numIntersections = 0;
 
 	float2 localSpacePoint = float2(Dot(worldSpacePoint, basisU), Dot(worldSpacePoint, basisV));
 
