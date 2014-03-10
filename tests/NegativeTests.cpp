@@ -493,7 +493,7 @@ RANDOMIZED_TEST(AABBPolygonNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Polygon b = RandomPolygonInHalfspace(p);
-	assert2(!a.Intersects(b), a, b);
+	assert2(!a.Intersects(b), a.SerializeToCodeString(), b.SerializeToString());
 	assert(!b.Intersects(a));
 //	assert(a.Distance(b) > 0.f);
 //	assert(b.Distance(a) > 0.f);

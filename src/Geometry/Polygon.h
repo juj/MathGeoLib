@@ -155,7 +155,7 @@ public:
 			non-planar polygons in this class, they are better avoided. Read the member function documentation carefully
 			to avoid calling for non-planar polygons any functions which assume planarity.
 		@see IsConvex(), IsSimple(), IsNull(), IsFinite(), IsDegenerate(). */
-	bool IsPlanar(float epsilonSq = 1e-5f) const;
+	bool IsPlanar(float epsilonSq = 1e-4f) const;
 
 	/** Tests if this polygon is simple.
 		A polygon is simple if no two nonconsecutive edges have a point in common.

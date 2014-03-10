@@ -1520,7 +1520,7 @@ RANDOMIZED_TEST(TriangleLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
+	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
 //	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
