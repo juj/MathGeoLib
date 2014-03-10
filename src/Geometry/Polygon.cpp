@@ -203,16 +203,20 @@ vec Polygon::MapFrom2D(const float2 &point) const
 	return (vec)p[0] + point.x * BasisU() + point.y * BasisV();
 }
 
-bool Polygon::IsPlanar(float epsilon) const
+bool Polygon::IsPlanar(float epsilonSq) const
 {
 	if (p.empty())
 		return false;
 	if (p.size() <= 3)
 		return true;
-	Plane plane = PlaneCCW();
+	vec normal = (vec(p[1])-vec(p[0])).Cross(vec(p[2])-vec(p[0]));
+	float lenSq = normal.LengthSq();
 	for(size_t i = 3; i < p.size(); ++i)
-		if (plane.Distance(p[i]) > epsilon)
+	{
+		float d = normal.Dot(vec(p[i])-vec(p[0]));
+		if (d*d > epsilonSq * lenSq)
 			return false;
+	}
 	return true;
 }
 

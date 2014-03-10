@@ -36,3 +36,13 @@ UNIQUE_TEST(Polygon_IsPlanarCase)
 	p.p.push_back(POINT_VEC(0.001175f, 0.f, 1.f));
 	assert(p.IsPlanar());
 }
+
+UNIQUE_TEST(Polygon_IsPlanarCase2)
+{
+	Polygon p;
+	p.p.push_back(POINT_VEC(35.2095566f,148.158905f,13.9513502f));
+	p.p.push_back(POINT_VEC(36.0442657f,147.617859f,13.1296129f));
+	p.p.push_back(POINT_VEC(185.938354f,-49.2594376f,24.0656204f));
+	p.p.push_back(POINT_VEC(-38.1764603f,96.0109634f,244.697083f));
+	assert(p.IsPlanar());
+}
