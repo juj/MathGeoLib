@@ -46,3 +46,14 @@ UNIQUE_TEST(Polygon_IsPlanarCase2)
 	p.p.push_back(POINT_VEC(-38.1764603f,96.0109634f,244.697083f));
 	assert(p.IsPlanar());
 }
+
+UNIQUE_TEST(Triangle_ContainsPoint)
+{
+	Triangle t(POINT_VEC(37.8599548f,-7.36342621f,62.7666626f),
+		POINT_VEC(112.436401f,-119.294914f,-119.175751f),
+		POINT_VEC(99.9088364f,-100.386391f,-88.2388687f));
+
+	vec pt = POINT_VEC(96.5959015f,-95.449379f,-80.2810669f);
+
+	assert(t.Contains(pt));
+}

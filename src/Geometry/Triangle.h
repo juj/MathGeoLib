@@ -246,11 +246,11 @@ public:
 	static bool IsDegenerate(const vec &p1, const vec &p2, const vec &p3, float epsilon = 1e-3f);
 
 	/// Tests if the given object is fully contained inside this triangle.
-	/** @param triangleThickness An epsilon threshold value to use for this test.
+	/** @param triangleThickness An epsilon threshold value to use for this test. triangleThicknessSq is the squared version of this parameter.
 			This specifies the maximum distance the given object can lie from the plane defined by this triangle.
 		@see Distance(), Intersects(), ClosestPoint().
 		@todo Add Triangle::Contains(Circle) and Triangle::Contains(Disc). */
-	bool Contains(const vec &point, float triangleThickness = 1e-3f) const;
+	bool Contains(const vec &point, float triangleThicknessSq = 1e-5f) const;
 	bool Contains(const LineSegment &lineSegment, float triangleThickness = 1e-3f) const;
 	bool Contains(const Triangle &triangle, float triangleThickness = 1e-3f) const;
 

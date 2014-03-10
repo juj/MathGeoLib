@@ -321,9 +321,12 @@ bool Triangle::IsDegenerate(const vec &a, const vec &b, const vec &c, float epsi
 	return a.Equals(b, epsilon) || a.Equals(c, epsilon) || b.Equals(c, epsilon);
 }
 
-bool Triangle::Contains(const vec &point, float triangleThickness) const
+bool Triangle::Contains(const vec &point, float triangleThicknessSq) const
 {
-	if (PlaneCCW().Distance(point) > triangleThickness) // The winding order of the triangle plane does not matter.
+	vec normal = (b-a).Cross(c-a);
+	float lenSq = normal.LengthSq();
+	float d = normal.Dot(b - point);
+	if (d*d > triangleThicknessSq * lenSq)
 		return false; ///@todo The plane-point distance test is omitted in Real-Time Collision Detection. p. 25. A bug in the book?
 
 	float3 br = BarycentricUVW(point);
