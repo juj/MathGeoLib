@@ -374,8 +374,8 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 
 	vec normal = basisU.Cross(basisV);
 //	float lenSq = normal.LengthSq(); ///\todo Could we treat basisU and basisV unnormalized here?
-	float d = normal.Dot(vec(p[0]) - worldSpacePoint);
-	if (d*d > polygonThicknessSq)
+	float dot = normal.Dot(vec(p[0]) - worldSpacePoint);
+	if (dot*dot > polygonThicknessSq)
 		return false;
 
 	int numIntersections = 0;
