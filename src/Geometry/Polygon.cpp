@@ -270,11 +270,23 @@ Plane Polygon::PlaneCCW() const
 {
 	if (p.size() > 3)
 	{
-		for(size_t i = 0; i < p.size(); ++i)
-			for(size_t j = i+1; j < p.size(); ++j)
+		Plane plane;
+		for(size_t i = 0; i < p.size()-2; ++i)
+			for(size_t j = i+1; j < p.size()-1; ++j)
+			{
+				vec pij = vec(p[j])-vec(p[i]);
 				for(size_t k = j+1; k < p.size(); ++k)
-					if (!vec::AreCollinear(p[i], p[j], p[k]))
-						return Plane(p[i], p[j], p[k]);
+				{
+					plane.normal = pij.Cross(vec(p[k])-vec(p[i]));
+					float lenSq = plane.normal.LengthSq();
+					if (lenSq > 1e-8f)
+					{
+						plane.normal /= Sqrt(lenSq);
+						plane.d = plane.normal.Dot(vec(p[i]));
+						return plane;
+					}
+				}
+			}
 
 #ifndef MATH_SILENT_ASSUME
 		LOGW("Polygon contains %d points, but they are all collinear! Cannot form a plane for the Polygon using three points! %s", (int)p.size(), this->SerializeToString().c_str());
