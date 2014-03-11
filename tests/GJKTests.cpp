@@ -106,7 +106,14 @@ RANDOMIZED_TEST(GJKAABBLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	try
+	{
+		assert(GJKIntersect(a, b));
+	} catch(...)
+	{
+		LOGI("a: %s", a.SerializeToCodeString());
+		LOGI("b: %s", b.SerializeToCodeString());
+	}
 }
 
 RANDOMIZED_TEST(GJKAABBSphereIntersect)
@@ -202,7 +209,15 @@ RANDOMIZED_TEST(GJKSphereLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	try
+	{
+		assert(GJKIntersect(a, b));
+	} catch(...)
+	{
+		LOGI("%s", a.SerializeToCodeString().c_str());
+		LOGI("%s", b.SerializeToCodeString().c_str());
+		throw;
+	}
 }
 
 RANDOMIZED_TEST(GJKSphereCapsuleIntersect)
