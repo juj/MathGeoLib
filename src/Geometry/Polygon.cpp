@@ -547,7 +547,7 @@ bool Convex_Intersects_Polygon(const Convex &c, const Polygon &p)
 	// Check all the edges of the convex shape against the polygon.
 	for(int i = 0; i < c.NumEdges(); ++i)
 	{
-		LineSegment l = c.Edge(i);
+		l = c.Edge(i);
 		if (p.Intersects(l))
 			return true;
 	}
