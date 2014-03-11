@@ -526,6 +526,11 @@ bool Polygon::ConvexIntersects(const OBB &obb) const
 	return GJKIntersect(*this, obb);
 }
 
+bool Polygon::ConvexIntersects(const Frustum &frustum) const
+{
+	return GJKIntersect(*this, frustum);
+}
+
 template<typename Convex /* = AABB, OBB, Frustum. */>
 bool Convex_Intersects_Polygon(const Convex &c, const Polygon &p)
 {
