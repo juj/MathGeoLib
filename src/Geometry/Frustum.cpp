@@ -810,8 +810,7 @@ bool Frustum::Intersects(const Line &line) const
 
 bool Frustum::Intersects(const LineSegment &lineSegment) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(lineSegment);
+	return GJKIntersect(*this, lineSegment);
 }
 
 bool Frustum::Intersects(const AABB &aabb) const
