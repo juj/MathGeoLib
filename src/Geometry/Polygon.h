@@ -61,6 +61,9 @@ public:
 	vec *VertexArrayPtr() { return !p.empty() ? (vec*)&p[0] : 0; }
 	const vec *VertexArrayPtr() const { return !p.empty() ? (vec*)&p[0] : 0; }
 
+	/// Quickly returns an arbitrary point inside this AABB. Used in GJK intersection test.
+	vec AnyPointFast() const { return !p.empty() ? p[0] : vec::nan; }
+
 	/// Returns a vertex of this polygon.
 	/** @param vertexIndex The index of the vertex to get, in the range [0, NumVertices()-1].
 		@see p, NumVertices(), Edge(). */
@@ -103,6 +106,7 @@ public:
 			vertex of this Polygon.
 		@see Vertex(). */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
 
 	/// Projects this Polygon onto the given 1D axis direction vector.
 	/** This function collapses this Polygon onto an 1D axis for the purposes of e.g. separate axis test computations.
@@ -283,12 +287,15 @@ public:
 		@todo Add Contains2D(Circle/Disc/Triangle/Polygon). */
 	bool Contains2D(const LineSegment &localSpaceLineSegment) const;
 
-	/// Tests whether this polyhedron and the given object intersect.
+	/// Tests whether this polygon and the given object intersect.
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
 		another, this function still returns true.
 		This test is performed in the global (world) space of this polygon.
+		@note These functions assume that this polygon might be concave, which requires a significantly slower test. If
+			you know ahead of time that this polygon is convex, you can instead use one of the faster ConvexIntersects()
+			functions.
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
-		@see Contains(), ClosestPoint(), Distance().
+		@see ConvexIntersects(), Contains(), ClosestPoint(), Distance().
 		@todo Add Intersects(Circle/Disc). */
 	bool Intersects(const Line &line) const;
 	bool Intersects(const Ray &ray) const;
@@ -302,6 +309,15 @@ public:
 	bool Intersects(const Polyhedron &polyhedron) const;
 	bool Intersects(const Sphere &sphere) const;
 	bool Intersects(const Capsule &capsule) const;
+
+	/// Tests whether this convex polygon and the given object intersect.
+	/** @note These functions make an implicit assumption that this polygon is convex. If you call these functions on
+		a convex polygon, the intersection test is effectively performed on the convex hull of this polygon, meaning
+		that it can result in false positives, so these functions can still be useful as an approximate or an early-out 
+		test for concave polygons. */
+	bool ConvexIntersects(const AABB &aabb) const;
+	bool ConvexIntersects(const OBB &obb) const;
+	bool ConvexIntersects(const Frustum &frustum) const;
 
 	/// Computes the closest point on this polygon to the given object.
 	/** If the other object intersects this polygon, this function will return an arbitrary point inside

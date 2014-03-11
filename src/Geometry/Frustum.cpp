@@ -836,8 +836,7 @@ bool Frustum::Intersects(const Triangle &triangle) const
 
 bool Frustum::Intersects(const Polygon &polygon) const
 {
-	///@todo This is a naive test. Implement a faster version.
-	return this->ToPolyhedron().Intersects(polygon);
+	return polygon.Intersects(*this);
 }
 
 bool Frustum::Intersects(const Sphere &sphere) const

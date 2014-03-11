@@ -40,6 +40,7 @@
 #include "../Math/Quat.h"
 #include "../Math/float2.h"
 #include "../Math/MathConstants.h"
+#include "../Algorithm/GJK.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -515,14 +516,59 @@ bool Polygon::Intersects(const Plane &plane) const
 	return minD <= 1e-4f && maxD >= -1e-4f;
 }
 
+bool Polygon::ConvexIntersects(const AABB &aabb) const
+{
+	return GJKIntersect(*this, aabb);
+}
+
+bool Polygon::ConvexIntersects(const OBB &obb) const
+{
+	return GJKIntersect(*this, obb);
+}
+
+template<typename Convex /* = AABB, OBB, Frustum. */>
+bool Convex_Intersects_Polygon(const Convex &c, const Polygon &p)
+{
+	LineSegment l;
+	l.a = p.p.back();
+	for(size_t i = 0; i < p.p.size(); ++i)
+	{
+		l.b = p.p[i];
+		if (c.Intersects(l))
+			return true;
+		l.a = l.b;
+	}
+	return false;
+}
+
 bool Polygon::Intersects(const AABB &aabb) const
 {
-	return aabb.Intersects(*this);
+	// Because GJK test is so fast, use that as an early-out. (computes intersection between the convex hull of this poly, and the aabb)
+	bool convexIntersects = ConvexIntersects(aabb);
+	if (!convexIntersects)
+		return false;
+
+	return Convex_Intersects_Polygon(aabb, *this);
 }
 
 bool Polygon::Intersects(const OBB &obb) const
 {
-	return obb.Intersects(*this);
+	// Because GJK test is so fast, use that as an early-out. (computes intersection between the convex hull of this poly, and the obb)
+	bool convexIntersects = ConvexIntersects(obb);
+	if (!convexIntersects)
+		return false;
+
+	return Convex_Intersects_Polygon(obb, *this);
+}
+
+bool Polygon::Intersects(const Frustum &frustum) const
+{
+	// Because GJK test is so fast, use that as an early-out. (computes intersection between the convex hull of this poly, and the frustum)
+	bool convexIntersects = ConvexIntersects(frustum);
+	if (!convexIntersects)
+		return false;
+
+	return Convex_Intersects_Polygon(frustum, *this);
 }
 
 template<typename T /* = Polygon or Triangle */>
@@ -612,11 +658,6 @@ bool Polygon::Intersects(const Triangle &triangle, float polygonThickness) const
 bool Polygon::Intersects(const Polygon &polygon, float polygonThickness) const
 {
 	return Polygon_Intersects_Polygon(*this, polygon, polygonThickness);
-}
-
-bool Polygon::Intersects(const Frustum &frustum) const
-{
-	return frustum.Intersects(*this);
 }
 
 bool Polygon::Intersects(const Polyhedron &polyhedron) const
@@ -712,15 +753,21 @@ Plane Polygon::EdgePlane(int edgeIndex) const
 
 vec Polygon::ExtremePoint(const vec &direction) const
 {
+	float projectionDistance;
+	return ExtremePoint(direction, projectionDistance);
+}
+
+vec Polygon::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
 	vec mostExtreme = vec::nan;
-	float mostExtremeDist = -FLT_MAX;
+	projectionDistance = -FLOAT_INF;
 	for(int i = 0; i < NumVertices(); ++i)
 	{
 		vec pt = Vertex(i);
 		float d = Dot(direction, pt);
-		if (d > mostExtremeDist)
+		if (d > projectionDistance)
 		{
-			mostExtremeDist = d;
+			projectionDistance = d;
 			mostExtreme = pt;
 		}
 	}

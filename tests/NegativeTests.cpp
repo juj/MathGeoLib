@@ -487,6 +487,18 @@ RANDOMIZED_TEST(AABBPolyhedronNoIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(AABBPolygonNoIntersectCase)
+{
+	AABB a(POINT_VEC(-1.07812309f,50.0289841f,-42.3423996f),POINT_VEC(4.804286f,50.5800514f,-42.3384552f));
+	Polygon b;
+	b.p.push_back(POINT_VEC(5.48830986f,-108.176254f,84.0496674f));
+	b.p.push_back(POINT_VEC(5.48830986f,-69.97966f,84.0496674f));
+	b.p.push_back(POINT_VEC(24.5866089f,-58.1762543f,114.95137f));
+	b.p.push_back(POINT_VEC(36.3900108f,-89.0779572f,134.049667f));
+	b.p.push_back(POINT_VEC(24.5866089f,-119.97966f,114.95137f));
+	assert(!a.Intersects(b));
+}
+
 RANDOMIZED_TEST(AABBPolygonNoIntersect)
 {
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));

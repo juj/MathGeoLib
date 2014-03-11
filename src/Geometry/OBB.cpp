@@ -1041,7 +1041,7 @@ bool OBB::Intersects(const Triangle &triangle) const
 
 bool OBB::Intersects(const Polygon &polygon) const
 {
-	return ToPolyhedron().Intersects(polygon);
+	return polygon.Intersects(*this);
 }
 
 bool OBB::Intersects(const Frustum &frustum) const

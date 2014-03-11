@@ -941,7 +941,7 @@ bool AABB::Intersects(const Triangle &triangle) const
 
 bool AABB::Intersects(const Polygon &polygon) const
 {
-	return ToPolyhedron().Intersects(polygon);
+	return polygon.Intersects(*this);
 }
 
 bool AABB::Intersects(const Frustum &frustum) const
