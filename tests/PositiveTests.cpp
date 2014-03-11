@@ -476,12 +476,35 @@ RANDOMIZED_TEST(AABBPolyhedronIntersect)
 //	assert(b.Contains(b.ClosestPoint(a)));
 }
 
+UNIQUE_TEST(AABBPolygonIntersectCase)
+{
+	AABB a(POINT_VEC(-6.86657524,-87.7668533,-40.2900276),
+		POINT_VEC(2.77308559,-79.9921722,-34.0750961));
+	Polygon b;
+	b.p.push_back(POINT_VEC(-43.6267548,-19.4667053,-35.8499298));
+	b.p.push_back(POINT_VEC(56.3732452,-19.4667053,-35.8499298));
+	b.p.push_back(POINT_VEC(56.3732452,-119.466698,-35.8499298));
+	b.p.push_back(POINT_VEC(-43.6267548,-119.466698,-35.8499298));
+	assert(a.Intersects(b));
+}
+
+UNIQUE_TEST(AABBPolygonIntersectCase2)
+{
+	AABB a(POINT_VEC(-23.4495525,-25.5456314,82.2886734),
+		POINT_VEC(-14.9134054,-22.428545,87.317482));
+	Polygon b;
+	b.p.push_back(POINT_VEC(74.7439194,-20.989212,181.39743));
+	b.p.push_back(POINT_VEC(-25.2560806,-20.989212,81.3974304));
+	b.p.push_back(POINT_VEC(74.7439194,-120.989212,81.3974304));
+	assert(a.Intersects(b));
+}
+
 RANDOMIZED_TEST(AABBPolygonIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert(a.Intersects(b));
+	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToString());
 	assert(b.Intersects(a));
 //	assert(a.Distance(b) == 0.f);
 //	assert(b.Distance(a) == 0.f);
