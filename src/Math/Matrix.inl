@@ -79,9 +79,9 @@ void Set3x3PartRotateEulerXYZ(Matrix &m, float x, float y, float z)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx, sx, cy, sy, cz, sz;
-	SinCos(x, cx, sx);
-	SinCos(y, cy, sy);
-	SinCos(z, cz, sz);
+	SinCos(x, sx, cx);
+	SinCos(y, sy, cy);
+	SinCos(z, sz, cz);
 
 	m[0][0] =             cy*cz; m[0][1] =         -cy * sz; m[0][2] =     sy;
 	m[1][0] =  cz*sx*sy + cx*sz; m[1][1] = cx*cz - sx*sy*sz; m[1][2] = -cy*sx;
@@ -130,9 +130,9 @@ void Set3x3PartRotateEulerXZY(Matrix &m, float &x, float &z, float &y)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx, sx, cy, sy, cz, sz;
-	SinCos(x, cx, sx);
-	SinCos(y, cy, sy);
-	SinCos(z, cz, sz);
+	SinCos(x, sx, cx);
+	SinCos(y, sy, cy);
+	SinCos(z, sz, cz);
 
 	m[0][0] =             cy*cz; m[0][1] =   -sz; m[0][2] =             cz*sy;
 	m[1][0] =  sx*sy + cx*cy*sz; m[1][1] = cx*cz; m[1][2] = -cy*sx + cx*sy*sz;
@@ -181,9 +181,9 @@ void Set3x3PartRotateEulerYXZ(Matrix &m, float &y, float &x, float &z)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx, sx, cy, sy, cz, sz;
-	SinCos(x, cx, sx);
-	SinCos(y, cy, sy);
-	SinCos(z, cz, sz);
+	SinCos(x, sx, cx);
+	SinCos(y, sy, cy);
+	SinCos(z, sz, cz);
 
 	m[0][0] =  cy*cz + sx*sy*sz; m[0][1] = cx*sx*sy - cy*sz; m[0][2] = cx*sy;
 	m[1][0] =             cx*sz; m[1][1] = cx*cz;            m[1][2] =   -sx;
@@ -232,9 +232,9 @@ void Set3x3PartRotateEulerYZX(Matrix &m, float &y, float &z, float &x)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx, sx, cy, sy, cz, sz;
-	SinCos(x, cx, sx);
-	SinCos(y, cy, sy);
-	SinCos(z, cz, sz);
+	SinCos(x, sx, cx);
+	SinCos(y, sy, cy);
+	SinCos(z, sz, cz);
 
 	m[0][0] =  cy*cz; m[0][1] = sx*sy - cx*cy*sz; m[0][2] = cx*sy + cy*sx*sz;
 	m[1][0] =     sz; m[1][1] =            cx*cz; m[1][2] =           -cz*sx;
@@ -283,9 +283,9 @@ void Set3x3PartRotateEulerZXY(Matrix &m, float &z, float &x, float &y)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx, sx, cy, sy, cz, sz;
-	SinCos(x, cx, sx);
-	SinCos(y, cy, sy);
-	SinCos(z, cz, sz);
+	SinCos(x, sx, cx);
+	SinCos(y, sy, cy);
+	SinCos(z, sz, cz);
 
 	m[0][0] = cy*cz - sx*sy*sz; m[0][1] = -cx*sz; m[0][2] =  cz*sy + cy*sx*sz;
 	m[1][0] = cz*sx*sy + cy*sz; m[1][1] =  cx*cz; m[1][2] = -cy*cz*sx + sy*sz;
@@ -334,9 +334,9 @@ void Set3x3PartRotateEulerZYX(Matrix &m, float &z, float &y, float &x)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx, sx, cy, sy, cz, sz;
-	SinCos(x, cx, sx);
-	SinCos(y, cy, sy);
-	SinCos(z, cz, sz);
+	SinCos(x, sx, cx);
+	SinCos(y, sy, cy);
+	SinCos(z, sz, cz);
 
 	m[0][0] = cy*cz; m[0][1] = cz*sx*sy - cx*sz; m[0][2] =  cx*cz*sy + sx*sz;
 	m[1][0] = cy*sz; m[1][1] = cx*cz + sx*sy*sz; m[1][2] = -cz*sx + cx*sy*sz;
@@ -385,9 +385,9 @@ void Set3x3PartRotateEulerXYX(Matrix &m, float &x2, float &y, float &x1)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx2, sx2, cy, sy, cx1, sx1;
-	SinCos(x2, cx2, sx2);
-	SinCos(y, cy, sy);
-	SinCos(x1, cx1, sx1);
+	SinCos(x2, sx2, cx2);
+	SinCos(y, sy, cy);
+	SinCos(x1, sx1, cx1);
 
 	m[0][0] =      cy; m[0][1] =               sy*sx1; m[0][2] =                sy*cx1;
 	m[1][0] =  sy*sx2; m[1][1] = cx2*cx1 - cy*sx2*sx1; m[1][2] = -cy*cx1*sx2 - cx2*sx1;
@@ -436,9 +436,9 @@ void Set3x3PartRotateEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cx2, sx2, cz, sz, cx1, sx1;
-	SinCos(x2, cx2, sx2);
-	SinCos(z, cz, sz);
-	SinCos(x1, cx1, sx1);
+	SinCos(x2, sx2, cx2);
+	SinCos(z, sz, cz);
+	SinCos(x1, sx1, cx1);
 
 	m[0][0] =     cz; m[0][1] =              -sz*cx1; m[0][2] =                sz*sx1;
 	m[1][0] = sz*cx2; m[1][1] = cz*cx2*cx1 - sx2*sx1; m[1][2] = -cx1*sx2 - cz*cx2*sx1;
@@ -487,9 +487,9 @@ void Set3x3PartRotateEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cy2, sy2, cx, sx, cy1, sy1;
-	SinCos(y2, cy2, sy2);
-	SinCos(x, cx, sx);
-	SinCos(y1, cy1, sy1);
+	SinCos(y2, sy2, cy2);
+	SinCos(x, sx, cx);
+	SinCos(y1, sy1, cy1);
 
 	m[0][0] =  cy2*cy1 - cx*sy2*sy1; m[0][1] = sx*sy2; m[0][2] = cx*cy1*sy2 + cy2*sy1;
 	m[1][0] =                sx*sy1; m[1][1] =     cx; m[1][2] =              -sx*cy1;
@@ -538,9 +538,9 @@ void Set3x3PartRotateEulerYZY(Matrix &m, float &y2, float &z, float &y1)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cy2, sy2, cz, sz, cy1, sy1;
-	SinCos(y2, cy2, sy2);
-	SinCos(z, cz, sz);
-	SinCos(y1, cy1, sy1);
+	SinCos(y2, sy2, cy2);
+	SinCos(z, sz, cz);
+	SinCos(y1, sy1, cy1);
 
 	m[0][0] =  cz*cy2*cy1 - sy2*sy1; m[0][1] = -sz*cy2; m[0][2] = cy1*sy2 + cz*cy2*sy1;
 	m[1][0] =                sz*cy1; m[1][1] =      cz; m[1][2] =               sz*sy1;
@@ -589,9 +589,9 @@ void Set3x3PartRotateEulerZXZ(Matrix &m, float &z2, float &x, float &z1)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cz2, sz2, cx, sx, cz1, sz1;
-	SinCos(z2, cz2, sz2);
-	SinCos(x, cx, sx);
-	SinCos(z1, cz1, sz1);
+	SinCos(z2, sz2, cz2);
+	SinCos(x, sx, cx);
+	SinCos(z1, sz1, cz1);
 
 	m[0][0] = cz2*cz1 - cx*sz2*sz1; m[0][1] = -cx*cz1*sz2 - cz2*sz1; m[0][2] =  sx*sz2;
 	m[1][0] = cz1*sz2 + cx*cz2*sz1; m[1][1] =  cx*cz2*cz1 - sz2*sz1; m[1][2] = -sx*cz2;
@@ -640,9 +640,9 @@ void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 {
 	///\todo Vectorize to compute 4 sines+cosines at one time.
 	float cz2, sz2, cy, sy, cz1, sz1;
-	SinCos(z2, cz2, sz2);
-	SinCos(y, cy, sy);
-	SinCos(z1, cz1, sz1);
+	SinCos(z2, sz2, cz2);
+	SinCos(y, sy, cy);
+	SinCos(z1, sz1, cz1);
 
 	m[0][0] = cy*cz2*cz1 - sz2*sz1; m[0][1] = -cz1*sz2 - cy*cz2*sz1; m[0][2] = sy*cz2;
 	m[1][0] =           cy*cz1*sz2; m[1][1] =  cz2*cz1 - cy*sz2*sz1; m[1][2] = sy*sz2;
