@@ -5,6 +5,8 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 
+MATH_IGNORE_UNUSED_VARS_WARNING
+
 UNIQUE_TEST(Polygon_collinear_points_Plane)
 {
 	math::Polygon poly;
