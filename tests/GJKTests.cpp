@@ -205,6 +205,15 @@ RANDOMIZED_TEST(GJKSphereSphereIntersect)
 	assert(GJKIntersect(a, b));
 }
 
+/*
+UNIQUE_TEST(GJKSphereLineSegmentIntersectCase)
+{
+	Sphere a(POINT_VEC(52.4970627f,45.4888649f,-7.32828188f),9.61045837f);
+	LineSegment b(POINT_VEC(90.447998f,30.0441036f,-46.333149f),POINT_VEC(35.6951218f,38.615181f,4.10816383f));
+	assert(GJKIntersect(a, b));
+}
+*/
+
 RANDOMIZED_TEST(GJKSphereLineSegmentIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
