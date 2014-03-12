@@ -111,8 +111,9 @@ RANDOMIZED_TEST(GJKAABBLineSegmentIntersect)
 		assert(GJKIntersect(a, b));
 	} catch(...)
 	{
-		LOGI("a: %s", a.SerializeToCodeString());
-		LOGI("b: %s", b.SerializeToCodeString());
+		LOGI("a: %s", a.SerializeToCodeString().c_str());
+		LOGI("b: %s", b.SerializeToCodeString().c_str());
+		throw;
 	}
 }
 
