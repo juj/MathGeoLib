@@ -177,19 +177,15 @@ RANDOMIZED_TEST(Frustum_Contains_Corners)
 
 	for(int i = 0; i < 9; ++i)
 	{
-		vec pt;
-		if (i == 8)
-			pt = b.CenterPoint();
-		else
-			pt = b.CornerPoint(i);
+		vec point = (i == 8) ? b.CenterPoint() : b.CornerPoint(i);
 
-		assert(b.NearPlane().SignedDistance(pt) < 1e-3f);
-		assert(b.FarPlane().SignedDistance(pt) < 1e-3f);
-		assert(b.LeftPlane().SignedDistance(pt) < 1e-3f);
-		assert(b.RightPlane().SignedDistance(pt) < 1e-3f);
-		assert(b.TopPlane().SignedDistance(pt) < 1e-3f);
-		assert(b.BottomPlane().SignedDistance(pt) < 1e-3f);
-		assert(b.Contains(pt));
+		assert(b.NearPlane().SignedDistance(point) < 1e-3f);
+		assert(b.FarPlane().SignedDistance(point) < 1e-3f);
+		assert(b.LeftPlane().SignedDistance(point) < 1e-3f);
+		assert(b.RightPlane().SignedDistance(point) < 1e-3f);
+		assert(b.TopPlane().SignedDistance(point) < 1e-3f);
+		assert(b.BottomPlane().SignedDistance(point) < 1e-3f);
+		assert(b.Contains(point));
 	}
 }
 
