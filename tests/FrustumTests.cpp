@@ -83,13 +83,6 @@ UNIQUE_TEST(Frustum_Planes)
 				pt = f.CenterPoint();
 			else
 				pt = f.CornerPoint(i);
-			LOGI("pt %d: %s", i, pt.ToString().c_str());
-			LOGI("dnearplane: %f", f.NearPlane().SignedDistance(pt));
-			LOGI("dfarplane: %f", f.FarPlane().SignedDistance(pt));
-			LOGI("dleftplane: %f", f.LeftPlane().SignedDistance(pt));
-			LOGI("drightplane: %f", f.RightPlane().SignedDistance(pt));
-			LOGI("dtopplane: %f", f.TopPlane().SignedDistance(pt));
-			LOGI("dbottomplane: %f", f.BottomPlane().SignedDistance(pt));
 			assert(f.NearPlane().SignedDistance(pt) < 1e-3f);
 			assert(f.FarPlane().SignedDistance(pt) < 1e-3f);
 			assert(f.LeftPlane().SignedDistance(pt) < 1e-3f);
