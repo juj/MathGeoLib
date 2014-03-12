@@ -41,7 +41,8 @@ enum CullTestResult
 
 /// PBVolume is a "plane bounded volume", a convex polyhedron represented by a set
 /// of planes. The number of planes is fixed at compile time so that compilers are able to perfectly unroll the loops for
-/// best performance.
+/// best performance. As a fixed convention, the plane normals of the volume point outwards from the plane, so the
+/// negative halfspaces are inside the convex volume.
 template<int N>
 class PBVolume
 {
