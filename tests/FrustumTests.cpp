@@ -4,6 +4,7 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "ObjectGenerators.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
@@ -74,6 +75,29 @@ UNIQUE_TEST(Frustum_Planes)
 
 		assert(f.FarPlane().normal.Equals(DIR_VEC(0, 0, -1)));
 		assert(EqualAbs(f.FarPlane().d, 100.f));
+
+		for(int i = 0; i < 9; ++i)
+		{
+			vec pt;
+			if (i == 8)
+				pt = f.CenterPoint();
+			else
+				pt = f.CornerPoint(i);
+			LOGI("pt %d: %s", i, pt.ToString().c_str());
+			LOGI("dnearplane: %f", f.NearPlane().SignedDistance(pt));
+			LOGI("dfarplane: %f", f.FarPlane().SignedDistance(pt));
+			LOGI("dleftplane: %f", f.LeftPlane().SignedDistance(pt));
+			LOGI("drightplane: %f", f.RightPlane().SignedDistance(pt));
+			LOGI("dtopplane: %f", f.TopPlane().SignedDistance(pt));
+			LOGI("dbottomplane: %f", f.BottomPlane().SignedDistance(pt));
+			assert(f.NearPlane().SignedDistance(pt) < 1e-3f);
+			assert(f.FarPlane().SignedDistance(pt) < 1e-3f);
+			assert(f.LeftPlane().SignedDistance(pt) < 1e-3f);
+			assert(f.RightPlane().SignedDistance(pt) < 1e-3f);
+			assert(f.TopPlane().SignedDistance(pt) < 1e-3f);
+			assert(f.BottomPlane().SignedDistance(pt) < 1e-3f);
+			assert(f.Contains(pt));
+		}
 	}
 }
 
@@ -150,6 +174,29 @@ UNIQUE_TEST(Frustum_Contains)
 		}
 
 		assert3(f.Contains(f.CenterPoint()), f, f.CenterPoint(), f.Distance(f.CenterPoint()));
+	}
+}
+
+RANDOMIZED_TEST(Frustum_Contains_Corners)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum b = RandomFrustumContainingPoint(pt);
+
+	for(int i = 0; i < 9; ++i)
+	{
+		vec pt;
+		if (i == 8)
+			pt = b.CenterPoint();
+		else
+			pt = b.CornerPoint(i);
+
+		assert(b.NearPlane().SignedDistance(pt) < 1e-3f);
+		assert(b.FarPlane().SignedDistance(pt) < 1e-3f);
+		assert(b.LeftPlane().SignedDistance(pt) < 1e-3f);
+		assert(b.RightPlane().SignedDistance(pt) < 1e-3f);
+		assert(b.TopPlane().SignedDistance(pt) < 1e-3f);
+		assert(b.BottomPlane().SignedDistance(pt) < 1e-3f);
+		assert(b.Contains(pt));
 	}
 }
 

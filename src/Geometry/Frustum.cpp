@@ -119,36 +119,66 @@ Plane Frustum::FarPlane() const
 
 Plane Frustum::LeftPlane() const
 {
-	vec left = -WorldRight();
-	left.ScaleToLength(Tan(horizontalFov*0.5f));
-	vec leftSide = front + left;
-	vec leftSideNormal = Cross(up, leftSide).Normalized();
-	return Plane(pos, leftSideNormal);
+	if (type == PerspectiveFrustum)
+	{
+		vec left = -WorldRight();
+		left.ScaleToLength(Tan(horizontalFov*0.5f));
+		vec leftSide = front + left;
+		vec leftSideNormal = ((handedness == FrustumRightHanded) ? Cross(up, leftSide) : Cross(leftSide, up)).Normalized();
+		return Plane(pos, leftSideNormal);
+	}
+	else
+	{
+		vec left = -WorldRight();
+		return Plane(NearPlanePos(-1.f, 0.f), left.Normalized());
+	}
 }
 
 Plane Frustum::RightPlane() const
 {
-	vec right = WorldRight();
-	right.ScaleToLength(Tan(horizontalFov*0.5f));
-	vec rightSide = front + right;
-	vec rightSideNormal = Cross(rightSide, up).Normalized();
-	return Plane(pos, rightSideNormal);
+	if (type == PerspectiveFrustum)
+	{
+		vec right = WorldRight();
+		right.ScaleToLength(Tan(horizontalFov*0.5f));
+		vec rightSide = front + right;
+		vec rightSideNormal = ((handedness == FrustumRightHanded) ? Cross(rightSide, up) : Cross(up, rightSide)).Normalized();
+		return Plane(pos, rightSideNormal);
+	}
+	else
+	{
+		vec right = WorldRight();
+		return Plane(NearPlanePos(1.f, 0.f), right.Normalized());
+	}
 }
 
 Plane Frustum::TopPlane() const
 {
-	vec topSide = front + Tan(verticalFov * 0.5f) * up;
-	vec right = WorldRight();
-	vec topSideNormal = Cross(right, topSide).Normalized();
-	return Plane(pos, topSideNormal);
+	if (type == PerspectiveFrustum)
+	{
+		vec topSide = front + Tan(verticalFov * 0.5f) * up;
+		vec right = WorldRight();
+		vec topSideNormal = ((handedness == FrustumRightHanded) ? Cross(right, topSide) : Cross(topSide, right)).Normalized();
+		return Plane(pos, topSideNormal);
+	}
+	else
+	{
+		return Plane(NearPlanePos(0.f, 1.f), up);
+	}
 }
 
 Plane Frustum::BottomPlane() const
 {
-	vec bottomSide = front - Tan(verticalFov * 0.5f) * up;
-	vec left = -WorldRight();
-	vec bottomSideNormal = Cross(left, bottomSide).Normalized();
-	return Plane(pos, bottomSideNormal);
+	if (type == PerspectiveFrustum)
+	{
+		vec bottomSide = front - Tan(verticalFov * 0.5f) * up;
+		vec left = -WorldRight();
+		vec bottomSideNormal = ((handedness == FrustumRightHanded) ? Cross(left, bottomSide) : Cross(bottomSide, left)).Normalized();
+		return Plane(pos, bottomSideNormal);
+	}
+	else
+	{
+		return Plane(NearPlanePos(0.f, -1.f), -up);
+	}
 }
 
 void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
