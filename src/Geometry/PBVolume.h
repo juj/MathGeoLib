@@ -50,6 +50,14 @@ public:
 
 	int NumPlanes() const { return N; }
 
+	bool Contains(const vec &point) const
+	{
+		for(int i = 0; i < N; ++i)
+			if (p[i].SignedDistance(point) > 0.f)
+				return false;
+		return true;
+	}
+
 	/// Performs an *approximate* intersection test between this PBVolume and the given AABB.
 	/** This function is best used for high-performance object culling purposes, e.g. for frustum-aabb culling, when
 		a small percentage of false positives do not matter.
