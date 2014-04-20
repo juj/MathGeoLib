@@ -1165,6 +1165,7 @@ std::string AABB::SerializeToString() const
 	s = SerializeFloat(maxPoint.y, s); *s = ','; ++s;
 	s = SerializeFloat(maxPoint.z, s);
 	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
 	return str;
 }
 
