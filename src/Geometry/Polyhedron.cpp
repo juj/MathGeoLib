@@ -1160,12 +1160,12 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	for(; iter != extremes.end() && i < 4; ++iter, ++i)
 		p.v.push_back(pointArray[*iter]);
 
-	Face f;
-	f.v.resize(3);
-	f.v[0] = 0; f.v[1] = 1; f.v[2] = 2; p.f.push_back(f);
-	f.v[0] = 0; f.v[1] = 1; f.v[2] = 3; p.f.push_back(f);
-	f.v[0] = 0; f.v[1] = 2; f.v[2] = 3; p.f.push_back(f);
-	f.v[0] = 1; f.v[1] = 2; f.v[2] = 3; p.f.push_back(f);
+	Face face;
+	face.v.resize(3);
+	face.v[0] = 0; face.v[1] = 1; face.v[2] = 2; p.f.push_back(face);
+	face.v[0] = 0; face.v[1] = 1; face.v[2] = 3; p.f.push_back(face);
+	face.v[0] = 0; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
+	face.v[0] = 1; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
 	p.OrientNormalsOutsideConvex(); // Ensure that the winding order of the generated tetrahedron is correct for each face.
 
 //	assert(p.IsClosed());
