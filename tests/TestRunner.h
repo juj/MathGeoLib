@@ -101,6 +101,12 @@ public:
 	AddTestOp addtestop_##name(#name, __FILE__, "", false, true, false, TestFunc_##name); \
 	void TestFunc_##name(Test & /*test*/)
 
+#ifndef __EMSCRIPTEN__
+#define RDTSC() Clock::RdTsc()
+#else
+#define RDTSC() 0
+#endif
+
 #define BENCHMARK(name, description) \
 	void BenchmarkFunc_##name(Test &test); \
 	AddTestOp addbenchmarkop_##name(#name, __FILE__, description, false, false, true, BenchmarkFunc_##name); \
@@ -110,32 +116,35 @@ public:
 		tick_t bestTicks = (tick_t)-1; \
 		tick_t accumTicks = 0; \
 		tick_t worstTicks = 0; \
-		for(int xx = 0; xx < testrunner_numTimerTests; ++xx) \
+		int numWarmupTicks = 1; /* Run a warmup for JIT environments */ \
+		for(int xx = -numWarmupTicks; xx < testrunner_numTimerTests; ++xx) \
 		{ \
 			tick_t start = Clock::Tick(); \
-			unsigned long long startTsc = Clock::Rdtsc(); \
+			unsigned long long startTsc = RDTSC(); \
 			for(int i = 0; i < testrunner_numItersPerTest; ++i) \
 			{
 
 #define BENCHMARK_END \
+			} \
+			unsigned long long endTsc = RDTSC(); \
+			tick_t end = Clock::Tick(); \
+			tick_t elapsedTicks = end - start; \
+			tick_t elapsedTsc = (startTsc != 0 || endTsc != 0) ? (endTsc - startTsc) : elapsedTicks; \
+			/*LOGI("Took %d ticks %s", (int)elapsedTicks, (xx < 0) ? "Ignored (warmup)" : ""); */ \
+			if (xx < 0) continue; /* Skip recording measures when warming up. */ \
+			bestTsc = Min(bestTsc, elapsedTsc); \
+			bestTicks = Min(bestTicks, elapsedTicks); \
+			worstTicks = Max(worstTicks, elapsedTicks); \
+			accumTicks += elapsedTicks; \
 		} \
-		unsigned long long endTsc = Clock::Rdtsc(); \
-		tick_t end = Clock::Tick(); \
-		tick_t elapsedTicks = end - start; \
-		tick_t elapsedTsc = endTsc - startTsc; \
-		bestTsc = Min(bestTsc, elapsedTsc); \
-		bestTicks = Min(bestTicks, elapsedTicks); \
-		worstTicks = Max(worstTicks, elapsedTicks); \
-		accumTicks += elapsedTicks; \
-	} \
-	test.numTimesRun = testrunner_numTimerTests; \
-	test.numTrialsPerRun = testrunner_numItersPerTest; \
-	test.fastestCycles = (double)bestTsc / testrunner_numItersPerTest; \
-	test.fastestTime = (double)bestTicks / testrunner_numItersPerTest; \
-	test.averageTime = (double)accumTicks / (testrunner_numTimerTests * testrunner_numItersPerTest); \
-	test.worstTime = (double)worstTicks / testrunner_numItersPerTest; \
-	LOGI("\n   Best: %s / %g ticks, Avg: %s, Worst: %s", FormatTime(test.fastestTime).c_str(), test.fastestCycles, \
-		FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
+		test.numTimesRun = testrunner_numTimerTests; \
+		test.numTrialsPerRun = testrunner_numItersPerTest; \
+		test.fastestCycles = (double)bestTsc / testrunner_numItersPerTest; \
+		test.fastestTime = (double)bestTicks / testrunner_numItersPerTest; \
+		test.averageTime = (double)accumTicks / (testrunner_numTimerTests * testrunner_numItersPerTest); \
+		test.worstTime = (double)worstTicks / testrunner_numItersPerTest; \
+		LOGI("\n   Best: %s / %g ticks, Avg: %s, Worst: %s", FormatTime(test.fastestTime).c_str(), test.fastestCycles, \
+			FormatTime(test.averageTime).c_str(), FormatTime(test.worstTime).c_str()); \
 }
 
 #define BENCHMARK_ITERS(name, numTests_, numIters_, description) \
