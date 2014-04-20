@@ -227,10 +227,15 @@ tick_t Clock::Tick()
 	clock_gettime(CLOCK_REALTIME, &res);
 	return 1000000000ULL*res.tv_sec + (tick_t)res.tv_nsec;
 #elif defined(EMSCRIPTEN)
+
+#ifdef MATH_TICK_IS_FLOAT
+	return (tick_t)emscripten_get_now();
+#else
 	// emscripten_get_now() returns a wallclock time as a float in milliseconds (1e-3).
 	// scale it to microseconds (1e-6) and return as a tick.
 	return (tick_t)(((double)emscripten_get_now()) * 1e3);
-//	return (tick_t)clock();
+#endif
+
 #elif defined(WIN32)
 	LARGE_INTEGER ddwTimer;
 	BOOL success = QueryPerformanceCounter(&ddwTimer);
@@ -270,8 +275,13 @@ tick_t Clock::TicksPerSec()
 #if defined(ANDROID)
 	return 1000000000ULL; // 1e9 == nanoseconds.
 #elif defined(EMSCRIPTEN)
+
+#ifdef MATH_TICK_IS_FLOAT
+	return (tick_t)1000.0;
+#else
 	return 1000000ULL; // 1e6 == microseconds.
-//	return CLOCKS_PER_SEC;
+#endif
+
 #elif defined(WIN32)
 	return ddwTimerFrequency.QuadPart;
 #elif defined(__APPLE__)

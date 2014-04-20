@@ -113,7 +113,7 @@ public:
 	void BenchmarkFunc_##name(Test &test) \
 	{ \
 		unsigned long long bestTsc = (unsigned long long)-1; \
-		tick_t bestTicks = (tick_t)-1; \
+		tick_t bestTicks = TICK_INF; \
 		tick_t accumTicks = 0; \
 		tick_t worstTicks = 0; \
 		int numWarmupTicks = 1; /* Run a warmup for JIT environments */ \
@@ -129,8 +129,8 @@ public:
 			unsigned long long endTsc = RDTSC(); \
 			tick_t end = Clock::Tick(); \
 			tick_t elapsedTicks = end - start; \
-			tick_t elapsedTsc = (startTsc != 0 || endTsc != 0) ? (endTsc - startTsc) : elapsedTicks; \
-			/*LOGI("Took %d ticks %s", (int)elapsedTicks, (xx < 0) ? "Ignored (warmup)" : ""); */ \
+			unsigned long long elapsedTsc = (unsigned long long)((startTsc != 0 || endTsc != 0) ? (endTsc - startTsc) : elapsedTicks); \
+			/*LOGI("Took %f ticks %s", (float)elapsedTicks, (xx < 0) ? "Ignored (warmup)" : "");*/ \
 			if (xx < 0) continue; /* Skip recording measures when warming up. */ \
 			bestTsc = Min(bestTsc, elapsedTsc); \
 			bestTicks = Min(bestTicks, elapsedTicks); \
