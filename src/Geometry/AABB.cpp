@@ -960,13 +960,11 @@ void AABB::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 	vec e = HalfDiagonal();
 
 	// Compute the projection interval radius of the AABB onto L(t) = aabb.center + t * plane.normal;
-	float r = e[0]*Abs(axis[0]) + e[1]*Abs(axis[1]) + e[2]*Abs(axis[2]);
+	float r = Abs(e[0]*Abs(axis[0]) + e[1]*Abs(axis[1]) + e[2]*Abs(axis[2]));
 	// Compute the distance of the box center from plane.
 	float s = axis.Dot(c);
 	dMin = s - r;
 	dMax = s + r;
-	if (dMin > dMax)
-		Swap(dMin, dMax);
 }
 
 int AABB::UniqueFaceNormals(vec *out) const
