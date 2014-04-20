@@ -19,7 +19,6 @@ RANDOMIZED_TEST(AABBPBVolumeIntersect)
 
 	bool contained = b.Contains(a);
 
-	vec centerPoint = b.CenterPoint();
 	assert(b.Contains(b.CenterPoint()));
 
 	PBVolume<6> pbVolume = ToPBVolume(b);
@@ -55,7 +54,6 @@ RANDOMIZED_TEST(SpherePBVolumeIntersect)
 
 //	bool contained = b.Contains(a);
 
-	vec centerPoint = b.CenterPoint();
 	assert(b.Contains(b.CenterPoint()));
 
 	PBVolume<6> pbVolume = ToPBVolume(b);
