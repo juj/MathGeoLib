@@ -91,7 +91,7 @@ inline u32 LSB(u32 bits)
 	assert(bits <= 32);
 	if (bits >= 32)
 		return 0xFFFFFFFF;
-	return (1 << bits) - 1;
+	return (1U << bits) - 1;
 }
 
 inline u64 LSB64(u64 bits)
@@ -99,7 +99,7 @@ inline u64 LSB64(u64 bits)
 	assert(bits <= 64);
 	if (bits >= 64)
 		return 0xFFFFFFFFFFFFFFFFULL;
-	return (1 << bits) - 1;
+	return (1ULL << bits) - 1;
 }
 
 /** @brief A template-computed enum to create a mask of given amount of bits at given position of a u32 variable.

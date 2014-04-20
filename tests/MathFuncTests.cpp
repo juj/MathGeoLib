@@ -1086,3 +1086,28 @@ UNIQUE_TEST(RoundDownPow2_u64)
 	asserteq(RoundDownPow2(0xFE87321084208274ULL), 0x8000000000000000ULL);
 	asserteq(RoundDownPow2(0xFFFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
 }
+
+UNIQUE_TEST(LSB_U32)
+{
+	asserteq(LSB((u32)0), 0);
+	asserteq(LSB((u32)1), 1);
+	asserteq(LSB((u32)2), 3);
+	asserteq(LSB((u32)3), 7);
+	asserteq(LSB((u32)16), 0xFFFFU);
+	asserteq(LSB((u32)31), 0x7FFFFFFFU);
+	asserteq(LSB((u32)32), 0xFFFFFFFFU);
+}
+
+UNIQUE_TEST(LSB_U64)
+{
+	asserteq(LSB64((u64)0), 0);
+	asserteq(LSB64((u64)1), 1);
+	asserteq(LSB64((u64)2), 3);
+	asserteq(LSB64((u64)3), 7);
+	asserteq(LSB64((u64)16), 0xFFFFULL);
+	asserteq(LSB64((u64)31), 0x7FFFFFFFULL);
+	asserteq(LSB64((u64)32), 0xFFFFFFFFULL);
+	asserteq(LSB64((u64)33), 0x1FFFFFFFFULL);
+	asserteq(LSB64((u64)63), 0x7FFFFFFFFFFFFFFFULL);
+	asserteq(LSB64((u64)64), 0xFFFFFFFFFFFFFFFFULL);
+}
