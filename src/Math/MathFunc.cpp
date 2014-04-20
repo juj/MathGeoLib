@@ -460,7 +460,7 @@ float DeserializeFloat(const char *str, const char **outEndStr)
 		return FLOAT_NAN;
 	if (MATH_NEXT_WORD_IS(str, "NaN("))
 	{
-		MATH_SKIP_WORD(str, "NaN(");
+		str += strlen("NaN("); //MATH_SKIP_WORD(str, "NaN(");
 		u32 x;
 		int n = sscanf(str, "%X", (unsigned int *)&x);
 		if (n != 1)
