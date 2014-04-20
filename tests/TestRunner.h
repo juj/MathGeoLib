@@ -102,7 +102,7 @@ public:
 	void TestFunc_##name(Test & /*test*/)
 
 #ifndef __EMSCRIPTEN__
-#define RDTSC() Clock::RdTsc()
+#define RDTSC() Clock::Rdtsc()
 #else
 #define RDTSC() 0
 #endif
