@@ -160,10 +160,6 @@ public:
 	{
 #ifdef _DEBUG
 		return "Debug";
-#elif defined(RELEASE)
-		return "Release";
-#elif defined(RELWITHDEBINFO)
-		return "RelWithDebInfo";
 #else
 		return "";
 #endif
@@ -222,6 +218,18 @@ public:
 #endif
 #ifdef _DEBUG
 		LOG_WRITE("\t\t\"_DEBUG\": true,\n");
+#endif
+#ifdef NDEBUG
+		LOG_WRITE("\t\t\"NDEBUG\": true,\n");
+#endif
+#ifdef RELEASE
+		LOG_WRITE("\t\t\"RELEASE\": true,\n");
+#endif
+#ifdef RELWITHDEBINFO
+		LOG_WRITE("\t\t\"RELWITHDEBINFO\": true,\n");
+#endif
+#ifdef OPTIMIZED_RELEASE
+		LOG_WRITE("\t\t\"OPTIMIZED_RELEASE\": true,\n");
 #endif
 #ifdef MATH_SILENT_ASSUME
 		LOG_WRITE("\t\t\"MATH_SILENT_ASSUME\": true,\n");
