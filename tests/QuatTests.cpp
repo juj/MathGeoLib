@@ -32,6 +32,12 @@ BENCHMARK(Quat_to_float4x4, "Quat::ToFloat4x4")
 }
 BENCHMARK_END;
 
+BENCHMARK(Quat_Slerp, "Quat::Slerp")
+{
+	q2[i] = q[i].Slerp(q2[i], uf[i]);
+}
+BENCHMARK_END;
+
 RANDOMIZED_TEST(Quat_Transform)
 {
 	Quat q = Quat::RandomRotation(rng);
