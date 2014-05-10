@@ -682,17 +682,16 @@ void ExtractEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 	}
 }
 
-///@todo Clean this up, or remove if unused completely. -jj.
-#if 0
 /** Sets the top-left 3x3 area of the matrix to the rotation matrix about an arbitrary axis. Elements
-	outside the top-left 3x3 area are ignored.
+	outside the top-left 3x3 area are not modified.
 	@param m The matrix to store the result.
 	@param a The axis to rotate about. The axis must be normalized.
 	@param angle The rotation angle. */
 template<typename Matrix, typename Vector>
 void SetRotationAxis3x3(Matrix &m, const Vector &a, float angle)
 {
-//	assert(axis is normalized);
+	assume(a.IsNormalized());
+	assume(MATH_NS::IsFinite(angle));
 
 	float s, c;
 	SinCos(angle, s, c);
@@ -711,8 +710,6 @@ void SetRotationAxis3x3(Matrix &m, const Vector &a, float angle)
 	m[1][2] = c1*a.y*a.z-s*a.x;
 	m[2][2] = c+c1*a.z*a.z;
 }
-
-#endif
 
 template<typename Matrix>
 void SetIdentity3x3(Matrix &m)
