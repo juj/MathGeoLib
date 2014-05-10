@@ -64,6 +64,7 @@ MATH_BEGIN_NAMESPACE
 #define mul_ps _mm_mul_ps
 #define div_ps _mm_div_ps
 #define set1_ps _mm_set1_ps
+/// Sets the vector in order (w, z, y, x).
 #define set_ps _mm_set_ps
 const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define abs_ps(x) _mm_andnot_ps(simd4fSignBit, (x))

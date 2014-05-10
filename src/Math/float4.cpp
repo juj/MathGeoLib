@@ -179,7 +179,6 @@ simd4f float4::Length4_SSE() const
 	return _mm_sqrt_ps(dot4_ps(v, v));
 }
 
-
 void float4::Normalize3_Fast_SSE()
 {
 	simd4f len = Length3_SSE();
