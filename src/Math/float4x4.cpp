@@ -52,9 +52,9 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
 
 float4x4::float4x4(const float3x3 &m)
 {
-	Set(m.v[0][0], m.v[0][1], m.v[0][2], 0.f,
-		m.v[1][0], m.v[1][1], m.v[1][2], 0.f,
-		m.v[2][0], m.v[2][1], m.v[2][2], 0.f,
+	Set(m.At(0,0), m.At(0,1), m.At(0,2), 0.f,
+		m.At(1,0), m.At(1,1), m.At(1,2), 0.f,
+		m.At(2,0), m.At(2,1), m.At(2,2), 0.f,
 		      0.f,       0.f,       0.f, 1.f);
 }
 
