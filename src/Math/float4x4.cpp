@@ -1118,12 +1118,24 @@ void float4x4::SwapRows3(int row1, int row2)
 
 void float4x4::SetTranslatePart(float tx, float ty, float tz)
 {
-	SetCol3(3, tx, ty, tz);
+	v[0][3] = tx;
+	v[1][3] = ty;
+	v[2][3] = tz;
 }
 
 void float4x4::SetTranslatePart(const float3 &offset)
 {
-	SetCol3(3, offset);
+	v[0][3] = offset.x;
+	v[1][3] = offset.y;
+	v[2][3] = offset.z;
+}
+
+void float4x4::SetTranslatePart(const float4 &offset)
+{
+	v[0][3] = offset.x;
+	v[1][3] = offset.y;
+	v[2][3] = offset.z;
+	assume(EqualAbs(offset.w, 1.f) || EqualAbs(offset.w, 0.f));
 }
 
 void float4x4::SetRotatePartX(float angle)
@@ -1143,24 +1155,7 @@ void float4x4::SetRotatePartZ(float angle)
 
 void float4x4::SetRotatePart(const float3 &a, float angle)
 {
-	assume(a.IsNormalized());
-	assume(MATH_NS::IsFinite(angle));
-
-	float s, c;
-	SinCos(angle, s, c);
-	const float c1 = (1.f-c);
-
-	v[0][0] = c+c1*a.x*a.x;
-	v[1][0] = c1*a.x*a.y+s*a.z;
-	v[2][0] = c1*a.x*a.z-s*a.y;
-
-	v[0][1] = c1*a.x*a.y-s*a.z;
-	v[1][1] = c+c1*a.y*a.y;
-	v[2][1] = c1*a.y*a.z+s*a.x;
-
-	v[0][2] = c1*a.x*a.z+s*a.y;
-	v[1][2] = c1*a.y*a.z-s*a.x;
-	v[2][2] = c+c1*a.z*a.z;
+	SetRotationAxis3x3(*this, a, angle);
 }
 
 void float4x4::SetRotatePart(const Quat &q)

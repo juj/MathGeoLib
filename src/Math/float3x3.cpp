@@ -615,7 +615,7 @@ void float3x3::SetRotatePartZ(float angle)
 
 void float3x3::SetRotatePart(const float3 &axisDirection, float angle)
 {
-	SetRotatePart(Quat(axisDirection, angle));
+	SetRotationAxis3x3(*this, axisDirection, angle);
 }
 
 void float3x3::SetRotatePart(const Quat &q)

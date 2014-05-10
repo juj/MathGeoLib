@@ -505,6 +505,7 @@ public:
 		All other entries are left untouched. */
 	void SetTranslatePart(float tx, float ty, float tz);
 	void SetTranslatePart(const float3 &offset);
+	void SetTranslatePart(const float4 &offset);
 
 	/// Sets the 3-by-3 part of this matrix to perform rotation about the positive X axis which passes through
 	/// the origin. Leaves all other entries of this matrix untouched. [similarOverload: SetRotatePart] [hideIndex]
