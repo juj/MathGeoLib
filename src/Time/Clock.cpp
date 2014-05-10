@@ -100,7 +100,7 @@ Clock::Clock()
 void Clock::Sleep(int milliseconds)
 {
 #ifdef WIN8RT
-#pragma WARNING(Clock::Sleep has not been implemented!)
+#pragma warning(Clock::Sleep has not been implemented!)
 #elif defined(WIN32)
 	::Sleep(milliseconds);
 #elif !defined(__native_client__) && !defined(EMSCRIPTEN)

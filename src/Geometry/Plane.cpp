@@ -260,7 +260,7 @@ float3x4 Plane::OrthoProjection() const
 float3x4 Plane::ObliqueProjection(const vec & /*obliqueProjectionDir*/) const
 {
 #ifdef _MSC_VER
-#pragma WARNING(Plane::ObliqueProjection not implemented!)
+#pragma warning(Plane::ObliqueProjection not implemented!)
 #else
 #warning Plane::ObliqueProjection not implemented!
 #endif
@@ -411,7 +411,7 @@ vec Plane::ClosestPoint(const LineSegment &lineSegment) const
 vec Plane::ObliqueProject(const vec & /*point*/, const vec & /*obliqueProjectionDir*/) const
 {
 #ifdef _MSC_VER
-#pragma WARNING(Plane::ObliqueProject not implemented!)
+#pragma warning(Plane::ObliqueProject not implemented!)
 #else
 #warning Plane::ObliqueProject not implemented!
 #endif

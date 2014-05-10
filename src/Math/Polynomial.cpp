@@ -44,7 +44,7 @@ int Polynomial::SolveQuadratic(float a, float b, float c, float &root1, float &r
 int Polynomial::SolveCubic(float /*a*/, float /*b*/, float /*c*/, float /*d*/, float & /*root1*/, float & /*root2*/, float & /*root3*/)
 {
 #ifdef _MSC_VER
-#pragma WARNING(Polynomial::SolveCubic not implemented!)
+#pragma warning(Polynomial::SolveCubic not implemented!)
 #else
 #warning Polynomial::SolveCubic not implemented!
 #endif
@@ -55,7 +55,7 @@ int Polynomial::SolveCubic(float /*a*/, float /*b*/, float /*c*/, float /*d*/, f
 int Polynomial::SolveQuartic(float /*a*/, float /*b*/, float /*c*/, float /*d*/, float & /*root1*/, float & /*root2*/, float & /*root3*/, float & /*root4*/)
 {
 #ifdef _MSC_VER
-#pragma WARNING(Polynomial::SolveQuartic not implemented!)
+#pragma warning(Polynomial::SolveQuartic not implemented!)
 #else
 #warning Polynomial::SolveQuartic not implemented!
 #endif

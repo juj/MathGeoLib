@@ -204,7 +204,7 @@ AABB OBB::MinimalEnclosingAABB() const
 AABB OBB::MaximalContainedAABB() const
 {
 #ifdef _MSC_VER
-#pragma WARNING(OBB::MaximalContainedAABB not implemented!)
+#pragma warning(OBB::MaximalContainedAABB not implemented!)
 #else
 #warning OBB::MaximalContainedAABB not implemented!
 #endif
@@ -471,7 +471,7 @@ void OBB::ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int
 OBB OBB::PCAEnclosingOBB(const vec * /*pointArray*/, int /*numPoints*/)
 {
 #ifdef _MSC_VER
-#pragma WARNING(OBB::PCAEnclosingOBB not implemented!)
+#pragma warning(OBB::PCAEnclosingOBB not implemented!)
 #else
 #warning OBB::PCAEnclosingOBB not implemented!
 #endif
