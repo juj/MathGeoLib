@@ -737,7 +737,7 @@ public:
 
 	/// A compile-time constant float4 with value (NaN, NaN, NaN, NaN).
 	/** For this constant, each element has the value of quiet NaN, or Not-A-Number.
-		@note Never compare a float4 to this value! Due to how IEEE floats work, for each float x, both expressions "x == nan" and "x != nan" return false!
+		@note Never compare a float4 to this value! Due to how IEEE floats work, "nan == nan" returns false!
 			  That is, nothing is equal to NaN, not even NaN itself!
 		@note Due to static data initialization order being undefined in C++, do NOT use this
 			member to initialize other static data in other compilation units! */
