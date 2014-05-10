@@ -30,6 +30,10 @@
 #include "quat_simd.h"
 #include "float4_neon.h"
 
+#ifdef MATH_AUTOMATIC_SSE
+#include "sse_mathfun.h"
+#endif
+
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
 #endif
@@ -138,7 +142,14 @@ float Quat::Length() const
 
 float Quat::Normalize()
 {
-	///\todo SSE.
+#ifdef MATH_AUTOMATIC_SSE
+	simd4f lenSq = vec4_length_sq_ps(q);
+	simd4f len = vec4_rsqrt(lenSq);
+	simd4f isZero = _mm_cmplt_ps(lenSq, simd4fEpsilon); // Was the length zero?
+	simd4f normalized = mul_ps(q, len); // Normalize.
+	q = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
+	return s4f_x(len);
+#else
 	float length = Length();
 	if (length < 1e-4f)
 		return 0.f;
@@ -148,15 +159,20 @@ float Quat::Normalize()
 	z *= rcpLength;
 	w *= rcpLength;
 	return length;
+#endif
 }
 
 Quat Quat::Normalized() const
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return Quat(vec4_normalize(q));
+#else
 	Quat copy = *this;
 	float success = copy.Normalize();
 	assume(success > 0 && "Quat::Normalized failed!");
 	MARK_UNUSED(success);
 	return copy;
+#endif
 }
 
 bool Quat::IsNormalized(float epsilonSq) const
@@ -309,9 +325,22 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 	{
 		angle = Acos(angle); // After this, angle is in the range pi/2 -> 0 as the original angle variable ranged from 0 -> 1.
 
-		float c = 1.f / Sin(angle);
-		a = Sin((1.f - t) * angle) * c;
-		b = Sin(angle * t) * c;
+		float angleT = t*angle;
+
+#ifdef MATH_AUTOMATIC_SSE
+		// Compute three sines in one go with SSE.
+		simd4f s = set_ps(0.f, angleT, angle - angleT, angle);
+		s = sin_ps(s);
+		simd4f denom = shuffle1_ps(s, _MM_SHUFFLE(0, 0, 0, 0));
+		s = div_ps(s, denom);
+		a = s4f_y(s);
+		b = s4f_z(s);
+#else
+		float s[3] = { Sin(angle), Sin(angle - angleT), Sin(angleT) };
+		float c = 1.f / s[0];
+		a = s[1] * c;
+		b = s[2] * c;
+#endif
 	}
 	else // If angle is close to taking the denominator to zero, resort to linear interpolation (and normalization).
 	{
@@ -617,6 +646,15 @@ float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 	return m;
 #else
 	return float4x4(*this);
+#endif
+}
+
+float4x4 MUST_USE_RESULT Quat::ToFloat4x4(const float3 &translation) const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return ToFloat4x4(float4(translation, 1.f));
+#else
+	return float4x4(*this, translation);
 #endif
 }
 

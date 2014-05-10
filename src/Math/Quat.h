@@ -325,6 +325,7 @@ public:
 	float3x3 MUST_USE_RESULT ToFloat3x3() const;
 	float3x4 MUST_USE_RESULT ToFloat3x4() const;
 	float4x4 MUST_USE_RESULT ToFloat4x4() const;
+	float4x4 MUST_USE_RESULT ToFloat4x4(const float3 &translation) const;
 	float4x4 MUST_USE_RESULT ToFloat4x4(const float4 &translation) const;
 
 #ifdef MATH_ENABLE_STL_SUPPORT
