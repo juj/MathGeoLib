@@ -66,9 +66,9 @@ float4x4::float4x4(const float3x4 &m)
 	row[2] = m.row[2];
 	row[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 #else
-	Set(m.v[0][0], m.v[0][1], m.v[0][2], m[0][3],
-		m.v[1][0], m.v[1][1], m.v[1][2], m[1][3],
-		m.v[2][0], m.v[2][1], m.v[2][2], m[2][3],
+	Set(m.At(0,0), m.At(0,1), m.At(0,2), m.At(0,3),
+		m.At(1,0), m.At(1,1), m.At(1,2), m.At(1,3),
+		m.At(2,0), m.At(2,1), m.At(2,2), m.At(2,3),
 		      0.f,       0.f,       0.f,     1.f);
 #endif
 }
