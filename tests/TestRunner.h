@@ -107,6 +107,17 @@ public:
 #define RDTSC() 0
 #endif
 
+#if _MSC_VER >= 1700 // Visual Studio 2012
+// On VS2012 and newer, benchmarks are not apples-to-apples if some for loops get autovectorized by
+// the compiler, and others aren't. For example, measuring scalar sinf() vs MGL SSE Sin() shows that
+// VS2012 autovectorizer is able to compute 8 sinf()s in one iteration, but Sin() is always computed fully scalar.
+// Therefore in the benchmarks disable autovectorization to provide directly comparable results.
+// http://msdn.microsoft.com/en-us/library/hh872235.aspx
+#define MGL_PRAGMA_NO_AUTOVECTORIZE __pragma(loop(no_vector))
+#else
+#define MGL_PRAGMA_NO_AUTOVECTORIZE
+#endif
+
 #define BENCHMARK(name, description) \
 	void BenchmarkFunc_##name(Test &test); \
 	AddTestOp addbenchmarkop_##name(#name, __FILE__, description, false, false, true, BenchmarkFunc_##name); \
@@ -117,11 +128,11 @@ public:
 		tick_t accumTicks = 0; \
 		tick_t worstTicks = 0; \
 		int numWarmupTicks = 1; /* Run a warmup for JIT environments */ \
-		for(int xx = -numWarmupTicks; xx < testrunner_numTimerTests; ++xx) \
+		MGL_PRAGMA_NO_AUTOVECTORIZE for(int xx = -numWarmupTicks; xx < testrunner_numTimerTests; ++xx) \
 		{ \
 			tick_t start = Clock::Tick(); \
 			unsigned long long startTsc = RDTSC(); \
-			for(int i = 0; i < testrunner_numItersPerTest; ++i) \
+			MGL_PRAGMA_NO_AUTOVECTORIZE for(int i = 0; i < testrunner_numItersPerTest; ++i) \
 			{
 
 #define BENCHMARK_END \
@@ -158,11 +169,11 @@ public:
 		tick_t bestTicks = (tick_t)-1; \
 		tick_t accumTicks = 0; \
 		tick_t worstTicks = 0; \
-		for(int xx = 0; xx < numTests; ++xx) \
+		MGL_PRAGMA_NO_AUTOVECTORIZE for(int xx = 0; xx < numTests; ++xx) \
 		{ \
 			tick_t start = Clock::Tick(); \
 			unsigned long long startTsc = Clock::Rdtsc(); \
-			for(int i = 0; i < numIters; ++i) \
+			MGL_PRAGMA_NO_AUTOVECTORIZE for(int i = 0; i < numIters; ++i) \
 			{
 
 #define BENCHMARK_ITERS_END \
