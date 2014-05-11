@@ -660,6 +660,29 @@ BENCHMARK(sin, "sin")
 }
 BENCHMARK_END;
 
+#if defined(_MSC_VER) && !defined(_M_X64)
+// For historical purposes, compare how the FSIN instruction does against SIMD.
+// On VS2013 32-bit, not very well:
+// Benchmark 'Sin': Sin Best : 21.082 nsecs / 35.428 ticks, Avg : 26.472 nsecs, Worst : 29.514 nsecs
+// Benchmark 'x87_sin' : FSIN Best : 49.994 nsecs / 84.866 ticks, Avg : 52.873 nsecs, Worst : 57.222 nsecs
+double x87_sin(double x)
+{
+	double sine;
+	__asm {
+		fld x
+		fsin
+		fstp sine
+	}
+	return sine;
+}
+
+BENCHMARK(x87_sin, "FSIN")
+{
+	f[i] = (float)x87_sin((double)pf[i]);
+}
+BENCHMARK_END;
+#endif
+
 BENCHMARK(sinf, "sinf")
 {
 	f[i] = sinf(pf[i]);
