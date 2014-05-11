@@ -30,6 +30,7 @@
 #include "TransformOps.h"
 #include "SSEMath.h"
 #include "float4x4_sse.h"
+#include "simd.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iostream>
@@ -537,8 +538,8 @@ void float3x4::ScaleRow3(int row, float scalar)
 
 void float3x4::ScaleRow(int r, float scalar)
 {
-#ifdef MATH_SSE
-	row[r] = _mm_mul_ps(row[r], _mm_set1_ps(scalar));
+#ifdef MATH_SIMD
+	row[r] = mul_ps(row[r], set1_ps(scalar));
 #else
 	Row(r) *= scalar;
 #endif
@@ -614,8 +615,8 @@ void float3x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 		return; // Benign failure
 #endif
 
-#ifdef MATH_SSE
-	this->row[row] = _mm_set_ps(m_r3, m_r2, m_r1, m_r0);
+#ifdef MATH_SIMD
+	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
 	v[row][0] = m_r0;
 	v[row][1] = m_r1;
@@ -631,7 +632,7 @@ void float3x4::SetRow(int row, const float3 &rowVector, float w)
 
 void float3x4::SetRow(int row, const float4 &rowVector)
 {
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (row < 0 || row >= Rows)
@@ -698,10 +699,10 @@ void float3x4::Set(float _00, float _01, float _02, float _03,
 				   float _10, float _11, float _12, float _13,
 				   float _20, float _21, float _22, float _23)
 {
-#ifdef MATH_SSE
-	row[0] = _mm_set_ps(_03, _02, _01, _00);
-	row[1] = _mm_set_ps(_13, _12, _11, _10);
-	row[2] = _mm_set_ps(_23, _22, _21, _20);
+#ifdef MATH_SIMD
+	row[0] = set_ps(_03, _02, _01, _00);
+	row[1] = set_ps(_13, _12, _11, _10);
+	row[2] = set_ps(_23, _22, _21, _20);
 #else
 	v[0][0] = _00; v[0][1] = _01; v[0][2] = _02; v[0][3] = _03;
 	v[1][0] = _10; v[1][1] = _11; v[1][2] = _12; v[1][3] = _13;
@@ -711,7 +712,7 @@ void float3x4::Set(float _00, float _01, float _02, float _03,
 
 void float3x4::Set(const float3x4 &rhs)
 {
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -797,7 +798,7 @@ void float3x4::SwapRows(int row1, int row2)
 		return; // Benign failure
 #endif
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	Swap(row[row1], row[row2]);
 #else
 	Swap(v[row1][0], v[row2][0]);
@@ -863,7 +864,7 @@ float3x4 &float3x4::operator =(const float3x4 &rhs)
 	// But note that when assigning through a conversion above (float3x3 -> float3x4),
 	// we do assume the input matrix is finite.
 //	assume(rhs.IsFinite());
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -1305,12 +1306,12 @@ float4 float3x4::operator *(const float4 &rhs) const
 
 float3x4 float3x4::operator *(float scalar) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	float3x4 r;
-	__m128 s = _mm_set1_ps(scalar);
-	r.row[0] = _mm_mul_ps(row[0], s);
-	r.row[1] = _mm_mul_ps(row[1], s);
-	r.row[2] = _mm_mul_ps(row[2], s);
+	simd4f s = set1_ps(scalar);
+	r.row[0] = mul_ps(row[0], s);
+	r.row[1] = mul_ps(row[1], s);
+	r.row[2] = mul_ps(row[2], s);
 #else
 	float3x4 r = *this;
 	r *= scalar;
@@ -1323,14 +1324,14 @@ float3x4 float3x4::operator /(float scalar) const
 {
 	assume(!EqualAbs(scalar, 0));
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	float3x4 r;
-	__m128 s = _mm_set1_ps(scalar);
-	__m128 one = _mm_set1_ps(1.f);
-	s = _mm_div_ps(one, s);
-	r.row[0] = _mm_mul_ps(row[0], s);
-	r.row[1] = _mm_mul_ps(row[1], s);
-	r.row[2] = _mm_mul_ps(row[2], s);
+	simd4f s = set1_ps(scalar);
+	simd4f one = set1_ps(1.f);
+	s = div_ps(one, s);
+	r.row[0] = mul_ps(row[0], s);
+	r.row[1] = mul_ps(row[1], s);
+	r.row[2] = mul_ps(row[2], s);
 #else
 	float3x4 r = *this;
 	r /= scalar;
@@ -1341,11 +1342,11 @@ float3x4 float3x4::operator /(float scalar) const
 
 float3x4 float3x4::operator +(const float3x4 &rhs) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	float3x4 r;
-	r.row[0] = _mm_add_ps(row[0], rhs.row[0]);
-	r.row[1] = _mm_add_ps(row[1], rhs.row[1]);
-	r.row[2] = _mm_add_ps(row[2], rhs.row[2]);
+	r.row[0] = add_ps(row[0], rhs.row[0]);
+	r.row[1] = add_ps(row[1], rhs.row[1]);
+	r.row[2] = add_ps(row[2], rhs.row[2]);
 #else
 	float3x4 r = *this;
 	r += rhs;
@@ -1356,11 +1357,11 @@ float3x4 float3x4::operator +(const float3x4 &rhs) const
 
 float3x4 float3x4::operator -(const float3x4 &rhs) const
 {
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	float3x4 r;
-	r.row[0] = _mm_sub_ps(row[0], rhs.row[0]);
-	r.row[1] = _mm_sub_ps(row[1], rhs.row[1]);
-	r.row[2] = _mm_sub_ps(row[2], rhs.row[2]);
+	r.row[0] = sub_ps(row[0], rhs.row[0]);
+	r.row[1] = sub_ps(row[1], rhs.row[1]);
+	r.row[2] = sub_ps(row[2], rhs.row[2]);
 #else
 	float3x4 r = *this;
 	r -= rhs;
@@ -1373,11 +1374,11 @@ float3x4 float3x4::operator -() const
 {
 	float3x4 r;
 
-#ifdef MATH_SSE
-	__m128 zero = _mm_setzero_ps();
-	r.row[0] = _mm_sub_ps(zero, row[0]);
-	r.row[1] = _mm_sub_ps(zero, row[1]);
-	r.row[2] = _mm_sub_ps(zero, row[2]);
+#ifdef MATH_SIMD
+	simd4f zero = zero_ps();
+	r.row[0] = sub_ps(zero, row[0]);
+	r.row[1] = sub_ps(zero, row[1]);
+	r.row[2] = sub_ps(zero, row[2]);
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -1389,11 +1390,11 @@ float3x4 float3x4::operator -() const
 
 float3x4 &float3x4::operator *=(float scalar)
 {
-#ifdef MATH_SSE
-	__m128 s = _mm_set1_ps(scalar);
-	row[0] = _mm_mul_ps(row[0], s);
-	row[1] = _mm_mul_ps(row[1], s);
-	row[2] = _mm_mul_ps(row[2], s);
+#ifdef MATH_SIMD
+	simd4f s = set1_ps(scalar);
+	row[0] = mul_ps(row[0], s);
+	row[1] = mul_ps(row[1], s);
+	row[2] = mul_ps(row[2], s);
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -1407,13 +1408,13 @@ float3x4 &float3x4::operator /=(float scalar)
 {
 	assume(!EqualAbs(scalar, 0));
 
-#ifdef MATH_SSE
-	__m128 s = _mm_set1_ps(scalar);
-	__m128 one = _mm_set1_ps(1.f);
-	s = _mm_div_ps(one, s);
-	row[0] = _mm_mul_ps(row[0], s);
-	row[1] = _mm_mul_ps(row[1], s);
-	row[2] = _mm_mul_ps(row[2], s);
+#ifdef MATH_SIMD
+	simd4f s = set1_ps(scalar);
+	simd4f one = set1_ps(1.f);
+	s = div_ps(one, s);
+	row[0] = mul_ps(row[0], s);
+	row[1] = mul_ps(row[1], s);
+	row[2] = mul_ps(row[2], s);
 #else
 	float invScalar = 1.f / scalar;
 	for(int y = 0; y < Rows; ++y)
@@ -1426,10 +1427,10 @@ float3x4 &float3x4::operator /=(float scalar)
 
 float3x4 &float3x4::operator +=(const float3x4 &rhs)
 {
-#ifdef MATH_SSE
-	row[0] = _mm_add_ps(row[0], rhs.row[0]);
-	row[1] = _mm_add_ps(row[1], rhs.row[1]);
-	row[2] = _mm_add_ps(row[2], rhs.row[2]);
+#ifdef MATH_SIMD
+	row[0] = add_ps(row[0], rhs.row[0]);
+	row[1] = add_ps(row[1], rhs.row[1]);
+	row[2] = add_ps(row[2], rhs.row[2]);
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
@@ -1441,10 +1442,10 @@ float3x4 &float3x4::operator +=(const float3x4 &rhs)
 
 float3x4 &float3x4::operator -=(const float3x4 &rhs)
 {
-#ifdef MATH_SSE
-	row[0] = _mm_sub_ps(row[0], rhs.row[0]);
-	row[1] = _mm_sub_ps(row[1], rhs.row[1]);
-	row[2] = _mm_sub_ps(row[2], rhs.row[2]);
+#ifdef MATH_SIMD
+	row[0] = sub_ps(row[0], rhs.row[0]);
+	row[1] = sub_ps(row[1], rhs.row[1]);
+	row[2] = sub_ps(row[2], rhs.row[2]);
 #else
 	for(int y = 0; y < Rows; ++y)
 		for(int x = 0; x < Cols; ++x)
