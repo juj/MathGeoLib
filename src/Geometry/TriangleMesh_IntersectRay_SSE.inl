@@ -207,41 +207,26 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 		tris += 36;
 	}
 
-	float ds[16];
-	float *alignedDS = (float*)(((uintptr_t)ds + 0xF) & ~0xF);
-
+	float4 d = nearestD;
 #ifdef MATH_GEN_UV
-	float su[16];
-	float *alignedU = (float*)(((uintptr_t)su + 0xF) & ~0xF);
-
-	float sv[16];
-	float *alignedV = (float*)(((uintptr_t)sv + 0xF) & ~0xF);
-
-	_mm_store_ps(alignedU, nearestU);
-	_mm_store_ps(alignedV, nearestV);
+	float4 u = nearestU;
+	float4 v = nearestV;
 #endif
-
 #ifdef MATH_GEN_TRIANGLEINDEX
-	u32 ds2[16];
-	u32 *alignedDS2 = (u32*)(((uintptr_t)ds2 + 0xF) & ~0xF);
-
-	_mm_store_si128((__m128i*)alignedDS2, nearestIndex);
+	u32 idx[4];
+	_mm_store_si128((__m128i*)idx, nearestIndex);
 #endif
-
-	_mm_store_ps(alignedDS, nearestD);
-
 	float smallestT = FLOAT_INF;
-//	float u = FLOAT_NAN, v = FLOAT_NAN;
 	for(int i = 0; i < 4; ++i)
-		if (alignedDS[i] < smallestT)
+		if (d[i] < smallestT)
 		{
-			smallestT = alignedDS[i];
+			smallestT = d[i];
 #ifdef MATH_GEN_TRIANGLEINDEX
-			outTriangleIndex = alignedDS2[i]+i;
+			outTriangleIndex = idx[i]+i;
 #endif
 #ifdef MATH_GEN_UV
-			outU = alignedU[i];
-			outV = alignedV[i];
+			outU = u[i];
+			outV = v[i];
 #endif
 		}
 
