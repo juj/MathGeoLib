@@ -681,7 +681,40 @@ BENCHMARK(x87_sin, "FSIN")
 	f[i] = (float)x87_sin((double)pf[i]);
 }
 BENCHMARK_END;
+
 #endif
+
+// Another interesting comparison: how fast is sin() via precomputed lookup tables
+// compared to SIMD implementation?
+// Test a lookup table implementation adapted from http://www.flipcode.com/archives/Fast_Trigonometry_Functions_Using_Lookup_Tables.shtml
+#define MAX_CIRCLE_ANGLE      65536
+#define HALF_MAX_CIRCLE_ANGLE (MAX_CIRCLE_ANGLE/2)
+#define QUARTER_MAX_CIRCLE_ANGLE (MAX_CIRCLE_ANGLE/4)
+#define MASK_MAX_CIRCLE_ANGLE (MAX_CIRCLE_ANGLE - 1)
+#define PI 3.14159265358979323846f
+static float fast_cossin_table[MAX_CIRCLE_ANGLE];           // Declare table of fast cosinus and sinus
+class Init_fast_cossin_table
+{
+public:
+	Init_fast_cossin_table()
+	{
+		// Build cossin table
+		for(int i = 0; i < MAX_CIRCLE_ANGLE; i++)
+			fast_cossin_table[i] = (float)sin((double)i * PI / HALF_MAX_CIRCLE_ANGLE);
+	}
+};
+Init_fast_cossin_table static_initializer;
+static inline float sin_lookuptable(float n)
+{
+	int i = (int)(n * (HALF_MAX_CIRCLE_ANGLE / PI));
+	if (i < 0) return fast_cossin_table[MAX_CIRCLE_ANGLE - ((-i)&MASK_MAX_CIRCLE_ANGLE)];
+	else return fast_cossin_table[i&MASK_MAX_CIRCLE_ANGLE];
+}
+BENCHMARK(sin_lookuptable, "sin_lookuptable")
+{
+	f[i] = sin_lookuptable(pf[i]);
+}
+BENCHMARK_END;
 
 BENCHMARK(sinf, "sinf")
 {
@@ -712,13 +745,16 @@ BENCHMARK_END;
 
 UNIQUE_TEST(sin_ps_precision)
 {
-	const int C = 5;
-	float maxRelError[C] = {};
-	float maxAbsError[C] = {};
-	float X[C] = {};
+	const int C = 6;
 
 	for(int l = 0; l < 2; ++l)
 	{
+		float maxRelError[C] = {};
+		float maxAbsError[C] = {};
+		float maxErrorArg[C] = {};
+		float maxErrorVal[C] = {};
+		float X[C] = {};
+
 		float maxVal = (l == 0 ? 4.f*pi : 1e6f);
 		for(int i = 0; i < 1000000; ++i)
 		{
@@ -733,20 +769,29 @@ UNIQUE_TEST(sin_ps_precision)
 			X[2] = sinf(f);
 			X[3] = Sin(f);
 			X[4] = (float)sin((double)f);
+			X[5] = sin_lookuptable(f);
 
 			for(int j = 0; j < C; ++j)
 			{
+				float absError = Abs(x - X[j]);
+				if (absError > maxAbsError[j])
+				{
+					maxAbsError[j] = absError;
+					maxErrorArg[j] = f;
+					maxErrorVal[j] = X[j];
+				}
 				maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
-				maxAbsError[j] = Abs(x - X[j]);
 			}
 		}
 
+		LOGI(" ");
 		LOGI("With |x| < %f:", maxVal);
-		LOGI("Max absolute error with sin_ps(x): %e",  maxAbsError[0]);
-		LOGI("Max absolute error with sin_ps_range_reduced(x): %e",  maxAbsError[1]);
-		LOGI("Max absolute error with sinf(x): %e",  maxAbsError[2]);
-		LOGI("Max absolute error with Sin(x): %e",  maxAbsError[3]);
-		LOGI("Max absolute error with unwrapped sin(x): %e",  maxAbsError[4]);
+		LOGI("Max absolute error with sin_ps(x): %e, with sin_ps(%f)=%f vs correct %f", maxAbsError[0], maxErrorArg[0], maxErrorVal[0], sin(maxErrorArg[0]));
+		LOGI("Max absolute error with sin_ps_range_reduced(x): %e, with sin_ps_range_reduced(%f)=%f vs correct %f", maxAbsError[1], maxErrorArg[1], maxErrorVal[1], sin(maxErrorArg[1]));
+		LOGI("Max absolute error with sinf(x): %e, with sinf(%f) = %f vs correct %f", maxAbsError[2], maxErrorArg[2], maxErrorVal[2], sin(maxErrorArg[2]));
+		LOGI("Max absolute error with Sin(x): %e, with Sin(%f) = %f vs correct %f", maxAbsError[3], maxErrorArg[3], maxErrorVal[3], sin(maxErrorArg[3]));
+		LOGI("Max absolute error with unwrapped sin(x): %e, with unwrapped sin(%f) = %f vs correct %f", maxAbsError[4], maxErrorArg[4], maxErrorVal[4], sin(maxErrorArg[4]));
+		LOGI("Max absolute error with sin_lookuptable(x): %e, with sin_lookuptable(%f) = %f vs correct %f", maxAbsError[5], maxErrorArg[5], maxErrorVal[5], sin(maxErrorArg[5]));
 		LOGI(" ");
 
 		LOGI("Max relative error with sin_ps(x): %e",  maxRelError[0]);
@@ -754,6 +799,7 @@ UNIQUE_TEST(sin_ps_precision)
 		LOGI("Max relative error with sinf(x): %e",  maxRelError[2]);
 		LOGI("Max relative error with Sin(x): %e",  maxRelError[3]);
 		LOGI("Max relative error with unwrapped sin(x): %e",  maxRelError[4]);
+		LOGI("Max relative error with sin_lookuptable(x): %e", maxRelError[5]);
 	}
 }
 
