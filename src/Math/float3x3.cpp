@@ -634,6 +634,9 @@ float3x3 float3x3::LookAt(const float3 &localForward, const float3 &targetDirect
 	// In the local space, the forward and up directions must be perpendicular to be well-formed.
 	assume(localForward.IsPerpendicular(localUp));
 
+	// In the world space, the targetDirection and worldUp cannot be degenerate (collinear)
+	assume(!targetDirection.Cross(worldUp).IsZero() && "Passed a degenerate coordinate frame to look towards in float3x3::LookAt!");
+
 	// Generate the third basis vector in the local space.
 	float3 localRight = localUp.Cross(localForward).Normalized();
 
