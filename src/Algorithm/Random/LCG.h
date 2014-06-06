@@ -75,46 +75,46 @@ public:
 	/// Reinitializes the generator to the new settings.
 	void Seed(u32 seed, u32 multiplier = 69621, u32 increment = 0, u32 modulus = 0x7FFFFFFF);
 
-	/// Returns an integer in the range [0, MaxInt()]
+	/// Returns a random integer picked uniformly in the range [0, MaxInt()]
 	u32 Int();
 
 	/// Returns the biggest number the generator can yield. (Which is always modulus-1)
 	u32 MaxInt() const { return modulus - 1; }
 
-	/// Returns an integer in the range [0, 2^32-1].
+	/// Returns a random integer picked uniformly in the range [0, 2^32-1].
 	/// @note The configurable modulus and increment are not used by this function, but are always increment == 0, modulus=2^32.
 	u32 IntFast();
 
-	/// Returns an integer in the range [a, b]
+	/// Returns a random integer picked uniformly in the range [a, b]
 	/** @param a Lower bound, inclusive.
 	    @param b Upper bound, inclusive.
-	    @return An integer in the range [a, b] */
+	    @return A random integer picked uniformly in the range [a, b] */
 	int Int(int a, int b);
 
-	/// Returns a float in the range [0, 1[.
+	/// Returns a random float picked uniformly in the range [0, 1[.
 	float Float();
 
-	/// Returns a float in the range [0, 1].
+	/// Returns a random float picked uniformly in the range [0, 1].
 	/// @note This is much slower than Float()! Prefer that function instead if possible.
 	float Float01Incl();
 
-	/// Returns a float in the range ]-1, 1[.
+	/// Returns a random float picked uniformly in the range ]-1, 1[.
 	/// @note This function has one more bit of randomness compared to Float(), but has a theoretical bias
 	/// towards 0.0, since floating point has two representations for 0 (+0 and -0).
 	float FloatNeg1_1();
 
-	/// Returns a float in the range [a, b[.
+	/// Returns a random float picked uniformly in the range [a, b[.
 	/** @param a Lower bound, inclusive.
 	    @param b Upper bound, exclusive.
-	    @return A float in the range [a, b[
+	    @return A random float picked uniformly in the range [a, b[
 	    @Note This function is slower than LCG::FloatIncl(). If you do not care about the open/closed interval, prefer calling FloatIncl() instead.
 	    @see Float(), FloatIncl(). */
 	float Float(float a, float b);
 
-	/// Returns a float in the range [a, b].
+	/// Returns a random float picked uniformly in the range [a, b].
 	/** @param a Lower bound, inclusive.
 	    @param b Upper bound, inclusive.
-	    @return A float in the range [a, b] */
+	    @return A random float picked uniformly in the range [a, b] */
 	float FloatIncl(float a, float b);
 
 	u32 multiplier;
