@@ -1045,6 +1045,18 @@ void float4::SetFromScalar(float scalar, float w_)
 #endif
 }
 
+void float4::SetFromSphericalCoordinates(float azimuth, float inclination)
+{
+	float4 v, s, c;
+	v.x = inclination;
+	v.y = azimuth;
+	SinCos2(v, s, c);
+	x = c.x * s.y;
+	y = -s.x;
+	z = c.x * c.y;
+	w = 0.f;
+}
+
 bool float4::Equals(const float4 &other, float epsilon) const
 {
 	return MATH_NS::Abs(x - other.x) < epsilon &&

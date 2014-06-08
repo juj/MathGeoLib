@@ -282,6 +282,14 @@ public:
 	/// Sets this float4 to (scalar, scalar, scalar, w).
 	void SetFromScalar(float scalar, float w);
 
+	/// Converts the given vector represented in spherical coordinates to an euclidean direction vector.
+	/** @param azimuth The direction, or yaw, of the vector. This function uses the convention that the X-Z plane is
+			the 2D horizontal "map" plane, with the vector (0,0,radius) corresponding to the vector in the direction azimuth=0 and inclination=0.
+			This value is typically in the range [-pi, pi] (, or [0, 2pi]).
+		@param inclination The elevation, or pitch, of the vector. This function uses the convention that the +Y axis
+			points towards up, i.e. +Y is the "Zenith direction". This value is typically in the range [-pi/2, pi/2]. */
+	void SetFromSphericalCoordinates(float azimuth, float inclination);
+
 	/// Sets all elements of this vector.
 	/** @see x, y, z, w, At(). */
 	void Set(float x, float y, float z, float w);
