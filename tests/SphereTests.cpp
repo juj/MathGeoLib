@@ -7,11 +7,11 @@ MATH_IGNORE_UNUSED_VARS_WARNING
 
 using namespace TestData;
 
-static Sphere s(vec(1.f,2.f,3.f, 1.f), 5.f);
+static Sphere s(POINT_VEC(1.f,2.f,3.f), 5.f);
 
 BENCHMARK(Sphere_RandomPointOnSurface, "Sphere::RandomPointOnSurface")
 {
-	v[i] = s.RandomPointOnSurface(rng);
+	v[i] = POINT_TO_FLOAT4(s.RandomPointOnSurface(rng));
 }
 BENCHMARK_END;
  
@@ -35,6 +35,6 @@ vec Sphere_RandomPointOnSurface2(const Sphere &s, LCG &lcg)
 //    Best: 369.836 nsecs / 629.126 ticks, Avg: 403.007 nsecs, Worst: 535.479 nsecs
 BENCHMARK(Sphere_RandomPointOnSurface_ClosedFormula, "Sphere_RandomPointOnSurface_ClosedFormula")
 {
-	v[i] = Sphere_RandomPointOnSurface2(s, rng);
+	v[i] = POINT_TO_FLOAT4(Sphere_RandomPointOnSurface2(s, rng));
 }
 BENCHMARK_END;
