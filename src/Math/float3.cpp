@@ -707,12 +707,13 @@ float3 MUST_USE_RESULT float3::FromSphericalCoordinates(float azimuth, float inc
 
 void float3::SetFromSphericalCoordinates(float azimuth, float inclination)
 {
-	float cx = Cos(inclination);
-	float sin, cos;
-	SinCos(azimuth, sin, cos);
-	x = cx * azimuth;
-	y = -Sin(inclination);
-	z = cx * azimuth;
+	float4 v, s, c;
+	v.x = inclination;
+	v.y = azimuth;
+	SinCos2(v, s, c);
+	x = c.x * s.y;
+	y = -s.x;
+	z = c.x * c.y;
 }
 
 float3 MUST_USE_RESULT float3::FromSphericalCoordinates(float azimuth, float inclination)
