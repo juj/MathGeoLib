@@ -922,13 +922,16 @@ int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVerti
 vec Sphere::RandomPointInside(LCG &lcg)
 {
 	assume(r > 1e-3f);
+	vec v = vec::zero;
+	// Rejection sampling analysis: The unit sphere fills ~52.4% of the volume of its enclosing box, so this
+	// loop is expected to take only very few iterations before succeeding.
 	for(int i = 0; i < 1000; ++i)
 	{
-		float x = lcg.Float(-r, r);
-		float y = lcg.Float(-r, r);
-		float z = lcg.Float(-r, r);
-		if (x*x + y*y + z*z <= r*r)
-			return pos + DIR_VEC(x,y,z);
+		v.x = lcg.Float(-r, r);
+		v.y = lcg.Float(-r, r);
+		v.z = lcg.Float(-r, r);
+		if (v.LengthSq() <= r*r)
+			return pos + v;
 	}
 	assume(false && "Sphere::RandomPointInside failed!");
 
@@ -940,6 +943,8 @@ vec Sphere::RandomPointOnSurface(LCG &lcg)
 {
 	assume(r > 1e-3f);
 	vec v = vec::zero;
+	// Rejection sampling analysis: The unit sphere fills ~52.4% of the volume of its enclosing box, so this
+	// loop is expected to take only very few iterations before succeeding.
 	for(int i = 0; i < 1000; ++i)
 	{
 		v.x = lcg.FloatNeg1_1();
@@ -949,6 +954,7 @@ vec Sphere::RandomPointOnSurface(LCG &lcg)
 		if (lenSq >= 1e-6f && lenSq <= r*r)
 			return pos + (r / Sqrt(lenSq)) * v;
 	}
+	// Astronomically small probability to reach here, and if we do so, the provided random number generator must have been in a bad state.
 	assume(false && "Sphere::RandomPointOnSurface failed!");
 
 	// Failed to generate a point inside this sphere. Return an arbitrary point on the surface as fallback.
