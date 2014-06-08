@@ -133,6 +133,14 @@ float Tan(float angleRadians);
 /// computing them separately.
 /** @see Sin(), Cos(), Tan(), Asin(), Acos(), Atan(), Atan2(), Sinh(), Cosh(), Tanh(). */
 void SinCos(float angleRadians, float &outSin, float &outCos);
+/// Computes sin and cos of the .x and .y components of angleRadians, stored to the corresponding components of outSin and outCos.
+/// The .y and .w components of the outputs are undefined.
+void SinCos2(const float4 &angleRadians, float4 &outSin, float4 &outCos);
+/// Computes sin and cos of the .x, .y and .z components of angleRadians, stored to the corresponding components of outSin and outCos.
+/// The .w components of the outputs are undefined.
+void SinCos3(const float4 &angleRadians, float4 &outSin, float4 &outCos);
+/// Computes sin and cos of the four components of angleRadians, stored to the corresponding components of outSin and outCos.
+void SinCos4(const float4 &angleRadians, float4 &outSin, float4 &outCos);
 /// Computes the function arcsin(x), in radians.
 /** @see Sin(), Cos(), Tan(), SinCos(), Acos(), Atan(), Atan2(), Sinh(), Cosh(), Tanh(). */
 float Asin(float x);

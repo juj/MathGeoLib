@@ -102,6 +102,51 @@ void SinCos(float angleRadians, float &outSin, float &outCos)
 #endif
 }
 
+void SinCos2(const float4 &angleRadians, float4 &outSin, float4 &outCos)
+{
+#ifdef MATH_SSE2
+	__m128 angle = modf_ps(angleRadians.v, pi2);
+	sincos_ps(angle, &outSin.v, &outCos.v);
+#else
+	outSin.x = Sin(angleRadians.x);
+	outCos.x = Cos(angleRadians.x);
+	outSin.y = Sin(angleRadians.y);
+	outCos.y = Cos(angleRadians.y);
+#endif
+}
+
+void SinCos3(const float4 &angleRadians, float4 &outSin, float4 &outCos)
+{
+#ifdef MATH_SSE2
+	__m128 angle = modf_ps(angleRadians.v, pi2);
+	sincos_ps(angle, &outSin.v, &outCos.v);
+#else
+	outSin.x = Sin(angleRadians.x);
+	outCos.x = Cos(angleRadians.x);
+	outSin.y = Sin(angleRadians.y);
+	outCos.y = Cos(angleRadians.y);
+	outSin.z = Sin(angleRadians.z);
+	outCos.z = Cos(angleRadians.z);
+#endif
+}
+
+void SinCos4(const float4 &angleRadians, float4 &outSin, float4 &outCos)
+{
+#ifdef MATH_SSE2
+	__m128 angle = modf_ps(angleRadians.v, pi2);
+	sincos_ps(angle, &outSin.v, &outCos.v);
+#else
+	outSin.x = Sin(angleRadians.x);
+	outCos.x = Cos(angleRadians.x);
+	outSin.y = Sin(angleRadians.y);
+	outCos.y = Cos(angleRadians.y);
+	outSin.z = Sin(angleRadians.z);
+	outCos.z = Cos(angleRadians.z);
+	outSin.w = Sin(angleRadians.w);
+	outCos.w = Cos(angleRadians.w);
+#endif
+}
+
 float Asin(float x)
 {
 	return asinf(x);
