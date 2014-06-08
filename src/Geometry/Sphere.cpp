@@ -939,14 +939,15 @@ vec Sphere::RandomPointInside(LCG &lcg)
 vec Sphere::RandomPointOnSurface(LCG &lcg)
 {
 	assume(r > 1e-3f);
+	vec v = vec::zero;
 	for(int i = 0; i < 1000; ++i)
 	{
-		float x = lcg.Float(-r, r);
-		float y = lcg.Float(-r, r);
-		float z = lcg.Float(-r, r);
-		float lenSq = x*x + y*y + z*z;
+		v.x = lcg.FloatNeg1_1();
+		v.y = lcg.FloatNeg1_1();
+		v.z = lcg.FloatNeg1_1();
+		float lenSq = v.LengthSq();
 		if (lenSq >= 1e-6f && lenSq <= r*r)
-			return pos + r / Sqrt(lenSq) * DIR_VEC(x, y, z);
+			return pos + (r / Sqrt(lenSq)) * v;
 	}
 	assume(false && "Sphere::RandomPointOnSurface failed!");
 
