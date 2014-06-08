@@ -1,8 +1,11 @@
 #include "../src/Math/myassert.h"
 #include "../src/MathGeoLib.h"
 #include "../tests/TestRunner.h"
+#include "../tests/TestData.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
+
+using namespace TestData;
 
 RANDOMIZED_TEST(LCG_IntFast)
 {
@@ -131,3 +134,15 @@ RANDOMIZED_TEST(LCG_Float_A_B_Incl)
 		assert2(f <= b, f, b);
 	}
 }
+
+BENCHMARK(LCG_FloatNeg1_1, "LCG::FloatNeg1_1")
+{
+	f[i] = rng.FloatNeg1_1();
+}
+BENCHMARK_END;
+
+BENCHMARK(LCG_FloatNeg1_1_2, "LCG::FloatNeg1_1_2")
+{
+	f[i] = rng.Float(-1.f, 1.f);
+}
+BENCHMARK_END;
