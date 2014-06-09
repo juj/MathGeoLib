@@ -18,13 +18,13 @@ BENCHMARK_END;
 // Implement an alternative method for generating a random point on the surface of a Sphere that uses
 // a closed formula for uniform geometric distribution instead of rejection sampling, which Sphere::RandomPointOnSurface uses.
 // See here: http://mathworld.wolfram.com/SpherePointPicking.html
-vec Sphere_RandomPointOnSurface2(const Sphere &s, LCG &lcg)
+vec Sphere_RandomPointOnSurface2(const Sphere &sphere, LCG &lcg)
 {
 	float a = lcg.Float(0.f, 2.f*pi);
 	float i = Acos(lcg.Float(-1.f, 1.f));
 	vec v;
 	v.SetFromSphericalCoordinates(a, i);
-	return s.pos + v * s.r;
+	return sphere.pos + v * sphere.r;
 }
 
 // Which version is faster? Rejection sampling or closed formula?
