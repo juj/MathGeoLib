@@ -21,6 +21,8 @@
 #include <cstdarg>
 #include <stdio.h>
 
+#include "Callstack.h"
+
 #if defined(WIN32) && !defined(WIN8RT)
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -90,15 +92,21 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 {
 	if (channel == MathLogError)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY);
+		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY); // Red
 		fprintf(stderr, "Error: %s\n", str);
-		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_INTENSITY); // Dark gray
+		std::string callstack = GetCallstack("  ", "PrintToConsole");
+		fprintf(stderr, "%s", callstack.c_str());
+		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Light gray/default
 	}
 	else if (channel == MathLogWarning)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); // Yellow
 		printf("Warning: %s\n", str);
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY); // Dark gray
+		std::string callstack = GetCallstack("  ", "PrintToConsole");
+		printf("%s", callstack.c_str());
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Light gray/default
 	}
 	else
 		printf("%s\n", str);
