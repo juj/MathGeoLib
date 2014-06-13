@@ -1,7 +1,7 @@
 #include "Callstack.h"
 #include <string>
 
-#ifdef WIN32
+#if defined(WIN32) && defined(_MSC_VER)
 
 #include <Windows.h>
 #include <DbgHelp.h>
