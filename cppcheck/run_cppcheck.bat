@@ -6,6 +6,8 @@
 
 :: In suppressions.txt:
 :: unusedPrivateFunction:Math/Quat.h: cppcheck does not see that the functions 'Quat::operator*/+-()' are being used.
+:: A false positive: https://sourceforge.net/apps/trac/cppcheck/ticket/5788:
+::    Math\Quat.cpp(689): (warning) (invalidPrintfArgType_float): %f in format string (no. 4) requires 'double' but the argument type is 'float3'.
 
 set OLDPATH=%PATH%
 set PATH=%PATH%;C:\Program Files (x86)\Cppcheck
