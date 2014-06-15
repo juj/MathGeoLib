@@ -135,6 +135,26 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 #pragma warning(pop)
 #endif
 
+#elif defined(__APPLE__)
+
+#include <execinfo.h>
+
+std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
+{
+	const int N = 128;
+	void *callstack[N];
+	int n = backtrace(callstack, N);
+	char **strs = backtrace_symbols(callstack, n);
+	std::string stack;
+	for(int i = 0; i < n; ++i)
+	{
+		stack += indent;
+		stack += strs[i];
+		stack += '\n';
+	}
+	return stack;
+}
+
 #else
 
 std::string GetCallstack(const char *indent, const char *ignoreFilter)

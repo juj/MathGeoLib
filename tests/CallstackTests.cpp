@@ -9,7 +9,7 @@ std::string NOINLINE CapturingCallstacksWorks()
 	return callstack;
 }
 
-#if defined(WIN32) && defined(_MSC_VER)
+#if (defined(WIN32) && defined(_MSC_VER) || defined(__APPLE__))
 UNIQUE_TEST(CaptureCallstack)
 {
 	std::string callstack = CapturingCallstacksWorks();
