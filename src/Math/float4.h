@@ -282,6 +282,21 @@ public:
 	/// Sets this float4 to (scalar, scalar, scalar, w).
 	void SetFromScalar(float scalar, float w);
 
+	/// Converts the given vector represented in spherical coordinates to an euclidean vector (x,y,z,w=0) triplet.
+	/** @param azimuth The direction, or yaw, of the vector. This function uses the convention that the X-Z plane is
+			the 2D horizontal "map" plane, with the vector (0,0,radius) corresponding to the vector in the direction azimuth=0 and inclination=0.
+			This value is typically in the range [-pi, pi] (, or [0, 2pi]).
+		@param inclination The elevation, or pitch, of the vector. This function uses the convention that the +Y axis
+			points towards up, i.e. +Y is the "Zenith direction". This value is typically in the range [-pi/2, pi/2].
+		@param radius The magnitude of the vector. This is usually >= 0, although passing in the zero vector as radius returns (0,0,0), and passing
+			in a negative radius mirrors the coordinate along the origin.
+		@note The returned vector will be a direction vector with w==0.
+		@see FromSphericalCoordinates, ToSphericalCoordinates, ToSphericalCoordinatesNormalized. */
+	void SetFromSphericalCoordinates(float azimuth, float inclination, float radius);
+	void SetFromSphericalCoordinates(const float3 &spherical) { SetFromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
+	static MUST_USE_RESULT float4 FromSphericalCoordinates(float azimuth, float inclination, float radius);
+	static MUST_USE_RESULT float4 FromSphericalCoordinates(const float3 &spherical) { return FromSphericalCoordinates(spherical.x, spherical.y, spherical.z); }
+
 	/// Converts the given vector represented in spherical coordinates to an euclidean direction vector.
 	/** @param azimuth The direction, or yaw, of the vector. This function uses the convention that the X-Z plane is
 			the 2D horizontal "map" plane, with the vector (0,0,radius) corresponding to the vector in the direction azimuth=0 and inclination=0.
@@ -289,6 +304,22 @@ public:
 		@param inclination The elevation, or pitch, of the vector. This function uses the convention that the +Y axis
 			points towards up, i.e. +Y is the "Zenith direction". This value is typically in the range [-pi/2, pi/2]. */
 	void SetFromSphericalCoordinates(float azimuth, float inclination);
+	static MUST_USE_RESULT float4 FromSphericalCoordinates(float azimuth, float inclination);
+
+	/// Converts this euclidean (x,y,z) vector to spherical coordinates representation in the form (azimuth, inclination, radius).
+	/** @note This corresponds to the matrix operation R_y * R_x * (0,0,radius), where R_y is a rotation about the y-axis by azimuth,
+			and R_x is a rotation about the x-axis by inclination.
+		@note It is valid for the magnitude of this vector to be (very close to) zero, in which case the return value is the zero vector.
+		@see FromSphericalCoordinates, SetFromSphericalCoordinates, ToSphericalCoordinatesNormalized. */
+	float3 ToSphericalCoordinates() const;
+
+	/// Converts this normalized euclidean (x,y,z) vector to spherical coordinates representation in the form (azimuth, inclination)
+	/** @note This function requires that this vector is normalized. This function is identical to ToSphericalCoordinates, but is slightly
+			faster in the case this vector is known to be normalized in advance.
+		@note This corresponsds to the matrix operation R_y * R_x * (0,0,radius), where R_y is a rotation about the y-axis by azimuth,
+			and R_x is a rotation about the x-axis by inclination.
+		@see ToSphericalCoordinates, FromSphericalCoordinates, SetFromSphericalCoordinates. */
+	float2 ToSphericalCoordinatesNormalized() const;
 
 	/// Sets all elements of this vector.
 	/** @see x, y, z, w, At(). */

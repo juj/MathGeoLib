@@ -312,7 +312,7 @@ public:
 	float4 ToDir4() const;
 
 	/// Converts this euclidean (x,y,z) float3 to spherical coordinates representation in the form (azimuth, inclination, radius).
-	/** @note This corresponsds to the matrix operation R_y * R_x * (0,0,radius), where R_y is a rotation about the y-axis by azimuth,
+	/** @note This corresponds to the matrix operation R_y * R_x * (0,0,radius), where R_y is a rotation about the y-axis by azimuth,
 			and R_x is a rotation about the x-axis by inclination.
 		@note It is valid for the magnitude of this vector to be (very close to) zero, in which case the return value is the zero vector.
 		@see FromSphericalCoordinates, SetFromSphericalCoordinates, ToSphericalCoordinatesNormalized. */

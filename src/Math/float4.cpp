@@ -1045,6 +1045,24 @@ void float4::SetFromScalar(float scalar, float w_)
 #endif
 }
 
+void float4::SetFromSphericalCoordinates(float azimuth, float inclination, float radius)
+{
+	float cx = Cos(inclination);
+	float sin, cos;
+	SinCos(azimuth, sin, cos);
+	x = cx * sin * radius;
+	y = -Sin(inclination) * radius;
+	z = cx * cos * radius;
+	w = 0.f;
+}
+
+float4 MUST_USE_RESULT float4::FromSphericalCoordinates(float azimuth, float inclination, float radius)
+{
+	float4 v;
+	v.SetFromSphericalCoordinates(azimuth, inclination, radius);
+	return v;
+}
+
 void float4::SetFromSphericalCoordinates(float azimuth, float inclination)
 {
 	float4 v, s, c;
@@ -1055,6 +1073,33 @@ void float4::SetFromSphericalCoordinates(float azimuth, float inclination)
 	y = -s.x;
 	z = c.x * c.y;
 	w = 0.f;
+}
+
+float4 MUST_USE_RESULT float4::FromSphericalCoordinates(float azimuth, float inclination)
+{
+	float4 v;
+	v.SetFromSphericalCoordinates(azimuth, inclination);
+	return v;
+}
+
+float3 float4::ToSphericalCoordinates() const
+{
+	// R_y * R_x * (0,0,length) = (cosx*siny, -sinx, cosx*cosy).
+	vec v = *this;
+	float len = v.Normalize();
+	if (len <= 1e-5f)
+		return float3::zero;
+	float azimuth = atan2(v.x, v.z);
+	float inclination = asin(-v.y);
+	return float3(azimuth, inclination, len);
+}
+
+float2 float4::ToSphericalCoordinatesNormalized() const
+{
+	assume(IsNormalized());
+	float azimuth = atan2(x, z);
+	float inclination = asin(-y);
+	return float2(azimuth, inclination);
 }
 
 bool float4::Equals(const float4 &other, float epsilon) const
