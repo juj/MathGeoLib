@@ -1085,7 +1085,7 @@ float4 MUST_USE_RESULT float4::FromSphericalCoordinates(float azimuth, float inc
 float3 float4::ToSphericalCoordinates() const
 {
 	// R_y * R_x * (0,0,length) = (cosx*siny, -sinx, cosx*cosy).
-	vec v = *this;
+	float4 v = *this;
 	float len = v.Normalize();
 	if (len <= 1e-5f)
 		return float3::zero;
