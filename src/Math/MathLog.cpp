@@ -117,9 +117,17 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 void PrintToConsole(MathLogChannel channel, const char *str)
 {
 	if (channel == MathLogError)
+	{
 		fprintf(stderr, "Error: %s\n", str);
+		std::string callstack = GetCallstack("  ", "PrintToConsole");
+		fprintf(stderr, "%s", callstack.c_str());
+	}
 	else if (channel == MathLogWarning)
+	{
 		printf("Warning: %s\n", str);
+		std::string callstack = GetCallstack("  ", "PrintToConsole");
+		printf("%s", callstack.c_str());
+	}
 	else
 		printf("%s\n", str);
 }
