@@ -152,6 +152,7 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 		stack += strs[i];
 		stack += '\n';
 	}
+	free(strs);
 	return stack;
 }
 
