@@ -137,6 +137,7 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 
 #elif defined(__APPLE__) || defined(LINUX)
 
+#include <stdlib.h>
 #include <execinfo.h>
 
 std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
