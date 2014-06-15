@@ -1,3 +1,31 @@
+if (CMAKE_C_COMPILER MATCHES ".*(clang|emcc).*" OR CMAKE_C_COMPILER_ID MATCHES ".*(Clang|emcc).*")
+	set(COMPILER_IS_CLANG TRUE)
+endif()
+
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES ".*(gcc|clang|emcc).*" OR CMAKE_C_COMPILER_ID MATCHES ".*(GCC|Clang|emcc).*")
+	set(IS_GCC_LIKE TRUE)
+else()
+	set(IS_GCC_LIKE FALSE)
+endif()
+
+if (IS_GCC_LIKE AND NOT COMPILER_IS_CLANG)
+	set(COMPILER_IS_GCC TRUE)
+endif()
+
+# Undef WIN32 when Windows is only used as a host system
+if (EMSCRIPTEN OR NACL OR ANDROID OR FLASCC)
+	SET(WIN32)
+endif()
+
+#if (MATH_TESTS_EXECUTABLE)
+#	SET(GENERATE_ASM_LISTING FALSE)
+#endif()
+#SET(GENERATE_ASM_LISTING TRUE)
+
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux" AND NOT EMSCRIPTEN AND NOT NACL AND NOT ANDROID AND NOT FLASCC)
+	set(LINUX TRUE)
+endif()
+
 # If true, output assembly source code (.asm) for examination.
 # Set this in calling code
 # SET(GENERATE_ASM_LISTING TRUE)
@@ -254,4 +282,33 @@ endif()
 
 if (MATH_AUTOMATIC_SSE)
 	add_definitions(-DMATH_AUTOMATIC_SSE)
+endif()
+
+# If requested from the command line, run Visual Studio 2012 static code analysis. Warning: this is very slow!
+if (MSVC11 AND RUN_VS2012_ANALYZE)
+	add_definitions(/analyze)
+endif()
+
+if (FAIL_USING_EXCEPTIONS)
+	set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS_DEBUG} -DFAIL_USING_EXCEPTIONS")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DFAIL_USING_EXCEPTIONS")
+
+	if (EMSCRIPTEN)
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
+		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -s DISABLE_EXCEPTION_CATCHING=0")
+	endif()
+endif()
+
+if (MATH_TESTS_EXECUTABLE)
+	add_definitions(-DMATH_TESTS_EXECUTABLE)
+
+	if (BUILD_FOR_GCOV)
+		if (IS_GCC_LIKE)
+			add_definitions(-fprofile-arcs -ftest-coverage)
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
+			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs")
+			set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fprofile-arcs")
+		endif()
+	endif()
 endif()
