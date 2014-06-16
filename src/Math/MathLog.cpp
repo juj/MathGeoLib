@@ -23,7 +23,7 @@
 
 #include "Callstack.h"
 
-#if defined(WIN32) && !defined(WIN8RT)
+#if defined(WIN32)
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #endif
@@ -116,6 +116,9 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 
 void PrintToConsole(MathLogChannel channel, const char *str)
 {
+#ifdef WIN8RT
+	OutputDebugStringA(str);
+#endif
 	if (channel == MathLogError)
 	{
 		fprintf(stderr, "Error: %s\n", str);
