@@ -45,7 +45,10 @@ public:
 		/// the normal of this face points to.
 		void FlipWindingOrder();
 
+		/// Returns a string of form "0,1,2,3,4" that refers to the indices of the vertices that this face uses.
 		std::string ToString() const;
+
+		static Face FromString(const char *str);
 	};
 
 	/// Specifies the vertices of this polyhedron.

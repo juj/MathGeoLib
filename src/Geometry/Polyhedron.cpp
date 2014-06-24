@@ -59,6 +59,23 @@ std::string Polyhedron::Face::ToString() const
 	return ss.str();
 }
 
+Polyhedron::Face Polyhedron::Face::FromString(const char *str)
+{
+	Face f;
+	if (!str)
+		return f;
+	while(*str)
+	{
+		char *endptr = 0;
+		int idx = (int)strtol(str, &endptr, 10);
+		str = endptr;
+		while(*str == ',' || *str == ' ')
+			++str;
+		f.v.push_back(idx);
+	}
+	return f;
+}
+
 int Polyhedron::NumEdges() const
 {
 	return (int)EdgeIndices().size();
