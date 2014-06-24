@@ -130,6 +130,7 @@ public:
 		@see NumFaces(), FacePolygon(). */
 	Plane FacePlane(int faceIndex) const;
 
+	/// Returns the normalized normal vector of the given face.
 	vec FaceNormal(int faceIndex) const;
 
 	/// Returns the index of the vertex of this polyhedron that reaches farthest in the given direction.
@@ -167,7 +168,8 @@ public:
 	vec Centroid() const;
 
 	/// Computes the total surface area of the faces of this polyhedron.
-	/** @see Centroid(), Volume(). */
+	/** @note When you call this function, none of the faces of this polyhedron may be self-intersecting.
+		@see Centroid(), Volume(). */
 	float SurfaceArea() const;
 
 	/// Computes the internal volume of this polyhedron.
@@ -252,9 +254,10 @@ public:
 		@see FLOAT_INF. */
 	bool ClipLineSegmentToConvexPolyhedron(const vec &ptA, const vec &dir, float &tFirst, float &tLast) const;
 
-	/// Tests if the given object is fully contained inside this polyhedron.
+	/// Tests if the given object is fully contained inside this closed polyhedron.
 	/** This function treats this polyhedron as a non-convex object. If you know this polyhedron
 		to be convex, you can use the faster ContainsConvex() function.
+		@note This function assumes that this polyhedron is closed and its edges are not self-intersecting.
 		@see ContainsConvex(), ClosestPoint(), ClosestPointConvex(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add Contains(Circle/Disc/Sphere/Capsule). */
 	bool Contains(const vec &point) const;
@@ -278,6 +281,7 @@ public:
 	/// Tests if the given object is fully contained inside this <b>convex</b> polyhedron.
 	/** This function behaves exactly like Contains(), except this version of the containment test
 		assumes this polyhedron is convex, and uses a faster method of testing containment.
+		@note This function assumes that this polyhedron is closed and its edges are not self-intersecting.
 		@see Contains(), ClosestPoint(), ClosestPointConvex(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add ContainsConvex(Polygon/AABB/OBB/Frustum/Polyhedron/Circle/Disc/Sphere/Capsule). */
 	bool ContainsConvex(const vec &point) const;
@@ -291,6 +295,7 @@ public:
 		@param lineSegmentPt [out] If specified, returns the closest point on the line segment to this
 		polyhedron. This pointer may be null.
 		@todo Make lineSegmentPt an out-reference instead of an out-pointer.
+		@note This function assumes that this polyhedron is closed and the edges are not self-intersecting.
 		@see Contains(), ContainsConvex(), ClosestPointConvex(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add ClosestPoint(Line/Ray/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
 	vec ClosestPoint(const LineSegment &lineSegment, vec *lineSegmentPt) const;
@@ -301,6 +306,7 @@ public:
 	/// Returns the closest point on this <b>convex</b> polyhedron to the given point.
 	/** This function behaves exactly like ClosestPoint(), except this version of the test assumes
 		this polyhedron is convex, and uses a faster method of finding the closest point.
+		@note This function assumes that this polyhedron is closed and the edges are not self-intersecting.
 		@see Contains(), ContainsConvex(), ClosestPoint(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add ClosestPointConvex(Line/LineSegment/Ray/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
 	vec ClosestPointConvex(const vec &point) const;
@@ -308,6 +314,7 @@ public:
 	/// Returns the distance between this polyhedron and the given object.
 	/** This function finds the nearest pair of points on this and the given object, and computes their distance.
 		If the two objects intersect, or one object is contained inside the other, the returned distance is zero.
+		@note This function assumes that this polyhedron is closed and the edges are not self-intersecting.
 		@see Contains(), ContainsConvex(), ClosestPoint(), ClosestPointConvex(), Intersects(), IntersectsConvex().
 		@todo Add Distance(Line/LineSegment/Ray/Plane/Triangle/Polygon/Circle/Disc/AABB/OBB/Sphere/Capsule/Frustum/Polyhedron). */
 	float Distance(const vec &point) const;
@@ -317,6 +324,7 @@ public:
 		another, this function still returns true. (e.g. in case a line segment is contained inside this polyhedron,
 		or this polyhedron is contained inside a sphere, etc.)
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
+		@note This function assumes that this polyhedron is closed and the edges are not self-intersecting.
 		@see Contains(), ContainsConvex(), ClosestPoint(), ClosestPointConvex(), Distance(), IntersectsConvex().
 		@todo Add Intersects(Circle/Disc). */
 	bool Intersects(const LineSegment &lineSegment) const;
@@ -336,6 +344,7 @@ public:
 	/** This function is exactly like Intersects(), but this version assumes that this polyhedron is convex,
 		and uses a faster method of testing the intersection.
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
+		@note This function assumes that this polyhedron is closed and the edges are not self-intersecting.
 		@see Contains(), ContainsConvex(), ClosestPoint(), ClosestPointConvex(), Distance(), Intersects().
 		@todo Add Intersects(Circle/Disc). */
 	bool IntersectsConvex(const Line &line) const;
