@@ -21,6 +21,7 @@
 #include <utility>
 #include <list>
 #include <sstream>
+#include <stdlib.h>
 #include "../Math/assume.h"
 #include "../Math/MathFunc.h"
 #include "../Math/float3x3.h"
