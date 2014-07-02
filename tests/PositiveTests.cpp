@@ -86,8 +86,8 @@ Frustum RandomFrustumContainingPoint(const vec &pt)
 	if (rng.Int(0,1))
 	{
 		f.type = OrthographicFrustum;
-		f.orthographicWidth = rng.Float(0.001f, SCALE);
-		f.orthographicHeight = rng.Float(0.001f, SCALE);
+		f.orthographicWidth = rng.Float(0.1f, SCALE);
+		f.orthographicHeight = rng.Float(0.1f, SCALE);
 	}
 	else
 	{
@@ -95,8 +95,8 @@ Frustum RandomFrustumContainingPoint(const vec &pt)
 		// Really random Frustum could have fov as ]0, pi[, but limit
 		// to much narrower fovs to not cause the corner vertices
 		// shoot too far when farPlaneDistance is very large.
-		f.horizontalFov = rng.Float(0.001f, 3.f*pi/4.f);
-		f.verticalFov = rng.Float(0.001f, 3.f*pi/4.f);
+		f.horizontalFov = rng.Float(0.1f, 3.f*pi/4.f);
+		f.verticalFov = rng.Float(0.1f, 3.f*pi/4.f);
 	}
 	f.nearPlaneDistance = rng.Float(0.1f, SCALE);
 	f.farPlaneDistance = f.nearPlaneDistance + rng.Float(0.1f, SCALE);

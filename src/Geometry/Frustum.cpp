@@ -386,9 +386,9 @@ vec Frustum::Project(const vec &point) const
 
 bool Frustum::Contains(const vec &point) const
 {
-	const float eps = 1e-4f;
-	const float neg = -1.f - eps;
+	const float eps = 1e-3f;
 	const float pos = 1.f + eps;
+	const float neg = -pos;
 	vec projected = Project(point);
 	if (projectiveSpace == FrustumSpaceD3D)
 	{
