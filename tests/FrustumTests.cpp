@@ -125,6 +125,38 @@ UNIQUE_TEST(Frustum_Corners)
 	}
 }
 
+// Tests that whatever can be unprojected projects back to the same location on the Frustum 2D plane.
+UNIQUE_TEST(Frustum_Project_Unproject_Symmetry)
+{
+	Frustum f;
+	FOR_EACH_FRUSTUM_CONVENTION(f)
+
+		for(int i = 0; i < 10; ++i)
+		{
+			// Orient and locate the Frustum randomly
+			float3x3 rot = float3x3::RandomRotation(rng);
+			f.Transform(rot);
+			f.pos += vec::RandomDir(rng, rng.Float(0.f, 100.f));
+
+			for(int j = 0; j < 100; ++j)
+			{
+				float2 pt = float2::RandomBox(rng, -1.f, 1.f);
+				vec pos = f.NearPlanePos(pt);
+				vec pt2 = f.Project(pos);
+				assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
+
+				pos = f.FarPlanePos(pt);
+				pt2 = f.Project(pos);
+				assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
+
+				pos = f.PointInside(pt.x, pt.y, rng.Float());
+				pt2 = f.Project(pos);
+				assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
+			}
+		}
+	}
+}
+
 /* TODO: Support this.
 UNIQUE_TEST(Frustum_IsConvex)
 {
