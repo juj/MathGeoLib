@@ -804,22 +804,31 @@ Polyhedron Frustum::ToPolyhedron() const
 	for(int i = 0; i < 8; ++i)
 		p.v.push_back(CornerPoint(i));
 
-	// Generate the 6 faces of this Frustum.
+	// Generate the 6 faces of this Frustum. The function Frustum::GetPlane() has a convention of returning
+	// the planes in order near,far,left,right,top,bottom, so follow the same convention here.
 	const int faces[6][4] =
 	{
-		{ 0, 2, 3, 1 }, // X-
-		{ 4, 5, 7, 6 }, // X+
-		{ 0, 1, 5, 4 }, // Y-
-		{ 7, 3, 2, 6 }, // Y+
-		{ 0, 4, 6, 2 }, // Z-
-		{ 1, 3, 7, 5 }, // Z+
+		{ 0, 4, 6, 2 }, // Z-: near plane
+		{ 1, 3, 7, 5 }, // Z+: far plane
+		{ 0, 2, 3, 1 }, // X-: left plane
+		{ 4, 5, 7, 6 }, // X+: right plane
+		{ 7, 3, 2, 6 }, // Y+: top plane
+		{ 0, 1, 5, 4 }, // Y-: bottom plane
 	};
 
 	for(int f = 0; f < 6; ++f)
 	{
 		Polyhedron::Face face;
-		for(int v = 0; v < 4; ++v)
-			face.v.push_back(faces[f][v]);
+		if (this->handedness == FrustumLeftHanded)
+		{
+			for(int v = 0; v < 4; ++v)
+				face.v.push_back(faces[f][3-v]);
+		}
+		else
+		{
+			for(int v = 0; v < 4; ++v)
+				face.v.push_back(faces[f][v]);
+		}
 		p.f.push_back(face);
 	}
 
