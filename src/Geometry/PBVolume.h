@@ -22,6 +22,7 @@
 #include "AABB.h"
 #include "Plane.h"
 #include "Sphere.h"
+#include "Polyhedron.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -120,6 +121,125 @@ public:
 				result = TestNotContained;
 		}
 		return result;
+	}
+
+private:
+	struct CornerPt // A helper struct used only internally in ToPolyhedron.
+	{
+		int ptIndex; // Index to the Polyhedron list of vertices.
+		int j, k; // The two plane faces in addition to the main plane that make up this point.
+	};
+
+	bool ContainsExcept(const vec &point, int i, int j, int k) const
+	{
+		for(int l = 0; l < N; ++l)
+			if (l != i && l != j && l != k && p[l].SignedDistance(point) > 0.f)
+				return false;
+		return true;
+	}
+
+public:
+	Polyhedron ToPolyhedron() const
+	{
+		Polyhedron ph;
+		std::vector<CornerPt> faces[N];
+		for(int i = 0; i < N-2; ++i)
+			for(int j = i+1; j < N-1; ++j)
+				for(int k = j+1; k < N; ++k)
+				{
+					vec corner;
+					bool intersects = p[i].Intersects(p[j], p[k], 0, &corner);
+					if (intersects && ContainsExcept(corner, i, j, k))
+					{
+//						LOGI("Point at corner (%d,%d,%d): %s", i, j, k, corner.ToString().c_str());
+						ph.v.push_back(corner);
+						CornerPt pt;
+						pt.ptIndex = ph.v.size()-1;
+
+						pt.j = j;
+						pt.k = k;
+						faces[i].push_back(pt);
+
+						pt.j = i;
+						pt.k = k;
+						faces[j].push_back(pt);
+
+						pt.j = i;
+						pt.k = j;
+						faces[k].push_back(pt);
+					}
+				}
+
+		// Connect the edges in each face using selection sort.
+		for(int i = 0; i < N; ++i)
+		{
+			std::vector<CornerPt> &p = faces[i];
+			if (p.size() < 3)
+				continue;
+			for(size_t j = 0; j < p.size()-1; ++j)
+			{
+				CornerPt &prev = p[j];
+				bool found = false;
+				for(size_t k = j+1; k < p.size(); ++k)
+				{
+					CornerPt &cur = p[k];
+					if (cur.j == prev.k)
+					{
+						Swap(cur, p[j+1]);
+						found = true;
+						break;
+					}
+					if (cur.k == prev.k)
+					{
+						Swap(cur.j, cur.k);
+						Swap(cur, p[j+1]);
+						found = true;
+						break;
+					}
+				}
+				assert(found);
+			}
+			assert(p[0].j == p[p.size()-1].k);
+			if (p.size() >= 3)
+			{
+				Polyhedron::Face f;
+				for(size_t i = 0; i < p.size(); ++i)
+				{
+					f.v.push_back(p[i].ptIndex);
+				}
+				ph.f.push_back(f);
+			}
+		}
+
+		// Fix up winding directions.
+		for(size_t i = 0; i < ph.f.size(); ++i)
+		{
+			Plane p = ph.FacePlane(i);
+			for(size_t j = 0; j < ph.v.size(); ++j)
+			{
+				if (p.SignedDistance(ph.v[j]) < -1e-3f)
+				{
+					ph.f[i].FlipWindingOrder();
+					break;
+				}
+			}
+		}
+		return ph;
+	}
+
+	/// Computes the set intersection of this PBVolume and the PBVolume rhs.
+	/// That is, returns the convex set of points that are contained in both this and rhs.
+	/// Set intersection is symmetric, so a.SetIntersection(b) is the same as b.SetIntersection(a).
+	/// @note The returned PBVolume may contain redundant planes, these are not pruned.
+	template<int M>
+	PBVolume<N+M> SetIntersection(const PBVolume<M> &rhs) const
+	{
+		PBVolume<N+M> res;
+		for(int i = 0; i < N; ++i)
+			res.p[i] = p[i];
+		for(int i = 0; i < M; ++i)
+			res.p[N+i] = rhs.p[i];
+		return res;
 	}
 };
 

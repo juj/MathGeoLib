@@ -3,6 +3,7 @@
 
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
+#include "../src/Geometry/PBVolume.h"
 #include "TestRunner.h"
 #include "ObjectGenerators.h"
 
@@ -190,18 +191,41 @@ UNIQUE_TEST(Frustum_Project_Unproject_Symmetry)
 	}
 }
 
-/* TODO: Support this.
+UNIQUE_TEST(Frustum_Plane_Normals_Are_Correct)
+{
+	Frustum f;
+	FOR_EACH_FRUSTUM_CONVENTION(f)
+		PBVolume<6> pb = ToPBVolume(f);
+		vec corners[8];
+		Plane planes[6];
+		f.GetCornerPoints(corners);
+		f.GetPlanes(planes);
+		for(int i = 0; i < 8; ++i)
+			assert(pb.Contains(corners[i]));
+		for(int i = 0; i < 6; ++i)
+			for(int j = 0; j < 8; ++j)
+				assert(planes[i].SignedDistance(corners[j]) <= 0.f);
+	}
+}
+
 UNIQUE_TEST(Frustum_IsConvex)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		Polyhedron p = f.ToPolyhedron();
+
+		for(int i = 0; i < 6; ++i)
+		{
+			Plane p1 = f.GetPlane(i);
+			Plane p2 = p.FacePlane(i);
+			assert3(p1.Equals(p2), i, p1, p2);
+		}
+		assert(p.EulerFormulaHolds());
 		assert(p.IsClosed());
 		assert(p.IsConvex());
 		assert(!p.IsNull());
 	}
 }
-*/
 
 UNIQUE_TEST(Plane_ProjectToNegativeHalf)
 {
@@ -447,4 +471,63 @@ UNIQUE_TEST(Frustum_AspectRatio_NearPlanePos)
 
 	float aspect = f.NearPlaneWidth() / f.NearPlaneHeight();
 	assert(EqualAbs(aspect, f.AspectRatio()));
+}
+
+RANDOMIZED_TEST(Frustum_ToPbVolume_And_Back)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Frustum f = RandomFrustumContainingPoint(pt);
+	PBVolume<6> pbvol = ToPBVolume(f);
+
+	Polyhedron ph2 = f.ToPolyhedron();
+	assert(ph2.EulerFormulaHolds());
+	///\todo Due to numeric instability, this condition does not always hold, but would be nice to have it.
+//	assert(ph2.IsConvex());
+	assert(ph2.IsClosed());
+	Polyhedron ph = pbvol.ToPolyhedron();
+	assert(ph.EulerFormulaHolds());
+	assert(ph.SetEquals(ph2));
+	assert(ph.IsClosed());
+//	assert(ph.IsConvex());
+	assert(!ph.IsNull());
+
+	assert(ph.SetEquals(ph2));
+
+	// .SetEquals() canonicalizes the Polyhedrons, so run the assert()s again to ensure it didn't change anything for real.
+	assert(ph2.EulerFormulaHolds());
+	assert(ph.EulerFormulaHolds());
+//	assert(ph2.IsConvex());
+	assert(ph2.IsClosed());
+	assert(ph.IsClosed());
+//	assert(ph.IsConvex());
+	assert(!ph.IsNull());
+}
+
+// This tests the ability to compute the set intersection of two convex objects (Frustums) represented as PBVolumes.
+RANDOMIZED_TEST(Intersect_Two_Frustums)
+{
+	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+
+	// First, create two Frustums.
+	Frustum a = RandomFrustumContainingPoint(pt);
+	PBVolume<6> A = ToPBVolume(a);
+
+	Frustum b = RandomFrustumContainingPoint(pt);
+	PBVolume<6> B = ToPBVolume(b);
+
+	// When convex objects are represented as plane-bounded volumes, their set intersection is easy: just add
+	// up the face planes of each to the same list.
+	PBVolume<12> intersection = A.SetIntersection(B);
+
+	// Finally, convert the plane-bounded volume representation back to a Polyhedron representation.
+	Polyhedron ph = intersection.ToPolyhedron();
+
+	// ph is the set intersection of a and b, so must be contained in both a and b.
+	assert(a.Contains(ph));
+	assert(b.Contains(ph));
+
+	// ph must be valid in itself.
+	assert(!ph.IsNull());
+	assert(ph.IsClosed());
+	assert(ph.Contains(pt));
 }

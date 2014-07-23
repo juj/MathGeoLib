@@ -376,6 +376,28 @@ public:
 	static Polyhedron Icosahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Dodecahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 
+	/// Tests if these two polyhedrons represent the same set of points.
+	/// @note This function is very slow, and should be used only for debugging purposes.
+	/// @note This function mutates this and the given polyhedron in order to make the test more feasible. The set of space represented
+	///       by the polyhedrons will not change.
+	bool SetEquals(Polyhedron &p2);
+
+	/// Swaps two vertices in the vertex array and updates all faces of this polyhedron so that the volume represented by this polyhedron
+	/// stays the same.
+	void SwapVertices(int i, int j);
+
+	/// Converts the list of faces into a canonical order for easier comparison.
+	void CanonicalizeFaceArray();
+
+	/// Returns true if one of the faces of this Polyhedron has the same ordered of indices as the given Face.
+	bool ContainsFace(const Face &face) const;
+
+	/// Searches each vertex of this polyhedron to find the closest vertex to the given target point.
+	/// @param outDistanceSq [out] Outputs the distance between the target point and the closest vertex, or FLOAT_INF if no such point was found.
+	/// @return An index to the vertex array of this polyhedron denoting the closest vertex to the target point.
+	///         Returns -1 if no such point is found. (no vertices in polyhedron, or all of them contained NaNs/Infs)
+	int FindClosestVertex(const vec &pt, float &outDistanceSq) const;
+
 	TriangleArray Triangulate() const;
 
 	std::string ToString() const;
