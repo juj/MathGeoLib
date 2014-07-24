@@ -20,6 +20,8 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 vec UpdateSimplex(vec *s, int &n);
 
 #define SUPPORT(dir) (a.ExtremePoint(dir, maxS) - b.ExtremePoint(-dir, minS));
@@ -57,3 +59,5 @@ bool GJKIntersect(const A &a, const B &b)
 	assume2(false && "GJK intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
 	return false; // Report no intersection.
 }
+
+MATH_END_NAMESPACE

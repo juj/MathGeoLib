@@ -20,6 +20,8 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/float3.h"
 
+MATH_BEGIN_NAMESPACE
+
 template<typename A, typename B>
 bool SATIntersect(const A &a, const B &b)
 {
@@ -59,3 +61,5 @@ bool SATIntersect(const A &a, const B &b)
 		}
 	return true;
 }
+
+MATH_END_NAMESPACE
