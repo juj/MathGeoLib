@@ -693,17 +693,17 @@ BENCHMARK_END;
 #define MASK_MAX_CIRCLE_ANGLE (MAX_CIRCLE_ANGLE - 1)
 #define PI 3.14159265358979323846f
 static float fast_cossin_table[MAX_CIRCLE_ANGLE];           // Declare table of fast cosinus and sinus
-class Init_fast_cossin_table
+class Init_fast_cossin_table_
 {
 public:
-	Init_fast_cossin_table()
+	Init_fast_cossin_table_()
 	{
 		// Build cossin table
 		for(int i = 0; i < MAX_CIRCLE_ANGLE; i++)
 			fast_cossin_table[i] = (float)sin((double)i * PI / HALF_MAX_CIRCLE_ANGLE);
 	}
 };
-Init_fast_cossin_table static_initializer;
+Init_fast_cossin_table_ static_sincos_initializer;
 static inline float sin_lookuptable(float n)
 {
 	int i = (int)(n * (HALF_MAX_CIRCLE_ANGLE / PI));
