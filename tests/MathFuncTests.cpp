@@ -200,6 +200,9 @@ UNIQUE_TEST(FloatRepresentation)
 	LOGI("FLOAT_NAN as double: %f, or 0x%llX", FLOAT_NAN, ReinterpretAsU64((double)FLOAT_NAN));
 	LOGI("FLOAT_INF as double: %f, or 0x%llX", FLOAT_INF, ReinterpretAsU64((double)FLOAT_INF));
 
+	// Commented out - Valgrind does not support long double and gives a false positive if the following code is run,
+	// so just for simplicity, leave this test out.
+	/*
 #if !defined(EMSCRIPTEN)
 	LOGI("sizeof(long double): %d", (int)sizeof(long double));
 	LOGI("LDBL_DIG: %d, LDBL_MANT_DIG: %d", (int)LDBL_DIG, (int)LDBL_MANT_DIG);
@@ -209,6 +212,7 @@ UNIQUE_TEST(FloatRepresentation)
 #endif
 
 #endif
+	*/
 }
 
 TEST(IsFinite)
