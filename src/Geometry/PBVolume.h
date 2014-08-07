@@ -155,7 +155,7 @@ public:
 //						LOGI("Point at corner (%d,%d,%d): %s", i, j, k, corner.ToString().c_str());
 						ph.v.push_back(corner);
 						CornerPt pt;
-						pt.ptIndex = ph.v.size()-1;
+						pt.ptIndex = (int)ph.v.size()-1;
 
 						pt.j = j;
 						pt.k = k;
@@ -216,7 +216,7 @@ public:
 		// Fix up winding directions.
 		for(size_t i = 0; i < ph.f.size(); ++i)
 		{
-			Plane p = ph.FacePlane(i);
+			Plane p = ph.FacePlane((int)i);
 			for(size_t j = 0; j < ph.v.size(); ++j)
 			{
 				if (p.SignedDistance(ph.v[j]) < -1e-3f)

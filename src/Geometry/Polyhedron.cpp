@@ -81,7 +81,7 @@ int Polyhedron::NumEdges() const
 {
 	int numEdges = 0;
 	for(size_t i = 0; i < f.size(); ++i)
-		numEdges += f[i].v.size();
+		numEdges += (int)f[i].v.size();
 	return numEdges / 2;
 }
 
@@ -1539,7 +1539,7 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 int CmpFaces(const Polyhedron::Face &a, const Polyhedron::Face &b)
 {
 	if (a.v.size() != b.v.size())
-		return b.v.size() - a.v.size();
+		return (int)b.v.size() - (int)a.v.size();
 	for(size_t i = 0; i < a.v.size(); ++i)
 	{
 		if (a.v[i] != b.v[i])
@@ -1560,7 +1560,7 @@ void Polyhedron::CanonicalizeFaceArray()
 		for(size_t j = 1; j < fc.v.size(); ++j)
 		{
 			if (fc.v[j] < fc.v[smallestJ])
-				smallestJ = j;
+				smallestJ = (int)j;
 		}
 		while(smallestJ-- > 0) // Cycle smallest to front.
 		{
@@ -1619,7 +1619,7 @@ bool Polyhedron::ContainsFace(const Face &face) const
 		{
 			if (f2.v[j] == face.v[0])
 			{
-				shift = j; // Assuming that each Face only contains each vertex once, like all good Faces do.
+				shift = (int)j; // Assuming that each Face only contains each vertex once, like all good Faces do.
 				break;
 			}
 		}
@@ -1669,7 +1669,7 @@ int Polyhedron::FindClosestVertex(const vec &pt, float &outDistanceSq) const
 		if (distSq < outDistanceSq)
 		{
 			outDistanceSq = distSq;
-			closestI = i;
+			closestI = (int)i;
 		}
 	}
 	return closestI;
