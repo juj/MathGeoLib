@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../Math/float3.h"
+#include "../Math/assume.h"
 #include "AABB.h"
 #include "Plane.h"
 #include "Sphere.h"
@@ -198,6 +199,7 @@ public:
 					}
 				}
 				assert(found);
+				MARK_UNUSED(found);
 			}
 			assert(p[0].j == p[p.size()-1].k);
 			if (p.size() >= 3)
