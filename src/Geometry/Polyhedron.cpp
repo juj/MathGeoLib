@@ -1647,14 +1647,14 @@ void Polyhedron::SwapVertices(int i, int j)
 	if (i == j)
 		return;
 	Swap(v[i], v[j]);
-	for(size_t i = 0; i < f.size(); ++i)
+	for(size_t F = 0; F < f.size(); ++F)
 	{
-		for(size_t j = 0; j < f[i].v.size(); ++j)
+		for(size_t V = 0; V < f[i].v.size(); ++V)
 		{
-			if (f[i].v[j] == i)
-				f[i].v[j] = j;
-			else if (f[i].v[j] == j)
-				f[i].v[j] = i;
+			if (f[F].v[V] == i)
+				f[F].v[V] = j;
+			else if (f[F].v[V] == j)
+				f[F].v[V] = i;
 		}
 	}
 }
