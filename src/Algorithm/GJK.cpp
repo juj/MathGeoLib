@@ -225,7 +225,7 @@ vec UpdateSimplex(vec *s, int &n)
 		float dist = FLOAT_INF;
 		int minDistIndex = -1;
 		for(int i = 6; i < 14; ++i)
-			if (i == 6 || i == 8 || i == 9 || i == 11 || i == 12 || i == 13 || i == 14)
+			if (i == 6 || i == 8 || i == 9 || i == 11 || i == 12 || i == 13)
 				if (d[i] < dist)
 				{
 					dist = d[i];
