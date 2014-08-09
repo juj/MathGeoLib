@@ -205,9 +205,9 @@ public:
 			if (p.size() >= 3)
 			{
 				Polyhedron::Face f;
-				for(size_t i = 0; i < p.size(); ++i)
+				for(size_t j = 0; j < p.size(); ++j)
 				{
-					f.v.push_back(p[i].ptIndex);
+					f.v.push_back(p[j].ptIndex);
 				}
 				ph.f.push_back(f);
 			}
