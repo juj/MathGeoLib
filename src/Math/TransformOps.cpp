@@ -100,11 +100,12 @@ float3x4 operator *(const float3x4 &lhs, const TranslateOp &rhs)
 
 float4x4 operator *(const TranslateOp &lhs, const float4x4 &rhs)
 {
+	// This function is based on the optimized assumption that the last row of rhs is [0,0,0,1].
+	// If this does not hold and you are hitting the check below, explicitly cast TranslateOp lhs to float4x4 before multiplication!
+	assume(rhs.Row(3).Equals(0.f, 0.f, 0.f, 1.f));
+
 	float4x4 r = rhs;
 	r.SetTranslatePart(r.TranslatePart() + DIR_TO_FLOAT3(lhs.Offset()));
-
-	// Our optimized form of multiplication must be the same as this.
-	mathassert(r.Equals(lhs.ToFloat4x4() * rhs));
 	return r;
 }
 
@@ -112,9 +113,6 @@ float4x4 operator *(const float4x4 &lhs, const TranslateOp &rhs)
 {
 	float4x4 r = lhs;
 	r.SetTranslatePart(lhs.TransformPos(DIR_TO_FLOAT3(rhs.Offset())));
-
-	// Our optimized form of multiplication must be the same as this.
-	mathassert(r.Equals(lhs * rhs.ToFloat4x4()));
 	return r;
 }
 

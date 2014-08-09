@@ -21,3 +21,20 @@ TEST(TranslateOp)
 	assert(tm3.Float3x3Part().IsIdentity());
 	assert(tm3.Row(3).Equals(0,0,0,1));
 }
+
+RANDOMIZED_TEST(TranslateOpMul)
+{
+	TranslateOp t = float3x4::Translate(float3::RandomBox(rng, 0.f, 100.f));
+	float4x4 tm = float4x4(t);
+	assert(tm.TranslatePart().Equals(t.offset.xyz()));
+	float4x4 m = float4x4::RandomGeneral(rng, -100.f, 100.f);
+	m.SetRow(3, 0.f, 0.f, 0.f, 1.f);
+
+	float4x4 m1 = t * m;
+	float4x4 m2 = tm * m;
+	assert2(m1.Equals(m2), m1, m2);
+
+	m1 = m * t;
+	m2 = m * tm;
+	assert2(m1.Equals(m2), m1, m2);
+}

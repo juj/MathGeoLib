@@ -60,6 +60,10 @@ public:
 
 float3x4 operator *(const TranslateOp &lhs, const float3x4 &rhs);
 float3x4 operator *(const float3x4 &lhs, const TranslateOp &rhs);
+
+// This form of multiplication is based on the optimization assumption that the last row of rhs is [0,0,0,1], i.e.
+// that rhs does not contain a "projective" part. If this does not hold, cast TranslateOp lhs to a float4x4 to 
+// perform a full generic 4x4 matrix multiplication instead.
 float4x4 operator *(const TranslateOp &lhs, const float4x4 &rhs);
 float4x4 operator *(const float4x4 &lhs, const TranslateOp &rhs);
 
