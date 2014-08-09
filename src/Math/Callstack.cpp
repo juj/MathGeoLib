@@ -94,14 +94,13 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 	stack.AddrStack.Offset    = context.Rsp;
 	stack.AddrFrame.Offset    = context.Rbp;
 	const DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
-	const PVOID contextRecord = &context;
 #else
 	stack.AddrPC.Offset       = context.Eip;
 	stack.AddrStack.Offset    = context.Esp;
 	stack.AddrFrame.Offset    = context.Ebp;
 	const DWORD machineType = IMAGE_FILE_MACHINE_I386;
-	const PVOID contextRecord = NULL;
 #endif
+	const PVOID contextRecord = &context;
 
 	std::string callstack;
 	for(int i = 0; i < 128; ++i)
