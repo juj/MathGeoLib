@@ -219,7 +219,7 @@ public:
 			Plane p = ph.FacePlane((int)i);
 			for(size_t j = 0; j < ph.v.size(); ++j)
 			{
-				if (p.SignedDistance(ph.v[j]) < -1e-3f)
+				if (p.SignedDistance(ph.v[j]) > 1e-3f)
 				{
 					ph.f[i].FlipWindingOrder();
 					break;
