@@ -25,7 +25,7 @@ TEST(TranslateOp)
 RANDOMIZED_TEST(TranslateOpMul)
 {
 	TranslateOp t = float3x4::Translate(float3::RandomBox(rng, 0.f, 100.f));
-	float4x4 tm = float4x4(t);
+	float4x4 tm = t.ToFloat4x4();
 	assert(tm.TranslatePart().Equals(t.offset.xyz()));
 	float4x4 m = float4x4::RandomGeneral(rng, -100.f, 100.f);
 	m.SetRow(3, 0.f, 0.f, 0.f, 1.f);
