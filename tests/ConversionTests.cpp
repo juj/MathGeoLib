@@ -50,20 +50,17 @@ int U32ToString(u32 val, char *str)
 
 #ifdef MATH_SSE
 
-#ifdef _MSC_VER
-#define LOAD_TO_M128(dst, integer) dst.m128i_i32[0] = integer;
-#elif defined(__clang__) || defined(__GNUC__)
-// Would like to prefer _mm_loadu_si32, but it doesn't seem to exist for clang?
-#define LOAD_TO_M128(dst, integer) dst = _mm_set1_epi32(integer)
-#else
-#define LOAD_TO_M128(dst, integer) dst = _mm_loadu_si32(&integer)
-#endif
-
 FORCE_INLINE __m128i INT_TO_M128(int i)
 {
+#ifdef _MSC_VER
 	__m128i v = _mm_setzero_si128();
-	LOAD_TO_M128(v, i);
+	v.m128i_i32[0] = i;
 	return v;
+#elif defined(__clang__) || defined(__GNUC__)
+	return _mm_set1_epi32(i);
+#else
+	return _mm_loadu_si32(&i);
+#endif
 }
 
 FORCE_INLINE int M128_TO_INT16(__m128i i)
