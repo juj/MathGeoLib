@@ -15,6 +15,8 @@ RANDOMIZED_TEST(LCG_IntFast)
 	{
 		u32 next = lcg.IntFast();
 		assert(next != prev);
+		MARK_UNUSED(prev);
+		MARK_UNUSED(next);
 		prev = next;
 	}
 }
@@ -29,6 +31,7 @@ RANDOMIZED_TEST(LCG_Int)
 		int prev = lcg.Int();
 		int next = lcg.Int();
 		assert4(prev != 0 || next != 0, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
+		MARK_UNUSED(allEqual);
 		if (prev != next)
 			allEqual = false;
 	}
@@ -47,6 +50,9 @@ RANDOMIZED_TEST(LCG_Int_A_B)
 		int val = lcg.Int(a, b);
 		assert(a <= val);
 		assert(val <= b);
+		MARK_UNUSED(a);
+		MARK_UNUSED(b);
+		MARK_UNUSED(val);
 	}
 }
 
@@ -61,10 +67,13 @@ RANDOMIZED_TEST(LCG_Float)
 		assert1(f < 1.f, f);
 		assert1(f >= 0.f, f);
 		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
+		MARK_UNUSED(f);
+		MARK_UNUSED(f2);
 		if (f != f2)
 			allEqual = false;
 	}
 	assert(!allEqual);
+	MARK_UNUSED(allEqual);
 }
 
 RANDOMIZED_TEST(LCG_Float01Incl)
@@ -82,6 +91,7 @@ RANDOMIZED_TEST(LCG_Float01Incl)
 			allEqual = false;
 	}
 	assert(!allEqual);
+	MARK_UNUSED(allEqual);
 }
 
 RANDOMIZED_TEST(LCG_FloatNeg1_1)
@@ -99,6 +109,7 @@ RANDOMIZED_TEST(LCG_FloatNeg1_1)
 			allEqual = false;
 	}
 	assert(!allEqual);
+	MARK_UNUSED(allEqual);
 }
 
 RANDOMIZED_TEST(LCG_Float_A_B)

@@ -1723,6 +1723,7 @@ RANDOMIZED_TEST(RayTriangleMeshNoIntersect)
 	Ray b = RandomRayInHalfspace(p);
 	float d = tm.IntersectRay(b);
 	assert(d == FLOAT_INF);
+	MARK_UNUSED(d);
 }
 
 RANDOMIZED_TEST(RayKdTreeNoIntersect)

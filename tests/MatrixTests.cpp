@@ -81,6 +81,7 @@ RANDOMIZED_TEST(Float3x4TransformFloat4)
 	pt = rot.Transform(pt);
 	assert(pt.w == 1.f);
 	float d = l.Distance(FLOAT4_TO_POINT(pt));
+	MARK_UNUSED(d);
 	assert(EqualAbs(d, 0.f));
 	assert(l.Contains(FLOAT4_TO_POINT(pt)));
 }
@@ -97,6 +98,7 @@ RANDOMIZED_TEST(Float3x4TransformPosDir)
 	l.dir.Normalize();
 	pt = POINT_VEC(rot.TransformPos(POINT_TO_FLOAT3(pt)));
 	float d = l.Distance(pt);
+	MARK_UNUSED(d);
 	assert(EqualAbs(d, 0.f));
 	assert(l.Contains(pt));
 }
@@ -231,6 +233,8 @@ RANDOMIZED_TEST(Float3x3SolveAxb)
 	float3 x;
 	bool success = A.SolveAxb(b, x);
 	assert(success || mayFail);
+	MARK_UNUSED(success);
+	MARK_UNUSED(mayFail);
 	if (success)
 	{
 		float3 b2 = A*x;
@@ -243,6 +247,7 @@ UNIQUE_TEST(Float3x3InverseCase)
 	float3x3 m(-8.75243664f,6.71196938f,-5.95816374f,6.81996822f,-6.85106039f,2.38949537f,-0.856015682f,3.45762491f,3.311584f);
 	bool success = m.Inverse();
 	assert(success);
+	MARK_UNUSED(success);
 }
 
 RANDOMIZED_TEST(Float3x3Inverse)
@@ -253,6 +258,8 @@ RANDOMIZED_TEST(Float3x3Inverse)
 	float3x3 A2 = A;
 	bool success = A2.Inverse();
 	assert(success || mayFail);
+	MARK_UNUSED(success);
+	MARK_UNUSED(mayFail);
 	if (success)
 	{
 		float3x3 id = A * A2;
@@ -270,6 +277,8 @@ RANDOMIZED_TEST(Float3x3InverseFast)
 	float3x3 A2 = A;
 	bool success = A2.InverseFast();
 	assert(success || mayFail);
+	MARK_UNUSED(success);
+	MARK_UNUSED(mayFail);
 	if (success)
 	{
 		float3x3 id = A * A2;

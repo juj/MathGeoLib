@@ -18,6 +18,7 @@ TEST(Float4Swizzled)
 	float4 f2 = f.Swizzled(2,0,1,3);
 	float f3[4] = { 3, 1, 2, 4 };
 	assert(f2.Equals(float4(f3)));
+	MARK_UNUSED(f3);
 }
 
 #if defined(MATH_AVX) || defined(MATH_NEON)
@@ -72,6 +73,7 @@ TEST(Float4Normalize3)
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float oldLength = f.Normalize3();
 	assert(oldLength > 0.f);
+	MARK_UNUSED(oldLength);
 	assert(EqualAbs(f.x, -1.f / Sqrt(14.f)));
 	assert(EqualAbs(f.y, 2.f / Sqrt(14.f)));
 	assert(EqualAbs(f.z, 3.f / Sqrt(14.f)));
@@ -79,6 +81,7 @@ TEST(Float4Normalize3)
 
 	float4 f2(0,0,0, 1000.f);
 	oldLength = f2.Normalize3();
+	MARK_UNUSED(oldLength);
 	assert(oldLength == 0.f);
 	assert(f2.x == 1.f);
 	assert(f2.y == 0.f);
@@ -100,6 +103,7 @@ TEST(Float4Normalize4)
 {
 	float4 f(-1.f, 2.f, 3.f, 4.f);
 	float oldLength = f.Normalize4();
+	MARK_UNUSED(oldLength);
 	assertcmp(oldLength, >, 0);
 	assert(EqualAbs(f.x, -1.f / Sqrt(30.f)));
 	assert(EqualAbs(f.y, 2.f / Sqrt(30.f)));
@@ -108,6 +112,7 @@ TEST(Float4Normalize4)
 
 	float4 f2(0,0,0, 0.f);
 	oldLength = f2.Normalize4();
+	MARK_UNUSED(oldLength);
 	assert(oldLength == 0.f);
 	assert(f2.x == 1.f);
 	assert(f2.y == 0.f);
@@ -144,6 +149,7 @@ TEST(Float4ScaleToLength3)
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float4 f2 = f.ScaledToLength3(10.f);
 	float oldLength = f.ScaleToLength3(10.f);
+	MARK_UNUSED(oldLength);
 	assert(f.Equals(f2));
 	assert(EqualAbs(oldLength, Sqrt(14.f)));
 	assert(EqualAbs(f.x, -1.f * 10.f / oldLength));

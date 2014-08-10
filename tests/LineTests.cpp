@@ -72,9 +72,11 @@ RANDOMIZED_TEST(ParallelRayRayClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float cpd = closestPointA.Distance(closestPointB);
 	assert(cpd <= displacement.Length()+1e-4f);
+	MARK_UNUSED(cpd);
 
 	float t = a.pos.Distance(b.pos);
 	assert(cpd <= t+1e-4f);
+	MARK_UNUSED(t);
 }
 
 RANDOMIZED_TEST(ParallelRayLineSegmentClosestPoint)
@@ -93,11 +95,14 @@ RANDOMIZED_TEST(ParallelRayLineSegmentClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float cpd = closestPointA.Distance(closestPointB);
 	assert(cpd <= displacement.Length()+1e-4f);
+	MARK_UNUSED(cpd);
 
 	float t1 = a.pos.Distance(b.a);
 	float t2 = a.pos.Distance(b.b);
 	assert(cpd <= t1+1e-4f);
 	assert(cpd <= t2+1e-4f);
+	MARK_UNUSED(t1);
+	MARK_UNUSED(t2);
 }
 
 RANDOMIZED_TEST(ParallelLineSegmentLineSegmentClosestPoint)
@@ -125,6 +130,7 @@ RANDOMIZED_TEST(ParallelLineSegmentLineSegmentClosestPoint)
 	vec closestPointB = b.GetPoint(d2);
 	float cpd = closestPointA.Distance(closestPointB);
 	assert(cpd <= displacement.Length()+1e-4f);
+	MARK_UNUSED(cpd);
 
 	float t1 = a.a.Distance(b.a);
 	float t2 = a.a.Distance(b.b);
@@ -134,6 +140,10 @@ RANDOMIZED_TEST(ParallelLineSegmentLineSegmentClosestPoint)
 	assert(cpd <= t2+1e-4f);
 	assert(cpd <= t3+1e-4f);
 	assert(cpd <= t4+1e-4f);
+	MARK_UNUSED(t1);
+	MARK_UNUSED(t2);
+	MARK_UNUSED(t3);
+	MARK_UNUSED(t4);
 }
 
 RANDOMIZED_TEST(LineLineClosestPoint)

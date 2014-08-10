@@ -1720,6 +1720,7 @@ RANDOMIZED_TEST(RayTriangleMeshIntersect)
 	tm.Set(a);
 	Ray b = RandomRayContainingPoint(pt);
 	float d = tm.IntersectRay(b);
+	MARK_UNUSED(d);
 	assert(d >= 0.f);
 	assert(IsFinite(d));
 }

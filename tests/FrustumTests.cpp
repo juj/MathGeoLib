@@ -316,6 +316,7 @@ UNIQUE_TEST(Frustum_Projection)
 		assert(f.Project(f.CornerPoint(5)).Equals(POINT_VEC(1, -1, 1)));
 		assert(f.Project(f.CornerPoint(6)).Equals(POINT_VEC(1, 1, nearD)));
 		assert(f.Project(f.CornerPoint(7)).Equals(POINT_VEC(1, 1, 1)));
+		MARK_UNUSED(nearD);
 	}
 }
 
@@ -471,6 +472,7 @@ UNIQUE_TEST(Frustum_AspectRatio_NearPlanePos)
 
 	float aspect = f.NearPlaneWidth() / f.NearPlaneHeight();
 	assert(EqualAbs(aspect, f.AspectRatio()));
+	MARK_UNUSED(aspect);
 }
 
 RANDOMIZED_TEST(Frustum_ToPbVolume_And_Back)

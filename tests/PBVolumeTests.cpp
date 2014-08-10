@@ -25,6 +25,7 @@ RANDOMIZED_TEST(AABBPBVolumeIntersect)
 	assert(pbVolume.Contains(b.CenterPoint()));
 	CullTestResult r = pbVolume.InsideOrIntersects(a);
 	assert(r == TestInside || r == TestNotContained);
+	MARK_UNUSED(r);
 	if (contained)
 		assert(r == TestInside);
 }
@@ -41,6 +42,7 @@ RANDOMIZED_TEST(AABBPBVolumeNoIntersect)
 	PBVolume<6> pbVolume = ToPBVolume(b);
 	assert(pbVolume.Contains(b.CenterPoint()));
 	CullTestResult r = pbVolume.InsideOrIntersects(a);
+	MARK_UNUSED(r);
 	assert(r == TestOutside || r == TestNotContained);
 }
 
@@ -59,6 +61,7 @@ RANDOMIZED_TEST(SpherePBVolumeIntersect)
 	PBVolume<6> pbVolume = ToPBVolume(b);
 	assert(pbVolume.Contains(b.CenterPoint()));
 	CullTestResult r = pbVolume.InsideOrIntersects(a);
+	MARK_UNUSED(r);
 	assert(r == TestInside || r == TestNotContained);
 //	if (contained)
 //		assert(r == TestInside);
@@ -76,5 +79,6 @@ RANDOMIZED_TEST(SpherePBVolumeNoIntersect)
 	PBVolume<6> pbVolume = ToPBVolume(b);
 	assert(pbVolume.Contains(b.CenterPoint()));
 	CullTestResult r = pbVolume.InsideOrIntersects(a);
+	MARK_UNUSED(r);
 	assert(r == TestOutside || r == TestNotContained);
 }

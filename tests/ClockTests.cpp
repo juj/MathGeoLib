@@ -48,6 +48,7 @@ UNIQUE_TEST(SubMillisecondPrecision)
 #endif
 
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
+	MARK_UNUSED(ticksPerMillisecond);
 	assert(ticksPerMillisecond > 1);
 
 	tick_t minDiff = Clock::TicksPerSec();

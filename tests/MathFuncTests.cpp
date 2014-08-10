@@ -923,6 +923,8 @@ RANDOMIZED_TEST(Min)
 	float correctMin = std::min(a,b);
 	float mglMin = Min(a, b);
 	assert(correctMin == mglMin);
+	MARK_UNUSED(correctMin);
+	MARK_UNUSED(mglMin);
 }
 
 #ifdef max

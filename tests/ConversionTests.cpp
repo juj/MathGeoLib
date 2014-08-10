@@ -216,6 +216,7 @@ RANDOMIZED_TEST(IntToString)
 		char str[32] = {};
 		int len = IntToString(i, str);
 		assert(len > 0);
+		MARK_UNUSED(len);
 		assert(strlen(str) == (size_t)len);
 		char str2[32] = {};
 		sprintf(str2, "%d", i);
@@ -258,6 +259,7 @@ RANDOMIZED_TEST(U32ToString)
 		char str[32] = {};
 		int len = U32ToString(i, str);
 		assert(len > 0);
+		MARK_UNUSED(len);
 		assert(strlen(str) == (size_t)len);
 		char str2[32] = {};
 		sprintf(str2, "%lu", (unsigned long)i);
