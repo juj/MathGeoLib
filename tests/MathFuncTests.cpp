@@ -942,6 +942,8 @@ RANDOMIZED_TEST(Max)
 	float correctMax = std::max(a,b);
 	float mglMax = Max(a, b);
 	assert(correctMax == mglMax);
+	MARK_UNUSED(correctMax);
+	MARK_UNUSED(mglMax);
 }
 
 BENCHMARK(Min, "Min")
