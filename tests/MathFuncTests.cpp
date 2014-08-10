@@ -939,9 +939,9 @@ RANDOMIZED_TEST(Max)
 	if (rng.Int(0,10) == 0) a = FLOAT_INF;
 	if (rng.Int(0,10) == 0) b = -FLOAT_INF;
 	if (rng.Int(0,10) == 0) b = FLOAT_INF;
-	float correctMin = std::min(a,b);
-	float mglMin = Min(a, b);
-	assert(correctMin == mglMin);
+	float correctMax = std::max(a,b);
+	float mglMax = Max(a, b);
+	assert(correctMax == mglMax);
 }
 
 BENCHMARK(Min, "Min")
