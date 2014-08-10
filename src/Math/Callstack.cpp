@@ -148,9 +148,14 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 	std::string stack;
 	for(int i = 0; i < n; ++i)
 	{
-		stack += indent;
-		stack += strs[i];
-		stack += '\n';
+		if (strstr(strs[i], "_Z12GetCallstackPK") != 0)
+			continue;
+		if (!ignoreFilter || strstr(strs[i], ignoreFilter) != 0)
+		{
+			stack += indent;
+			stack += strs[i];
+			stack += '\n';
+		}
 	}
 	free(strs);
 	return stack;
