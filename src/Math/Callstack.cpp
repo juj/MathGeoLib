@@ -138,6 +138,7 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 
 #include <stdlib.h>
 #include <execinfo.h>
+#include <string.h>
 
 std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 {
