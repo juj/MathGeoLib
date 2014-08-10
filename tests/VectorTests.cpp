@@ -28,6 +28,7 @@ TEST(vec4_permute)
 	float4 f2 = vec4_permute(f, 2, 0, 1, 3);
 	float f3[4] = { 3, 1, 2, 4 };
 	assert(f2.Equals(float4(f3)));
+	MARK_UNUSED(f3);
 }
 
 BENCHMARK(Float4Swizzle, "float4::Swizzled")
