@@ -471,41 +471,42 @@ std::string GetProcessorBrandName()
 	std::string m = sysctl_string("hw.machine");
 	// http://stackoverflow.com/questions/18414032/how-to-identify-a-hw-machine-identifier-reliable
 	if (m == "iPad1,1") return "iPad 1G Wi-Fi/GSM A1219/A1337";
-	if (m == "iPad2,1") return "iPad 2 Wi-Fi A1395";
-	if (m == "iPad2,2") return "iPad 2 GSM A1396";
-	if (m == "iPad2,3") return "iPad 2 CDMA A1397";
-	if (m == "iPad2,4") return "iPad 2 Wi-Fi Rev A A1395";
-	if (m == "iPad2,5") return "iPad mini 1G Wi-Fi A1432";
-	if (m == "iPad2,6") return "iPad mini 1G GSM A1454";
-	if (m == "iPad2,7") return "iPad mini 1G GSM+CDMA A1455";
-	if (m == "iPad3,1") return "iPad 3 Wi-Fi A1416";
-	if (m == "iPad3,2") return "iPad 3 GSM+CDMA A1403";
-	if (m == "iPad3,3") return "iPad 3 GSM A1430";
-	if (m == "iPad3,4") return "iPad 4 Wi-Fi A1458";
-	if (m == "iPad3,5") return "iPad 4 GSM A1459";
-	if (m == "iPad3,6") return "iPad 4 GSM+CDMA A1460";
-	if (m == "iPad4,1") return "iPad Air Wi‑Fi A1474";
-	if (m == "iPad4,2") return "iPad Air Cellular A1475";
-	if (m == "iPad4,4") return "iPad mini 2G Wi‑Fi A1489";
-	if (m == "iPad4,5") return "iPad mini 2G Cellular A1517";
-	if (m == "iPhone1,1") return "iPhone 2G GSM A1203";
-	if (m == "iPhone1,2") return "iPhone 3G GSM A1241/A13241";
-	if (m == "iPhone2,1") return "iPhone 3GS GSM A1303/A13251";
-	if (m == "iPhone3,1") return "iPhone 4 GSM A1332";
-	if (m == "iPhone3,2") return "iPhone 4 GSM Rev A -";
-	if (m == "iPhone3,3") return "iPhone 4 CDMA A1349";
-	if (m == "iPhone4,1") return "iPhone 4S GSM+CDMA A1387/A14311";
-	if (m == "iPhone5,1") return "iPhone 5 GSM A1428";
-	if (m == "iPhone5,2") return "iPhone 5 GSM+CDMA A1429/A14421";
-	if (m == "iPhone5,3") return "iPhone 5C GSM A1456/A1532";
-	if (m == "iPhone5,4") return "iPhone 5C Global A1507/A1516/A1526/A1529";
-	if (m == "iPhone6,1") return "iPhone 5S GSM A1433/A1533";
-	if (m == "iPhone6,2") return "iPhone 5S Global A1457/A1518/A1528/A1530";
-	if (m == "iPod1,1") return "iPod touch 1G - A1213";
-	if (m == "iPod2,1") return "iPod touch 2G - A1288";
-	if (m == "iPod3,1") return "iPod touch 3G - A1318";
-	if (m == "iPod4,1") return "iPod touch 4G - A1367";
-	if (m == "iPod5,1") return "iPod touch 5G - A1421/A1509";
+	else if (m == "iPad2,1") return "iPad 2 Wi-Fi A1395";
+	else if (m == "iPad2,2") return "iPad 2 GSM A1396";
+	else if (m == "iPad2,3") return "iPad 2 CDMA A1397";
+	else if (m == "iPad2,4") return "iPad 2 Wi-Fi Rev A A1395";
+	else if (m == "iPad2,5") return "iPad mini 1G Wi-Fi A1432";
+	else if (m == "iPad2,6") return "iPad mini 1G GSM A1454";
+	else if (m == "iPad2,7") return "iPad mini 1G GSM+CDMA A1455";
+	else if (m == "iPad3,1") return "iPad 3 Wi-Fi A1416";
+	else if (m == "iPad3,2") return "iPad 3 GSM+CDMA A1403";
+	else if (m == "iPad3,3") return "iPad 3 GSM A1430";
+	else if (m == "iPad3,4") return "iPad 4 Wi-Fi A1458";
+	else if (m == "iPad3,5") return "iPad 4 GSM A1459";
+	else if (m == "iPad3,6") return "iPad 4 GSM+CDMA A1460";
+	else if (m == "iPad4,1") return "iPad Air Wi‑Fi A1474";
+	else if (m == "iPad4,2") return "iPad Air Cellular A1475";
+	else if (m == "iPad4,3") return "iPad Air Wi-Fi+Cellular A1476";
+	else if (m == "iPad4,4") return "iPad mini 2G Wi‑Fi A1489";
+	else if (m == "iPad4,5") return "iPad mini 2G Cellular A1517";
+	else if (m == "iPhone1,1") return "iPhone 2G GSM A1203";
+	else if (m == "iPhone1,2") return "iPhone 3G GSM A1241/A13241";
+	else if (m == "iPhone2,1") return "iPhone 3GS GSM A1303/A13251";
+	else if (m == "iPhone3,1") return "iPhone 4 GSM A1332";
+	else if (m == "iPhone3,2") return "iPhone 4 GSM Rev A -";
+	else if (m == "iPhone3,3") return "iPhone 4 CDMA A1349";
+	else if (m == "iPhone4,1") return "iPhone 4S GSM+CDMA A1387/A14311";
+	else if (m == "iPhone5,1") return "iPhone 5 GSM A1428";
+	else if (m == "iPhone5,2") return "iPhone 5 GSM+CDMA A1429/A14421";
+	else if (m == "iPhone5,3") return "iPhone 5C GSM A1456/A1532";
+	else if (m == "iPhone5,4") return "iPhone 5C Global A1507/A1516/A1526/A1529";
+	else if (m == "iPhone6,1") return "iPhone 5S GSM A1433/A1533";
+	else if (m == "iPhone6,2") return "iPhone 5S Global A1457/A1518/A1528/A1530";
+	else if (m == "iPod1,1") return "iPod touch 1G - A1213";
+	else if (m == "iPod2,1") return "iPod touch 2G - A1288";
+	else if (m == "iPod3,1") return "iPod touch 3G - A1318";
+	else if (m == "iPod4,1") return "iPod touch 4G - A1367";
+	else if (m == "iPod5,1") return "iPod touch 5G - A1421/A1509";
 
 #ifndef NDEBUG
 	static bool unknownHardwareWarned = false;
@@ -523,19 +524,84 @@ std::string GetProcessorBrandName()
 
 std::string GetProcessorCPUIDString()
 {
+#ifdef APPLE_IOS
+	return sysctl_string("hw.model");
+#else
 	return sysctl_string("machdep.cpu.brand_string");
+#endif
 }
 
 std::string GetProcessorExtendedCPUIDInfo()
 {
 	char str[1024];
+#ifdef APPLE_IOS
+	sprintf(str, "Model: %s, Family: %d, Type: %d, Subtype: %d, 64-bit capable: %d, HW fp support: %d, NEON support: %d, NEON hpfp: %d, VFP shortvector: %d",
+			sysctl_string("hw.model").c_str(), sysctl_int32("hw.cpufamily"), sysctl_int32("hw.cputype"), sysctl_int32("hw.cpusubtype"), sysctl_int32("hw.cpu64bit_capable"),
+			sysctl_int32("hw.optional.floatingpoint"), sysctl_int32("hw.optional.neon"), sysctl_int32("hw.optional.neon_hpfp"), sysctl_int32("hw.optional.vfp_shortvector"));
+#else
 	sprintf(str, "%s, Stepping: %d, Model: %d, Family: %d, Ext.model: %d, Ext.family: %d.", GetProcessorCPUIDString().c_str(), sysctl_int32("machdep.cpu.stepping"), sysctl_int32("machdep.cpu.model"), sysctl_int32("machdep.cpu.family"), sysctl_int32("machdep.cpu.extmodel"), sysctl_int32("machdep.cpu.extfamily"));
+#endif
 	return str;
 }
 
 unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
 {
 	int64_t freq = sysctl_int64("hw.cpufrequency");
+#ifdef APPLE_IOS
+	if (freq == 0)
+	{
+		// Apple has stopped from supporting querying the CPU clock speed in new iOS versions: http://stackoverflow.com/questions/8291357/cannot-get-cpu-frequency-in-ios-5
+		// Therefore if we fail to get the frequency in above way, make a guess based on the HW version.
+		// The guess database is taken from http://en.wikipedia.org/wiki/List_of_iOS_devices
+		std::string m = sysctl_string("hw.machine");
+		if (m == "iPad1,1") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad2,1") freq = 800 * 1000 * 1000;
+		else if (m == "iPad2,2") freq = 800 * 1000 * 1000;
+		else if (m == "iPad2,3") freq = 800 * 1000 * 1000;
+		else if (m == "iPad2,4") freq = 800 * 1000 * 1000;
+		else if (m == "iPad2,5") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad2,6") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad2,7") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad3,1") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad3,2") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad3,3") freq = 1000 * 1000 * 1000;
+		else if (m == "iPad3,4") freq = 1400 * 1000 * 1000;
+		else if (m == "iPad3,5") freq = 1400 * 1000 * 1000;
+		else if (m == "iPad3,6") freq = 1400 * 1000 * 1000;
+		else if (m == "iPad4,1") freq = 1400 * 1000 * 1000;
+		else if (m == "iPad4,2") freq = 1400 * 1000 * 1000;
+		else if (m == "iPad4,3") freq = 1400 * 1000 * 1000;
+		else if (m == "iPad4,4") freq = 1300 * 1000 * 1000;
+		else if (m == "iPad4,5") freq = 1300 * 1000 * 1000;
+		else if (m == "iPhone1,1") freq = 412 * 1000 * 1000;
+		else if (m == "iPhone1,2") freq = 412 * 1000 * 1000;
+		else if (m == "iPhone2,1") freq = 600 * 1000 * 1000;
+		else if (m == "iPhone3,1") freq = 800 * 1000 * 1000;
+		else if (m == "iPhone3,2") freq = 800 * 1000 * 1000;
+		else if (m == "iPhone3,3") freq = 800 * 1000 * 1000;
+		else if (m == "iPhone4,1") freq = 800 * 1000 * 1000;
+		else if (m == "iPhone5,1") freq = 1300 * 1000 * 1000;
+		else if (m == "iPhone5,2") freq = 1300 * 1000 * 1000;
+		else if (m == "iPhone5,3") freq = 1300 * 1000 * 1000;
+		else if (m == "iPhone5,4") freq = 1300 * 1000 * 1000;
+		else if (m == "iPhone6,1") freq = 1300 * 1000 * 1000;
+		else if (m == "iPhone6,2") freq = 1300 * 1000 * 1000;
+		else if (m == "iPod1,1") freq = 400 * 1000 * 1000;
+		else if (m == "iPod2,1") freq = 533 * 1000 * 1000;
+		else if (m == "iPod3,1") freq = 600 * 1000 * 1000;
+		else if (m == "iPod4,1") freq = 800 * 1000 * 1000;
+		else if (m == "iPod5,1") freq = 800 * 1000 * 1000;
+	}
+
+#ifndef NDEBUG
+	static bool unknownHardwareWarned = false;
+	if (freq == 0 && !unknownHardwareWarned)
+	{
+		unknownHardwareWarned = true;
+		fprintf(stderr, "Your device has an unidentified cpu frequency! Please report it to https://github.com/juj/MathGeoLib/issues . Thanks!\n");
+	}
+#endif
+#endif
 	return (unsigned long)(freq / 1000 / 1000);
 }
 
