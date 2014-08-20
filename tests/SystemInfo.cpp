@@ -384,8 +384,19 @@ BrowserVersion GetSafariVersion()
 
 #elif defined(__APPLE__)
 
+extern "C"
+{
+	char *IosSystemInformation();
+}
+
 std::string GetOSDisplayString()
 {
+#ifdef APPLE_IOS
+	char *systemInfo = IosSystemInformation();
+	std::string info = systemInfo;
+	free(systemInfo);
+	return info;
+#else
 	std::string uname = RunProcess("uname -mrs");
 
 	// http://stackoverflow.com/questions/11072804/mac-os-x-10-8-replacement-for-gestalt-for-testing-os-version-at-runtime/11697362#11697362
@@ -419,6 +430,7 @@ std::string GetOSDisplayString()
 		case 1008: return uname + " Mountain Lion";
 		default: return uname;
 	}
+#endif
 }
 
 #include <sys/types.h>

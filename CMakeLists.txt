@@ -24,6 +24,10 @@ if (BUILD_FOR_GCOV OR MATH_TESTS_EXECUTABLE OR FAIL_USING_EXCEPTIONS) # TODO: Us
 	file(GLOB_RECURSE testHeaderFiles ./tests/*.h)
 	set(sourceFiles ${sourceFiles} ${testSourceFiles})
 	set(headerFiles ${headerFiles} ${testHeaderFiles})
+	if (IOS)
+		file(GLOB_RECURSE testObjCFiles ./tests/*.m)
+		set(sourceFiles ${sourceFiles} ${testObjCFiles})
+	endif()
 endif()
 
 if (MATH_TESTS_EXECUTABLE)
