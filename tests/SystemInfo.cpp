@@ -467,7 +467,58 @@ unsigned long long GetTotalSystemPhysicalMemory()
 
 std::string GetProcessorBrandName()
 {
+#ifdef APPLE_IOS
+	std::string m = sysctl_string("hw.machine");
+	// http://stackoverflow.com/questions/18414032/how-to-identify-a-hw-machine-identifier-reliable
+	if (m == "iPad1,1") return "iPad 1G Wi-Fi/GSM A1219/A1337";
+	if (m == "iPad2,1") return "iPad 2 Wi-Fi A1395";
+	if (m == "iPad2,2") return "iPad 2 GSM A1396";
+	if (m == "iPad2,3") return "iPad 2 CDMA A1397";
+	if (m == "iPad2,4") return "iPad 2 Wi-Fi Rev A A1395";
+	if (m == "iPad2,5") return "iPad mini 1G Wi-Fi A1432";
+	if (m == "iPad2,6") return "iPad mini 1G GSM A1454";
+	if (m == "iPad2,7") return "iPad mini 1G GSM+CDMA A1455";
+	if (m == "iPad3,1") return "iPad 3 Wi-Fi A1416";
+	if (m == "iPad3,2") return "iPad 3 GSM+CDMA A1403";
+	if (m == "iPad3,3") return "iPad 3 GSM A1430";
+	if (m == "iPad3,4") return "iPad 4 Wi-Fi A1458";
+	if (m == "iPad3,5") return "iPad 4 GSM A1459";
+	if (m == "iPad3,6") return "iPad 4 GSM+CDMA A1460";
+	if (m == "iPad4,1") return "iPad Air Wi‑Fi A1474";
+	if (m == "iPad4,2") return "iPad Air Cellular A1475";
+	if (m == "iPad4,4") return "iPad mini 2G Wi‑Fi A1489";
+	if (m == "iPad4,5") return "iPad mini 2G Cellular A1517";
+	if (m == "iPhone1,1") return "iPhone 2G GSM A1203";
+	if (m == "iPhone1,2") return "iPhone 3G GSM A1241/A13241";
+	if (m == "iPhone2,1") return "iPhone 3GS GSM A1303/A13251";
+	if (m == "iPhone3,1") return "iPhone 4 GSM A1332";
+	if (m == "iPhone3,2") return "iPhone 4 GSM Rev A -";
+	if (m == "iPhone3,3") return "iPhone 4 CDMA A1349";
+	if (m == "iPhone4,1") return "iPhone 4S GSM+CDMA A1387/A14311";
+	if (m == "iPhone5,1") return "iPhone 5 GSM A1428";
+	if (m == "iPhone5,2") return "iPhone 5 GSM+CDMA A1429/A14421";
+	if (m == "iPhone5,3") return "iPhone 5C GSM A1456/A1532";
+	if (m == "iPhone5,4") return "iPhone 5C Global A1507/A1516/A1526/A1529";
+	if (m == "iPhone6,1") return "iPhone 5S GSM A1433/A1533";
+	if (m == "iPhone6,2") return "iPhone 5S Global A1457/A1518/A1528/A1530";
+	if (m == "iPod1,1") return "iPod touch 1G - A1213";
+	if (m == "iPod2,1") return "iPod touch 2G - A1288";
+	if (m == "iPod3,1") return "iPod touch 3G - A1318";
+	if (m == "iPod4,1") return "iPod touch 4G - A1367";
+	if (m == "iPod5,1") return "iPod touch 5G - A1421/A1509";
+
+#ifndef NDEBUG
+	static bool unknownHardwareWarned = false;
+	if (!unknownHardwareWarned)
+	{
+		unknownHardwareWarned = true;
+		fprintf(stderr, "Your device has an unidentified hw.machine identifier: %s. Please report it to https://github.com/juj/MathGeoLib/issues . Thanks!\n", m.c_str());
+	}
+#endif
+	return m;
+#else
 	return sysctl_string("machdep.cpu.vendor");
+#endif
 }
 
 std::string GetProcessorCPUIDString()
