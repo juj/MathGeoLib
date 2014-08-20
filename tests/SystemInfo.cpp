@@ -543,7 +543,11 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
 // E.g. for dualcore hyperthreaded Intel CPUs, this returns 4.
 int GetMaxSimultaneousThreads()
 {
+#ifdef APPLE_IOS
+	return (int)sysctl_int32("hw.ncpu");
+#else
 	return (int)sysctl_int32("machdep.cpu.thread_count");
+#endif
 }
 
 #elif defined(ANDROID)
