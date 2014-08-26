@@ -37,6 +37,10 @@
 #include <OgreQuaternion.h>
 #endif
 
+#ifdef MATH_BULLET_INTEROP
+#include <LinearMath/btQuaternion.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// Represents a rotation or an orientation of a 3D object.
