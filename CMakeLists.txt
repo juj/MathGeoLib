@@ -50,3 +50,9 @@ if (WIN8RT)
 	#    since we are not authoring any WinRT components from this code. 
 	set_target_properties(MathGeoLib PROPERTIES STATIC_LIBRARY_FLAGS "/ignore:4264")
 endif()
+
+# install lib and header files if testing is disabled
+if (NOT MATH_TESTS_EXECUTABLE)
+        install (TARGETS MathGeoLib DESTINATION "lib")
+        install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.h")
+endif (NOT MATH_TESTS_EXECUTABLE)
