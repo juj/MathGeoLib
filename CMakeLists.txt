@@ -53,6 +53,7 @@ endif()
 
 # install lib and header files if testing is disabled
 if (NOT MATH_TESTS_EXECUTABLE)
-        install (TARGETS MathGeoLib DESTINATION "lib")
-        install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.h")
+	install (TARGETS MathGeoLib DESTINATION "lib")
+	install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.h")
+	install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.inl")
 endif (NOT MATH_TESTS_EXECUTABLE)
