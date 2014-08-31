@@ -830,11 +830,6 @@ float3 float3::operator /(float scalar) const
 	return float3(x * invScalar, y * invScalar, z * invScalar);
 }
 
-float3 operator /(float scalar, const float3 &rhs)
-{
-	return float3(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z);
-}
-
 float3 &float3::operator +=(const float3 &rhs)
 {
 	x += rhs.x;

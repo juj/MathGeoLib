@@ -741,11 +741,6 @@ float2 float2::operator /(float scalar) const
 	return float2(x * invScalar, y * invScalar);
 }
 
-float2 operator /(float scalar, const float2 &rhs)
-{
-	return float2(scalar / rhs.x, scalar / rhs.y);
-}
-
 float2 &float2::operator +=(const float2 &rhs)
 {
 	x += rhs.x;
