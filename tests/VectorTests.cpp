@@ -1010,3 +1010,52 @@ RANDOMIZED_TEST(copy_nan_Quat)
 	Quat b = a;
 	uninitializedQuat = b;
 }
+
+#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+
+UNIQUE_TEST(float2_pointwise)
+{
+	float2 a(12.f, 8.f);
+	float2 b(3.f, 4.f);
+	float2 c = a;
+	c *= b;
+	float2 d = a;
+	d /= b;
+	assert((a*b).Equals(float2(36.f, 32.f)));
+	assert((a/b).Equals(float2(4.f, 2.f)));
+	assert(c.Equals(float2(36.f, 32.f)));
+	assert(d.Equals(float2(4.f, 2.f)));
+	assert((12.f / b).Equals(float2(4.f, 3.f)));
+}
+
+UNIQUE_TEST(float3_pointwise)
+{
+	float3 a(12.f, 8.f, 90.f);
+	float3 b(3.f, 4.f, 30.f);
+	float3 c = a;
+	c *= b;
+	float3 d = a;
+	d /= b;
+	assert((a*b).Equals(float3(36.f, 32.f, 2700.f)));
+	assert((a/b).Equals(float3(4.f, 2.f, 3.f)));
+	assert(c.Equals(float3(36.f, 32.f, 2700.f)));
+	assert(d.Equals(float3(4.f, 2.f, 3.f)));
+	assert((360.f / b).Equals(float3(120.f, 90.f, 12.f)));
+}
+
+UNIQUE_TEST(float4_pointwise)
+{
+	float4 a(12.f, 8.f, 90.f, -20.f);
+	float4 b(3.f, 4.f, 30.f, 10.f);
+	float4 c = a;
+	c *= b;
+	float4 d = a;
+	d /= b;
+	assert((a*b).Equals(float4(36.f, 32.f, 2700.f, -200.f)));
+	assert((a/b).Equals(float4(4.f, 2.f, 3.f, -2.f)));
+	assert(c.Equals(float4(36.f, 32.f, 2700.f, -200.f)));
+	assert(d.Equals(float4(4.f, 2.f, 3.f, -2.f)));
+	assert((3600.f / b).Equals(float4(1200.f, 900.f, 120.f, 360.f)));
+}
+
+#endif

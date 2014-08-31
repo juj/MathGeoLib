@@ -277,6 +277,10 @@ elseif (MATH_SSE)
 	endif()
 endif()
 
+if (MATH_ENABLE_UNCOMMON_OPERATIONS)
+	add_definitions(-DMATH_ENABLE_UNCOMMON_OPERATIONS)
+endif()
+
 if (MATH_NEON)
 	add_definitions(-DMATH_NEON)
 	if (NOT MSVC)
