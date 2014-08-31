@@ -569,13 +569,6 @@ public:
 	/// Returns a random float3 with each entry randomized between the range [minElem, maxElem].
 	static MUST_USE_RESULT float2 RandomBox(LCG &lcg, float minElem, float maxElem);
 
-#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
-	float2 operator *(const float2 &rhs) const { return this->Mul(rhs); }
-	float2 operator /(const float2 &rhs) const { return this->Div(rhs); }
-	float2 &operator *=(const float2 &rhs) { *this = this->Mul(rhs); return *this; }
-	float2 &operator /=(const float2 &rhs) { *this = this->Div(rhs); return *this; }
-#endif
-
 	/// Specifies a compile-time constant float2 with value (0, 0).
 	/** @note Due to static data initialization order being undefined in C++, do NOT use this
 			member to initialize other static data in other compilation units! */

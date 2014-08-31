@@ -737,13 +737,6 @@ public:
 		This function is mostly used for testing and debugging purposes only. */
 	static float4 RandomGeneral(LCG &lcg, float minElem, float maxElem);
 
-#ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
-	float4 operator *(const float4 &rhs) const { return this->Mul(rhs); }
-	float4 operator /(const float4 &rhs) const { return this->Div(rhs); }
-	float4 &operator *=(const float4 &rhs) { *this = this->Mul(rhs); return *this; }
-	float4 &operator /=(const float4 &rhs) { *this = this->Div(rhs); return *this; }
-#endif
-
 	/// Specifies a compile-time constant float4 with value (0, 0, 0, 0).
 	/** @note Due to static data initialization order being undefined in C++, do NOT use this
 			member to initialize other static data in other compilation units! */
