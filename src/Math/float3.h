@@ -157,6 +157,12 @@ public:
 	float3 &operator /=(float scalar);
 
 #ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
+	// In math textbooks, pointwise multiplication of vectors is not defined within a linear space.
+	// However, in programming it is often useful for e.g. modulating colors via pointwise multiplication.
+	// If you #define MATH_ENABLE_UNCOMMON_OPERATIONS, you'll get these operations upgraded to handy
+	// operator * and / notation and can use vec * vec and vec / vec. Otherwise, use the notation
+	// vec.Mul(vec) and vec.Div(vec) for pointwise notation. MATH_ENABLE_UNCOMMON_OPERATIONS also enables
+	// the operation scalar / vec.
 	float3 operator *(const float3 &vector) const { return this->Mul(vector); }
 	float3 operator /(const float3 &vector) const { return this->Div(vector); }
 	float3 &operator *=(const float3 &vector) { *this = this->Mul(vector); return *this; }
