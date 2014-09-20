@@ -283,7 +283,7 @@ endif()
 
 if (MATH_NEON)
 	add_definitions(-DMATH_NEON)
-	if (NOT MSVC)
+	if (IS_GCC_LIKE)
 		add_definitions(-mfpu=neon)
 	endif()
 endif()
