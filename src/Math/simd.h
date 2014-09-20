@@ -17,8 +17,6 @@
 	@brief Generic abstraction layer over different SIMD instruction sets. */
 #pragma once
 
-#pragma once
-
 #include "../MathBuildConfig.h"
 #include "MathNamespace.h"
 #include "../MathGeoLibFwd.h"
@@ -66,7 +64,7 @@ MATH_BEGIN_NAMESPACE
 #define set1_ps _mm_set1_ps
 /// Sets the vector in order (w, z, y, x).
 #define set_ps _mm_set_ps
-const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
+static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define abs_ps(x) _mm_andnot_ps(simd4fSignBit, (x))
 #define zero_ps() _mm_setzero_ps()
 #define min_ps _mm_min_ps
@@ -77,6 +75,20 @@ const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define andnot_ps _mm_andnot_ps
 #define or_ps _mm_or_ps
 #define xor_ps _mm_xor_ps
+#define storeu_ps _mm_storeu_ps
+#define store_ps _mm_store_ps
+#define loadu_ps _mm_loadu_ps
+#define load_ps _mm_load_ps
+#define load1_ps _mm_load1_ps
+#define stream_ps _mm_stream_ps
+#define rcp_ps _mm_rcp_ps
+#define rsqrt_ps _mm_rsqrt_ps
+#define sqrt_ps _mm_sqrt_ps
+#define cmpeq_ps _mm_cmpeq_ps
+#define cmpge_ps _mm_cmpge_ps
+#define cmpgt_ps _mm_cmpgt_ps
+#define cmple_ps _mm_cmple_ps
+#define cmplt_ps _mm_cmplt_ps
 
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
@@ -207,6 +219,7 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define add_ps vaddq_f32
 #define sub_ps vsubq_f32
 #define mul_ps vmulq_f32
+#define div_ps vdivq_f32
 #define min_ps vminq_f32
 #define max_ps vmaxq_f32
 #define s4f_to_s4i(s4f) vreinterpretq_u32_f32((s4f))
@@ -217,22 +230,29 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define xor_ps(x, y) s4i_to_s4f(veorq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
 #define ornot_ps(x, y) s4i_to_s4f(vornq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
 
-#define s4f_x(vec) vget_lane_f32(vget_low_f32((vec)), 0)
-#define s4f_y(vec) vget_lane_f32(vget_low_f32((vec)), 1)
-#define s4f_z(vec) vget_lane_f32(vget_high_f32((vec)), 0)
-#define s4f_w(vec) vget_lane_f32(vget_high_f32((vec)), 1)
-
-// NEON doesn't have a divide instruction. Do reciprocal + one step of Newton-Rhapson.
-FORCE_INLINE simd4f div_ps(simd4f vec, simd4f vec2)
-{
-	simd4f rcp = vrecpeq_f32(vec2);
-	rcp = mul_ps(vrecpsq_f32(vec2, rcp), rcp);
-	return mul_ps(vec, rcp);
-}
+#define s4f_x(vec) vgetq_lane_f32((vec), 0)
+#define s4f_y(vec) vgetq_lane_f32((vec), 1)
+#define s4f_z(vec) vgetq_lane_f32((vec), 0)
+#define s4f_w(vec) vgetq_lane_f32((vec), 1)
 
 #define set1_ps vdupq_n_f32
 #define abs_ps vabsq_f32
-#define zero_ps() set1_ps(0.f) // TODO: Is there anything better than this?
+#define zero_ps() vdupq_n_f32(0.f)
+
+#define storeu_ps vst1q_f32
+#define store_ps vst1q_f32
+#define loadu_ps vld1q_f32
+#define load_ps vld1q_f32
+#define load1_ps(ptr) vdupq_n_f32(*(float*)(ptr))
+#define stream_ps vst1q_f32
+#define rcp_ps vrecpeq_f32
+#define rsqrt_ps vrsqrteq_f32
+#define sqrt_ps vsqrtq_f32
+#define cmpeq_ps(a, b) vreinterpretq_f32_u32(vceqq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
+#define cmpge_ps(a, b) vreinterpretq_f32_u32(vcgeq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
+#define cmpgt_ps(a, b) vreinterpretq_f32_u32(vcgtq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
+#define cmple_ps(a, b) vreinterpretq_f32_u32(vcleq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
+#define cmplt_ps(a, b) vreinterpretq_f32_u32(vcltq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
 
 #ifdef _MSC_VER
 #define set_ps_const(w,z,y,x) {{ (u64)ReinterpretAsU32(x) | (((u64)ReinterpretAsU32(y)) << 32), (u64)ReinterpretAsU32(z) | (((u64)ReinterpretAsU32(w)) << 32) }}
