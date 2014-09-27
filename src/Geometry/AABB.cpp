@@ -833,7 +833,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	farD = min_ps(farD, setx_ps(tFar));
 
 	// Finally, test if the ranges overlap.
-	simd4f rangeIntersects = cmple_ss(nearD, farD);
+	simd4f rangeIntersects = _mm_cmple_ss(nearD, farD);
 
 	// To store out out the interval of intersection, uncomment the following:
 	// These are disabled, since without these, the whole function runs without a single memory store,
@@ -857,7 +857,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	// parallel to some cardinal axis.
 	simd4f intersects = andnot_ps(zeroDirections, rangeIntersects);
 	simd4f epsilonMasked = and_ps(epsilon, intersects);
-	return comieq_ss(epsilon, epsilonMasked) != 0;
+	return _mm_comieq_ss(epsilon, epsilonMasked) != 0;
 }
 #endif
 

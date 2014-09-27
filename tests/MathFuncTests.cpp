@@ -318,39 +318,39 @@ float NewtonRhapsonSqrt(float x)
 float NewtonRhapsonSSESqrt(float x)
 {
 	simd4f X = setx_ps(x);
-	simd4f estimate = rcp_ss(rsqrt_ss(X));
-	simd4f e2 = mul_ss(estimate,estimate);
-	simd4f half = set_ss(0.5f);
-	simd4f recipEst = rcp_ss(estimate);
+	simd4f estimate = _mm_rcp_ss(_mm_rsqrt_ss(X));
+	simd4f e2 = _mm_mul_ss(estimate,estimate);
+	simd4f half = _mm_set_ss(0.5f);
+	simd4f recipEst = _mm_rcp_ss(estimate);
 
-	return s4f_x(sub_ss(estimate, mul_ss(mul_ss((sub_ss(e2, X)), half), recipEst)));
+	return s4f_x(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
 
 float NewtonRhapsonSSESqrt2(float x)
 {
 	simd4f X = setx_ps(x);
-	simd4f estimate = rsqrt_ss(_mm_rcp_ss(X));
-	simd4f e2 = mul_ss(estimate,estimate);
-	simd4f half = set_ss(0.5f);
-	simd4f recipEst = rcp_ss(estimate);
+	simd4f estimate = _mm_rsqrt_ss(_mm_rcp_ss(X));
+	simd4f e2 = _mm_mul_ss(estimate,estimate);
+	simd4f half = _mm_set_ss(0.5f);
+	simd4f recipEst = _mm_rcp_ss(estimate);
 
-	return s4f_x(sub_ss(estimate, mul_ss(mul_ss((sub_ss(e2, X)), half), recipEst)));
+	return s4f_x(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
 
 float NewtonRhapsonSSESqrt3(float x)
 {
 	simd4f X = setx_ps(x);
-	simd4f estimate = mul_ss(X, rsqrt_ss(X));
-	simd4f e2 = mul_ss(estimate,estimate);
-	simd4f half = set_ss(0.5f);
-	simd4f recipEst = rcp_ss(estimate);
+	simd4f estimate = _mm_mul_ss(X, _mm_rsqrt_ss(X));
+	simd4f e2 = _mm_mul_ss(estimate,estimate);
+	simd4f half = _mm_set_ss(0.5f);
+	simd4f recipEst = _mm_rcp_ss(estimate);
 
-	return s4f_x(sub_ss(estimate, mul_ss(mul_ss((sub_ss(e2, X)), half), recipEst)));
+	return s4f_x(_mm_sub_ss(estimate, _mm_mul_ss(_mm_mul_ss((_mm_sub_ss(e2, X)), half), recipEst)));
 }
 
 float Sqrt_Via_Rcp_RSqrt(float x)
 {
-	return s4f_x(rcp_ss(rsqrt_ss(setx_ps(x))));
+	return s4f_x(_mm_rcp_ss(_mm_rsqrt_ss(setx_ps(x))));
 }
 
 #endif
@@ -559,7 +559,7 @@ float OneOverX(float x)
 float NewtonRhapsonRecip(float x)
 {
 	simd4f X = setx_ps(x);
-	simd4f e = rcp_ss(X);
+	simd4f e = _mm_rcp_ss(X);
 	// 1/x = D
 	// f(e) = e^-1 - x
 	// f'(e) = -e^-2
@@ -569,15 +569,15 @@ float NewtonRhapsonRecip(float x)
 	// e_n = 2*e - x*e^2
 
 	// Do one iteration of Newton-Rhapson:
-	simd4f e2 = mul_ss(e,e);
+	simd4f e2 = _mm_mul_ss(e,e);
 	
-	return s4f_x(sub_ss(add_ss(e, e), mul_ss(X, e2)));
+	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 
 float NewtonRhapsonRecip2(float x)
 {
 	simd4f X = setx_ps(x);
-	simd4f e = rcp_ss(X);
+	simd4f e = _mm_rcp_ss(X);
 	// 1/x = D
 	// f(e) = e^-1 - x
 	// f'(e) = -e^-2
@@ -587,11 +587,11 @@ float NewtonRhapsonRecip2(float x)
 	// e_n = 2*e - x*e^2
 
 	// Do one iteration of Newton-Rhapson:
-	__m128 e2 = mul_ss(e,e);
+	__m128 e2 = _mm_mul_ss(e,e);
 
-	e = sub_ss(add_ss(e, e), mul_ss(X, e2));
-	e2 = mul_ss(e,e);
-	return s4f_x(sub_ss(add_ss(e, e), mul_ss(X, e2)));
+	e = _mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2));
+	e2 = _mm_mul_ss(e,e);
+	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 #endif
 
@@ -984,7 +984,7 @@ BENCHMARK_END;
 // (does not seem to be the case)
 FORCE_INLINE void Min_SSE_dst(float *dst, float a, float b)
 {
-	store_ss(dst, min_ss(setx_ps(a), setx_ps(b)));
+	_mm_store_ss(dst, _mm_min_ss(setx_ps(a), setx_ps(b)));
 }
 
 BENCHMARK(Min_SSE_dst, "Min SSE with dst pointer")

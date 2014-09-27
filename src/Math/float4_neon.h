@@ -20,7 +20,9 @@
 
 #ifdef MATH_SIMD
 
+#ifdef MATH_NEON
 #include <arm_neon.h>
+#endif
 
 #include "float4_sse.h"
 

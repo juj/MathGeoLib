@@ -353,7 +353,7 @@ static const float andMaskOneF = ReinterpretAsFloat(0xFFFFFFFFU);
 static const simd4f sseMaskXYZ = set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
 static const simd4f sseSignMask3 = set_ps(0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
 #ifdef MATH_AVX
-static const simd4f sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
+static const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 #endif
 #ifdef MATH_AVX
 #define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)

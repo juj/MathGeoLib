@@ -481,7 +481,7 @@ TEST(Float4Div)
 	movss	xmm0, DWORD PTR [edx+eax*4] */
 BENCHMARK(float_to_Float4_ss, "sse")
 {
-	simd4f scale = set_ss(f[i]);
+	simd4f scale = _mm_set_ss(f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;

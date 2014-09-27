@@ -291,7 +291,7 @@ FORCE_INLINE float Sqrt(float x)
 	asm("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
 	return result;
 #elif defined(MATH_SSE)
-	return s4f_x(sqrt_ss(setx_ps(x)));
+	return s4f_x(_mm_sqrt_ss(setx_ps(x)));
 #else
 	return sqrtf(x);
 #endif
@@ -306,7 +306,7 @@ FORCE_INLINE float SqrtFast(float x)
 	return result;
 #elif defined(MATH_SSE)
 	simd4f X = setx_ps(x);
-	return s4f_x(mul_ss(X, rsqrt_ss(X)));
+	return s4f_x(_mm_mul_ss(X, _mm_rsqrt_ss(X)));
 #else
 	return sqrtf(x);
 #endif
@@ -324,14 +324,14 @@ FORCE_INLINE float RSqrt(float x)
 	return vget_lane_f32(e, 0);
 #elif defined(MATH_SSE)
 	simd4f X = setx_ps(x);
-	simd4f e = rsqrt_ss(X);
+	simd4f e = _mm_rsqrt_ss(X);
 
 	// Do one iteration of Newton-Rhapson:
 	// e_n = e + 0.5 * (e - x * e^3)
-	simd4f e3 = mul_ss(mul_ss(e,e), e);
-	simd4f half = set_ss(0.5f);
+	simd4f e3 = _mm_mul_ss(_mm_mul_ss(e,e), e);
+	simd4f half = _mm_set_ss(0.5f);
 	
-	return s4f_x(add_ss(e, mul_ss(half, sub_ss(e, mul_ss(X, e3)))));
+	return s4f_x(_mm_add_ss(e, _mm_mul_ss(half, _mm_sub_ss(e, _mm_mul_ss(X, e3)))));
 #else
 	return 1.f / sqrtf(x);
 #endif
@@ -345,7 +345,7 @@ FORCE_INLINE float RSqrtFast(float x)
 	float32x2_t X = vdup_n_f32(x);
 	return vget_lane_f32(vrsqrte_f32(X), 0);
 #elif defined(MATH_SSE)
-	return s4f_x(rsqrt_ss(setx_ps(x)));
+	return s4f_x(_mm_rsqrt_ss(setx_ps(x)));
 #else
 	return 1.f / sqrtf(x);
 #endif
@@ -363,11 +363,11 @@ FORCE_INLINE float Recip(float x)
 	return vget_lane_f32(e, 0);
 #elif defined(MATH_SSE)
 	simd4f X = setx_ps(x);
-	simd4f e = rcp_ss(X);
+	simd4f e = _mm_rcp_ss(X);
 	// Do one iteration of Newton-Rhapson:
 	// e_n = 2*e - x*e^2
-	simd4f e2 = mul_ss(e,e);
-	return s4f_x(sub_ss(add_ss(e, e), mul_ss(X, e2)));
+	simd4f e2 = _mm_mul_ss(e,e);
+	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 #else
 	return 1.f / x;
 #endif
@@ -380,7 +380,7 @@ FORCE_INLINE float RecipFast(float x)
 	// Note: This is a two-wide operation, but perhaps it needn't be?
 	return vget_lane_f32(vrecpe_f32(vdup_n_f32(x)), 0);
 #elif defined(MATH_SIMD)
-	return s4f_x(rcp_ss(setx_ps(x)));
+	return s4f_x(_mm_rcp_ss(setx_ps(x)));
 #else
 	return 1.f / x;
 #endif
@@ -431,7 +431,7 @@ template<>
 inline float Max(const float &a, const float &b)
 {
 #ifdef MATH_SSE
-	return s4f_x(max_ss(setx_ps(a), setx_ps(b)));
+	return s4f_x(_mm_max_ss(setx_ps(a), setx_ps(b)));
 #else
 	return a >= b ? a : b;
 #endif
@@ -449,7 +449,7 @@ template<>
 inline float Min(const float &a, const float &b)
 {
 #ifdef MATH_SSE
-	return s4f_x(min_ss(setx_ps(a), setx_ps(b)));
+	return s4f_x(_mm_min_ss(setx_ps(a), setx_ps(b)));
 #else
 	return a <= b ? a : b;
 #endif
