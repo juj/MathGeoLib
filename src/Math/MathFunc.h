@@ -290,7 +290,7 @@ FORCE_INLINE float Sqrt(float x)
 	float result;
 	asm("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
 	return result;
-#elif defied(MATH_SSE)
+#elif defined(MATH_SSE)
 	return s4f_x(sqrt_ss(setx_ps(x)));
 #else
 	return sqrtf(x);
