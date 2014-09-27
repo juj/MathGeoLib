@@ -151,7 +151,7 @@ float4 float4::Swizzled(int i, int j, int k, int l) const
 #endif
 }
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 
 /// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.
 ///\todo Delete this function.
@@ -160,11 +160,11 @@ simd4f float4::LengthSq3_SSE() const
 	return dot3_ps3(v, v);
 }
 
-/// The returned vector contains the length of the float3 part in eacj channel of the vector.
+/// The returned vector contains the length of the float3 part in each channel of the vector.
 ///\todo Delete this function.
 simd4f float4::Length3_SSE() const
 {
-	return _mm_sqrt_ps(dot3_ps(v, v));
+	return sqrt_ps(dot3_ps(v, v));
 }
 
 /// The returned vector contains the squared length of the float4 in each channel of the vector.
@@ -176,35 +176,39 @@ simd4f float4::LengthSq4_SSE() const
 /// The returned vector contains the length of the float4 in each channel of the vector.
 simd4f float4::Length4_SSE() const
 {
-	return _mm_sqrt_ps(dot4_ps(v, v));
+	return sqrt_ps(dot4_ps(v, v));
 }
 
 void float4::Normalize3_Fast_SSE()
 {
 	simd4f len = Length3_SSE();
-	simd4f normalized = _mm_div_ps(v, len); // Normalize.
+	simd4f normalized = div_ps(v, len); // Normalize.
 	v = cmov_ps(v, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
 
 simd4f float4::Normalize4_SSE()
 {
 	simd4f len = Length4_SSE();
-	simd4f isZero = _mm_cmplt_ps(len, simd4fEpsilon); // Was the length zero?
-	simd4f normalized = _mm_div_ps(v, len); // Normalize.
+	simd4f isZero = cmplt_ps(len, simd4fEpsilon); // Was the length zero?
+	simd4f normalized = div_ps(v, len); // Normalize.
 	v = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
 	return len;
 }
 
 void float4::Normalize4_Fast_SSE()
 {
-	simd4f recipLen = _mm_rsqrt_ps(dot4_ps(v, v));
-	v = _mm_mul_ps(v, recipLen);
+	simd4f recipLen = rsqrt_ps(dot4_ps(v, v));
+	v = mul_ps(v, recipLen);
 }
 
 void float4::NormalizeW_SSE()
 {
+#ifdef MATH_SSE
 	simd4f div = shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
-	v = _mm_div_ps(v, div);
+	v = div_ps(v, div);
+#elif defined(MATH_NEON)
+	v = div_ps(v, vdupq_n_f32(vgetq_lane_f32(v, 3)));
+#endif
 }
 
 #endif

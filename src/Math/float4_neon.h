@@ -20,6 +20,8 @@
 
 #ifdef MATH_SIMD
 
+#include <arm_neon.h>
+
 #include "float4_sse.h"
 
 #ifdef ANDROID
@@ -106,11 +108,6 @@ FORCE_INLINE simd4f vec4_recip(simd4f vec)
 #endif
 }
 
-FORCE_INLINE simd4f vec4_div_vec4(simd4f vec, simd4f vec2)
-{
-	return div_ps(vec, vec2);
-}
-
 #ifdef MATH_NEON
 inline std::string ToString(uint8x8x2_t vec)
 {
@@ -164,8 +161,8 @@ FORCE_INLINE float mul_xyzw_float(simd4f vec)
 
 FORCE_INLINE simd4f negate3_ps(simd4f vec)
 {
-	const ALIGN16 uint32_t indexData[4] = { 0x80000000UL, 0x80000000UL, 0x80000000UL, 0 };
-	uint64x2_t mask = vld1q_u64((const uint64_t*)indexData);
+	static const ALIGN16 uint32_t indexData[4] = { 0x80000000UL, 0x80000000UL, 0x80000000UL, 0 };
+	static const uint64x2_t mask = vld1q_u64((const uint64_t*)indexData);
 	return vreinterpretq_f32_u64(veorq_u64(vreinterpretq_u64_f32(vec), mask));
 }
 

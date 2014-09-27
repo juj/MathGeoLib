@@ -652,13 +652,13 @@ void float3x4::SetRow(int row, const float *data)
 		return;
 #endif
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (row < 0 || row >= Rows)
 		return; // Benign failure
 #endif
-	this->row[row] = _mm_loadu_ps(data); // Assume unaligned load, since we don't know if data is 16-byte-aligned.
+	this->row[row] = loadu_ps(data); // Assume unaligned load, since we don't know if data is 16-byte-aligned.
 #else
 	SetRow(row, data[0], data[1], data[2], data[3]);
 #endif
@@ -1103,7 +1103,7 @@ void float3x4::RemoveScale()
 float3 float3x4::TransformPos(const float3 &pointVector) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, _mm_set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
+	return mat3x4_mul_vec(row, set_ps(1.f, pointVector.z, pointVector.y, pointVector.x));
 #else
 	return TransformPos(pointVector.x, pointVector.y, pointVector.z);
 #endif
@@ -1112,7 +1112,7 @@ float3 float3x4::TransformPos(const float3 &pointVector) const
 float3 float3x4::TransformPos(float x, float y, float z) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, _mm_set_ps(1, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(1, z, y, x));
 #else
 	return float3(DOT3_xyz(v[0], x,y,z) + v[0][3],
 				  DOT3_xyz(v[1], x,y,z) + v[1][3],
@@ -1123,7 +1123,7 @@ float3 float3x4::TransformPos(float x, float y, float z) const
 float3 float3x4::TransformDir(const float3 &directionVector) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, _mm_set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
+	return mat3x4_mul_vec(row, set_ps(0.f, directionVector.z, directionVector.y, directionVector.x));
 #else
 	return TransformDir(directionVector.x, directionVector.y, directionVector.z);
 #endif
@@ -1132,7 +1132,7 @@ float3 float3x4::TransformDir(const float3 &directionVector) const
 float3 float3x4::TransformDir(float x, float y, float z) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, _mm_set_ps(0, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(0, z, y, x));
 #else
 	return float3(DOT3_xyz(v[0], x,y,z),
 				  DOT3_xyz(v[1], x,y,z),

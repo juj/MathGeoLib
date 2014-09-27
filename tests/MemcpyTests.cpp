@@ -271,7 +271,7 @@ BENCHMARK(copy_float4x4_memcpy, "test against copy_float4x4_opequals")
 }
 BENCHMARK_END;
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 BENCHMARK(copy_float4x4_sse, "test against copy_float4x4_opequals")
 {
 	m2[i].row[0] = m[i].row[0];

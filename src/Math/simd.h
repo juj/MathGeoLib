@@ -89,6 +89,7 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define cmpgt_ps _mm_cmpgt_ps
 #define cmple_ps _mm_cmple_ps
 #define cmplt_ps _mm_cmplt_ps
+#define negate3_ps(x) xor_ps(x, sseSignMask3)
 
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
@@ -136,19 +137,7 @@ FORCE_INLINE float s4f_x(simd4f s4f)
 #define set1_ps_hex(x) _mm_set1_ps(ReinterpretAsFloat(x))
 #endif
 
-const float andMaskOneF = ReinterpretAsFloat(0xFFFFFFFFU);
-/// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
-const __m128 sseMaskXYZ = set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
-const __m128 sseSignMask3 = set_ps(0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
-#ifdef MATH_AVX
-const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
-#endif
-#define negate3_ps(x) xor_ps(x, sseSignMask3)
-#ifdef MATH_AVX
-#define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)
-#endif
-
-/// Returns the simd vector [_, _, _, f], that is, a SSE variable with the given float f in the lowest index. 
+/// Returns the simd vector [_, _, _, f], that is, a SSE variable with the given float f in the lowest index.
 /** The three higher indices should all be treated undefined.
 	@note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast" if the given 
 	float is already in a register, since it will lie in an XMM register already. Check the disassembly to confirm!
@@ -213,13 +202,15 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 
 #elif defined(MATH_NEON)
 
+#include <arm_neon.h>
+
 #define simd4f float32x4_t
 #define simd4i int32x4_t
 
 #define add_ps vaddq_f32
 #define sub_ps vsubq_f32
 #define mul_ps vmulq_f32
-#define div_ps vdivq_f32
+#define div_ps(a, b) ((a) / (b))
 #define min_ps vminq_f32
 #define max_ps vmaxq_f32
 #define s4f_to_s4i(s4f) vreinterpretq_u32_f32((s4f))
@@ -236,6 +227,7 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define s4f_w(vec) vgetq_lane_f32((vec), 1)
 
 #define set1_ps vdupq_n_f32
+#define setx_ps vdupq_n_f32
 #define abs_ps vabsq_f32
 #define zero_ps() vdupq_n_f32(0.f)
 
@@ -245,14 +237,41 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define load_ps vld1q_f32
 #define load1_ps(ptr) vdupq_n_f32(*(float*)(ptr))
 #define stream_ps vst1q_f32
-#define rcp_ps vrecpeq_f32
-#define rsqrt_ps vrsqrteq_f32
-#define sqrt_ps vsqrtq_f32
+static inline simd4f rcp_ps(simd4f x)
+{
+	simd4f e = vrecpeq_f32(x);
+	e = vmulq_f32(e, vrecpsq_f32(x, e));
+	e = vmulq_f32(e, vrecpsq_f32(x, e));
+	return e;
+}
+
+static inline simd4f rsqrt_ps(simd4f x)
+{
+	simd4f e = vrsqrteq_f32(x);
+	e = vmulq_f32(e, vrsqrtsq_f32(x, vmulq_f32(e, e)));
+	e = vmulq_f32(e, vrsqrtsq_f32(x, vmulq_f32(e, e)));
+	return e;
+}
+
+static inline simd4f sqrt_ps(simd4f x) { return mul_ps(x, rsqrt_ps(x)); }
+
 #define cmpeq_ps(a, b) vreinterpretq_f32_u32(vceqq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
 #define cmpge_ps(a, b) vreinterpretq_f32_u32(vcgeq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
 #define cmpgt_ps(a, b) vreinterpretq_f32_u32(vcgtq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
 #define cmple_ps(a, b) vreinterpretq_f32_u32(vcleq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
 #define cmplt_ps(a, b) vreinterpretq_f32_u32(vcltq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
+
+// This might not be the most efficient form, and typically it is better to avoid this in NEON, and instead
+// prefer the scattering/gathering loads and stores instead.
+#define _MM_TRANSPOSE4_PS(a,b,c,d) do { \
+	float32x4x2_t m1 = vuzpq_f32((a), (c)); \
+	float32x4x2_t m2 = vuzpq_f32((b), (d)); \
+	float32x4x2_t m3 = vtrnq_f32(m1.val[0], m2.val[0]); \
+	float32x4x2_t m4 = vtrnq_f32(m1.val[1], m2.val[1]); \
+	(a) = m3.val[0]; \
+	(b) = m4.val[0]; \
+	(c) = m3.val[1]; \
+	(d) = m4.val[1]; } while(0)
 
 #ifdef _MSC_VER
 #define set_ps_const(w,z,y,x) {{ (u64)ReinterpretAsU32(x) | (((u64)ReinterpretAsU32(y)) << 32), (u64)ReinterpretAsU32(z) | (((u64)ReinterpretAsU32(w)) << 32) }}
@@ -277,7 +296,18 @@ FORCE_INLINE simd4f set_ps_hex(u32 w, u32 z, u32 y, u32 x)
 	return c;
 }
 
-#endif
+FORCE_INLINE simd4f dir_from_scalar_ps(float scalar)
+{
+	return vsetq_lane_f32(0.f, vdupq_n_f32(scalar), 3);
+}
+
+/// Returns a position vector (w == 1) with xyz all set to the same scalar value.
+FORCE_INLINE simd4f pos_from_scalar_ps(float scalar)
+{
+	return vsetq_lane_f32(1.f, vdupq_n_f32(scalar), 3);
+}
+
+#endif // ~MATH_NEON
 
 // TODO: Which is better codegen - use simd4fZero constant everywhere, or explicitly refer to zero_ps() everywhere,
 //       or does it matter?
@@ -306,7 +336,7 @@ FORCE_INLINE simd4f cmov_ps(simd4f a, simd4f b, simd4f mask)
 
 MATH_END_NAMESPACE
 
-#else // ~MATH_SIMD
+#else // ~MATH_NEON
 
 #define ALIGN16
 #define ALIGN32
@@ -314,4 +344,19 @@ MATH_END_NAMESPACE
 #define ALIGN_MAT
 #define IS_MAT_ALIGNED(x) true
 
-#endif // ~MATH_SIMD
+#endif // ~MATH_SSE/NEON
+
+#ifdef MATH_SIMD
+
+static const float andMaskOneF = ReinterpretAsFloat(0xFFFFFFFFU);
+/// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
+static const simd4f sseMaskXYZ = set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
+static const simd4f sseSignMask3 = set_ps(0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
+#ifdef MATH_AVX
+static const simd4f sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
+#endif
+#ifdef MATH_AVX
+#define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)
+#endif
+
+#endif

@@ -145,7 +145,7 @@ float Quat::Normalize()
 #ifdef MATH_AUTOMATIC_SSE
 	simd4f lenSq = vec4_length_sq_ps(q);
 	simd4f len = vec4_rsqrt(lenSq);
-	simd4f isZero = _mm_cmplt_ps(lenSq, simd4fEpsilon); // Was the length zero?
+	simd4f isZero = cmplt_ps(lenSq, simd4fEpsilon); // Was the length zero?
 	simd4f normalized = mul_ps(q, len); // Normalize.
 	q = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
 	return s4f_x(len);
@@ -255,7 +255,7 @@ Quat MUST_USE_RESULT Quat::Conjugated() const
 
 float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
-	assume(this->IsNormalized());
+	assume2(this->IsNormalized(), *this, this->LengthSq());
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	///\todo Check the generation of temporaries here!
 	return float4(quat_transform_vec4(q, float4(vec,0.f).v)).xyz();
@@ -327,7 +327,7 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 
 		float angleT = t*angle;
 
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 		// Compute three sines in one go with SSE.
 		simd4f s = set_ps(0.f, angleT, angle - angleT, angle);
 		s = sin_ps(s);

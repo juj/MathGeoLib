@@ -543,11 +543,6 @@ public:
 	bool IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const;
 #ifdef MATH_SSE
 	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float tNear, float tFar) const;
-
-	__m128 &MinPoint_SSE() { return *(__m128*)minPoint.ptr(); }
-	__m128 &MaxPoint_SSE() { return *(__m128*)maxPoint.ptr(); }
-	const __m128 &MinPoint_SSE() const { return *(__m128*)minPoint.ptr(); }
-	const __m128 &MaxPoint_SSE() const { return *(__m128*)maxPoint.ptr(); }
 #endif
 
 #ifdef MATH_OGRE_INTEROP
@@ -581,7 +576,7 @@ Q_DECLARE_METATYPE(AABB*)
 std::ostream &operator <<(std::ostream &o, const AABB &aabb);
 #endif
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m);
 #endif
 

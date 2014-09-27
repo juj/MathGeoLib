@@ -472,25 +472,25 @@ void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 	aabb.maxPoint = newCenter + newDir;
 }
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
 {
-	simd4f minPt = aabb.MinPoint_SSE();
-	simd4f maxPt = aabb.MaxPoint_SSE();
-	simd4f centerPoint = _mm_mul_ps(_mm_add_ps(minPt, maxPt), _mm_set1_ps(0.5f));
-	simd4f halfSize = _mm_sub_ps(centerPoint, minPt);
+	simd4f minPt = aabb.minPoint;
+	simd4f maxPt = aabb.maxPoint;
+	simd4f centerPoint = mul_ps(add_ps(minPt, maxPt), set1_ps(0.5f));
+	simd4f halfSize = sub_ps(centerPoint, minPt);
 	simd4f newCenter = mat4x4_mul_vec4(m.row, centerPoint);
 
-	simd4f x = abs_ps(_mm_mul_ps(m.row[0], halfSize));
-	simd4f y = abs_ps(_mm_mul_ps(m.row[1], halfSize));
-	simd4f z = abs_ps(_mm_mul_ps(m.row[2], halfSize));
-	simd4f w = _mm_setzero_ps();
+	simd4f x = abs_ps(mul_ps(m.row[0], halfSize));
+	simd4f y = abs_ps(mul_ps(m.row[1], halfSize));
+	simd4f z = abs_ps(mul_ps(m.row[2], halfSize));
+	simd4f w = zero_ps();
 	_MM_TRANSPOSE4_PS(x, y, z, w); // Contains 2x unpacklo's, 2x unpackhi's, 2x movelh's and 2x movehl's. (or 8 shuffles, depending on the compiler)
 
-	simd4f newDir = _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
+	simd4f newDir = add_ps(add_ps(x, y), add_ps(z, w));
 
-	aabb.MinPoint_SSE() = _mm_sub_ps(newCenter, newDir);
-	aabb.MaxPoint_SSE() = _mm_add_ps(newCenter, newDir);
+	aabb.minPoint = sub_ps(newCenter, newDir);
+	aabb.minPoint = add_ps(newCenter, newDir);
 }
 #endif
 
@@ -794,27 +794,27 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	return tNear < tFar;
 	*/
 
-	__m128 recipDir = _mm_rcp_ps(rayDir.v);
+	simd4f recipDir = rcp_ps(rayDir.v);
 	// Note: The above performs an approximate reciprocal (11 bits of precision).
 	// For a full precision reciprocal, perform a div:
-//	__m128 recipDir = _mm_div_ps(_mm_set1_ps(1.f), rayDir.v);
+//	simd4f recipDir = div_ps(set1_ps(1.f), rayDir.v);
 
-	__m128 t1 = _mm_mul_ps(_mm_sub_ps(MinPoint_SSE(), rayPos.v), recipDir);
-	__m128 t2 = _mm_mul_ps(_mm_sub_ps(MaxPoint_SSE(), rayPos.v), recipDir);
+	simd4f t1 = mul_ps(sub_ps(minPoint, rayPos.v), recipDir);
+	simd4f t2 = mul_ps(sub_ps(maxPoint, rayPos.v), recipDir);
 
-	__m128 nearD = _mm_min_ps(t1, t2); // [0 n3 n2 n1]
-	__m128 farD = _mm_max_ps(t1, t2);  // [0 f3 f2 f1]
+	simd4f nearD = min_ps(t1, t2); // [0 n3 n2 n1]
+	simd4f farD = max_ps(t1, t2);  // [0 f3 f2 f1]
 
 	// Check if the ray direction is parallel to any of the cardinal axes, and if so,
 	// mask those [near, far] ranges away from the hit test computations.
-	__m128 rayDirAbs = abs_ps(rayDir.v);
+	simd4f rayDirAbs = abs_ps(rayDir.v);
 
-	const __m128 epsilon = _mm_set1_ps(1e-4f);
+	const simd4f epsilon = set1_ps(1e-4f);
 	// zeroDirections[i] will be nonzero for each axis i the ray is parallel to.
-	__m128 zeroDirections = _mm_cmple_ps(rayDirAbs, epsilon);
+	simd4f zeroDirections = cmple_ps(rayDirAbs, epsilon);
 
-	const __m128 floatInf = _mm_set1_ps(FLOAT_INF);
-	const __m128 floatNegInf = _mm_set1_ps(-FLOAT_INF);
+	const simd4f floatInf = set1_ps(FLOAT_INF);
+	const simd4f floatNegInf = set1_ps(-FLOAT_INF);
 
 	// If the ray is parallel to one of the axes, replace the slab range for that axis
 	// with [-inf, inf] range instead. (which is a no-op in the comparisons below)
@@ -823,17 +823,17 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 
 	// Next, we need to compute horizontally max(nearD[0], nearD[1], nearD[2]) and min(farD[0], farD[1], farD[2])
 	// to see if there is an overlap in the hit ranges.
-	__m128 v1 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(0, 0, 0, 0)); // [f1 f1 n1 n1]
-	__m128 v2 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(1, 1, 1, 1)); // [f2 f2 n2 n2]
-	__m128 v3 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(2, 2, 2, 2)); // [f3 f3 n3 n3]
-	nearD = _mm_max_ps(v1, _mm_max_ps(v2, v3));
-	farD = _mm_min_ps(v1, _mm_min_ps(v2, v3));
+	simd4f v1 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(0, 0, 0, 0)); // [f1 f1 n1 n1]
+	simd4f v2 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(1, 1, 1, 1)); // [f2 f2 n2 n2]
+	simd4f v3 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(2, 2, 2, 2)); // [f3 f3 n3 n3]
+	nearD = max_ps(v1, max_ps(v2, v3));
+	farD = min_ps(v1, min_ps(v2, v3));
 	farD = _mm_shuffle_ps(farD, farD, _MM_SHUFFLE(3, 3, 3, 3)); // Unpack the result from high offset in the register.
-	nearD = _mm_max_ps(nearD, _mm_set_ss(tNear));
-	farD = _mm_min_ps(farD, _mm_set_ss(tFar));
+	nearD = max_ps(nearD, setx_ps(tNear));
+	farD = min_ps(farD, setx_ps(tFar));
 
 	// Finally, test if the ranges overlap.
-	__m128 rangeIntersects = _mm_cmple_ss(nearD, farD);
+	simd4f rangeIntersects = cmple_ss(nearD, farD);
 
 	// To store out out the interval of intersection, uncomment the following:
 	// These are disabled, since without these, the whole function runs without a single memory store,
@@ -844,20 +844,20 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 
 	// To avoid false positives, need to have an additional rejection test for each cardinal axis the ray direction
 	// is parallel to.
-	__m128 out2 = _mm_cmplt_ps(rayPos.v, MinPoint_SSE());
-	__m128 out3 = _mm_cmpgt_ps(rayPos.v, MaxPoint_SSE());
-	out2 = _mm_or_ps(out2, out3);
-	zeroDirections = _mm_and_ps(zeroDirections, out2);
+	simd4f out2 = cmplt_ps(rayPos.v, minPoint);
+	simd4f out3 = cmpgt_ps(rayPos.v, maxPoint);
+	out2 = or_ps(out2, out3);
+	zeroDirections = and_ps(zeroDirections, out2);
 
-	__m128 yOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(1,1,1,1));
-	__m128 zOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(2,2,2,2));
+	simd4f yOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(1,1,1,1));
+	simd4f zOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(2,2,2,2));
 
-	zeroDirections = _mm_or_ps(_mm_or_ps(zeroDirections, yOut), zOut);
+	zeroDirections = or_ps(or_ps(zeroDirections, yOut), zOut);
 	// Intersection occurs if the slab ranges had positive overlap and if the test was not rejected by the ray being
 	// parallel to some cardinal axis.
-	__m128 intersects = _mm_andnot_ps(zeroDirections, rangeIntersects);
-	__m128 epsilonMasked = _mm_and_ps(epsilon, intersects);
-	return _mm_comieq_ss(epsilon, epsilonMasked) != 0;
+	simd4f intersects = andnot_ps(zeroDirections, rangeIntersects);
+	simd4f epsilonMasked = and_ps(epsilon, intersects);
+	return comieq_ss(epsilon, epsilonMasked) != 0;
 }
 #endif
 

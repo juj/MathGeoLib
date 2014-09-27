@@ -89,9 +89,9 @@ void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 {
 	normal = (v2-v1).Cross(v3-v1);
 	float len = normal.Length();
-	assume(len > 1e-10f);
+	assume1(len > 1e-10f, len);
 	normal /= len;
-	assume(normal.IsNormalized());
+	assume2(normal.IsNormalized(), normal, normal.LengthSq());
 	d = normal.Dot(v1);
 }
 

@@ -35,6 +35,8 @@
   (this is the zlib license)
 */
 
+#ifdef MATH_SSE
+
 #include "SSEMath.h"
 
 static const __m128 _ps_1 = _mm_set1_ps(1.f);
@@ -456,3 +458,5 @@ FORCE_INLINE void sincos_ps(__m128 x, __m128 *s, __m128 *c) {
   *s = _mm_xor_ps(xmm1, sign_bit_sin);
   *c = _mm_xor_ps(xmm2, sign_bit_cos);
 }
+
+#endif

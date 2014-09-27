@@ -806,28 +806,24 @@ public:
 	operator btVector3() const { btVector3 v(x, y, z); v.setW(w); return v; }
 #endif
 
-#ifdef MATH_SSE
-	float4(__m128 vec):v(vec) {}
+#ifdef MATH_SIMD
+	float4(simd4f vec):v(vec) {}
 
 	///\todo All the _SSE() functions will be deleted in favor of C SSE API.
-	__m128 Swizzled_SSE(int i, int j, int k, int l) const;
-	__m128 LengthSq3_SSE() const;
-	__m128 Length3_SSE() const;
-	__m128 LengthSq4_SSE() const;
-	__m128 Length4_SSE() const;
-	__m128 Normalize4_SSE();
+	simd4f Swizzled_SSE(int i, int j, int k, int l) const;
+	simd4f LengthSq3_SSE() const;
+	simd4f Length3_SSE() const;
+	simd4f LengthSq4_SSE() const;
+	simd4f Length4_SSE() const;
+	simd4f Normalize4_SSE();
 	void Normalize3_Fast_SSE();
 	void Normalize4_Fast_SSE();
 	void NormalizeW_SSE();
-	__m128 SumOfElements_SSE() const;
+	simd4f SumOfElements_SSE() const;
 
-	inline float4 &operator =(__m128 vec) { v = vec; return *this; }
+	inline float4 &operator =(simd4f vec) { v = vec; return *this; }
 
-	inline operator __m128() const { return v; }
-#elif defined(MATH_NEON)
-	float4(float32x4_t vec):v(vec) {}
-	inline float4 &operator =(float32x4_t vec) { v = vec; return *this; }
-	inline operator float32x4_t() const { return v; }
+	inline operator simd4f() const { return v; }
 #endif
 };
 

@@ -481,7 +481,7 @@ TEST(Float4Div)
 	movss	xmm0, DWORD PTR [edx+eax*4] */
 BENCHMARK(float_to_Float4_ss, "sse")
 {
-	__m128 scale = _mm_set_ss(f[i]);
+	simd4f scale = set_ss(f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;
@@ -494,7 +494,7 @@ BENCHMARK_END;
 		shufps	xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_set1, "sse")
 {
-	__m128 scale = _mm_set1_ps(f[i]);
+	simd4f scale = set1_ps(f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;
@@ -504,7 +504,7 @@ BENCHMARK_END;
 	vshufps	xmm0, xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_load1, "sse")
 {
-	__m128 scale = _mm_load1_ps(&f[i]);
+	simd4f scale = load1_ps(&f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;
@@ -531,11 +531,12 @@ BENCHMARK_END;
 	vmovss	xmm1, xmm0, xmm1 */
 BENCHMARK(float_to_Float4_macro1, "sse")
 {
-	__m128 scale = setx_ps(f[i]);
+	simd4f scale = setx_ps(f[i]);
 	v[i] = scale;
 }
 BENCHMARK_END;
 
+#ifdef MATH_SSE
 /* VS2010 with AVX enabled generates this BAD code(!):
 	vmovss	xmm0, DWORD PTR [edx+eax*4]
 	vxorps	xmm1, xmm1, xmm1
@@ -543,7 +544,7 @@ BENCHMARK_END;
 	vshufps	xmm0, xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_load_swizzle, "sse")
 {
-	__m128 scale = shuffle1_ps(_mm_load_ss(&f[i]), _MM_SHUFFLE(0,0,0,0));
+	simd4f scale = shuffle1_ps(_mm_load_ss(&f[i]), _MM_SHUFFLE(0,0,0,0));
 	v[i] = scale;
 }
 BENCHMARK_END;
@@ -555,33 +556,35 @@ BENCHMARK_END;
 	vshufps	xmm0, xmm0, xmm0, 0 */
 BENCHMARK(float_to_Float4_macro_swizzle, "sse")
 {
-	__m128 scale = shuffle1_ps(setx_ps(f[i]), _MM_SHUFFLE(0,0,0,0));
+	simd4f scale = shuffle1_ps(setx_ps(f[i]), _MM_SHUFFLE(0,0,0,0));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
 BENCHMARK(sse_shuffle1, "sse")
 {
-	__m128 scale = shuffle1_ps(v[i].v, _MM_SHUFFLE(0,1,2,3));
+	simd4f scale = shuffle1_ps(v[i].v, _MM_SHUFFLE(0,1,2,3));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
 BENCHMARK(sse_shuffle_ps, "sse")
 {
-	__m128 scale = _mm_shuffle_ps(v[i].v, v[i].v, _MM_SHUFFLE(0,1,2,3));
+	simd4f scale = _mm_shuffle_ps(v[i].v, v[i].v, _MM_SHUFFLE(0,1,2,3));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
 BENCHMARK(sse_shuffle_epi32, "sse")
 {
-	__m128 scale = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((v[i].v)), _MM_SHUFFLE(0,1,2,3)));
+	simd4f scale = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((v[i].v)), _MM_SHUFFLE(0,1,2,3)));
 	v[i] = scale;
 }
 BENCHMARK_END;
 
-#endif
+#endif // ~MATH_SSE
+
+#endif // ~MATH_SIMD
 
 // Benchmark scalar ops so that we can compare scalar vs vector primitive ops costs.
 BENCHMARK(FloatAdd, "float + float")
@@ -744,7 +747,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Div_float4_simd, "test against Float4_Div_float4")
 {
-	v3[i] = vec4_div_vec4(v[i], v2[i]);
+	v3[i] = div_ps(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
@@ -1010,6 +1013,22 @@ RANDOMIZED_TEST(copy_nan_Quat)
 	Quat b = a;
 	uninitializedQuat = b;
 }
+
+#ifdef MATH_NEON
+UNIQUE_TEST(MatrixTranspose)
+{
+	simd4f a = set_ps(1.f,2.f,3.f,4.f);
+	simd4f b = set_ps(5.f,6.f,7.f,8.f);
+	simd4f c = set_ps(9.f,10.f,11.f,12.f);
+	simd4f d = set_ps(13.f,14.f,15.f,16.f);
+	
+	_MM_TRANSPOSE4_PS(a, b, c, d);
+	assert(float4(a).Equals(float4(4.f, 8.f, 12.f, 16.f)));
+	assert(float4(b).Equals(float4(3.f, 7.f, 11.f, 15.f)));
+	assert(float4(c).Equals(float4(2.f, 6.f, 10.f, 14.f)));
+	assert(float4(d).Equals(float4(1.f, 5.f, 9.f, 13.f)));
+}
+#endif
 
 #ifdef MATH_ENABLE_UNCOMMON_OPERATIONS
 

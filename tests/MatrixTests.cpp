@@ -791,7 +791,7 @@ BENCHMARK(matrix_copy3, "matrix-copy-unrolled")
 }
 BENCHMARK_END;
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 BENCHMARK(matrix_copy4, "matrix-copy-sse")
 {
 	simd4f *dst = (simd4f *)&m2[i];
