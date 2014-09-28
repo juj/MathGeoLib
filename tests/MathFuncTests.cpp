@@ -593,6 +593,21 @@ float NewtonRhapsonRecip2(float x)
 	e2 = _mm_mul_ss(e,e);
 	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
+
+#ifdef MATH_SSE2
+static inline double rcp_double(float x)
+{
+	__m128d X = _mm_cvtps_pd(_mm_set1_ps(x));
+	__m128d e = _mm_cvtps_pd(_mm_rcp_ps(_mm_set1_ps(x)));
+	e = _mm_sub_sd(_mm_add_sd(e,e), _mm_mul_sd(X, _mm_mul_sd(e,e)));
+	e = _mm_sub_sd(_mm_add_sd(e,e), _mm_mul_sd(X, _mm_mul_sd(e,e)));
+	e = _mm_sub_sd(_mm_add_sd(e,e), _mm_mul_sd(X, _mm_mul_sd(e,e)));
+	e = _mm_sub_sd(_mm_add_sd(e,e), _mm_mul_sd(X, _mm_mul_sd(e,e)));
+	e = _mm_sub_sd(_mm_add_sd(e,e), _mm_mul_sd(X, _mm_mul_sd(e,e)));
+	return _mm_cvtsd_f64(_mm_sub_sd(_mm_add_sd(e,e), _mm_mul_sd(X, _mm_mul_sd(e,e))));
+}
+#endif
+
 #endif
 
 UNIQUE_TEST(sqrt_recip_precision)
@@ -616,6 +631,9 @@ UNIQUE_TEST(sqrt_recip_precision)
 #ifdef MATH_SIMD
 		X[5] = s4f_x(rcp_ps(set1_ps(f)));
 #endif
+#ifdef MATH_SSE2
+		X[6] = (float)rcp_double(f);
+#endif
 
 		for(int j = 0; j < C; ++j)
 			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
@@ -635,7 +653,11 @@ UNIQUE_TEST(sqrt_recip_precision)
 	assert(maxRelError[4] < 1e-6f);
 #ifdef MATH_SIMD
 	LOGI("Max relative error with rcp_ps: %e", maxRelError[5]);
-	assert(maxRelError[5] < 1e-6f);
+	assert(maxRelError[5] < 1e-5f);
+#endif
+#ifdef MATH_SSE2
+	LOGI("Max relative error with rcp_double: %e", maxRelError[6]);
+	assert(maxRelError[6] < 1e-5f);
 #endif
 }
 
