@@ -490,7 +490,7 @@ void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
 	simd4f newDir = add_ps(add_ps(x, y), add_ps(z, w));
 
 	aabb.minPoint = sub_ps(newCenter, newDir);
-	aabb.minPoint = add_ps(newCenter, newDir);
+	aabb.maxPoint = add_ps(newCenter, newDir);
 }
 #endif
 
