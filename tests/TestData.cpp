@@ -78,6 +78,24 @@ AABB *AABBArray()
 	return arr;
 }
 
+OBB *OBBArray()
+{
+	LCG lcg;
+	static OBB *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<OBB>(testrunner_numItersPerTest + UNROLL_LOOP_PADDING);
+		for (int i = 0; i < testrunner_numItersPerTest + UNROLL_LOOP_PADDING; ++i)
+		{
+			AABB a;
+			a.minPoint = POINT_VEC(float3::RandomBox(lcg, -100.f, 100.f));
+			a.maxPoint = a.minPoint + POINT_VEC(float3::RandomBox(lcg, 0, 100.f));
+			arr[i] = a.Transform(Quat::RandomRotation(lcg));
+		}
+	}
+	return arr;
+}
+
 float *FloatArray()
 {
 	LCG lcg;
@@ -204,6 +222,19 @@ float4 *VectorArray()
 		arr = AlignedNew<float4>(testrunner_numItersPerTest+UNROLL_LOOP_PADDING);
 		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
 			arr[i] = float4::RandomGeneral(lcg, -10.f, 10.f);
+	}
+	return arr;
+}
+
+vec *VecArray2()
+{
+	LCG lcg;
+	static vec *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<vec>(testrunner_numItersPerTest + UNROLL_LOOP_PADDING);
+		for (int i = 0; i < testrunner_numItersPerTest + UNROLL_LOOP_PADDING; ++i)
+			arr[i] = vec::RandomGeneral(lcg, -10.f, 10.f);
 	}
 	return arr;
 }

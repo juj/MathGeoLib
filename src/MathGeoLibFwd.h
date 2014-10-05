@@ -98,6 +98,22 @@ class LCG;
 
 struct float4_storage;
 
+#ifdef MATH_AUTOMATIC_SSE
+
+#ifndef MATH_VEC_IS_FLOAT4
+#define MATH_VEC_IS_FLOAT4
+#endif
+
+typedef float4 vec;
+typedef float4_storage vec_storage;
+
+#else
+
+typedef float3 vec;
+typedef float3 vec_storage;
+
+#endif
+
 template<class T, size_t Alignment>
 struct AlignedAllocator;
 

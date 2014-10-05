@@ -22,11 +22,13 @@ float4x4 *TransposedMatrixArray();
 float2 *Float2Array();
 float4 *NormalizedVectorArray();
 float4 *NormalizedVectorArray2();
+vec *VecArray2();
 float4 *VectorArray();
 float4 *VectorArray2();
 float4 *VectorArray3();
 float4 *VectorArrayWithW0Or1();
 AABB *AABBArray();
+OBB *OBBArray();
 
 // N.B. These must be static and not extern to not generate UDB with initialization order between compilation units!
 static DONT_WARN_UNUSED float *f = FloatArray();
@@ -44,9 +46,11 @@ static DONT_WARN_UNUSED float4 *v = VectorArray();
 static DONT_WARN_UNUSED float4 *v2 = VectorArray2();
 static DONT_WARN_UNUSED float4 *v3 = VectorArray3();
 static DONT_WARN_UNUSED float4 *v01 = VectorArrayWithW0Or1();
+static DONT_WARN_UNUSED vec *ve = VecArray2();
 static DONT_WARN_UNUSED Quat *q = QuatArray();
 static DONT_WARN_UNUSED Quat *q2 = QuatArray2();
 static DONT_WARN_UNUSED AABB *aabb = AABBArray();
+static DONT_WARN_UNUSED OBB *obb = OBBArray();
 
 extern float2 uninitializedFloat2;
 extern float3 uninitializedFloat3;
