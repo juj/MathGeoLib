@@ -92,6 +92,19 @@ std::string FormatTime(double ticks)
 #if !defined(LOGI_NL)
 #if defined(ANDROID) || defined(NPAPI) || defined(__native_client__)
 #define LOGI_NL LOGI
+#elif defined(WIN8RT)
+void LOGI_NL(const char *format, ...)
+{
+	const int capacity = 2048;
+	char str[capacity];
+
+	va_list args;
+	va_start(args, format);
+
+	vsnprintf((char *)str, capacity, format, args);
+	str[capacity-1] = 0; // We only support logging a fixed-length string so don't care if we fail/truncate, just make sure we zero-terminate so there won't be any issues.
+	OutputDebugStringA(str);
+}
 #else
 #define LOGI_NL printf
 #endif
