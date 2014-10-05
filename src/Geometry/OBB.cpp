@@ -47,6 +47,10 @@
 #include "VertexBuffer.h"
 #endif
 
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
+#include "../Math/float4_sse.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 OBB::OBB(const vec &pos, const vec &r, const vec &axis0, const vec &axis1, const vec &axis2)
@@ -744,10 +748,29 @@ float OBB::Distance(const Sphere &sphere) const
 
 bool OBB::Contains(const vec &point) const
 {
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
+// Best: 9.985 nsecs / 26.816 ticks, Avg: 10.112 nsecs, Worst: 11.137 nsecs
+	simd4f pt = sub_ps(point.v, pos.v);
+	simd4f s1 = mul_ps(pt, axis[0].v);
+	simd4f s2 = mul_ps(pt, axis[1].v);
+	simd4f s3 = mul_ps(pt, axis[2].v);
+	s1 = abs_ps(sum_xyzw_ps(s1));
+	s2 = abs_ps(sum_xyzw_ps(s2));
+	s3 = abs_ps(sum_xyzw_ps(s3));
+
+	s1 = _mm_sub_ss(s1, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(0, 0, 0, 0)));
+	s2 = _mm_sub_ss(s2, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(1, 1, 1, 1)));
+	simd4f s12 = _mm_max_ss(s1, s2);
+	s3 = _mm_sub_ss(s3, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(2, 2, 2, 2)));
+	s3 = _mm_max_ss(s12, s3);
+	return _mm_cvtss_f32(s3) <= 0.f; // Note: This might be micro-optimized further out by switching to a signature "float OBB::SignedDistance(point)" instead.
+#else
+// Best: 14.978 nsecs / 39.944 ticks, Avg: 15.350 nsecs, Worst: 39.941 nsecs
 	vec pt = point - pos;
 	return Abs(Dot(pt, axis[0])) <= r[0] &&
 	       Abs(Dot(pt, axis[1])) <= r[1] &&
 	       Abs(Dot(pt, axis[2])) <= r[2];
+#endif
 }
 
 bool OBB::Contains(const LineSegment &lineSegment) const
