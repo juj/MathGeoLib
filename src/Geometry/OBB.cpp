@@ -758,7 +758,7 @@ bool OBB::Contains(const vec &point) const
 	s2 = abs_ps(sum_xyzw_ps(s2));
 	s3 = abs_ps(sum_xyzw_ps(s3));
 
-	s1 = _mm_sub_ss(s1, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(0, 0, 0, 0)));
+	s1 = _mm_sub_ss(s1, r.v);
 	s2 = _mm_sub_ss(s2, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(1, 1, 1, 1)));
 	simd4f s12 = _mm_max_ss(s1, s2);
 	s3 = _mm_sub_ss(s3, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(2, 2, 2, 2)));
