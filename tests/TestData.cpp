@@ -312,6 +312,8 @@ public:
 		AlignedFree(QuatArray2());
 		AlignedFree(VectorArrayWithW0Or1());
 		AlignedFree(AABBArray());
+		AlignedFree(OBBArray());
+		AlignedFree(VecArray2());
 	}
 };
 
