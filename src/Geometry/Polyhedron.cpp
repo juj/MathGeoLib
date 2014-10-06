@@ -223,12 +223,41 @@ void Polyhedron::ProjectToAxis(const vec &direction, float &outMin, float &outMa
 	outMax = Dot(maxPt, direction);
 }
 
-vec Polyhedron::Centroid() const
+vec Polyhedron::ApproximateConvexCentroid() const
 {
-	vec centroid = vec::zero;
+	// Since this shape is convex, the averaged position of all vertices is inside this polyhedron.
+	vec arbitraryCenterVertex = vec::zero;
 	for(int i = 0; i < NumVertices(); ++i)
-		centroid += Vertex(i);
-	return centroid / (float)NumVertices();
+		arbitraryCenterVertex += Vertex(i);
+	return arbitraryCenterVertex / (float)NumVertices();
+}
+
+vec Polyhedron::ConvexCentroid() const
+{
+	// Since this shape is convex, the averaged position of all vertices is inside this polyhedron.
+	vec arbitraryCenterVertex = ApproximateConvexCentroid();
+
+	vec centroid = vec::zero;
+	float totalVolume = 0.f;
+	// Decompose the polyhedron to tetrahedrons and compute the mass of center of each, and the total
+	// mass of center of the polyhedron will be the weighted average of the tetrahedrons' mass of centers.
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		const Face &fa = f[i];
+		if (fa.v.size() < 3)
+			continue;
+		for(int v = 0; v < (int)fa.v.size()-2; ++v)
+		{
+			vec a = Vertex(fa.v[v]);
+			vec b = Vertex(fa.v[v+1]);
+			vec c = Vertex(fa.v[v+2]);
+			vec center = (a + b + c + arbitraryCenterVertex) * 0.25f;
+			float volume = (a - arbitraryCenterVertex).Dot((b - arbitraryCenterVertex).Cross(c - arbitraryCenterVertex)); // This is actually volume*6, but can ignore the scale.
+			totalVolume += volume;
+			centroid += volume * center;
+		}
+	}
+	return centroid / totalVolume;
 }
 
 float Polyhedron::SurfaceArea() const
@@ -786,10 +815,10 @@ bool Polyhedron::Intersects(const Plane &plane) const
 	As noted by the author, the algorithm is very naive (and here unoptimized), and better methods exist. [groupSyntax] */
 bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 {
-	vec c = this->Centroid();
+	vec c = this->ApproximateConvexCentroid();
 	if (polyhedron.Contains(c) && this->Contains(c))
 		return true;
-	c = polyhedron.Centroid();
+	c = polyhedron.ApproximateConvexCentroid();
 	if (polyhedron.Contains(c) && this->Contains(c))
 		return true;
 
@@ -842,7 +871,7 @@ bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 {
 	if (p.Contains(obj.CenterPoint()))
 		return true;
-	if (obj.Contains(p.Centroid()))
+	if (obj.Contains(p.ApproximateConvexCentroid())) // @bug: This is not correct for concave polyhedrons!
 		return true;
 
 	// Test for each edge of the AABB/OBB whether this polyhedron intersects it.

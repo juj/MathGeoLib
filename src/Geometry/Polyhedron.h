@@ -162,18 +162,25 @@ public:
 		@param outMax [out] Returns the maximum extent of this object along the projection axis. */
 	void ProjectToAxis(const vec &direction, float &outMin, float &outMax) const;
 
-	/// Returns the arithmetic mean of all the corner vertices.
-	/** @bug This is not the proper centroid of the polyhedron! */
-	/** @see SurfaceArea(), Volume(). */
-	vec Centroid() const;
+	/// Returns the exact center of mass of the convex hull of this polyhedron.
+	/** @see SurfaceArea(), Volume(), ApproximateConvexCentroid(). */
+	vec ConvexCentroid() const;
+
+	// Computes the average of all vertices of this Polyhedron.
+	/** If this Polyhedron is a tetrahedron, this is the center of mass for the Polyhedron. Otherwise it
+		is a kind of an approximate enter of mass, biased towards the direction where there are lots of
+		vertices in the Polyhedron.
+		@note This function is considerably faster than ConvexCentroid().
+		@see SurfaceArea(), Volume(), ConvexCentroid(). */
+	vec ApproximateConvexCentroid() const;
 
 	/// Computes the total surface area of the faces of this polyhedron.
 	/** @note When you call this function, none of the faces of this polyhedron may be self-intersecting.
-		@see Centroid(), Volume(). */
+		@see ConvexCentroid(), Volume(). */
 	float SurfaceArea() const;
 
 	/// Computes the internal volume of this polyhedron.
-	/** @see Centroid(), SurfaceArea(). */
+	/** @see ConvexCentroid(), SurfaceArea(). */
 	float Volume() const;
 
 	/// Returns the smallest AABB that encloses this polyhedron.

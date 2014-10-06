@@ -7,6 +7,22 @@
 
 Polyhedron RandomPolyhedronContainingPoint(const vec &pt);
 
+RANDOMIZED_TEST(PolyhedronConvexCentroid)
+{
+	vec pt;
+	if (rng.Int(0, 20) == 0)
+		pt = POINT_VEC_SCALAR(0.f);
+	else
+		pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
+	Polyhedron p = RandomPolyhedronContainingPoint(pt);
+
+	vec convexCentroid = p.ConvexCentroid();
+	assert2(p.Contains(convexCentroid), p, convexCentroid);
+
+	vec approximateConvexCentroid = p.ApproximateConvexCentroid();
+	assert2(p.Contains(approximateConvexCentroid), p, approximateConvexCentroid);
+}
+
 RANDOMIZED_TEST(Polyhedron_intersects_itself)
 {
 	vec pt;
