@@ -28,16 +28,6 @@
 
 MATH_BEGIN_NAMESPACE
 
-#ifdef _MSC_VER
-#define ALIGN16 __declspec(align(16))
-#define ALIGN32 __declspec(align(32))
-#define ALIGN64 __declspec(align(64))
-#else
-#define ALIGN16 __attribute__((aligned(16)))
-#define ALIGN32 __attribute__((aligned(32)))
-#define ALIGN64 __attribute__((aligned(64)))
-#endif
-
 #define IS16ALIGNED(x) ((((uintptr_t)(x)) & 0xF) == 0)
 #define IS32ALIGNED(x) ((((uintptr_t)(x)) & 0x1F) == 0)
 #define IS64ALIGNED(x) ((((uintptr_t)(x)) & 0x3F) == 0)

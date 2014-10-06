@@ -98,13 +98,23 @@ class LCG;
 
 struct float4_storage;
 
+#ifdef _MSC_VER
+#define ALIGN16 __declspec(align(16))
+#define ALIGN32 __declspec(align(32))
+#define ALIGN64 __declspec(align(64))
+#else
+#define ALIGN16 __attribute__((aligned(16)))
+#define ALIGN32 __attribute__((aligned(32)))
+#define ALIGN64 __attribute__((aligned(64)))
+#endif
+
 #ifdef MATH_AUTOMATIC_SSE
 
 #ifndef MATH_VEC_IS_FLOAT4
 #define MATH_VEC_IS_FLOAT4
 #endif
 
-typedef float4 vec;
+typedef ALIGN16 float4 vec;
 typedef float4_storage vec_storage;
 
 #else
