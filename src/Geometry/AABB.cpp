@@ -583,6 +583,40 @@ float AABB::Distance(const Sphere &sphere) const
 
 bool AABB::Contains(const vec &point) const
 {
+/*
+#if defined(MATH_SSE2) && defined(MATH_AUTOMATIC_SSE)
+	// A SSE2 version of this algorithm with comparisons would look as follows. However it is benchmarked to be slower than the scalar version below,
+	// so keep it disabled for now, but retain for historical reference ("don't do this").
+
+	// Best: 3.012 nsecs / 6.039 ticks, Avg: 3.602 nsecs, Worst: 4.216 nsecs
+	simd4f a = _mm_cmple_ps(minPoint, point);
+	simd4f b = _mm_cmple_ps(point, maxPoint);
+	a = and_ps(a, b);
+	simd4f y = _mm_shuffle_ps(a, a, _MM_SHUFFLE(1, 1, 1, 1));
+	simd4f z = _mm_shuffle_ps(a, a, _MM_SHUFFLE(2, 2, 2, 2));
+	y = and_ps(y, z);
+	a = and_ps(a, y);
+	int d = _mm_cvtsi128_si32(_mm_castps_si128(a));
+	return d != 0;
+#else
+*/
+/*
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
+	// A SSE1 version of this algorithm without comparisons could look as follows. However it is benchmarked to be slower than the scalar version below,
+	// so keep it disabled for now, but retain for historical reference ("don't do this").
+
+	// Best: 4.819 nsecs / 7.984 ticks, Avg: 5.927 nsecs, Worst: 17.468 nsecs
+	simd4f center = mul_ps(add_ps(minPoint, maxPoint), set1_ps(0.5f));
+	simd4f halfSize = sub_ps(center, minPoint);
+	simd4f pt = abs_ps(sub_ps(point.v, center));
+	pt = sub_ps(pt, halfSize);
+	simd4f y = _mm_shuffle_ps(pt, pt, _MM_SHUFFLE(1, 1, 1, 1));
+	simd4f z = _mm_shuffle_ps(pt, pt, _MM_SHUFFLE(2, 2, 2, 2));
+	pt = _mm_max_ss(z, _mm_max_ss(pt, y));
+	return _mm_cvtss_f32(pt) <= 0.f; // Note: This might be micro-optimized further out by switching to a signature "float AABB::SignedDistance(point)" instead.
+#else
+*/
+	// Best: 1.807 nsecs / 3.1 ticks, Avg: 2.012 nsecs, Worst: 6.626 nsecs
 	return minPoint.x <= point.x && point.x <= maxPoint.x &&
 		   minPoint.y <= point.y && point.y <= maxPoint.y &&
 		   minPoint.z <= point.z && point.z <= maxPoint.z;

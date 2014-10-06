@@ -14,6 +14,12 @@ MATH_BEGIN_NAMESPACE
 
 using namespace TestData;
 
+BENCHMARK(AABBContains, "AABB::Contains(point)")
+{
+	uf[i] = aabb[i].Contains(ve[i]) ? 1.f : 0.f;
+}
+BENCHMARK_END
+
 RANDOMIZED_TEST(AABBTransformAsAABB)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
