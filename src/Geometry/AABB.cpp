@@ -31,6 +31,7 @@
 #include "Polygon.h"
 #include "Polyhedron.h"
 #include "Sphere.h"
+#include "PBVolume.h"
 #include "../Math/float2.h"
 #include "../Math/float3x3.h"
 #include "../Math/float3x4.h"
@@ -97,6 +98,15 @@ void AABB::SetFrom(const vec *pointArray, int numPoints)
 		return;
 	for(int i = 0; i < numPoints; ++i)
 		Enclose(pointArray[i]);
+}
+
+PBVolume<6> AABB::ToPBVolume() const
+{
+	PBVolume<6> pbVolume;
+	for(int i = 0; i < 6; ++i)
+	pbVolume.p[i] = FacePlane(i);
+
+	return pbVolume;
 }
 
 Polyhedron AABB::ToPolyhedron() const
