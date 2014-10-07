@@ -252,7 +252,7 @@ vec Polyhedron::ConvexCentroid() const
 			vec b = Vertex(fa.v[v+1]);
 			vec c = Vertex(fa.v[v+2]);
 			vec center = (a + b + c + arbitraryCenterVertex) * 0.25f;
-			float volume = (a - arbitraryCenterVertex).Dot((b - arbitraryCenterVertex).Cross(c - arbitraryCenterVertex)); // This is actually volume*6, but can ignore the scale.
+			float volume = Abs((a - arbitraryCenterVertex).Dot((b - arbitraryCenterVertex).Cross(c - arbitraryCenterVertex))); // This is actually volume*6, but can ignore the scale.
 			totalVolume += volume;
 			centroid += volume * center;
 		}
