@@ -152,10 +152,28 @@ public:
 					bool intersects = p[i].Intersects(p[j], p[k], 0, &corner);
 					if (intersects && ContainsExcept(corner, i, j, k))
 					{
-//						LOGI("Point at corner (%d,%d,%d): %s", i, j, k, corner.ToString().c_str());
-						ph.v.push_back(corner);
 						CornerPt pt;
-						pt.ptIndex = (int)ph.v.size()-1;
+
+						// Find if this vertex is duplicate of an existing vertex.
+						bool found = false;
+						for(size_t m = 0; m < ph.v.size(); ++m)
+							if (vec(ph.v[m]).Equals(corner))
+							{
+								found = true;
+								pt.ptIndex = m;
+								break;
+							}
+
+						if (!found) // New vertex?
+						{
+//							LOGI("New point at corner (%d,%d,%d): %s", i, j, k, corner.ToString().c_str());
+							ph.v.push_back(corner);
+							pt.ptIndex = (int)ph.v.size()-1;
+						}
+						else
+						{
+//							LOGI("Existing point at corner (%d,%d,%d): %s", i, j, k, corner.ToString().c_str());
+						}
 
 						pt.j = j;
 						pt.k = k;
@@ -170,6 +188,29 @@ public:
 						faces[k].push_back(pt);
 					}
 				}
+
+		// Check if we got a degenerate polyhedron?
+		if (ph.v.size() <= 1)
+			return ph;
+		else if (ph.v.size() == 2)
+		{
+			// Create a degenerate face that's an edge.
+			Polyhedron::Face f;
+			f.v.push_back(0);
+			f.v.push_back(1);
+			ph.f.push_back(f);
+			return ph;
+		}
+		else if (ph.v.size() == 3)
+		{
+			// Create a degenerate face that's a triangle.
+			Polyhedron::Face f;
+			f.v.push_back(0);
+			f.v.push_back(1);
+			f.v.push_back(2);
+			ph.f.push_back(f);
+			return ph;
+		}
 
 		// Connect the edges in each face using selection sort.
 		for(int i = 0; i < N; ++i)
@@ -244,9 +285,5 @@ public:
 		return res;
 	}
 };
-
-class Frustum;
-
-PBVolume<6> ToPBVolume(const Frustum &frustum);
 
 MATH_END_NAMESPACE

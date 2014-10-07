@@ -23,6 +23,27 @@ RANDOMIZED_TEST(PolyhedronConvexCentroid)
 	assert2(p.Contains(approximateConvexCentroid), p, approximateConvexCentroid);
 }
 
+UNIQUE_TEST(PolyhedronConvexCentroidCase)
+{
+	OBB Source, Target;
+	Source.pos = POINT_VEC(79.4365463f, 9.49199295f, 80.8106842f);
+	Source.r = DIR_VEC(0.699999988f, 2.f, 0.850000023f);
+	Source.axis[0] = DIR_VEC(0.578298271f, -0.0776693448f, -0.812119781f).Normalized();
+	Source.axis[1] = DIR_VEC(0.0360996947f, 0.996811926f, -0.0696268454f).Normalized();
+	Source.axis[2] = DIR_VEC(0.823416352f, 0.00980918481f, 0.567352891f).Normalized();
+	Target.pos = POINT_VEC(78.0123138f, 9.09825801f, 82.1548614f);
+	Target.r = DIR_VEC(0.699999988f, 2.f, 0.850000023f);
+	Target.axis[0] = DIR_VEC(-0.311279029f, 0.00630328758f, -0.950297653f).Normalized();
+	Target.axis[1] = DIR_VEC(0.0378052816f, 0.999268531f, -0.00575537002f).Normalized();
+	Target.axis[2] = DIR_VEC(0.954284727f, -0.0378111079f, -0.296496868f).Normalized();
+	PBVolume<12> intersection = Source.ToPBVolume().SetIntersection(Target.ToPBVolume());
+	Polyhedron Volume = intersection.ToPolyhedron();
+	vec c = Volume.ConvexCentroid();
+	assert(Volume.Contains(c));
+	assert(Source.Contains(c));
+	assert(Target.Contains(c));
+}
+
 RANDOMIZED_TEST(Polyhedron_intersects_itself)
 {
 	vec pt;

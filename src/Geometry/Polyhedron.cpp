@@ -234,6 +234,17 @@ vec Polyhedron::ApproximateConvexCentroid() const
 
 vec Polyhedron::ConvexCentroid() const
 {
+	if (v.size() <= 3)
+	{
+		if (v.size() == 3)
+			return (vec(v[0]) + vec(v[1]) + vec(v[2])) / 3.f;
+		else if (v.size() == 2)
+			return (vec(v[0]) + vec(v[1])) / 2.f;
+		else if (v.size() == 1)
+			return vec(v[0]);
+		else
+			return vec::nan;
+	}
 	// Since this shape is convex, the averaged position of all vertices is inside this polyhedron.
 	vec arbitraryCenterVertex = ApproximateConvexCentroid();
 
@@ -504,6 +515,17 @@ bool Polyhedron::FaceContains(int faceIndex, const vec &worldSpacePoint, float p
 
 bool Polyhedron::Contains(const vec &point) const
 {
+	if (v.size() <= 3)
+	{
+		if (v.size() == 3)
+			return Triangle(vec(v[0]), vec(v[1]), vec(v[2])).Contains(point);
+		else if (v.size() == 2)
+			return LineSegment(vec(v[0]), vec(v[1])).Contains(point);
+		else if (v.size() == 1)
+			return vec(v[0]).Equals(point);
+		else
+			return false;
+	}
 	int bestNumIntersections = 0;
 	float bestFaceContainmentDistance = 0.f;
 
