@@ -195,7 +195,7 @@ UNIQUE_TEST(Frustum_Plane_Normals_Are_Correct)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
-		PBVolume<6> pb = ToPBVolume(f);
+		PBVolume<6> pb = f.ToPBVolume();
 		vec corners[8];
 		Plane planes[6];
 		f.GetCornerPoints(corners);
@@ -479,7 +479,7 @@ RANDOMIZED_TEST(Frustum_ToPbVolume_And_Back)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum f = RandomFrustumContainingPoint(pt);
-	PBVolume<6> pbvol = ToPBVolume(f);
+	PBVolume<6> pbvol = f.ToPBVolume();
 
 	Polyhedron ph2 = f.ToPolyhedron();
 	assert(ph2.EulerFormulaHolds());
@@ -512,10 +512,10 @@ RANDOMIZED_TEST(Intersect_Two_Frustums)
 
 	// First, create two Frustums.
 	Frustum a = RandomFrustumContainingPoint(pt);
-	PBVolume<6> A = ToPBVolume(a);
+	PBVolume<6> A = a.ToPBVolume();
 
 	Frustum b = RandomFrustumContainingPoint(pt);
-	PBVolume<6> B = ToPBVolume(b);
+	PBVolume<6> B = b.ToPBVolume();
 
 	// When convex objects are represented as plane-bounded volumes, their set intersection is easy: just add
 	// up the face planes of each to the same list.

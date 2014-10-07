@@ -125,14 +125,20 @@ public:
 
 	/// Converts this AABB to a polyhedron.
 	/** This function returns a polyhedron representation of this AABB. This conversion is exact, meaning that the returned
-		polyhedron represents the same set of points than this AABB.
-		@see class Polyhedron. */
+		polyhedron represents the same set of points that this AABB does.
+		@see class Polyhedron, ToPBVolume(), ToOBB(). */
 	Polyhedron ToPolyhedron() const;
+
+	/// Converts this AABB to a PBVolume.
+	/** This function returns a plane-bounded volume representation of this AABB. The conversion is exact, meaning that the
+		returned PBVolume<6> represents exactly the same set of points that this AABB does.
+		@see ToPolyhedron(), ToOBB(). */
+	PBVolume<6> ToPBVolume() const;
 
 	/// Converts this AABB to an OBB.
 	/** This function returns an OBB representation of this AABB. This conversion is exact, meaning that the returned
 		OBB represents the same set of points than this AABB.
-		@see class OBB. */
+		@see class OBB, ToPolyhedron(), ToPBVolume(). */
 	OBB ToOBB() const;
 
 	/// Returns the smallest sphere that contains this AABB.

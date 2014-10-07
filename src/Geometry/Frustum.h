@@ -438,9 +438,15 @@ public:
 
 	/// Converts this Frustum to a Polyhedron.
 	/** This function returns a Polyhedron representation of this Frustum. This conversion is exact, meaning that the returned
-		Polyhedron represents exactly the same set of points than this Frustum.
+		Polyhedron represents exactly the same set of points that this Frustum does.
 		@see MinimalEnclosingAABB(), MinimalEnclosingOBB(). */
 	Polyhedron ToPolyhedron() const;
+
+	/// Converts this Frustum to a PBVolume.
+	/** This function returns a plane-bounded volume representation of this Frustum. The conversion is exact, meaning that the
+		returned PBVolume<6> represents exactly the same set of points that this Frustum does.
+		@see ToPolyhedron(). */
+	PBVolume<6> ToPBVolume() const;
 
 	/// Tests if the given object is fully contained inside this Frustum.
 	/** This function returns true if the given object lies inside this Frustum, and false otherwise.

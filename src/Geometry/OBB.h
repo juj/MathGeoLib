@@ -118,8 +118,15 @@ public:
 
 	/// Converts this OBB to a polyhedron.
 	/** This function returns a polyhedron representation of this OBB. This conversion is exact, meaning that the returned
-		polyhedron represents the same set of points than this OBB. */
+		polyhedron represents the same set of points that this OBB does.
+		@see MinimalEnclosingAABB(), ToPBVolume(). */
 	Polyhedron ToPolyhedron() const;
+
+	/// Converts this OBB to a PBVolume.
+	/** This function returns a plane-bounded volume representation of this OBB. The conversion is exact, meaning that the
+		returned PBVolume<6> represents exactly the same set of points that this OBB does.
+		@see MinimalEnclosingAABB(), ToPolyhedron(). */
+	PBVolume<6> ToPBVolume() const;
 
 	/// Returns the tightest AABB that contains this OBB.
 	/** This function computes the optimal minimum volume AABB that encloses this OBB.

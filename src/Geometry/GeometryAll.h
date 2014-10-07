@@ -53,3 +53,4 @@
 #include "Triangle.h"
 #include "TriangleMesh.h"
 #include "GeomType.h"
+#include "PBVolume.h"

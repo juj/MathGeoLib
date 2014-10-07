@@ -72,6 +72,9 @@ class Quat;
 class TranslateOp;
 class ScaleOp;
 
+template<int N>
+class PBVolume;
+
 class AABB;
 class Capsule;
 class Circle;

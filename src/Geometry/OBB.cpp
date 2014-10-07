@@ -36,6 +36,7 @@
 #include "../Math/float4.h"
 #include "../Math/float4x4.h"
 #include "../Math/Quat.h"
+#include "PBVolume.h"
 #include "Ray.h"
 #include "Triangle.h"
 
@@ -194,6 +195,15 @@ Polyhedron OBB::ToPolyhedron() const
 	}
 
 	return p;
+}
+
+PBVolume<6> OBB::ToPBVolume() const
+{
+	PBVolume<6> pbVolume;
+	for(int i = 0; i < 6; ++i)
+		pbVolume.p[i] = FacePlane(i);
+
+	return pbVolume;
 }
 
 AABB OBB::MinimalEnclosingAABB() const
