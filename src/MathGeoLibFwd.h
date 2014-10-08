@@ -101,6 +101,22 @@ class LCG;
 
 struct float4_storage;
 
+#define IS16ALIGNED(x) ((((uintptr_t)(x)) & 0xF) == 0)
+#define IS32ALIGNED(x) ((((uintptr_t)(x)) & 0x1F) == 0)
+#define IS64ALIGNED(x) ((((uintptr_t)(x)) & 0x3F) == 0)
+
+#ifdef MATH_SIMD
+
+#ifdef MATH_AVX
+#define ALIGN_MAT ALIGN32
+#define MAT_ALIGNMENT 32
+#define IS_MAT_ALIGNED(x) IS32ALIGNED(x)
+#else
+#define ALIGN_MAT ALIGN16
+#define MAT_ALIGNMENT 16
+#define IS_MAT_ALIGNED(x) IS16ALIGNED(x)
+#endif
+
 #ifdef _MSC_VER
 #define ALIGN16 __declspec(align(16))
 #define ALIGN32 __declspec(align(32))
@@ -109,6 +125,16 @@ struct float4_storage;
 #define ALIGN16 __attribute__((aligned(16)))
 #define ALIGN32 __attribute__((aligned(32)))
 #define ALIGN64 __attribute__((aligned(64)))
+#endif
+
+#else
+
+#define ALIGN16
+#define ALIGN32
+#define ALIGN64
+#define ALIGN_MAT
+#define IS_MAT_ALIGNED(x) true
+
 #endif
 
 #ifdef MATH_AUTOMATIC_SSE

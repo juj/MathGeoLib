@@ -28,20 +28,6 @@
 
 MATH_BEGIN_NAMESPACE
 
-#define IS16ALIGNED(x) ((((uintptr_t)(x)) & 0xF) == 0)
-#define IS32ALIGNED(x) ((((uintptr_t)(x)) & 0x1F) == 0)
-#define IS64ALIGNED(x) ((((uintptr_t)(x)) & 0x3F) == 0)
-
-#ifdef MATH_AVX
-#define ALIGN_MAT ALIGN32
-#define MAT_ALIGNMENT 32
-#define IS_MAT_ALIGNED(x) IS32ALIGNED(X)
-#else
-#define ALIGN_MAT ALIGN16
-#define MAT_ALIGNMENT 16
-#define IS_MAT_ALIGNED(x) IS16ALIGNED(X)
-#endif
-
 #ifdef MATH_SSE
 
 #define simd4f __m128
@@ -348,20 +334,6 @@ FORCE_INLINE simd4f cmov_ps(simd4f a, simd4f b, simd4f mask)
 #endif
 }
 
-MATH_END_NAMESPACE
-
-#else // ~MATH_NEON
-
-#define ALIGN16
-#define ALIGN32
-#define ALIGN64
-#define ALIGN_MAT
-#define IS_MAT_ALIGNED(x) true
-
-#endif // ~MATH_SSE/NEON
-
-#ifdef MATH_SIMD
-
 static const float andMaskOneF = ReinterpretAsFloat(0xFFFFFFFFU);
 /// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
 static const simd4f sseMaskXYZ = set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
@@ -373,4 +345,6 @@ static const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 #define abs_ps256(x) _mm256_andnot_ps(sseSignMask256, x)
 #endif
 
-#endif
+MATH_END_NAMESPACE
+
+#endif // ~MATH_SIMD
