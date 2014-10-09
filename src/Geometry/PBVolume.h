@@ -160,7 +160,7 @@ public:
 							if (vec(ph.v[m]).Equals(corner))
 							{
 								found = true;
-								pt.ptIndex = m;
+								pt.ptIndex = (int)m;
 								break;
 							}
 
