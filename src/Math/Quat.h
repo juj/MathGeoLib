@@ -107,11 +107,11 @@ public:
 	Quat(const float4 &rotationAxis, float rotationAngleRadians);
 
 	/// Returns the local +X axis in the post-transformed coordinate space. This is the same as transforming the vector (1,0,0) by this quaternion.
-	float3 WorldX() const;
+	vec WorldX() const;
 	/// Returns the local +Y axis in the post-transformed coordinate space. This is the same as transforming the vector (0,1,0) by this quaternion.
-	float3 WorldY() const;
+	vec WorldY() const;
 	/// Returns the local +Z axis in the post-transformed coordinate space. This is the same as transforming the vector (0,0,1) by this quaternion.
-	float3 WorldZ() const;
+	vec WorldZ() const;
 
 	/// Returns the axis of rotation for this quaternion.
 	float3 Axis() const;

@@ -92,30 +92,30 @@ Quat::Quat(const float4 &rotationAxis, float rotationAngle)
 	SetFromAxisAngle(rotationAxis, rotationAngle);
 }
 
-float3 Quat::WorldX() const
+vec Quat::WorldX() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return float4(quat_transform_vec4(q, float4::unitX)).xyz();
+	return FLOAT4_TO_DIR(quat_transform_vec4(q, float4::unitX));
 #else
-	return this->Transform(1.f, 0.f, 0.f);
+	return DIR_VEC(this->Transform(1.f, 0.f, 0.f));
 #endif
 }
 
-float3 Quat::WorldY() const
+vec Quat::WorldY() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return float4(quat_transform_vec4(q, float4::unitY)).xyz();
+	return FLOAT4_TO_DIR(quat_transform_vec4(q, float4::unitY));
 #else
-	return this->Transform(0.f, 1.f, 0.f);
+	return DIR_VEC(this->Transform(0.f, 1.f, 0.f));
 #endif
 }
 
-float3 Quat::WorldZ() const
+vec Quat::WorldZ() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return float4(quat_transform_vec4(q, float4::unitZ)).xyz();
+	return FLOAT4_TO_DIR(quat_transform_vec4(q, float4::unitZ));
 #else
-	return this->Transform(0.f, 0.f, 1.f);
+	return DIR_VEC(this->Transform(0.f, 0.f, 1.f));
 #endif
 }
 
@@ -442,6 +442,9 @@ void Quat::ToAxisAngle(float3 &axis, float &angle) const
 
 void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	SetFromAxisAngle(load_vec3(axis.ptr(), 0.f), angle);
+#else
 	assume1(axis.IsNormalized(), axis);
 	assume1(MATH_NS::IsFinite(angle), angle);
 	float sinz, cosz;
@@ -450,6 +453,7 @@ void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 	y = axis.y * sinz;
 	z = axis.z * sinz;
 	w = cosz;
+#endif
 }
 
 void Quat::SetFromAxisAngle(const float4 &axis, float angle)
