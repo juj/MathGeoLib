@@ -73,6 +73,11 @@ Quat::Quat(const float3 &rotationAxis, float rotationAngle)
 	SetFromAxisAngle(rotationAxis, rotationAngle);
 }
 
+Quat::Quat(const float4 &rotationAxis, float rotationAngle)
+{
+	SetFromAxisAngle(rotationAxis, rotationAngle);
+}
+
 float3 Quat::WorldX() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
@@ -425,8 +430,21 @@ void Quat::ToAxisAngle(float3 &axis, float &angle) const
 
 void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 {
-	assume(axis.IsNormalized());
-	assume(MATH_NS::IsFinite(angle));
+	assume1(axis.IsNormalized(), axis);
+	assume1(MATH_NS::IsFinite(angle), angle);
+	float sinz, cosz;
+	SinCos(angle*0.5f, sinz, cosz);
+	x = axis.x * sinz;
+	y = axis.y * sinz;
+	z = axis.z * sinz;
+	w = cosz;
+}
+
+void Quat::SetFromAxisAngle(const float4 &axis, float angle)
+{
+	assume1(EqualAbs(axis.w, 0.f), axis);
+	assume1(axis.IsNormalized(), axis);
+	assume1(MATH_NS::IsFinite(angle), angle);
 	float sinz, cosz;
 	SinCos(angle*0.5f, sinz, cosz);
 	x = axis.x * sinz;
@@ -560,14 +578,47 @@ Quat MUST_USE_RESULT Quat::RotateFromTo(const float3 &sourceDirection, const flo
 {
 	assume(sourceDirection.IsNormalized());
 	assume(targetDirection.IsNormalized());
-	float angle = sourceDirection.AngleBetweenNorm(targetDirection);
-	assume(angle >= 0.f);
 	// If sourceDirection == targetDirection, the cross product comes out zero, and normalization would fail. In that case, pick an arbitrary axis.
 	float3 axis = sourceDirection.Cross(targetDirection);
 	float oldLength = axis.Normalize();
-	if (oldLength == 0)
-		axis = float3(1, 0, 0);
-	return Quat(axis, angle);
+	if (oldLength != 0.f)
+	{
+		float halfCosAngle = 0.5f*sourceDirection.Dot(targetDirection);
+		float cosHalfAngle = Sqrt(0.5f + halfCosAngle);
+		float sinHalfAngle = Sqrt(0.5f - halfCosAngle);
+		return Quat(axis.x * sinHalfAngle, axis.y * sinHalfAngle, axis.z * sinHalfAngle, cosHalfAngle);
+	}
+	else
+		return Quat(1.f, 0.f, 0.f, 0.f);
+
+}
+
+Quat MUST_USE_RESULT Quat::RotateFromTo(const float4 &sourceDirection, const float4 &targetDirection)
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 12.289 nsecs / 33.144 ticks, Avg: 12.489 nsecs, Worst: 14.210 nsecs
+	simd4f cosAngle = dot4_ps(sourceDirection.v, targetDirection.v);
+	cosAngle = negate3_ps(cosAngle); // [+ - - -]
+	// XYZ channels use the trigonometric formula sin(x/2) = +/-sqrt(0.5-0.5*cosx))
+	// The W channel uses the trigonometric formula cos(x/2) = +/-sqrt(0.5+0.5*cosx))
+	simd4f half = set1_ps(0.5f);
+	simd4f cosSinHalfAngle = sqrt_ps(add_ps(half, mul_ps(half, cosAngle))); // [cos(x/2), sin(x/2), sin(x/2), sin(x/2)]
+	simd4f axis = cross_ps(sourceDirection.v, targetDirection.v);
+	simd4f recipLen = rsqrt_ps(dot4_ps(axis, axis));
+	axis = mul_ps(axis, recipLen); // [0 z y x]
+	// Set the w component to one.
+	simd4f one = add_ps(half, half); // [1 1 1 1]
+	simd4f highPart = _mm_unpackhi_ps(axis, one); // [_ _ 1 z]
+	axis = _mm_movelh_ps(axis, highPart); // [1 z y x]
+	Quat q;
+	q.q = mul_ps(axis, cosSinHalfAngle);
+	return q;
+#else
+	// Best: 19.970 nsecs / 53.632 ticks, Avg: 20.197 nsecs, Worst: 21.122 nsecs
+	assume(EqualAbs(sourceDirection.w, 0.f));
+	assume(EqualAbs(targetDirection.w, 0.f));
+	return Quat::RotateFromTo(sourceDirection.xyz(), targetDirection.xyz());
+#endif
 }
 
 Quat MUST_USE_RESULT Quat::RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection,
@@ -794,8 +845,10 @@ Quat Quat::operator /(float scalar) const
 Quat Quat::operator *(const Quat &r) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 3.456 nsecs / 9.752 ticks, Avg: 3.721 nsecs, Worst: 3.840 nsecs
 	return quat_mul_quat(q, r.q);
 #else
+	// Best: 12.289 nsecs / 33.216 ticks, Avg: 12.585 nsecs, Worst: 13.442 nsecs
 	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
 	           -x*r.z + y*r.w + z*r.x + w*r.y,
 	            x*r.y - y*r.x + z*r.w + w*r.z,

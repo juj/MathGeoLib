@@ -94,6 +94,12 @@ BENCHMARK(Quat_Lerp, "Quat::Lerp")
 }
 BENCHMARK_END
 
+BENCHMARK(Quat_RotateFromTo, "Quat::RotateFromTo")
+{
+	q2[i] = Quat::RotateFromTo(nv[i], nv2[i]);
+}
+BENCHMARK_END
+
 #ifdef MATH_SIMD
 BENCHMARK(quat_mul_quat, "test against Quat_op_mul_Quat")
 {
@@ -116,6 +122,24 @@ RANDOMIZED_TEST(quat_mul_quat)
 	Quat correct = q * q2;
 	Quat q3 = quat_mul_quat(q.q, q2.q);
 	assert(q3.Equals(correct));
+}
+
+RANDOMIZED_TEST(Quat_RotateFromTo_float3)
+{
+	float3 v = float3::RandomDir(rng);
+	float3 v2 = float3::RandomDir(rng);
+	Quat rot = Quat::RotateFromTo(v, v2);
+	float3 v2_ = rot * v;
+	assert2(v2.Equals(v2_), v2, v2_);
+}
+
+RANDOMIZED_TEST(Quat_RotateFromTo_float4)
+{
+	float4 v = float4::RandomDir(rng);
+	float4 v2 = float4::RandomDir(rng);
+	Quat rot = Quat::RotateFromTo(v, v2);
+	float4 v2_ = rot * v;
+	assert2(v2.Equals(v2_), v2, v2_);
 }
 
 #ifdef ANDROID

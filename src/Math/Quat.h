@@ -100,10 +100,11 @@ public:
 
 	/// Constructs this quaternion by specifying a rotation axis and the amount of rotation to be performed
 	/// about that axis.
-	/** @param rotationAxis The normalized rotation axis to rotate about.
+	/** @param rotationAxis The normalized rotation axis to rotate about. If using the float4 version of the constructor, the w component of this vector must be 0.
 		@param rotationAngleRadians The angle to rotate by, in radians. For example, Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
 		@see DegToRad(). */
 	Quat(const float3 &rotationAxis, float rotationAngleRadians);
+	Quat(const float4 &rotationAxis, float rotationAngleRadians);
 
 	/// Returns the local +X axis in the post-transformed coordinate space. This is the same as transforming the vector (1,0,0) by this quaternion.
 	float3 WorldX() const;
@@ -216,9 +217,11 @@ public:
 	/// @param rotationAngleRadians [out] Receives the angle of rotation around the given axis. This parameter is returned in the range [0, 2pi].
 	void ToAxisAngle(float3 &rotationAxis, float &rotationAngleRadians) const;
 	/// Sets this quaternion by specifying the axis about which the rotation is performed, and the angle of rotation.
-	/// @param rotationAxis The axis of rotation. This vector must be normalized to call this function.
-	/// @param rotationAngleRadians The angle of rotation in radians.
+	/** @param rotationAxis The axis of rotation. This vector must be normalized to call this function. If using the float4 version of this function, 
+		then the w component must be zero.
+		@param rotationAngleRadians The angle of rotation in radians. */
 	void SetFromAxisAngle(const float3 &rotationAxis, float rotationAngleRadians);
+	void SetFromAxisAngle(const float4 &rotationAxis, float rotationAngleRadians);
 
 	/// Sets this quaternion to represent the same rotation as the given matrix.
 	void Set(const float3x3 &matrix);
@@ -274,6 +277,7 @@ public:
 	/// @note There are multiple such rotations - this function returns the rotation that has the shortest angle
 	/// (when decomposed to axis-angle notation).
 	static MUST_USE_RESULT Quat RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
+	static MUST_USE_RESULT Quat RotateFromTo(const float4 &sourceDirection, const float4 &targetDirection);
 
 	/// Creates a new quaternion that
 	/// 1. rotates sourceDirection vector to coincide with the targetDirection vector, and then
