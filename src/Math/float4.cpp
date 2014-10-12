@@ -1038,12 +1038,22 @@ bool MUST_USE_RESULT float4::AreOrthonormal(const float4 &a, const float4 &b, co
 
 float4 float4::FromScalar(float scalar)
 {
+#ifdef MATH_AUTOMATIC_SSE
+	return set1_ps(scalar);
+#else
 	return float4(scalar, scalar, scalar, scalar);
+#endif
 }
 
-float4 float4::FromScalar(float scalar, float w)
+float4 float4::FromScalar(float scalar, float w_)
 {
-	return float4(scalar, scalar, scalar, w);
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	simd4f s = set1_ps(scalar);
+	simd4f highPart = _mm_unpacklo_ps(s, _mm_set_ss(w_)); // [_ _ w s]
+	return _mm_movelh_ps(s, highPart); // [w s s s]
+#else
+	return float4(scalar, scalar, scalar, w_);
+#endif
 }
 
 void float4::SetFromScalar(float scalar)
