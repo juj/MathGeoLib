@@ -807,7 +807,7 @@ i x j == -(j x i) == k,
 float4 float4::Cross3(const float3 &rhs) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return float4(cross_ps(v, float4(rhs, 0.f).v));
+	return float4(cross_ps(v, load_vec3(rhs.ptr(), 0.f)));
 #else
 	float4 dst;
 	dst.x = y * rhs.z - z * rhs.y;
