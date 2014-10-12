@@ -546,10 +546,14 @@ void Quat::Set(const float4x4 &m)
 
 void Quat::Set(float x_, float y_, float z_, float w_)
 {
+#ifdef MATH_AUTOMATIC_SSE
+	q = set_ps(w_, z_, y_, x_);
+#else
 	x = x_;
 	y = y_;
 	z = z_;
 	w = w_;
+#endif
 }
 
 Quat MUST_USE_RESULT Quat::LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp)
