@@ -1075,7 +1075,7 @@ void float4::SetFromScalar(float scalar, float w_)
 #ifdef MATH_AUTOMATIC_SSE
 #ifdef MATH_SSE
 	simd4f s = set1_ps(scalar);
-	simd4f highPart = _mm_unpackhi_ps(s, _mm_set_ss(w_)); // [_ _ w s]
+	simd4f highPart = _mm_unpacklo_ps(s, _mm_set_ss(w_)); // [_ _ w s]
 	v = _mm_movelh_ps(s, highPart); // [w s s s]
 #else
 	v = set_ps(w_, scalar, scalar, scalar);
