@@ -445,12 +445,22 @@ void Quat::SetFromAxisAngle(const float4 &axis, float angle)
 	assume1(EqualAbs(axis.w, 0.f), axis);
 	assume1(axis.IsNormalized(), axis);
 	assume1(MATH_NS::IsFinite(angle), angle);
-	float sinz, cosz;
-	SinCos(angle*0.5f, sinz, cosz);
-	x = axis.x * sinz;
-	y = axis.y * sinz;
-	z = axis.z * sinz;
-	w = cosz;
+
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 26.499 nsecs / 71.024 ticks, Avg: 26.856 nsecs, Worst: 27.651 nsecs
+	simd4f half = set1_ps(0.5f);
+	simd4f halfAngle = mul_ps(set1_ps(angle), half);
+	simd4f sinAngle, cosAngle;
+	sincos_ps(halfAngle, &sinAngle, &cosAngle);
+	simd4f quat = mul_ps(axis, sinAngle);
+
+	// Set the w component to cosAngle.
+	simd4f highPart = _mm_unpackhi_ps(quat, cosAngle); // [_ _ 1 z]
+	q = _mm_movelh_ps(quat, highPart); // [1 z y x]
+#else
+	// Best: 36.868 nsecs / 98.312 ticks, Avg: 36.980 nsecs, Worst: 41.477 nsecs
+	SetFromAxisAngle(axis.xyz(), angle);
+#endif
 }
 
 /// See Schneider, Eberly. Geometric Tools for Computer Graphics, p. 861.

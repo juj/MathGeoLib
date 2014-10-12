@@ -26,6 +26,12 @@ BENCHMARK(Quat_Transform_float4, "Quat::Transform(float4)")
 }
 BENCHMARK_END;
 
+BENCHMARK(Quat_SetFromAxisAngle_float4, "Quat::SetFromAxisAngle(float4,float)")
+{
+	q2[i].SetFromAxisAngle(nv[i], f[i]);
+}
+BENCHMARK_END;
+
 BENCHMARK(Quat_to_float4x4, "Quat::ToFloat4x4")
 {
 	m[i] = q[i].ToFloat4x4();
@@ -37,6 +43,17 @@ BENCHMARK(Quat_Slerp, "Quat::Slerp")
 	q2[i] = q[i].Slerp(q2[i], uf[i]);
 }
 BENCHMARK_END;
+
+RANDOMIZED_TEST(Quat_SetFromAxisAngle)
+{
+	float3 axis = float3::RandomDir(rng);
+	float4 axis4(axis, 0.f);
+	float f = rng.Float(-10000.f, 10000.f);
+	Quat q, q2;
+	q.SetFromAxisAngle(axis, f);
+	q2.SetFromAxisAngle(axis4, f);
+	assert2(q.Equals(q2), q, q2);
+}
 
 RANDOMIZED_TEST(Quat_Transform)
 {
