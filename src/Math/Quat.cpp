@@ -369,20 +369,36 @@ float3 MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 
 void Quat::ToAxisAngle(float3 &axis, float &angle) const
 {
-	angle = Acos(w) * 2.f;
-	float sinz = Sin(angle * 0.5f);
-	if (MATH_NS::Abs(sinz) > 1e-4f)
-	{
-		sinz = 1.f / sinz;
-		axis = float3(x * sinz, y * sinz, z * sinz);
-	}
-	else
-	{
-		// The quaternion does not produce any rotation. Still, explicitly
-		// set the axis so that the user gets a valid normalized vector back.
-		angle = 0.f;
-		axis = float3(1.f, 0.f, 0.f);
-	}
+	// Best: 36.868 nsecs / 98.752 ticks, Avg: 37.095 nsecs, Worst: 37.636 nsecs
+	assume2(this->IsNormalized(), *this, this->Length());
+	float halfAngle = Acos(w);
+	angle = halfAngle * 2.f;
+	// Convert cos to sin via the identity sin^2 + cos^2 = 1, and fuse reciprocal and square root to the same instruction,
+	// since we are about to divide by it.
+	float rcpSinAngle = RSqrt(1.f - w*w);
+	axis.x = x * rcpSinAngle;
+	axis.y = y * rcpSinAngle;
+	axis.z = z * rcpSinAngle;
+}
+
+void Quat::ToAxisAngle(float4 &axis, float &angle) const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 35.332 nsecs / 94.328 ticks, Avg: 35.870 nsecs, Worst: 57.607 nsecs
+	assume2(this->IsNormalized(), *this, this->Length());
+	simd4f cosAngle = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 3));
+	simd4f rcpSinAngle = rsqrt_ps(sub_ps(set1_ps(1.f), mul_ps(cosAngle, cosAngle)));
+	angle = Acos(s4f_x(cosAngle)) * 2.f;
+	simd4f a = mul_ps(q, rcpSinAngle);
+
+	// Set the w component to zero.
+	simd4f highPart = _mm_unpackhi_ps(a, zero_ps()); // [_ _ 0 z]
+	axis.v = _mm_movelh_ps(a, highPart); // [0 z y x]
+#else
+	// Best: 85.258 nsecs / 227.656 ticks, Avg: 85.492 nsecs, Worst: 86.410 nsecs
+	ToAxisAngle(reinterpret_cast<float3&>(axis), angle);
+	axis.w = 0.f;
+#endif
 }
 
 void Quat::SetFromAxisAngle(const float3 &axis, float angle)
@@ -404,7 +420,7 @@ void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 void Quat::SetFromAxisAngle(const float4 &axis, float angle)
 {
 	assume1(EqualAbs(axis.w, 0.f), axis);
-	assume1(axis.IsNormalized(), axis);
+	assume2(axis.IsNormalized(1e-4f), axis, axis.Length4());
 	assume1(MATH_NS::IsFinite(angle), angle);
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)

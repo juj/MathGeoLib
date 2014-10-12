@@ -32,6 +32,18 @@ BENCHMARK(Quat_SetFromAxisAngle_float4, "Quat::SetFromAxisAngle(float4,float)")
 }
 BENCHMARK_END;
 
+BENCHMARK(Quat_ToAxisAngle_float3, "Quat::ToAxisAngle(float3,float)")
+{
+	q2[i].ToAxisAngle(*(float3*)&v3[i], f[i]);
+}
+BENCHMARK_END;
+
+BENCHMARK(Quat_ToAxisAngle_float4, "Quat::ToAxisAngle(float4,float)")
+{
+	q2[i].ToAxisAngle(v3[i], f[i]);
+}
+BENCHMARK_END;
+
 BENCHMARK(Quat_to_float4x4, "Quat::ToFloat4x4")
 {
 	m[i] = q[i].ToFloat4x4();
@@ -139,6 +151,28 @@ RANDOMIZED_TEST(quat_mul_quat)
 	Quat correct = q * q2;
 	Quat q3 = quat_mul_quat(q.q, q2.q);
 	assert(q3.Equals(correct));
+}
+
+RANDOMIZED_TEST(Quat_ToAxisAngle_float3)
+{
+	Quat q = Quat::RandomRotation(rng);
+	float3 axis;
+	float angle;
+	q.ToAxisAngle(axis, angle);
+	Quat q2;
+	q2.SetFromAxisAngle(axis, angle);
+	assert(q.Equals(q2));
+}
+
+RANDOMIZED_TEST(Quat_ToAxisAngle_float4)
+{
+	Quat q = Quat::RandomRotation(rng);
+	float4 axis;
+	float angle;
+	q.ToAxisAngle(axis, angle);
+	Quat q2;
+	q2.SetFromAxisAngle(axis, angle);
+	assert(q.Equals(q2));
 }
 
 RANDOMIZED_TEST(Quat_RotateFromTo_float3)
