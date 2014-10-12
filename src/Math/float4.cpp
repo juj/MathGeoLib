@@ -130,16 +130,6 @@ float4::float4(const float *data)
 #endif
 }
 
-float *float4::ptr()
-{
-	return &x;
-}
-
-const float *float4::ptr() const
-{
-	return &x;
-}
-
 CONST_WIN32 float float4::At(int index) const
 {
 	assume(index >= 0);

@@ -57,16 +57,6 @@ float2::float2(const float *data)
 	y = data[1];
 }
 
-float *float2::ptr()
-{
-	return &x;
-}
-
-const float *float2::ptr() const
-{
-	return &x;
-}
-
 CONST_WIN32 float float2::At(int index) const
 {
 	assume(index >= 0);

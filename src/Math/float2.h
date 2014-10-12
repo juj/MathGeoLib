@@ -88,8 +88,8 @@ public:
 			or the At() function to access the elements of this vector by index.
 		@return A pointer to the first float element of this class. The data is contiguous in memory.
 		@see operator [](), At(). */
-	float *ptr();
-	const float *ptr() const;
+	FORCE_INLINE float *ptr() { return &x; }
+	FORCE_INLINE const float *ptr() const { return &x; }
 
 	/// Accesses an element of this vector using array notation.
 	/** @param index The element to get. Pass in 0 for x and 1 for y.

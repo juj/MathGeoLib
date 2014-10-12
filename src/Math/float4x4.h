@@ -430,9 +430,8 @@ public:
 	/// @return A pointer to the upper-left element. The data is contiguous in memory.
 	/// ptr[0] gives the element [0][0], ptr[1] is [0][1], ptr[2] is [0][2].
 	/// ptr[4] == [1][0], ptr[5] == [1][1], ..., and finally, ptr[15] == [3][3].
-	float *ptr();
-	/// @return A pointer to the upper-left element . The data is contiguous in memory.
-	const float *ptr() const;
+	FORCE_INLINE float *ptr() { return &v[0][0]; }
+	FORCE_INLINE const float *ptr() const { return &v[0][0]; }
 
 	/// Sets the three first elements of the given row. The fourth element is left unchanged.
 	/** @param row The index of the row to set, in the range [0-3].

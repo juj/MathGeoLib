@@ -68,16 +68,6 @@ float3::float3(const float *data)
 	z = data[2];
 }
 
-float *float3::ptr()
-{
-	return &x;
-}
-
-const float *float3::ptr() const
-{
-	return &x;
-}
-
 CONST_WIN32 float float3::At(int index) const
 {
 	assume(index >= 0);

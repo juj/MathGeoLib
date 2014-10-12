@@ -804,16 +804,6 @@ float3 float4x4::WorldZ() const
 	return Col3(2);
 }
 
-float *float4x4::ptr()
-{
-	return reinterpret_cast<float *>(v);
-}
-
-const float *float4x4::ptr() const
-{
-	return reinterpret_cast<const float *>(v);
-}
-
 void float4x4::SetRow3(int row, const float3 &rowVector)
 {
 	SetRow3(row, rowVector.x, rowVector.y, rowVector.z);

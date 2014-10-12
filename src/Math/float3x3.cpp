@@ -444,16 +444,6 @@ float3 float3x3::WorldZ() const
 	return Col(2);
 }
 
-float *float3x3::ptr()
-{
-	return &v[0][0];
-}
-
-const float *float3x3::ptr() const
-{
-	return &v[0][0];
-}
-
 void float3x3::SetRow(int row, float x, float y, float z)
 {
 	assume(row >= 0);
