@@ -57,21 +57,6 @@ Quat::Quat(const float *data)
 #endif
 }
 
-Quat::Quat(const float3x3 &rotationMatrix)
-{
-	Set(rotationMatrix);
-}
-
-Quat::Quat(const float3x4 &rotationMatrix)
-{
-	Set(rotationMatrix);
-}
-
-Quat::Quat(const float4x4 &rotationMatrix)
-{
-	Set(rotationMatrix);
-}
-
 Quat::Quat(float x_, float y_, float z_, float w_)
 #if !defined(MATH_AUTOMATIC_SSE)
 :x(x_), y(y_), z(z_), w(w_)
@@ -80,16 +65,6 @@ Quat::Quat(float x_, float y_, float z_, float w_)
 #if defined(MATH_AUTOMATIC_SSE)
 	q = set_ps(w_, z_, y_, x_);
 #endif
-}
-
-Quat::Quat(const float3 &rotationAxis, float rotationAngle)
-{
-	SetFromAxisAngle(rotationAxis, rotationAngle);
-}
-
-Quat::Quat(const float4 &rotationAxis, float rotationAngle)
-{
-	SetFromAxisAngle(rotationAxis, rotationAngle);
 }
 
 vec Quat::WorldX() const
@@ -222,16 +197,6 @@ bool Quat::BitEquals(const Quat &other) const
 		ReinterpretAsU32(w) == ReinterpretAsU32(other.w);
 }
 
-float *Quat::ptr()
-{
-	return &x;
-}
-
-const float *Quat::ptr() const
-{
-	return &x;
-}
-
 void Quat::Inverse()
 {
 	assume(IsNormalized());
@@ -315,11 +280,6 @@ Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 #endif
 }
 
-Quat MUST_USE_RESULT Quat::Lerp(const Quat &a, const Quat &b, float t)
-{
-	return a.Lerp(b, t);
-}
-
 /** Implementation based on the math in the book Watt, Policarpo. 3D Games: Real-time rendering and Software Technology, pp. 383-386. */
 Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 {
@@ -366,21 +326,6 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 	}
 	
 	return (*this * (a * sign) + q2 * b).Normalized();
-}
-
-Quat MUST_USE_RESULT Quat::Slerp(const Quat &a, const Quat &b, float t)
-{
-	return a.Slerp(b, t);
-}
-
-Quat Lerp(const Quat &a, const Quat &b, float t)
-{
-	return a.Lerp(b, t);
-}
-
-Quat Slerp(const Quat &a, const Quat &b, float t)
-{
-	return a.Slerp(b, t);
 }
 
 float3 MUST_USE_RESULT Quat::SlerpVector(const float3 &from, const float3 &to, float t)

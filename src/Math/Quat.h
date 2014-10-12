@@ -87,9 +87,9 @@ public:
 	/// @note The input data is not normalized after construction, this has to be done manually.
 	explicit Quat(const float *data);
 
-	explicit Quat(const float3x3 &rotationMatrix);
-	explicit Quat(const float3x4 &rotationMatrix);
-	explicit Quat(const float4x4 &rotationMatrix);
+	explicit Quat(const float3x3 &rotationMatrix) { Set(rotationMatrix); }
+	explicit Quat(const float3x4 &rotationMatrix) { Set(rotationMatrix); }
+	explicit Quat(const float4x4 &rotationMatrix) { Set(rotationMatrix); }
 
 	/// @param x The factor of i.
 	/// @param y The factor of j.
@@ -103,8 +103,8 @@ public:
 	/** @param rotationAxis The normalized rotation axis to rotate about. If using the float4 version of the constructor, the w component of this vector must be 0.
 		@param rotationAngleRadians The angle to rotate by, in radians. For example, Pi/4.f equals to 45 degrees, Pi/2.f is 90 degrees, and Pi is 180 degrees.
 		@see DegToRad(). */
-	Quat(const float3 &rotationAxis, float rotationAngleRadians);
-	Quat(const float4 &rotationAxis, float rotationAngleRadians);
+	Quat(const float3 &rotationAxis, float rotationAngleRadians) { SetFromAxisAngle(rotationAxis, rotationAngleRadians); }
+	Quat(const float4 &rotationAxis, float rotationAngleRadians) { SetFromAxisAngle(rotationAxis, rotationAngleRadians); }
 
 	/// Returns the local +X axis in the post-transformed coordinate space. This is the same as transforming the vector (1,0,0) by this quaternion.
 	vec WorldX() const;
@@ -151,8 +151,8 @@ public:
 
 	/// @return A pointer to the first element (x). The data is contiguous in memory.
 	/// ptr[0] gives x, ptr[1] is y, ptr[2] is z and ptr[3] is w.
-	float *ptr();
-	const float *ptr() const;
+	FORCE_INLINE float *ptr() { return &x; }
+	FORCE_INLINE const float *ptr() const { return &x; }
 
 	/// Inverses this quaternion in-place.
 	/// @note For optimization purposes, this function assumes that the quaternion is unitary, in which
@@ -184,9 +184,9 @@ public:
 	MUST_USE_RESULT float4 Transform(const float4 &vec) const;
 
 	MUST_USE_RESULT Quat Lerp(const Quat &target, float t) const;
-	static MUST_USE_RESULT Quat Lerp(const Quat &source, const Quat &target, float t);
+	static FORCE_INLINE MUST_USE_RESULT Quat Lerp(const Quat &source, const Quat &target, float t) { return source.Lerp(target, t); }
 	MUST_USE_RESULT Quat Slerp(const Quat &target, float t) const;
-	static MUST_USE_RESULT Quat Slerp(const Quat &source, const Quat &target, float t);
+	static FORCE_INLINE MUST_USE_RESULT Quat Slerp(const Quat &source, const Quat &target, float t) { return source.Slerp(target, t); }
 
 	/// Returns the 'from' vector rotated towards the 'to' vector by the given normalized time parameter.
 	/** This function slerps the given 'from' vector towards the 'to' vector.
@@ -449,8 +449,8 @@ private: // Hide the unsafe operations from the user, so that he doesn't acciden
 std::ostream &operator <<(std::ostream &out, const Quat &rhs);
 #endif
 
-Quat Lerp(const Quat &a, const Quat &b, float t);
-Quat Slerp(const Quat &a, const Quat &b, float t);
+FORCE_INLINE Quat Lerp(const Quat &a, const Quat &b, float t) { return a.Lerp(b, t); }
+FORCE_INLINE Quat Slerp(const Quat &a, const Quat &b, float t) { return a.Slerp(b, t); }
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(Quat)
