@@ -40,38 +40,77 @@ MATH_BEGIN_NAMESPACE
 using namespace std;
 
 float4::float4(float x_, float y_, float z_, float w_)
+#if !defined(MATH_AUTOMATIC_SSE)
+	// Best: 8.449 nsecs / 23.376 ticks, Avg: 8.837 nsecs, Worst: 9.601 nsecs
 :x(x_), y(y_), z(z_), w(w_)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	// Best: 1.536 nsecs / 4.2 ticks, Avg: 1.609 nsecs, Worst: 1.920 nsecs
+	v = set_ps(w_, z_, y_, x_);
+#endif
 }
 
 float4::float4(const float3 &xyz, float w_)
+#if !defined(MATH_AUTOMATIC_SSE) || !defined(MATH_SSE)
+// Best: 5.761 nsecs / 15.872 ticks, Avg: 6.237 nsecs, Worst: 7.681 nsecs
 :x(xyz.x), y(xyz.y), z(xyz.z), w(w_)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 1.536 nsecs / 4.032 ticks, Avg: 1.540 nsecs, Worst: 1.920 nsecs
+	v = load_vec3(xyz.ptr(), w_);
+#endif
 }
 
 float4::float4(float x_, float y_, const float2 &zw)
+#if !defined(MATH_AUTOMATIC_SSE)
 :x(x_), y(y_), z(zw.x), w(zw.y)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	v = set_ps(zw.y, zw.x, y_, x_);
+#endif
 }
 
 float4::float4(float x_, const float2 &yz, float w_)
+#if !defined(MATH_AUTOMATIC_SSE)
 :x(x_), y(yz.x), z(yz.y), w(w_)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	v = set_ps(w_, yz.y, yz.x, x_);
+#endif
 }
 
 float4::float4(float x_, const float3 &yzw)
+#if !defined(MATH_AUTOMATIC_SSE)
 :x(x_), y(yzw.x), z(yzw.y), w(yzw.z)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	v = set_ps(yzw.z, yzw.y, yzw.x, x_);
+#endif
 }
 
 float4::float4(const float2 &xy, float z_, float w_)
+#if !defined(MATH_AUTOMATIC_SSE)
 :x(xy.x), y(xy.y), z(z_), w(w_)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	v = set_ps(w_, z_, xy.y, xy.x);
+#endif
 }
 
 float4::float4(const float2 &xy, const float2 &zw)
+#if !defined(MATH_AUTOMATIC_SSE)
 :x(xy.x), y(xy.y), z(zw.x), w(zw.y)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	v = set_ps(zw.y, zw.x, xy.y, xy.x);
+#endif
 }
 
 float4::float4(const float *data)
@@ -81,10 +120,14 @@ float4::float4(const float *data)
 	if (!data)
 		return;
 #endif
+#if defined(MATH_AUTOMATIC_SSE)
+	v = loadu_ps(data);
+#else
 	x = data[0];
 	y = data[1];
 	z = data[2];
 	w = data[3];
+#endif
 }
 
 float *float4::ptr()

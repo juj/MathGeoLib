@@ -500,4 +500,59 @@ BENCHMARK(float4_Normalize4_Fast_SSE, "test against float4_Normalize4")
 }
 BENCHMARK_END;
 
+BENCHMARK(load_vec3, "load_vec3")
+{
+	// Best: 1.536 nsecs / 4.032 ticks, Avg: 1.544 nsecs, Worst: 1.920 nsecs
+	v[i] = load_vec3(v2[i].ptr(), 1.f);
+}
+BENCHMARK_END;
+
+BENCHMARK(load_vec3_scalar, "load_vec3_scalar")
+{
+	// Best: 5.761 nsecs / 15.536 ticks, Avg: 5.930 nsecs, Worst: 8.833 nsecs
+	const float *ptr = v2[i].ptr();
+	v[i] = float4(ptr[2], ptr[0], ptr[1], 1.f);
+}
+BENCHMARK_END;
+
+BENCHMARK(vec4_set_scalar, "vec4_set_scalar")
+{
+	const float *ptr = v2[i].ptr();
+	v[i] = float4(ptr[3], ptr[0], ptr[4], ptr[2]);
+	v[i].v = mul_ps(v[i].v, v[i].v);
+}
+BENCHMARK_END;
+
+#ifdef MATH_SSE
+BENCHMARK(vec4_set_simd, "vec4_set_simd")
+{
+	const float *ptr = v2[i].ptr();
+	simd4f x = _mm_set_ss(ptr[3]);
+	simd4f y = _mm_set_ss(ptr[0]);
+	simd4f z = _mm_set_ss(ptr[4]);
+	simd4f w = _mm_set_ss(ptr[2]);
+	simd4f xy = _mm_unpacklo_ps(x, y);
+	simd4f zw = _mm_unpacklo_ps(z, w);
+	simd4f xyzw = _mm_movelh_ps(xy, zw);
+	v[i].v = mul_ps(xyzw, xyzw);
+}
+BENCHMARK_END;
+#endif
+
+BENCHMARK(vec4_set_simd_2, "vec4_set_simd_2")
+{
+	const float *ptr = v2[i].ptr();
+	simd4f xyzw = set_ps(ptr[3], ptr[0], ptr[4], ptr[2]);
+	v[i].v = mul_ps(xyzw, xyzw);
+}
+BENCHMARK_END;
+
+BENCHMARK(load_vec3_xyz, "load_vec3_xyz")
+{
+	// Best: 5.761 nsecs / 15.496 ticks, Avg: 6.122 nsecs, Worst: 6.529 nsecs
+	const float3 &f3 = reinterpret_cast<const float3&>(v2[i]);
+	v[i] = float4(f3, 1.f);
+}
+BENCHMARK_END;
+
 #endif

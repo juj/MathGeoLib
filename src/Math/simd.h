@@ -58,6 +58,14 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define load1_ps _mm_load1_ps
 #define stream_ps _mm_stream_ps
 
+static inline __m128 load_vec3(const float *ptr, float w)
+{
+	__m128 low = _mm_loadl_pi(_mm_setzero_ps(), (const __m64*)ptr); // [_ _ y x]
+	__m128 high = _mm_load_ss(ptr + 2); // [_ _ _ z]
+	high = _mm_unpacklo_ps(high, _mm_set_ss(w)); // [_ _ w z]
+	return _mm_movelh_ps(low, high);
+}
+
 // Note: Unlike SSE1 _mm_rcp_ps, which has a measured relative error of 3e-4f, the
 //       rcp_ps function is more precise, and has a measured relative error of 7e-6f.
 static inline __m128 rcp_ps(__m128 x)

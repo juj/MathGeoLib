@@ -92,7 +92,9 @@ public:
 #endif
 
 	/// Constructs a new float4 with the value (x, y, z, w).
-	/** @see x, y, z, w. */
+	/** @note If you are constructing a float4 from an array of consecutive values, always prefer calling "float4(ptr);" instead of "float4(ptr[0], ptr[1], ptr[2], ptr[3]);"
+			because there is a considerable SIMD performance benefit in the first form.
+		@see x, y, z, w. */
 	float4(float x, float y, float z, float w);
 
 	/// Constructs a new float3 with the value (xyz.x, xyz.y, xyz.z, w).
