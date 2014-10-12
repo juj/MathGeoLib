@@ -41,11 +41,20 @@
 MATH_BEGIN_NAMESPACE
 
 Quat::Quat(const float *data)
-:x(data[0]),
-y(data[1]),
-z(data[2]),
-w(data[3])
 {
+	assume(data);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (!data)
+		return;
+#endif
+#if defined(MATH_AUTOMATIC_SSE)
+	q = loadu_ps(data);
+#else
+	x = data[0];
+	y = data[1];
+	z = data[2];
+	w = data[3];
+#endif
 }
 
 Quat::Quat(const float3x3 &rotationMatrix)
@@ -64,8 +73,13 @@ Quat::Quat(const float4x4 &rotationMatrix)
 }
 
 Quat::Quat(float x_, float y_, float z_, float w_)
+#if !defined(MATH_AUTOMATIC_SSE)
 :x(x_), y(y_), z(z_), w(w_)
+#endif
 {
+#if defined(MATH_AUTOMATIC_SSE)
+	q = set_ps(w_, z_, y_, x_);
+#endif
 }
 
 Quat::Quat(const float3 &rotationAxis, float rotationAngle)
