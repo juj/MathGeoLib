@@ -262,8 +262,7 @@ float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
 	assume2(this->IsNormalized(), *this, this->LengthSq());
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	///\todo Check the generation of temporaries here!
-	return float4(quat_transform_vec4(q, float4(vec,0.f).v)).xyz();
+	return float4(quat_transform_vec4(q, load_vec3(vec.ptr(), 0.f))).xyz();
 #else
 	///\todo Optimize/benchmark the scalar path not to generate a matrix!
 	float3x3 mat = this->ToFloat3x3();
@@ -274,8 +273,7 @@ float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	///\todo Check the generation of temporaries here!
-	return float4(quat_transform_vec4(q, float4(x,y,z,0.f).v)).xyz();
+	return float4(quat_transform_vec4(q, set_ps(0.f, z, y, x))).xyz();
 #else
 	return Transform(float3(x, y, z));
 #endif
