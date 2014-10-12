@@ -44,6 +44,12 @@ BENCHMARK(Quat_ToAxisAngle_float4, "Quat::ToAxisAngle(float4,float)")
 }
 BENCHMARK_END;
 
+BENCHMARK(Quat_Axis, "Quat::Axis()")
+{
+	ve[i] = q2[i].Axis();
+}
+BENCHMARK_END;
+
 BENCHMARK(Quat_to_float4x4, "Quat::ToFloat4x4")
 {
 	m[i] = q[i].ToFloat4x4();
@@ -170,6 +176,9 @@ RANDOMIZED_TEST(Quat_ToAxisAngle_float4)
 	float4 axis;
 	float angle;
 	q.ToAxisAngle(axis, angle);
+
+	vec axis2 = q.Axis();
+	assert(axis2.xyz().Equals(axis.xyz()));
 	Quat q2;
 	q2.SetFromAxisAngle(axis, angle);
 	assert(q.Equals(q2));

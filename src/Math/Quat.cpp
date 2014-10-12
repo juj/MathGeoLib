@@ -94,12 +94,28 @@ vec Quat::WorldZ() const
 #endif
 }
 
-float3 Quat::Axis() const
+vec Quat::Axis() const
 {
-	float3 axis;
-	float angle;
-	ToAxisAngle(axis, angle);
-	return axis;
+	assume2(this->IsNormalized(), *this, this->Length());
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 6.145 nsecs / 16.88 ticks, Avg: 6.367 nsecs, Worst: 6.529 nsecs
+	assume2(this->IsNormalized(), *this, this->Length());
+	simd4f cosAngle = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 3));
+	simd4f rcpSinAngle = rsqrt_ps(sub_ps(set1_ps(1.f), mul_ps(cosAngle, cosAngle)));
+	simd4f a = mul_ps(q, rcpSinAngle);
+
+	// Set the w component to zero.
+	simd4f highPart = _mm_unpackhi_ps(a, zero_ps()); // [_ _ 0 z]
+	a = _mm_movelh_ps(a, highPart); // [0 z y x]
+	return FLOAT4_TO_DIR(a);
+#else
+	// Best: 6.529 nsecs / 18.152 ticks, Avg: 6.851 nsecs, Worst: 8.065 nsecs
+
+	// Convert cos to sin via the identity sin^2 + cos^2 = 1, and fuse reciprocal and square root to the same instruction,
+	// since we are about to divide by it.
+	float rcpSinAngle = RSqrt(1.f - w*w);
+	return DIR_VEC(x, y, z) * rcpSinAngle;
+#endif
 }
 
 float Quat::Angle() const
@@ -360,7 +376,7 @@ float MUST_USE_RESULT Quat::AngleBetween(const Quat &target) const
 	return q.Angle();
 }
 
-float3 MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
+vec MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 {
 	assume(this->IsInvertible());
 	Quat q = target / *this;

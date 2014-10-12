@@ -114,7 +114,7 @@ public:
 	vec WorldZ() const;
 
 	/// Returns the axis of rotation for this quaternion.
-	float3 Axis() const;
+	vec Axis() const;
 
 	/// Returns the angle of rotation for this quaternion, in radians.
 	float Angle() const;
@@ -210,7 +210,7 @@ public:
 	/// Returns the angle between this and the target orientation (the shortest route) in radians.
 	MUST_USE_RESULT float AngleBetween(const Quat &target) const;
 	/// Returns the axis of rotation to get from this orientation to target orientation (the shortest route).
-	MUST_USE_RESULT float3 AxisFromTo(const Quat &target) const;
+	MUST_USE_RESULT vec AxisFromTo(const Quat &target) const;
 
 	/// Returns the rotation axis and angle of this quaternion.
 	/// @param rotationAxis [out] Received the normalized axis of the rotation.
