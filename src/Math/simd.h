@@ -108,34 +108,16 @@ static inline __m128 rsqrt_ps(__m128 x)
 
 /// Returns the lowest element of the given sse register as a float.
 /// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
-/// the resulting float is represented in an XMM register as well. Check the disassembly to confirm!
-FORCE_INLINE float s4f_x(simd4f s4f)
-{
-#ifdef _MSC_VER
-	// On VS2013, generates only one spurious vmovups, then a vmovss mem <- reg
-	return s4f.m128_f32[0];
-#else
-	// On VS2013 this is bad: generates a spurious vmovups, vmovss tempMem <- reg, vmovss reg <- tempMem, vmovss dstMem <- reg sequence
-	float ret;
-	_mm_store_ss(&ret, s4f);
-	return ret;
-#endif
-	// One could do this as well: On VS2013, gives the same extra vmovups, and then a store.
-	//	return *(float*)&s4f;
-
-	// On VS2013, same as the above - extra vmovups and vmovss.
-	//	union
-	//	{
-	//		__m128 m;
-	//		float v[4];
-	//	} u;
-	//	u.m = s4f;
-	//	return u.v[0];
-}
-
-#define s4f_y(s4f) s4f_x(shuffle1_ps((s4f), _MM_SHUFFLE(1,1,1,1)))
-#define s4f_z(s4f) s4f_x(shuffle1_ps((s4f), _MM_SHUFFLE(2,2,2,2)))
-#define s4f_w(s4f) s4f_x(shuffle1_ps((s4f), _MM_SHUFFLE(3,3,3,3)))
+/// the resulting float is represented in an XMM register as well.
+#define s4f_x(s4f) _mm_cvtss_f32((s4f))
+// Given a 4-channel single-precision simd4f variable [w z y x], returns the second channel 'y' as a float.
+#define s4f_y(s4f) _mm_cvtss_f32(shuffle1_ps((s4f), _MM_SHUFFLE(1,1,1,1)))
+// Given a 4-channel single-precision simd4f variable [w z y x], returns the third channel 'z' as a float.
+// @note The intrinsic _mm_movehl_ps() is theoretically better than _mm_unpackhi_ps() or a shuffle to extract the z channel because it has throughput latency of 0.33 compared to 1.0 that the
+//       other have. However using _mm_movehl_ps() is tricky since in a blind use, VS2013 compiler easily emits a redundant movaps when targeting pre-AVX, so it might not be worth it.
+#define s4f_z(s4f) _mm_cvtss_f32(_mm_unpackhi_ps((s4f), (s4f)))
+// Given a 4-channel single-precision simd4f variable [w z y x], returns the fourth channel 'w' as a float.
+#define s4f_w(s4f) _mm_cvtss_f32(shuffle1_ps((s4f), _MM_SHUFFLE(3,3,3,3)))
 
 #ifdef MATH_SSE2
 #define set_ps_hex(w, z, y, x) _mm_castsi128_ps(_mm_set_epi32(w, z, y, x))
