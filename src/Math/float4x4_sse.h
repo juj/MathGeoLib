@@ -30,6 +30,7 @@ void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m);
 
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 #ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
+// Note: There is an indication that this version is slower than the SSE3 version. Be sure to profile.
 inline __m128 mat4x4_mul_sse41(const __m128 *matrix, __m128 vector)
 {
 	__m128 x = _mm_dp_ps(matrix[0], vector, 0xF0 | 0x0F); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
@@ -114,9 +115,11 @@ inline __m128 colmajor_mat4x4_mul_sse1_2(const __m128 *matrix, __m128 vector)
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 inline __m128 mat4x4_mul_sse(const __m128 *matrix, __m128 vector)
 {
-#ifdef MATH_SSE41
-	return mat4x4_mul_sse41(matrix, vector);
-#elif defined(MATH_SSE3)
+// Disabled: The SSE 4.1 version has been profiled to be 2 clock cycles slower than the SSE 3 version.
+//#ifdef MATH_SSE41
+//	return mat4x4_mul_sse41(matrix, vector);
+
+#if defined(MATH_SSE3)
 	return mat4x4_mul_sse3(matrix, vector);
 #else
 	return mat4x4_mul_sse1(matrix, vector);
