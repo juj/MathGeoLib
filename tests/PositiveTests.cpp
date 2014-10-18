@@ -77,30 +77,30 @@ Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius)
 	return s;
 }
 
-Frustum RandomFrustumContainingPoint(LCG &rng, const vec &pt)
+Frustum RandomFrustumContainingPoint(LCG &lcg, const vec &pt)
 {
 	Frustum f;
-	f.SetKind((rng.Int(0, 1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL, (rng.Int(0, 1) == 1) ? FrustumRightHanded : FrustumLeftHanded);
+	f.SetKind((lcg.Int(0, 1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL, (lcg.Int(0, 1) == 1) ? FrustumRightHanded : FrustumLeftHanded);
 
-	if (rng.Int(0,1))
+	if (lcg.Int(0,1))
 	{
-		f.SetOrthographic(rng.Float(0.1f, SCALE), rng.Float(0.1f, SCALE));
+		f.SetOrthographic(lcg.Float(0.1f, SCALE), lcg.Float(0.1f, SCALE));
 	}
 	else
 	{
 		// Really random Frustum could have fov as ]0, pi[, but limit
 		// to much narrower fovs to not cause the corner vertices
 		// shoot too far when farPlaneDistance is very large.
-		f.SetPerspective(rng.Float(0.1f, 3.f*pi / 4.f), rng.Float(0.1f, 3.f*pi / 4.f));
+		f.SetPerspective(lcg.Float(0.1f, 3.f*pi / 4.f), lcg.Float(0.1f, 3.f*pi / 4.f));
 	}
-	float nearPlaneDistance = rng.Float(0.1f, SCALE);
-	f.SetViewPlaneDistances(nearPlaneDistance, nearPlaneDistance + rng.Float(0.1f, SCALE));
-	vec front = vec::RandomDir(rng);
+	float nearPlaneDistance = lcg.Float(0.1f, SCALE);
+	f.SetViewPlaneDistances(nearPlaneDistance, nearPlaneDistance + lcg.Float(0.1f, SCALE));
+	vec front = vec::RandomDir(lcg);
 	f.SetFrame(POINT_VEC_SCALAR(0.f),
 		front,
-		front.RandomPerpendicular(rng));
+		front.RandomPerpendicular(lcg));
 
-	vec pt2 = f.UniformRandomPointInside(rng);
+	vec pt2 = f.UniformRandomPointInside(lcg);
 	f.SetPos(f.Pos() + pt - pt2);
 
 	assert(f.IsFinite());
