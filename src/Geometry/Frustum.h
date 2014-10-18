@@ -20,6 +20,8 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/float2.h"
 #include "../Math/float3.h"
+#include "../Math/float3x4.h"
+#include "../Math/float4x4.h"
 #include "Ray.h"
 
 #ifdef MATH_TINYXML_INTEROP
@@ -95,7 +97,7 @@ enum FrustumHandedness
 /// Represents either an orthographic or a perspective viewing frustum.
 class Frustum
 {
-public:
+private:
 	/// Specifies whether this frustum is a perspective or an orthographic frustum.
 	/** [noscript] @todo Remove the noscript attribute. */
 	FrustumType type;
@@ -114,10 +116,10 @@ public:
 	/** This vector is specified in world (global) space. This vector is always normalized.
 		If you assign to this member directly, be sure to only assign normalized vectors.
 		@note The vectors front and up must always be perpendicular to each other. This means that this up vector is not
-			a static/constant up vector, e.g. (0,1,0), but changes according to when the camera pitches up and down to
-			preserve the condition that front and up are always perpendicular.
+		a static/constant up vector, e.g. (0,1,0), but changes according to when the camera pitches up and down to
+		preserve the condition that front and up are always perpendicular.
 		@note In the _local_ space of the Frustum, the direction +Y is _always_ the up direction and cannot be changed. This
-			coincides to how Direct3D and OpenGL view and projection matrices are constructed. */
+		coincides to how Direct3D and OpenGL view and projection matrices are constructed. */
 	vec up;
 	/// Distance from the eye point to the front plane.
 	/** This parameter must be positive. If perspective projection is used, this parameter must be strictly positive
@@ -152,12 +154,43 @@ public:
 		float orthographicHeight;
 	};
 
-	/// The default constructor creates a Frustum with undefined values.
+	void WorldMatrixChanged();
+	void ProjectionMatrixChanged();
+
+	// Frustums are typically used in batch culling operations. Therefore the matrices associated with a Frustum are cached
+	// for immediate access.
+	float3x4 worldMatrix;
+	float4x4 projectionMatrix;
+	float4x4 viewProjMatrix;
+
+public:
+	/// The default constructor creates an uninitialized Frustum object.
 	/** This means that the values of the members type, projectiveSpace, handedness, pos, front, up, nearPlaneDistance, farPlaneDistance, horizontalFov/orthographicWidth and
-		verticalFov/orthographicHeight are all undefined after creating a new Frustum using this
-		default constructor. Remember to assign to them before use. [opaque-qtscript] @todo remove the opaque-qtscript attribute.
+		verticalFov/orthographicHeight are all NaN after creating a new Frustum using this
+		default constructor. Remember to assign to them before use.
+		@note As an exception to other classes in MathGeoLib, this class initializes its members to NaNs, whereas the other classes leave the members uninitialized. This difference
+			is because the Frustum class implements a caching mechanism where world, projection and viewProj matrices are recomputed on demand, which does not work nicely together
+			if the defaults were uninitialized.
+		[opaque-qtscript] @todo remove the opaque-qtscript attribute.
 		@see type, pos, front, up, nearPlaneDistance, projectiveSpace, handedness, farPlaneDistance, horizontalFov, verticalFov, orthographicWidth, orthographicHeight. */
 	Frustum();
+
+	void SetKind(FrustumProjectiveSpace projectiveSpace, FrustumHandedness handedness);
+	void SetViewPlaneDistances(float nearPlaneDistance, float farPlaneDistance);
+	void SetFrame(const vec &pos, const vec &front, const vec &up);
+	void SetPos(const vec &pos);
+	void SetFront(const vec &front);
+	void SetUp(const vec &up);
+
+	void SetPerspective(float horizontalFov, float verticalFov);
+	void SetOrthographic(float orthographicWidth, float orthographicHeight);
+
+	FrustumHandedness Handedness() const { return handedness; }
+	FrustumType Type() const { return type; }
+	FrustumProjectiveSpace ProjectiveSpace() const { return projectiveSpace; }
+	const vec &Pos() const { return pos; }
+	const vec &Front() const { return front; }
+	const vec &Up() const { return up; }
 
 	int NumEdges() const { return 12; }
 
@@ -283,7 +316,8 @@ public:
 			matrix is built to use the convention Matrix * vector to map a point between these spaces.
 			(as opposed to the convention v*M).
 		@see ViewMatrix(), ProjectionMatrix(), ViewProjMatrix(). */
-	float3x4 WorldMatrix() const;
+	float3x4 WorldMatrix() const { return worldMatrix;  }
+	float3x4 ComputeWorldMatrix() const;
 
 	/// Computes the matrix that transforms from the world (global) space to the view space of this Frustum.
 	/** @note The returned matrix is the inverse of the matrix returned by WorldMatrix().
@@ -291,14 +325,16 @@ public:
 			matrix is built to use the convention Matrix * vector to map a point between these spaces.
 			(as opposed to the convention v*M).
 		@see WorldMatrix(), ProjectionMatrix(), ViewProjMatrix(). */
-	float3x4 ViewMatrix() const;
+	float3x4 ViewMatrix() const { float3x4 m = worldMatrix; m.InverseOrthonormal(); return m; }
+	float3x4 ComputeViewMatrix() const;
 
 	/// Computes the matrix that projects from the view space to the projection space of this Frustum.
 	/** @return A projection matrix that performs the view->proj transformation. This matrix is neither
 			invertible or orthonormal. The returned matrix is built to use the convention Matrix * vector
 			to map a point between these spaces. (as opposed to the convention v*M).
 		@see WorldMatrix(), ViewMatrix(), ViewProjMatrix(). */
-	float4x4 ProjectionMatrix() const;
+	float4x4 ProjectionMatrix() const { return projectionMatrix; }
+	float4x4 ComputeProjectionMatrix() const;
 
 	/// Computes the matrix that transforms from the world (global) space to the projection space of this Frustum.
 	/** The matrix computed by this function is simply the concatenation ProjectionMatrix()*ViewMatrix(). This order
@@ -308,7 +344,8 @@ public:
 			orthonormal. The returned matrix is built to use the convention Matrix * vector
 			to map a point between these spaces. (as opposed to the convention v*M).
 		@see WorldMatrix(), ViewMatrix(), ProjectionMatrix(). */
-	float4x4 ViewProjMatrix() const;
+	float4x4 ViewProjMatrix() const { return viewProjMatrix; }
+	float4x4 ComputeViewProjMatrix() const;
 
 	/// Finds a ray in world space that originates at the eye point and looks in the given direction inside the frustum.
 	/** The (x,y) coordinate specifies the normalized viewport coordinate through which the ray passes.
