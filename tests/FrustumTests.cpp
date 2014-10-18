@@ -548,6 +548,32 @@ RANDOMIZED_TEST(Frustum_Contains_LineSegment)
 
 	// Must not contain line segment past the far plane.
 	assert(!f.Contains(LineSegment(d + front, d + 2.f*front)));
+
+	// Must not contain a line segment that straddles the Frustum.
+	assert(!f.Contains(LineSegment(p, d + 2.f * front)));
+}
+
+RANDOMIZED_TEST(Frustum_Contains_Triangle)
+{
+	vec pt = POINT_VEC_SCALAR(0.f);
+	Frustum f = RandomFrustumContainingPoint(rng, pt);
+	assert(f.Contains(LineSegment(pt, pt)));
+	vec pt2 = POINT_VEC_SCALAR(1e9f);
+	assert(!f.Contains(LineSegment(pt2, pt2)));
+
+	// Test containment inside the Frustum.
+	vec n = f.NearPlanePos(-1.f, 0.f);
+	vec n2 = f.NearPlanePos(1.f, 0.f);
+	vec d = f.FarPlanePos(0.f, 0.f);
+	assert(f.Contains(Triangle(n, n2, d)));
+
+	// Must not contain the eye position (unless an orthographic frustum with zero near plane distance) or a Triangle that straddles the Frustum.
+	vec p = f.Pos();
+	assert(!f.Contains(Triangle(p, n, d)));
+
+	// Must not contain a Triangle that's completely outside the Frustum.
+	vec front = f.Front();
+	assert(!f.Contains(Triangle(p - front, p - front, p - front)));
 }
 
 BENCHMARK(Frustum_Contains_Point, "Frustum::Contains(point)")
@@ -556,3 +582,33 @@ BENCHMARK(Frustum_Contains_Point, "Frustum::Contains(point)")
 		++dummyResultInt;
 }
 BENCHMARK_END
+
+BENCHMARK(Frustum_Contains_LineSegment, "Frustum::Contains(LineSegment)")
+{
+	if (frustum[0].Contains(LineSegment(ve[i], ve[i+1])))
+		++dummyResultInt;
+}
+BENCHMARK_END
+
+BENCHMARK(Frustum_Contains_Triangle, "Frustum::Contains(Triangle)")
+{
+	if (frustum[0].Contains(Triangle(ve[i], ve[i+1], ve[i+2])))
+		++dummyResultInt;
+}
+BENCHMARK_END
+
+RANDOMIZED_TEST(Frustum_ClosestPoint_Point)
+{
+	vec pt = POINT_VEC_SCALAR(0.f);
+	Frustum f = RandomFrustumContainingPoint(rng, pt);
+	assert(f.ClosestPoint(pt).Equals(pt));
+
+	vec n = f.NearPlanePos(0.f, 0.f);
+	assert(f.ClosestPoint(n).Equals(n));
+	vec p = f.Pos();
+	assert3(f.ClosestPoint(p).Equals(n), p, f.ClosestPoint(p), n);
+
+	vec d = f.FarPlanePos(0.f, 0.f);
+	vec front = f.Front();
+	assert(f.ClosestPoint(d + front).Equals(d));
+}
