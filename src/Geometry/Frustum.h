@@ -175,23 +175,107 @@ public:
 		@see type, pos, front, up, nearPlaneDistance, projectiveSpace, handedness, farPlaneDistance, horizontalFov, verticalFov, orthographicWidth, orthographicHeight. */
 	Frustum();
 
+	/// Sets the type of this Frustum.
+	/** @note Calling this function recomputes the cached view and projection matrices of this Frustum.
+		@see SetViewPlaneDistances(), SetFrame(), SetPos(), SetFront(), SetUp(), SetPerspective(), SetOrthographic(), ProjectiveSpace(), Handedness(). */
 	void SetKind(FrustumProjectiveSpace projectiveSpace, FrustumHandedness handedness);
+
+	/// Sets the depth clip distances of this Frustum.
+	/** @param nearPlaneDistance The z distance from the eye point to the position of the Frustum near clip plane. Always pass a positive value here.
+		@param farPlaneDistance The z distance from the eye point to the position of the Frustum far clip plane. Always pass a value that is larger than nearClipDistance.
+		@note Calling this function recomputes the cached projection matrix of this Frustum.
+		@see SetKind(), SetFrame(), SetPos(), SetFront(), SetUp(), SetPerspective(), SetOrthographic(), NearPlaneDistance(), FarPlaneDistance(). */
 	void SetViewPlaneDistances(float nearPlaneDistance, float farPlaneDistance);
+
+	/// Specifies the full coordinate space of this Frustum in one call.
+	/** @note Calling this function recomputes the cached world matrix of this Frustum.
+		@note As a micro-optimization, prefer this function over the individual SetPos/SetFront/SetUp functions if you need to do a batch of two or more changes, to avoid
+		redundant recomputation of the world matrix.
+		@see SetKind(), SetViewPlaneDistances(), SetPos(), SetFront(), SetUp(), SetPerspective(), SetOrthographic(), Pos(), Front(), Up(). */
 	void SetFrame(const vec &pos, const vec &front, const vec &up);
+
+	/// Sets the world-space position of this Frustum.
+	/** @note Calling this function recomputes the cached world matrix of this Frustum.
+		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetFront(), SetUp(), SetPerspective(), SetOrthographic(), Pos(). */
 	void SetPos(const vec &pos);
+
+	/// Sets the world-space direction the Frustum eye is looking towards.
+	/** @note Calling this function recomputes the cached world matrix of this Frustum.
+		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetPos(), SetUp(), SetPerspective(), SetOrthographic(), Front(). */
 	void SetFront(const vec &front);
+
+	/// Sets the world-space camera up direction vector of this Frustum.
+	/** @note Calling this function recomputes the cached world matrix of this Frustum.
+		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetPos(), SetFront(), SetPerspective(), SetOrthographic(), Up(). */
 	void SetUp(const vec &up);
 
+	/// Makes this Frustum use a perspective projection formula with the given FOV parameters.
+	/** A Frustum that uses the perspective projection is shaped like a pyramid that is cut from the top, and has a
+		base with a rectangular area.
+		@note Calling this function recomputes the cached projection matrix of this Frustum.
+		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetPos(), SetFront(), SetUp(), SetOrthographic(), HorizontalFov(), VerticalFov(). */
 	void SetPerspective(float horizontalFov, float verticalFov);
+
+	/// Makes this Frustum use an orthographic projection formula with the given FOV parameters.
+	/** A Frustum that uses the orthographic projection is shaded like a cube (an OBB).
+		@note Calling this function recomputes the cached projection matrix of this Frustum.
+		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetPos(), SetFront(), SetUp(), SetOrthographic(), OrthographicWidth(), OrthographicHeight(). */
 	void SetOrthographic(float orthographicWidth, float orthographicHeight);
 
+	/// Returns the handedness of the projection formula used by this Frustum.
+	/** @see SetKind(), FrustumHandedness. */
 	FrustumHandedness Handedness() const { return handedness; }
+
+	/// Returns the type of the projection formula used by this Frustum.
+	/** @see SetPerspective(), SetOrthographic(), FrustumType. */
 	FrustumType Type() const { return type; }
+
+	/// Returns the convention of the post-projective space used by this Frustum.
+	/** @see SetKind(), FrustumProjectiveSpace. */
 	FrustumProjectiveSpace ProjectiveSpace() const { return projectiveSpace; }
+
+	/// Returns the world-space position of this Frustum.
+	/** @see SetPos(), Front(), Up(). */
 	const vec &Pos() const { return pos; }
+
+	/// Returns the world-space camera look-at direction of this Frustum.
+	/** @see Pos(), SetFront(), Up(). */
 	const vec &Front() const { return front; }
+
+	/// Returns the world-space camera up direction of this Frustum.
+	/** @see Pos(), Front(), SetUp(). */
 	const vec &Up() const { return up; }
 
+	/// Returns the distance from the Frustum eye to the near clip plane.
+	/** @see SetViewPlaneDistances(), FarPlaneDistance(). */
+	float NearPlaneDistance() const { return nearPlaneDistance; }
+
+	/// Returns the distance from the Frustum eye to the far clip plane.
+	/** @see SetViewPlaneDistances(), NearPlaneDistance(). */
+	float FarPlaneDistance() const { return farPlaneDistance; }
+
+	/// Returns the horizontal field-of-view used by this Frustum, in radians.
+	/** @note Calling this function when the Frustum is not set to use perspective projection will return values that are meaningless.
+		@see SetPerspective(), Type(), VerticalFov(). */
+	float HorizontalFov() const { return horizontalFov; }
+
+	/// Returns the vertical field-of-view used by this Frustum, in radians.
+	/** @note Calling this function when the Frustum is not set to use perspective projection will return values that are meaningless.
+		@see SetPerspective(), Type(), HorizontalFov(). */
+	float VerticalFov() const { return verticalFov; }
+
+	/// Returns the world-space width of this Frustum.
+	/** @note Calling this function when the Frustum is not set to use orthographic projection will return values that are meaningless.
+		@see SetOrthographic(), Type(), OrthographicHeight(). */
+	float OrthographicWidth() const { return orthographicWidth; }
+
+	/// Returns the world-space height of this Frustum.
+	/** @note Calling this function when the Frustum is not set to use orthographic projection will return values that are meaningless.
+		@see SetOrthographic(), Type(), OrthographicWidth(). */
+	float OrthographicHeight() const { return orthographicHeight; }
+
+	/// Returns the number of line segment edges that this Frustum is made up of, which is always 12.
+	/** This function is used in template-based algorithms to provide an unified API for iterating over the features of a Polyhedron. */
 	int NumEdges() const { return 12; }
 
 	/// Returns the aspect ratio of the view rectangle on the near plane.
