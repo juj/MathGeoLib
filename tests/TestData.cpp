@@ -1,6 +1,7 @@
 #include "../src/MathGeoLib.h"
 #include "TestRunner.h"
 #include "../src/Math/SSEMath.h"
+#include "ObjectGenerators.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -91,6 +92,21 @@ OBB *OBBArray()
 			a.minPoint = POINT_VEC(float3::RandomBox(lcg, -100.f, 100.f));
 			a.maxPoint = a.minPoint + POINT_VEC(float3::RandomBox(lcg, 0, 100.f));
 			arr[i] = a.Transform(Quat::RandomRotation(lcg));
+		}
+	}
+	return arr;
+}
+
+Frustum *FrustumArray()
+{
+	LCG lcg(Clock::TickU32());
+	static Frustum *arr;
+	if (!arr)
+	{
+		arr = AlignedNew<Frustum>(testrunner_numItersPerTest + UNROLL_LOOP_PADDING);
+		for (int i = 0; i < testrunner_numItersPerTest + UNROLL_LOOP_PADDING; ++i)
+		{
+			arr[i] = RandomFrustumContainingPoint(lcg, POINT_VEC_SCALAR(0.f));
 		}
 	}
 	return arr;
@@ -313,12 +329,15 @@ public:
 		AlignedFree(VectorArrayWithW0Or1());
 		AlignedFree(AABBArray());
 		AlignedFree(OBBArray());
+		AlignedFree(FrustumArray());
 		AlignedFree(VecArray2());
 	}
 };
 
 // At app exit time, this causes all test data arrays to be freed.
 FreeTestData testDataDeleter;
+
+int dummyResultInt = 0;
 
 } // ~namespace TestData
 

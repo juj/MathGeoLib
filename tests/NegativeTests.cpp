@@ -80,27 +80,23 @@ Frustum RandomFrustumInHalfspace(const Plane &plane)
 	Frustum f;
 	if (rng.Int(0,1))
 	{
-		f.type = OrthographicFrustum;
-		f.orthographicWidth = rng.Float(0.001f, SCALE);
-		f.orthographicHeight = rng.Float(0.001f, SCALE);
+		f.SetOrthographic(rng.Float(0.001f, SCALE), rng.Float(0.001f, SCALE));
 	}
 	else
 	{
-		f.type = PerspectiveFrustum;
 		// Really random Frustum could have fov as ]0, pi[, but limit
 		// to much narrower fovs to not cause the corner vertices
 		// shoot too far when farPlaneDistance is very large.
-		f.horizontalFov = rng.Float(0.001f, 3.f*pi/4.f);
-		f.verticalFov = rng.Float(0.001f, 3.f*pi/4.f);
+		f.SetPerspective(rng.Float(0.001f, 3.f*pi / 4.f), rng.Float(0.001f, 3.f*pi / 4.f));
 	}
-	f.nearPlaneDistance = rng.Float(0.1f, SCALE);
-	f.farPlaneDistance = f.nearPlaneDistance + rng.Float(0.1f, SCALE);
-	f.pos = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	f.front = vec::RandomDir(rng);
-	f.up = f.front.RandomPerpendicular(rng);
+	float nearPlaneDistance = rng.Float(0.1f, SCALE);
+	f.SetViewPlaneDistances(nearPlaneDistance, nearPlaneDistance + rng.Float(0.1f, SCALE));
+	vec front = vec::RandomDir(rng);
+	f.SetFrame(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)),
+		front,
+		front.RandomPerpendicular(rng));
 
-	f.handedness = (rng.Int(0,1) == 1) ? FrustumRightHanded : FrustumLeftHanded;
-	f.projectiveSpace = (rng.Int(0,1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL;
+	f.SetKind((rng.Int(0, 1) == 1) ? FrustumSpaceD3D : FrustumSpaceGL, (rng.Int(0, 1) == 1) ? FrustumRightHanded : FrustumLeftHanded);
 
 //	assert(!f.IsDegenerate());
 

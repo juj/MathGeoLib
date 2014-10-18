@@ -5,7 +5,7 @@
 AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength);
 OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength);
 Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius);
-Frustum RandomFrustumContainingPoint(const vec &pt);
+Frustum RandomFrustumContainingPoint(LCG &rng, const vec &pt);
 Line RandomLineContainingPoint(const vec &pt);
 Ray RandomRayContainingPoint(const vec &pt);
 LineSegment RandomLineSegmentContainingPoint(const vec &pt);

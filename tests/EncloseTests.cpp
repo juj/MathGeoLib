@@ -4,6 +4,7 @@
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
+#include "ObjectGenerators.h"
 
 vec RandomPointNearOrigin(float maxDistanceFromOrigin)
 {
@@ -44,10 +45,9 @@ Triangle RandomTriangleNearOrigin(float maxDistanceFromOrigin)
 	return Triangle(RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin), RandomPointNearOrigin(maxDistanceFromOrigin));
 }
 
-Frustum RandomFrustumContainingPoint(const vec &pt);
 Frustum RandomFrustumNearOrigin(float maxDistanceFromOrigin)
 {
-	return RandomFrustumContainingPoint(RandomPointNearOrigin(maxDistanceFromOrigin));
+	return RandomFrustumContainingPoint(rng, RandomPointNearOrigin(maxDistanceFromOrigin));
 }
 
 Polygon RandomPolygonContainingPoint(const vec &pt);

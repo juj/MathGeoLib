@@ -145,7 +145,7 @@ RANDOMIZED_TEST(GJKAABBFrustumIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
-	Frustum b = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(rng, pt);
 	assert(GJKIntersect(a, b));
 }
 
@@ -193,7 +193,7 @@ RANDOMIZED_TEST(GJKOBBFrustumIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
-	Frustum b = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(rng, pt);
 	assert(GJKIntersect(a, b));
 }
 
@@ -250,14 +250,14 @@ RANDOMIZED_TEST(GJKSphereFrustumIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
-	Frustum b = RandomFrustumContainingPoint(pt);
+	Frustum b = RandomFrustumContainingPoint(rng, pt);
 	assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumLineSegmentIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	assert(GJKIntersect(a, b));
 }
@@ -265,7 +265,7 @@ RANDOMIZED_TEST(GJKFrustumLineSegmentIntersect)
 RANDOMIZED_TEST(GJKFrustumCapsuleIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
 	assert(GJKIntersect(a, b));
 }
@@ -273,7 +273,7 @@ RANDOMIZED_TEST(GJKFrustumCapsuleIntersect)
 RANDOMIZED_TEST(GJKFrustumTriangleIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Frustum a = RandomFrustumContainingPoint(pt);
+	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
 	assert(GJKIntersect(a, b));
 }
@@ -281,8 +281,8 @@ RANDOMIZED_TEST(GJKFrustumTriangleIntersect)
 RANDOMIZED_TEST(GJKFrustumFrustumIntersect)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
-	Frustum a = RandomFrustumContainingPoint(pt);
-	Frustum b = RandomFrustumContainingPoint(pt);
+	Frustum a = RandomFrustumContainingPoint(rng, pt);
+	Frustum b = RandomFrustumContainingPoint(rng, pt);
 	assert(GJKIntersect(a, b));
 }
 

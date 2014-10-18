@@ -29,6 +29,7 @@ float4 *VectorArray3();
 float4 *VectorArrayWithW0Or1();
 AABB *AABBArray();
 OBB *OBBArray();
+Frustum *FrustumArray();
 
 // N.B. These must be static and not extern to not generate UDB with initialization order between compilation units!
 static DONT_WARN_UNUSED float *f = FloatArray();
@@ -51,6 +52,7 @@ static DONT_WARN_UNUSED Quat *q = QuatArray();
 static DONT_WARN_UNUSED Quat *q2 = QuatArray2();
 static DONT_WARN_UNUSED AABB *aabb = AABBArray();
 static DONT_WARN_UNUSED OBB *obb = OBBArray();
+static DONT_WARN_UNUSED Frustum *frustum = FrustumArray();
 
 extern float2 uninitializedFloat2;
 extern float3 uninitializedFloat3;
@@ -59,6 +61,10 @@ extern float3x3 uninitializedFloat3x3;
 extern float3x4 uninitializedFloat3x4;
 extern float4x4 uninitializedFloat4x4;
 extern Quat uninitializedQuat;
+
+// An otherwise unused variable, but global so that writing results to this has the effect that compiler won't
+// optimize out benchmarks that time how long computations take.
+extern int dummyResultInt;
 
 } // ~TestData
 
