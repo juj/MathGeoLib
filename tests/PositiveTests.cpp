@@ -96,7 +96,6 @@ Frustum RandomFrustumContainingPoint(LCG &rng, const vec &pt)
 	float nearPlaneDistance = rng.Float(0.1f, SCALE);
 	f.SetViewPlaneDistances(nearPlaneDistance, nearPlaneDistance + rng.Float(0.1f, SCALE));
 	vec front = vec::RandomDir(rng);
-	vec up = DIR_VEC(0, 1, 0);
 	f.SetFrame(POINT_VEC_SCALAR(0.f),
 		front,
 		front.RandomPerpendicular(rng));
