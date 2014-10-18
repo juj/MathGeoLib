@@ -523,6 +523,33 @@ RANDOMIZED_TEST(Intersect_Two_Frustums)
 	assert(ph.Contains(pt));
 }
 
+RANDOMIZED_TEST(Frustum_Contains_LineSegment)
+{
+	vec pt = POINT_VEC_SCALAR(0.f);
+	Frustum f = RandomFrustumContainingPoint(rng, pt);
+	assert(f.Contains(LineSegment(pt, pt)));
+	vec pt2 = POINT_VEC_SCALAR(1e9f);
+	assert(!f.Contains(LineSegment(pt2, pt2)));
+
+	// Must contain the line segment passing from the center of near plane to the far plane.
+	vec n = f.NearPlanePos(0.f, 0.f);
+	vec d = f.FarPlanePos(0.f, 0.f);
+	LineSegment l(n, d);
+	assert(f.Contains(l));
+
+	// Must not contain the eye position (unless an orthographic frustum with zero near plane distance)
+	vec p = f.Pos();
+	vec front = f.Front();
+	assert(!f.Contains(LineSegment(p, p)) || (f.NearPlaneDistance() <= 0.f && f.Type() == OrthographicFrustum));
+
+	// Must not contain line segment between eye and behind it.
+	vec out = (p + n)*0.5f;
+	assert(!f.Contains(LineSegment(out, out - front)));
+
+	// Must not contain line segment past the far plane.
+	assert(!f.Contains(LineSegment(d + front, d + 2.f*front)));
+}
+
 BENCHMARK(Frustum_Contains_Point, "Frustum::Contains(point)")
 {
 	if (frustum[0].Contains(ve[i]))
