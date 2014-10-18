@@ -850,7 +850,7 @@ void OBB::Enclose(const vec &point)
 	vec p = point - pos;
 	for(int i = 0; i < 3; ++i)
 	{
-		assert(EqualAbs(axis[i].Length(), 1.f));
+		assume2(EqualAbs(axis[i].Length(), 1.f), axis[i], axis[i].Length());
 		float dist = p.Dot(axis[i]);
 		float distanceFromOBB = Abs(dist) - r[i];
 		if (distanceFromOBB > 0.f)
@@ -867,7 +867,7 @@ void OBB::Enclose(const vec &point)
 		}
 	}
 	// Should now contain the point.
-	assume(Distance(point) <= 1e-3f);
+	assume2(Distance(point) <= 1e-3f, point, Distance(point));
 }
 
 void OBB::Triangulate(int x, int y, int z, vec *outPos, vec *outNormal, float2 *outUV, bool ccwIsFrontFacing) const
