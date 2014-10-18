@@ -478,7 +478,7 @@ vec Frustum::Project(const vec &point) const
 
 bool Frustum::Contains(const vec &point) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE) && 0
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// SSE 4.1 32-bit: Best: 6.913 nsecs / 18.52 ticks, Avg: 6.978 nsecs, Worst: 7.297 nsecs
 	vec projected = Project(point);
 	simd4f a = abs_ps(projected);
@@ -520,6 +520,7 @@ bool Frustum::Contains(const vec &point) const
 
 bool Frustum::Contains(const LineSegment &lineSegment) const
 {
+	// Best: 13.057 nsecs / 35.464 ticks, Avg : 13.338 nsecs, Worst : 13.826 nsecs
 	return Contains(lineSegment.a) && Contains(lineSegment.b);
 }
 
