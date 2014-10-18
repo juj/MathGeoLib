@@ -520,13 +520,49 @@ bool Frustum::Contains(const vec &point) const
 
 bool Frustum::Contains(const LineSegment &lineSegment) const
 {
-	// Best: 13.057 nsecs / 35.464 ticks, Avg : 13.338 nsecs, Worst : 13.826 nsecs
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// SSE 4.1: Best: 15.746 nsecs / 42.152 ticks, Avg: 15.842 nsecs, Worst: 16.130 nsecs
+	vec pa = Project(lineSegment.a);
+	simd4f a = abs_ps(pa);
+	vec pb = Project(lineSegment.b);
+	simd4f b = abs_ps(pb);
+	a = max_ps(a, b);
+	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1, 1, 1, 1));
+	a = max_ps(a, y);
+	y = shuffle1_ps(a, _MM_SHUFFLE(2, 2, 2, 2));
+	a = max_ps(a, y);
+	const float eps = 1e-3f;
+	return _mm_cvtss_f32(a) <= 1.f + eps &&
+		(projectiveSpace == FrustumSpaceGL || s4f_z(min_ps(pa, pb)) >= -eps);
+#else
+	// SSE 4.1: 16.514 nsecs / 44.784 ticks, Avg: 16.825 nsecs, Worst: 16.898 nsecs
 	return Contains(lineSegment.a) && Contains(lineSegment.b);
+#endif
 }
 
 bool Frustum::Contains(const Triangle &triangle) const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 21.206 nsecs / 55.496 ticks, Avg: 21.702 nsecs, Worst: 21.891 nsecs
+	vec pa = Project(triangle.a);
+	simd4f a = abs_ps(pa);
+	vec pb = Project(triangle.b);
+	simd4f b = abs_ps(pb);
+	a = max_ps(a, b);
+	vec pc = Project(triangle.c);
+	simd4f c = abs_ps(pc);
+	a = max_ps(a, c);
+	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1, 1, 1, 1));
+	a = max_ps(a, y);
+	y = shuffle1_ps(a, _MM_SHUFFLE(2, 2, 2, 2));
+	a = max_ps(a, y);
+	const float eps = 1e-3f;
+	return _mm_cvtss_f32(a) <= 1.f + eps &&
+		(projectiveSpace == FrustumSpaceGL || s4f_z(min_ps(min_ps(pa, pb), pc)) >= -eps);
+#else
+	// Best: 21.122 nsecs / 56.512 ticks, Avg: 21.226 nsecs, Worst: 21.506 nsecs
 	return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+#endif
 }
 
 bool Frustum::Contains(const Polygon &polygon) const
