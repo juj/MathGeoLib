@@ -607,7 +607,9 @@ RANDOMIZED_TEST(Frustum_ClosestPoint_Point)
 	assert(f.ClosestPoint(n).Equals(n));
 	vec p = f.Pos();
 	vec cp = f.ClosestPoint(p);
+#ifdef MATH_VEC_IS_FLOAT4
 	assert(EqualAbs(cp.w, 1.f));
+#endif
 	assert3(cp.Equals(n), p, cp, n);
 
 	vec d = f.FarPlanePos(0.f, 0.f);
