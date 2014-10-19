@@ -65,6 +65,7 @@ extern Quat uninitializedQuat;
 // An otherwise unused variable, but global so that writing results to this has the effect that compiler won't
 // optimize out benchmarks that time how long computations take.
 extern int dummyResultInt;
+extern vec dummyResultVec;
 
 } // ~TestData
 

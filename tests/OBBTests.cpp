@@ -18,6 +18,12 @@ BENCHMARK(OBBContains, "OBB::Contains(point)")
 }
 BENCHMARK_END
 
+BENCHMARK(OBBClosestPoint, "OBB::ClosestPoint(point)")
+{
+	dummyResultVec += obb[i].ClosestPoint(ve[i]);
+}
+BENCHMARK_END
+
 BENCHMARK(OBBOBBIntersectionCentroid, "Centroid of OBB-OBB intersection")
 {
 	// Best: 43.610 usecs / 74139.1 ticks, Avg: 45.376 usecs, Worst: 52.899 usecs

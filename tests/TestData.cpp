@@ -338,6 +338,7 @@ public:
 FreeTestData testDataDeleter;
 
 int dummyResultInt = 0;
+vec dummyResultVec = vec::zero;
 
 } // ~namespace TestData
 
