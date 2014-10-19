@@ -47,6 +47,10 @@
 #include "Container/UString.h"
 #endif
 
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
+#include "../Math/float4_sse.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Frustum::Frustum()
@@ -612,7 +616,37 @@ bool Frustum::Contains(const Polyhedron &polyhedron) const
 
 vec Frustum::ClosestPoint(const vec &point) const
 {
-	return ToPolyhedron().ClosestPoint(point);
+	if (type == OrthographicFrustum)
+	{
+		float frontHalfSize = (farPlaneDistance - nearPlaneDistance) * 0.5f;
+		float halfWidth = orthographicWidth * 0.5f;
+		float halfHeight = orthographicHeight * 0.5f;
+		vec frustumCenter = pos + (frontHalfSize + nearPlaneDistance) * front;
+		vec right = Cross(front, up);
+		assert(right.IsNormalized());
+		vec d = point - frustumCenter;
+		vec closestPoint = frustumCenter;
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+		// Best: 21.506 nsecs / 57.224 ticks, Avg: 21.683 nsecs, Worst: 22.659 nsecs
+		simd4f z = set1_ps(frontHalfSize);
+		closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d.v, front.v), z), negate_ps(z)), front.v));
+		simd4f y = set1_ps(halfHeight);
+		closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d.v, up.v), y), negate_ps(y)), up.v));
+		simd4f x = set1_ps(halfWidth);
+		closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d.v, right.v), x), negate_ps(x)), right.v));
+#else
+		// Best: 30.724 nsecs / 82.192 ticks, Avg: 31.069 nsecs, Worst: 39.172 nsecs
+		closestPoint += Clamp(Dot(d, front), -frontHalfSize, frontHalfSize) * front;
+		closestPoint += Clamp(Dot(d, right), -halfWidth, halfWidth) * right;
+		closestPoint += Clamp(Dot(d, up), -halfHeight, halfHeight) * up;
+#endif
+		return closestPoint;
+	}
+	else
+	{
+		// Best: 12.339 usecs / 32900.7 ticks, Avg: 12.521 usecs, Worst: 13.308 usecs
+		return ToPolyhedron().ClosestPoint(point);
+	}
 
 ///\todo Improve numerical stability enough to do effectively this - but do so without temporary memory allocations.
 //	return ToPolyhedron().ClosestPointConvex(point);

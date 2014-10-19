@@ -613,6 +613,12 @@ RANDOMIZED_TEST(Frustum_ClosestPoint_Point)
 	vec d = f.FarPlanePos(0.f, 0.f);
 	vec front = f.Front();
 	assert(f.ClosestPoint(d + front).Equals(d));
+
+	vec pt2 = vec::RandomSphere(rng, pt, 1000.f);
+	cp = f.ClosestPoint(pt2);
+
+	vec cp2 = f.ToPolyhedron().ClosestPoint(pt2); // This is known to be correct.
+	assert2(cp.Equals(cp2), cp, cp2);
 }
 
 BENCHMARK(Frustum_ClosestPoint_Point, "Frustum::ClosestPoint(point)")
