@@ -12,6 +12,16 @@ MATH_BEGIN_NAMESPACE
 
 using namespace TestData;
 
+UNIQUE_TEST(OBB_ClosestPoint_Point)
+{
+	vec pt = POINT_VEC_SCALAR(0.f);
+	OBB o(pt, DIR_VEC(1.f, 1.f, 1.f), vec::unitX, vec::unitY, vec::unitZ);
+	assert(o.ClosestPoint(pt).Equals(pt));
+	assert(o.ClosestPoint(POINT_VEC(5.f, 0.f, 0.f)).Equals(POINT_VEC(1.f, 0.f, 0.f)));
+	assert(o.ClosestPoint(POINT_VEC(5.f, 5.f, 5.f)).Equals(POINT_VEC(1.f, 1.f, 1.f)));
+	assert(o.ClosestPoint(POINT_VEC(-5.f, -5.f, -5.f)).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
+}
+
 BENCHMARK(OBBContains, "OBB::Contains(point)")
 {
 	uf[i] = obb[i].Contains(ve[i]) ? 1.f : 0.f;

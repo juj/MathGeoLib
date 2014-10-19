@@ -644,12 +644,26 @@ float3x4 OBB::LocalToWorld() const
 /// The implementation of this function is from Christer Ericson's Real-Time Collision Detection, p.133.
 vec OBB::ClosestPoint(const vec &targetPoint) const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Best: 8.833 nsecs / 24 ticks, Avg: 9.044 nsecs, Worst: 9.217 nsecs
+	simd4f d = sub_ps(targetPoint.v, pos.v);
+	simd4f x = shuffle1_ps(r.v, _MM_SHUFFLE(0,0,0,0));
+	simd4f closestPoint = pos.v;
+	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[0].v), x), negate_ps(x)), axis[0].v));
+	simd4f y = shuffle1_ps(r.v, _MM_SHUFFLE(1,1,1,1));
+	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[1].v), y), negate_ps(y)), axis[1].v));
+	simd4f z = shuffle1_ps(r.v, _MM_SHUFFLE(2,2,2,2));
+	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[2].v), z), negate_ps(z)), axis[2].v));
+	return closestPoint;
+#else
+	// Best: 33.412 nsecs / 89.952 ticks, Avg: 33.804 nsecs, Worst: 34.180 nsecs
 	vec d = targetPoint - pos;
 	vec closestPoint = pos; // Start at the center point of the OBB.
 	for(int i = 0; i < 3; ++i) // Project the target onto the OBB axes and walk towards that point.
 		closestPoint += Clamp(Dot(d, axis[i]), -r[i], r[i]) * axis[i];
 
 	return closestPoint;
+#endif
 }
 
 float OBB::Volume() const
