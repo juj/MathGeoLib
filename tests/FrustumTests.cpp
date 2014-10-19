@@ -606,9 +606,17 @@ RANDOMIZED_TEST(Frustum_ClosestPoint_Point)
 	vec n = f.NearPlanePos(0.f, 0.f);
 	assert(f.ClosestPoint(n).Equals(n));
 	vec p = f.Pos();
-	assert3(f.ClosestPoint(p).Equals(n), p, f.ClosestPoint(p), n);
+	vec cp = f.ClosestPoint(p);
+	assert(EqualAbs(cp.w, 1.f));
+	assert3(cp.Equals(n), p, cp, n);
 
 	vec d = f.FarPlanePos(0.f, 0.f);
 	vec front = f.Front();
 	assert(f.ClosestPoint(d + front).Equals(d));
 }
+
+BENCHMARK(Frustum_ClosestPoint_Point, "Frustum::ClosestPoint(point)")
+{
+	dummyResultVec += frustum[i].ClosestPoint(ve[i]);
+}
+BENCHMARK_END;
