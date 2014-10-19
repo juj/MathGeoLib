@@ -306,9 +306,11 @@ const simd4f simd4fOne      = set1_ps(1.f);
 const simd4f simd4fMinusOne = set1_ps(-1.f);
 const simd4f simd4fEpsilon  = set1_ps(1e-4f);
 
-///\todo Benchmark which one is better!
+// NOTE: This version was benchmarked to be minutely better than the sub_ps(zero_ps) version on a SSE 4.1 capable system in OBB::ClosestPoint(point):
+// sub_ps&zero_ps: Best: 8.833 nsecs / 24 ticks, Avg: 9.044 nsecs, Worst: 9.217 nsecs
+// xor_ps&signMask: Best: 8.833 nsecs / 23.768 ticks, Avg: 8.975 nsecs, Worst: 9.601 nsecs
+// However the memory load is still worrying, so using the zero_ps still for now.
 //#define negate_ps(x) _mm_xor_ps(x, sseSignMask)
-//#define negate_ps(x) _mm_sub_ps(_mm_setzero_ps(), x)
 
 #define negate_ps(x) sub_ps(zero_ps(), (x))
 
@@ -328,6 +330,7 @@ static const float andMaskOneF = ReinterpretAsFloat(0xFFFFFFFFU);
 /// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
 static const simd4f sseMaskXYZ = set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
 static const simd4f sseSignMask3 = set_ps(0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
+static const simd4f sseSignMask = set_ps(-0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
 #ifdef MATH_AVX
 static const __m256 sseSignMask256 = _mm256_set1_ps(-0.f); // -0.f = 1 << 31
 #endif
