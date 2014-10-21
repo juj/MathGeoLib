@@ -167,14 +167,18 @@ float Frustum::AspectRatio() const
 
 void Frustum::SetHorizontalFovAndAspectRatio(float hFov, float aspectRatio)
 {
+	type = PerspectiveFrustum;
 	horizontalFov = hFov;
 	verticalFov = 2.f * Atan(Tan(hFov*0.5f)/aspectRatio);
+	ProjectionMatrixChanged();
 }
 
 void Frustum::SetVerticalFovAndAspectRatio(float vFov, float aspectRatio)
 {
+	type = PerspectiveFrustum;
 	verticalFov = vFov;
 	horizontalFov = 2.f * Atan(Tan(vFov*0.5f)*aspectRatio);
+	ProjectionMatrixChanged();
 }
 
 vec Frustum::WorldRight() const
@@ -288,6 +292,9 @@ void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
 	assume(up.IsNormalized());
 	assume(worldTransform.IsColOrthogonal3()); // Front and up must be orthogonal to each other.
 	assume(EqualAbs(worldTransform.Determinant(), 1.f)); // The matrix cannot contain mirroring.
+
+	// Finally store the passed world matrix as the cached matrix.
+	worldMatrix = worldTransform;
 }
 
 float3x4 Frustum::ComputeWorldMatrix() const

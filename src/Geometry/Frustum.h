@@ -213,7 +213,7 @@ public:
 	/** A Frustum that uses the perspective projection is shaped like a pyramid that is cut from the top, and has a
 		base with a rectangular area.
 		@note Calling this function recomputes the cached projection matrix of this Frustum.
-		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetPos(), SetFront(), SetUp(), SetOrthographic(), HorizontalFov(), VerticalFov(). */
+		@see SetKind(), SetViewPlaneDistances(), SetFrame(), SetPos(), SetFront(), SetUp(), SetOrthographic(), HorizontalFov(), VerticalFov(), SetHorizontalFovAndAspectRatio(), SetVerticalFovAndAspectRatio(). */
 	void SetPerspective(float horizontalFov, float verticalFov);
 
 	/// Makes this Frustum use an orthographic projection formula with the given FOV parameters.
@@ -285,12 +285,18 @@ public:
 		@see horizontalFov, verticalFov. */
 	float AspectRatio() const;
 
-	/// Specifies the horizontal and vertical field-of-view values for this Frustum based on the given horizontal FOV
-	/// and the screen size aspect ratio.
+	/// Makes this Frustum use a perspective projection formula with the given horizontal FOV parameter and aspect ratio.
+	/** Specifies the horizontal and vertical field-of-view values for this Frustum based on the given horizontal FOV
+		and the screen size aspect ratio.
+		@note Calling this function recomputes the cached projection matrix of this Frustum.
+		@see SetPerspective(), SetVerticalFovAndAspectRatio(). */
 	void SetHorizontalFovAndAspectRatio(float horizontalFov, float aspectRatio);
 
-	/// Specifies the horizontal and vertical field-of-view values for this Frustum based on the given vertical FOV
-	/// and the screen size aspect ratio.
+	/// Makes this Frustum use a perspective projection formula with the given vertical FOV parameter and aspect ratio.
+	/** Specifies the horizontal and vertical field-of-view values for this Frustum based on the given vertical FOV
+		and the screen size aspect ratio.
+		@note Calling this function recomputes the cached projection matrix of this Frustum.
+		@see SetPerspective(), SetHorizontalFovAndAspectRatio(). */
 	void SetVerticalFovAndAspectRatio(float verticalFov, float aspectRatio);
 
 	/// Computes the direction vector that points logically to the right-hand side of the Frustum.
