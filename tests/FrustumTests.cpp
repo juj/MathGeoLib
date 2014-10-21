@@ -625,6 +625,12 @@ RANDOMIZED_TEST(Frustum_ClosestPoint_Point)
 
 BENCHMARK(Frustum_ClosestPoint_Point, "Frustum::ClosestPoint(point)")
 {
+#ifdef FAIL_USING_EXCEPTIONS
+	try { // Ignore failures in this benchmark.
+#endif
 	dummyResultVec += frustum[i].ClosestPoint(ve[i]);
+#ifdef FAIL_USING_EXCEPTIONS
+	} catch(...) {};
+#endif
 }
 BENCHMARK_END;
