@@ -26,7 +26,7 @@
 #include "float2.h"
 
 #ifdef WIN32
-#include <Windows.h>
+#include "../Math/InclWindows.h"
 #endif
 
 #ifdef MATH_SSE2

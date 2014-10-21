@@ -33,12 +33,6 @@
 #include <arm_neon.h>
 #endif
 
-#ifdef WIN32
-#define Polygon Polygon_unused
-#include <Windows.h> // For DebugBreak();
-#undef Polygon
-#endif
-
 #include "assume.h"
 
 MATH_BEGIN_NAMESPACE

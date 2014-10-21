@@ -16,12 +16,6 @@
 /** @file Clock.h
 	@brief The Clock class. Supplies timing facilities. */
 
-#ifdef WIN32
-#define Polygon Polygon_unused
-#include <Windows.h>
-#undef Polygon
-#endif
-
 #ifdef __EMSCRIPTEN__
 
 // The native type for high-resolution timing is double, use
@@ -136,8 +130,9 @@ private:
 	static void InitClockData();
 
 #ifdef WIN32
-	static LARGE_INTEGER ddwTimerFrequency; ///< Ticks per second.
-	static LARGE_INTEGER ddwTimer;          ///< Temporary storage for Win32 function calls.
+	// The following two are actually used as LARGE_INTEGERs, but to avoid having to pull Windows.h in Clock.h, define them
+	// as identically sized u64 instead.
+	static u64/*LARGE_INTEGER*/ ddwTimerFrequency; ///< Ticks per second.
 #endif
 #ifdef __APPLE__
 	static tick_t ticksPerSecond;

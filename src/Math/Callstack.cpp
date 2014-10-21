@@ -3,7 +3,7 @@
 
 #if defined(WIN32) && defined(_MSC_VER) && !defined(WIN8RT)
 
-#include <Windows.h>
+#include "../Math/InclWindows.h"
 #include <DbgHelp.h>
 
 #pragma comment(lib, "dbghelp.lib")

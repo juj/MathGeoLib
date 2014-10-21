@@ -20,17 +20,9 @@
 
 #include "../MathBuildConfig.h"
 #include "../Math/MathNamespace.h"
-#ifdef WIN32
-// Windows GDI has a global function named Polygon. I am not renaming my Polygon object just for its sake, especially since
-// I'm not expecting anyone to co-use this library with GDI. Kill the Polygon function from Windows. and force-include
-// Windows.h here to erase that function signature.
 
-// If this is an issue for you, do the following things to use MathGeoLib from behind a namespace:
-// 1. Enable MATH_ENABLE_NAMESPACE and disable MATH_AUTO_USE_NAMESPACE in MathBuildConfig.h
-// 2. Comment out the following three lines.
-#define Polygon Polygon_unused
-#include <Windows.h>
-#undef Polygon
+#if defined(WIN32) && defined(MATH_WIN32_INTEROP)
+#include "../Math/InclWindows.h"
 #endif
 
 #include "AABB.h"

@@ -23,21 +23,13 @@
 
 #include "Callstack.h"
 
-#if defined(WIN32)
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#if defined(WIN32) || defined(WIN8PHONE)
+#include "../Math/InclWindows.h"
 #endif
 
 #if defined(ANDROID)
 /// This will require you to pass '-llog' on the command line to link against the Android logging libraries.
 #include <android/log.h>
-#endif
-
-#ifdef WIN8PHONE
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <Windows.h>
 #endif
 
 #ifdef _MSC_VER

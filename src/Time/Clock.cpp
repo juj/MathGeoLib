@@ -23,7 +23,7 @@
 #endif
 
 #ifdef WIN32
-#include <windows.h>
+#include "../Math/InclWindows.h"
 #endif
 
 #ifdef EMSCRIPTEN
@@ -41,7 +41,7 @@
 MATH_BEGIN_NAMESPACE
 
 #ifdef WIN32
-LARGE_INTEGER Clock::ddwTimerFrequency;
+u64 Clock::ddwTimerFrequency;
 #endif
 
 #ifdef __APPLE__
@@ -58,11 +58,10 @@ void Clock::InitClockData()
 		appStartTime = Tick();
 
 #ifdef WIN32
-	if (!QueryPerformanceFrequency(&ddwTimerFrequency))
+	if (!QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&ddwTimerFrequency)))
 	{
 		LOGE("The system doesn't support high-resolution timers!");
-		ddwTimerFrequency.HighPart = (unsigned long)-1;
-		ddwTimerFrequency.LowPart = (unsigned long)-1;
+		ddwTimerFrequency = (u64)-1;
 	}
 
 	if (appStartTime == 0)
@@ -283,7 +282,7 @@ tick_t Clock::TicksPerSec()
 #endif
 
 #elif defined(WIN32)
-	return ddwTimerFrequency.QuadPart;
+	return ddwTimerFrequency;
 #elif defined(__APPLE__)
 	return ticksPerSecond;
 #elif defined(_POSIX_MONOTONIC_CLOCK)
