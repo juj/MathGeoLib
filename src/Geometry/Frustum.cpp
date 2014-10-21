@@ -287,9 +287,10 @@ void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
 	else
 		front = DIR_VEC(worldTransform.Col(2)); // The camera looks towards +Z axis of the given transform.
 	up = DIR_VEC(worldTransform.Col(1)); // The camera up points towards +Y of the given transform.
-	assume(pos.IsFinite());
-	assume(front.IsNormalized());
-	assume(up.IsNormalized());
+	assume1(pos.IsFinite(), pos);
+	assume2(up.IsNormalized(1e-3f), up, up.Length());
+	assume2(front.IsNormalized(1e-3f), front, front.Length());
+	assume3(up.IsPerpendicular(front), up, front, up.Dot(front));
 	assume(worldTransform.IsColOrthogonal3()); // Front and up must be orthogonal to each other.
 	assume(EqualAbs(worldTransform.Determinant(), 1.f)); // The matrix cannot contain mirroring.
 
@@ -299,8 +300,10 @@ void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
 
 float3x4 Frustum::ComputeWorldMatrix() const
 {
-	assume(up.IsNormalized());
-	assume(front.IsNormalized());
+	assume1(pos.IsFinite(), pos);
+	assume2(up.IsNormalized(1e-3f), up, up.Length());
+	assume2(front.IsNormalized(1e-3f), front, front.Length());
+	assume3(up.IsPerpendicular(front), up, front, up.Dot(front));
 	float3x4 m;
 	m.SetCol(0, DIR_TO_FLOAT3(WorldRight().Normalized()));
 	m.SetCol(1, DIR_TO_FLOAT3(up));
