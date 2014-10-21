@@ -396,7 +396,7 @@ public:
 			If the normalization fails, an error message is printed and the vector (1, 0, 0, oldW) is returned.
 		@see Length3(), Length4(), Normalize3(), Normalize4(), Normalized3(). */
 	float4 Normalized4() const;
-	inline float4 Normalized() { return Normalized4(); }
+	inline float4 Normalized() const { return Normalized4(); }
 
 	/// Divides each element by w to produce a float4 of form (x, y, z, 1).
 	/** This function performs the <b>perspective divide</b> or the <b>homogeneous divide</b> on this vector, which is the
