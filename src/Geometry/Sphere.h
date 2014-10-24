@@ -20,6 +20,10 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/float3.h"
 
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Sphere.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A 3D sphere.
@@ -384,9 +388,12 @@ public:
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
-
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacing) const;
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	Sphere(const Urho3D::Sphere &other) : pos(other.center_), r(other.radius_) {}
+	operator Urho3D::Sphere() const { return Urho3D::Sphere(pos, r); }
 #endif
 
 	bool Equals(const Sphere &rhs, float epsilon = 1e-3f) const { return pos.Equals(rhs.pos, epsilon) && EqualAbs(r, rhs.r, epsilon); }

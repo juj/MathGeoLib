@@ -28,6 +28,9 @@
 #ifdef MATH_OGRE_INTEROP
 #include <OgreAxisAlignedBox.h>
 #endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/BoundingBox.h>
+#endif
 
 MATH_BEGIN_NAMESPACE
 
@@ -555,10 +558,13 @@ public:
 	AABB(const Ogre::AxisAlignedBox &other):minPoint(other.getMinimum()), maxPoint(other.getMaximum()) {}
 	operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
 #endif
-
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb) const;
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	AABB(const Urho3D::BoundingBox&other) : minPoint(other.min_), maxPoint(other.max_) {}
+	operator Urho3D::BoundingBox() const { return Urho3D::BoundingBox(minPoint, maxPoint); }
 #endif
 
 	bool Equals(const AABB &rhs, float epsilon = 1e-3f) const { return minPoint.Equals(rhs.minPoint, epsilon) && maxPoint.Equals(rhs.maxPoint, epsilon); }

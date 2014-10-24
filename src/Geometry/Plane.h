@@ -23,6 +23,9 @@
 #ifdef MATH_OGRE_INTEROP
 #include <OgrePlane.h>
 #endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Plane.h>
+#endif
 
 MATH_BEGIN_NAMESPACE
 
@@ -383,11 +386,6 @@ public:
 		@return If an intersection occurs, this function returns true. */
 	static bool IntersectLinePlane(const vec &planeNormal, float planeD, const vec &linePos, const vec &lineDir, float &t);
 
-#ifdef MATH_OGRE_INTEROP
-	Plane(const Ogre::Plane &other):normal(other.normal), d(other.d) {}
-	operator Ogre::Plane() const { return Ogre::Plane(normal, d); }
-#endif
-
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns a human-readable representation of this Plane. Most useful for debugging purposes.
 	std::string ToString() const;
@@ -402,14 +400,21 @@ public:
 	static Plane FromString(const std::string &str) { return FromString(str.c_str()); }
 #endif
 
+#ifdef MATH_OGRE_INTEROP
+	Plane(const Ogre::Plane &other):normal(other.normal), d(other.d) {}
+	operator Ogre::Plane() const { return Ogre::Plane(normal, d); }
+#endif
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
-
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const vec &centerPoint, int numFacesU, int numFacesV, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const vec &centerPoint, int numLinesU, int numLinesV) const;
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	Plane(const Urho3D::Plane &other) : normal(other.normal_), d(other.d_) {}
+	operator Urho3D::Plane() const { return Urho3D::Plane(float4(normal, d)); }
 #endif
 };
 
