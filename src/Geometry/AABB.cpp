@@ -85,7 +85,7 @@ void AABB::SetFrom(const OBB &obb)
 
 void AABB::SetFrom(const Sphere &s)
 {
-	vec d = DIR_VEC(float3::FromScalar(s.r));
+	vec d = DIR_VEC_SCALAR(s.r);
 	minPoint = s.pos - d;
 	maxPoint = s.pos + d;
 }
@@ -104,7 +104,7 @@ PBVolume<6> AABB::ToPBVolume() const
 {
 	PBVolume<6> pbVolume;
 	for(int i = 0; i < 6; ++i)
-	pbVolume.p[i] = FacePlane(i);
+		pbVolume.p[i] = FacePlane(i);
 
 	return pbVolume;
 }
@@ -191,7 +191,7 @@ vec AABB::PointInside(float x, float y, float z) const
 	assume(0.f <= z && z <= 1.f);
 
 	vec d = maxPoint - minPoint;
-	return minPoint + d.Mul(POINT_VEC(float3(x, y, z)));
+	return minPoint + d.Mul(POINT_VEC(x, y, z));
 }
 
 LineSegment AABB::Edge(int edgeIndex) const
@@ -215,18 +215,18 @@ LineSegment AABB::Edge(int edgeIndex) const
 		case 11: return LineSegment(CornerPoint(6), CornerPoint(7));
 		*/
 		// Force-optimize to avoid calling to CornerPoint for another switch-case statement.
-		case 0: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, minPoint.z), POINT_VEC(minPoint.x, minPoint.y, maxPoint.z));
-		case 1: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, minPoint.z), POINT_VEC(minPoint.x, maxPoint.y, minPoint.z));
-		case 2: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, minPoint.z), POINT_VEC(maxPoint.x, minPoint.y, minPoint.z));
+		case 0: return LineSegment(minPoint, POINT_VEC(minPoint.x, minPoint.y, maxPoint.z));
+		case 1: return LineSegment(minPoint, POINT_VEC(minPoint.x, maxPoint.y, minPoint.z));
+		case 2: return LineSegment(minPoint, POINT_VEC(maxPoint.x, minPoint.y, minPoint.z));
 		case 3: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, maxPoint.z), POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z));
 		case 4: return LineSegment(POINT_VEC(minPoint.x, minPoint.y, maxPoint.z), POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z));
 		case 5: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, minPoint.z), POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z));
 		case 6: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, minPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z));
-		case 7: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 7: return LineSegment(POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z), maxPoint);
 		case 8: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, minPoint.z), POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z));
 		case 9: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, minPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z));
-		case 10: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, maxPoint.z));
-		case 11: return LineSegment(POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z), POINT_VEC(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 10: return LineSegment(POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z), maxPoint);
+		case 11: return LineSegment(POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z), maxPoint);
 	}
 }
 
@@ -236,24 +236,22 @@ vec AABB::CornerPoint(int cornerIndex) const
 	switch(cornerIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-		case 0: return POINT_VEC(float3(minPoint.x, minPoint.y, minPoint.z));
-		case 1: return POINT_VEC(float3(minPoint.x, minPoint.y, maxPoint.z));
-		case 2: return POINT_VEC(float3(minPoint.x, maxPoint.y, minPoint.z));
-		case 3: return POINT_VEC(float3(minPoint.x, maxPoint.y, maxPoint.z));
-		case 4: return POINT_VEC(float3(maxPoint.x, minPoint.y, minPoint.z));
-		case 5: return POINT_VEC(float3(maxPoint.x, minPoint.y, maxPoint.z));
-		case 6: return POINT_VEC(float3(maxPoint.x, maxPoint.y, minPoint.z));
-		case 7: return POINT_VEC(float3(maxPoint.x, maxPoint.y, maxPoint.z));
+		case 0: return minPoint;
+		case 1: return POINT_VEC(minPoint.x, minPoint.y, maxPoint.z);
+		case 2: return POINT_VEC(minPoint.x, maxPoint.y, minPoint.z);
+		case 3: return POINT_VEC(minPoint.x, maxPoint.y, maxPoint.z);
+		case 4: return POINT_VEC(maxPoint.x, minPoint.y, minPoint.z);
+		case 5: return POINT_VEC(maxPoint.x, minPoint.y, maxPoint.z);
+		case 6: return POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z);
+		case 7: return maxPoint;
 	}
 }
 
 vec AABB::ExtremePoint(const vec &direction) const
 {
-	float3 pt;
-	pt.x = (direction.x >= 0.f ? maxPoint.x : minPoint.x);
-	pt.y = (direction.y >= 0.f ? maxPoint.y : minPoint.y);
-	pt.z = (direction.z >= 0.f ? maxPoint.z : minPoint.z);
-	return POINT_VEC(pt);
+	return POINT_VEC((direction.x >= 0.f ? maxPoint.x : minPoint.x),
+	                 (direction.y >= 0.f ? maxPoint.y : minPoint.y),
+	                 (direction.z >= 0.f ? maxPoint.z : minPoint.z));
 }
 
 vec AABB::ExtremePoint(const vec &direction, float &projectionDistance) const
@@ -272,20 +270,20 @@ vec AABB::PointOnEdge(int edgeIndex, float u) const
 	switch(edgeIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return POINT_VEC(float3(minPoint.x, minPoint.y, minPoint.z + u * d.z));
-	case 1: return POINT_VEC(float3(minPoint.x, maxPoint.y, minPoint.z + u * d.z));
-	case 2: return POINT_VEC(float3(maxPoint.x, minPoint.y, minPoint.z + u * d.z));
-	case 3: return POINT_VEC(float3(maxPoint.x, maxPoint.y, minPoint.z + u * d.z));
+	case 0: return POINT_VEC(minPoint.x, minPoint.y, minPoint.z + u * d.z);
+	case 1: return POINT_VEC(minPoint.x, maxPoint.y, minPoint.z + u * d.z);
+	case 2: return POINT_VEC(maxPoint.x, minPoint.y, minPoint.z + u * d.z);
+	case 3: return POINT_VEC(maxPoint.x, maxPoint.y, minPoint.z + u * d.z);
 
-	case 4: return POINT_VEC(float3(minPoint.x, minPoint.y + u * d.y, minPoint.z));
-	case 5: return POINT_VEC(float3(maxPoint.x, minPoint.y + u * d.y, minPoint.z));
-	case 6: return POINT_VEC(float3(minPoint.x, minPoint.y + u * d.y, maxPoint.z));
-	case 7: return POINT_VEC(float3(maxPoint.x, minPoint.y + u * d.y, maxPoint.z));
+	case 4: return POINT_VEC(minPoint.x, minPoint.y + u * d.y, minPoint.z);
+	case 5: return POINT_VEC(maxPoint.x, minPoint.y + u * d.y, minPoint.z);
+	case 6: return POINT_VEC(minPoint.x, minPoint.y + u * d.y, maxPoint.z);
+	case 7: return POINT_VEC(maxPoint.x, minPoint.y + u * d.y, maxPoint.z);
 
-	case 8: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y, minPoint.z));
-	case 9: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y, maxPoint.z));
-	case 10: return POINT_VEC(float3(minPoint.x + u * d.x, maxPoint.y, minPoint.z));
-	case 11: return POINT_VEC(float3(minPoint.x + u * d.x, maxPoint.y, maxPoint.z));
+	case 8: return POINT_VEC(minPoint.x + u * d.x, minPoint.y, minPoint.z);
+	case 9: return POINT_VEC(minPoint.x + u * d.x, minPoint.y, maxPoint.z);
+	case 10: return POINT_VEC(minPoint.x + u * d.x, maxPoint.y, minPoint.z);
+	case 11: return POINT_VEC(minPoint.x + u * d.x, maxPoint.y, maxPoint.z);
 	}
 }
 
@@ -297,12 +295,12 @@ vec AABB::FaceCenterPoint(int faceIndex) const
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return POINT_VEC(float3(minPoint.x, center.y, center.z));
-	case 1: return POINT_VEC(float3(maxPoint.x, center.y, center.z));
-	case 2: return POINT_VEC(float3(center.x, minPoint.y, center.z));
-	case 3: return POINT_VEC(float3(center.x, maxPoint.y, center.z));
-	case 4: return POINT_VEC(float3(center.x, center.y, minPoint.z));
-	case 5: return POINT_VEC(float3(center.x, center.y, maxPoint.z));
+	case 0: return POINT_VEC(minPoint.x, center.y, center.z);
+	case 1: return POINT_VEC(maxPoint.x, center.y, center.z);
+	case 2: return POINT_VEC(center.x, minPoint.y, center.z);
+	case 3: return POINT_VEC(center.x, maxPoint.y, center.z);
+	case 4: return POINT_VEC(center.x, center.y, minPoint.z);
+	case 5: return POINT_VEC(center.x, center.y, maxPoint.z);
 	}
 }
 
@@ -316,12 +314,12 @@ vec AABB::FacePoint(int faceIndex, float u, float v) const
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return POINT_VEC(float3(minPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z));
-	case 1: return POINT_VEC(float3(maxPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z));
-	case 2: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y, minPoint.z + v * d.z));
-	case 3: return POINT_VEC(float3(minPoint.x + u * d.x, maxPoint.y, minPoint.z + v * d.z));
-	case 4: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y + v * d.y, minPoint.z));
-	case 5: return POINT_VEC(float3(minPoint.x + u * d.x, minPoint.y + v * d.y, maxPoint.z));
+	case 0: return POINT_VEC(minPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z);
+	case 1: return POINT_VEC(maxPoint.x, minPoint.y + u * d.y, minPoint.z + v * d.z);
+	case 2: return POINT_VEC(minPoint.x + u * d.x, minPoint.y, minPoint.z + v * d.z);
+	case 3: return POINT_VEC(minPoint.x + u * d.x, maxPoint.y, minPoint.z + v * d.z);
+	case 4: return POINT_VEC(minPoint.x + u * d.x, minPoint.y + v * d.y, minPoint.z);
+	case 5: return POINT_VEC(minPoint.x + u * d.x, minPoint.y + v * d.y, maxPoint.z);
 	}
 }
 
@@ -331,12 +329,12 @@ vec AABB::FaceNormal(int faceIndex) const
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
-	case 0: return DIR_VEC(float3(-1,  0,  0));
-	case 1: return DIR_VEC(float3( 1,  0,  0));
-	case 2: return DIR_VEC(float3( 0, -1,  0));
-	case 3: return DIR_VEC(float3( 0,  1,  0));
-	case 4: return DIR_VEC(float3( 0,  0, -1));
-	case 5: return DIR_VEC(float3( 0,  0,  1));
+	case 0: return DIR_VEC(-1,  0,  0);
+	case 1: return DIR_VEC( 1,  0,  0);
+	case 2: return DIR_VEC( 0, -1,  0);
+	case 3: return DIR_VEC( 0,  1,  0);
+	case 4: return DIR_VEC( 0,  0, -1);
+	case 5: return DIR_VEC( 0,  0,  1);
 	}
 }
 
@@ -477,7 +475,7 @@ void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 	vec newCenter = m.MulPos(centerPoint);
 
 	// The following is equal to taking the absolute value of the whole matrix m.
-	vec newDir = DIR_VEC(float3(ABSDOT3(m[0], halfSize), ABSDOT3(m[1], halfSize), ABSDOT3(m[2], halfSize)));
+	vec newDir = DIR_VEC(ABSDOT3(m[0], halfSize), ABSDOT3(m[1], halfSize), ABSDOT3(m[2], halfSize));
 	aabb.minPoint = newCenter - newDir;
 	aabb.maxPoint = newCenter + newDir;
 }
