@@ -31,9 +31,11 @@
 #ifdef MATH_QT_INTEROP
 #include <QVector4D>
 #endif
-
 #ifdef MATH_OGRE_INTEROP
 #include <OgreVector4.h>
+#endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Vector4.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
@@ -806,6 +808,10 @@ public:
 	// Bullet uses the same btVector3 class for both 3- and 4 -tuples (due to SSE).
 	float4(const btVector3 &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator btVector3() const { btVector3 v(x, y, z); v.setW(w); return v; }
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	float4(const Urho3D::Vector4 &other) : x(other.x_), y(other.y_), z(other.z_), w(other.w_) {}
+	operator Urho3D::Vector4() const { return Urho3D::Vector4(x, y, z, w); }
 #endif
 
 #ifdef MATH_SIMD

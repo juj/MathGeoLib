@@ -28,17 +28,14 @@
 #ifdef MATH_QT_INTEROP
 #include <QQuaternion>
 #endif
-/*
-#ifdef MATH_IRRLICHT_INTEROP
-#include "Quaternion.h"
-#endif
-*/
 #ifdef MATH_OGRE_INTEROP
 #include <OgreQuaternion.h>
 #endif
-
 #ifdef MATH_BULLET_INTEROP
 #include <LinearMath/btQuaternion.h>
+#endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Quaternion.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
@@ -387,12 +384,6 @@ public:
 	Quat(const Ogre::Quaternion &other):x(other.x), y(other.y), z(other.z), w(other.w) {}
 	operator Ogre::Quaternion() const { return Ogre::Quaternion(w, x, y, z); }
 #endif
-/*
-#ifdef MATH_IRRLICHT_INTEROP
-	Quat(const Quaternion &other) { w = other.w; x = other.x; y = other.y; z = other.z; }
-	operator Quaternion() const { return Quaternion(x, y, z, w); }
-#endif
-*/
 #ifdef MATH_QT_INTEROP
 	Quat(const QQuaternion &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator QQuaternion() const { return QQuaternion(w, x, y, z); }
@@ -405,6 +396,10 @@ public:
 #ifdef MATH_BULLET_INTEROP
 	Quat(const btQuaternion &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
 	operator btQuaternion() const { return btQuaternion(x, y, z, w); }
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	Quat(const Urho3D::Quaternion &other) : x(other.x_), y(other.y_), z(other.z_), w(other.w_) {}
+	operator Urho3D::Quaternion() const { return Urho3D::Quaternion(x, y, z, w); }
 #endif
 
 	/// Multiplies two quaternions in the order 'this * rhs'.

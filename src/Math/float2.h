@@ -29,9 +29,11 @@
 #ifdef MATH_QT_INTEROP
 #include <QVector2D>
 #endif
-
 #ifdef MATH_OGRE_INTEROP
 #include <OgreVector2.h>
+#endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Vector2.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
@@ -615,6 +617,10 @@ public:
 	QVector2D ToQVector2D() const { return QVector2D(x, y); }
 	static float2 FromQVector2D(const QVector2D &v) { return (float2)v; }
 	static float2 FromString(const QString &str) { return FromString(str.toStdString()); }
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	float2(const Urho3D::Vector2 &other) : x(other.x_), y(other.y_) {}
+	operator Urho3D::Vector2() const { return Urho3D::Vector2(x, y); }
 #endif
 };
 

@@ -27,6 +27,10 @@
 #include "float3.h"
 #include "SSEMath.h"
 
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Matrix3x4.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 /// A 3-by-4 matrix for affine transformations of 3D geometry.
@@ -798,6 +802,10 @@ public:
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }
 	QString toString() const { return ToString2().c_str(); }
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	float3x4(const Urho3D::Matrix3x4 &m) { Set(m.m00_, m.m01_, m.m02_, m.m03_, m.m10_, m.m11_, m.m12_, m.m13_, m.m20_, m.m21_, m.m22_, m.m23_); }
+	operator Urho3D::Matrix3x4() { return Urho3D::Matrix3x4(ptr()); }
 #endif
 };
 

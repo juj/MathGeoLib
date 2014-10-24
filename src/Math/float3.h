@@ -28,17 +28,14 @@
 #ifdef MATH_QT_INTEROP
 #include <QVector3D>
 #endif
-/*
-#ifdef MATH_IRRLICHT_INTEROP
-#include "float3.h"
-#endif
-*/
 #ifdef MATH_OGRE_INTEROP
 #include <OgreVector3.h>
 #endif
-
 #ifdef MATH_BULLET_INTEROP
-#include "LinearMath/btVector3.h"
+#include <LinearMath/btVector3.h>
+#endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Vector3.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
@@ -688,12 +685,6 @@ public:
 	float3(const Ogre::Vector3 &other):x(other.x), y(other.y), z(other.z) {}
 	operator Ogre::Vector3() const { return Ogre::Vector3(x, y, z); }
 #endif
-/*
-#ifdef MATH_IRRLICHT_INTEROP
-	float3(const Vector3df &other) { x = other.x; y = other.y; z = other.z; }
-	operator Vector3df() const { return Vector3df(x, y, z); }
-#endif
-*/
 #ifdef MATH_QT_INTEROP
 	float3(const QVector3D &other):x(other.x()), y(other.y()), z(other.z()) {}
 	operator QVector3D() const { return QVector3D(x, y, z); }
@@ -706,6 +697,10 @@ public:
 #ifdef MATH_BULLET_INTEROP
 	float3(const btVector3 &other):x(other.x()), y(other.y()), z(other.z()) {}
 	operator btVector3() const { return btVector3(x, y, z); }
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	float3(const Urho3D::Vector3 &other) : x(other.x_), y(other.y_), z(other.z_) {}
+	operator Urho3D::Vector3() const { return Urho3D::Vector3(x, y, z); }
 #endif
 };
 

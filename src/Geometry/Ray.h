@@ -23,6 +23,9 @@
 #ifdef MATH_OGRE_INTEROP
 #include <OgreRay.h>
 #endif
+#ifdef MATH_URHO3D_INTEROP
+#include <Engine/Math/Ray.h>
+#endif
 
 MATH_BEGIN_NAMESPACE
 
@@ -229,10 +232,13 @@ public:
 	operator QString() const { return toString(); }
 	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
-
 #ifdef MATH_OGRE_INTEROP
 	Ray(const Ogre::Ray &other):pos(other.getOrigin()), dir(other.getDirection()) {}
 	operator Ogre::Ray() const { return Ogre::Ray(pos, dir); }
+#endif
+#ifdef MATH_URHO3D_INTEROP
+	Ray(const Urho3D::Ray &other) : pos(other.origin_), dir(other.direction_) {}
+	operator Urho3D::Ray() const { return Urho3D::Ray(pos, dir); }
 #endif
 };
 
