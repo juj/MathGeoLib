@@ -31,6 +31,7 @@ def canonicalizeSymbolName(symbol):
   symbol = symbol.replace('static ', '')
   symbol = symbol.replace('union ', '')
   symbol = symbol.replace('struct ', '')
+  symbol = symbol.replace('enum ', '')
   symbol = symbol.replace('class ', '')
   symbol = symbol.replace(')const', ') const')
 
