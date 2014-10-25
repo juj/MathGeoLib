@@ -593,43 +593,69 @@ float AABB::Distance(const Sphere &sphere) const
 
 bool AABB::Contains(const vec &point) const
 {
-/*
-#if defined(MATH_SSE2) && defined(MATH_AUTOMATIC_SSE)
-	// A SSE2 version of this algorithm with comparisons would look as follows. However it is benchmarked to be slower than the scalar version below,
-	// so keep it disabled for now, but retain for historical reference ("don't do this").
+// Benchmarking this code is very difficult, since branch prediction makes the scalar version
+// look very good. In isolation the scalar version might be better, however when joined with
+// other SSE computation, the SIMD variants are probably more efficient because the data is
+// already "hot" in the registers. Therefore favoring the SSE version over the scalar version
+// when possible.
 
-	// Best: 3.012 nsecs / 6.039 ticks, Avg: 3.602 nsecs, Worst: 4.216 nsecs
-	simd4f a = _mm_cmple_ps(minPoint, point);
-	simd4f b = _mm_cmple_ps(point, maxPoint);
-	a = and_ps(a, b);
-	simd4f y = _mm_shuffle_ps(a, a, _MM_SHUFFLE(1, 1, 1, 1));
-	simd4f z = _mm_shuffle_ps(a, a, _MM_SHUFFLE(2, 2, 2, 2));
-	y = and_ps(y, z);
-	a = and_ps(a, y);
-	int d = _mm_cvtsi128_si32(_mm_castps_si128(a));
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE41)
+	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
+	//    Best: 2.048 nsecs / 3.5128 ticks, Avg: 2.241 nsecs, Worst: 4.277 nsecs
+	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
+	//    Best: 2.048 nsecs / 3.467 ticks, Avg: 2.115 nsecs, Worst: 4.156 nsecs
+	// Benchmark 'AABBContains_unpredictable': AABB::Contains(point) unpredictable
+	//    Best: 2.590 nsecs / 4.4106 ticks, Avg: 2.978 nsecs, Worst: 6.084 nsecs
+	simd4f a = cmplt_ps(point, minPoint);
+	simd4f b = cmpgt_ps(point, maxPoint);
+	a = or_ps(a, b);
+	return _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(a)) != 0;
+
+/* // This version with hadd_ps is interesting, but does not make sense because hadd is so slow!
+#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE3)
+	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
+	//    Best: 3.373 nsecs / 5.7862 ticks, Avg: 3.651 nsecs, Worst: 7.951 nsecs
+	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
+	//    Best: 3.132 nsecs / 5.3906 ticks, Avg: 3.383 nsecs, Worst: 8.312 nsecs
+	// Benchmark 'AABBContains_unpredictable': AABB::Contains(point) unpredictable
+	//    Best: 3.734 nsecs / 6.3922 ticks, Avg: 4.008 nsecs, Worst: 7.951 nsecs
+	simd4f a = cmplt_ps(point, minPoint);
+	simd4f b = cmpgt_ps(point, maxPoint);
+	a = or_ps(a, b);
+	a = _mm_hadd_ps(a, a);
+	a = _mm_hadd_ps(a, a);
+	int d = _mm_ucomige_ss(a, a);
 	return d != 0;
-#else
 */
-/*
-#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
-	// A SSE1 version of this algorithm without comparisons could look as follows. However it is benchmarked to be slower than the scalar version below,
-	// so keep it disabled for now, but retain for historical reference ("don't do this").
+#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
+	//    Best: 3.012 nsecs / 5.1382 ticks, Avg: 3.235 nsecs, Worst: 5.361 nsecs
+	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
+	//    Best: 3.012 nsecs / 5.1374 ticks, Avg: 3.230 nsecs, Worst: 5.602 nsecs
+	// Benchmark 'AABBContains_unpredictable': AABB::Contains(point) unpredictable
+	//    Best: 3.554 nsecs / 6.0404 ticks, Avg: 3.797 nsecs, Worst: 6.626 nsecs
+	simd4f a = cmplt_ps(point, minPoint);
+	simd4f b = cmpgt_ps(point, maxPoint);
+	a = or_ps(a, b);
+	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1, 1, 1, 1));
+	a = or_ps(a, y);
+	y = _mm_movehl_ps(y, a);
+	a = or_ps(a, y);
+	int d = _mm_ucomige_ss(a, a);
+	return d != 0;
 
-	// Best: 4.819 nsecs / 7.984 ticks, Avg: 5.927 nsecs, Worst: 17.468 nsecs
-	simd4f center = mul_ps(add_ps(minPoint, maxPoint), set1_ps(0.5f));
-	simd4f halfSize = sub_ps(center, minPoint);
-	simd4f pt = abs_ps(sub_ps(point.v, center));
-	pt = sub_ps(pt, halfSize);
-	simd4f y = _mm_shuffle_ps(pt, pt, _MM_SHUFFLE(1, 1, 1, 1));
-	simd4f z = _mm_shuffle_ps(pt, pt, _MM_SHUFFLE(2, 2, 2, 2));
-	pt = _mm_max_ss(z, _mm_max_ss(pt, y));
-	return _mm_cvtss_f32(pt) <= 0.f; // Note: This might be micro-optimized further out by switching to a signature "float AABB::SignedDistance(point)" instead.
 #else
-*/
-	// Best: 1.807 nsecs / 3.1 ticks, Avg: 2.012 nsecs, Worst: 6.626 nsecs
+	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
+	//    Best: 2.108 nsecs / 3.6022 ticks, Avg: 2.232 nsecs, Worst: 4.638 nsecs
+	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
+	//    Best: 1.988 nsecs / 3.361 ticks, Avg: 2.148 nsecs, Worst: 4.457 nsecs
+	// Benchmark 'AABBContains_unpredictable': AABB::Contains(point) unpredictable
+	//    Best: 3.554 nsecs / 6.0764 ticks, Avg: 3.803 nsecs, Worst: 6.264 nsecs
 	return minPoint.x <= point.x && point.x <= maxPoint.x &&
-		   minPoint.y <= point.y && point.y <= maxPoint.y &&
-		   minPoint.z <= point.z && point.z <= maxPoint.z;
+	       minPoint.y <= point.y && point.y <= maxPoint.y &&
+	       minPoint.z <= point.z && point.z <= maxPoint.z;
+
+#endif
 }
 
 bool AABB::Contains(const LineSegment &lineSegment) const

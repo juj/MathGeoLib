@@ -14,11 +14,39 @@ MATH_BEGIN_NAMESPACE
 
 using namespace TestData;
 
-BENCHMARK(AABBContains, "AABB::Contains(point)")
+BENCHMARK(AABBContains_positive, "AABB::Contains(point) positive")
 {
-	uf[i] = aabb[i].Contains(ve[i]) ? 1.f : 0.f;
+	uf[i] = aabb[i].Contains(aabb[i].minPoint) ? 1.f : 0.f;
 }
 BENCHMARK_END
+
+BENCHMARK(AABBContains_negative, "AABB::Contains(point) negative")
+{
+	uf[i] = aabb[i].Contains(POINT_VEC_SCALAR(1e10f)) ? 1.f : 0.f;
+}
+BENCHMARK_END
+
+BENCHMARK(AABBContains_unpredictable, "AABB::Contains(point) unpredictable")
+{
+	uf[i] = aabb[i].Contains((i%2 == 0) ? POINT_VEC_SCALAR(1e10f) : aabb[i].minPoint) ? 1.f : 0.f;
+}
+BENCHMARK_END
+
+UNIQUE_TEST(AABBContains)
+{
+	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
+	assert(a.Contains(POINT_VEC(0,0,0)));
+	assert(a.Contains(POINT_VEC(10,10,10)));
+	assert(a.Contains(POINT_VEC(1,2,3)));
+	assert(!a.Contains(POINT_VEC(-1,2,3)));
+	assert(!a.Contains(POINT_VEC(1,-2,3)));
+	assert(!a.Contains(POINT_VEC(1,2,-3)));
+	assert(!a.Contains(POINT_VEC(11,2,3)));
+	assert(!a.Contains(POINT_VEC(1,12,3)));
+	assert(!a.Contains(POINT_VEC(1,2,13)));
+	assert(!a.Contains(POINT_VEC(-1,-2,-3)));
+	assert(!a.Contains(POINT_VEC(11,12,13)));
+}
 
 RANDOMIZED_TEST(AABBTransformAsAABB)
 {
