@@ -972,6 +972,23 @@ bool AABB::Intersects(const Plane &plane) const
 
 bool AABB::Intersects(const AABB &aabb) const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE41)
+	// Benchmark 'AABBIntersectsAABB_positive': AABB::Intersects(AABB) positive
+	//    Best: 2.229 nsecs / 3.848 ticks, Avg: 2.409 nsecs, Worst: 4.457 nsecs
+	// Benchmark 'AABBIntersectsAABB_random': AABB::Intersects(AABB) random
+	//    Best: 3.072 nsecs / 5.2904 ticks, Avg: 3.262 nsecs, Worst: 5.301 nsecs
+
+	simd4f a = cmpge_ps(minPoint.v, aabb.maxPoint.v);
+	simd4f b = cmpge_ps(aabb.minPoint.v, maxPoint.v);
+	a = or_ps(a, b);
+	a = and_ps(a, set_ps_hex(0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)); // Mask off results from the W channel.
+	return _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(a)) != 0;
+#else
+	// Benchmark 'AABBIntersectsAABB_positive': AABB::Intersects(AABB) positive
+	//    Best: 2.108 nsecs / 3.588 ticks, Avg: 2.310 nsecs, Worst: 5.481 nsecs
+	// Benchmark 'AABBIntersectsAABB_random': AABB::Intersects(AABB) random
+	//    Best: 7.529 nsecs / 12.8282 ticks, Avg: 8.892 nsecs, Worst: 16.323 nsecs
+
 	// If any of the cardinal X,Y,Z axes is a separating axis, then
 	// there is no intersection.
 	return minPoint.x < aabb.maxPoint.x &&
@@ -980,6 +997,7 @@ bool AABB::Intersects(const AABB &aabb) const
 	       aabb.minPoint.x < maxPoint.x &&
 	       aabb.minPoint.y < maxPoint.y &&
 	       aabb.minPoint.z < maxPoint.z;
+#endif
 }
 
 bool AABB::Intersects(const OBB &obb) const

@@ -48,6 +48,32 @@ UNIQUE_TEST(AABBContains)
 	assert(!a.Contains(POINT_VEC(11,12,13)));
 }
 
+UNIQUE_TEST(AABBIntersectsAABB)
+{
+	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
+	AABB b(POINT_VEC(5,0,0), POINT_VEC(15, 10, 10));
+	AABB c(POINT_VEC(-5,-5,-5), POINT_VEC(0, 10, 0));
+	AABB d(POINT_VEC(20,20,20), POINT_VEC(30, 30, 30));
+	AABB e(POINT_VEC(1,1,1), POINT_VEC(9,9,9));
+	assert(a.Intersects(a));
+	assert(a.Intersects(b));
+	assert(!a.Intersects(c));
+	assert(!a.Intersects(d));
+	assert(a.Intersects(e));
+}
+
+BENCHMARK(AABBIntersectsAABB_positive, "AABB::Intersects(AABB) positive")
+{
+	uf[i] = aabb[i].Intersects(aabb[i]) ? 1.f : 0.f;
+}
+BENCHMARK_END
+
+BENCHMARK(AABBIntersectsAABB_random, "AABB::Intersects(AABB) random")
+{
+	uf[i] = aabb[i].Intersects(aabb[i+1]) ? 1.f : 0.f;
+}
+BENCHMARK_END
+
 RANDOMIZED_TEST(AABBTransformAsAABB)
 {
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
