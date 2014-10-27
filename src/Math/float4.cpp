@@ -184,6 +184,69 @@ float4 float4::Swizzled(int i, int j, int k, int l) const
 #endif
 }
 
+float4 float4::xxxx() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(0, 0, 0, 0));
+#else
+	return float4::FromScalar(x);
+#endif
+}
+
+float4 float4::yyyy() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(1, 1, 1, 1));
+#else
+	return float4::FromScalar(x);
+#endif
+}
+
+float4 float4::zzzz() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(2, 2, 2, 2));
+#else
+	return float4::FromScalar(x);
+#endif
+}
+
+float4 float4::xxxw() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(3, 0, 0, 0));
+#else
+	return float4(x, x, x, w);
+#endif
+}
+
+float4 float4::yyyw() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(3, 1, 1, 1));
+#else
+	return float4(y, y, y, w);
+#endif
+}
+
+float4 float4::zzzw() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(3, 2, 2, 2));
+#else
+	return float4(z, z, z, w);
+#endif
+}
+
+float4 float4::wwww() const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	return shuffle1_ps(v, _MM_SHUFFLE(3, 3, 3, 3));
+#else
+	return float4::FromScalar(x);
+#endif
+}
+
 #ifdef MATH_SIMD
 
 /// The returned vector contains the squared length of the float3 part in the lowest channel of the vector.

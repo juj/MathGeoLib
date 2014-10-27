@@ -278,6 +278,14 @@ public:
 	float3 Swizzled(int i, int j, int k) const;
 	float2 Swizzled(int i, int j) const;
 
+	float4 xxxx() const;
+	float4 xxxw() const;
+	float4 yyyy() const;
+	float4 yyyw() const;
+	float4 zzzz() const;
+	float4 zzzw() const;
+	float4 wwww() const;
+
 	/// Returns float4(scalar, scalar, scalar, scalar).
 	/** @see float4::float4(float scalar), SetFromScalar(). */
 	static float4 FromScalar(float scalar);
