@@ -424,6 +424,55 @@ inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
 }
 
+// Multiplies a 4x4 matrix by a 3x4 matrix, producing a 4x4 matrix.
+// @param out A 4x4 matrix (4 x __m128)
+// @param m1 left-hand side matrix (4 x __m128)
+// @param m2 right-hand side matrix (3 x __m128)
+inline void mat4x4_mul_mat3x4_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
+{
+	const __m128 m2_3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+
+	__m128 s0 = shuffle1_ps(m1[0], _MM_SHUFFLE(0,0,0,0));
+	__m128 s1 = shuffle1_ps(m1[0], _MM_SHUFFLE(1,1,1,1));
+	__m128 s2 = shuffle1_ps(m1[0], _MM_SHUFFLE(2,2,2,2));
+	__m128 s3 = shuffle1_ps(m1[0], _MM_SHUFFLE(3,3,3,3));
+	__m128 r0 = _mm_mul_ps(s0, m2[0]);
+	__m128 r1 = _mm_mul_ps(s1, m2[1]);
+	__m128 r2 = _mm_mul_ps(s2, m2[2]);
+	__m128 r3 = _mm_mul_ps(s3, m2_3);
+	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+
+	s0 = shuffle1_ps(m1[1], _MM_SHUFFLE(0,0,0,0));
+	s1 = shuffle1_ps(m1[1], _MM_SHUFFLE(1,1,1,1));
+	s2 = shuffle1_ps(m1[1], _MM_SHUFFLE(2,2,2,2));
+	s3 = shuffle1_ps(m1[1], _MM_SHUFFLE(3,3,3,3));
+	r0 = _mm_mul_ps(s0, m2[0]);
+	r1 = _mm_mul_ps(s1, m2[1]);
+	r2 = _mm_mul_ps(s2, m2[2]);
+	r3 = _mm_mul_ps(s3, m2_3);
+	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+
+	s0 = shuffle1_ps(m1[2], _MM_SHUFFLE(0,0,0,0));
+	s1 = shuffle1_ps(m1[2], _MM_SHUFFLE(1,1,1,1));
+	s2 = shuffle1_ps(m1[2], _MM_SHUFFLE(2,2,2,2));
+	s3 = shuffle1_ps(m1[2], _MM_SHUFFLE(3,3,3,3));
+	r0 = _mm_mul_ps(s0, m2[0]);
+	r1 = _mm_mul_ps(s1, m2[1]);
+	r2 = _mm_mul_ps(s2, m2[2]);
+	r3 = _mm_mul_ps(s3, m2_3);
+	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+
+	s0 = shuffle1_ps(m1[3], _MM_SHUFFLE(0,0,0,0));
+	s1 = shuffle1_ps(m1[3], _MM_SHUFFLE(1,1,1,1));
+	s2 = shuffle1_ps(m1[3], _MM_SHUFFLE(2,2,2,2));
+	s3 = shuffle1_ps(m1[3], _MM_SHUFFLE(3,3,3,3));
+	r0 = _mm_mul_ps(s0, m2[0]);
+	r1 = _mm_mul_ps(s1, m2[1]);
+	r2 = _mm_mul_ps(s2, m2[2]);
+	r3 = _mm_mul_ps(s3, m2_3);
+	out[3] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+}
+
 // Multiplies a 3x4 matrix by a 4x4 matrix, producing a 4x4 matrix.
 // @param out A 4x4 matrix (4 x __m128)
 // @param m1 left-hand side matrix (3 x __m128)

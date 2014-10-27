@@ -636,6 +636,17 @@ RANDOMIZED_TEST(Float3x4MulFloat4x4)
 	assert(test.Equals(correct));
 }
 
+RANDOMIZED_TEST(Float4x4MulFloat3x4)
+{
+	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m_ = m;
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
+
+	float4x4 test = m2 * m;
+	float4x4 correct = m2 * m_;
+	assert(test.Equals(correct));
+}
+
 #ifdef MATH_SSE
 BENCHMARK(mat4x4_determinant, "test against float4x4_Determinant4")
 {
