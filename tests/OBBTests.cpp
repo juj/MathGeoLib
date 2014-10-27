@@ -5,6 +5,8 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 #include "TestData.h"
+#include "../src/Algorithm/GJK.h"
+#include "../src/Algorithm/SAT.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
@@ -21,6 +23,34 @@ UNIQUE_TEST(OBB_ClosestPoint_Point)
 	assert(o.ClosestPoint(POINT_VEC(5.f, 5.f, 5.f)).Equals(POINT_VEC(1.f, 1.f, 1.f)));
 	assert(o.ClosestPoint(POINT_VEC(-5.f, -5.f, -5.f)).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
 }
+
+BENCHMARK(OBBIntersectsOBB_Random, "OBB::Intersects(OBB) Random")
+{
+	if (obb[i].Intersects(obb[i+1]))
+		++dummyResultInt;
+}
+BENCHMARK_END
+
+BENCHMARK(OBBIntersectsOBB_Positive, "OBB::Intersects(OBB) Positive")
+{
+	if (obb[i].Intersects(obb[i]))
+		++dummyResultInt;
+}
+BENCHMARK_END
+
+BENCHMARK(OBBIntersectsOBB_GJK, "OBB::Intersects(OBB)_GJK")
+{
+	if (GJKIntersect(obb[i], obb[i+1]))
+		++dummyResultInt;
+}
+BENCHMARK_END
+
+BENCHMARK(OBBIntersectsOBB_SAT, "OBB::Intersects(OBB)_SAT")
+{
+	if (SATIntersect(obb[i], obb[i+1]))
+		++dummyResultInt;
+}
+BENCHMARK_END
 
 BENCHMARK(OBBContains, "OBB::Contains(point)")
 {
