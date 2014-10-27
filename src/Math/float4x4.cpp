@@ -1356,7 +1356,7 @@ bool float4x4::Inverse(float epsilon)
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	MARK_UNUSED(epsilon);
 	float det = mat4x4_inverse(row, row);
-	return det > 1e-5f;
+	return MATH_NS::Abs(det) > 1e-5f;
 #else
 	return InverseMatrix(*this, epsilon);
 #endif
