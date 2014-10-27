@@ -2124,8 +2124,9 @@ float4x4 float4x4::Abs() const
 	ret.row[2] = abs_ps(row[2]);
 	ret.row[3] = abs_ps(row[3]);
 #else
-	for(int i = 0; i < 16; ++i)
-		ret.v[i] = Abs(v[i]);
+	for(int y = 0; y < 4; ++y)
+		for(int x = 0; x < 4; ++x)
+			ret.v[y][x] = MATH_NS::Abs(v[y][x]);
 #endif
 	return ret;
 }
