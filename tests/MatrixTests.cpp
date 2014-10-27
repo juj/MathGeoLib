@@ -269,6 +269,48 @@ RANDOMIZED_TEST(Float3x3Inverse)
 	}
 }
 
+RANDOMIZED_TEST(Float3x4Inverse)
+{
+	float3x4 A = float3x4::RandomGeneral(rng, -10.f, 10.f);
+	bool mayFail = EqualAbs(A.Determinant(), 0.f, 1e-2f);
+
+	float3x4 A2 = A;
+	bool success = A2.Inverse();
+	A2 = A;
+	success = A2.Inverse();
+	assert(success || mayFail);
+	MARK_UNUSED(success);
+	MARK_UNUSED(mayFail);
+	if (success)
+	{
+		float3x4 id = A * A2;
+		float3x4 id2 = A2 * A;
+		assert(id.Equals(float3x4::identity, 0.3f));
+		assert(id2.Equals(float3x4::identity, 0.3f));
+	}
+}
+
+RANDOMIZED_TEST(Float4x4Inverse)
+{
+	float4x4 A = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	bool mayFail = EqualAbs(A.Determinant4(), 0.f, 1e-2f);
+
+	float4x4 A2 = A;
+	bool success = A2.Inverse();
+	A2 = A;
+	success = A2.Inverse();
+	assert(success || mayFail);
+	MARK_UNUSED(success);
+	MARK_UNUSED(mayFail);
+	if (success)
+	{
+		float4x4 id = A * A2;
+		float4x4 id2 = A2 * A;
+		assert(id.Equals(float3x4::identity, 0.3f));
+		assert(id2.Equals(float3x4::identity, 0.3f));
+	}
+}
+
 RANDOMIZED_TEST(Float3x3InverseFast)
 {
 	float3x3 A = float3x3::RandomGeneral(rng, -10.f, 10.f);

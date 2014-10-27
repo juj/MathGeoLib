@@ -906,17 +906,27 @@ float float3x4::Determinant() const
 
 bool float3x4::Inverse(float epsilon)
 {
-	///\todo SSE.
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	MARK_UNUSED(epsilon);
+	float det = mat3x4_inverse(row, row);
+	return MATH_NS::Abs(det) > 1e-5f;
+#else
 	float4x4 temp(*this); ///@todo It is possible optimize to avoid copying here by writing the inverse function specifically for float3x4.
 	bool success = temp.Inverse(epsilon);
 	*this = temp.Float3x4Part();
 	return success;
+#endif
 }
 
 float3x4 float3x4::Inverted() const
 {
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	float3x4 copy;
+	mat4x4_inverse(row, copy.row);
+#else
 	float3x4 copy = *this;
 	copy.Inverse();
+#endif
 	return copy;
 }
 
