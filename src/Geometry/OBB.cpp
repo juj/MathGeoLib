@@ -50,6 +50,7 @@
 
 #if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
 #include "../Math/float4_sse.h"
+#include "../Math/float4x4_sse.h"
 #endif
 
 MATH_BEGIN_NAMESPACE
@@ -907,12 +908,111 @@ void OBB::ToEdgeList(vec *outPos) const
 	}
 }
 
+#ifdef MATH_SSE41
+#define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
+#elif defined(MATH_SSE)
+// Given a input vector of either 0xFFFFFFFF or 0, returns a nonzero integer of all lanes were zero.
+// Note that this SSE1 version is more like "all finite without nans" instead of "allzero", because
+// it does not detect finite non-zero floats.
+int FORCE_INLINE allzero_ps(simd4f x)
+{
+	simd4f y = shuffle1_ps(x, _MM_SHUFFLE(1, 1, 1, 1));
+	x = or_ps(x, y);
+	y = _mm_movehl_ps(y, x);
+	x = or_ps(x, y);
+	return _mm_ucomige_ss(x, x);
+}
+#endif
+
 bool OBB::Intersects(const OBB &b, float epsilon) const
 {
 	assume(pos.IsFinite());
 	assume(b.pos.IsFinite());
 	assume(vec::AreOrthogonal(axis[0], axis[1], axis[2]));
 	assume(vec::AreOrthogonal(b.axis[0], b.axis[1], b.axis[2]));
+
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// SSE4.1:
+	// Benchmark 'OBBIntersectsOBB_Random': OBB::Intersects(OBB) Random
+	//    Best: 23.913 nsecs / 40.645 ticks, Avg: 26.490 nsecs, Worst: 43.729 nsecs
+	// Benchmark 'OBBIntersectsOBB_Positive': OBB::Intersects(OBB) Positive
+	//    Best: 42.585 nsecs / 72.413 ticks, Avg: 44.373 nsecs, Worst: 70.774 nsecs
+
+	simd4f bLocalToWorld[3];
+	mat3x4_transpose((const simd4f*)b.axis, bLocalToWorld);
+
+	// Generate a rotation matrix that transforms from world space to this OBB's coordinate space.
+	simd4f R[3];
+	mat3x4_mul_sse(R, (const simd4f*)axis, bLocalToWorld);
+
+	// Express the translation vector in a's coordinate frame.
+	simd4f t = mat3x4_mul_sse((const simd4f*)axis, sub_ps(b.pos, pos));
+
+	// This trashes the w component, which should technically be zero, but this does not matter since
+	// AbsR will only be used with direction vectors.
+	const vec epsilonxyz = set1_ps(epsilon);
+	simd4f AbsR[3];
+	AbsR[0] = add_ps(abs_ps(R[0]), epsilonxyz);
+	AbsR[1] = add_ps(abs_ps(R[1]), epsilonxyz);
+	AbsR[2] = add_ps(abs_ps(R[2]), epsilonxyz);
+
+	// Test the three major axes of this OBB.
+	simd4f res = cmpgt_ps(abs_ps(t), add_ps(r, mat3x4_mul_sse(AbsR, b.r)));
+	if (!allzero_ps(res)) return false;
+
+	// Test the three major axes of the OBB b.
+	simd4f transpR[3];
+	mat3x4_transpose(R, transpR);
+	vec l = abs_ps(mat3x4_mul_sse(transpR, r));
+	simd4f transpAbsR[3];
+	mat3x4_transpose(AbsR, transpAbsR);
+	vec s = mat3x4_mul_sse(transpAbsR, r);
+	res = cmpgt_ps(l, add_ps(s, b.r));
+	if (!allzero_ps(res)) return false;
+
+	// Test the 9 different cross-axes.
+
+	// A.x <cross> B.x
+	// A.x <cross> B.y
+	// A.x <cross> B.z
+	simd4f ra = mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,1,1,1)), AbsR[2]);
+	ra = add_ps(ra, mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,2,2,2)), AbsR[1]));
+	simd4f rb = mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[0], _MM_SHUFFLE(3,1,2,2)));
+	rb = add_ps(rb, mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[0], _MM_SHUFFLE(3,0,0,1))));
+	simd4f lhs = mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,2,2,2)), R[1]);
+	lhs = sub_ps(lhs, mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,1,1,1)), R[2]));
+	res = cmpgt_ps(abs_ps(lhs), add_ps(ra, rb));
+	if (!allzero_ps(res)) return false;
+
+	// A.y <cross> B.x
+	// A.y <cross> B.y
+	// A.y <cross> B.z
+	ra = mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,0,0,0)), AbsR[2]);
+	ra = add_ps(ra, mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,2,2,2)), AbsR[0]));
+	rb = mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[1], _MM_SHUFFLE(3,1,2,2)));
+	rb = add_ps(rb, mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[1], _MM_SHUFFLE(3,0,0,1))));
+	lhs = mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,0,0,0)), R[2]);
+	lhs = sub_ps(lhs, mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,2,2,2)), R[0]));
+	res = cmpgt_ps(abs_ps(lhs), add_ps(ra, rb));
+	if (!allzero_ps(res)) return false;
+
+	// A.z <cross> B.x
+	// A.z <cross> B.y
+	// A.z <cross> B.z
+	ra = mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,0,0,0)), AbsR[1]);
+	ra = add_ps(ra, mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,1,1,1)), AbsR[0]));
+	rb = mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[2], _MM_SHUFFLE(3,1,2,2)));
+	rb = add_ps(rb, mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[2], _MM_SHUFFLE(3,0,0,1))));
+	lhs = mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,1,1,1)), R[0]);
+	lhs = sub_ps(lhs, mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,0,0,0)), R[1]));
+	res = cmpgt_ps(abs_ps(lhs), add_ps(ra, rb));
+	return allzero_ps(res) != 0;
+
+#else
+	// Benchmark 'OBBIntersectsOBB_Random': OBB::Intersects(OBB) Random
+	//    Best: 100.830 nsecs / 171.37 ticks, Avg: 110.533 nsecs, Worst: 155.582 nsecs
+	// Benchmark 'OBBIntersectsOBB_Positive': OBB::Intersects(OBB) Positive
+	//    Best: 95.771 nsecs / 162.739 ticks, Avg: 107.935 nsecs, Worst: 173.110 nsecs
 
 	// Generate a rotation matrix that transforms from world space to this OBB's coordinate space.
 	float3x3 R;
@@ -1005,6 +1105,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 
 	// No separating axis exists, so the two OBB don't intersect.
 	return true;
+#endif
 }
 
 /// The implementation of OBB-Plane intersection test follows Christer Ericson's Real-Time Collision Detection, p. 163. [groupSyntax]
