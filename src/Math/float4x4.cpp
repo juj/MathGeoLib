@@ -1510,7 +1510,7 @@ void float4x4::Pivot()
 
 		// find the row k with k >= 1 for which Mkj has the largest absolute value.
 		for(int i = row; i < Rows; ++i)
-			if (Abs(v[i][col]) > Abs(v[greatest][col]))
+			if (MATH_NS::Abs(v[i][col]) > MATH_NS::Abs(v[greatest][col]))
 				greatest = i;
 
 		if (!EqualAbs(v[greatest][col], 0))
@@ -2113,6 +2113,21 @@ void float4x4::Decompose(float3 &translate, float4x4 &rotate, float3 &scale) con
 
 	// Test that composing back yields the original float4x4.
 	assume(float4x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
+}
+
+float4x4 float4x4::Abs() const
+{
+	float4x4 ret;
+#ifdef MATH_AUTOMATIC_SSE
+	ret.row[0] = abs_ps(row[0]);
+	ret.row[1] = abs_ps(row[1]);
+	ret.row[2] = abs_ps(row[2]);
+	ret.row[3] = abs_ps(row[3]);
+#else
+	for(int i = 0; i < 16; ++i)
+		ret.v[i] = Abs(v[i]);
+#endif
+	return ret;
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT

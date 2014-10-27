@@ -920,6 +920,9 @@ public:
 	void Decompose(float3 &translate, float3x4 &rotate, float3 &scale) const;
 	void Decompose(float3 &translate, float4x4 &rotate, float3 &scale) const;
 
+	/// Computes a new matrix with each element of this matrix replaced with their absolute value.
+	float4x4 Abs() const;
+
 #ifdef MATH_OGRE_INTEROP
 	float4x4(const Ogre::Matrix4 &m) { Set(&m[0][0]); }
 	operator Ogre::Matrix4() { return Ogre::Matrix4(v[0][0], v[0][1], v[0][2], v[0][3], v[1][0], v[1][1], v[1][2], v[1][3], v[2][0], v[2][1], v[2][2], v[2][3], v[3][0], v[3][1], v[3][2], v[3][3]); }
