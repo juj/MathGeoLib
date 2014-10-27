@@ -1674,8 +1674,10 @@ void float4x4::Transform(float4 *vectorArray, int numVectors, int strideBytes) c
 
 float4x4 float4x4::operator *(const float3x3 &rhs) const
 {
-	///\todo SSE.
 	float4x4 r;
+#ifdef MATH_AUTOMATIC_SSE
+	mat4x4_mul_mat3x3_sse(r.row, this->row, rhs.ptr());
+#else
 	const float *c0 = rhs.ptr();
 	const float *c1 = rhs.ptr() + 1;
 	const float *c2 = rhs.ptr() + 2;
@@ -1698,7 +1700,7 @@ float4x4 float4x4::operator *(const float3x3 &rhs) const
 	r[3][1] = DOT3STRIDED(v[3], c1, 3);
 	r[3][2] = DOT3STRIDED(v[3], c2, 3);
 	r[3][3] = v[3][3];
-
+#endif
 	return r;
 }
 
