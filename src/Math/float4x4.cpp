@@ -2179,8 +2179,10 @@ float4x4 operator *(const float3x3 &lhs, const float4x4 &rhs)
 
 float4x4 operator *(const float3x4 &lhs, const float4x4 &rhs)
 {
-	///\todo SSE.
 	float4x4 r;
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	mat3x4_mul_mat4x4_sse(r.row, lhs.row, rhs.row);
+#else
 	const float *c0 = rhs.ptr();
 	const float *c1 = rhs.ptr() + 1;
 	const float *c2 = rhs.ptr() + 2;
@@ -2204,7 +2206,7 @@ float4x4 operator *(const float3x4 &lhs, const float4x4 &rhs)
 	r[3][1] = rhs[3][1];
 	r[3][2] = rhs[3][2];
 	r[3][3] = rhs[3][3];
-
+#endif
 	return r;
 }
 
