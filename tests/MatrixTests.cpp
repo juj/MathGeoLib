@@ -614,6 +614,17 @@ UNIQUE_TEST(float4x4_Determinant_Correctness)
 	asserteq(m.Float3x4Part().Determinant(), 6.f);
 }
 
+RANDOMIZED_TEST(Float3x3MulFloat4x4)
+{
+	float3x3 m = float3x3::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m_ = m;
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
+
+	float4x4 test = m * m2;
+	float4x4 correct = m_ * m2;
+	assert(test.Equals(correct));
+}
+
 RANDOMIZED_TEST(Float3x4MulFloat4x4)
 {
 	float3x4 m = float3x4::RandomGeneral(rng, -10.f, 10.f);

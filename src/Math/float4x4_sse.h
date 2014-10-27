@@ -463,6 +463,42 @@ inline void mat3x4_mul_mat4x4_sse(__m128 *out, const __m128 *m1, const __m128 *m
 	out[3] = m2[3];
 }
 
+// Multiplies a 3x3 matrix by a 4x4 matrix, producing a 4x4 matrix.
+// @param out A 4x4 matrix (4 x __m128)
+// @param m1 left-hand side matrix (3x3 floats)
+// @param m2 right-hand side matrix (4 x __m128)
+inline void mat3x3_mul_mat4x4_sse(__m128 *out, const float *m1, const __m128 *m2)
+{
+	__m128 m1_0 = loadu_ps(m1);
+
+	__m128 s0 = shuffle1_ps(m1_0, _MM_SHUFFLE(0,0,0,0));
+	__m128 s1 = shuffle1_ps(m1_0, _MM_SHUFFLE(1,1,1,1));
+	__m128 s2 = shuffle1_ps(m1_0, _MM_SHUFFLE(2,2,2,2));
+	__m128 r0 = _mm_mul_ps(s0, m2[0]);
+	__m128 r1 = _mm_mul_ps(s1, m2[1]);
+	__m128 r2 = _mm_mul_ps(s2, m2[2]);
+	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), r2);
+
+	s0 = shuffle1_ps(m1_0, _MM_SHUFFLE(3,3,3,3));
+	__m128 m1_1 = loadu_ps(m1+4);
+	s1 = shuffle1_ps(m1_1, _MM_SHUFFLE(0,0,0,0));
+	s2 = shuffle1_ps(m1_1, _MM_SHUFFLE(1,1,1,1));
+	r0 = _mm_mul_ps(s0, m2[0]);
+	r1 = _mm_mul_ps(s1, m2[1]);
+	r2 = _mm_mul_ps(s2, m2[2]);
+	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), r2);
+
+	s0 = shuffle1_ps(m1_1, _MM_SHUFFLE(2,2,2,2));
+	s1 = shuffle1_ps(m1_1, _MM_SHUFFLE(3,3,3,3));
+	s2 = load1_ps(m1+8);
+	r0 = _mm_mul_ps(s0, m2[0]);
+	r1 = _mm_mul_ps(s1, m2[1]);
+	r2 = _mm_mul_ps(s2, m2[2]);
+	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), r2);
+
+	out[3] = m2[3];
+}
+
 // Computes the inverse of a 4x4 matrix via direct cofactor expansion.
 /// Returns the determinant of the original matrix, and zero on failure.
 #define MAT_COFACTOR(mat, i, j) \
