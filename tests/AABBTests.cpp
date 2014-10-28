@@ -28,7 +28,7 @@ BENCHMARK_END
 
 BENCHMARK(AABBContains_unpredictable, "AABB::Contains(point) unpredictable")
 {
-	uf[i] = aabb[i].Contains((i%2 == 0) ? POINT_VEC_SCALAR(1e10f) : aabb[i].minPoint) ? 1.f : 0.f;
+	uf[i] = aabb[i].Contains((i%2 == 0) ? vec(POINT_VEC_SCALAR(1e10f)) : aabb[i].minPoint) ? 1.f : 0.f;
 }
 BENCHMARK_END
 
