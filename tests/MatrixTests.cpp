@@ -305,6 +305,26 @@ RANDOMIZED_TEST(Float3x4InverseOrthogonalUniformScale)
 	}
 }
 
+RANDOMIZED_TEST(Float3x4InverseInverseColOrthogonal)
+{
+	float3x4 A = float3x4::RandomRotation(rng) * float3x4::Translate(float3::RandomGeneral(rng, -100.f, 100.f));
+	A.SetCol(0, A.Col(0) * rng.Float(0.01f, 100.f) * (rng.Int(0,1) ? 1.f : -1.f));
+	A.SetCol(1, A.Col(1) * rng.Float(0.01f, 100.f) * (rng.Int(0,1) ? 1.f : -1.f));
+	A.SetCol(2, A.Col(2) * rng.Float(0.01f, 100.f) * (rng.Int(0,1) ? 1.f : -1.f));
+
+	float3x4 A2 = A;
+	bool success = A2.InverseColOrthogonal();
+	assert(success);
+	MARK_UNUSED(success);
+	if (success)
+	{
+		float3x4 id = A * A2;
+		float3x4 id2 = A2 * A;
+		assert(id.Equals(float3x4::identity, 0.3f));
+		assert(id2.Equals(float3x4::identity, 0.3f));
+	}
+}
+
 RANDOMIZED_TEST(Float4x4Inverse)
 {
 	float4x4 A = float4x4::RandomGeneral(rng, -10.f, 10.f);

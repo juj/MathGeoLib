@@ -932,10 +932,9 @@ float3x4 float3x4::Inverted() const
 
 bool float3x4::InverseColOrthogonal()
 {
-	///\todo SSE.
-#ifdef MATH_ASSERT_CORRECTNESS
-	float3x4 orig = *this;
-#endif
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	mat3x4_inverse_colorthogonal(row, row);
+#else
 	assume(IsColOrthogonal());
 	float s1 = float3(v[0][0], v[1][0], v[2][0]).LengthSq();
 	float s2 = float3(v[0][1], v[1][1], v[2][1]).LengthSq();
@@ -954,10 +953,8 @@ bool float3x4::InverseColOrthogonal()
 	v[2][0] *= s3; v[2][1] *= s3; v[2][2] *= s3;
 
 	SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
-
-	mathassert(!orig.IsInvertible()|| (orig * *this).IsIdentity());
 	mathassert(IsRowOrthogonal());
-
+#endif
 	return true;
 }
 
