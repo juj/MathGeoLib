@@ -635,7 +635,7 @@ bool AABB::Contains(const vec &point) const
 	simd4f a = cmplt_ps(point, minPoint);
 	simd4f b = cmpgt_ps(point, maxPoint);
 	a = or_ps(a, b);
-	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1, 1, 1, 1));
+	simd4f y = yyyy_ps(a);
 	a = or_ps(a, y);
 	y = _mm_movehl_ps(y, a);
 	a = or_ps(a, y);
@@ -896,7 +896,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	simd4f v3 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(2, 2, 2, 2)); // [f3 f3 n3 n3]
 	nearD = max_ps(v1, max_ps(v2, v3));
 	farD = min_ps(v1, min_ps(v2, v3));
-	farD = _mm_shuffle_ps(farD, farD, _MM_SHUFFLE(3, 3, 3, 3)); // Unpack the result from high offset in the register.
+	farD = wwww_ps(farD); // Unpack the result from high offset in the register.
 	nearD = max_ps(nearD, setx_ps(tNear));
 	farD = min_ps(farD, setx_ps(tFar));
 
@@ -917,8 +917,8 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	out2 = or_ps(out2, out3);
 	zeroDirections = and_ps(zeroDirections, out2);
 
-	simd4f yOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(1,1,1,1));
-	simd4f zOut = _mm_shuffle_ps(zeroDirections, zeroDirections, _MM_SHUFFLE(2,2,2,2));
+	simd4f yOut = yyyy_ps(zeroDirections);
+	simd4f zOut = zzzz_ps(zeroDirections);
 
 	zeroDirections = or_ps(or_ps(zeroDirections, yOut), zOut);
 	// Intersection occurs if the slab ranges had positive overlap and if the test was not rejected by the ray being

@@ -33,9 +33,9 @@ FORCE_INLINE simd4f sum_xyz_ps(simd4f m)
 	m = _mm_hadd_ps(m, m); // m = (x+y+z, x+y+z, x+y+z, x+y+z).
 	return m; // Each index of the output will contain the sum x+y+z.
 #else // We only have SSE 1, and must individually shuffle.
-	simd4f X = shuffle1_ps(m, _MM_SHUFFLE(0,0,0,0));
-	simd4f Y = shuffle1_ps(m, _MM_SHUFFLE(1,1,1,1));
-	simd4f Z = shuffle1_ps(m, _MM_SHUFFLE(2,2,2,2));
+	simd4f X = xxxx_ps(m);
+	simd4f Y = yyyy_ps(m);
+	simd4f Z = zzzz_ps(m);
 	simd4f XYZ = add_ps(X, add_ps(Y, Z)); 
 	return XYZ; // Each index of the output will contain the sum x+y+z.
 #endif

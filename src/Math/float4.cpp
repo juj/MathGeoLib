@@ -187,7 +187,7 @@ float4 float4::Swizzled(int i, int j, int k, int l) const
 float4 float4::xxxx() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return shuffle1_ps(v, _MM_SHUFFLE(0, 0, 0, 0));
+	return xxxx_ps(v);
 #else
 	return float4::FromScalar(x);
 #endif
@@ -196,7 +196,7 @@ float4 float4::xxxx() const
 float4 float4::yyyy() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return shuffle1_ps(v, _MM_SHUFFLE(1, 1, 1, 1));
+	return yyyy_ps(v);
 #else
 	return float4::FromScalar(x);
 #endif
@@ -205,7 +205,7 @@ float4 float4::yyyy() const
 float4 float4::zzzz() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return shuffle1_ps(v, _MM_SHUFFLE(2, 2, 2, 2));
+	return zzzz_ps(v);
 #else
 	return float4::FromScalar(x);
 #endif
@@ -241,7 +241,7 @@ float4 float4::zzzw() const
 float4 float4::wwww() const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return shuffle1_ps(v, _MM_SHUFFLE(3, 3, 3, 3));
+	return wwww_ps(v);
 #else
 	return float4::FromScalar(x);
 #endif
@@ -300,7 +300,7 @@ void float4::Normalize4_Fast_SSE()
 void float4::NormalizeW_SSE()
 {
 #ifdef MATH_SSE
-	simd4f div = shuffle1_ps(v, _MM_SHUFFLE(3,3,3,3));
+	simd4f div = wwww_ps(v);
 	v = div_ps(v, div);
 #elif defined(MATH_NEON)
 	v = div_ps(v, vdupq_n_f32(vgetq_lane_f32(v, 3)));

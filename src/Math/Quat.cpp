@@ -100,7 +100,7 @@ vec Quat::Axis() const
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Best: 6.145 nsecs / 16.88 ticks, Avg: 6.367 nsecs, Worst: 6.529 nsecs
 	assume2(this->IsNormalized(), *this, this->Length());
-	simd4f cosAngle = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 3));
+	simd4f cosAngle = wwww_ps(q);
 	simd4f rcpSinAngle = rsqrt_ps(sub_ps(set1_ps(1.f), mul_ps(cosAngle, cosAngle)));
 	simd4f a = mul_ps(q, rcpSinAngle);
 
@@ -324,7 +324,7 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 		// Compute three sines in one go with SSE.
 		simd4f s = set_ps(0.f, angleT, angle - angleT, angle);
 		s = sin_ps(s);
-		simd4f denom = shuffle1_ps(s, _MM_SHUFFLE(0, 0, 0, 0));
+		simd4f denom = xxxx_ps(s);
 		s = div_ps(s, denom);
 		a = s4f_y(s);
 		b = s4f_z(s);
@@ -402,7 +402,7 @@ void Quat::ToAxisAngle(float4 &axis, float &angle) const
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Best: 35.332 nsecs / 94.328 ticks, Avg: 35.870 nsecs, Worst: 57.607 nsecs
 	assume2(this->IsNormalized(), *this, this->Length());
-	simd4f cosAngle = _mm_shuffle_ps(q, q, _MM_SHUFFLE(3, 3, 3, 3));
+	simd4f cosAngle = wwww_ps(q);
 	simd4f rcpSinAngle = rsqrt_ps(sub_ps(set1_ps(1.f), mul_ps(cosAngle, cosAngle)));
 	angle = Acos(s4f_x(cosAngle)) * 2.f;
 	simd4f a = mul_ps(q, rcpSinAngle);

@@ -224,9 +224,9 @@ float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
 {
 	float4x4 ret;
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	simd4f x = _mm_shuffle_ps(lhs.scale.v, lhs.scale.v, _MM_SHUFFLE(0, 0, 0, 0));
-	simd4f y = _mm_shuffle_ps(lhs.scale.v, lhs.scale.v, _MM_SHUFFLE(1, 1, 1, 1));
-	simd4f z = _mm_shuffle_ps(lhs.scale.v, lhs.scale.v, _MM_SHUFFLE(2, 2, 2, 2));
+	simd4f x = xxxx_ps(lhs.scale.v);
+	simd4f y = yyyy_ps(lhs.scale.v);
+	simd4f z = zzzz_ps(lhs.scale.v);
 	ret.row[0] = _mm_mul_ps(rhs.row[0], x);
 	ret.row[1] = _mm_mul_ps(rhs.row[1], y);
 	ret.row[2] = _mm_mul_ps(rhs.row[2], z);

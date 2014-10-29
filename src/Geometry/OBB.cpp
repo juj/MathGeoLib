@@ -648,12 +648,12 @@ vec OBB::ClosestPoint(const vec &targetPoint) const
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Best: 8.833 nsecs / 24 ticks, Avg: 9.044 nsecs, Worst: 9.217 nsecs
 	simd4f d = sub_ps(targetPoint.v, pos.v);
-	simd4f x = shuffle1_ps(r.v, _MM_SHUFFLE(0,0,0,0));
+	simd4f x = xxxx_ps(r.v);
 	simd4f closestPoint = pos.v;
 	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[0].v), x), negate_ps(x)), axis[0].v));
-	simd4f y = shuffle1_ps(r.v, _MM_SHUFFLE(1,1,1,1));
+	simd4f y = yyyy_ps(r.v);
 	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[1].v), y), negate_ps(y)), axis[1].v));
-	simd4f z = shuffle1_ps(r.v, _MM_SHUFFLE(2,2,2,2));
+	simd4f z = zzzz_ps(r.v);
 	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[2].v), z), negate_ps(z)), axis[2].v));
 	return closestPoint;
 #else
@@ -784,9 +784,9 @@ bool OBB::Contains(const vec &point) const
 	s3 = abs_ps(sum_xyzw_ps(s3));
 
 	s1 = _mm_sub_ss(s1, r.v);
-	s2 = _mm_sub_ss(s2, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(1, 1, 1, 1)));
+	s2 = _mm_sub_ss(s2, yyyy_ps(r.v));
 	simd4f s12 = _mm_max_ss(s1, s2);
-	s3 = _mm_sub_ss(s3, _mm_shuffle_ps(r.v, r.v, _MM_SHUFFLE(2, 2, 2, 2)));
+	s3 = _mm_sub_ss(s3, zzzz_ps(r.v));
 	s3 = _mm_max_ss(s12, s3);
 	return _mm_cvtss_f32(s3) <= 0.f; // Note: This might be micro-optimized further out by switching to a signature "float OBB::SignedDistance(point)" instead.
 #else
@@ -916,7 +916,7 @@ void OBB::ToEdgeList(vec *outPos) const
 // it does not detect finite non-zero floats.
 int FORCE_INLINE allzero_ps(simd4f x)
 {
-	simd4f y = shuffle1_ps(x, _MM_SHUFFLE(1, 1, 1, 1));
+	simd4f y = yyyy_ps(x);
 	x = or_ps(x, y);
 	y = _mm_movehl_ps(y, x);
 	x = or_ps(x, y);

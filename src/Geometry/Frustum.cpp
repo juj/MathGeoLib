@@ -496,9 +496,9 @@ bool Frustum::Contains(const vec &point) const
 	// SSE 4.1 32-bit: Best: 6.913 nsecs / 18.52 ticks, Avg: 6.978 nsecs, Worst: 7.297 nsecs
 	vec projected = Project(point);
 	simd4f a = abs_ps(projected);
-	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1,1,1,1));
+	simd4f y = yyyy_ps(a);
 	a = max_ps(a, y);
-	y = shuffle1_ps(a, _MM_SHUFFLE(2, 2, 2, 2));
+	y = zzzz_ps(a);
 	a = max_ps(a, y);
 	const float eps = 1e-3f;
 	return _mm_cvtss_f32(a) <= 1.f + eps &&
@@ -541,9 +541,9 @@ bool Frustum::Contains(const LineSegment &lineSegment) const
 	vec pb = Project(lineSegment.b);
 	simd4f b = abs_ps(pb);
 	a = max_ps(a, b);
-	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1, 1, 1, 1));
+	simd4f y = yyyy_ps(a);
 	a = max_ps(a, y);
-	y = shuffle1_ps(a, _MM_SHUFFLE(2, 2, 2, 2));
+	y = zzzz_ps(a);
 	a = max_ps(a, y);
 	const float eps = 1e-3f;
 	return _mm_cvtss_f32(a) <= 1.f + eps &&
@@ -566,9 +566,9 @@ bool Frustum::Contains(const Triangle &triangle) const
 	vec pc = Project(triangle.c);
 	simd4f c = abs_ps(pc);
 	a = max_ps(a, c);
-	simd4f y = shuffle1_ps(a, _MM_SHUFFLE(1, 1, 1, 1));
+	simd4f y = yyyy_ps(a);
 	a = max_ps(a, y);
-	y = shuffle1_ps(a, _MM_SHUFFLE(2, 2, 2, 2));
+	y = zzzz_ps(a);
 	a = max_ps(a, y);
 	const float eps = 1e-3f;
 	return _mm_cvtss_f32(a) <= 1.f + eps &&

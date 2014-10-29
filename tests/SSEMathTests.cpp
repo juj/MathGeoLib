@@ -181,10 +181,10 @@ inline __m128 mat4x4_mul_avx_2(const __m256 *matrix, __m128 vector)
 
 inline __m128 colmajor_mat4x4_mul_avx(const __m256 *matrix, __m128 vector)
 {
-	__m256 x = _mm256_castps128_ps256(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(0,0,0,0)));
-	__m128 y = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(1,1,1,1));
-	__m256 z = _mm256_castps128_ps256(_mm_shuffle_ps(vector, vector, _MM_SHUFFLE(2,2,2,2)));
-	__m128 w = _mm_shuffle_ps(vector, vector, _MM_SHUFFLE(3,3,3,3));
+	__m256 x = _mm256_castps128_ps256(xxxx_ps(vector));
+	__m128 y = yyyy_ps(vector);
+	__m256 z = _mm256_castps128_ps256(zzzz_ps(vector));
+	__m128 w = wwww_ps(vector);
 
 	__m256 yx = _mm256_insertf128_ps(x, y, 1); // [yyyyxxxx]
 	__m256 wz = _mm256_insertf128_ps(z, w, 1); // [wwwwzzzz]

@@ -110,7 +110,7 @@ FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 
 FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 {
-	__m128 W = shuffle1_ps(quat, _MM_SHUFFLE(3,3,3,3));
+	__m128 W = wwww_ps(quat);
 
 //	__m128 qxv = cross_ps(q, vec.v);
 	__m128 a_xzy = shuffle1_ps(quat, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
@@ -202,10 +202,10 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));   // [- - + +]
 	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));   // [- + + -]
 
-	__m128 X = _mm_xor_ps(signx, shuffle1_ps(q1, _MM_SHUFFLE(0,0,0,0)));
-	__m128 Y = _mm_xor_ps(signy, shuffle1_ps(q1, _MM_SHUFFLE(1,1,1,1)));
-	__m128 Z = _mm_xor_ps(signz, shuffle1_ps(q1, _MM_SHUFFLE(2,2,2,2)));
-	__m128 W = shuffle1_ps(q1, _MM_SHUFFLE(3,3,3,3));
+	__m128 X = _mm_xor_ps(signx, xxxx_ps(q1));
+	__m128 Y = _mm_xor_ps(signy, yyyy_ps(q1));
+	__m128 Z = _mm_xor_ps(signz, zzzz_ps(q1));
+	__m128 W = wwww_ps(q1);
 
 	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
 	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2)); // [y,x,w,z]
@@ -253,10 +253,10 @@ FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));   // [- - + +]
 	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));   // [- + + -]
 
-	__m128 X = _mm_xor_ps(signx, shuffle1_ps(q1, _MM_SHUFFLE(0,0,0,0)));
-	__m128 Y = _mm_xor_ps(signy, shuffle1_ps(q1, _MM_SHUFFLE(1,1,1,1)));
-	__m128 Z = _mm_xor_ps(signz, shuffle1_ps(q1, _MM_SHUFFLE(2,2,2,2)));
-	__m128 W = shuffle1_ps(q1, _MM_SHUFFLE(3,3,3,3));
+	__m128 X = _mm_xor_ps(signx, xxxx_ps(q1));
+	__m128 Y = _mm_xor_ps(signy, yyyy_ps(q1));
+	__m128 Z = _mm_xor_ps(signz, zzzz_ps(q1));
+	__m128 W = wwww_ps(q1);
 
 	q2 = negate3_ps(q2);
 	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
