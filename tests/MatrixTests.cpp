@@ -276,11 +276,26 @@ RANDOMIZED_TEST(Float3x4Inverse)
 
 	float3x4 A2 = A;
 	bool success = A2.Inverse();
-	A2 = A;
-	success = A2.Inverse();
 	assert(success || mayFail);
 	MARK_UNUSED(success);
 	MARK_UNUSED(mayFail);
+	if (success)
+	{
+		float3x4 id = A * A2;
+		float3x4 id2 = A2 * A;
+		assert(id.Equals(float3x4::identity, 0.3f));
+		assert(id2.Equals(float3x4::identity, 0.3f));
+	}
+}
+
+RANDOMIZED_TEST(Float3x4InverseOrthogonalUniformScale)
+{
+	float3x4 A = float3x4::UniformScale(rng.Float(0.01f, 100.f)) * float3x4::RandomRotation(rng) * float3x4::Translate(float3::RandomGeneral(rng, -100.f, 100.f));
+
+	float3x4 A2 = A;
+	bool success = A2.InverseOrthogonalUniformScale();
+	assert(success);
+	MARK_UNUSED(success);
 	if (success)
 	{
 		float3x4 id = A * A2;

@@ -963,7 +963,10 @@ bool float3x4::InverseColOrthogonal()
 
 bool float3x4::InverseOrthogonalUniformScale()
 {
-	///\todo SSE.
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	mat3x4_inverse_orthogonal_uniformscale(row, row);
+	return true; ///\todo The return value is difficult here with SSE, figure out how to treat that.
+#else
 	assume(IsColOrthogonal(1e-3f));
 	assume(HasUniformScale());
 	Swap(v[0][1], v[1][0]);
@@ -981,6 +984,7 @@ bool float3x4::InverseOrthogonalUniformScale()
 	SetTranslatePart(TransformDir(-v[0][3], -v[1][3], -v[2][3]));
 
 	return true;
+#endif
 }
 
 void float3x4::InverseOrthonormal()

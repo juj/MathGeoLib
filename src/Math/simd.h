@@ -175,6 +175,19 @@ FORCE_INLINE simd4f pack_4ss_to_ps(simd4f x, simd4f y, simd4f z, const simd4f &w
 	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
 }
 
+// Given m = [W z y x], and a float w, returns [w z y x]. That is, sets the highest channel of the given 4-channel vector.
+static FORCE_INLINE __m128 setw_ps(__m128 m, float w)
+{
+	__m128 hi = _mm_movehl_ps(m, m); // [W z W z]
+	hi = _mm_unpacklo_ps(hi, _mm_set_ss(w)); // [0 W w z]
+	return _mm_movelh_ps(m, hi); // [w z y x]
+}
+
+#define xxxx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,0,0,0))
+#define yyyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,1,1))
+#define zzzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,2,2))
+#define wwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,3))
+
 #ifdef MATH_SSE2
 FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 {
