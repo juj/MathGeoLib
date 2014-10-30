@@ -37,6 +37,9 @@
 #ifdef MATH_URHO3D_INTEROP
 #include <Engine/Math/Vector3.h>
 #endif
+#ifdef MATH_IRRKLANG_INTEROP
+#include <ik_vec3d.h>
+#endif
 
 MATH_BEGIN_NAMESPACE
 
@@ -701,6 +704,10 @@ public:
 #ifdef MATH_URHO3D_INTEROP
 	float3(const Urho3D::Vector3 &other) : x(other.x_), y(other.y_), z(other.z_) {}
 	operator Urho3D::Vector3() const { return Urho3D::Vector3(x, y, z); }
+#endif
+#ifdef MATH_IRRKLANG_INTEROP
+    float3(const irrklang::vec3df &other) : x(other.X), y(other.Y), z(other.Z) {}
+    operator irrklang::vec3df() const { return irrklang::vec3df(x, y, z); }
 #endif
 };
 
