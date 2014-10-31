@@ -305,6 +305,56 @@ float3x4 uninitializedFloat3x4;
 float4x4 uninitializedFloat4x4;
 Quat uninitializedQuat;
 
+int dummyResultInt = 0;
+vec dummyResultVec = vec::zero;
+
+extern float *f = 0;
+extern float *pf = 0;
+extern float *uf = 0;
+extern float4x4 *m = 0;
+extern float4x4 *m2 = 0;
+extern const float4x4 *om = 0;
+extern const float4x4 *ogm = 0;
+extern float4x4 *tpm = 0;
+extern float2 *fl_2 = 0;
+extern const float4 *nv = 0;
+extern const float4 *nv2 = 0;
+extern float4 *v = 0;
+extern float4 *v2 = 0;
+extern float4 *v3 = 0;
+extern float4 *v01 = 0;
+extern vec *ve = 0;
+extern Quat *q = 0;
+extern Quat *q2 = 0;
+extern AABB *aabb = 0;
+extern OBB *obb = 0;
+extern Frustum *frustum = 0;
+
+void InitTestData()
+{
+	f = FloatArray();
+	pf = PosFloatArray(); // > 0
+	uf = UnitFloatArray(); // [0,1]
+	m = MatrixArray();
+	m2 = MatrixArray2();
+	om = OrthonormalMatrixArray();
+	ogm = OrthogonalMatrixArray();
+	tpm = TransposedMatrixArray();
+	fl_2 = Float2Array();
+	nv = NormalizedVectorArray();
+	nv2 = NormalizedVectorArray2();
+	v = VectorArray();
+	v2 = VectorArray2();
+	v3 = VectorArray3();
+	v01 = VectorArrayWithW0Or1();
+	ve = VecArray2();
+	q = QuatArray();
+	q2 = QuatArray2();
+	aabb = AABBArray();
+	obb = OBBArray();
+	frustum = FrustumArray();
+}
+
 class FreeTestData
 {
 public:
@@ -333,12 +383,8 @@ public:
 		AlignedFree(VecArray2());
 	}
 };
-
 // At app exit time, this causes all test data arrays to be freed.
 FreeTestData testDataDeleter;
-
-int dummyResultInt = 0;
-vec dummyResultVec = vec::zero;
 
 } // ~namespace TestData
 

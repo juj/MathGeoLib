@@ -360,6 +360,8 @@ void PrintTestRunSummary()
 #ifdef MATH_TESTS_EXECUTABLE
 int main(int argc, char **argv)
 {
+	TestData::InitTestData();
+
 	int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
 	int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
 #ifdef EMSCRIPTEN

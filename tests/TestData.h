@@ -31,28 +31,29 @@ AABB *AABBArray();
 OBB *OBBArray();
 Frustum *FrustumArray();
 
-// N.B. These must be static and not extern to not generate UDB with initialization order between compilation units!
-static DONT_WARN_UNUSED float *f = FloatArray();
-static DONT_WARN_UNUSED float *pf = PosFloatArray(); // > 0
-static DONT_WARN_UNUSED float *uf = UnitFloatArray(); // [0,1]
-static DONT_WARN_UNUSED float4x4 *m = MatrixArray();
-static DONT_WARN_UNUSED float4x4 *m2 = MatrixArray2();
-static DONT_WARN_UNUSED const float4x4 *om = OrthonormalMatrixArray();
-static DONT_WARN_UNUSED const float4x4 *ogm = OrthogonalMatrixArray();
-static DONT_WARN_UNUSED float4x4 *tpm = TransposedMatrixArray();
-static DONT_WARN_UNUSED float2 *fl_2 = Float2Array();
-static DONT_WARN_UNUSED const float4 *nv = NormalizedVectorArray();
-static DONT_WARN_UNUSED const float4 *nv2 = NormalizedVectorArray2();
-static DONT_WARN_UNUSED float4 *v = VectorArray();
-static DONT_WARN_UNUSED float4 *v2 = VectorArray2();
-static DONT_WARN_UNUSED float4 *v3 = VectorArray3();
-static DONT_WARN_UNUSED float4 *v01 = VectorArrayWithW0Or1();
-static DONT_WARN_UNUSED vec *ve = VecArray2();
-static DONT_WARN_UNUSED Quat *q = QuatArray();
-static DONT_WARN_UNUSED Quat *q2 = QuatArray2();
-static DONT_WARN_UNUSED AABB *aabb = AABBArray();
-static DONT_WARN_UNUSED OBB *obb = OBBArray();
-static DONT_WARN_UNUSED Frustum *frustum = FrustumArray();
+void InitTestData();
+
+extern float *f;
+extern float *pf;
+extern float *uf;
+extern float4x4 *m;
+extern float4x4 *m2;
+extern const float4x4 *om;
+extern const float4x4 *ogm;
+extern float4x4 *tpm;
+extern float2 *fl_2;
+extern const float4 *nv;
+extern const float4 *nv2;
+extern float4 *v;
+extern float4 *v2;
+extern float4 *v3;
+extern float4 *v01;
+extern vec *ve;
+extern Quat *q;
+extern Quat *q2;
+extern AABB *aabb;
+extern OBB *obb;
+extern Frustum *frustum;
 
 extern float2 uninitializedFloat2;
 extern float3 uninitializedFloat3;
