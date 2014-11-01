@@ -1042,11 +1042,16 @@ bool AABB::Intersects(const Polyhedron &polyhedron) const
 
 void AABB::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 {
-	vec c = CenterPoint();
-	vec e = HalfDiagonal();
+	vec c = (minPoint + maxPoint) * 0.5f;
+	vec e = maxPoint - c;
 
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	vec absAxis = axis.Abs();
+	float r = Abs(e.Dot(absAxis));
+#else
 	// Compute the projection interval radius of the AABB onto L(t) = aabb.center + t * plane.normal;
 	float r = Abs(e[0]*Abs(axis[0]) + e[1]*Abs(axis[1]) + e[2]*Abs(axis[2]));
+#endif
 	// Compute the distance of the box center from plane.
 	float s = axis.Dot(c);
 	dMin = s - r;
