@@ -694,41 +694,119 @@ bool RangesOverlap(float start1, float end1, float start2, float end2)
 bool Triangle::Intersects(const AABB &aabb) const
 {
 /** The AABB-Triangle test implementation is based on the pseudo-code in
-	Christer Ericson's Real-Time Collision Detection, pp. 169-172. */
-	///@todo The Triangle-AABB intersection test can be greatly optimized by manually unrolling loops, trivial math and by avoiding
-	/// unnecessary copying.
-	float t1, t2, a1, a2;
-	const vec e[3] = { DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1) };
+	Christer Ericson's Real-Time Collision Detection, pp. 169-172. It is
+	practically a standard SAT test. */
+	vec tMin = a.Min(b.Min(c));
+	vec tMax = a.Max(b.Max(c));
 
-	for(int i = 0; i < 3; ++i)
-	{
-		ProjectToAxis(e[i], t1, t2);
-		aabb.ProjectToAxis(e[i], a1, a2);
-		if (!RangesOverlap(t1, t2, a1, a2))
-			return false;
-	}
-
-	vec n = UnnormalizedNormalCCW();
-	ProjectToAxis(n, t1, t2);
-	aabb.ProjectToAxis(n, a1, a2);
-	if (!RangesOverlap(t1, t2, a1, a2))
+	if (tMin.x >= aabb.maxPoint.x || tMax.x <= aabb.minPoint.x
+		|| tMin.y >= aabb.maxPoint.y || tMax.y <= aabb.minPoint.y
+		|| tMin.z >= aabb.maxPoint.z || tMax.z <= aabb.minPoint.z)
 		return false;
+
+	vec center = (aabb.minPoint + aabb.maxPoint) * 0.5f;
+	vec h = aabb.maxPoint - center;
 
 	const vec t[3] = { b-a, c-a, c-b };
 
+	vec n = Cross(t[0], t[1]);
+	float s = n.Dot(center - a);
+	float r = Abs(h.Dot(n.Abs()));
+	if (Abs(s) >= r)
+		return false;
+
+	const vec at[3] = { Abs(t[0]), Abs(t[1]), Abs(t[2]) };
+
+	vec ac = a-center;
+	vec bc = b-center;
+	vec cc = c-center;
+
+	// SAT test all cross-axes.
+	// The following is a fully unrolled loop of this code, stored here for reference:
+	/*
+	float t1, t2, a1, a2;
+	const vec e[3] = { DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1) };
 	for(int i = 0; i < 3; ++i)
 		for(int j = 0; j < 3; ++j)
 		{
 			vec axis = Cross(e[i], t[j]);
-			float len = axis.LengthSq();
-			if (len <= 1e-4f)
-				continue; // Ignore tests on degenerate axes.
-
 			ProjectToAxis(axis, t1, t2);
 			aabb.ProjectToAxis(axis, a1, a2);
-			if (!RangesOverlap(t1, t2, a1, a2))
-				return false;
+			if (t2 <= a1 || t1 >= a2) return false;
 		}
+	*/
+
+	// eX <cross> t[0]
+	float t1 = t[0].y * ac.z - t[0].z * ac.y;
+	float t2 = t[0].y * cc.z - t[0].z * cc.y;
+	float tc = (t1 + t2) * 0.5f;
+	r = Abs(h.y * at[0].z + h.z * at[0].y);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eX <cross> t[1]
+	t1 = t[1].y * ac.z - t[1].z * ac.y;
+	t2 = t[1].y * bc.z - t[1].z * bc.y;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.y * at[1].z + h.z * at[1].y);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eX <cross> t[2]
+	t1 = t[2].y * ac.z - t[2].z * ac.y;
+	t2 = t[2].y * bc.z - t[2].z * bc.y;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.y * at[2].z + h.z * at[2].y);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eY <cross> t[0]
+	t1 = t[0].z * ac.x - t[0].x * ac.z;
+	t2 = t[0].z * cc.x - t[0].x * cc.z;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.x * at[0].z + h.z * at[0].x);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eY <cross> t[1]
+	t1 = t[1].z * ac.x - t[1].x * ac.z;
+	t2 = t[1].z * bc.x - t[1].x * bc.z;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.x * at[1].z + h.z * at[1].x);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eY <cross> t[2]
+	t1 = t[2].z * ac.x - t[2].x * ac.z;
+	t2 = t[2].z * bc.x - t[2].x * bc.z;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.x * at[2].z + h.z * at[2].x);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eZ <cross> t[0]
+	t1 = t[0].x * ac.y - t[0].y * ac.x;
+	t2 = t[0].x * cc.y - t[0].y * cc.x;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.y * at[0].x + h.x * at[0].y);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eZ <cross> t[1]
+	t1 = t[1].x * ac.y - t[1].y * ac.x;
+	t2 = t[1].x * bc.y - t[1].y * bc.x;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.y * at[1].x + h.x * at[1].y);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
+
+	// eZ <cross> t[2]
+	t1 = t[2].x * ac.y - t[2].y * ac.x;
+	t2 = t[2].x * bc.y - t[2].y * bc.x;
+	tc = (t1 + t2) * 0.5f;
+	r = Abs(h.y * at[2].x + h.x * at[2].y);
+	if (r + Abs(tc - t1) <= Abs(tc))
+		return false;
 
 	// No separating axis exists, the AABB and triangle intersect.
 	return true;
