@@ -72,6 +72,31 @@ UNIQUE_TEST(AABBContainsAABB)
 	assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
 }
 
+UNIQUE_TEST(AABBContainsLineSegment)
+{
+	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
+	assert(a.Contains(LineSegment(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10))));
+	assert(a.Contains(LineSegment(POINT_VEC(10,10,10), POINT_VEC(0, 0, 0))));
+	assert(a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(6,6,6))));
+	assert(a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(10,6,6))));
+	assert(!a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(15,15,15))));
+	assert(!a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(5,15,5))));
+	assert(!a.Contains(LineSegment(POINT_VEC(-5,-5,-5), POINT_VEC(5,5,5))));
+	assert(!a.Contains(LineSegment(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
+	assert(!a.Contains(LineSegment(POINT_VEC(15,15,15), POINT_VEC(-15,-15,-15))));
+}
+
+UNIQUE_TEST(AABBContainsSphere)
+{
+	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
+	assert(a.Contains(Sphere(POINT_VEC(0,0,0), 0.f)));
+	assert(a.Contains(Sphere(POINT_VEC(5,5,5), 1.f)));
+	assert(!a.Contains(Sphere(POINT_VEC(5,5,5), 15.f)));
+	assert(!a.Contains(Sphere(POINT_VEC(9,5,5), 2.f)));
+	assert(!a.Contains(Sphere(POINT_VEC(1,5,5), 2.f)));
+	assert(!a.Contains(Sphere(POINT_VEC(-10,-10,-10), 1000.f)));
+}
+
 UNIQUE_TEST(AABBIntersectsAABB)
 {
 	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));

@@ -623,7 +623,7 @@ bool AABB::Contains(const vec &point) const
 
 bool AABB::Contains(const LineSegment &lineSegment) const
 {
-	return Contains(lineSegment.a) && Contains(lineSegment.b);
+	return Contains(Min(lineSegment.a, lineSegment.b), Max(lineSegment.a, lineSegment.b));
 }
 
 bool AABB::Contains(const vec &aabbMinPoint, const vec &aabbMaxPoint) const
@@ -647,8 +647,7 @@ bool AABB::Contains(const OBB &obb) const
 
 bool AABB::Contains(const Sphere &sphere) const
 {
-	///@todo Optimize.
-	return Contains(sphere.MinimalEnclosingAABB());
+	return Contains(sphere.pos - DIR_VEC_SCALAR(sphere.r), sphere.pos + DIR_VEC_SCALAR(sphere.r));
 }
 
 bool AABB::Contains(const Capsule &capsule) const
@@ -658,7 +657,7 @@ bool AABB::Contains(const Capsule &capsule) const
 
 bool AABB::Contains(const Triangle &triangle) const
 {
-	return Contains(triangle.a) && Contains(triangle.b) && Contains(triangle.c);
+	return Contains(triangle.BoundingAABB());
 }
 
 bool AABB::Contains(const Polygon &polygon) const
