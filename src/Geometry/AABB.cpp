@@ -1073,7 +1073,7 @@ void AABB::Enclose(const OBB &obb)
 
 void AABB::Enclose(const Sphere &sphere)
 {
-	vec d = POINT_VEC_SCALAR(sphere.r);
+	vec d = DIR_VEC_SCALAR(sphere.r);
 	Enclose(sphere.pos - d);
 	Enclose(sphere.pos + d);
 }
@@ -1087,7 +1087,7 @@ void AABB::Enclose(const Triangle &triangle)
 
 void AABB::Enclose(const Capsule &capsule)
 {
-	vec d = POINT_VEC_SCALAR(capsule.r);
+	vec d = DIR_VEC_SCALAR(capsule.r);
 	Enclose(capsule.l.a - d);
 	Enclose(capsule.l.a + d);
 	Enclose(capsule.l.b - d);
