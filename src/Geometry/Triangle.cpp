@@ -293,10 +293,8 @@ Polyhedron Triangle::ToPolyhedron() const
 AABB Triangle::BoundingAABB() const
 {
 	AABB aabb;
-	aabb.SetNegativeInfinity();
-	aabb.Enclose(a);
-	aabb.Enclose(b);
-	aabb.Enclose(c);
+	aabb.minPoint = Min(a, b, c);
+	aabb.maxPoint = Max(a, b, c);
 	return aabb;
 }
 
