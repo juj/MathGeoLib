@@ -58,6 +58,22 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define load1_ps _mm_load1_ps
 #define stream_ps _mm_stream_ps
 
+#ifdef MATH_SSE41
+#define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
+#elif defined(MATH_SSE)
+// Given a input vector of either 0xFFFFFFFF or 0, returns a nonzero integer of all lanes were zero.
+// Warning: this SSE1 version is more like "all finite without nans" instead of "allzero", because
+// it does not detect finite non-zero floats. Call only for inputs that are either all 0xFFFFFFFF or 0.
+int FORCE_INLINE allzero_ps(simd4f x)
+{
+	simd4f y = yyyy_ps(x);
+	x = or_ps(x, y);
+	y = _mm_movehl_ps(y, x);
+	x = or_ps(x, y);
+	return _mm_ucomige_ss(x, x);
+}
+#endif
+
 static inline __m128 load_vec3(const float *ptr, float w)
 {
 	__m128 low = _mm_loadl_pi(_mm_setzero_ps(), (const __m64*)ptr); // [_ _ y x]

@@ -908,22 +908,6 @@ void OBB::ToEdgeList(vec *outPos) const
 	}
 }
 
-#ifdef MATH_SSE41
-#define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
-#elif defined(MATH_SSE)
-// Given a input vector of either 0xFFFFFFFF or 0, returns a nonzero integer of all lanes were zero.
-// Note that this SSE1 version is more like "all finite without nans" instead of "allzero", because
-// it does not detect finite non-zero floats.
-int FORCE_INLINE allzero_ps(simd4f x)
-{
-	simd4f y = yyyy_ps(x);
-	x = or_ps(x, y);
-	y = _mm_movehl_ps(y, x);
-	x = or_ps(x, y);
-	return _mm_ucomige_ss(x, x);
-}
-#endif
-
 bool OBB::Intersects(const OBB &b, float epsilon) const
 {
 	assume(pos.IsFinite());
