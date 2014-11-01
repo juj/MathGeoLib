@@ -40,6 +40,10 @@
 #include <iostream>
 #endif
 
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
+#include "../Math/float4_sse.h"
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 Triangle::Triangle(const vec &a_, const vec &b_, const vec &c_)
@@ -696,6 +700,86 @@ bool Triangle::Intersects(const AABB &aabb) const
 /** The AABB-Triangle test implementation is based on the pseudo-code in
 	Christer Ericson's Real-Time Collision Detection, pp. 169-172. It is
 	practically a standard SAT test. */
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Benchmark 'Triangle_intersects_AABB': Triangle::Intersects(AABB)
+	//    Best: 8.065 nsecs / 21.664 ticks, Avg: 8.207 nsecs, Worst: 9.985 nsecs
+	simd4f tMin = min_ps(a, min_ps(b, c));
+	simd4f tMax = max_ps(a, max_ps(b, c));
+
+	simd4f cmp = cmpge_ps(tMin, aabb.maxPoint.v);
+	cmp = or_ps(cmp, cmple_ps(tMax, aabb.minPoint.v));
+	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)); // Mask off results from the W channel.
+	if (!allzero_ps(cmp)) return false;
+
+	simd4f center = mul_ps(add_ps(aabb.minPoint.v, aabb.maxPoint.v), set1_ps(0.5f));
+	simd4f h = sub_ps(aabb.maxPoint.v, center);
+
+	simd4f t0 = sub_ps(b, a);
+	simd4f t1 = sub_ps(c, a);
+	simd4f ac = sub_ps(a, center);
+	simd4f n = cross_ps(t0, t1);
+	if (_mm_ucomige_ss(abs_ps(dot4_ps(n, ac)), abs_ps(dot4_ps(h, abs_ps(n))))) return false;
+
+	// {eX, eY, eZ} cross t1
+	simd4f ac_wyxz  = shuffle1_ps(ac,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f h_wyxz   = shuffle1_ps(h,   _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f ac_wxzy  = shuffle1_ps(ac,  _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f h_wxzy   = shuffle1_ps(h,   _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f bc = sub_ps(b, center);
+	simd4f bc_wyxz  = shuffle1_ps(bc,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f at1 = abs_ps(t1);
+	simd4f t1_wyxz  = shuffle1_ps(t1,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f at1_wyxz = shuffle1_ps(at1, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f bc_wxzy  = shuffle1_ps(bc,  _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f t1_wxzy  = shuffle1_ps(t1,  _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f at1_wxzy = shuffle1_ps(at1, _MM_SHUFFLE(3, 0, 2, 1));
+
+	simd4f d1 = sub_ps(mul_ps(t1_wxzy, ac_wyxz), mul_ps(t1_wyxz, ac_wxzy));
+	simd4f d2 = sub_ps(mul_ps(t1_wxzy, bc_wyxz), mul_ps(t1_wyxz, bc_wxzy));
+	simd4f tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
+	simd4f r = abs_ps(add_ps(mul_ps(h_wyxz, at1_wxzy), mul_ps(h_wxzy, at1_wyxz)));
+	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	// Note: The three masks of W channel could be omitted if cmplt_ps was used instead of cmple_ps, but
+	// want to be strict here and define that AABB and Triangle which touch at a vertex should not intersect.
+	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)); // Mask off results from the W channel.
+	if (!allzero_ps(cmp)) return false;
+
+	// {eX, eY, eZ} cross t2
+	simd4f t2 = sub_ps(c, b);
+	simd4f at2 = abs_ps(t2);
+	simd4f t2_wyxz  = shuffle1_ps(t2,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f at2_wyxz = shuffle1_ps(at2, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f t2_wxzy  = shuffle1_ps(t2,  _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f at2_wxzy = shuffle1_ps(at2, _MM_SHUFFLE(3, 0, 2, 1));
+
+	d1 = sub_ps(mul_ps(t2_wxzy, ac_wyxz), mul_ps(t2_wyxz, ac_wxzy));
+	d2 = sub_ps(mul_ps(t2_wxzy, bc_wyxz), mul_ps(t2_wyxz, bc_wxzy));
+	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
+	r = abs_ps(add_ps(mul_ps(h_wyxz, at2_wxzy), mul_ps(h_wxzy, at2_wyxz)));
+	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)); // Mask off results from the W channel.
+	if (!allzero_ps(cmp)) return false;
+
+	// {eX, eY, eZ} cross t0
+	simd4f cc = sub_ps(c, center);
+	simd4f cc_wyxz  = shuffle1_ps(cc,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f t0_wyxz  = shuffle1_ps(t0,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f at0 = abs_ps(t0);
+	simd4f at0_wyxz = shuffle1_ps(at0, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f at0_wxzy = shuffle1_ps(at0, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f t0_wxzy  = shuffle1_ps(t0,  _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f cc_wxzy  = shuffle1_ps(cc,  _MM_SHUFFLE(3, 0, 2, 1));
+
+	d1 = sub_ps(mul_ps(t0_wxzy, ac_wyxz), mul_ps(t0_wyxz, ac_wxzy));
+	d2 = sub_ps(mul_ps(t0_wxzy, cc_wyxz), mul_ps(t0_wyxz, cc_wxzy));
+	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
+	r = abs_ps(add_ps(mul_ps(h_wyxz, at0_wxzy), mul_ps(h_wxzy, at0_wyxz)));
+	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)); // Mask off results from the W channel.
+	return allzero_ps(cmp) != 0;
+#else
+	// Benchmark 'Triangle_intersects_AABB': Triangle::Intersects(AABB)
+	//    Best: 17.282 nsecs / 46.496 ticks, Avg: 17.804 nsecs, Worst: 18.434 nsecs
 	vec tMin = a.Min(b.Min(c));
 	vec tMax = a.Max(b.Max(c));
 
@@ -709,107 +793,109 @@ bool Triangle::Intersects(const AABB &aabb) const
 
 	const vec t[3] = { b-a, c-a, c-b };
 
+	vec ac = a-center;
+
 	vec n = Cross(t[0], t[1]);
-	float s = n.Dot(center - a);
+	float s = n.Dot(ac);
 	float r = Abs(h.Dot(n.Abs()));
 	if (Abs(s) >= r)
 		return false;
 
 	const vec at[3] = { Abs(t[0]), Abs(t[1]), Abs(t[2]) };
 
-	vec ac = a-center;
 	vec bc = b-center;
 	vec cc = c-center;
 
 	// SAT test all cross-axes.
 	// The following is a fully unrolled loop of this code, stored here for reference:
 	/*
-	float t1, t2, a1, a2;
+	float d1, d2, a1, a2;
 	const vec e[3] = { DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1) };
 	for(int i = 0; i < 3; ++i)
 		for(int j = 0; j < 3; ++j)
 		{
 			vec axis = Cross(e[i], t[j]);
-			ProjectToAxis(axis, t1, t2);
+			ProjectToAxis(axis, d1, d2);
 			aabb.ProjectToAxis(axis, a1, a2);
-			if (t2 <= a1 || t1 >= a2) return false;
+			if (d2 <= a1 || d1 >= a2) return false;
 		}
 	*/
 
 	// eX <cross> t[0]
-	float t1 = t[0].y * ac.z - t[0].z * ac.y;
-	float t2 = t[0].y * cc.z - t[0].z * cc.y;
-	float tc = (t1 + t2) * 0.5f;
+	float d1 = t[0].y * ac.z - t[0].z * ac.y;
+	float d2 = t[0].y * cc.z - t[0].z * cc.y;
+	float tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[0].z + h.z * at[0].y);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eX <cross> t[1]
-	t1 = t[1].y * ac.z - t[1].z * ac.y;
-	t2 = t[1].y * bc.z - t[1].z * bc.y;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[1].y * ac.z - t[1].z * ac.y;
+	d2 = t[1].y * bc.z - t[1].z * bc.y;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[1].z + h.z * at[1].y);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eX <cross> t[2]
-	t1 = t[2].y * ac.z - t[2].z * ac.y;
-	t2 = t[2].y * bc.z - t[2].z * bc.y;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[2].y * ac.z - t[2].z * ac.y;
+	d2 = t[2].y * bc.z - t[2].z * bc.y;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[2].z + h.z * at[2].y);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eY <cross> t[0]
-	t1 = t[0].z * ac.x - t[0].x * ac.z;
-	t2 = t[0].z * cc.x - t[0].x * cc.z;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[0].z * ac.x - t[0].x * ac.z;
+	d2 = t[0].z * cc.x - t[0].x * cc.z;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.x * at[0].z + h.z * at[0].x);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eY <cross> t[1]
-	t1 = t[1].z * ac.x - t[1].x * ac.z;
-	t2 = t[1].z * bc.x - t[1].x * bc.z;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[1].z * ac.x - t[1].x * ac.z;
+	d2 = t[1].z * bc.x - t[1].x * bc.z;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.x * at[1].z + h.z * at[1].x);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eY <cross> t[2]
-	t1 = t[2].z * ac.x - t[2].x * ac.z;
-	t2 = t[2].z * bc.x - t[2].x * bc.z;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[2].z * ac.x - t[2].x * ac.z;
+	d2 = t[2].z * bc.x - t[2].x * bc.z;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.x * at[2].z + h.z * at[2].x);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eZ <cross> t[0]
-	t1 = t[0].x * ac.y - t[0].y * ac.x;
-	t2 = t[0].x * cc.y - t[0].y * cc.x;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[0].x * ac.y - t[0].y * ac.x;
+	d2 = t[0].x * cc.y - t[0].y * cc.x;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[0].x + h.x * at[0].y);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eZ <cross> t[1]
-	t1 = t[1].x * ac.y - t[1].y * ac.x;
-	t2 = t[1].x * bc.y - t[1].y * bc.x;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[1].x * ac.y - t[1].y * ac.x;
+	d2 = t[1].x * bc.y - t[1].y * bc.x;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[1].x + h.x * at[1].y);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// eZ <cross> t[2]
-	t1 = t[2].x * ac.y - t[2].y * ac.x;
-	t2 = t[2].x * bc.y - t[2].y * bc.x;
-	tc = (t1 + t2) * 0.5f;
+	d1 = t[2].x * ac.y - t[2].y * ac.x;
+	d2 = t[2].x * bc.y - t[2].y * bc.x;
+	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[2].x + h.x * at[2].y);
-	if (r + Abs(tc - t1) <= Abs(tc))
+	if (r + Abs(tc - d1) <= Abs(tc))
 		return false;
 
 	// No separating axis exists, the AABB and triangle intersect.
 	return true;
+#endif
 }
 
 bool Triangle::Intersects(const OBB &obb) const
