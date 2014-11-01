@@ -597,7 +597,7 @@ bool AABB::Contains(const vec &point) const
 // already "hot" in the registers. Therefore favoring the SSE version over the scalar version
 // when possible.
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE41)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
 	//    Best: 2.048 nsecs / 3.5128 ticks, Avg: 2.241 nsecs, Worst: 4.277 nsecs
 	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
@@ -607,41 +607,7 @@ bool AABB::Contains(const vec &point) const
 	simd4f a = cmplt_ps(point, minPoint);
 	simd4f b = cmpgt_ps(point, maxPoint);
 	a = or_ps(a, b);
-	return _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(a)) != 0;
-
-/* // This version with hadd_ps is interesting, but does not make sense because hadd is so slow!
-#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE3)
-	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
-	//    Best: 3.373 nsecs / 5.7862 ticks, Avg: 3.651 nsecs, Worst: 7.951 nsecs
-	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
-	//    Best: 3.132 nsecs / 5.3906 ticks, Avg: 3.383 nsecs, Worst: 8.312 nsecs
-	// Benchmark 'AABBContains_unpredictable': AABB::Contains(point) unpredictable
-	//    Best: 3.734 nsecs / 6.3922 ticks, Avg: 4.008 nsecs, Worst: 7.951 nsecs
-	simd4f a = cmplt_ps(point, minPoint);
-	simd4f b = cmpgt_ps(point, maxPoint);
-	a = or_ps(a, b);
-	a = _mm_hadd_ps(a, a);
-	a = _mm_hadd_ps(a, a);
-	int d = _mm_ucomige_ss(a, a);
-	return d != 0;
-*/
-#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
-	//    Best: 3.012 nsecs / 5.1382 ticks, Avg: 3.235 nsecs, Worst: 5.361 nsecs
-	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
-	//    Best: 3.012 nsecs / 5.1374 ticks, Avg: 3.230 nsecs, Worst: 5.602 nsecs
-	// Benchmark 'AABBContains_unpredictable': AABB::Contains(point) unpredictable
-	//    Best: 3.554 nsecs / 6.0404 ticks, Avg: 3.797 nsecs, Worst: 6.626 nsecs
-	simd4f a = cmplt_ps(point, minPoint);
-	simd4f b = cmpgt_ps(point, maxPoint);
-	a = or_ps(a, b);
-	simd4f y = yyyy_ps(a);
-	a = or_ps(a, y);
-	y = _mm_movehl_ps(y, a);
-	a = or_ps(a, y);
-	int d = _mm_ucomige_ss(a, a);
-	return d != 0;
-
+	return allzero_ps(a) != 0;
 #else
 	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
 	//    Best: 2.108 nsecs / 3.6022 ticks, Avg: 2.232 nsecs, Worst: 4.638 nsecs
@@ -652,7 +618,6 @@ bool AABB::Contains(const vec &point) const
 	return minPoint.x <= point.x && point.x <= maxPoint.x &&
 	       minPoint.y <= point.y && point.y <= maxPoint.y &&
 	       minPoint.z <= point.z && point.z <= maxPoint.z;
-
 #endif
 }
 
@@ -661,9 +626,18 @@ bool AABB::Contains(const LineSegment &lineSegment) const
 	return Contains(lineSegment.a) && Contains(lineSegment.b);
 }
 
-bool AABB::Contains(const AABB &aabb) const
+bool AABB::Contains(const vec &aabbMinPoint, const vec &aabbMaxPoint) const
 {
-	return Contains(aabb.minPoint) && Contains(aabb.maxPoint);
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	simd4f a = cmplt_ps(aabbMinPoint, minPoint);
+	simd4f b = cmpgt_ps(aabbMaxPoint, maxPoint);
+	a = or_ps(a, b);
+	return allzero_ps(a) != 0;
+#else
+	return minPoint.x <= aabbMinPoint.x && maxPoint.x >= aabbMaxPoint.x &&
+	       minPoint.y <= aabbMinPoint.y && maxPoint.y >= aabbMaxPoint.y &&
+	       minPoint.z <= aabbMinPoint.z && maxPoint.z >= aabbMaxPoint.z;
+#endif
 }
 
 bool AABB::Contains(const OBB &obb) const

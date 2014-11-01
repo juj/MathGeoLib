@@ -32,6 +32,18 @@ BENCHMARK(AABBContains_unpredictable, "AABB::Contains(point) unpredictable")
 }
 BENCHMARK_END
 
+BENCHMARK(AABBContainsAABB_positive, "AABB::Contains(AABB) positive")
+{
+	dummyResultInt += aabb[i].Contains(aabb[i]) ? 1 : 0;
+}
+BENCHMARK_END
+
+BENCHMARK(AABBContainsAABB_random, "AABB::Contains(AABB) random")
+{
+	dummyResultInt += aabb[i].Contains(aabb[i+1]) ? 1 : 0;
+}
+BENCHMARK_END
+
 UNIQUE_TEST(AABBContains)
 {
 	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
@@ -46,6 +58,18 @@ UNIQUE_TEST(AABBContains)
 	assert(!a.Contains(POINT_VEC(1,2,13)));
 	assert(!a.Contains(POINT_VEC(-1,-2,-3)));
 	assert(!a.Contains(POINT_VEC(11,12,13)));
+}
+
+UNIQUE_TEST(AABBContainsAABB)
+{
+	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
+	assert(a.Contains(a));
+	assert(a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(6,6,6))));
+	assert(a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(10,6,6))));
+	assert(!a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(15,15,15))));
+	assert(!a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(5,15,5))));
+	assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(5,5,5))));
+	assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
 }
 
 UNIQUE_TEST(AABBIntersectsAABB)

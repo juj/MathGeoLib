@@ -389,7 +389,8 @@ public:
 		@see Distance(), Intersects(), ClosestPoint(). */
 	bool Contains(const vec &point) const;
 	bool Contains(const LineSegment &lineSegment) const;
-	bool Contains(const AABB &aabb) const;
+	bool Contains(const vec &aabbMinPoint, const vec &aabbMaxPoint) const;
+	bool Contains(const AABB &aabb) const { return Contains(aabb.minPoint, aabb.maxPoint); }
 	bool Contains(const OBB &obb) const;
 	bool Contains(const Sphere &sphere) const;
 	bool Contains(const Triangle &triangle) const;
