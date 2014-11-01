@@ -1055,61 +1055,55 @@ void AABB::Enclose(const vec &point)
 
 void AABB::Enclose(const LineSegment &lineSegment)
 {
-	Enclose(lineSegment.a);
-	Enclose(lineSegment.b);
+	Enclose(Min(lineSegment.a, lineSegment.b), Max(lineSegment.a, lineSegment.b));
 }
 
-void AABB::Enclose(const AABB &aabb)
+void AABB::Enclose(const vec &aabbMinPoint, const vec &aabbMaxPoint)
 {
-	minPoint = Min(minPoint, aabb.minPoint);
-	maxPoint = Max(maxPoint, aabb.maxPoint);
+	minPoint = Min(minPoint, aabbMinPoint);
+	maxPoint = Max(maxPoint, aabbMaxPoint);
 }
 
 void AABB::Enclose(const OBB &obb)
 {
-	for(int i = 0; i < 8; ++i)
-		Enclose(obb.CornerPoint(i));
+	vec absAxis0 = obb.axis[0].Abs();
+	vec absAxis1 = obb.axis[1].Abs();
+	vec absAxis2 = obb.axis[2].Abs();
+	vec d = obb.r.x * absAxis0 + obb.r.y * absAxis1 + obb.r.z * absAxis2;
+	Enclose(obb.pos - d, obb.pos + d);
 }
 
 void AABB::Enclose(const Sphere &sphere)
 {
 	vec d = DIR_VEC_SCALAR(sphere.r);
-	Enclose(sphere.pos - d);
-	Enclose(sphere.pos + d);
+	Enclose(sphere.pos - d, sphere.pos + d);
 }
 
 void AABB::Enclose(const Triangle &triangle)
 {
-	Enclose(triangle.a);
-	Enclose(triangle.b);
-	Enclose(triangle.c);
+	Enclose(Min(triangle.a, triangle.b, triangle.c), Max(triangle.a, triangle.b, triangle.c));
 }
 
 void AABB::Enclose(const Capsule &capsule)
 {
 	vec d = DIR_VEC_SCALAR(capsule.r);
-	Enclose(capsule.l.a - d);
-	Enclose(capsule.l.a + d);
-	Enclose(capsule.l.b - d);
-	Enclose(capsule.l.b + d);
+	minPoint = Min(minPoint, Min(capsule.l.a, capsule.l.b) - d);
+	maxPoint = Max(maxPoint, Max(capsule.l.a, capsule.l.b) + d);
 }
 
 void AABB::Enclose(const Frustum &frustum)
 {
-	for(int i = 0; i < 8; ++i)
-		Enclose(frustum.CornerPoint(i));
+	Enclose(frustum.MinimalEnclosingAABB());
 }
 
 void AABB::Enclose(const Polygon &polygon)
 {
-	for(int i = 0; i < polygon.NumVertices(); ++i)
-		Enclose(polygon.Vertex(i));
+	Enclose(polygon.MinimalEnclosingAABB());
 }
 
 void AABB::Enclose(const Polyhedron &polyhedron)
 {
-	for(int i = 0; i < polyhedron.NumVertices(); ++i)
-		Enclose(polyhedron.Vertex(i));
+	Enclose(polyhedron.MinimalEnclosingAABB());
 }
 
 void AABB::Enclose(const vec *pointArray, int numPoints)

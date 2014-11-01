@@ -446,8 +446,9 @@ public:
 		AABB into this.
 		@note The generated AABB is not necessarily the optimal enclosing AABB for this AABB and the given object. */
 	void Enclose(const vec &point);
+	void Enclose(const vec &aabbMinPoint, const vec &aabbMaxPoint);
 	void Enclose(const LineSegment &lineSegment);
-	void Enclose(const AABB &aabb);
+	void Enclose(const AABB &aabb) { Enclose(aabb.minPoint, aabb.maxPoint); }
 	void Enclose(const OBB &obb);
 	void Enclose(const Sphere &sphere);
 	void Enclose(const Triangle &triangle);
