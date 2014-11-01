@@ -408,7 +408,7 @@ inline T Clamp01(const T &val) { return Clamp(val, T(0), T(1)); }
 /// Computes the smaller of two values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
-T Min(const T &a, const T &b)
+inline T Min(const T &a, const T &b)
 {
 	return a <= b ? a : b;
 }
@@ -416,7 +416,7 @@ T Min(const T &a, const T &b)
 /// Computes the larger of two values.
 /** @see Clamp(), Clamp01(), Min(). */
 template<typename T>
-T Max(const T &a, const T &b)
+inline T Max(const T &a, const T &b)
 {
 	return a >= b ? a : b;
 }
@@ -434,7 +434,7 @@ inline float Max(const float &a, const float &b)
 /// Computes the smallest of three values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
-T Min(const T &a, const T &b, const T &c)
+inline T Min(const T &a, const T &b, const T &c)
 {
 	return Min(Min(a, b), c);
 }
@@ -452,7 +452,7 @@ inline float Min(const float &a, const float &b)
 /// Computes the largest of three values.
 /** @see Clamp(), Clamp01(), Min(). */
 template<typename T>
-T Max(const T &a, const T &b, const T &c)
+inline T Max(const T &a, const T &b, const T &c)
 {
 	return Max(Max(a, b), c);
 }
@@ -460,7 +460,7 @@ T Max(const T &a, const T &b, const T &c)
 /// Computes the smallest of four values.
 /** @see Clamp(), Clamp01(), Max(). */
 template<typename T>
-T Min(const T &a, const T &b, const T &c, const T &d)
+inline T Min(const T &a, const T &b, const T &c, const T &d)
 {
 	return Min(Min(a, b), Min(c, d));
 }
@@ -468,14 +468,14 @@ T Min(const T &a, const T &b, const T &c, const T &d)
 /// Computes the largest of four values.
 /** @see Clamp(), Clamp01(), Min(). */
 template<typename T>
-T Max(const T &a, const T &b, const T &c, const T &d)
+inline T Max(const T &a, const T &b, const T &c, const T &d)
 {
 	return Max(Max(a, b), Max(c, d));
 }
 
 /// Swaps the two values.
 template<typename T>
-void Swap(T &a, T &b)
+inline void Swap(T &a, T &b)
 {
 	T temp = a;
 	a = b;
@@ -484,28 +484,38 @@ void Swap(T &a, T &b)
 
 /** @return True if a > b. */
 template<typename T>
-bool GreaterThan(const T &a, const T &b)
+inline bool GreaterThan(const T &a, const T &b)
 {
 	return a > b;
 }
 
 /** @return True if a < b. */
 template<typename T>
-bool LessThan(const T &a, const T &b)
+inline bool LessThan(const T &a, const T &b)
 {
 	return a < b;
 }
 
 /** @return The absolute value of a. */
 template<typename T>
-const T Abs(const T &a)
+inline const T Abs(const T &a)
 {
 	return a >= 0 ? a : -a;
 }
 
+template<>
+inline const float Abs(const float &a)
+{
+#ifdef MATH_SSE
+	return s4f_x(abs_ps(setx_ps(a)));
+#else
+	return a <= b ? a : b;
+#endif
+}
+
 /// @return True if a and b are equal, using operator ==().
 template<typename T>
-bool Equal(const T &a, const T &b)
+FORCE_INLINE bool Equal(const T &a, const T &b)
 {
 	return a == b;
 }
