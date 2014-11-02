@@ -4,8 +4,12 @@
 
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
+#include "../src/Math/grisu3.h"
 #include "TestRunner.h"
 #include "ObjectGenerators.h"
+#include "TestData.h"
+
+using namespace TestData;
 
 MATH_BEGIN_NAMESPACE
 bool IsNeutralCLocale();
@@ -417,3 +421,121 @@ RANDOMIZED_TEST(Polygon_Serialize)
 	assert(o.Equals(o2, 0.1f));
 */
 }
+
+std::string U64Str(uint64_t u)
+{
+	char str[256];
+	sprintf(str, "%X%X", (uint32_t)(u >> 32), (uint32_t)u);
+	return str;
+}
+
+void test_double_to_string(double d, const char *d_in_src)
+{
+	std::string s = dtoa_grisu3_string(d);
+	double d1 = d;
+	double d2 = DeserializeDouble(s.c_str(), 0);
+	uint64_t u1 = *(uint64_t*)&d1;
+	uint64_t u2 = *(uint64_t*)&d2;
+	if (u1 != u2)
+	{
+		int64_t ulpsDifference = Abs<int64_t>(u1 - u2);
+#ifdef _MSC_VER
+		bool isDenormal = (u1 & 0x7FF0000000000000ULL) == 0 && (u2 & 0x7FF0000000000000ULL) == 0;
+		if (isDenormal && ulpsDifference <= 1) return; // Ignore 1 ulp differences on denormals! (MSVC bug?)
+#endif
+		LOGE("%.17g to str -> %s does not match:\nOriginal: %.17g (0x%s)\nExpected: %.17g (0x%s)\n   %d ulps difference!", d, s.c_str(), d1, U64Str(u1).c_str(), d2, U64Str(u2).c_str(), ulpsDifference);
+	}
+	assert(u1 == u2);
+
+	if (d_in_src && strcmp(d_in_src, s.c_str()))// && strlen(d_in_src) < s.length())
+	{
+		LOGE("%.17g to str -> string does not match shortest representation:\nExpected: %s\nReceived: %s!", d1, d_in_src, s.c_str());
+		assert(false);
+	}
+}
+
+// Test that we get the short representation as presented in source code.
+#define TEST_D_GIVEN(d) test_double_to_string((double)d, #d)
+
+#define TEST_D_TO_STR(d) test_double_to_string(d, 0)
+
+UNIQUE_TEST(grisu3)
+{
+	test_double_to_string((double)-FLOAT_INF, "-inf");
+	TEST_D_GIVEN(-3.3885015522551284e+186);
+	TEST_D_GIVEN(-16777216);
+	TEST_D_GIVEN(-99.9);
+	TEST_D_GIVEN(-1);
+	TEST_D_GIVEN(-.5);
+	TEST_D_GIVEN(-1.3447622391509214e-5);
+	TEST_D_GIVEN(-1.0971427264533918e-308); // grisu3 fails.
+	TEST_D_GIVEN(-5e-324);
+	uint64_t negZero = 0x8000000000000000ULL;
+	double d = *(double*)&negZero;
+	test_double_to_string(d, "-0");
+	TEST_D_GIVEN(0);
+	TEST_D_GIVEN(5e-324); // min denormal double
+	TEST_D_TO_STR(1.0971427264533918e-308); // grisu3 fails.
+	TEST_D_GIVEN(1.5450561895576771e-308);
+	TEST_D_TO_STR(4.1878166087191307e-23); // grisu3 fails.
+	test_double_to_string(1.2345e-2, "12345e-6");
+	TEST_D_TO_STR(0.0020599371828568034); // grisu3 fails.
+	TEST_D_GIVEN(.5);
+	test_double_to_string(.0009, "9e-4");
+	TEST_D_GIVEN(.009);
+	TEST_D_GIVEN(.09);
+	TEST_D_GIVEN(.9);
+	TEST_D_GIVEN(1);
+	TEST_D_TO_STR(1.0444224918822551); // grisu3 fails.
+	TEST_D_GIVEN(1.1);
+	TEST_D_GIVEN(2);
+	TEST_D_GIVEN(10);
+	TEST_D_GIVEN(11.1);
+	TEST_D_GIVEN(99.9);
+	TEST_D_GIVEN(100);
+	test_double_to_string(1000, "1e3");
+	TEST_D_GIVEN(1e5);
+	TEST_D_GIVEN(100000.00000001);
+	TEST_D_GIVEN(16777216);
+	TEST_D_GIVEN(12345e4);
+	TEST_D_GIVEN(1.2345e-1);
+	TEST_D_TO_STR(232889534317.95139);
+	TEST_D_GIVEN(232889534317.9514);
+	TEST_D_TO_STR(1075193546584750.7); // grisu3 fails.
+	TEST_D_TO_STR(3.3885015522551284e186); // grisu3 fails.
+	TEST_D_TO_STR(1.7976931348623157e308); // max double
+	TEST_D_GIVEN(17976931348623157e292); // max double, but in one char less.
+	test_double_to_string((double)FLOAT_INF, "inf");
+	TEST_D_TO_STR((double)FLOAT_NAN);
+}
+
+RANDOMIZED_TEST(grisu3_random)
+{
+	uint64_t u = (uint64_t)rng.Int() ^ ((uint64_t)rng.Int() << 15) ^ ((uint64_t)rng.Int() << 30) ^ ((uint64_t)rng.Int() << 45)  ^ ((uint64_t)rng.Int() << 60);
+	double d = *(double*)&u;
+	test_double_to_string(d, 0);
+}
+
+extern char dummy_str[256] = {};
+
+// Benchmark 'dtoa_sprintf': dtoa_sprintf
+//    Best: 967.948 nsecs / 1646 ticks, Avg: 1.181 usecs, Worst: 2.403 usecs
+BENCHMARK(dtoa_sprintf, "dtoa_sprintf")
+{
+	sprintf(dummy_str, "%.17g", (double)f[i]);
+}
+BENCHMARK_END;
+
+// Benchmark 'dtoa_grisu': dtoa_grisu
+//    Best: 213.828 nsecs / 363.596 ticks, Avg: 229.754 nsecs, Worst: 338.511 nsecs
+BENCHMARK(dtoa_grisu3, "dtoa_grisu3")
+{
+	dtoa_grisu3(f[i], dummy_str);
+}
+BENCHMARK_END;
+
+BENCHMARK(float4_SerializeToString, "float4::SerializeToString")
+{
+	strcpy(dummy_str, v[i].SerializeToString().c_str());
+}
+BENCHMARK_END;
