@@ -8,7 +8,7 @@ include(CommonOptions.cmake)
 include_directories(../CodeLib/src)
 include_directories(../GraphicsEngine/src)
 
-file(GLOB_RECURSE sourceFiles ./src/*.cpp)
+file(GLOB_RECURSE sourceFiles ./src/*.cpp ./src/*.c)
 file(GLOB_RECURSE headerFiles ./src/*.h)
 
 if (BUILD_FOR_GCOV)
