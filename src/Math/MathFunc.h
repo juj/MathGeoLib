@@ -578,7 +578,14 @@ char *SerializeFloat(float f, char *dstStr);
 		to advance to reading a next element in a sequence of multiple serialized entries. */
 float DeserializeFloat(const char *str, const char **outEndStr = 0);
 
+/// Deserializes a double from the given string.
+/** @param str The source string buffer to deserialize. If this is a null pointer or an empty string, then NaN is returned.
+	@param outEndStr [out] Optional. If present, a pointer to the string position where reading ended is outputted. You can use this pointer
+		to advance to reading a next element in a sequence of multiple serialized entries. */
+double DeserializeDouble(const char *str, const char **outEndStr = 0);
+
 // A deserialization helper.
 #define MATH_SKIP_WORD(str, word) if (!strncmp(str, word, strlen(word))) str += strlen(word);
 #define MATH_NEXT_WORD_IS(str, word) !strncmp(str, word, strlen(word))
+
 MATH_END_NAMESPACE
