@@ -509,7 +509,7 @@ inline const float Abs(const float &a)
 #ifdef MATH_SSE
 	return s4f_x(abs_ps(setx_ps(a)));
 #else
-	return a <= b ? a : b;
+	return a >= 0 ? a : -a;
 #endif
 }
 
