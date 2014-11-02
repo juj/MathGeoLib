@@ -6,6 +6,9 @@
 	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
 #pragma once
 
+extern "C"
+{
+
 /// Converts the given double-precision floating point number to a string representation.
 /** For most inputs, this string representation is the
 	shortest such, which deserialized again, returns the same bit
@@ -18,6 +21,8 @@
 	@return the number of characters written to dst, excluding the null terminator (which
 		is always written) is returned here. */
 int dtoa_grisu3(double v, char *dst);
+
+}
 
 #ifdef __cplusplus
 

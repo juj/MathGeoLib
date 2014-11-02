@@ -10,6 +10,10 @@
 #include <math.h> // ceil
 #include <stdio.h> // sprintf
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4204) // nonstandard extension used : non-constant aggregate initializer
+#endif
+
 #define D64_SIGN         0x8000000000000000ULL
 #define D64_EXP_MASK     0x7FF0000000000000ULL
 #define D64_FRACT_MASK   0x000FFFFFFFFFFFFFULL
@@ -28,17 +32,17 @@
 #define MIN_CACHED_EXP -348
 #define CACHED_EXP_STEP 8
 
-struct diy_fp
+typedef struct diy_fp
 {
 	uint64_t f;
 	int e;
-};
+} diy_fp;
 
-struct power
+typedef struct power
 {
 	uint64_t fract;
 	int16_t b_exp, d_exp;
-};
+} power;
 
 static const power pow_cache[] =
 {
@@ -142,28 +146,29 @@ static int cached_pow(int exp, diy_fp *p)
 
 static diy_fp minus(diy_fp x, diy_fp y)
 {
+	diy_fp d; d.f = x.f - y.f; d.e = x.e;
 	assert(x.e == y.e && x.f >= y.f);
-	diy_fp d = { x.f - y.f, x.e };
 	return d;
 }
 
 static diy_fp multiply(diy_fp x, diy_fp y)
 {
 	uint64_t a, b, c, d, ac, bc, ad, bd, tmp;
+	diy_fp r;
 	a = x.f >> 32; b = x.f & MASK32;
 	c = y.f >> 32; d = y.f & MASK32;
 	ac = a*c; bc = b*c;
 	ad = a*d; bd = b*d;
 	tmp = (bd >> 32) + (ad & MASK32) + (bc & MASK32);
 	tmp += 1U << 31; // round
-	diy_fp r = { ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), x.e + y.e + 64 };
+	r.f = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32);
+	r.e = x.e + y.e + 64;
 	return r;
 }
 
-static diy_fp normalize_diy_fp(const diy_fp &fp)
+static diy_fp normalize_diy_fp(diy_fp n)
 {
-	assert(fp.f != 0);
-	diy_fp n = fp;
+	assert(n.f != 0);
 	while(!(n.f & 0xFFC0000000000000ULL)) { n.f <<= 10; n.e -= 10; }
 	while(!(n.f & D64_SIGN)) { n.f <<= 1; --n.e; }
 	return n;
@@ -201,7 +206,7 @@ static int round_weed(char *buffer, int len, uint64_t wp_W, uint64_t delta, uint
 	}
 	if (rest < wp_Wdown && delta - rest >= ten_kappa
 		&& (rest + ten_kappa < wp_Wdown || wp_Wdown - rest > rest + ten_kappa - wp_Wdown))
-		return false;
+		return 0;
 
 	return 2*ulp <= rest && rest <= delta - 4*ulp;
 }
@@ -221,23 +226,25 @@ static int digit_gen(diy_fp low, diy_fp w, diy_fp high, char *buffer, int *lengt
 
 	while(*kappa > 0)
 	{
+		uint64_t rest;
 		int digit = p1 / div;
 		buffer[*length] = (char)('0' + digit);
 		++*length;
 		p1 %= div;
 		--*kappa;
-		uint64_t rest = ((uint64_t)p1 << -one.e) + p2;
+		rest = ((uint64_t)p1 << -one.e) + p2;
 		if (rest < unsafe_interval.f) return round_weed(buffer, *length, minus(too_high, w).f, unsafe_interval.f, rest, (uint64_t)div << -one.e, unit);
 		div /= 10;
 	}
 
 	for(;;)
 	{
+		int digit;
 		p2 *= 10;
 		unit *= 10;
 		unsafe_interval.f *= 10;
 		// Integer division by one.
-		int digit = (int)(p2 >> -one.e);
+		digit = (int)(p2 >> -one.e);
 		buffer[*length] = (char)('0' + digit);
 		++*length;
 		p2 &= one.f - 1;  // Modulo by one.
@@ -248,7 +255,7 @@ static int digit_gen(diy_fp low, diy_fp w, diy_fp high, char *buffer, int *lengt
 
 static int grisu3(double v, char *buffer, int *length, int *d_exp)
 {
-	assert(v > 0 && v <= 1.7976931348623157e308); // Grisu only handles strictly positive finite numbers.
+	int mk, kappa, success;
 	diy_fp dfp = double2diy_fp(v);
 	diy_fp w = normalize_diy_fp(dfp);
 
@@ -256,21 +263,21 @@ static int grisu3(double v, char *buffer, int *length, int *d_exp)
 	diy_fp t = { (dfp.f << 1) + 1, dfp.e - 1 };
 	diy_fp b_plus = normalize_diy_fp(t);
 	diy_fp b_minus;
+	diy_fp c_mk; // Cached power of ten: 10^-k
 	uint64_t u64 = CAST_U64(v);
+	assert(v > 0 && v <= 1.7976931348623157e308); // Grisu only handles strictly positive finite numbers.
 	if (!(u64 & D64_FRACT_MASK) && (u64 & D64_EXP_MASK) != 0) { b_minus.f = (dfp.f << 2) - 1; b_minus.e =  dfp.e - 2;} // lower boundary is closer?
 	else { b_minus.f = (dfp.f << 1) - 1; b_minus.e = dfp.e - 1; }
 	b_minus.f = b_minus.f << (b_minus.e - b_plus.e);
 	b_minus.e = b_plus.e;
 
-	diy_fp c_mk; // Cached power of ten: 10^-k
-	int mk = cached_pow(MIN_TARGET_EXP - DIYFP_FRACT_SIZE - w.e, &c_mk);
+	mk = cached_pow(MIN_TARGET_EXP - DIYFP_FRACT_SIZE - w.e, &c_mk);
 
-	diy_fp D = multiply(w, c_mk);
-	diy_fp scaled_b_minus = multiply(b_minus, c_mk);
-	diy_fp scaled_b_plus  = multiply(b_plus,  c_mk);
+	w = multiply(w, c_mk);
+	b_minus = multiply(b_minus, c_mk);
+	b_plus  = multiply(b_plus,  c_mk);
 
-	int kappa;
-	int success = digit_gen(scaled_b_minus, D, scaled_b_plus, buffer, length, &kappa);
+	success = digit_gen(b_minus, w, b_plus, buffer, length, &kappa);
 	*d_exp = kappa - mk;
 	return success;
 }
@@ -285,9 +292,11 @@ static int exp_len(int u)
 
 static int i_to_str(int val, char *str)
 {
+	int len, i;
+	char *s;
 	char *begin = str;
 	if (val < 0) { *str++ = '-'; val = -val; }
-	char *s = str;
+	s = str;
 
 	for(;;)
 	{
@@ -299,8 +308,8 @@ static int i_to_str(int val, char *str)
 		val = ni;
 	}
 	*s = '\0';
-	ptrdiff_t len = s - str;
-	for(int i = 0; i < len/2; ++i)
+	len = s - str;
+	for(i = 0; i < len/2; ++i)
 	{
 		char ch = str[i];
 		str[i] = str[len-1-i];
@@ -312,9 +321,10 @@ static int i_to_str(int val, char *str)
 
 int dtoa_grisu3(double v, char *dst)
 {
-	assert(dst);
+	int d_exp, len, success, decimals, i;
 	uint64_t u64 = CAST_U64(v);
 	char *s2 = dst;
+	assert(dst);
 
 	// Prehandle NaNs
 	if ((u64 << 1) > 0xFFE0000000000000ULL) return sprintf(dst, "NaN(%08X%08X)", (uint32_t)(u64 >> 32), (uint32_t)u64);
@@ -325,15 +335,14 @@ int dtoa_grisu3(double v, char *dst)
 	// Prehandle infinity.
 	if (u64 == D64_EXP_MASK) { *s2++ = 'i'; *s2++ = 'n'; *s2++ = 'f'; *s2 = '\0'; return (int)(s2 - dst); }
 
-	int d_exp, len;
-	int success = grisu3(v, s2, &len, &d_exp);
+	success = grisu3(v, s2, &len, &d_exp);
 	// If grisu3 was not able to convert the number to a string, then use old sprintf (suboptimal).
 	if (!success) return sprintf(s2, "%.17g", v) + (int)(s2 - dst);
 
-	int decimals = MIN(-d_exp, MAX(1, len-1));
+	decimals = MIN(-d_exp, MAX(1, len-1));
 	if (d_exp < 0 && (len >= -d_exp || exp_len(d_exp+decimals)+1 <= exp_len(d_exp))) // Add decimal point?
 	{
-		for(int i = 0; i < decimals; ++i) s2[len-i] = s2[len-i-1];
+		for(i = 0; i < decimals; ++i) s2[len-i] = s2[len-i-1];
 		s2[len++ - decimals] = '.';
 		d_exp += decimals;
 		// Need scientific notation as well?
@@ -341,9 +350,9 @@ int dtoa_grisu3(double v, char *dst)
 	}
 	else if (d_exp < 0 && d_exp >= -3) // Add decimal point for numbers of form 0.000x where it's shorter?
 	{
-		for(int i = 0; i < len; ++i) s2[len-d_exp-1-i] = s2[len-i-1];
+		for(i = 0; i < len; ++i) s2[len-d_exp-1-i] = s2[len-i-1];
 		s2[0] = '.';
-		for(int i = 1; i < -d_exp; ++i) s2[i] = '0';
+		for(i = 1; i < -d_exp; ++i) s2[i] = '0';
 		len += -d_exp;
 	}
 	// Add scientific notation?
