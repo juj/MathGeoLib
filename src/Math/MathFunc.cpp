@@ -589,6 +589,27 @@ float DeserializeFloat(const char *str, const char **outEndStr)
 	return f;
 }
 
+int hexstr_to_u64(const char *str, uint64_t *u)
+{
+	assert(u);
+	*u = 0;
+	const char *s = str;
+	for(int i = 0; i <= 16; ++i)
+	{
+		char ch = *s;
+		if (ch >= '0' && ch <= '9')
+			*u = 16 * *u + ch - '0';
+		else if (ch >= 'a' && ch <= 'f')
+			*u = 16 * *u + 10 + ch - 'a';
+		else if (ch >= 'A' && ch <= 'F')
+			*u = 16 * *u + 10 + ch - 'A';
+		else
+			break;
+		++s;
+	}
+	return (int)(s - str);
+}
+
 double DeserializeDouble(const char *str, const char **outEndStr)
 {
 	if (!str)
@@ -602,14 +623,9 @@ double DeserializeDouble(const char *str, const char **outEndStr)
 		str += strlen("NaN("); //MATH_SKIP_WORD(str, "NaN(");
 
 		// Read 64-bit unsigned hex representation of the NaN. TODO: Make this more efficient without using sscanf.
-		u32 hiPart, loPart;
-		char tmp[9];
-		strncpy(tmp, str, 8);
-		int n = sscanf(tmp, "%X", (unsigned int *)&hiPart);
-		if (n != 1) return (double)FLOAT_NAN;
-		str += 8;
-		n = sscanf(str, "%X", (unsigned int *)&loPart);
-		if (n != 1) return (double)FLOAT_NAN;
+		uint64_t u;
+		int nChars = hexstr_to_u64(str, &u);
+		str += nChars;
 		while(*str != 0)
 		{
 			++str;
@@ -621,7 +637,7 @@ double DeserializeDouble(const char *str, const char **outEndStr)
 		}
 		if (outEndStr)
 			*outEndStr = str;
-		return ReinterpretAsDouble(((uint64_t)hiPart << 32) | (uint64_t)loPart);
+		return ReinterpretAsDouble(u);
 	}
 	double f;
 	
