@@ -58,6 +58,18 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define load1_ps _mm_load1_ps
 #define stream_ps _mm_stream_ps
 
+#if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
+/// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
+#define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
+#else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
+#define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((reg), (reg), (shuffle))
+#endif
+
+#define xxxx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,0,0,0))
+#define yyyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,1,1))
+#define zzzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,2,2))
+#define wwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,3))
+
 #ifdef MATH_SSE41
 #define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
 #elif defined(MATH_SSE)
@@ -114,13 +126,6 @@ static inline __m128 rsqrt_ps(__m128 x)
 #define cmple_ps _mm_cmple_ps
 #define cmplt_ps _mm_cmplt_ps
 #define negate3_ps(x) xor_ps(x, sseSignMask3)
-
-#if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
-/// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
-#define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
-#else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
-#define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((reg), (reg), (shuffle))
-#endif
 
 /// Returns the lowest element of the given sse register as a float.
 /// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
@@ -198,11 +203,6 @@ static FORCE_INLINE __m128 setw_ps(__m128 m, float w)
 	hi = _mm_unpacklo_ps(hi, _mm_set_ss(w)); // [0 W w z]
 	return _mm_movelh_ps(m, hi); // [w z y x]
 }
-
-#define xxxx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,0,0,0))
-#define yyyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,1,1))
-#define zzzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,2,2))
-#define wwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,3))
 
 #ifdef MATH_SSE2
 FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
