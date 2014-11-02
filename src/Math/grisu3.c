@@ -308,7 +308,7 @@ static int i_to_str(int val, char *str)
 		val = ni;
 	}
 	*s = '\0';
-	len = s - str;
+	len = (int)(s - str);
 	for(i = 0; i < len/2; ++i)
 	{
 		char ch = str[i];
