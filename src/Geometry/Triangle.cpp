@@ -1953,7 +1953,17 @@ std::string Triangle::ToString() const
 std::string Triangle::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
+	s = SerializeFloat(a.y, s); *s = ','; ++s;
+	s = SerializeFloat(a.z, s); *s = ','; ++s;
+	s = SerializeFloat(b.x, s); *s = ','; ++s;
+	s = SerializeFloat(b.y, s); *s = ','; ++s;
+	s = SerializeFloat(b.z, s); *s = ','; ++s;
+	s = SerializeFloat(c.x, s); *s = ','; ++s;
+	s = SerializeFloat(c.y, s); *s = ','; ++s;
+	s = SerializeFloat(c.z, s);
+	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
 	return str;
 }
 

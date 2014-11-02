@@ -24,6 +24,7 @@
 
 #include "myassert.h"
 #include "float2.h"
+#include "grisu3.h"
 
 #ifdef WIN32
 #include "../Math/InclWindows.h"
@@ -532,7 +533,7 @@ char *SerializeFloat(float f, char *dstStr)
 {
 	if (!IsNan(f))
 	{
-		int numChars = sprintf(dstStr, "%.9g", f);
+		int numChars = dtoa_grisu3((double)f, dstStr);
 		return dstStr + numChars;
 	}
 	else

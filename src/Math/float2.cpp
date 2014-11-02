@@ -244,10 +244,12 @@ std::string float2::ToString() const
 
 std::string float2::SerializeToString() const
 {
-	assert(IsNeutralCLocale());
 	char str[256];
-	sprintf(str, "%.9g,%.9g", x, y);
-	return std::string(str);
+	char *s = SerializeFloat(x, str); *s = ','; ++s;
+	s = SerializeFloat(y, s);
+	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
+	return str;
 }
 
 std::string float2::SerializeToCodeString() const

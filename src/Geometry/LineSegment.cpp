@@ -446,7 +446,14 @@ std::string LineSegment::ToString() const
 std::string LineSegment::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", a.x, a.y, a.z, b.x, b.y, b.z);
+	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
+	s = SerializeFloat(a.y, s); *s = ','; ++s;
+	s = SerializeFloat(a.z, s); *s = ','; ++s;
+	s = SerializeFloat(b.x, s); *s = ','; ++s;
+	s = SerializeFloat(b.y, s); *s = ','; ++s;
+	s = SerializeFloat(b.z, s);
+	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
 	return str;
 }
 

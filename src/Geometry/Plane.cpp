@@ -919,7 +919,12 @@ std::string Plane::ToString() const
 std::string Plane::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g,%.9g,%.9g,%.9g", normal.x, normal.y, normal.z, d);
+	char *s = SerializeFloat(normal.x, str); *s = ','; ++s;
+	s = SerializeFloat(normal.y, s); *s = ','; ++s;
+	s = SerializeFloat(normal.z, s); *s = ','; ++s;
+	s = SerializeFloat(d, s);
+	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
 	return str;
 }
 

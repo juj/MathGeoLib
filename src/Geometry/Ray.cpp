@@ -372,7 +372,14 @@ std::string Ray::ToString() const
 std::string Ray::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	char *s = SerializeFloat(pos.x, str); *s = ','; ++s;
+	s = SerializeFloat(pos.y, s); *s = ','; ++s;
+	s = SerializeFloat(pos.z, s); *s = ','; ++s;
+	s = SerializeFloat(dir.x, s); *s = ','; ++s;
+	s = SerializeFloat(dir.y, s); *s = ','; ++s;
+	s = SerializeFloat(dir.z, s);
+	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
 	return str;
 }
 

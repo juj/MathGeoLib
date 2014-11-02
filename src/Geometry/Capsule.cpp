@@ -456,7 +456,15 @@ std::string Capsule::ToString() const
 std::string Capsule::SerializeToString() const
 {
 	char str[256];
-	sprintf(str, "%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g", l.a.x, l.a.y, l.a.z, l.b.x, l.b.y, l.b.z, r);
+	char *s = SerializeFloat(l.a.x, str); *s = ','; ++s;
+	s = SerializeFloat(l.a.y, s); *s = ','; ++s;
+	s = SerializeFloat(l.a.z, s); *s = ','; ++s;
+	s = SerializeFloat(l.b.x, s); *s = ','; ++s;
+	s = SerializeFloat(l.b.y, s); *s = ','; ++s;
+	s = SerializeFloat(l.b.z, s); *s = ','; ++s;
+	s = SerializeFloat(r, s);
+	assert(s+1 - str < 256);
+	MARK_UNUSED(s);
 	return str;
 }
 
