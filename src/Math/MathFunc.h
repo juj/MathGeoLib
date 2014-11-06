@@ -498,13 +498,13 @@ inline bool LessThan(const T &a, const T &b)
 
 /** @return The absolute value of a. */
 template<typename T>
-inline const T Abs(const T &a)
+inline T Abs(const T &a)
 {
 	return a >= 0 ? a : -a;
 }
 
 template<>
-inline const float Abs(const float &a)
+inline float Abs(const float &a)
 {
 #ifdef MATH_SSE
 	return s4f_x(abs_ps(setx_ps(a)));
