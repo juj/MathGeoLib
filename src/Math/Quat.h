@@ -399,7 +399,7 @@ public:
 #endif
 #ifdef MATH_URHO3D_INTEROP
 	Quat(const Urho3D::Quaternion &other) : x(other.x_), y(other.y_), z(other.z_), w(other.w_) {}
-	operator Urho3D::Quaternion() const { return Urho3D::Quaternion(x, y, z, w); }
+	operator Urho3D::Quaternion() const { return Urho3D::Quaternion(w, x, y, z); }
 #endif
 
 	/// Multiplies two quaternions in the order 'this * rhs'.
