@@ -605,10 +605,29 @@ int float2::ConvexHullInPlace(float2 *p, int n)
 			smallestY = i;
 		}
 	Swap(p[0], p[smallestY]);
+
+	// For robustness, remove duplicates of the perspective pivot points.
+	// This is because duplicates on that element will cause the sorting to be nontransitive and break
+	// the whole sort.
+	int d = 0;
+	for(int i = 1; i < n; ++i)
+		if (!p[i].Equals(p[0]))
+			p[++d] = p[i];
+	n = d+1;
+
 	std::sort(&p[1], &p[n], pred);
 
-	int h = 1; // Points to the index of the last point added to the hull so far. The first two points are in the hull without checking.
+	// For robustness, remove duplicate input values.
+	d = 0;
+	for(int i = 1; i < n; ++i)
+		if (!p[i].Equals(p[d]))
+			p[++d] = p[i];
+	n = d+1;
+
+	int h = 1; // Points to the index of the last point added to the hull so far. The first two points are in the hull to start.
+
 	float2 a = p[h] - p[h-1];
+	const float epsilon = 1e-5f;
 	for(int i = 2; i < n; ++i)
 	{
 		// The last two added points determine a line, check which side of that line the next point to be added lies in.
@@ -616,7 +635,7 @@ int float2::ConvexHullInPlace(float2 *p, int n)
 		float dir = d.x*a.y - d.y*a.x;
 		// Remove previous points from the convex hull until we have a left turn. Also for numerical stability,
 		// in the case of three collinear points, remove the middle point.
-		while(dir > 0.f || (dir == 0.f && d.Dot(d) >= a.Dot(a)))
+		while(dir > epsilon || (dir > -epsilon && d.Dot(d) >= a.Dot(a)))
 		{
 			--h;
 			if (h >= 1)
@@ -724,7 +743,7 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 		}
 	}
 	uDir = vDir.Rotated90CCW();
-	center = float2::zero;
+	center = 0.5f * (uDir * (minU+maxU) + vDir * (minV+maxV));
 
 	return minArea;
 }
