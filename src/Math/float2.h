@@ -549,9 +549,21 @@ public:
 	/// Computes the 2D convex hull of the given point set, in-place.
 	/** This version of the algorithm works in-place, meaning that when the algorithm finishes,
 		pointArray will contain the list of the points on the convex hull.
+		@note As a convention, the convex hull winds counter-clockwise when graphed in the xy plane where
+			+x points to the right and +y points up. That is, walking along the polylist
+			intArray[0] -> pointArray[1] -> pointArray[2] -> ... -> pointArray[numPoints-1] -> pointArray[0] performs
+			a counter-clockwise tour.
+		@param pointArray [in, out] A pointer to an array of numPoints float2 points that represent a point cloud. This
+			array will be rewritten to contain the convex hull of the original point set.
 		@return The number of points on the convex hull, i.e. the number of elements used in pointArray after the operation.
 		@see ConvexHull(). */
 	static int ConvexHullInPlace(float2 *pointArray, int numPoints);
+
+	/// Tests whether a 2D convex hull contains the given point.
+	/** @param convexHull [in] A pointer to an array of points in the convex hull.
+		@param numPointsInConvexHull The number of elements in the array convexHull.
+		@param point The target point to test. */
+	static bool ConvexHullContains(const float2 *convexHull, int numPointsInConvexHull, const float2 &point);
 #endif
 
 	/// Computes the minimum-area rectangle that bounds the given point set. [noscript]

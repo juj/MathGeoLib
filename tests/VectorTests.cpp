@@ -1014,6 +1014,44 @@ RANDOMIZED_TEST(copy_nan_Quat)
 	uninitializedQuat = b;
 }
 
+UNIQUE_TEST(float2_ConvexHull_Case)
+{
+	float2 p[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
+	float2 h[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
+	int numPointsInConvexHull = float2::ConvexHullInPlace(h, 4);
+	assert(numPointsInConvexHull == 4);
+
+	for(int i = 0; i < 4; ++i)
+		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
+	assert(float2::ConvexHullContains(h, numPointsInConvexHull, float2(0,0)));
+}
+
+RANDOMIZED_TEST(float2_ConvexHull)
+{
+	const int n = 100;
+	float2 h[n];
+	float2 p[n];
+	for(int i = 0; i < n; ++i)
+		h[i] = p[i] = float2::RandomBox(rng, -100.f, 100.f);
+
+	int numPointsInConvexHull = float2::ConvexHullInPlace(h, n);
+	assert(numPointsInConvexHull >= 3);
+
+	for(int i = 0; i < n; ++i)
+		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
+}
+
+BENCHMARK(float2_ConvexHull, "float2_ConvexHull")
+{
+	const int n = 100;
+	float2 h[n];
+	for(int i = 0; i < n; ++i)
+		h[i] = float2::RandomBox(rng, -100.f, 100.f);
+
+	dummyResultInt += float2::ConvexHullInPlace(h, n);
+}
+BENCHMARK_END;
+
 #ifdef MATH_NEON
 UNIQUE_TEST(MatrixTranspose)
 {
