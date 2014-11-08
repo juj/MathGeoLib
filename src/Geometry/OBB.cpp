@@ -495,18 +495,20 @@ OBB OBB::PCAEnclosingOBB(const vec * /*pointArray*/, int /*numPoints*/)
 }
 #endif
 
-#ifdef MATH_CONTAINERLIB_SUPPORT
+#define LEX_ORDER(x, y) if ((x) < (y)) return -1; else if ((x) > (y)) return 1;
 int LexFloat3Cmp(const vec &a, const vec &b)
 {
-	LEXCMP(a.x, b.x);
-	LEXCMP(a.y, b.y);
-	LEXCMP(a.z, b.z);
+	LEX_ORDER(a.x, b.x);
 	return 0;
 }
+int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*(const vec*)a, *(const vec*)b); }
 
 OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 {
 	OBB minOBB;
+#ifdef MATH_VEC_IS_FLOAT4
+	minOBB.r.w = 0.f;
+#endif
 	float minVolume = FLOAT_INF;
 
 	std::vector<float2> pts;
@@ -526,66 +528,78 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 				dirs.push_back(edge);
 		}
 
-	LOGI("Got %d directions.", (int)dirs.size());
+//	LOGI("Got %d directions.", (int)dirs.size());
+#ifdef MATH_CONTAINERLIB_SUPPORT
 	sort::QuickSort(&dirs[0], (int)dirs.size(), LexFloat3Cmp);
-	for(int i = (int)dirs.size()-1; i >= 0; --i)
-		for(int j = i-1; j >= 0; --j)
+#else
+	qsort(&dirs[0], dirs.size(), sizeof(VecArray::value_type), LexFloat3CmpV);
+#endif
+	int nDistinct = 1;
+	for(int i = 1; i < dirs.size(); ++i)
+	{
+		vec d = dirs[i];
+		bool removed = false;
+		for(int j = 0; j < nDistinct; ++j)
 		{
-			float distX = dirs[i].x - dirs[j].x;
-			if (distX > 1e-1f)
+			float distX = d.x - dirs[j].x;
+			if (distX > 1e-3f)
 				break;
-			if (vec(dirs[i]).DistanceSq(dirs[j]) < 1e-3f)
+			if (d.DistanceSq(dirs[j]) < 1e-3f)
 			{
-				dirs.erase(dirs.begin() + j);
-				--i;
+				removed = true;
+				break;
 			}
 		}
-	LOGI("Pruned to %d directions.", (int)dirs.size());
-
-//	int incr = 1;//Max(1, numPoints / 10);
-//	for(int i = 0; i < numPoints; ++i)
+		if (!removed)
+			dirs[nDistinct++] = dirs[i];
+	}
+	if (nDistinct != dirs.size())
 	{
-		//for(int j = i+1; j < numPoints; ++j)
-		for(size_t i = 0; i < dirs.size(); ++i)
+		dirs.erase(dirs.begin() + nDistinct, dirs.end());
+//		LOGI("Pruned %d directions (was %d to %d).", nDistinct, (int)dirs.size()+nDistinct, (int)dirs.size());
+	}
+
+	for(size_t i = 0; i < dirs.size(); ++i)
+	{
+		vec edge = dirs[i];
+
+		int e1, e2;
+		ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
+		float edgeLength = Abs(Dot(pointArray[e1] - pointArray[e2], edge));
+
+		vec u = edge.Perpendicular();
+		vec v = edge.AnotherPerpendicular();
+		for(int k = 0; k < numPoints; ++k)
+			pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
+
+		float2 rectCenter;
+		float2 uDir;
+		float2 vDir;
+		float minU, maxU, minV, maxV;
+		float rectArea = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
+		float volume = rectArea * edgeLength;
+
+		if (volume < minVolume)
 		{
-			vec edge = dirs[i];//(pointArray[i]-pointArray[j]).Normalized();
-
-			int e1, e2;
-			ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
-			float edgeLength = Abs(Dot(pointArray[e1], edge) - Dot(pointArray[e2], edge));
-
-			vec u = edge.Perpendicular();
-			vec v = edge.AnotherPerpendicular();
-			for(int k = 0; k < numPoints; ++k)
-				pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
-
-			float2 rectCenter;
-			float2 rectU;
-			float2 rectV;
-			float minU, maxU, minV, maxV;
-			float rectArea = float2::MinAreaRect(&pts[0], (int)pts.size(), rectCenter, rectU, rectV, minU, maxU, minV, maxV);
-			vec rectCenterPos = u * rectCenter.x + v * rectCenter.y;
-			
-			float volume = rectArea * edgeLength;
-			if (volume < minVolume)
-			{
-				minOBB.axis[0] = edge;
-				minOBB.axis[1] = rectU.x * u + rectU.y * v;
-				minOBB.axis[2] = rectV.x * u + rectV.y * v;
-				minOBB.pos = (Dot(pointArray[e1], edge) + Dot(pointArray[e2], edge)) * 0.5f * edge + rectCenterPos;
-				minOBB.r[0] = edgeLength * 0.5f;
-				minOBB.r[1] = (maxU - minU) * 0.5f;
-				minOBB.r[2] = (maxV - minV) * 0.5f;
-				minVolume = volume;
-			}
-			if (i % 100 == 0)
-				LOGI("%d/%d.", (int)i, (int)dirs.size());
+			float2 c10 = (maxV - minV) * vDir;
+			float2 c20 = (maxU - minU) * uDir;
+			float2 center = 0.5f * (uDir * (minU+maxU) + vDir * (minV+maxV));
+			vec C1 = c10.x*u + c10.y*v;
+			vec C2 = c20.x*u + c20.y*v;
+			minOBB.axis[0] = edge;
+			vec rectCenterPos = vec(POINT_VEC_SCALAR(0.f)) + center.x*u + center.y*v;
+			minOBB.pos = Dot(pointArray[e1]+pointArray[e2], edge) * 0.5f * edge + rectCenterPos;
+			minOBB.r[0] = edgeLength * 0.5f;
+			minOBB.r[1] = C1.Normalize()*0.5f;
+			minOBB.r[2] = C2.Normalize()*0.5f;
+			minOBB.axis[1] = C1;
+			minOBB.axis[2] = C2;
+			minVolume = volume;
 		}
 	}
 
 	return minOBB;
 }
-#endif
 
 vec OBB::Size() const
 {

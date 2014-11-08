@@ -76,4 +76,32 @@ BENCHMARK(OBBOBBIntersectionCentroid, "Centroid of OBB-OBB intersection")
 }
 BENCHMARK_END
 
+RANDOMIZED_TEST(OBB_OptimalEnclosingOBB)
+{
+	// Generate some points.
+#ifdef _DEBUG
+	const int n = 6; // This test is very slow, so run debug builds with fewer points.
+#else
+	const int n = 10;
+#endif
+	vec points[n];
+	for(int i = 0; i < n; ++i)
+		points[i] = vec::RandomBox(rng, -100.f, 100.f);
+
+	// Compute the minimal OBB that encloses those points.
+	OBB o = OBB::OptimalEnclosingOBB(points, n);
+
+#ifdef MATH_VEC_IS_FLOAT4
+	assert(EqualAbs(o.pos.w, 1.f));
+	assert(EqualAbs(o.axis[0].w, 0.f));
+	assert(EqualAbs(o.axis[1].w, 0.f));
+	assert(EqualAbs(o.axis[2].w, 0.f));
+	assert(EqualAbs(o.r.w, 0.f));
+#endif
+	// Test that it does actually enclose the given points.
+	for(int i = 0; i < n; ++i)
+		assert1(o.Distance(points[i]) < 1e-3f, o.Distance(points[i]));
+		//assert2(o.Contains(points[i]), points[i], o.Distance(points[i]));
+}
+
 MATH_END_NAMESPACE

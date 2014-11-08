@@ -324,10 +324,8 @@ public:
 	static OBB PCAEnclosingOBB(const vec *pointArray, int numPoints);
 #endif
 
-#ifdef MATH_CONTAINERLIB_SUPPORT
 	///\todo This function is strongly WIP! (Works, but is very very slow!)
 	static OBB OptimalEnclosingOBB(const vec *pointArray, int numPoints);
-#endif
 
 	/// Generates a random point inside this OBB.
 	/** The points are distributed uniformly.
