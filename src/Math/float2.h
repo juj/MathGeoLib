@@ -581,7 +581,7 @@ public:
 		@note For best performance, the input point array should contain only the points in the convex hull of the point set. This algorithm
 			does not compute the convex hull for you.
 		@return The area of the resulting rectangle. */
-	static float MinAreaRect(const float2 *pointArray, int numPoints, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV);
+	static float MinAreaRectInPlace(float2 *pointArray, int numPoints, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV);
 
 	/// Generates a direction vector of the given length pointing at a uniformly random direction.
 	static float2 RandomDir(LCG &lcg, float length = 1.f);

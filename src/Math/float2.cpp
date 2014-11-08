@@ -653,55 +653,79 @@ bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexH
 
 #endif
 
-float float2::MinAreaRect(const float2 *pts, int numPoints, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV)
+#define NEXT_P(ptr) ((ptr)+1 < (pEnd) ? (ptr)+1 : (p))
+
+float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV)
 {
-	assume(pts || numPoints == 0);
-	if (!pts)
+	assume(p || n == 0);
+	if (!p)
 		return 0.f;
 	float minArea = FLT_MAX;
 
-	// Loop through all edges formed by pairs of points.
-	for(int i = 0, j = numPoints -1; i < numPoints; j = i, ++i)
+	n = float2::ConvexHullInPlace(p, n);
+
+	// Compute the initial AABB rectangle for the rotating calipers method.
+	// Order the initial vertices minX -> minY -> maxX -> maxY to establish
+	// a counter-clockwise orientation.
+	float2 *e[4] = { p, p, p, p };
+	for(int i = 1; i < n; ++i)
 	{
-		// The edge formed by these two points.
-		float2 e0 = pts[i] - pts[j];
-		float len = e0.Normalize();
-		if (len == 0)
-			continue; // the points are duplicate, skip this axis.
+		if (p[i].x < e[0]->x) e[0] = &p[i];
+		else if (p[i].x > e[2]->x) e[2] = &p[i];
+		if (p[i].y < e[1]->y) e[1] = &p[i];
+		else if (p[i].y > e[3]->y) e[3] = &p[i];
+	}
 
-		float2 e1 = e0.Rotated90CCW();
+	// Direction vector of the edge that the currently tested rectangle is in contact with.
+	float2 ed = -float2::unitY;
 
-		// Find the most extreme points along the coordinate frame { e0, e1 }.
+	// Starting guess for minimum area rectangle (AABB).
+	minArea = (e[2]->x - e[0]->x) * (e[3]->y - e[1]->y);
 
-		///@todo Examine. A bug in the book? All the following are initialized to 0!.
-		float min0 = FLOAT_INF;
-		float min1 = FLOAT_INF;
-		float max0 = -FLOAT_INF;
-		float max1 = -FLOAT_INF;
-		for(int k = 0; k < numPoints; ++k)
-		{
-			float2 d = pts[k] - pts[j];
-			float dot =  MATH_NS::Dot(d, e0);
-			if (dot < min0) min0 = dot;
-			if (dot > max0) max0 = dot;
-			dot =  MATH_NS::Dot(d, e1);
-			if (dot < min1) min1 = dot;
-			if (dot > max1) max1 = dot;
-		}
-		float area = (max0 - min0) * (max1 - min1);
+	const float2 *pEnd = p + n;
 
+	// These track directions the convex hull is pointing towards at each antipodal point.
+	float2 d[4];
+	d[0] = (*NEXT_P(e[0]) - *e[0]).Normalized();
+	d[1] = (*NEXT_P(e[1]) - *e[1]).Normalized();
+	d[2] = (*NEXT_P(e[2]) - *e[2]).Normalized();
+	d[3] = (*NEXT_P(e[3]) - *e[3]).Normalized();
+
+	// Rotate the calipers through each edge in the convex hull in order.
+	for(int i = 0; i < n; ++i)
+	{
+		// Compute how much each edge will rotate before hitting the next vertex in the convex hull.
+		float cosA0 =  ed.Dot(d[0]);
+		float cosA1 =  ed.PerpDot(d[1]);
+		float cosA2 = -ed.Dot(d[2]);
+		float cosA3 = -ed.PerpDot(d[3]);
+
+		float maxCos = MATH_NS::Max(MATH_NS::Max(cosA0, cosA1), MATH_NS::Max(cosA2, cosA3));
+		// Pick the smallest angle (largest cosine of that angle) and increment the antipodal point index to travel the edge.
+		if (cosA0 >= maxCos)      { ed = d[0];                e[0] = NEXT_P(e[0]); d[0] = (*NEXT_P(e[0]) - *e[0]).Normalized(); }
+		else if (cosA1 >= maxCos) { ed = d[1].Rotated90CW();  e[1] = NEXT_P(e[1]); d[1] = (*NEXT_P(e[1]) - *e[1]).Normalized(); }
+		else if (cosA2 >= maxCos) { ed = -d[2];               e[2] = NEXT_P(e[2]); d[2] = (*NEXT_P(e[2]) - *e[2]).Normalized(); }
+		else                      { ed = d[3].Rotated90CCW(); e[3] = NEXT_P(e[3]); d[3] = (*NEXT_P(e[3]) - *e[3]).Normalized(); }
+
+		// Check if the area of the new rectangle is smaller than anything seen so far.
+		float minu = ed.PerpDot(*e[0]);
+		float maxu = ed.PerpDot(*e[2]);
+		float minv = ed.Dot(*e[1]);
+		float maxv = ed.Dot(*e[3]);
+		float area = MATH_NS::Abs(maxu-minu) * MATH_NS::Abs(maxv-minv);
 		if (area < minArea)
 		{
+			vDir = ed;
 			minArea = area;
-			center = pts[j] + 0.5f * ((min0 + max0) * e0 + (min1 + max1) * e1);
-			uDir = e0;
-			vDir = e1;
-			minU = min0;
-			maxU = max0;
-			minV = min1;
-			maxV = max1;
+			minU = MATH_NS::Min(minu, maxu);
+			maxU = MATH_NS::Max(minu, maxu);
+			minV = MATH_NS::Min(minv, maxv);
+			maxV = MATH_NS::Max(minv, maxv);
 		}
 	}
+	uDir = vDir.Rotated90CCW();
+	center = float2::zero;
+
 	return minArea;
 }
 
