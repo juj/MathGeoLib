@@ -1051,7 +1051,7 @@ BENCHMARK(float2_ConvexHull, "float2_ConvexHull")
 	dummyResultInt += float2::ConvexHullInPlace(h, n);
 }
 BENCHMARK_END;
-#if 0
+
 UNIQUE_TEST(float2_MinAreaRect_Case)
 {
 	float2 p[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
@@ -1063,7 +1063,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case)
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < 4; ++i)
 	{
-		float2 d = p[i] - center;
+		float2 d = p[i];
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
@@ -1078,7 +1078,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case)
 	assert1(diffVMin <= 1e-5f, diffVMin);
 	assert1(diffVMax <= 1e-5f, diffVMax);
 }
-#endif
+
 UNIQUE_TEST(float2_MinAreaRect_Case_2)
 {
 	float2 p[5] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1), float2(0.75f, 0.75f) };
@@ -1090,7 +1090,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case_2)
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < 5; ++i)
 	{
-		float2 d = p[i] - center;
+		float2 d = p[i];
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
@@ -1122,7 +1122,7 @@ RANDOMIZED_TEST(float2_MinAreaRect)
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < n; ++i)
 	{
-		float2 d = p[i] - center;
+		float2 d = p[i];
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
