@@ -39,6 +39,7 @@
 #include "PBVolume.h"
 #include "Ray.h"
 #include "Triangle.h"
+#include <stdlib.h>
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 #include "Algorithm/Sort/Sort.h"
