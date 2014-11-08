@@ -535,8 +535,8 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 #else
 	qsort(&dirs[0], dirs.size(), sizeof(VecArray::value_type), LexFloat3CmpV);
 #endif
-	int nDistinct = 1;
-	for(int i = 1; i < dirs.size(); ++i)
+	size_t nDistinct = 1;
+	for(size_t i = 1; i < dirs.size(); ++i)
 	{
 		vec d = dirs[i];
 		bool removed = false;

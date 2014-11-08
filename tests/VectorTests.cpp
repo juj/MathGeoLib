@@ -1058,7 +1058,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case)
 	float2 h[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;
-	float m = float2::MinAreaRectInPlace(h, 4, center, uDir, vDir, minU, maxU, minV, maxV);
+	float2::MinAreaRectInPlace(h, 4, center, uDir, vDir, minU, maxU, minV, maxV);
 
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < 4; ++i)
@@ -1085,7 +1085,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case_2)
 	float2 h[5] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1), float2(0.75f, 0.75f) };
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;
-	float m = float2::MinAreaRectInPlace(h, 5, center, uDir, vDir, minU, maxU, minV, maxV);
+	float2::MinAreaRectInPlace(h, 5, center, uDir, vDir, minU, maxU, minV, maxV);
 
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < 5; ++i)
@@ -1117,7 +1117,7 @@ RANDOMIZED_TEST(float2_MinAreaRect)
 
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;
-	float m = float2::MinAreaRectInPlace(p, n, center, uDir, vDir, minU, maxU, minV, maxV);
+	float2::MinAreaRectInPlace(p, n, center, uDir, vDir, minU, maxU, minV, maxV);
 
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < n; ++i)
