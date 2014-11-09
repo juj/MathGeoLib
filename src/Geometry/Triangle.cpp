@@ -665,8 +665,8 @@ bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 		if (t2.Contains(a, FLOAT_INF) || this->Contains(t2.a, FLOAT_INF))
 			return true;
 
-		vec basisU = p1.normal.Perpendicular();
-		vec basisV = p1.normal.AnotherPerpendicular();
+		vec basisU, basisV;
+		p1.normal.PerpendicularBasis(basisU, basisV);
 		float2 a1 = float2::zero;
 		float2 a2 = float2(basisU.Dot(b-a), basisV.Dot(b-a));
 		float2 a3 = float2(basisU.Dot(c-a), basisV.Dot(c-a));

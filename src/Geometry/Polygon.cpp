@@ -632,8 +632,8 @@ bool Polygon_Intersects_Polygon(const Polygon &poly, const T &other, float polyg
 		if (other.Contains(poly.Vertex(0), FLOAT_INF) || poly.Contains(other.Vertex(0), FLOAT_INF))
 			return true;
 
-		vec basisU = plane.normal.Perpendicular();
-		vec basisV = plane.normal.AnotherPerpendicular();
+		vec basisU, basisV;
+		plane.normal.PerpendicularBasis(basisU, basisV);
 
 		vec pivot = poly.Vertex(0);
 		vec pt = poly.Vertex(poly.NumVertices()-1)-pivot;

@@ -568,8 +568,8 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 		ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
 		float edgeLength = Abs(Dot(pointArray[e1] - pointArray[e2], edge));
 
-		vec u = edge.Perpendicular();
-		vec v = edge.AnotherPerpendicular();
+		vec u, v;
+		edge.PerpendicularBasis(u, v);
 		for(int k = 0; k < numPoints; ++k)
 			pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
 

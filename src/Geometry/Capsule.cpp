@@ -202,8 +202,7 @@ OBB Capsule::MinimalEnclosingOBB() const
 {
 	OBB obb;
 	obb.axis[0] = UpDirection();
-	obb.axis[1] = obb.axis[0].Perpendicular();
-	obb.axis[2] = obb.axis[0].AnotherPerpendicular();
+	obb.axis[0].PerpendicularBasis(obb.axis[1], obb.axis[2]);
 	obb.pos = Center();
 	obb.r[0] = Height() * 0.5f;
 	obb.r[1] = r;

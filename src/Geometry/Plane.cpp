@@ -124,12 +124,16 @@ vec Plane::PointOnPlane() const
 
 vec Plane::Point(float u, float v) const
 {
-	return PointOnPlane() + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
+	vec b1, b2;
+	normal.PerpendicularBasis(b1, b2);
+	return PointOnPlane() + u * b1 + v * b2;
 }
 
 vec Plane::Point(float u, float v, const vec &referenceOrigin) const
 {
-	return Project(referenceOrigin) + u * normal.Perpendicular() + v * normal.AnotherPerpendicular();
+	vec b1, b2;
+	normal.PerpendicularBasis(b1, b2);
+	return Project(referenceOrigin) + u * b1 + v * b2;
 }
 
 void Plane::Translate(const vec &offset)
