@@ -938,6 +938,49 @@ float4 float4::AnotherPerpendicular(const float4 &hint, const float4 &hint2) con
 	return v.Normalized();
 }
 
+void float4::PerpendicularBasis(float4 &outB, float4 &outC) const
+{
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// Benchmark 'float4_PerpendicularBasis': float4::PerpendicularBasis
+	//   Best: 17.468 nsecs / 29.418 ticks, Avg: 17.703 nsecs, Worst: 19.275 nsecs
+	simd4f a = abs_ps(this->v);
+	simd4f a_min = min_ps(a, min_ps(shuffle1_ps(a, _MM_SHUFFLE(1,1,1,1)), _mm_movehl_ps(a, a))); // Horizontal min of x,y,z
+	a_min = xxxx_ps(a_min); // Broadcast to all elements.
+	a = cmple_ps(a, a_min); // Mask 0xFFFFFFFF to channels that contain the min element.
+	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
+	simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
+
+	// Compute (this cross q) and (this cross (this cross q)) in one go.
+	simd4f v_xzy = shuffle1_ps(this->v, _MM_SHUFFLE(3, 0, 2, 1)); // v_xzy = [a.w, a.x, a.z, a.y]
+	simd4f v_yxz = shuffle1_ps(this->v, _MM_SHUFFLE(3, 1, 0, 2)); // v_yxz = [a.w, a.y, a.x, a.z]
+	simd4f q_yxz = shuffle1_ps(q, _MM_SHUFFLE(3, 1, 0, 2)); // q_yxz = [b.w, b.y, b.x, b.z]
+	simd4f q_xzy = shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1)); // q_xzy = [b.w, b.x, b.z, b.y]
+	simd4f b = sub_ps(mul_ps(v_xzy, q_yxz), mul_ps(v_yxz, q_xzy));
+	simd4f a_yxz = shuffle1_ps(b, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f a_xzy = shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f c = sub_ps(mul_ps(v_xzy, a_yxz), mul_ps(v_yxz, a_xzy));
+
+	outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
+	outC = mul_ps(c, rsqrt_ps(dot4_ps(c, c)));
+#else
+	// Benchmark 'float4_PerpendicularBasis': float4::PerpendicularBasis
+	//   Best: 33.731 nsecs / 57.715 ticks, Avg: 35.080 nsecs, Worst: 39.152 nsecs
+	float4 a = this->Abs();
+	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
+	float4 q;
+	if (a.x <= a.y)
+	{
+		if (a.x <= a.z) q = float4(1,0,0,0);
+		else q = float4(0,0,1,0);
+	}
+	else if (a.y <= a.z) q = float4(0,1,0,0);
+	else q = float4(0,0,1,0);
+
+	outB = this->Cross(q).Normalized();
+	outC = this->Cross(outB).Normalized();
+#endif
+}
+
 float4 float4::RandomPerpendicular(LCG &rng) const
 {
 	return Perpendicular(RandomDir(rng));

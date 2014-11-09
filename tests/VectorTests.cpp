@@ -1014,6 +1014,35 @@ RANDOMIZED_TEST(copy_nan_Quat)
 	uninitializedQuat = b;
 }
 
+RANDOMIZED_TEST(float4_PerpendicularBasis)
+{
+	float4 a = float4::RandomBox(rng, -100.f, 100.f);
+	a = float4(0,1,0,0);
+	if (!a.IsZero())
+	{
+		float4 b, c;
+
+		a.PerpendicularBasis(b, c);
+		assert2(a.IsPerpendicular(b), a, b);
+		assert2(a.IsPerpendicular(c), a, c);
+
+		a.Normalize();
+		a.PerpendicularBasis(b, c);
+		assert2(a.IsPerpendicular(b), a, b);
+		assert2(a.IsPerpendicular(c), a, c);
+		assert1(b.IsNormalized(), b.Length());
+		assert1(c.IsNormalized(), c.Length());
+	}
+}
+
+BENCHMARK(float4_PerpendicularBasis, "float4::PerpendicularBasis")
+{
+	float4 b, c;
+	nv[i].PerpendicularBasis(b, c);
+	dummyResultVec += FLOAT4_TO_DIR(b + c);
+}
+BENCHMARK_END;
+
 UNIQUE_TEST(float2_ConvexHull_Case)
 {
 	float2 p[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };

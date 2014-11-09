@@ -672,6 +672,14 @@ public:
 	float4 AnotherPerpendicular3(const float3 &hint = float3(0,1,0), const float3 &hint2 = float3(0,0,1)) const;
 	float4 AnotherPerpendicular(const float4 &hint = float4(0,1,0,0), const float4 &hint2 = float4(0,0,1,0)) const;
 
+	// Completes this vector to generate a perpendicular basis.
+	/** This function computes two new vectors b and c which are both orthogonal to this vector and to each other.
+		That is, the set { this, b, c} is an orthogonal set. The vectors b and c that are outputted are also normalized.
+		@param outB [out] Receives vector b.
+		@param outC [out] Receives vector c.
+		@note When calling this function, this vector should not be zero! */
+	void PerpendicularBasis(float4 &outB, float4 &outC) const;
+
 	/// Generates a random vector that is perpendicular to this vector.
 	/** The distribution is uniformly random. */
 	float4 RandomPerpendicular(LCG &rng) const;
