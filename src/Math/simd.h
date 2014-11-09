@@ -94,6 +94,13 @@ static inline __m128 load_vec3(const float *ptr, float w)
 	return _mm_movelh_ps(low, high);
 }
 
+static inline void store_vec3(float *ptr, simd4f v)
+{
+	_mm_storel_pi((__m64*)ptr, v);
+	v = _mm_movehl_ps(v, v);
+	_mm_store_ss(ptr+2, v);
+}
+
 // Note: Unlike SSE1 _mm_rcp_ps, which has a measured relative error of 3e-4f, the
 //       rcp_ps function is more precise, and has a measured relative error of 7e-6f.
 static inline __m128 rcp_ps(__m128 x)
