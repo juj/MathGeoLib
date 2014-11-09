@@ -735,7 +735,7 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 		float minv = ed.Dot(*e[1]);
 		float maxv = ed.Dot(*e[3]);
 
-		float area = MATH_NS::Abs(maxu-minu) * MATH_NS::Abs(maxv-minv);
+		float area = MATH_NS::Abs((maxu-minu) * (maxv-minv));
 		if (area < minArea)
 		{
 			vDir = ed;
