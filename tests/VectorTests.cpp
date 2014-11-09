@@ -1014,13 +1014,12 @@ RANDOMIZED_TEST(copy_nan_Quat)
 	uninitializedQuat = b;
 }
 
-RANDOMIZED_TEST(float4_PerpendicularBasis)
+RANDOMIZED_TEST(vec_PerpendicularBasis)
 {
-	float4 a = float4::RandomBox(rng, -100.f, 100.f);
-	a = float4(0,1,0,0);
+	vec a = vec::RandomBox(rng, -100.f, 100.f);
 	if (!a.IsZero())
 	{
-		float4 b, c;
+		vec b, c;
 
 		a.PerpendicularBasis(b, c);
 		assert2(a.IsPerpendicular(b), a, b);

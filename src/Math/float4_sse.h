@@ -142,6 +142,29 @@ FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
+FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
+{
+	simd4f a = abs_ps(v);
+	simd4f a_min = min_ps(a, min_ps(shuffle1_ps(a, _MM_SHUFFLE(1,1,1,1)), _mm_movehl_ps(a, a))); // Horizontal min of x,y,z
+	a_min = xxxx_ps(a_min); // Broadcast to all elements.
+	a = cmple_ps(a, a_min); // Mask 0xFFFFFFFF to channels that contain the min element.
+	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
+	simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
+
+	// Compute (this cross q) and (this cross (this cross q)) in one go.
+	simd4f v_xzy = shuffle1_ps(v, _MM_SHUFFLE(3, 0, 2, 1)); // v_xzy = [a.w, a.x, a.z, a.y]
+	simd4f v_yxz = shuffle1_ps(v, _MM_SHUFFLE(3, 1, 0, 2)); // v_yxz = [a.w, a.y, a.x, a.z]
+	simd4f q_yxz = shuffle1_ps(q, _MM_SHUFFLE(3, 1, 0, 2)); // q_yxz = [b.w, b.y, b.x, b.z]
+	simd4f q_xzy = shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1)); // q_xzy = [b.w, b.x, b.z, b.y]
+	simd4f b = sub_ps(mul_ps(v_xzy, q_yxz), mul_ps(v_yxz, q_xzy));
+	simd4f a_yxz = shuffle1_ps(b, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f a_xzy = shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f c = sub_ps(mul_ps(v_xzy, a_yxz), mul_ps(v_yxz, a_xzy));
+
+	*outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
+	*outC = mul_ps(c, rsqrt_ps(dot4_ps(c, c)));
+}
+
 simd4f vec3_length_ps(simd4f vec);
 simd4f vec3_length_ps3(simd4f vec);
 
