@@ -1061,17 +1061,18 @@ UNIQUE_TEST(float2_MinAreaRect_Case)
 	float2::MinAreaRectInPlace(h, 4, center, uDir, vDir, minU, maxU, minV, maxV);
 
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
+	const float epsilon = 1e-3f;
 	for(int i = 0; i < 4; ++i)
 	{
 		float2 d = p[i];
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert(x >= minU && x <= maxU);
+		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert(y >= minV && y <= maxV);
+		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
 	assert1(diffUMin <= 1e-5f, diffUMin);
 	assert1(diffUMax <= 1e-5f, diffUMax);
@@ -1088,17 +1089,47 @@ UNIQUE_TEST(float2_MinAreaRect_Case_2)
 	float2::MinAreaRectInPlace(h, 5, center, uDir, vDir, minU, maxU, minV, maxV);
 
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
+	const float epsilon = 1e-3f;
 	for(int i = 0; i < 5; ++i)
 	{
 		float2 d = p[i];
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert(x >= minU && x <= maxU);
+		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert(y >= minV && y <= maxV);
+		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+	}
+	assert1(diffUMin <= 1e-5f, diffUMin);
+	assert1(diffUMax <= 1e-5f, diffUMax);
+	assert1(diffVMin <= 1e-5f, diffVMin);
+	assert1(diffVMax <= 1e-5f, diffVMax);
+}
+
+UNIQUE_TEST(float2_MinAreaRect_Case_3)
+{
+	float2 p[3] = { float2(-74.0205307f,18.4061508f), float2(55.5148621f,0.11618042f), float2(89.0816193f,-47.8109818f) };
+	float2 h[3] = { p[0], p[1], p[2] };
+
+	float2 center, uDir, vDir;
+	float minU, maxU, minV, maxV;
+	float2::MinAreaRectInPlace(h, 3, center, uDir, vDir, minU, maxU, minV, maxV);
+
+	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
+	const float epsilon = 1e-3f;
+	for(int i = 0; i < 3; ++i)
+	{
+		float2 d = p[i];
+		float x = d.Dot(uDir);
+		diffUMin = MATH_NS::Min(diffUMin, x - minU);
+		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
+		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		float y = d.Dot(vDir);
+		diffVMin = MATH_NS::Min(diffVMin, y - minV);
+		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
+		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
 	assert1(diffUMin <= 1e-5f, diffUMin);
 	assert1(diffUMax <= 1e-5f, diffUMax);
@@ -1108,10 +1139,10 @@ UNIQUE_TEST(float2_MinAreaRect_Case_2)
 
 RANDOMIZED_TEST(float2_MinAreaRect)
 {
-	const int n = 100;
-	float2 h[n];
-	float2 p[n];
-	rng = LCG(125);
+	const int s = 100;
+	const int n = rng.Int(3, s);
+	float2 h[s];
+	float2 p[s];
 	for(int i = 0; i < n; ++i)
 		h[i] = p[i] = float2::RandomBox(rng, -100.f, 100.f);
 
@@ -1119,6 +1150,7 @@ RANDOMIZED_TEST(float2_MinAreaRect)
 	float minU, maxU, minV, maxV;
 	float2::MinAreaRectInPlace(p, n, center, uDir, vDir, minU, maxU, minV, maxV);
 
+	const float epsilon = 1e-3f;
 	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
 	for(int i = 0; i < n; ++i)
 	{
@@ -1126,11 +1158,11 @@ RANDOMIZED_TEST(float2_MinAreaRect)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert(x >= minU && x <= maxU);
+		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert(y >= minV && y <= maxV);
+		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
 	assert1(diffUMin <= 1e-5f, diffUMin);
 	assert1(diffUMax <= 1e-5f, diffUMax);

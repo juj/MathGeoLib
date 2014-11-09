@@ -679,14 +679,17 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 	assume(p || n == 0);
 	if (!p)
 		return 0.f;
-	float minArea = FLT_MAX;
 
+	// As a preparation, need to compute the convex hull so that points are CCW-oriented,
+	// and this also greatly reduces the number of points for performance.
 	n = float2::ConvexHullInPlace(p, n);
 
-	// Compute the initial AABB rectangle for the rotating calipers method.
+	// e[i] point to the antipodal point pairs: e[0] and e[2] are pairs, so are e[1] and e[3].
+	float2 *e[4] = { p, p, p, p };
+
+	// Compute the initial AABB rectangle antipodal points for the rotating calipers method.
 	// Order the initial vertices minX -> minY -> maxX -> maxY to establish
 	// a counter-clockwise orientation.
-	float2 *e[4] = { p, p, p, p };
 	for(int i = 1; i < n; ++i)
 	{
 		if (p[i].x < e[0]->x) e[0] = &p[i];
@@ -696,12 +699,11 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 	}
 
 	// Direction vector of the edge that the currently tested rectangle is in contact with.
+	// This specifies the reference frame for the rectangle, and this is the direction the
+	// convex hull points toward at the antipodal point e[0].
 	float2 ed = -float2::unitY;
-
-	// Starting guess for minimum area rectangle (AABB).
-	minArea = (e[2]->x - e[0]->x) * (e[3]->y - e[1]->y);
-
-	const float2 *pEnd = p + n;
+	float minArea = FLOAT_INF; // Track the area of the best rectangle seen so far.
+	const float2 * const pEnd = p + n; // For wraparound testing in NEXT_P().
 
 	// These track directions the convex hull is pointing towards at each antipodal point.
 	float2 d[4];
@@ -710,10 +712,11 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 	d[2] = (*NEXT_P(e[2]) - *e[2]).Normalized();
 	d[3] = (*NEXT_P(e[3]) - *e[3]).Normalized();
 
-	// Rotate the calipers through each edge in the convex hull in order.
-	for(int i = 0; i < n; ++i)
+	// Rotate the calipers 90 degrees to see through each possible edge that might support
+	// the bounding rectangle.
+	while(ed.y <= 0.f)
 	{
-		// Compute how much each edge will rotate before hitting the next vertex in the convex hull.
+		// Compute how much each edge can at most rotate before hitting the next vertex in the convex hull.
 		float cosA0 =  ed.Dot(d[0]);
 		float cosA1 =  ed.PerpDot(d[1]);
 		float cosA2 = -ed.Dot(d[2]);
@@ -731,6 +734,7 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 		float maxu = ed.PerpDot(*e[2]);
 		float minv = ed.Dot(*e[1]);
 		float maxv = ed.Dot(*e[3]);
+
 		float area = MATH_NS::Abs(maxu-minu) * MATH_NS::Abs(maxv-minv);
 		if (area < minArea)
 		{
