@@ -149,12 +149,12 @@ FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
 	simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
 
 	simd4f v_xzy = shuffle1_ps(v, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f v_yxz = shuffle1_ps(v, _MM_SHUFFLE(3, 1, 0, 2));
 	simd4f q_xzy = shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1));
 	simd4f b_yxz = sub_ps(mul_ps(q_xzy, v), mul_ps(v_xzy, q));
 	simd4f b = shuffle1_ps(b_yxz, _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f b_xzy = shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f c_yxz = sub_ps(mul_ps(b_xzy, v), mul_ps(v_xzy, b));
-	simd4f c = shuffle1_ps(c_yxz, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f b_xzy = shuffle1_ps(b_yxz, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f c = sub_ps(mul_ps(b_yxz, v_xzy), mul_ps(v_yxz, b_xzy));
 
 	*outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
 	*outC = mul_ps(c, rsqrt_ps(dot4_ps(c, c)));
