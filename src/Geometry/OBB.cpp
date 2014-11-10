@@ -540,7 +540,7 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 	{
 		vec d = dirs[i];
 		bool removed = false;
-		for(int j = 0; j < nDistinct; ++j)
+		for(size_t j = 0; j < nDistinct; ++j)
 		{
 			float distX = d.x - dirs[j].x;
 			if (distX > 1e-3f)
