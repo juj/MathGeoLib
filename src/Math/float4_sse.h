@@ -130,16 +130,13 @@ FORCE_INLINE float dot4_float(simd4f a, simd4f b)
 
 FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 {
-	simd4f a_xzy = shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
-	simd4f b_yxz = shuffle1_ps(b, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
+	simd4f a_xzy = shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // = [a.w, a.x, a.z, a.y]
+	simd4f b_xzy = shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1)); // = [b.w, b.x, b.z, b.y]
 
-	simd4f a_yxz = shuffle1_ps(a, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
-	simd4f b_xzy = shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
+	simd4f x_yxz = mul_ps(b_xzy, a); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
+	simd4f y_yxz = mul_ps(a_xzy, b); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
 
-	simd4f x = mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	simd4f y = mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-
-	return _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+	return shuffle1_ps(sub_ps(x_yxz, y_yxz), _MM_SHUFFLE(3, 0, 2, 1)); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
 FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
