@@ -142,7 +142,7 @@ FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
 {
 	simd4f a = abs_ps(v);
-	simd4f a_min = min_ps(a, min_ps(shuffle1_ps(a, _MM_SHUFFLE(1,1,1,1)), _mm_movehl_ps(a, a))); // Horizontal min of x,y,z
+	simd4f a_min = min_ps(a, min_ps(yyyy_ps(a), _mm_movehl_ps(a, a))); // Horizontal min of x,y,z
 	a_min = xxxx_ps(a_min); // Broadcast to all elements.
 	a = cmple_ps(a, a_min); // Mask 0xFFFFFFFF to channels that contain the min element.
 	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
