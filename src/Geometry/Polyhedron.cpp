@@ -422,6 +422,22 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 	return true;
 }
 
+int Polyhedron::NearestVertex(const vec &point) const
+{
+	int nearest = -1;
+	float nearestDistSq = FLOAT_INF;
+	for(size_t i = 0; i < v.size(); ++i)
+	{
+		float dSq = point.DistanceSq(v[i]);
+		if (dSq < nearestDistSq)
+		{
+			nearestDistSq = dSq;
+			nearest = i;
+		}
+	}
+	return nearest;
+}
+
 float Polyhedron::FaceContainmentDistance2D(int faceIndex, const vec &worldSpacePoint, float polygonThickness) const
 {
 	// N.B. This implementation is a duplicate of Polygon::Contains, but adapted to avoid dynamic memory allocation
@@ -644,11 +660,11 @@ bool Polyhedron::Contains(const Polyhedron &polyhedron) const
 	return true;
 }
 
-bool Polyhedron::ContainsConvex(const vec &point) const
+bool Polyhedron::ContainsConvex(const vec &point, float epsilon) const
 {
 	assume(IsConvex());
 	for(int i = 0; i < NumFaces(); ++i)
-		if (FacePlane(i).SignedDistance(point) > 0.f)
+		if (FacePlane(i).SignedDistance(point) > epsilon)
 			return false;
 
 	return true;
@@ -980,6 +996,7 @@ bool Polyhedron::IntersectsConvex(const LineSegment &lineSegment) const
 	return ClipLineSegmentToConvexPolyhedron(lineSegment.a, lineSegment.b - lineSegment.a, tFirst, tLast);
 }
 
+#if 0
 void Polyhedron::MergeConvex(const vec &point)
 {
 //	LOGI("mergeconvex.");
@@ -1124,11 +1141,11 @@ void Polyhedron::MergeConvex(const vec &point)
 //			if (!v[deletedEdges[i].first].Equals(point) && !v[deletedEdges[i].second].Equals(point))
 			{
 				Face tri;
+				tri.v.push_back(iter->first);
 				tri.v.push_back(iter->second);
 				tri.v.push_back((int)v.size()-1);
-				tri.v.push_back(iter->first);
 				f.push_back(tri);
-	//			LOGI("Added face %d: %s.", (int)f.size()-1, tri.ToString().c_str());
+				LOGI("Added face %d: %s.", (int)f.size()-1, tri.ToString().c_str());
 			}
 		}
 	}
@@ -1144,6 +1161,66 @@ void Polyhedron::MergeConvex(const vec &point)
 
 //	if (hadDisconnectedHorizon)
 //		MergeConvex(point);
+}
+#endif
+
+void Polyhedron::MergeConvex(const vec &point)
+{
+//	assert(IsClosed());
+//	assert(IsConvex());
+
+	std::set<std::pair<int, int> > deletedEdges;
+
+	int nFacesAlive = 0;
+	for(int i = 0; i < (int)f.size(); ++i)
+	{
+		// Delete all faces that don't contain the given point. (they have point in their positive side)
+		Plane p = FacePlane(i);
+		Face &face = f[i];
+
+		if (p.SignedDistance(point) <= 0.f)
+		{
+			if (i != nFacesAlive)
+				f[nFacesAlive] = f[i];
+			++nFacesAlive;
+			continue;
+		}
+
+		int v0 = face.v.back();
+		for(size_t j = 0; j < face.v.size(); ++j)
+		{
+			deletedEdges.insert(std::make_pair(v0, face.v[j]));
+			v0 = face.v[j];
+		}
+	}
+	f.erase(f.begin()+nFacesAlive, f.end());
+
+	// If the polyhedron contained our point, then there is nothing to merge.
+	if (deletedEdges.empty())
+		return;
+
+	// Add the new point to this polyhedron.
+	v.push_back(point);
+
+	// Now fix all edges by adding new triangular faces for the point.
+	for(std::set<std::pair<int, int> >::iterator iter = deletedEdges.begin(); iter != deletedEdges.end(); ++iter)
+	{
+		std::pair<int, int> opposite = std::make_pair(iter->second, iter->first);
+		if (deletedEdges.find(opposite) != deletedEdges.end())
+			continue;
+
+		Face tri;
+		tri.v.push_back(iter->first);
+		tri.v.push_back(iter->second);
+		tri.v.push_back((int)v.size()-1);
+		f.push_back(tri);
+	}
+
+//	assert(FaceIndicesValid());
+//	assert(EulerFormulaHolds());
+//	assert(IsClosed());
+//	assert(FacesAreNondegeneratePlanar());
+//	assert(IsConvex());
 }
 
 void Polyhedron::Translate(const vec &offset)
@@ -1207,26 +1284,44 @@ struct CHullHelp
 
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
-	///\todo Check input ptr and size!
 	std::set<int> extremes;
 
-	const vec dirs[] =
+	if (numPoints > 3)
 	{
-		DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
-		DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
-		DIR_VEC(1, 1, 1)
-	};
+		const vec dirs[] =
+		{
+			DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
+			DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
+			DIR_VEC(1, -1, 0), DIR_VEC(1, 0, -1), DIR_VEC(0, 1, -1),
+			DIR_VEC(1, 1, 1), DIR_VEC(-1, 1, 1), DIR_VEC(1, -1, 1),
+			DIR_VEC(1, 1, -1)
+		};
 
-	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
-	{
-		int idx1, idx2;
-		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
-		extremes.insert(idx1);
-		extremes.insert(idx2);
+		for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
+		{
+			int idx1, idx2;
+			OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
+			extremes.insert(idx1);
+			extremes.insert(idx2);
+		}
 	}
 
 	Polyhedron p;
-	assume(extremes.size() >= 4); ///\todo Fix this case!
+
+	// Handle degenerate cases.
+	if (extremes.size() < 4)
+	{
+		Face f;
+		for(int i = 0; i < numPoints; ++i)
+		{
+			p.v.push_back(pointArray[i]);
+			f.v.push_back(i);
+		}
+		if (numPoints > 0)
+			p.f.push_back(f);
+		return p;
+	}
+
 	int i = 0;
 	std::set<int>::iterator iter = extremes.begin();
 	for(; iter != extremes.end() && i < 4; ++iter, ++i)
@@ -1240,43 +1335,43 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	face.v[0] = 1; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
 	p.OrientNormalsOutsideConvex(); // Ensure that the winding order of the generated tetrahedron is correct for each face.
 
-//	assert(p.IsClosed());
-	//assert(p.IsConvex());
+	assert(p.IsClosed());
+	assert(p.IsConvex());
 	assert(p.FaceIndicesValid());
 	assert(p.EulerFormulaHolds());
 //	assert(p.FacesAreNondegeneratePlanar());
-
-	CHullHelp hull;
-	for(int j = 0; j < (int)p.f.size(); ++j)
-		hull.livePlanes.push_back(j);
 
 	// For better performance, merge the remaining extreme points first.
 	for(; iter != extremes.end(); ++iter)
 	{
 		p.MergeConvex(pointArray[*iter]);
 
-		mathassert(p.FaceIndicesValid());
-//		mathassert(p.IsClosed());
-//		mathassert(p.FacesAreNondegeneratePlanar());
-//		mathassert(p.IsConvex());
+//		assert(p.FaceIndicesValid());
+//		assert(p.IsClosed());
+//		assert(p.FacesAreNondegeneratePlanar());
+//		assert(p.IsConvex());
 	}
 
 	// Merge all the rest of the points.
 	for(int j = 0; j < numPoints; ++j)
 	{
-		if (p.f.size() > 5000 && (j & 255) == 0)
-			LOGI("Mergeconvex %d/%d, #vertices %d, #faces %d", j, numPoints, (int)p.v.size(), (int)p.f.size());
-		p.MergeConvex(pointArray[i]);
+		if (extremes.find(j) != extremes.end())
+			continue; // The extreme points have already been merged.
+		p.MergeConvex(pointArray[j]);
 
-		mathassert(p.FaceIndicesValid());
-//		mathassert(p.IsClosed());
+//		assert(p.FaceIndicesValid());
+//		assert(p.IsClosed());
 //		mathassert(p.FacesAreNondegeneratePlanar());
-		//mathassert(p.IsConvex());
+//		assert(p.IsConvex());
 
 //		if (p.f.size() > 5000)
 //			break;
 	}
 
+	assert(p.FaceIndicesValid());
+	assert(p.IsClosed());
+	assert(p.IsConvex());
+	p.RemoveRedundantVertices();
 	return p;
 }
 

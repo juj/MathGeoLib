@@ -107,3 +107,15 @@ UNIQUE_TEST(PolyhedronContainsPointCase)
 	assert(p.Contains(a.CenterPoint()));
 }
 
+RANDOMIZED_TEST(Polyhedron_ConvexHull)
+{
+	const int n = 7;
+	vec points[n];
+	for(int i = 0; i < n; ++i)
+		points[i] = vec::RandomBox(rng, -50.f, 50.f);
+
+	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
+
+	for(int i = 0; i < n; ++i)
+		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+}

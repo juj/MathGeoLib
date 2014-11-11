@@ -261,6 +261,10 @@ public:
 		@see FLOAT_INF. */
 	bool ClipLineSegmentToConvexPolyhedron(const vec &ptA, const vec &dir, float &tFirst, float &tLast) const;
 
+	/// Returns the index of the nearest vertex to the given point.
+	/** @note In the degenerate case when this Polyhedron is null and does not contain any vertices, this function returns -1. */
+	int NearestVertex(const vec &point) const;
+
 	/// Tests if the given object is fully contained inside this closed polyhedron.
 	/** This function treats this polyhedron as a non-convex object. If you know this polyhedron
 		to be convex, you can use the faster ContainsConvex() function.
@@ -291,7 +295,7 @@ public:
 		@note This function assumes that this polyhedron is closed and its edges are not self-intersecting.
 		@see Contains(), ClosestPoint(), ClosestPointConvex(), Distance(), Intersects(), IntersectsConvex().
 		@todo Add ContainsConvex(Polygon/AABB/OBB/Frustum/Polyhedron/Circle/Disc/Sphere/Capsule). */
-	bool ContainsConvex(const vec &point) const;
+	bool ContainsConvex(const vec &point, float epsilon = 1e-4f) const;
 	bool ContainsConvex(const LineSegment &lineSegment) const;
 	bool ContainsConvex(const Triangle &triangle) const;
 
