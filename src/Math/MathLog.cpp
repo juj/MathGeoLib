@@ -82,22 +82,28 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 
 void PrintToConsole(MathLogChannel channel, const char *str)
 {
-	if (channel == MathLogError)
+	if (channel == MathLogError || channel == MathLogErrorNoCallstack)
 	{
 		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY); // Red
 		fprintf(stderr, "Error: %s\n", str);
 		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_INTENSITY); // Dark gray
-		std::string callstack = GetCallstack("  ", "PrintToConsole");
-		fprintf(stderr, "%s", callstack.c_str());
+		if (channel != MathLogErrorNoCallstack)
+		{
+			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			fprintf(stderr, "%s", callstack.c_str());
+		}
 		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Light gray/default
 	}
-	else if (channel == MathLogWarning)
+	else if (channel == MathLogWarning || channel == MathLogWarningNoCallstack)
 	{
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); // Yellow
 		printf("Warning: %s\n", str);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY); // Dark gray
-		std::string callstack = GetCallstack("  ", "PrintToConsole");
-		printf("%s", callstack.c_str());
+		if (channel != MathLogWarningNoCallstack)
+		{
+			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			printf("%s", callstack.c_str());
+		}
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Light gray/default
 	}
 	else
@@ -111,17 +117,23 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 #ifdef WIN8RT
 	OutputDebugStringA(str);
 #endif
-	if (channel == MathLogError)
+	if (channel == MathLogError || channel == MathLogErrorNoCallstack)
 	{
 		fprintf(stderr, "Error: %s\n", str);
-		std::string callstack = GetCallstack("  ", "PrintToConsole");
-		fprintf(stderr, "%s", callstack.c_str());
+		if (channel != MathLogErrorNoCallstack)
+		{
+			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			fprintf(stderr, "%s", callstack.c_str());
+		}
 	}
-	else if (channel == MathLogWarning)
+	else if (channel == MathLogWarning || channel == MathLogWarningNoCallstack)
 	{
 		printf("Warning: %s\n", str);
-		std::string callstack = GetCallstack("  ", "PrintToConsole");
-		printf("%s", callstack.c_str());
+		if (channel != MathLogWarningNoCallstack)
+		{
+			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			printf("%s", callstack.c_str());
+		}
 	}
 	else
 		printf("%s\n", str);

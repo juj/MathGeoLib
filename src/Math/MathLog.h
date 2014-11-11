@@ -46,6 +46,8 @@ namespace
 const MathLogChannel MathLogInfo = 1;
 const MathLogChannel MathLogError = 2;
 const MathLogChannel MathLogWarning = 4;
+const MathLogChannel MathLogErrorNoCallstack = MathLogError|65536;
+const MathLogChannel MathLogWarningNoCallstack = MathLogWarning|65536;
 }
 
 void PrintToConsoleVariadic(MathLogChannel channel, const char *format, ...);
