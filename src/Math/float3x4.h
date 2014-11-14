@@ -608,10 +608,14 @@ public:
 	void RemoveScale();
 
 	/// Transforms the given point vector by this matrix M , i.e. returns M * (x, y, z, 1).
+	/** The suffix "Pos" in this function means that the w component of the input vector is assumed to be 1, i.e. the input
+		vector represents a point (a position). */
 	float3 TransformPos(const float3 &pointVector) const;
 	float3 TransformPos(float x, float y, float z) const;
 
 	/// Transforms the given direction vector by this matrix M , i.e. returns M * (x, y, z, 0).
+	/** The suffix "Dir" in this function just means that the w component of the input vector is assumed to be 0, i.e. the
+		input vector represents a direction. The input vector does not need to be normalized. */
 	float4 TransformDir(const float4 &directionVector) const;
 	float3 TransformDir(const float3 &directionVector) const;
 	float3 TransformDir(float x, float y, float z) const;
@@ -619,27 +623,31 @@ public:
 	/// Transforms the given 4-vector by this matrix M, i.e. returns M * (x, y, z, w).
 	float4 Transform(const float4 &vector) const;
 
-	/// Performs a batch transform of the given array.
+	/// Performs a batch transform of the given array of point vectors.
+	/** The suffix "Pos" in this function just means that the w components of each input vector are assumed to be 1, i.e. the
+		input vectors represent points (positions).
+		@param stride If specified, represents the distance in bytes between subsequent vector elements. If stride is not
+			specified, the vectors are assumed to be tightly packed in memory. */
 	void BatchTransformPos(float3 *pointArray, int numPoints) const;
-
-	/// Performs a batch transform of the given array.
 	void BatchTransformPos(float3 *pointArray, int numPoints, int stride) const;
-
-	/// Performs a batch transform of the given array.
-	void BatchTransformDir(float3 *dirArray, int numVectors) const;
-
-	/// Performs a batch transform of the given array.
-	void BatchTransformDir(float3 *dirArray, int numVectors, int stride) const;
-
-	/// Performs a batch transform of the given array.
-	void BatchTransform(float4 *vectorArray, int numVectors) const;
 	void BatchTransformPos(float4 *vectorArray, int numVectors) const { BatchTransform(vectorArray, numVectors); }
+	void BatchTransformPos(float4 *vectorArray, int numVectors, int stride) const { BatchTransform(vectorArray, numVectors, stride); }
+
+	/// Performs a batch transform of the given array of direction vectors.
+	/** The suffix "Dir" in this function just means that the w components of each input vector are assumed to be 0, i.e. the
+		input vectors represent directions. The input vectors do not need to be normalized.
+		@param stride If specified, represents the distance in bytes between subsequent vector elements. If stride is not
+			specified, the vectors are assumed to be tightly packed in memory. */
+	void BatchTransformDir(float3 *dirArray, int numVectors) const;
+	void BatchTransformDir(float3 *dirArray, int numVectors, int stride) const;
 	void BatchTransformDir(float4 *vectorArray, int numVectors) const { BatchTransform(vectorArray, numVectors); }
+	void BatchTransformDir(float4 *vectorArray, int numVectors, int stride) const { BatchTransform(vectorArray, numVectors, stride); }
 
 	/// Performs a batch transform of the given array.
+	/** @param stride If specified, represents the distance in bytes between subsequent vector elements. If stride is not
+			specified, the vectors are assumed to be tightly packed in memory. */
+	void BatchTransform(float4 *vectorArray, int numVectors) const;
 	void BatchTransform(float4 *vectorArray, int numVectors, int stride) const;
-	void BatchTransformPos(float4 *vectorArray, int numVectors, int stride) const { BatchTransform(vectorArray, numVectors, stride); }
-	void BatchTransformDir(float4 *vectorArray, int numVectors, int stride) const { BatchTransform(vectorArray, numVectors, stride); }
 
 	/// Treats the float3x3 as a 4-by-4 matrix with the last row and column as identity, and multiplies the two matrices.
 	float3x4 operator *(const float3x3 &rhs) const;

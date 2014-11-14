@@ -733,36 +733,44 @@ public:
 	void Pivot();
 
 	/// Transforms the given point vector by this matrix M , i.e. returns M * (x, y, z, 1).
+	/** The suffix "Pos" in this function means that the w component of the input vector is assumed to be 1, i.e. the input
+		vector represents a point (a position). */
 	float3 TransformPos(const float3 &pointVector) const;
 	float3 TransformPos(float x, float y, float z) const;
+	float4 TransformPos(const float4 &vector) const { return Transform(vector); }
 
 	/// Transforms the given direction vector by this matrix M , i.e. returns M * (x, y, z, 0).
+	/** The suffix "Dir" in this function just means that the w component of the input vector is assumed to be 0, i.e. the
+		input vector represents a direction. The input vector does not need to be normalized. */
 	float3 TransformDir(const float3 &directionVector) const;
 	float3 TransformDir(float x, float y, float z) const;
+	float4 TransformDir(const float4 &vector) const { return Transform(vector); }
 
 	/// Transforms the given 4-vector by this matrix M, i.e. returns M * (x, y, z, w).
 	/// Does not perform a perspective divide afterwards, so remember to divide by w afterwards
 	/// at some point, if this matrix contained a projection.
 	float4 Transform(const float4 &vector) const;
-	float4 TransformPos(const float4 &vector) const { return Transform(vector); }
-	float4 TransformDir(const float4 &vector) const { return Transform(vector); }
 
-	/// Performs a batch transform of the given point vector array.
+	/// Performs a batch transform of the given array of point vectors.
+	/** The suffix "Pos" in this function just means that the w components of each input vector are assumed to be 1, i.e. the
+		input vectors represent points (positions).
+		@param strideBytes If specified, represents the distance in bytes between subsequent vector elements. If stride is not
+			specified, the vectors are assumed to be tightly packed in memory. */
 	void TransformPos(float3 *pointArray, int numPoints) const;
-
-	/// Performs a batch transform of the given point vector array.
 	void TransformPos(float3 *pointArray, int numPoints, int strideBytes) const;
 
-	/// Performs a batch transform of the given direction vector array.
+	/// Performs a batch transform of the given array of direction vectors.
+	/** The suffix "Dir" in this function just means that the w components of each input vector are assumed to be 0, i.e. the
+		input vectors represent directions. The input vectors do not need to be normalized.
+		@param strideBytes If specified, represents the distance in bytes between subsequent vector elements. If stride is not
+			specified, the vectors are assumed to be tightly packed in memory. */
 	void TransformDir(float3 *dirArray, int numVectors) const;
-
-	/// Performs a batch transform of the given direction vector array.
 	void TransformDir(float3 *dirArray, int numVectors, int strideBytes) const;
 
 	/// Performs a batch transform of the given float4 array.
+	/** @param strideBytes If specified, represents the distance in bytes between subsequent vector elements. If stride is not
+			specified, the vectors are assumed to be tightly packed in memory. */
 	void Transform(float4 *vectorArray, int numVectors) const;
-
-	/// Performs a batch transform of the given float4 array.
 	void Transform(float4 *vectorArray, int numVectors, int strideBytes) const;
 
 	/// Treats the float3x3 as a 4-by-4 matrix with the last row and column as identity, and multiplies the two matrices.
