@@ -1286,30 +1286,47 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
 	std::set<int> extremes;
 
-	if (numPoints > 3)
-	{
-		const vec dirs[] =
-		{
-			DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
-			DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
-			DIR_VEC(1, -1, 0), DIR_VEC(1, 0, -1), DIR_VEC(0, 1, -1),
-			DIR_VEC(1, 1, 1), DIR_VEC(-1, 1, 1), DIR_VEC(1, -1, 1),
-			DIR_VEC(1, 1, -1)
-		};
+	Polyhedron p;
 
-		for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
+	const vec dirs[] =
+	{
+		DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
+		DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
+		DIR_VEC(1, -1, 0), DIR_VEC(1, 0, -1), DIR_VEC(0, 1, -1),
+		DIR_VEC(1, 1, 1), DIR_VEC(-1, 1, 1), DIR_VEC(1, -1, 1),
+		DIR_VEC(1, 1, -1)
+	};
+
+	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
+	{
+		int idx1, idx2;
+		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
+		extremes.insert(idx1);
+		extremes.insert(idx2);
+	}
+
+	assume(extremes.size() >= 3);
+	if (extremes.size() < 3)
+		return p; // This might happen if there's NaNs in the vertex data, or duplicates.
+
+	// Handle degenerate case when the predefined directions did not find a nonzero volume.
+	if (extremes.size() == 3)
+	{
+		std::set<int>::iterator iter = extremes.begin();
+		int v0 = *iter++;
+		int v1 = *iter++;
+		int v2 = *iter;
+		Plane p(pointArray[v0], pointArray[v1], pointArray[v2]);
+		for(int i = 0; i < numPoints; ++i)
 		{
-			int idx1, idx2;
-			OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
-			extremes.insert(idx1);
-			extremes.insert(idx2);
+			if (!p.Contains(pointArray[i]))
+				extremes.insert(i);
+			if (extremes.size() >= 4)
+				break;
 		}
 	}
 
-	Polyhedron p;
-
-	// Handle degenerate cases.
-	if (extremes.size() < 4)
+	if (extremes.size() == 3)
 	{
 		Face f;
 		for(int i = 0; i < numPoints; ++i)

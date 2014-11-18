@@ -119,3 +119,19 @@ RANDOMIZED_TEST(Polyhedron_ConvexHull)
 	for(int i = 0; i < n; ++i)
 		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
 }
+
+UNIQUE_TEST(Polyhedron_ConvexHull_case)
+{
+	const int n = 5;
+	vec points[n];
+	points[0] = POINT_VEC(21.49077606201172,3.3931899070739746,-19.969764709472656);
+	points[1] = POINT_VEC(33.36421585083008,22.60091781616211,-7.723135948181152);
+	points[2] = POINT_VEC(43.97615432739258,37.8233642578125,-7.067361354827881);
+	points[3] = POINT_VEC(30.455629348754883,-46.866241455078125,4.110633850097656);
+	points[4] = POINT_VEC(6.104404449462891,5.22857666015625,-47.601768493652344);
+
+	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
+
+	for(int i = 0; i < n; ++i)
+		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+}
