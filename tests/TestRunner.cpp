@@ -10,6 +10,10 @@
 
 #include "../src/Math/myassert.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 LCG rng(Clock::TickU32());
 
 std::vector<Test> &Tests()
@@ -311,18 +315,6 @@ int RunOneTest(int numTimes, int numTrials, const char * const *prefixes, JSONRe
 	return -2; // No tests left to run
 }
 
-// Returns the number of failures.
-int RunTests(int numTimes, int numTrials, const char * const *prefixes, JSONReport &jsonReport)
-{
-	numTestsRun = numTestsPassed = numTestsWarnings = numTestsFailed = 0;
-
-	for(size_t i = 0; i < Tests().size(); ++i)
-		RunOneTest(numTimes, numTrials, prefixes, jsonReport);
-
-	PrintTestRunSummary();
-	return numTestsFailed;
-}
-
 void PrintTestRunSummary()
 {
 	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", numTestsRun, numTestsPassed, numTestsWarnings, numTestsFailed);
@@ -357,27 +349,63 @@ void PrintTestRunSummary()
 	}
 }
 
+int argc_;
+char **argv_;
+void TestsFinished()
+{
+	PrintTestRunSummary();
+
+	LOGI("%d", globalPokedData);
+
+	// When --exit0 is passed, we forcibly return 0 and not the number of failed tests.
+	// Used by buildbot in valgrind runs to ignore any failures - the failures are detected
+	// in a "real" run instead that carry more randomized trial runs.
+	for(int i = 1; i < argc_; ++i)
+		if (!strcmp(argv_[i], "--exit0"))
+			exit(0);
+}
+
+int numTotalRuns = 0;
+int numTrialsPerTimedBlock = 0;
+// A list of test prefixes to include in the run.
+std::vector<const char *> prefixes;
+JSONReport jsonReport;
+
+void RunNextTest()
+{
+	RunOneTest(numTotalRuns, numTrialsPerTimedBlock, &prefixes[0], jsonReport);
+	++nextTestToRun;
+#ifdef __EMSCRIPTEN__
+	if (nextTestToRun >= (int)Tests().size())
+	{
+		emscripten_cancel_main_loop();
+		TestsFinished();
+		exit(numTestsFailed);
+	}
+#endif
+}
+
 #ifdef MATH_TESTS_EXECUTABLE
 int main(int argc, char **argv)
 {
+	argc_ = argc;
+	argv_ = argv;
+
 	TestData::InitTestData();
 
-	int numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
-	int numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
+	numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
+	numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
 #ifdef EMSCRIPTEN
 	numTotalRuns = numTrialsPerTimedBlock = 10;
 #endif
-	// A list of test prefixes to include in the run.
-	std::vector<const char *>prefixesArray;
 	for(int i = 3; i < argc; ++i)
 	{
 		if (argv[i][0] != '-' && argv[i][0] != '/')
-			prefixesArray.push_back(argv[i]);
+			prefixes.push_back(argv[i]);
 	}
-	if (prefixesArray.empty())
-		prefixesArray.push_back(""); // Empty prefix runs all tests.
-	prefixesArray.push_back(0); // Sentinel to terminate prefix string list.
-	const char * const *prefixes = &prefixesArray[0];
+	if (prefixes.empty())
+		prefixes.push_back(""); // Empty prefix runs all tests.
+	prefixes.push_back(0); // Sentinel to terminate prefix string list.
 
 	if (numTotalRuns == 0 || numTrialsPerTimedBlock == 0)
 	{
@@ -388,23 +416,21 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	JSONReport jsonReport;
 	std::string jsonFilename = "test_results.json";
 	for(int i = 1; i+1 < argc; ++i)
 		if (!strcmp(argv[i], "--json"))
 			jsonFilename = argv[i+1]; // Allow overriding the output file name from command line.
 	jsonReport.Create(jsonFilename.c_str());
 
-	int numFailures = RunTests(numTotalRuns, numTrialsPerTimedBlock, prefixes, jsonReport);
-	LOGI("%d", globalPokedData);
+	numTestsRun = numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
-	// When --exit0 is passed, we forcibly return 0 and not the number of failed tests.
-	// Used by buildbot in valgrind runs to ignore any failures - the failures are detected
-	// in a "real" run instead that carry more randomized trial runs.
-	for(int i = 1; i < argc; ++i)
-		if (!strcmp(argv[i], "--exit0"))
-			return 0;
-
-	return numFailures; // exit code of 0 denotes a successful run.
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(&RunNextTest, 0, 0);
+#else
+	while(nextTestToRun < Tests().size())
+		RunNextTest();
+	TestsFinished();
+	return numTestsFailed; // exit code of 0 denotes a successful run.
+#endif
 }
 #endif
