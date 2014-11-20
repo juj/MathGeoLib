@@ -320,7 +320,7 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 
 		float angleT = t*angle;
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
 		// Compute three sines in one go with SSE.
 		simd4f s = set_ps(0.f, angleT, angle - angleT, angle);
 		s = sin_ps(s);
@@ -439,7 +439,7 @@ void Quat::SetFromAxisAngle(const float4 &axis, float angle)
 	assume2(axis.IsNormalized(1e-4f), axis, axis.Length4());
 	assume1(MATH_NS::IsFinite(angle), angle);
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
 	// Best: 26.499 nsecs / 71.024 ticks, Avg: 26.856 nsecs, Worst: 27.651 nsecs
 	simd4f half = set1_ps(0.5f);
 	simd4f halfAngle = mul_ps(set1_ps(angle), half);

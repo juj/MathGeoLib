@@ -574,15 +574,16 @@ BENCHMARK(sse_shuffle_ps, "sse")
 	v[i] = scale;
 }
 BENCHMARK_END;
+#endif // ~MATH_SSE
 
+#ifdef MATH_SSE2
 BENCHMARK(sse_shuffle_epi32, "sse")
 {
 	simd4f scale = _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((v[i].v)), _MM_SHUFFLE(0,1,2,3)));
 	v[i] = scale;
 }
 BENCHMARK_END;
-
-#endif // ~MATH_SSE
+#endif
 
 #endif // ~MATH_SIMD
 

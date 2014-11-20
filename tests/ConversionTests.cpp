@@ -48,7 +48,7 @@ int U32ToString(u32 val, char *str)
 	return (int)(s - str);
 }
 
-#ifdef MATH_SSE
+#ifdef MATH_SSE2
 
 FORCE_INLINE __m128i INT_TO_M128(int i)
 {

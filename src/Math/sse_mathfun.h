@@ -35,7 +35,7 @@
   (this is the zlib license)
 */
 
-#ifdef MATH_SSE
+#ifdef MATH_SSE2
 
 #include "SSEMath.h"
 
