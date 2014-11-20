@@ -760,8 +760,8 @@ bool EqualAbs(float a, float b, float epsilon);
 #define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
 #define DIR_VEC(...) float4(__VA_ARGS__, 0.f)
 
-#define POINT_VEC_SCALAR(s) pos_from_scalar_ps(s)
-#define DIR_VEC_SCALAR(s) dir_from_scalar_ps(s)
+#define POINT_VEC_SCALAR(s) float4(pos_from_scalar_ps(s))
+#define DIR_VEC_SCALAR(s) float4(dir_from_scalar_ps(s))
 
 #define POINT_TO_FLOAT3(v) (v).xyz()
 #define DIR_TO_FLOAT3(v) (v).xyz()
