@@ -222,8 +222,16 @@ public:
 #define EXPECT_FAIL(reason) { globalTestExpectedToFail = 1; globalTestFailureDescription = reason; }
 
 #if defined(_DEBUG) || defined(DEBUG) // In debug mode, it's sensible to run benchmarks only to test they don't crash, so do minimal amount of iterations.
+
+#ifdef __EMSCRIPTEN__
+// Need to be _very_ minimal in debug mode, since we run with SAFE_HEAP=1.
+const int testrunner_numTimerTests = 2;
+const int testrunner_numItersPerTest = 4;
+#else
 const int testrunner_numTimerTests = 3;
 const int testrunner_numItersPerTest = 10;
+#endif
+
 #else
 const int testrunner_numTimerTests = 100;
 const int testrunner_numItersPerTest = 1000;
