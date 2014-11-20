@@ -427,7 +427,7 @@ int main(int argc, char **argv)
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop(&RunNextTest, 0, 0);
 #else
-	while(nextTestToRun < Tests().size())
+	while(nextTestToRun < (int)Tests().size())
 		RunNextTest();
 	TestsFinished();
 	return numTestsFailed; // exit code of 0 denotes a successful run.
