@@ -308,27 +308,27 @@ Quat uninitializedQuat;
 int dummyResultInt = 0;
 vec dummyResultVec = vec::zero;
 
-extern float *f = 0;
-extern float *pf = 0;
-extern float *uf = 0;
-extern float4x4 *m = 0;
-extern float4x4 *m2 = 0;
-extern const float4x4 *om = 0;
-extern const float4x4 *ogm = 0;
-extern float4x4 *tpm = 0;
-extern float2 *fl_2 = 0;
-extern const float4 *nv = 0;
-extern const float4 *nv2 = 0;
-extern float4 *v = 0;
-extern float4 *v2 = 0;
-extern float4 *v3 = 0;
-extern float4 *v01 = 0;
-extern vec *ve = 0;
-extern Quat *q = 0;
-extern Quat *q2 = 0;
-extern AABB *aabb = 0;
-extern OBB *obb = 0;
-extern Frustum *frustum = 0;
+float *f = 0;
+float *pf = 0;
+float *uf = 0;
+float4x4 *m = 0;
+float4x4 *m2 = 0;
+const float4x4 *om = 0;
+const float4x4 *ogm = 0;
+float4x4 *tpm = 0;
+float2 *fl_2 = 0;
+const float4 *nv = 0;
+const float4 *nv2 = 0;
+float4 *v = 0;
+float4 *v2 = 0;
+float4 *v3 = 0;
+float4 *v01 = 0;
+vec *ve = 0;
+Quat *q = 0;
+Quat *q2 = 0;
+AABB *aabb = 0;
+OBB *obb = 0;
+Frustum *frustum = 0;
 
 void InitTestData()
 {

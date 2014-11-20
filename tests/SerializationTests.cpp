@@ -516,7 +516,7 @@ RANDOMIZED_TEST(grisu3_random)
 	test_double_to_string(d, 0);
 }
 
-extern char dummy_str[256] = {};
+char dummy_str[256] = {};
 
 // Benchmark 'dtoa_sprintf': dtoa_sprintf
 //    Best: 967.948 nsecs / 1646 ticks, Avg: 1.181 usecs, Worst: 2.403 usecs
