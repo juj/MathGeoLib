@@ -62,7 +62,7 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
 #define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
 #else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
-#define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((reg), (reg), (shuffle))
+#define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((simd4f)(reg), (simd4f)(reg), (shuffle))
 #endif
 
 #define xxxx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,0,0,0))
