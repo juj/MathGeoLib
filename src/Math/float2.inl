@@ -42,13 +42,14 @@ public:
 
 	bool operator()(const T &a, const T &b) const
 	{
+		const float epsilon = 1e-4f;
 		float2 A = float2(a) - float2(perspective);
 		float2 B = float2(b) - float2(perspective);
 		float da = B.x*A.y - A.x*B.y;
 		// If the aimed angle of pred->A is smaller than aimed angle of pred->B, then
 		// A should come before; or if the three points pred, A and B lie on the same line,
 		// then the closer one of A and B to pred should come before.
-		return da < 0 || (da == 0 && A.LengthSq() < B.LengthSq());
+		return da < -epsilon || (da < epsilon && A.LengthSq() < B.LengthSq());
 	}
 };
 
@@ -134,7 +135,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 	int h = 1; // Points to the index of the last point added to the hull so far. The first two points are in the hull to start.
 
 	float2 a = p[h] - p[h-1];
-	const float epsilon = 1e-5f;
+	const float epsilon = 1e-4f;
 	for(int i = 2; i < n; ++i)
 	{
 		// The last two added points determine a line, check which side of that line the next point to be added lies in.
