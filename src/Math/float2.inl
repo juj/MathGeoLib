@@ -41,9 +41,17 @@ bool LexSortPred(const T &a, const T &b)
 }
 
 template<typename T>
-float PerpDot2D(const T &O, const T &A, const T &B)
+float PerpDot2D(const T &o, const T &a, const T &b)
 {
-	return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+	return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+}
+
+template<typename T>
+float DistSq2D(const T &a, const T &b)
+{
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	return dx*dx + dy*dy;
 }
 
 /// Implements Andrew's Monotone chain 2D convex hull algorithm.
@@ -58,14 +66,14 @@ int float2_ConvexHullInPlace(T *p, int n)
 	// Scan left to right for the bottom side.
 	for (int i = 0; i < n; ++i)
 	{
-		while (k >= 2 && PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0) --k;
+		while (k >= 2 && (PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0 || DistSq2D(p[i], hull[k-1]) < 1e-8f)) --k;
 		hull[k++] = p[i];
 	}
 
 	// Come back scanning right to left for the top side.
 	const int start = k+1;
 	for (int i = n-2; i >= 0; --i) {
-		while (k >= start && PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0) --k;
+		while (k >= start && (PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0 || DistSq2D(p[i], hull[k-1]) < 1e-8f)) --k;
 		hull[k++] = p[i];
 	}
 	assert(k <= n+1);
