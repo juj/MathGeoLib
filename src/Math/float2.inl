@@ -64,16 +64,19 @@ int float2_ConvexHullInPlace(T *p, int n)
 	std::sort(p, p + n, LexSortPred<T>);
 
 	// Scan left to right for the bottom side.
-	for (int i = 0; i < n; ++i)
+	for(int i = 0; i < n; ++i)
 	{
-		while (k >= 2 && (PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0 || DistSq2D(p[i], hull[k-1]) < 1e-8f)) --k;
+		while (k >= 2 && PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0)
+			--k;
 		hull[k++] = p[i];
 	}
 
 	// Come back scanning right to left for the top side.
 	const int start = k+1;
-	for (int i = n-2; i >= 0; --i) {
-		while (k >= start && (PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0 || DistSq2D(p[i], hull[k-1]) < 1e-8f)) --k;
+	for(int i = n-2; i >= 0; --i)
+	{
+		while (k >= start && PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0)
+			--k;
 		hull[k++] = p[i];
 	}
 	assert(k <= n+1);
@@ -82,10 +85,21 @@ int float2_ConvexHullInPlace(T *p, int n)
 	// to avoid having duplicate data in the outputted hull, drop the
 	// last coordinate.
 	--k;
+	
+	const float eps = 1e-6f;
 
-	memcpy(p, hull, k*sizeof(T));
+	// For numerical stability, clean up the generated convex hull by erasing duplicate entries.
+	int h = 0;
+	p[0] = hull[0];
+	for(int i = 1; i < k; ++i)
+	{
+		if (DistSq2D(hull[i], p[h]) > eps)
+			p[++h] = hull[i];
+	}
+	while(DistSq2D(p[h], p[0]) < eps && h > 0) --h;
+
 	delete[] hull;
-	return k;
+	return h+1;
 }
 
 MATH_END_NAMESPACE
