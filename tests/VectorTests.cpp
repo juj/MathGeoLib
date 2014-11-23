@@ -1165,6 +1165,52 @@ UNIQUE_TEST(float2_MinAreaRect_Case_3)
 	assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
+UNIQUE_TEST(float2_MinAreaRect_Case_4)
+{
+	const int n = 7;
+	float2 p[n];
+	p[0] = float2(-10.606602668762207f,-10.f);
+	p[1] = float2(31.819807052612305f,15.f);
+	p[2] = float2(17.677671432495117f,-10.f);
+	p[3] = float2(7.071068286895752f,20.f);
+	p[4] = float2(-31.819807052612305f,-10.f);
+	p[5] = float2(31.819807052612305f,-10.f);
+	p[6] = float2(3.535534143447876f,20.f);
+	float2 h[n];
+	memcpy(h, p, sizeof(h));
+
+	float2 c[n];
+	memcpy(c, p, sizeof(c));
+
+	int numPointsInConvexHull = float2::ConvexHullInPlace(c, n);
+
+	for(int i = 0; i < n; ++i)
+		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+
+	float2 center, uDir, vDir;
+	float minU, maxU, minV, maxV;
+	float2::MinAreaRectInPlace(h, n, center, uDir, vDir, minU, maxU, minV, maxV);
+
+	float diffUMin = FLOAT_INF, diffUMax = FLOAT_INF, diffVMin = FLOAT_INF, diffVMax = FLOAT_INF;
+	const float epsilon = 1e-3f;
+	for(int i = 0; i < n; ++i)
+	{
+		float2 d = p[i];
+		float x = d.Dot(uDir);
+		diffUMin = MATH_NS::Min(diffUMin, x - minU);
+		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
+		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		float y = d.Dot(vDir);
+		diffVMin = MATH_NS::Min(diffVMin, y - minV);
+		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
+		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+	}
+	assert1(diffUMin <= 1e-5f, diffUMin);
+	assert1(diffUMax <= 1e-5f, diffUMax);
+	assert1(diffVMin <= 1e-5f, diffVMin);
+	assert1(diffVMax <= 1e-5f, diffVMax);
+}
+
 RANDOMIZED_TEST(float2_MinAreaRect)
 {
 	const int s = 100;

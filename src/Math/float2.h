@@ -663,4 +663,7 @@ Q_DECLARE_METATYPE(float2)
 Q_DECLARE_METATYPE(float2*)
 #endif
 
+template<typename T>
+int float2_ConvexHullInPlace(T *p, int n);
+
 MATH_END_NAMESPACE
