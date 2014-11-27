@@ -153,6 +153,21 @@ public:
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
 
+	// Computes the most extreme point of this convex Polyhedron into the given direction.
+	/** @param adjacencyData A precomputed data structure that specifies the adjacency information between the vertices of this Polyhedron.
+			Call GenerateVertexAdjacencyData() to compute this structure.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@param floodFillVisited A temporary structure to an array of size |V| where each element specifies whether the extreme
+			vertex search has visited that vertex or not. If floodFillVisited[i] == floodFillVisitColor, then the vertex i
+			has been visited, otherwise not.
+		@param mostExtremeDistance [out] Receives the 1D projection distance of the most extreme vertex onto the direction vector.
+		@param startingVertex [optional] Specifies a hint vertex from where to start the search. Specifying a know vertex that is close
+			to being the most extreme vertex in the given direction may speed up the search.
+		@return The index of the most extreme vertex into the specified direction. */
+	int ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction, 
+		std::vector<int> &floodFillVisited, int floodFillVisitColor, float &mostExtremeDistance, int startingVertex = 0) const;
+
 	/// Projects this Polyhedron onto the given 1D axis direction vector.
 	/** This function collapses this Polyhedron onto an 1D axis for the purposes of e.g. separate axis test computations.
 		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
@@ -192,6 +207,11 @@ public:
 #endif
 
 	void MergeAdjacentPlanarFaces();
+
+	/// Computes a data structure that specifies adjacent vertices for each vertex.
+	/** In the returned vector of vectors V, the vector V[i] specifies all the vertex indices that vertex i
+		is connected to. */
+	std::vector<std::vector<int> > GenerateVertexAdjacencyData() const;
 
 	/// Tests if the faces in this polyhedron refer to valid existing vertices.
 	/** This function performs sanity checks on the face indices array.
@@ -412,6 +432,7 @@ public:
 	TriangleArray Triangulate() const;
 
 	std::string ToString() const;
+	void DumpStructure() const;
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart = 0, int faceEnd = 0x7FFFFFFF) const;

@@ -214,6 +214,45 @@ vec Polyhedron::ExtremePoint(const vec &direction) const
 	return Vertex(ExtremeVertex(direction));
 }
 
+int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction, 
+	std::vector<int> &floodFillVisited, int floodFillVisitColor,
+	float &mostExtremeDistance, int startingVertex) const
+{
+	mostExtremeDistance = Dot(direction, Vertex(startingVertex));
+	int prevVertex;
+	do
+	{
+		prevVertex = startingVertex;
+		const std::vector<int> &neighbors = adjacencyData[startingVertex];
+		for(size_t i = 0; i < neighbors.size(); ++i)
+		{
+			int v = neighbors[i];
+			if (floodFillVisited[v] == floodFillVisitColor)
+				continue;
+			floodFillVisited[v] = floodFillVisitColor;
+			float d = Dot(direction, Vertex(v));
+			if (d > mostExtremeDistance)
+			{
+				mostExtremeDistance = d;
+				startingVertex = v;
+				break;
+			}
+			if (d > mostExtremeDistance - 1e-3f)
+			{
+				float subSearchMostExtreme;
+				int ev = ExtremeVertexConvex(adjacencyData, direction, floodFillVisited, floodFillVisitColor, subSearchMostExtreme, v);
+				if (subSearchMostExtreme > mostExtremeDistance)
+				{
+					mostExtremeDistance = subSearchMostExtreme;
+					startingVertex = ev;
+					break;
+				}
+			}
+		}
+	} while(prevVertex != startingVertex);
+	return startingVertex;
+}
+
 void Polyhedron::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
 {
 	///\todo Optimize!
@@ -409,6 +448,9 @@ bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 	{
 		const Face &face = f[i];
 		if (face.v.size() < 3)
+			return false;
+		float area = FacePolygon(i).Area();
+		if (!(area > 0.f)) // Test with negation for NaNs.
 			return false;
 		if (face.v.size() >= 4)
 		{
@@ -1352,10 +1394,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	face.v[0] = 1; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
 	p.OrientNormalsOutsideConvex(); // Ensure that the winding order of the generated tetrahedron is correct for each face.
 
-	assert(p.IsClosed());
-	assert(p.IsConvex());
-	assert(p.FaceIndicesValid());
-	assert(p.EulerFormulaHolds());
+//	assert(p.IsClosed());
+//	assert(p.IsConvex());
+//	assert(p.FaceIndicesValid());
+//	assert(p.EulerFormulaHolds());
 //	assert(p.FacesAreNondegeneratePlanar());
 
 	// For better performance, merge the remaining extreme points first.
@@ -1385,9 +1427,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 //			break;
 	}
 
-	assert(p.FaceIndicesValid());
-	assert(p.IsClosed());
-	assert(p.IsConvex());
+//	assert(p.FaceIndicesValid());
+//	assert(p.IsClosed());
+//	assert(p.IsConvex());
 	p.RemoveRedundantVertices();
 	return p;
 }
@@ -1699,6 +1741,25 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 	///\todo
 }
 
+std::vector<std::vector<int> > Polyhedron::GenerateVertexAdjacencyData() const
+{
+	std::vector<std::vector<int> > adjacencyData;
+	adjacencyData.reserve(v.size());
+	adjacencyData.insert(adjacencyData.end(), v.size(), std::vector<int>());
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		const Face &face = f[i];
+		int v0 = face.v.back();
+		for(size_t j = 0; j < face.v.size(); ++j)
+		{
+			int v1 = face.v[j];
+			adjacencyData[v0].push_back(v1);
+			v0 = v1;
+		}
+	}
+	return adjacencyData;
+}
+
 int CmpFaces(const Polyhedron::Face &a, const Polyhedron::Face &b)
 {
 	if (a.v.size() != b.v.size())
@@ -1865,6 +1926,13 @@ std::string Polyhedron::ToString() const
 	}
 	ss << ")";
 	return ss.str();
+}
+
+void Polyhedron::DumpStructure() const
+{
+	LOGI("Polyhedron volume: %f", Volume());
+	for(size_t i = 0; i < f.size(); ++i)
+		LOGI("Face %d: %s (area: %f", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area());
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
