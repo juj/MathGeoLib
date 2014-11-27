@@ -312,7 +312,10 @@ public:
 			This pointer may be left null, if this information is of no interest.
 		@param idxLargest [out] The index of the largest point along the given direction will be received here.
 			This pointer may be left null, if this information is of no interest. */
-	static void ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int numPoints, int &idxSmallest, int &idxLargest);
+	static void ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int numPoints, int &idxSmallest, int &idxLargest) { float smallestD, largestD; ExtremePointsAlongDirection(dir, pointArray, numPoints, idxSmallest, idxLargest, smallestD, largestD); }
+	/** @param smallestD [out] Receives the minimum projection distance along the given direction.
+		@param largestD [out] Receives the maximum projection distance along the given direction. */
+	static void ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int numPoints, int &idxSmallest, int &idxLargest, float &smallestD, float &largestD);
 
 #if 0
 	/// Generates an OBB that encloses the given point set.
@@ -326,6 +329,11 @@ public:
 
 	///\todo This function is strongly WIP! (Works, but is very very slow!)
 	static OBB OptimalEnclosingOBB(const vec *pointArray, int numPoints);
+
+	static OBB FastEnclosingOBB(const vec *pointArray, int numPoints);
+
+	/// Returns an OBB that is oriented to the coordinate frame specified by vectors dir0 and dir1 and encloses the given point set.
+	static OBB FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, const vec &dir0, const vec &dir1);
 
 	/// Generates a random point inside this OBB.
 	/** The points are distributed uniformly.
