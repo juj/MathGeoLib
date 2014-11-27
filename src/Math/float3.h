@@ -395,7 +395,7 @@ public:
 
 	/// Tests if two vectors are perpendicular to each other.
 	/** @see IsNormalized(), IsZero(), IsPerpendicular(), Equals(). */
-	bool IsPerpendicular(const float3 &other, float epsilonSq = 1e-8f) const;
+	bool IsPerpendicular(const float3 &other, float epsilonSq = 1e-5f) const;
 
 	/// Tests if the points p1, p2 and p3 lie on a straight line, up to the given epsilon.
 	/** @see AreOrthogonal(), AreOrthonormal(), Line::AreCollinear(). */

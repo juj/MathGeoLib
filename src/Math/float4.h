@@ -464,9 +464,9 @@ public:
 	bool IsFinite() const;
 
 	/// Tests if the (x, y, z) parts of two vectors are perpendicular to each other.
-	bool IsPerpendicular3(const float4 &other, float epsilonSq = 1e-8f) const;
+	bool IsPerpendicular3(const float4 &other, float epsilonSq = 1e-5f) const;
 
-	bool IsPerpendicular(const float4 &other, float epsilonSq = 1e-8f) const;
+	bool IsPerpendicular(const float4 &other, float epsilonSq = 1e-5f) const;
 
 	/// Makes the given vectors linearly independent.
 	/** This function directly follows the Gram-Schmidt procedure on the input vectors.
