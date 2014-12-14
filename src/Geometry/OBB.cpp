@@ -817,6 +817,11 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 #endif
 	float minVolume = FLOAT_INF;
 
+	tick_t t0 = Clock::Tick();
+	// Precomputation: Generate the convex hull of the input point set. This is because
+	// we need vertex-edge-face connectivity information about the convex hull shape, and
+	// this also allows discarding all points in the interior of the input hull, which
+	// are irrelevant.
 	Polyhedron convexHull = Polyhedron::ConvexHull(pointArray, numPoints);
 	if (!pointArray || convexHull.v.size() == 0)
 	{
@@ -825,10 +830,13 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 	}
 
 	tick_t t1 = Clock::Tick();
+	TIMING("Convexhull: %f msecs", Clock::TimespanToMillisecondsF(t0, t1));
+	// Precomputation: For each vertex in the convex hull, compute their neighboring vertices.
 	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData();
 	tick_t t2 = Clock::Tick();
 	TIMING("Adjacencygeneration: %f msecs", Clock::TimespanToMillisecondsF(t1, t2));
 
+	// Precomputation: Compute normalized face direction vectors for each face of the hull.
 	std::vector<vec> faceNormals;
 	faceNormals.reserve(convexHull.NumFaces());
 	for(int i = 0; i < convexHull.NumFaces(); ++i)
@@ -886,17 +894,20 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 
 	std::vector<int> traverseStack;
 
+	int startingVertex = 0;
 	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
 
 		float dummy;
-		int startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor++, dummy, 0); // O(log(|V|)?
+		// Micro-opt: start the search for the extreme vertex from the extreme vertex that was found during the previous iteration for
+		// the previous edge. This slightly speeds up the search since edges have some amount of spatial locality.
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor++, dummy, startingVertex); // O(log(|V|)?
 
 		traverseStack.push_back(startingVertex);
 
-		while(!traverseStack.empty()) // In amortized analyisis, only a constant number of vertices are antipodal points for any edge?
+		while(!traverseStack.empty()) // In amortized analysis, only a constant number of vertices are antipodal points for any edge?
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
@@ -909,7 +920,7 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 			for(size_t j = 0; j < n.size(); ++j)
 			{
 				/*
-					Is an edge and a vertex compatible?
+					Is an edge and a vertex compatible to be antipodal?
 
 					n1 = f1b + (f1a-f1b)*t
 					e { v-vn }
@@ -957,6 +968,98 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 
 	tick_t t4 = Clock::Tick();
 	TIMING("Antipodalpoints: %f msecs", Clock::TimespanToMillisecondsF(t3, t4));
+
+#if 0
+	// Precomputation: Compute all potential sidepodal vertices for each edge.
+	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	{
+		vec e = (convexHull.v[edges[i].first] - convexHull.v[edges[i].second]).Normalized();
+		vec f1a = faceNormals[facesForEdge[i].first];
+		vec f1b = faceNormals[facesForEdge[i].second];
+
+		float dummy;
+		// Micro-opt: start the search for the extreme vertex from the extreme vertex that was found during the previous iteration for
+		// the previous edge. This slightly speeds up the search since edges have some amount of spatial locality.
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, e, floodFillVisited, floodFillVisitColor++, dummy, startingVertex); // O(constant)?
+
+		traverseStack.push_back(startingVertex);
+
+		while(!traverseStack.empty()) // In amortized analysis, only a O(sqrt(|V|) number of vertices are sidepodal points for any edge?
+		{
+			int v = traverseStack.back();
+			traverseStack.pop_back();
+
+			floodFillVisited[v] = floodFillVisitColor;
+
+			float tMin = 0.f;
+			float tMax = 1.f;
+			const std::vector<int> &n = adjacencyData[v];
+			for(size_t j = 0; j < n.size(); ++j)
+			{
+				/*
+					Is an edge and a vertex compatible to be sidepodal?
+
+					n1 = f1b + (f1a-f1b)*t
+					n2.n1 = 0
+					e { v-vn }
+					n2.e <= 0
+
+					n2=(x,y,z)
+					n2.(f1b + (f1a-f1b)*t) = 0
+					n2.f1b + t*n2.(f1a-f1b) = 0
+
+					if n2.(f1a-f1b) != 0:
+					    t = -n2.f1b / (n2.(f1a-f1b))
+
+					n2.e <= 0
+					x*e.x + y*e.y + z*e.z <= 0
+
+					x*(f1b.x + (f1a.x-f1b.x)*t) + y*(f1b.y + (f1a.y-f1b.y)*t) + z*(f1b.z + (f1a.z-f1b.z)*t) = 0
+					x*e.x + y*e.y + z*e.z + r_e == 0, r_e >= 0
+
+					// XXX v
+
+					n1.e <= 0
+					(f1b + (f1a-f1b)*t).e <= 0
+					t*(f1a-f1b).e <= -f1b.e 
+					if (f1a-f1b).e > 0:
+						t <= -f1b.e / (f1a-f1b).e && t \in [0,1]
+						-f1b.e / (f1a-f1b).e >= 0
+						f1b.e <= 0
+					if (f1a-f1b).e < 0:
+						t >= -f1b.e / (f1a-f1b).e && t \in [0,1]
+						-f1b.e / (f1a-f1b).e <= 1
+						-f1b.e >= (f1a-f1b).e
+						f1b.e + (f1a-f1b).e <= 0 
+					if (f1a-f1b).e == 0:
+						0 <= -f1b.e
+				*/
+				vec e = convexHull.v[v] - convexHull.v[n[j]];
+				float s = (f1a-f1b).Dot(e);
+				float n = -f1b.Dot(e);
+				if (s > 0.f)
+					tMax = Min(tMax, n / s);
+				else if (s < 0.f)
+					tMin = Max(tMin, n / s);
+				else if (n < 0.f)
+					tMax = tMin - 1.f;
+
+				// The interval of possible solutions for t closed?
+				if (tMax < tMin)
+					break;
+			}
+
+			if (tMin <= tMax)
+			{
+				antipodalPointsForEdge[i].push_back(v);
+				for(size_t j = 0; j < n.size(); ++j)
+					if (floodFillVisited[n[j]] != floodFillVisitColor)
+						traverseStack.push_back(n[j]);
+			}
+		}
+		++floodFillVisitColor;
+	}
+#endif
 
 	// Precomputation: Compute all potential companion edges for each edge.
 	// This is O(|E|^2)
@@ -1105,6 +1208,8 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 	VecArray dirs;
 	dirs.reserve((numPoints * (numPoints-1)) / 2);
 
+	std::vector<std::pair<int, int> > opposingEdges;
+
 	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the convex hull
 	// from two opposing faces. This is O(|E|)?
 	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
@@ -1138,6 +1243,7 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 				if (success)
 				{
 					dirs.push_back(n.Normalized());
+					//opposingEdges.push_back(std::make_pair(i, edge));
 				}
 			}
 		}
@@ -1145,13 +1251,105 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 
 	tick_t t7 = Clock::Tick();
 	TIMING("Edgepairsforfaces: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t6, t7), (int)dirs.size());
+#if 0
+	for(size_t i = 0; i < opposingEdges.size(); ++i) // O(|E|)
+	{
+		int edgeI = opposingEdges[i].first;
+		int edgeJ = opposingEdges[i].second;
+		vec f1a = faceNormals[facesForEdge[edgeI].first];
+		vec f1b = faceNormals[facesForEdge[edgeI].second];
+		vec f2a = faceNormals[facesForEdge[edgeJ].first];
+		vec f2b = faceNormals[facesForEdge[edgeJ].second];
+
+		const std::vector<int> &compatibleEdgesI = compatibleEdges[edgeI];
+		const std::vector<int> &compatibleEdgesJ = compatibleEdges[edgeJ];
+
+		vec n1;
+		bool success = AreCompatibleOpposingEdges(f1a, f1b, f2a, f2b, n1);
+		if (!success) LOGE("Asd");
+		n1.Normalize();
+
+		size_t s_i = 0;
+		size_t s_j = 0;
+		while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(|E|))?
+		{
+			if (compatibleEdgesI[s_i] == compatibleEdgesJ[s_j])
+			{
+				int edgeK = compatibleEdgesJ[s_j];
+
+				// Test edge triplet i, edgeJ, edgeK.
+				vec f3a = faceNormals[facesForEdge[edgeK].first];
+				vec f3b = faceNormals[facesForEdge[edgeK].second];
+
+				vec e3 = (convexHull.v[edges[edgeK].first] - convexHull.v[edges[edgeK].second]).Normalized();
+				vec n2 = n1.Cross(e3);
+				if (n2.IsZero()) LOGE("Asfd");
+				n2.Normalize();
+				if (n2.Dot(f3a) < 0.f)
+					n2 = -n2;
+
+				vec n3 = n1.Cross(n2).Normalized();
+
+				// Compute the most extreme points in each direction.
+				float minN1 = n1.Dot(convexHull.v[edges[edgeJ].first]);
+				float maxN1 = n1.Dot(convexHull.v[edges[edgeI].first]);
+				if (minN1 > maxN1) LOGE("ASFDASDF");
+
+				float maxN2 = n2.Dot(convexHull.v[edges[edgeK].first]);
+
+//				float dMin, dMax;
+				float minN2 = FLOAT_INF;
+				convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, antipodalPointsForEdge[edgeK][0]); // O(constant)?
+				minN2 = -minN2;
+				convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, antipodalPointsForEdge[edgeK][0]); // O(constant)?
+//				for(size_t l = 0; l < antipodalPointsForEdge[edgeK].size(); ++l) // O(constant)?
+//					minN2 = Min(minN2, n2.Dot(convexHull.v[antipodalPointsForEdge[edgeK][l]]));
+
+				if (minN2 > maxN2) Swap(minN2, maxN2);//LOGE("N2ASFDASDF");
+
+				float minN3, maxN3;
+				convexHull.ExtremeVertexConvex(adjacencyData, n3, floodFillVisited, floodFillVisitColor++, maxN3, 0); // O(log|V|)?
+				convexHull.ExtremeVertexConvex(adjacencyData, -n3, floodFillVisited, floodFillVisitColor++, minN3, 0); // O(log|V|)?
+				minN3 = -minN3;
+
+				if (minN3 > maxN3) LOGE("N3ASFDASDF");
+
+				float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
+				if (volume < minVolume)
+				{
+					minOBB.axis[0] = n1;
+					minOBB.axis[1] = n2;
+					minOBB.axis[2] = n3;
+					minOBB.r[0] = (maxN1 - minN1) * 0.5f;
+					minOBB.r[1] = (maxN2 - minN2) * 0.5f;
+					minOBB.r[2] = (maxN3 - minN3) * 0.5f;
+					minOBB.pos = (minN1 + minOBB.r[0])*n1 + (minN2 + minOBB.r[1])*n2 + (minN3 + minOBB.r[2])*n3;
+					LOGI("Min volume  %f -> %f", minVolume, volume);
+					OBB check = OBB::FixedOrientationEnclosingOBB(&convexHull.v[0], convexHull.v.size(), n1, n2);
+					minVolume = volume;
+
+
+				}
+				++s_i;
+				++s_j;
+			}
+			else if (compatibleEdgesI[s_i] < compatibleEdgesJ[s_j])
+				++s_i;
+			else
+				++s_j;
+		}
+	}
+
+#endif
+	tick_t t72 = Clock::Tick();
+//	TIMING("Edgepairsforfaces_test: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t7, t72), (int)dirs.size());
 
 	// Main algorithm body for computing all search directions where the OBB touches two edges on the same face.
 	for(size_t i = 0; i < convexHull.f.size(); ++i) // O(|F|)
 		dirs.push_back(faceNormals[i]);
 
 	tick_t t8 = Clock::Tick();
-	TIMING("Facenormalsgen: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t7, t8), (int)convexHull.f.size());
+	TIMING("Facenormalsgen: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t72, t8), (int)convexHull.f.size());
 
 	tick_t t9 = Clock::Tick();
 
@@ -1196,6 +1394,107 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 			minVolume = volume;
 		}
 	}
+
+#if 0
+	// Main algorithm body for testing all search directions. This is O(|E|*|V|)
+	for(size_t i = 0; i < dirs.size(); ++i) // O(|E|)
+	{
+		vec edge = dirs[i];
+
+		float dMin, dMax;
+		convexHull.ExtremeVertexConvex(adjacencyData, -edge, floodFillVisited, floodFillVisitColor++, dMin, 0); // O(log|V|)?
+		convexHull.ExtremeVertexConvex(adjacencyData, edge, floodFillVisited, floodFillVisitColor++, dMax, 0); // O(log|V|)?
+
+		float edgeLength = dMin+dMax;
+
+		vec u, v;
+		edge.PerpendicularBasis(u, v);
+
+		float dummy;
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, u, floodFillVisited, floodFillVisitColor++, dummy, startingVertex); // O(log|V|)?
+
+#define PROJ_UV(pt) float2(pt.Dot(u), pt.Dot(v))
+		float2 firstVertex = PROJ_UV(convexHull.v[startingVertex]);
+		pts.clear();
+		pts.push_back(firstVertex);
+		traverseStack.push_back(startingVertex);
+//		LOGI("First: %d", startingVertex);
+
+		while(!traverseStack.empty())
+		{
+			int vx = traverseStack.back();
+//			LOGI("traversing %d", vx);
+			traverseStack.pop_back();
+
+			floodFillVisited[vx] = floodFillVisitColor;
+
+			const std::vector<int> &n = adjacencyData[vx];
+			float2 thisVtx = PROJ_UV(convexHull.v[vx]);
+			float2 bestVtx = PROJ_UV(convexHull.v[n[0]]);
+			int bestVtxIndex = n[0];
+			for(size_t j = 1; j < n.size(); ++j)
+			{
+				int vAdj = n[j];
+				if (floodFillVisited[vAdj] == floodFillVisitColor)
+					continue;
+
+				float2 pt = PROJ_UV(convexHull.v[vAdj]);
+				if (float2::OrientedCCW(thisVtx, pt, bestVtx))
+				{
+					bestVtx = pt;
+					bestVtxIndex = vAdj;
+				}
+			}
+
+			if (floodFillVisited[bestVtxIndex] != floodFillVisitColor)
+			{
+				if (!bestVtx.Equals(firstVertex))
+				{
+					pts.push_back(bestVtx);
+					traverseStack.push_back(bestVtxIndex);
+				}
+			}
+		}
+		++floodFillVisitColor;
+
+//		for(int k = 0; k < numPoints; ++k) // O(|V|)
+//			pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
+
+		float2 rectCenter;
+		float2 uDir;
+		float2 vDir;
+		float minU, maxU, minV, maxV;
+		float rectArea = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV); // O(|V|)
+		float volume = rectArea * edgeLength;
+
+		// TESTT
+		pts.clear();
+		for(int k = 0; k < numPoints; ++k) // O(|V|)
+			pts.push_back(float2(pointArray[k].Dot(u), pointArray[k].Dot(v)));
+		float rectArea2 = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV); // O(|V|)
+		if (!EqualAbs(rectArea, rectArea2)) LOGE("ERRORR %f vs %f", rectArea, rectArea2);
+
+
+
+		if (volume < minVolume)
+		{
+			float2 c10 = (maxV - minV) * vDir;
+			float2 c20 = (maxU - minU) * uDir;
+			float2 center = 0.5f * (uDir * (minU+maxU) + vDir * (minV+maxV));
+			vec C1 = c10.x*u + c10.y*v;
+			vec C2 = c20.x*u + c20.y*v;
+			minOBB.axis[0] = edge;
+			vec rectCenterPos = vec(POINT_VEC_SCALAR(0.f)) + center.x*u + center.y*v;
+			minOBB.pos = (-dMin+dMax) * 0.5f * edge + rectCenterPos;
+			minOBB.r[0] = edgeLength * 0.5f;
+			minOBB.r[1] = C1.Normalize()*0.5f;
+			minOBB.r[2] = C2.Normalize()*0.5f;
+			minOBB.axis[1] = C1;
+			minOBB.axis[2] = C2;
+			minVolume = volume;
+		}
+	}
+#endif
 	tick_t t10 = Clock::Tick();
 	TIMING("Testdirs: %f msecs", Clock::TimespanToMillisecondsF(t9, t10));
 
@@ -1510,7 +1809,7 @@ OBB OBB::FastEnclosingOBB(const vec *pointArray, int numPoints)
 
 			vec edgeA, edgeB;
 			float volume = SmallestOBBVolumeJiggle(edge, convexHull, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
-				3, edgeA, edgeB);
+				0, edgeA, edgeB);
 
 			if (volume < minVolume)
 			{
