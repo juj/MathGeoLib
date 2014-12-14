@@ -565,12 +565,26 @@ bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexH
 float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV)
 {
 	assume(p || n == 0);
-	if (!p)
-		return 0.f;
+	if (!p || n <= 0)
+	{
+		center = uDir = vDir = float2::nan;
+		minU = maxU = minV = maxV = FLOAT_NAN;
+		return FLOAT_NAN;
+	}
 
 	// As a preparation, need to compute the convex hull so that points are CCW-oriented,
 	// and this also greatly reduces the number of points for performance.
 	n = float2::ConvexHullInPlace(p, n);
+	assert(n > 0);
+	if (n == 1)
+	{
+		center = p[0];
+		uDir = float2(1,0);
+		vDir = float2(0,1);
+		minU = maxU = center.x;
+		minV = maxV = center.y;
+		return 0.f;
+	}
 
 	// e[i] point to the antipodal point pairs: e[0] and e[2] are pairs, so are e[1] and e[3].
 	float2 *e[4] = { p, p, p, p };
