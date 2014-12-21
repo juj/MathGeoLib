@@ -233,7 +233,7 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 			if (d > bestD)
 			{
 				bestD = d;
-				bestNeighbor = startingVertex;
+				bestNeighbor = neighbors[i];
 			}
 		}
 		if (bestNeighbor == -1 || floodFillVisited[bestNeighbor] == floodFillVisitColor)
