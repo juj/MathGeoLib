@@ -329,8 +329,9 @@ public:
 
 	///\todo This function is strongly WIP! (Works, but is very very slow!)
 	static OBB OptimalEnclosingOBB(const vec *pointArray, int numPoints);
+	static OBB OptimalEnclosingOBB(const Polyhedron &convexPolyhedron);
 
-	static OBB FastEnclosingOBB(const vec *pointArray, int numPoints);
+	static OBB BruteEnclosingOBB(const vec *pointArray, int numPoints);
 
 	/// Returns an OBB that is oriented to the coordinate frame specified by vectors dir0 and dir1 and encloses the given point set.
 	static OBB FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, const vec &dir0, const vec &dir1);
