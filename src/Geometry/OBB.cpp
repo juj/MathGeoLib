@@ -721,21 +721,63 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	float b = (f1a-f1b).Dot(f2b);
 	float c = (f2a-f2b).Dot(f1b);
 	float d = (f1a-f1b).Dot(f2a-f2b);
+
+	// a+b = f1a.Dot(f2b)
+	// c+d = f1a.Dot(f2a-f2b)
+
+	// x := f1a.Dot(f2b)
+	// y := f1a.Dot(f2a)
+
+	// x / (y-x)
+
 	if (d == 0.f)
 	{
+#if 0
 		if (c != 0.f)
 		{
+			/*
 			float u_t0 = -a/c;
 			float u_t1 = -(a+b)/c;
 			if (Max(u_t0, u_t1) < -epsilon || Min(u_t0, u_t1) > 1.f + epsilon)
 				return false;
+			*/
+			// if (-Min(a/c, (a+b)/c) < -epsilon || -Max(a/c, (a+b)/c) > 1.f + epsilon)
+			// if (Min(a/c, (a+b)/c) > epsilon || Max(a/c, (a+b)/c) < -1.f - epsilon)
+
+			// c > 0:
+			//   if (Min(a, a+b) > c*epsilon || Max(a, a+b) < c * (-1.f - epsilon))
+			// c < 0:
+			//   if (Max(a, a+b) < c*epsilon || Min(a, a+b) > c * (-1.f - epsilon))
+		}
+#endif
+		if (c > 0.f)
+		{
+			if (Min(a, a+b) > c*epsilon || Max(a, a+b) < c * (-1.f - epsilon))
+				return false;
+		}
+		else if (c < 0.f)
+		{
+			if (Max(a, a+b) < c*epsilon || Min(a, a+b) > c * (-1.f - epsilon))
+				return false;
 		}
 		else
 		{
+#if 0
 			if (b != 0.f)
 			{
 				float t = -a / b;
 				if (t < -epsilon || t > 1.f + epsilon)
+					return false;
+			}
+#endif
+			if (b > 0.f)
+			{
+				if (a > b * epsilon || a < b * (-1.f - epsilon))
+					return false;
+			}
+			else if (b < 0.f)
+			{
+				if (a < b * epsilon || a > b * (-1.f - epsilon))
 					return false;
 			}
 			else if (a != 0.f)
@@ -746,15 +788,19 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	{
 //		float a_b = f1a.Dot(f2b);
 //		float c_d = f1a.Dot(f2a-f2b);
-		float denomZero = -c / d;
-		float t1 = -a/c;
-		float t2 = -(a+b)/(c+d);//-a_b/c_d;
-		if (denomZero == 0.f || denomZero == 1.f)
+//		float denomZero = -c / d;
+
+		if (c == 0.f || c == -d)
+		// if (denomZero == 0.f || denomZero == 1.f)
 		{
+			float t1 = -a/c;
+			float t2 = -(a+b)/(c+d);//-a_b/c_d;
+
 			float deriv = a*d-b*c;
 			if (deriv == 0.f)
 				return t1 >= 0.f && t2 <= 1.f;
-			if (denomZero == 0.f)
+			if (c == 0.f)
+//			if (denomZero == 0.f)
 			{
 				return (deriv > 0.f && t2 >= 0.f) || (deriv < 0.f && t2 <= 1.f);
 			}
@@ -763,16 +809,42 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 				return (deriv > 0.f && t1 >= 0.f) || (deriv < 0.f && t1 <= 1.f);
 			}
 		}
+
+		float t1cd = -a*(c+d);
+		float t2c = -(a+b)*c;
+		float denom = c*(c+d);
+
 //			LOGI("t1: %f, t2: %f", t1, t2);
-		if (denomZero > 0.f && denomZero < 1.f)
+		//if (denomZero > 0.f && denomZero < 1.f)
+		if ((d > 0.f && c < 0.f && c > -d) || (d < 0.f && c > 0.f && c < -d))
 		{
-			if (Min(t1, t2) < -epsilon && Max(t1, t2) > 1.f + epsilon)
-				return false;
+			if (denom > 0.f)
+			{
+				if (Min(t1cd, t2c) < denom * -epsilon && Max(t1cd, t2c) > denom * (1.f + epsilon))
+					return false;
+			}
+			else
+			{
+				if (Max(t1cd, t2c) > denom * -epsilon && Min(t1cd, t2c) < denom * (1.f + epsilon))
+					return false;
+			}
+//			if (Min(t1, t2) < -epsilon && Max(t1, t2) > 1.f + epsilon)
+//				return false;
 		}
 		else
 		{
-			if (Max(t1, t2) < -epsilon || Min(t1, t2) > 1.f + epsilon)
-				return false; // If no solution for the two edges already, skip to next edge configuration.
+			if (denom > 0.f)
+			{
+				if (Max(t1cd, t2c) < denom * -epsilon || Min(t1cd, t2c) > denom * (1.f + epsilon))
+					return false;
+			}
+			else
+			{
+				if (Min(t1cd, t2c) > denom * -epsilon || Max(t1cd, t2c) < denom * (1.f + epsilon))
+					return false;
+			}
+//			if (Max(t1, t2) < -epsilon || Min(t1, t2) > 1.f + epsilon)
+//				return false; // If no solution for the two edges already, skip to next edge configuration.
 		}
 	}
 	return true;
