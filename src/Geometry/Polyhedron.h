@@ -238,6 +238,9 @@ public:
 	/// Removes from the vertex array all vertices that are not referred to by any of the faces of this polyhedron.
 	void RemoveRedundantVertices();
 
+	/// Removes all faces from this polyhedron which have two or less vertices in them.
+	void RemoveDegenerateFaces();
+
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */
 	bool IsNull() const { return v.empty() && f.empty(); }

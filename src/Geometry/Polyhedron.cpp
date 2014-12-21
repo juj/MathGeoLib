@@ -40,6 +40,8 @@
 #include "Sphere.h"
 #include "Capsule.h"
 
+#include <unordered_map>
+
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
 #endif
@@ -314,7 +316,11 @@ float Polyhedron::SurfaceArea() const
 {
 	float area = 0.f;
 	for(int i = 0; i < NumFaces(); ++i)
+	{
+		if (f[i].v.size() < 3)
+			continue; // Silently ignore degenerate faces.
 		area += FacePolygon(i).Area(); ///@todo Optimize temporary copies.
+	}
 	return area;
 }
 
@@ -324,6 +330,8 @@ float Polyhedron::Volume() const
 	float volume = 0.f;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
+		if (f[i].v.size() < 3)
+			continue; // Silently ignore degenerate faces.
 		Polygon face = FacePolygon(i); ///@todo Optimize temporary copies.
 		volume += face.Vertex(0).Dot(face.NormalCCW()) * face.Area();
 	}
@@ -1324,6 +1332,17 @@ struct CHullHelp
 	std::list<int> livePlanes;
 };
 
+namespace
+{
+	struct hash_edge
+	{
+		size_t operator()(const std::pair<int, int> &e) const
+		{
+			return (e.first << 16) ^ e.second;
+		}
+	};
+}
+
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
 	std::set<int> extremes;
@@ -1368,6 +1387,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		}
 	}
 
+	// The degenerate case when all vertices in the input data set are planar.
 	if (extremes.size() == 3)
 	{
 		Face f;
@@ -1381,10 +1401,23 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		return p;
 	}
 
-	int i = 0;
+	p.v.insert(p.v.end(), pointArray, pointArray + numPoints);
+
 	std::set<int>::iterator iter = extremes.begin();
-	for(; iter != extremes.end() && i < 4; ++iter, ++i)
-		p.v.push_back(pointArray[*iter]);
+	int v0 = *iter; ++iter;
+	int v1 = *iter; ++iter;
+	int v2 = *iter; ++iter;
+	int v3 = *iter;
+	assert(v0 < v1 && v1 < v2 && v2 < v3);
+	Swap(p.v[0], p.v[v0]);
+	Swap(p.v[1], p.v[v1]);
+	Swap(p.v[2], p.v[v2]);
+	Swap(p.v[3], p.v[v3]);
+
+	// For each face, maintain a list of its adjacent faces.
+//	std::vector<std::vector<int> > faceAdjacency(4);
+	// For each face, precompute its normal vector.
+	std::vector<Plane> facePlanes(4);
 
 	Face face;
 	face.v.resize(3);
@@ -1392,14 +1425,215 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	face.v[0] = 0; face.v[1] = 1; face.v[2] = 3; p.f.push_back(face);
 	face.v[0] = 0; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
 	face.v[0] = 1; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
-	p.OrientNormalsOutsideConvex(); // Ensure that the winding order of the generated tetrahedron is correct for each face.
 
-//	assert(p.IsClosed());
-//	assert(p.IsConvex());
-//	assert(p.FaceIndicesValid());
-//	assert(p.EulerFormulaHolds());
-//	assert(p.FacesAreNondegeneratePlanar());
+	// Ensure that the winding order of the generated tetrahedron is correct for each face.
+	vec center = p.v[0];
+	for(size_t i = 1; i < 4; ++i)
+		center += p.v[i];
 
+	center /= 4.f;
+	for(int i = 0; i < (int)p.f.size(); ++i)
+		if (p.FacePlane(i).SignedDistance(center) > 0.f)
+			p.f[i].FlipWindingOrder();
+
+	assert(p.IsClosed());
+	assert(p.FaceIndicesValid());
+	assert(p.FacesAreNondegeneratePlanar());
+
+//	p.DumpStructure();
+
+//	faceAdjacency[0].push_back(1); faceAdjacency[0].push_back(2); faceAdjacency[0].push_back(3);
+//	faceAdjacency[1].push_back(2); faceAdjacency[1].push_back(3); faceAdjacency[1].push_back(0);
+//	faceAdjacency[2].push_back(1); faceAdjacency[2].push_back(3); faceAdjacency[2].push_back(0);
+//	faceAdjacency[3].push_back(1); faceAdjacency[3].push_back(2); faceAdjacency[3].push_back(0);
+	facePlanes[0] = p.FacePlane(0);
+	facePlanes[1] = p.FacePlane(1);
+	facePlanes[2] = p.FacePlane(2);
+	facePlanes[3] = p.FacePlane(3);
+
+	std::unordered_map<std::pair<int, int>, int, hash_edge> edgesToFaces;
+	for(size_t i = 0; i < p.f.size(); ++i)
+	{
+		const Polyhedron::Face &f = p.f[i];
+		int v0 = f.v.back();
+		for(size_t j = 0; j < f.v.size(); ++j)
+		{
+			int v1 = f.v[j];
+			edgesToFaces[std::make_pair(v0, v1)] = i;
+			v0 = v1;
+		}
+	}
+
+	// If a vertex of the input point set is on the positive side of a face of the partially built convex hull, we
+	// call the vertex to be in conflict with that face, because due to the position of that vertex, the given face cannot
+	// be a face of the final convex hull.
+
+	// For each face of the partial convex hull, maintain a 'conflict list'.
+	// The conflict list represents for each face of the so far built convex hull the list of vertices that conflict
+	// with that face. The list is not complete in the sense that a vertex is only listed with one (arbitrary) face that it
+	// conflicts with, and not all of them.
+	std::vector<std::vector<int> > conflictList(p.f.size());
+
+	// Assign each remaining vertex (vertices 0-3 form the initial hull) to the initial conflict lists.
+	for(size_t i = 4; i < p.v.size(); ++i)
+		for(size_t j = 0; j < p.f.size(); ++j)
+			if (facePlanes[j].IsOnPositiveSide(p.v[i]))
+				conflictList[j].push_back(i);
+
+	std::vector<int> workStack;
+	if (!conflictList[0].empty()) workStack.push_back(0);
+	if (!conflictList[1].empty()) workStack.push_back(1);
+	if (!conflictList[2].empty()) workStack.push_back(2);
+	if (!conflictList[3].empty()) workStack.push_back(3);
+
+	std::set<int> conflictingVertices;
+	std::vector<std::pair<int, int> > boundaryEdges;
+	std::vector<int> faceVisitStack;
+
+	std::vector<bool> hullVertices(4, true);
+
+	// We need to perform flood fill searches across the faces to scan the interior faces vs border faces, so maintain
+	// an auxiliary data structure to store already visited faces.
+	std::vector<int> floodFillVisited(p.f.size());
+	int floodFillVisitColor = 1;
+//	p.DumpStructure();
+	while(!workStack.empty())
+	{
+		int f = workStack.back();
+		workStack.pop_back();
+		std::vector<int> &conflict = conflictList[f];
+		if (conflict.empty())
+			continue;
+
+		// Find the most extreme conflicting vertex on this face.
+		float extremeD = -FLOAT_INF;
+		int extremeCI = -1; // Index of the vertex in the conflict list.
+		int extremeI = -1; // Index of the vertex in the convex hull.
+		for(size_t i = 0; i < conflict.size(); ++i)
+		{
+			int vt = conflict[i];
+			if (vt < (int)hullVertices.size() && hullVertices[conflict[i]])
+				continue; // Robustness check: if this vertex is already part of the hull, ignore it.
+			float d = Dot(p.v[conflict[i]], facePlanes[f].normal);
+			if (d > extremeD)
+			{
+				extremeD = d;
+				extremeCI = i;
+				extremeI = conflict[i];
+			}
+		}
+		if (extremeD <= facePlanes[f].d + 1e-5f)
+			continue;
+//		LOGI("Verted %d is outside hull.", extremeI);
+
+		// Remove the most extreme conflicting vertex from the conflict list, because
+		// that vertex will become a part of the convex hull.
+		Swap(conflict[extremeCI], conflict.back());
+		conflict.pop_back();
+
+		floodFillVisited[f] = floodFillVisitColor;
+		faceVisitStack.push_back(f);
+		while(!faceVisitStack.empty())
+		{
+			int fi = faceVisitStack.back();
+			faceVisitStack.pop_back();
+			conflictingVertices.insert(conflictList[fi].begin(), conflictList[fi].end());
+			conflictList[fi].clear();
+
+			// Traverse through each edge of this face to detect whether this is an interior or a boundary face.
+			const Polyhedron::Face &f = p.f[fi];
+			int v0 = f.v.back();
+			for(size_t j = 0; j < f.v.size(); ++j)
+			{
+				int v1 = f.v[j];
+				int adjFace = edgesToFaces[std::make_pair(v1, v0)];
+				if (facePlanes[adjFace].IsOnPositiveSide(p.v[extremeI])) // Is v0<->v1 an interior edge?
+				{
+					if (floodFillVisited[adjFace] != floodFillVisitColor) // Add the neighboring face to the visit stack.
+					{
+						faceVisitStack.push_back(adjFace);
+						floodFillVisited[adjFace] = floodFillVisitColor;
+					}
+				}
+				else // v0<->v1 is a boundary edge.
+					boundaryEdges.push_back(std::make_pair(v0, v1));
+				v0 = v1;
+			}
+
+			// Mark this face as deleted by setting its size to zero vertices. This is better than erasing the face immediately,
+			// as that incurs memory allocation and bookkeeping costs. The null faces are all removed at the very end in one pass.
+			p.f[fi].v.clear();
+//			LOGI("Face %d removed.", fi);
+		}
+		++floodFillVisitColor;
+
+		// Reconstruct the proper CCW order of the boundary. Note that it is possible to perform a search where the order
+		// would come out right from the above graph search without needing to sort, perhaps a todo for later.
+		for(size_t i = 0; i < boundaryEdges.size(); ++i)
+			for(size_t j = i+1; j < boundaryEdges.size(); ++j)
+				if (boundaryEdges[i].second == boundaryEdges[j].first)
+				{
+					Swap(boundaryEdges[i+1], boundaryEdges[j]);
+					break;
+				}
+//		LOGI("Boundary:");
+//		for(size_t i = 0; i < boundaryEdges.size(); ++i)
+//			LOGI("%d->%d", (int)boundaryEdges[i].first, boundaryEdges[i].second);
+
+		size_t oldNumFaces = p.f.size();
+		// Create new faces to close the boundary.
+		for(size_t i = 0; i < boundaryEdges.size(); ++i)
+		{
+			face.v[0] = boundaryEdges[i].first; face.v[1] = boundaryEdges[i].second; face.v[2] = extremeI; p.f.push_back(face);
+//			LOGI("Adding %d-%d-%d", face.v[0], face.v[1], face.v[2]);
+			facePlanes.push_back(p.FacePlane(p.f.size()-1));
+			edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] = p.f.size()-1;
+			edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] = p.f.size()-1;
+			edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] = p.f.size()-1;
+//			LOGI("New face %d->%d->%d", face.v[0], face.v[1], face.v[2]);
+		}
+		boundaryEdges.clear();
+//		p.DumpStructure();
+
+		// Robustness: flag the new vertex as part of the convex hull.
+		if ((int)hullVertices.size() <= extremeI)
+			hullVertices.insert(hullVertices.end(), extremeI + 1 - hullVertices.size(), false);
+		hullVertices[extremeI] = true;
+
+		// Redistribute all conflicting points to the new faces.
+		conflictList.insert(conflictList.end(), p.f.size() - oldNumFaces, std::vector<int>());
+		floodFillVisited.insert(floodFillVisited.end(), p.f.size() - oldNumFaces, 0);
+		for(std::set<int>::iterator iter = conflictingVertices.begin(); iter != conflictingVertices.end(); ++iter)
+			for(size_t j = oldNumFaces; j < p.f.size(); ++j)
+				if (facePlanes[j].IsOnPositiveSide(p.v[*iter]) && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
+					conflictList[j].push_back(*iter);
+
+		conflictingVertices.clear();
+
+		// Add new faces that still have conflicting vertices to the work stack for later processing.
+		// The algorithm will terminate once all faces are clear of conflicts.
+		for(size_t j = oldNumFaces; j < p.f.size(); ++j)
+			if (!conflictList[j].empty())
+				workStack.push_back(j);
+//	p.DumpStructure();
+	}
+
+//	p.DumpStructure();
+	p.RemoveDegenerateFaces();
+	p.RemoveRedundantVertices();
+//	p.DumpStructure();
+
+	assert(p.IsClosed());
+	assert(p.IsConvex());
+	assert(p.FaceIndicesValid());
+	assert(p.EulerFormulaHolds());
+	assert(p.FacesAreNondegeneratePlanar());
+
+	for(int i = 0; i < numPoints; ++i)
+		assert1(p.ContainsConvex(pointArray[i]), p.Distance(pointArray[i]));
+
+	return p;
+#if 0
 	// For better performance, merge the remaining extreme points first.
 	for(; iter != extremes.end(); ++iter)
 	{
@@ -1432,6 +1666,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 //	assert(p.IsConvex());
 	p.RemoveRedundantVertices();
 	return p;
+#endif
 }
 
 /// See http://paulbourke.net/geometry/platonic/
@@ -1703,6 +1938,21 @@ int ArrayBinarySearch(const T *list, int numItems, const T &value, CmpFunc &cmp)
 	return -1;
 }
 
+void Polyhedron::RemoveDegenerateFaces()
+{
+	size_t n = 0;
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		if (f[i].v.size() >= 3)
+		{
+			if (n != i)
+				f[n] = f[i];
+			++n;
+		}
+	}
+	f.erase(f.begin()+n, f.end());
+}
+
 void Polyhedron::RemoveRedundantVertices()
 {
 	std::set<int> usedVertices;
@@ -1932,7 +2182,7 @@ void Polyhedron::DumpStructure() const
 {
 	LOGI("Polyhedron volume: %f", Volume());
 	for(size_t i = 0; i < f.size(); ++i)
-		LOGI("Face %d: %s (area: %f", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area());
+		LOGI("Face %d: %s (area: %f)", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area());
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
