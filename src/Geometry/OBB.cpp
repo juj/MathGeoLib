@@ -520,8 +520,8 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 	for(int i = 0; i <= jiggles; ++i)
 	{
 		int e1, e2;
-		OBB::ExtremePointsAlongDirection(edge, &convexHull.v[0], convexHull.v.size(), e1, e2);
-		edgeLength = Abs(Dot(convexHull.v[e1] - convexHull.v[e2], edge));
+		OBB::ExtremePointsAlongDirection(edge, (const vec*)&convexHull.v[0], convexHull.v.size(), e1, e2);
+		edgeLength = Abs(Dot((vec)convexHull.v[e1] - convexHull.v[e2], edge));
 //		float dMin, dMax;
 //		int emin = convexHull.ExtremeVertexConvex(adjacencyData, -edge, floodFillVisited, floodFillVisitColor++, dMin, 0);
 //		int emax = convexHull.ExtremeVertexConvex(adjacencyData, edge, floodFillVisited, floodFillVisitColor++, dMax, 0);
@@ -529,7 +529,7 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 
 		edge.PerpendicularBasis(u, v);
 		for(size_t k = 0; k < convexHull.v.size(); ++k)
-			pts[k] = float2(convexHull.v[k].Dot(u), convexHull.v[k].Dot(v));
+			pts[k] = float2(u.Dot(convexHull.v[k]), v.Dot(convexHull.v[k]));
 
 		float2 rectCenter;
 		float2 uDir;
@@ -778,11 +778,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-//#define TIMING(...) ((void)0)
-//#define TIMING_TICK(...) ((void)0)
+#define TIMING(...) ((void)0)
+#define TIMING_TICK(...) ((void)0)
 
-#define TIMING_TICK(...) __VA_ARGS__
-#define TIMING LOGI
+//#define TIMING_TICK(...) __VA_ARGS__
+//#define TIMING LOGI
 
 namespace
 {
@@ -798,11 +798,11 @@ namespace
 bool AreCompatibleOpposingEdges(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b, vec &outN)
 {
 	float3x3 A;
-	A.SetCol(0, f2b); // c
-	A.SetCol(1, f1a - f1b); // t
-	A.SetCol(2, f2a - f2b); // r = c*u
+	A.SetCol(0, f2b.xyz()); // c
+	A.SetCol(1, (f1a - f1b).xyz()); // t
+	A.SetCol(2, (f2a - f2b).xyz()); // r = c*u
 	float3 x;
-	bool success = A.SolveAxb(-f1b, x);
+	bool success = A.SolveAxb(-f1b.xyz(), x);
 	float c = x[0];
 	float t = x[1];
 	float cu = x[2];
@@ -846,7 +846,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING("Adjacencygeneration: %f msecs", Clock::TimespanToMillisecondsF(t1, t2));
 
 	// Precomputation: Compute normalized face direction vectors for each face of the hull.
-	std::vector<vec> faceNormals;
+	std::vector<vec_storage> faceNormals;
 	faceNormals.reserve(convexHull.NumFaces());
 	for(int i = 0; i < convexHull.NumFaces(); ++i)
 		faceNormals.push_back(convexHull.FaceNormal(i));
@@ -949,7 +949,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					if (f1a-f1b).e == 0:
 						0 <= -f1b.e
 				*/
-				vec e = convexHull.v[v] - convexHull.v[n[j]];
+				vec e = (vec)convexHull.v[v] - convexHull.v[n[j]];
 				float s = (f1a-f1b).Dot(e);
 				float n = -f1b.Dot(e);
 				if (s > 0.f)
@@ -1255,8 +1255,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 					n = n.Normalized();
 
-					float minN1 = convexHull.v[edges[edge].first].Dot(n);
-					float maxN1 = convexHull.v[edges[i].first].Dot(n);
+					float minN1 = n.Dot(convexHull.v[edges[edge].first]);
+					float maxN1 = n.Dot(convexHull.v[edges[i].first]);
 
 					// Test all mutual compatible edges.
 					size_t s_i = 0;
@@ -1296,11 +1296,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 								convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, 0); // O(log|V|)?
 								convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, 0); // O(log|V|)?
 								minN2 = -minN2;
-								float maxN3 = convexHull.v[edges[edge3].first].Dot(n3);
+								float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 								const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
 								float minN3 = FLOAT_INF;
 								for(size_t a = 0; a < antipodalsEdge3.size(); ++a)
-									minN3 = Min(minN3, convexHull.v[antipodalsEdge3[a]].Dot(n3));
+									minN3 = Min(minN3, n3.Dot(convexHull.v[antipodalsEdge3[a]]));
 
 								float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
 								++numTwoOpposingFacesConfigs;
@@ -1356,10 +1356,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		const std::vector<int> &compatibleEdgesI = compatibleEdgesAll[e1];
 		const std::vector<int> &compatibleEdgesJ = compatibleEdgesAll[e2];
 
-		float maxN1 = convexHull.v[edges[e1].first].Dot(n1);
+		float maxN1 = n1.Dot(convexHull.v[edges[e1].first]);
 		float minN1 = FLOAT_INF;
 		for(size_t j = 0; j < antipodals.size(); ++j)
-			minN1 = Min(minN1, convexHull.v[antipodals[j]].Dot(n1));
+			minN1 = Min(minN1, n1.Dot(convexHull.v[antipodals[j]]));
 
 		// Test all mutual compatible edges.
 		size_t s_i = 0;
@@ -1399,11 +1399,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, 0); // O(log|V|)?
 					convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, 0); // O(log|V|)?
 					minN2 = -minN2;
-					float maxN3 = convexHull.v[edges[edge3].first].Dot(n3);
+					float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 					const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
 					float minN3 = FLOAT_INF;
 					for(size_t a = 0; a < antipodalsEdge3.size(); ++a)
-						minN3 = Min(minN3, convexHull.v[antipodalsEdge3[a]].Dot(n3));
+						minN3 = Min(minN3, n3.Dot(convexHull.v[antipodalsEdge3[a]]));
 
 					float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
 					++numTwoSameFacesConfigs;

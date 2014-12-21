@@ -418,6 +418,21 @@ public:
 #endif
 };
 
+struct Plane_storage
+{
+	float4_storage normal;
+	float d;
+#ifdef MATH_VEC_IS_FLOAT4
+	float padding[3];
+#endif
+	Plane_storage(){}
+	Plane_storage(const Plane &rhs)
+	{
+		*reinterpret_cast<Plane*>(this) = rhs;
+	}
+	operator Plane() const { return *reinterpret_cast<const Plane*>(this); }
+};
+
 Plane operator *(const float3x3 &transform, const Plane &plane);
 Plane operator *(const float3x4 &transform, const Plane &plane);
 Plane operator *(const float4x4 &transform, const Plane &plane);
