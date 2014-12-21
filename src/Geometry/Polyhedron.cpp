@@ -220,6 +220,34 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 	std::vector<int> &floodFillVisited, int floodFillVisitColor,
 	float &mostExtremeDistance, int startingVertex) const
 {
+	float curD = direction.Dot(this->v[startingVertex]);
+	for(;;)
+	{
+		const std::vector<int> &neighbors = adjacencyData[startingVertex];
+		float bestD = curD - 1e-3f;
+		int bestNeighbor = -1;
+		floodFillVisited[startingVertex] = floodFillVisitColor;
+		for(size_t i = 0; i < neighbors.size(); ++i)
+		{
+			float d = direction.Dot(this->v[neighbors[i]]);
+			if (d > bestD)
+			{
+				bestD = d;
+				bestNeighbor = startingVertex;
+			}
+		}
+		if (bestNeighbor == -1 || floodFillVisited[bestNeighbor] == floodFillVisitColor)
+		{
+			mostExtremeDistance = curD;
+			return startingVertex;
+		}
+		else
+		{
+			startingVertex = bestNeighbor;
+			curD = bestD;
+		}
+	}
+#if 0
 	mostExtremeDistance = Dot(direction, Vertex(startingVertex));
 	int prevVertex;
 	do
@@ -232,7 +260,7 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 			if (floodFillVisited[v] == floodFillVisitColor)
 				continue;
 			floodFillVisited[v] = floodFillVisitColor;
-			float d = Dot(direction, Vertex(v));
+			float d = direction.Dot(this->v[v]);
 			if (d > mostExtremeDistance)
 			{
 				mostExtremeDistance = d;
@@ -253,6 +281,7 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 		}
 	} while(prevVertex != startingVertex);
 	return startingVertex;
+#endif
 }
 
 void Polyhedron::ProjectToAxis(const vec &direction, float &outMin, float &outMax) const
@@ -1417,7 +1446,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	// For each face, maintain a list of its adjacent faces.
 //	std::vector<std::vector<int> > faceAdjacency(4);
 	// For each face, precompute its normal vector.
-	std::vector<Plane> facePlanes(4);
+	std::vector<Plane_storage> facePlanes(4);
 
 	Face face;
 	face.v.resize(3);
@@ -1477,7 +1506,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	// Assign each remaining vertex (vertices 0-3 form the initial hull) to the initial conflict lists.
 	for(size_t i = 4; i < p.v.size(); ++i)
 		for(size_t j = 0; j < p.f.size(); ++j)
-			if (facePlanes[j].IsOnPositiveSide(p.v[i]))
+			if (((Plane)facePlanes[j]).IsOnPositiveSide(p.v[i]))
 				conflictList[j].push_back(i);
 
 	std::vector<int> workStack;
@@ -1514,7 +1543,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 			int vt = conflict[i];
 			if (vt < (int)hullVertices.size() && hullVertices[conflict[i]])
 				continue; // Robustness check: if this vertex is already part of the hull, ignore it.
-			float d = Dot(p.v[conflict[i]], facePlanes[f].normal);
+			float d = Dot(p.v[conflict[i]], ((Plane)facePlanes[f]).normal);
 			if (d > extremeD)
 			{
 				extremeD = d;
@@ -1522,7 +1551,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 				extremeI = conflict[i];
 			}
 		}
-		if (extremeD <= facePlanes[f].d + 1e-5f)
+		if (extremeD <= ((Plane)facePlanes[f]).d + 1e-5f)
 			continue;
 //		LOGI("Verted %d is outside hull.", extremeI);
 
@@ -1547,7 +1576,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 			{
 				int v1 = f.v[j];
 				int adjFace = edgesToFaces[std::make_pair(v1, v0)];
-				if (facePlanes[adjFace].IsOnPositiveSide(p.v[extremeI])) // Is v0<->v1 an interior edge?
+				if (((Plane)facePlanes[adjFace]).IsOnPositiveSide(p.v[extremeI])) // Is v0<->v1 an interior edge?
 				{
 					if (floodFillVisited[adjFace] != floodFillVisitColor) // Add the neighboring face to the visit stack.
 					{
@@ -1605,7 +1634,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		floodFillVisited.insert(floodFillVisited.end(), p.f.size() - oldNumFaces, 0);
 		for(std::set<int>::iterator iter = conflictingVertices.begin(); iter != conflictingVertices.end(); ++iter)
 			for(size_t j = oldNumFaces; j < p.f.size(); ++j)
-				if (facePlanes[j].IsOnPositiveSide(p.v[*iter]) && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
+				if (((Plane)facePlanes[j]).IsOnPositiveSide(p.v[*iter]) && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 					conflictList[j].push_back(*iter);
 
 		conflictingVertices.clear();
