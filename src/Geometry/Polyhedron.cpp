@@ -221,6 +221,50 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 	float &mostExtremeDistance, int startingVertex) const
 {
 	float curD = direction.Dot(this->v[startingVertex]);
+	const int *neighbors = &adjacencyData[startingVertex][0];
+	const int *neighborsEnd = neighbors + adjacencyData[startingVertex].size();
+	floodFillVisited[startingVertex] = floodFillVisitColor;
+
+	int secondBest = -1;
+	float secondBestD = curD - 1e-3f;
+	while(neighbors != neighborsEnd)
+	{
+		int n = *neighbors++;
+		if (floodFillVisited[n] != floodFillVisitColor)
+		{
+			float d = direction.Dot(this->v[n]);
+			if (d > curD)
+			{
+				startingVertex = n;
+				curD = d;
+				floodFillVisited[startingVertex] = floodFillVisitColor;
+				neighbors = &adjacencyData[startingVertex][0];
+				neighborsEnd = neighbors + adjacencyData[startingVertex].size();
+				secondBest = -1;
+				secondBestD = curD - 1e-3f;
+			}
+			else if (d > secondBestD)
+			{
+				secondBest = n;
+				secondBestD = d;
+			}
+		}
+	}
+	if (secondBest != -1 && floodFillVisited[secondBest] != floodFillVisitColor)
+	{
+		float secondMostExtreme = -FLOAT_INF;
+		int secondTry = ExtremeVertexConvex(adjacencyData, direction, floodFillVisited, floodFillVisitColor, secondMostExtreme, secondBest);
+		if (secondMostExtreme > curD)
+		{
+			mostExtremeDistance = secondMostExtreme;
+			return secondTry;
+		}
+	}
+	mostExtremeDistance = curD;
+	return startingVertex;
+
+#if 0
+	float curD = direction.Dot(this->v[startingVertex]);
 	for(;;)
 	{
 		const std::vector<int> &neighbors = adjacencyData[startingVertex];
@@ -230,6 +274,12 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 		for(size_t i = 0; i < neighbors.size(); ++i)
 		{
 			float d = direction.Dot(this->v[neighbors[i]]);
+			if (d > curD + 1e-3f)
+			{
+				startingVertex = bestNeighbor;
+				curD = d;
+				break;
+			}
 			if (d > bestD)
 			{
 				bestD = d;
@@ -247,6 +297,8 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 			curD = bestD;
 		}
 	}
+#endif
+
 #if 0
 	mostExtremeDistance = Dot(direction, Vertex(startingVertex));
 	int prevVertex;
