@@ -850,11 +850,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-#define TIMING(...) ((void)0)
-#define TIMING_TICK(...) ((void)0)
+//#define TIMING(...) ((void)0)
+//#define TIMING_TICK(...) ((void)0)
 
-//#define TIMING_TICK(...) __VA_ARGS__
-//#define TIMING LOGI
+#define TIMING_TICK(...) __VA_ARGS__
+#define TIMING LOGI
 
 namespace
 {
@@ -1289,6 +1289,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t t6 = Clock::Tick());
 	TIMING("Edgetripletconfigs: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t5, t6), numConfigsExplored);
 
+	// Micro-opt: start the search for the extreme vertex from the extreme vertex that was found during the previous iteration for
+	// the previous edge. This slightly speeds up the search since edges have some amount of spatial locality.
+	int extremeVertexSearchHint1 = 0;
+	int extremeVertexSearchHint2 = 0;
+
 	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the convex hull
 	// from two opposing faces. This is O(|E|)?
 	int numTwoOpposingFacesConfigs = 0;
@@ -1366,8 +1371,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 								vec n2 = n3.Cross(n).Normalized();
 
 								float minN2, maxN2;
-								convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, 0); // O(log|V|)?
-								convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, 0); // O(log|V|)?
+								extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+								extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, extremeVertexSearchHint2); // O(log|V|)?
 								minN2 = -minN2;
 								float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 								const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
@@ -1469,8 +1474,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					vec n2 = n3.Cross(n1).Normalized();
 
 					float minN2, maxN2;
-					convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, 0); // O(log|V|)?
-					convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, 0); // O(log|V|)?
+					extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+					extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, extremeVertexSearchHint2); // O(log|V|)?
 					minN2 = -minN2;
 					float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 					const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
