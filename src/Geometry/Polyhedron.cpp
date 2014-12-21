@@ -1667,7 +1667,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		{
 			face.v[0] = boundaryEdges[i].first; face.v[1] = boundaryEdges[i].second; face.v[2] = extremeI; p.f.push_back(face);
 //			LOGI("Adding %d-%d-%d", face.v[0], face.v[1], face.v[2]);
-			facePlanes.push_back(p.FacePlane(p.f.size()-1));
+			Plane facePlane = p.FacePlane(p.f.size()-1);
+			assert(!facePlane.IsDegenerate());
+			facePlanes.push_back(facePlane);
 			edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] = p.f.size()-1;
 			edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] = p.f.size()-1;
 			edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] = p.f.size()-1;
