@@ -850,11 +850,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-//#define TIMING(...) ((void)0)
-//#define TIMING_TICK(...) ((void)0)
+#define TIMING(...) ((void)0)
+#define TIMING_TICK(...) ((void)0)
 
-#define TIMING_TICK(...) __VA_ARGS__
-#define TIMING LOGI
+//#define TIMING_TICK(...) __VA_ARGS__
+//#define TIMING LOGI
 
 namespace
 {
@@ -901,6 +901,17 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 		return minOBB;
 	}
 	return OptimalEnclosingOBB(convexHull);
+}
+
+bool ContainsAndRemove(std::vector<int> &arr, int val)
+{
+	for(size_t i = 0; i < arr.size(); ++i)
+		if (arr[i] == val)
+		{
+			arr.erase(arr.begin() + i);
+			return true;
+		}
+	return false;
 }
 
 OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
@@ -1044,7 +1055,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						traverseStack.push_back(n[j]);
 			}
 		}
-		assert(!antipodalPointsForEdge[i].empty());
+		// Robustness: If the above search did not find any antipodal points, add the first found extreme point at least.
+		if (antipodalPointsForEdge[i].empty())
+		{
+			LOGI("Adding pt %d to edge %d.", (int)startingVertex, (int)i);
+			antipodalPointsForEdge[i].push_back(startingVertex);
+		}
+
+		assume(!antipodalPointsForEdge[i].empty());
 		++floodFillVisitColor;
 	}
 
@@ -1148,6 +1166,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	std::vector<std::vector<int> > compatibleEdges(edges.size());
 	std::vector<std::vector<int> > compatibleEdgesAll(edges.size());
 
+#if 1
 	for(size_t i = 0; i < edges.size()-1; ++i) // O(|E|)
 		for(size_t j = i+1; j < edges.size(); ++j) // O(|E|)
 			if (AreEdgesCompatibleForOBB(faceNormals[facesForEdge[i].first], faceNormals[facesForEdge[i].second],
@@ -1158,8 +1177,43 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				compatibleEdgesAll[i].push_back(j);
 				compatibleEdgesAll[j].push_back(i);
 			}
+#endif
+
+#if 0
 	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
-		std::sort(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end());
+	{
+		std::vector<int> x = compatibleEdgesAll[i];
+		int numIslands = 0;
+		while(x.size() > 0)
+		{
+			++numIslands;
+			traverseStack.push_back(edges[x[0]].first);
+
+			while(traverseStack.size() > 0)
+			{
+				while(!traverseStack.empty())
+				{
+					int v = traverseStack.back();
+					traverseStack.pop_back();
+
+					const std::vector<int> &n = adjacencyData[v];
+					for(size_t j = 0; j < n.size(); ++j)
+					{
+						int vAdj = n[j];
+						int edge = vertexPairsToEdges[std::make_pair(v, vAdj)];
+						int edge2 = vertexPairsToEdges[std::make_pair(vAdj, v)];
+					
+						if (ContainsAndRemove(x, edge) || ContainsAndRemove(x, edge2))
+						{
+							traverseStack.push_back(vAdj);
+						}
+					}
+				}
+			}
+		}
+		if (numIslands > 1) LOGI("Edges in %d islands.", numIslands);
+	}
+#endif
 
 #if 0
 	// Try a fast version of companionedges by adjacency info.
@@ -1170,10 +1224,19 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		vec f1b = faceNormals[facesForEdge[i].second];
 
 		float dummy;
-		vec dir = convexHull.v[edges[i].first] - convexHull.v[edges[i].second];
+		/*
+		vec dir = vec(convexHull.v[edges[i].first]) - convexHull.v[edges[i].second];
 		int startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
 
 		traverseStack.push_back(startingVertex);
+		*/
+		vec dir1 = f1a.Perpendicular();
+		vec dir2 = f1b.Perpendicular();
+		int startingVertex1 = convexHull.ExtremeVertexConvex(adjacencyData, dir1, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
+		int startingVertex2 = convexHull.ExtremeVertexConvex(adjacencyData, dir2, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
+		traverseStack.push_back(startingVertex1);
+		if (startingVertex2 != startingVertex1)
+			traverseStack.push_back(startingVertex2);
 
 		while(!traverseStack.empty())
 		{
@@ -1187,6 +1250,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			{
 				int vAdj = n[j];
 
+				if (floodFillVisited[vAdj] == floodFillVisitColor)
+					continue;
+
 //				if (vAdj < v)
 //					continue; // We search unordered edges, so no need to process edge (v1, v2) and (v2, v1) twice - take the canonical order to be antipodalVertex < vAdj
 
@@ -1199,21 +1265,49 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 				if (AreEdgesCompatibleForOBB(f1a, f1b, f2a, f2b))
 				{
-					compatibleEdges[i].push_back(edge);
-	//				compatibleEdges[j].push_back(i);
+					if (i != edge)
+					{
+						compatibleEdges[Min((int)i, edge)].push_back(Max((int)i, edge));
+
+						compatibleEdgesAll[i].push_back(edge);
+						compatibleEdgesAll[edge].push_back(i);
+					}
+
+					traverseStack.push_back(vAdj);
 				}
 			}
 
-			for(size_t j = 0; j < n.size(); ++j)
-				if (floodFillVisited[n[j]] != floodFillVisitColor)
-					traverseStack.push_back(n[j]);
+//			for(size_t j = 0; j < n.size(); ++j)
+//				if (floodFillVisited[n[j]] != floodFillVisitColor)
+//					traverseStack.push_back(n[j]);
 		}
 		++floodFillVisitColor;
 	}
+	for(size_t i = 0; i < compatibleEdges.size(); ++i)
+		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
+
+	for(size_t i = 0; i < compatibleEdges.size(); ++i)
+		compatibleEdges[i].erase( unique(compatibleEdges[i].begin(), compatibleEdges[i].end() ), compatibleEdges[i].end());
+#endif
+
+
+	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
+		std::sort(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end());
+
+#if 0
+	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
+		compatibleEdgesAll[i].erase( unique(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end() ), compatibleEdgesAll[i].end());
 #endif
 
 	TIMING_TICK(tick_t t5 = Clock::Tick());
-	TIMING("Companionedges: %f msecs", Clock::TimespanToMillisecondsF(t4, t5));
+
+	TIMING_TICK(
+
+		size_t numTotalEdges = 0;
+		for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
+			numTotalEdges += compatibleEdgesAll[i].size();
+		);
+	TIMING("Companionedges: %f msecs (%d edges have on average %d companion edges each)", Clock::TimespanToMillisecondsF(t4, t5), (int)compatibleEdgesAll.size(), (int)(numTotalEdges/compatibleEdgesAll.size()));
 
 	// Main algorithm body for testing three edges all on adjacent faces of the box.
 	// This is O(|E|^2)?
