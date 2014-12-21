@@ -1266,8 +1266,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 					n = n.Normalized();
 
-					float minN1 = FLOAT_INF, maxN1 = -FLOAT_INF;
-					bool n1ExtremesComputed = false;
+					float minN1 = convexHull.v[edges[edge].first].Dot(n);
+					float maxN1 = convexHull.v[edges[i].first].Dot(n);
 
 					// Test all mutual compatible edges.
 					size_t s_i = 0;
@@ -1306,16 +1306,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 								//vec n2 = n.Cross(e3).Normalized();
 								vec n3 = (f3b + (f3a - f3b) * v).Normalized();
 								vec n2 = n3.Cross(n).Normalized();
-
-								if (!n1ExtremesComputed)
-								{
-									//convexHull.ExtremeVertexConvex(adjacencyData, n, floodFillVisited, floodFillVisitColor++, maxN1, 0); // O(log|V|)?
-									//convexHull.ExtremeVertexConvex(adjacencyData, -n, floodFillVisited, floodFillVisitColor++, minN1, 0); // O(log|V|)?
-									//minN1 = -minN1;
-									maxN1 = convexHull.v[edges[i].first].Dot(n);
-									minN1 = convexHull.v[edges[edge].first].Dot(n);
-									n1ExtremesComputed = true;
-								}
 
 								float minN2, maxN2;
 								convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, 0); // O(log|V|)?
