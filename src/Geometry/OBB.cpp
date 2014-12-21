@@ -960,11 +960,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					tMax = tMin - 1.f;
 
 				// The interval of possible solutions for t closed?
-				if (tMax < tMin)
+				if (tMax - tMin < -1e-4f)
 					break;
 			}
 
-			if (tMin <= tMax)
+			if (tMin - 1e-4f <= tMax)
 			{
 				antipodalPointsForEdge[i].push_back(v);
 				for(size_t j = 0; j < n.size(); ++j)
@@ -972,6 +972,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						traverseStack.push_back(n[j]);
 			}
 		}
+		assert(!antipodalPointsForEdge[i].empty());
 		++floodFillVisitColor;
 	}
 
