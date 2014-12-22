@@ -1233,7 +1233,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		if (antipodalPointsForEdge[i].empty())
 			antipodalPointsForEdge[i].push_back(startingVertex);
 	}
-	CLEAR_GRAPH_SEARCH(); /// TODO: remove
 
 	TIMING_TICK(tick_t t4 = Clock::Tick());
 	TIMING("Antipodalpoints: %f msecs", Clock::TimespanToMillisecondsF(t3, t4));
@@ -1254,16 +1253,16 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		float dummy;
 		// Micro-opt: start the search for the extreme vertex from the extreme vertex that was found during the previous iteration for
 		// the previous edge. This slightly speeds up the search since edges have some amount of spatial locality.
-		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, e, floodFillVisited, floodFillVisitColor++, dummy, startingVertex); // O(constant)?
-
+		CLEAR_GRAPH_SEARCH();
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, e, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(constant)?
+		CLEAR_GRAPH_SEARCH();
 		traverseStack.push_back(startingVertex);
-
 		while(!traverseStack.empty()) // In amortized analysis, only a O(sqrt(|V|) number of vertices are sidepodal points for any edge?
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
 
-			floodFillVisited[v] = floodFillVisitColor;
+			MARK_VERTEX_VISITED(v);
 
 			float tMin = 0.f;
 			float tMax = 1.f;
@@ -1327,11 +1326,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			{
 				antipodalPointsForEdge[i].push_back(v);
 				for(size_t j = 0; j < n.size(); ++j)
-					if (floodFillVisited[n[j]] != floodFillVisitColor)
+					if (!HAVE_VISITED_VERTEX(n[j]))
 						traverseStack.push_back(n[j]);
 			}
 		}
-		++floodFillVisitColor;
+		CLEAR_GRAPH_SEARCH();
 	}
 #endif
 
@@ -1352,7 +1351,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				faceNormals[facesForEdge[j].first], faceNormals[facesForEdge[j].second]))
 			{
 				compatibleEdges[i].push_back(j);
-
 				compatibleEdgesAll[i].push_back(j);
 				if (i != j)
 					compatibleEdgesAll[j].push_back(i);
@@ -1446,7 +1444,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
 	}
 #endif
-	CLEAR_GRAPH_SEARCH(); // TODO: remove
 
 	// We will later perform set intersection operations on the compatibleEdgesAll arrays, so they must be sorted.
 	for (size_t i = 0; i < compatibleEdgesAll.size(); ++i)
@@ -1663,8 +1660,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 								vec n2 = n3.Cross(n).Normalized();
 
 								float minN2, maxN2;
-								extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, extremeVertexSearchHint1); // O(log|V|)?
-								extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, extremeVertexSearchHint2); // O(log|V|)?
+								CLEAR_GRAPH_SEARCH();
+								extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+								CLEAR_GRAPH_SEARCH();
+								extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(log|V|)?
 								minN2 = -minN2;
 								float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 								const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
@@ -1769,8 +1768,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						vec n2 = n3.Cross(n).Normalized();
 
 						float minN2, maxN2;
-						extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, extremeVertexSearchHint1); // O(log|V|)?
-						extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, extremeVertexSearchHint2); // O(log|V|)?
+						CLEAR_GRAPH_SEARCH();
+						extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+						CLEAR_GRAPH_SEARCH();
+						extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(log|V|)?
 						minN2 = -minN2;
 						float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 						const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
@@ -1872,8 +1873,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					vec n2 = n3.Cross(n1).Normalized();
 
 					float minN2, maxN2;
-					extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor++, maxN2, extremeVertexSearchHint1); // O(log|V|)?
-					extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor++, minN2, extremeVertexSearchHint2); // O(log|V|)?
+					CLEAR_GRAPH_SEARCH();
+					extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+					CLEAR_GRAPH_SEARCH();
+					extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(log|V|)?
 					minN2 = -minN2;
 					float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 					const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
