@@ -713,8 +713,6 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		float v = (-B + D) / (2.f * A);
 		//MoveSign(numV, denomV);
 
-		if (v < 0.f)
-			return 0;
 		//if (numV < 0.f)
 		//	return 0;
 		//denomV = 0.5f / denomV;
@@ -722,7 +720,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		float t = (-i-v*k)/(j + v*l);
 		float u = (-e -v*g) / (f + v*h);
 
-		if (t >= 0.f && u >= 0.f && /*v >= 0.f &&*/ t <= 1.f && u <= 1.f && v <= 1.f)
+		if (t >= 0.f && u >= 0.f && v >= 0.f && t <= 1.f && u <= 1.f && v <= 1.f)
 		{
 			n1[nSolutions] = (f1a*t + f1b*(1-t)).Normalized();
 			n2[nSolutions] = (f2a*u + f2b*(1-u)).Normalized();
