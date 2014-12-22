@@ -1082,7 +1082,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// For each edge i, specifies the two face indices f0 and f1 that share that edge.
 	std::vector<std::pair<int, int> > facesForEdge;
 	facesForEdge.reserve(convexHull.v.size()*2);
-	// For each vertex pair (v0, v1) through which there is an edge, specifies the index i of the edgethat passes through them.
+	// For each vertex pair (v0, v1) through which there is an edge, specifies the index i of the edge that passes through them.
 	// This map contains duplicates, so both (v0, v1) and (v1, v0) map to the same edge index.
 	std::unordered_map<std::pair<int, int>, int, hash_edge> vertexPairsToEdges;
 
@@ -1126,13 +1126,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// vertices that have already been visited have the value floodFillVisited[i] == floodFillVisitColor in them.
 	// This wins constant-time clears of the floodFillVisited array, as we can simply increment the counter to
 	// clear the array.
+	std::vector<int> floodFillVisited(convexHull.v.size());
+	int floodFillVisitColor = 1;
+
 	// As a syntactic aid, use the helpers MARK_VISITED(v), HAVE_VISITED_VERTEX(v) and CLEAR_GRAPH_SEARCH to 
 	// remind of the conceptual meaning of these values.
 #define MARK_VERTEX_VISITED(v) (floodFillVisited[(v)] = floodFillVisitColor)
 #define HAVE_VISITED_VERTEX(v) (floodFillVisited[(v)] == floodFillVisitColor)
 #define CLEAR_GRAPH_SEARCH() (++floodFillVisitColor)
-	std::vector<int> floodFillVisited(convexHull.v.size());
-	int floodFillVisitColor = 1;
 
 	// Stores for each edge index i the complete list of antipodal vertices for that edge.
 	std::vector<std::vector<int> > antipodalPointsForEdge(edges.size());
