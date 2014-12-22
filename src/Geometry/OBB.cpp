@@ -950,11 +950,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-//#define TIMING(...) ((void)0)
-//#define TIMING_TICK(...) ((void)0)
+#define TIMING(...) ((void)0)
+#define TIMING_TICK(...) ((void)0)
 
-#define TIMING_TICK(...) __VA_ARGS__
-#define TIMING LOGI
+//#define TIMING_TICK(...) __VA_ARGS__
+//#define TIMING LOGI
 
 namespace
 {
@@ -1299,7 +1299,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	std::vector<std::vector<int> > compatibleEdges(edges.size());
 	std::vector<std::vector<int> > compatibleEdgesAll(edges.size());
 
-#if 1
+#if 0
 	// Important! And edge can be its own companion edge! So have each edge test itself during iteration.
 	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
 		for(size_t j = i; j < edges.size(); ++j) // O(|E|)
@@ -1321,6 +1321,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		int numIslands = 0;
 		while(x.size() > 0)
 		{
+			int sizePrev = x.size();
 			++numIslands;
 			traverseStack.push_back(edges[x[0]].first);
 
@@ -1345,12 +1346,13 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					}
 				}
 			}
+			if (x.size() > 0) LOGI("Island of size %d. %d left.", sizePrev - (int)x.size(), (int)x.size());
 		}
 		if (numIslands > 1) LOGI("Edges in %d islands.", numIslands);
 	}
 #endif
 
-#if 0
+#if 1
 	// Try a fast version of companionedges by adjacency info.
 	for(size_t i = 0; i < edges.size(); ++i)
 	{
@@ -1366,12 +1368,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		traverseStack.push_back(startingVertex);
 		*/
 		vec dir1 = f1a.Perpendicular();
-		vec dir2 = f1b.Perpendicular();
+//		vec dir2 = f1b.Perpendicular();
 		int startingVertex1 = convexHull.ExtremeVertexConvex(adjacencyData, dir1, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
-		int startingVertex2 = convexHull.ExtremeVertexConvex(adjacencyData, dir2, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
+//		int startingVertex2 = convexHull.ExtremeVertexConvex(adjacencyData, dir2, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
 		traverseStack.push_back(startingVertex1);
-		if (startingVertex2 != startingVertex1)
-			traverseStack.push_back(startingVertex2);
+//		if (startingVertex2 != startingVertex1)
+//			traverseStack.push_back(startingVertex2);
 
 		while(!traverseStack.empty())
 		{
@@ -1400,13 +1402,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 				if (AreEdgesCompatibleForOBB(f1a, f1b, f2a, f2b))
 				{
-					if (i != edge)
-					{
-						compatibleEdges[Min((int)i, edge)].push_back(Max((int)i, edge));
+					compatibleEdges[Min((int)i, edge)].push_back(Max((int)i, edge));
 
-						compatibleEdgesAll[i].push_back(edge);
+					compatibleEdgesAll[i].push_back(edge);
+					if ((int)i != edge)
 						compatibleEdgesAll[edge].push_back(i);
-					}
 
 					traverseStack.push_back(vAdj);
 				}
@@ -1429,9 +1429,32 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
 		std::sort(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end());
 
-#if 0
+#if 1
 	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
 		compatibleEdgesAll[i].erase( unique(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end() ), compatibleEdgesAll[i].end());
+#endif
+
+#if 0
+	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	{
+		String s;
+		for (size_t j = 0; j < compatibleEdgesAll[i].size(); ++j) // O(|E|)
+		{
+			String s2;
+			s2.SPrintf("%d ", (int)compatibleEdgesAll[i][j]);
+			s += s2;
+		}
+		LOGI("Edge %d is compatible with: %s", (int)i, s.c_str());
+
+		s = "";
+		for (size_t j = 0; j < compatibleEdges[i].size(); ++j) // O(|E|)
+		{
+			String s2;
+			s2.SPrintf("%d ", (int)compatibleEdges[i][j]);
+			s += s2;
+		}
+		LOGI("EDGE %d is compatible with: %s", (int)i, s.c_str());
+	}
 #endif
 
 	TIMING_TICK(tick_t t5 = Clock::Tick());
