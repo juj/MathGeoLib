@@ -574,7 +574,7 @@ void GetAdjoiningFaces(const Polyhedron &p, int v0, int v1, int &f0, int &f1)
 
 // Moves the floating point sign bit from src to dst.
 #ifdef MATH_SSE
-#define MoveSign(dst, src)
+#define MoveSign(dst, src) \
 	dst = s4f_x(xor_ps(setx_ps(dst), and_ps(setx_ps(src), simd4fSignBit))); \
 	src = s4f_x(abs_ps(setx_ps(src));
 #else
