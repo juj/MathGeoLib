@@ -805,18 +805,28 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 {
 	const float epsilon = 1e-3f;
 
+/*	
+	// TODO: It feels sensible that computing four dot products at the same time would be a win,
+	//       however at least with AVX enabled, this was benchmarked to be slower than the four individual
+	//       dpps versions below.
+	simd4f v1 = f1a - f1b;
+	simd4f v2 = f2a - f2b;
+	simd4f A = mul_ps(f1b, f2b);
+	simd4f B = mul_ps(v1, f2b);
+	simd4f C = mul_ps(v2, f1b);
+	simd4f D = mul_ps(v1, v2);
+	_MM_TRANSPOSE4_PS(A, B, C, D);
+	A = add_ps(add_ps(A, B), C); // D is all zeroes, not needed.
+	float a = s4f_x(A);
+	float b = s4f_y(A);
+	float c = s4f_z(A);
+	float d = s4f_w(A);
+*/
+
 	float a = f1b.Dot(f2b);
 	float b = (f1a-f1b).Dot(f2b);
 	float c = (f2a-f2b).Dot(f1b);
 	float d = (f1a-f1b).Dot(f2a-f2b);
-
-	// a+b = f1a.Dot(f2b)
-	// c+d = f1a.Dot(f2a-f2b)
-
-	// x := f1a.Dot(f2b)
-	// y := f1a.Dot(f2a)
-
-	// x / (y-x)
 
 	if (d == 0.f)
 	{
