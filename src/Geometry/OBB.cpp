@@ -572,6 +572,15 @@ void GetAdjoiningFaces(const Polyhedron &p, int v0, int v1, int &f0, int &f1)
 	}
 }
 
+// Moves the floating point sign bit from src to dst.
+#ifdef MATH_SSE
+#define MoveSign(dst, src)
+	dst = s4f_x(xor_ps(setx_ps(dst), and_ps(setx_ps(src), simd4fSignBit))); \
+	src = s4f_x(abs_ps(setx_ps(src));
+#else
+#define MoveSign(dst, src) if (src < 0.f) { dst = -dst; src = -src; }
+#endif
+
 int ComputeBasis(const vec &f1a, const vec &f1b,
 	const vec &f2a, const vec &f2b,
 	const vec &f3a, const vec &f3b,
@@ -579,10 +588,51 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 	vec *n2,
 	vec *n3)
 {
-	float A = (f3a-f3b).Dot(f1b) * ((f3a-f3b).Dot(f2b) * f1a.Dot(f2a) - (f3a-f3b).Dot(f2a) * f1a.Dot(f2b))
-	        + (f3a-f3b).Dot(f1a) * ((f3a-f3b).Dot(f2a) * f1b.Dot(f2b) - (f3a-f3b).Dot(f2b) * f1b.Dot(f2a));
+	float a1_a2 = f1a.Dot(f2a);
+	float a1_a3 = f1a.Dot(f3a);
+//	float a1_b1 = f1a.Dot(f1b);
+	float a1_b2 = f1a.Dot(f2b);
+	float a1_b3 = f1a.Dot(f3b);
 
-	float B =
+	float a2_a3 = f2a.Dot(f3a);
+	float a2_b1 = f2a.Dot(f1b);
+//	float a2_b2 = f2a.Dot(f2b);
+	float a2_b3 = f2a.Dot(f3b);
+
+	float a3_b1 = f3a.Dot(f1b);
+	float a3_b2 = f3a.Dot(f2b);
+//	float a3_b3 = f3a.Dot(f3b);
+
+	float b1_b2 = f1b.Dot(f2b);
+	float b1_b3 = f1b.Dot(f3b);
+
+	float b2_b3 = f2b.Dot(f3b);
+
+	float A = (a3_b1 - b1_b3) * ((a3_b2 - b2_b3) * a1_a2 + (a2_b3 - a2_a3) * a1_b2)
+	        + (a1_a3 - a1_b3) * ((a2_a3 - a2_b3) * b1_b2 + (b2_b3 - a3_b2) * a2_b1);
+
+/*
+	float A2 = 
+		(f3a-f3b).Dot(f1b) *
+		(
+		    (f3a-f3b).Dot(f2b) * f1a.Dot(f2a)
+		  - (f3a-f3b).Dot(f2a) * f1a.Dot(f2b)
+		)
+		+
+		(f3a-f3b).Dot(f1a) *
+		(
+		    (f3a-f3b).Dot(f2a) * f1b.Dot(f2b)
+		  - (f3a-f3b).Dot(f2b) * f1b.Dot(f2a)
+		);
+
+	if (!EqualAbs(A, A2)) LOGE("Asdfasd");
+*/
+	float B = a1_b3 * (a2_b1 * (b2_b3 * 2.f - a3_b2) + b1_b2 * (a2_a3 - a2_b3 * 2.f))
+	        + a1_a3 * (b1_b2 * a2_b3 - a2_b1 * b2_b3)
+	        + a3_b1 * (a1_a2 * b2_b3 - a1_b2 * a2_b3)
+	        + b1_b3 * (a1_a2 * (a3_b2 - b2_b3 * 2.f) + a1_b2 * (a2_b3 * 2.f - a2_a3));
+/*
+	float B2 =
 		
 		f1a.Dot(f3b) *
 		(
@@ -595,9 +645,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		+ f1a.Dot(f3a) *
 		(
 		+ f1b.Dot(f2b) * f2a.Dot(f3b)
-		- f1b.Dot(f2b) * f2b.Dot(f3b)
 		- f1b.Dot(f2a) * f2b.Dot(f3b)
-		+ f1b.Dot(f2b) * f2b.Dot(f3b)
 		)
 
 		+ f1b.Dot(f3a) *
@@ -614,7 +662,12 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		+ f1a.Dot(f2b) * f2a.Dot(f3b) * 2.f
 		);
 
-	float C =
+	if (!EqualAbs(B, B2)) LOGE("Bsdfasd");
+*/
+	float C = a1_b3 * (b1_b2 * a2_b3 - a2_b1 * b2_b3)
+	        + b1_b3 * (a1_a2 * b2_b3 - a1_b2 * a2_b3);
+/*
+	float C2 =
 		
 		f1a.Dot(f3b) *
 		(
@@ -627,6 +680,18 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		- f1a.Dot(f2b) * f2a.Dot(f3b)
 		);
 
+	if (!EqualAbs(C, C2)) LOGE("Csdfasd");
+*/
+	float e = b2_b3;
+	float f = a2_b3 - b2_b3;
+	float g = a3_b2 - b2_b3;
+	float h = a2_a3 - a3_b2 - a2_b3 + b2_b3;
+
+	float i = b1_b3;
+	float j = a1_b3 - b1_b3;
+	float k = a3_b1 - b1_b3;
+	float l = a1_a3 - a3_b1 - a1_b3 + b1_b3;
+/*
 	float e = f2b.Dot(f3b);
 	float f = (f2a-f2b).Dot(f3b);
 	float g = (f3a-f3b).Dot(f2b);
@@ -636,19 +701,28 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 	float j = (f1a-f1b).Dot(f3b);
 	float k = (f3a-f3b).Dot(f1b);
 	float l = (f1a-f1b).Dot(f3a-f3b);
-
+*/
 	float D = B*B - 4.f * A * C;
-	if (D < 0.f)
-		return 0;
+
 	int nSolutions = 0;
 	if (D > 0.f)
 	{
 		D = Sqrt(D);
+//		float denomV = A;
+//		float numV = D - B;
 		float v = (-B + D) / (2.f * A);
+		//MoveSign(numV, denomV);
+
+		if (v < 0.f)
+			return 0;
+		//if (numV < 0.f)
+		//	return 0;
+		//denomV = 0.5f / denomV;
+		//float v = numV * denomV;
 		float t = (-i-v*k)/(j + v*l);
 		float u = (-e -v*g) / (f + v*h);
 
-		if (t >= 0.f && u >= 0.f && v >= 0.f && t <= 1.f && u <= 1.f && v <= 1.f)
+		if (t >= 0.f && u >= 0.f && /*v >= 0.f &&*/ t <= 1.f && u <= 1.f && v <= 1.f)
 		{
 			n1[nSolutions] = (f1a*t + f1b*(1-t)).Normalized();
 			n2[nSolutions] = (f2a*u + f2b*(1-u)).Normalized();
@@ -660,6 +734,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		}
 
 		v = (-B - D) / (2.f * A);
+		//v = (-B - D) * denomV;
 		t = (-i-v*k)/(j + v*l);
 		u = (-e -v*g) / (f + v*h);
 
@@ -674,7 +749,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 				++nSolutions;
 		}
 	}
-	else
+	else if (D == 0.f)
 	{
 		float v = -B / (2.f * A);
 		float t = (-i-v*k)/(j + v*l);
