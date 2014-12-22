@@ -59,7 +59,10 @@ template<typename T>
 int float2_ConvexHullInPlace(T *p, int n)
 {
 	int k = 0;
-	T *hull = new T[n+1];
+	// TODO: The hull array should really need only n+1 elements here instead of 2n, but for
+	// numerical stability reasons, it seems that sometimes more than n+1 elements get written.
+	// Figure if there is a way to avoid this.
+	T *hull = new T[2*n];
 
 	std::sort(p, p + n, LexSortPred<T>);
 
@@ -79,7 +82,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 			--k;
 		hull[k++] = p[i];
 	}
-	assert(k <= n+1);
+	assert(k <= 2*n);
 
 	// Due to our construction, the first and last points are the same, so
 	// to avoid having duplicate data in the outputted hull, drop the
