@@ -950,11 +950,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-#define TIMING(...) ((void)0)
-#define TIMING_TICK(...) ((void)0)
+//#define TIMING(...) ((void)0)
+//#define TIMING_TICK(...) ((void)0)
 
-//#define TIMING_TICK(...) __VA_ARGS__
-//#define TIMING LOGI
+#define TIMING_TICK(...) __VA_ARGS__
+#define TIMING LOGI
 
 namespace
 {
@@ -1026,6 +1026,28 @@ bool ContainsAndRemove(std::vector<int> &arr, int val)
 			arr.erase(arr.begin() + i);
 			return true;
 		}
+	return false;
+}
+
+bool SortedArrayContains(const std::vector<int> &arr, int i)
+{
+	size_t left = 0;
+	size_t right = arr.size() - 1;
+	if (arr[left] == i || arr[right] == i)
+		return true;
+	if (arr[left] > i || arr[right] < i)
+		return false;
+
+	while(left < right)
+	{
+		int middle = (left + right + 1) >> 1;
+		if (arr[middle] < i)
+			left = i;
+		else if (arr[middle] > i)
+			right = i;
+		else
+			return true;
+	}
 	return false;
 }
 
@@ -1390,47 +1412,38 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				if (floodFillVisited[vAdj] == floodFillVisitColor)
 					continue;
 
-//				if (vAdj < v)
-//					continue; // We search unordered edges, so no need to process edge (v1, v2) and (v2, v1) twice - take the canonical order to be antipodalVertex < vAdj
-
 				int edge = vertexPairsToEdges[std::make_pair(v, vAdj)];
-	//			if (i > edge) // We search pairs of edges, so no need to process twice - take the canonical order to be i < edge.
-	//				continue;
 
-				vec f2a = faceNormals[facesForEdge[edge].first];
-				vec f2b = faceNormals[facesForEdge[edge].second];
-
-				if (AreEdgesCompatibleForOBB(f1a, f1b, f2a, f2b))
+				if (AreEdgesCompatibleForOBB(f1a, f1b, faceNormals[facesForEdge[edge].first], faceNormals[facesForEdge[edge].second]))
 				{
-					compatibleEdges[Min((int)i, edge)].push_back(Max((int)i, edge));
-
-					compatibleEdgesAll[i].push_back(edge);
-					if ((int)i != edge)
-						compatibleEdgesAll[edge].push_back(i);
+					if (i <= edge)
+					{
+						compatibleEdges[i].push_back(edge);
+						compatibleEdgesAll[i].push_back(edge);
+						if ((int)i != edge)
+							compatibleEdgesAll[edge].push_back(i);
+					}
 
 					traverseStack.push_back(vAdj);
 				}
 			}
-
-//			for(size_t j = 0; j < n.size(); ++j)
-//				if (floodFillVisited[n[j]] != floodFillVisitColor)
-//					traverseStack.push_back(n[j]);
 		}
 		++floodFillVisitColor;
-	}
-	for(size_t i = 0; i < compatibleEdges.size(); ++i)
 		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
-
-	for(size_t i = 0; i < compatibleEdges.size(); ++i)
-		compatibleEdges[i].erase( unique(compatibleEdges[i].begin(), compatibleEdges[i].end() ), compatibleEdges[i].end());
+	}
 #endif
-
 
 	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
 		std::sort(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end());
 
-#if 1
-	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
+#if 0
+	for (size_t i = 0; i < compatibleEdgesAll.size(); ++i)
+	{
+		if (unique(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end()) != compatibleEdgesAll[i].end())
+			LOGW("grageg");
+	}
+
+	for (size_t i = 0; i < compatibleEdgesAll.size(); ++i)
 		compatibleEdgesAll[i].erase( unique(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end() ), compatibleEdgesAll[i].end());
 #endif
 
