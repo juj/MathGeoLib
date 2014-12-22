@@ -1061,29 +1061,35 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 	TIMING_TICK(tick_t t1 = Clock::Tick());
 	// Precomputation: For each vertex in the convex hull, compute their neighboring vertices.
-	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData();
+	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData(); // O(|V|)
 	TIMING_TICK(tick_t t2 = Clock::Tick());
 	TIMING("Adjacencygeneration: %f msecs", Clock::TimespanToMillisecondsF(t1, t2));
 
 	// Precomputation: Compute normalized face direction vectors for each face of the hull.
 	std::vector<vec_storage> faceNormals;
 	faceNormals.reserve(convexHull.NumFaces());
-	for(int i = 0; i < convexHull.NumFaces(); ++i)
+	for(int i = 0; i < convexHull.NumFaces(); ++i) // O(|F|)
 		faceNormals.push_back(convexHull.FaceNormal(i));
 
 	TIMING_TICK(tick_t t23 = Clock::Tick());
 	TIMING("Facenormalsgen: %f msecs", Clock::TimespanToMillisecondsF(t2, t23));
 
-	// Precomputation: for each edge through vertices (i,j), we need to know
-	// the face indices for the two adjoining faces that share the edge.
-	// This is O(|V|)
+	// For each edge i, specifies the two vertices v0 and v1 through which that edge goes.
+	// This array does not have duplicates, i.e. there only exists one edge index for (v0->v1), and no
+	// edge for (v1->v0).
 	std::vector<std::pair<int, int> > edges;
+	edges.reserve(convexHull.v.size() * 2);
+	// For each edge i, specifies the two face indices f0 and f1 that share that edge.
 	std::vector<std::pair<int, int> > facesForEdge;
-	edges.reserve(convexHull.v.size()*2);
 	facesForEdge.reserve(convexHull.v.size()*2);
+	// For each vertex pair (v0, v1) through which there is an edge, specifies the index i of the edgethat passes through them.
+	// This map contains duplicates, so both (v0, v1) and (v1, v0) map to the same edge index.
 	std::unordered_map<std::pair<int, int>, int, hash_edge> vertexPairsToEdges;
 
-	for(size_t i = 0; i < convexHull.f.size(); ++i)
+	// Precomputation: for each edge through vertices (i,j), we need to know
+	// the face indices for the two adjoining faces that share the edge.
+	// This is O(|V|).
+	for (size_t i = 0; i < convexHull.f.size(); ++i)
 	{
 		const Polyhedron::Face &f = convexHull.f[i];
 		int v0 = f.v.back();
@@ -1111,46 +1117,62 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t t3 = Clock::Tick());
 	TIMING("Adjoiningfaces: %f msecs", Clock::TimespanToMillisecondsF(t23, t3));
 
-	// Precomputation: for each edge, we need to compute the list of potential
-	// antipodal points (points on the opposing face of an enclosing OBB of
-	// the face that is flush with the given edge of the polyhedron).
-	// This is O(|E|*log(|V|) ?
-
+	// Throughout the whole algorithm, this array stores an auxiliary structure for performing graph searches
+	// on the vertices of the convex hull. Conceptually each index stores a boolean whether we have visited
+	// that vertex or not. However storing such booleans is slow, since we would have to perform a linear-time
+	// scan through this array after each search to reset each boolean to unvisited false state. Instead,
+	// store a number, or a "color" for each vertex to specify whether that vertex has been visited, and manage
+	// a global color counter floodFillVisitColor that represents the visited vertices. At any given time, the
+	// vertices that have already been visited have the value floodFillVisited[i] == floodFillVisitColor in them.
+	// This wins constant-time clears of the floodFillVisited array, as we can simply increment the counter to
+	// clear the array.
+	// As a syntactic aid, use the helpers MARK_VISITED(v), HAVE_VISITED_VERTEX(v) and CLEAR_GRAPH_SEARCH to 
+	// remind of the conceptual meaning of these values.
+#define MARK_VERTEX_VISITED(v) (floodFillVisited[(v)] = floodFillVisitColor)
+#define HAVE_VISITED_VERTEX(v) (floodFillVisited[(v)] == floodFillVisitColor)
+#define CLEAR_GRAPH_SEARCH() (++floodFillVisitColor)
 	std::vector<int> floodFillVisited(convexHull.v.size());
 	int floodFillVisitColor = 1;
 
+	// Stores for each edge index i the complete list of antipodal vertices for that edge.
 	std::vector<std::vector<int> > antipodalPointsForEdge(edges.size());
 //	std::vector<std::vector<std::pair<int, vec> > > antipodalEdgesForEdge(edges.size());
 
 	std::vector<int> traverseStack;
 
+	// Since we do several extreme vertex searches, and the search directions have a lot of spatial locality, start the search
+	// for the next extreme vertex from the extreme vertex that was found during the previous iteration for
+	// the previous edge. This has been profiled to improve overall performance by as much as 15-25%.
 	int startingVertex = 0;
-	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+
+	// Precomputation: for each edge, we need to compute the list of potential
+	// antipodal points (points on the opposing face of an enclosing OBB of
+	// the face that is flush with the given edge of the polyhedron).
+	// This is O(|E|*log(|V|) ?
+	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
 
 		float dummy;
-		// Micro-opt: start the search for the extreme vertex from the extreme vertex that was found during the previous iteration for
-		// the previous edge. This slightly speeds up the search since edges have some amount of spatial locality.
-		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor++, dummy, startingVertex); // O(log(|V|)?
+		CLEAR_GRAPH_SEARCH(); // ExtremeVertexConvex performs a graph search, initialize the search data structure for it.
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(log(|V|)?
 
+		CLEAR_GRAPH_SEARCH(); // Search through the graph for all adjacent antipodal vertices.
 		traverseStack.push_back(startingVertex);
-
 		while(!traverseStack.empty()) // In amortized analysis, only a constant number of vertices are antipodal points for any edge?
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
 
-			floodFillVisited[v] = floodFillVisitColor;
+			MARK_VERTEX_VISITED(v);
 
 			float tMin = 0.f;
 			float tMax = 1.f;
 			const std::vector<int> &n = adjacencyData[v];
 			for(size_t j = 0; j < n.size(); ++j)
 			{
-				/*
-					Is an edge and a vertex compatible to be antipodal?
+				/* Is an edge and a vertex compatible to be antipodal?
 
 					n1 = f1b + (f1a-f1b)*t
 					e { v-vn }
@@ -1180,7 +1202,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				else if (n < 0.f)
 					tMax = tMin - 1.f;
 
-				// The interval of possible solutions for t closed?
+				// The interval of possible solutions for t is now degenerate?
 				if (tMax - tMin < -1e-4f)
 					break;
 			}
@@ -1200,21 +1222,18 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							antipodalEdgesForEdge[i].push_back(std::make_pair(edgeJ, n.Normalized()));
 					}
 					*/
-					if (floodFillVisited[n[j]] != floodFillVisitColor)
+					if (!HAVE_VISITED_VERTEX(n[j]))
 						traverseStack.push_back(n[j]);
 				}
 			}
 		}
-		// Robustness: If the above search did not find any antipodal points, add the first found extreme point at least.
+		// Robustness: If the above search did not find any antipodal points, add the first found extreme point at least, since
+		// it is always an antipodal point.
+		// This is known to occur very rarely due to numerical imprecision in the above loop over adjacent edges.
 		if (antipodalPointsForEdge[i].empty())
-		{
-			LOGI("Adding pt %d to edge %d.", (int)startingVertex, (int)i);
 			antipodalPointsForEdge[i].push_back(startingVertex);
-		}
-
-		assume(!antipodalPointsForEdge[i].empty());
-		++floodFillVisitColor;
 	}
+	CLEAR_GRAPH_SEARCH(); /// TODO: remove
 
 	TIMING_TICK(tick_t t4 = Clock::Tick());
 	TIMING("Antipodalpoints: %f msecs", Clock::TimespanToMillisecondsF(t3, t4));
@@ -1316,12 +1335,16 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 #endif
 
-	// Precomputation: Compute all potential companion edges for each edge.
-	// This is O(|E|^2)
+	// compatibleEdges stores for each edge i the list of all sidepodal edge indices j that it can form an OBB with, such that i <= j.
+	// The restriction i <= j is placed here to avoid doubly iterating through pairs of edges and to not do any redundant work.
 	std::vector<std::vector<int> > compatibleEdges(edges.size());
+	// compatibleEdgesAll is like compatibleEdges, but stores all edge indices, and not just those with i <= j. This is used in the cases
+	// when all edges need to be iterated for completeness and there is no overlap symmetry with i <= j to remove.
 	std::vector<std::vector<int> > compatibleEdgesAll(edges.size());
 
 #if 0
+	// Precomputation: Compute all potential companion edges for each edge.
+	// This is O(|E|^2)
 	// Important! And edge can be its own companion edge! So have each edge test itself during iteration.
 	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
 		for(size_t j = i; j < edges.size(); ++j) // O(|E|)
@@ -1375,48 +1398,39 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #endif
 
 #if 1
-	// Try a fast version of companionedges by adjacency info.
+	// Compute all sidepodal edges for each edge by performing a graph search. The set of sidepodal edges is connected in the graph, which
+	// lets us avoid having to iterate over each edge pair of the convex hull.
 	for(size_t i = 0; i < edges.size(); ++i)
 	{
-//		antipodalPointsForEdge[i].clear(); /// TODO XXXXXXXXXXXXXXX
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
 
 		float dummy;
-		/*
-		vec dir = vec(convexHull.v[edges[i].first]) - convexHull.v[edges[i].second];
-		int startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
-
+		vec dir = f1a.Perpendicular();
+		CLEAR_GRAPH_SEARCH();
+		int startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor, dummy, edges[i].first);
+		CLEAR_GRAPH_SEARCH();
 		traverseStack.push_back(startingVertex);
-		*/
-		vec dir1 = f1a.Perpendicular();
-//		vec dir2 = f1b.Perpendicular();
-		int startingVertex1 = convexHull.ExtremeVertexConvex(adjacencyData, dir1, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
-//		int startingVertex2 = convexHull.ExtremeVertexConvex(adjacencyData, dir2, floodFillVisited, floodFillVisitColor++, dummy, edges[i].first);
-		traverseStack.push_back(startingVertex1);
-//		if (startingVertex2 != startingVertex1)
-//			traverseStack.push_back(startingVertex2);
-
 		while(!traverseStack.empty())
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
 
-			floodFillVisited[v] = floodFillVisitColor;
+			MARK_VERTEX_VISITED(v);
 
 			const std::vector<int> &n = adjacencyData[v];
 			for(size_t j = 0; j < n.size(); ++j)
 			{
 				int vAdj = n[j];
 
-				if (floodFillVisited[vAdj] == floodFillVisitColor)
+				if (HAVE_VISITED_VERTEX(vAdj))
 					continue;
 
 				int edge = vertexPairsToEdges[std::make_pair(v, vAdj)];
 
 				if (AreEdgesCompatibleForOBB(f1a, f1b, faceNormals[facesForEdge[edge].first], faceNormals[facesForEdge[edge].second]))
 				{
-					if (i <= edge)
+					if ((int)i <= edge)
 					{
 						compatibleEdges[i].push_back(edge);
 						compatibleEdgesAll[i].push_back(edge);
@@ -1428,12 +1442,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				}
 			}
 		}
-		++floodFillVisitColor;
+		// We will later perform set intersection operations on the compatibleEdges arrays, so they must be sorted.
 		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
 	}
 #endif
+	CLEAR_GRAPH_SEARCH(); // TODO: remove
 
-	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
+	// We will later perform set intersection operations on the compatibleEdgesAll arrays, so they must be sorted.
+	for (size_t i = 0; i < compatibleEdgesAll.size(); ++i)
 		std::sort(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end());
 
 #if 0
