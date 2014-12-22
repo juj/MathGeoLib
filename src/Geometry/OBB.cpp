@@ -869,6 +869,20 @@ namespace
 
 bool AreCompatibleOpposingEdges(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b, vec &outN)
 {
+	/*
+		n1 = f1a*t + f1b*(1-t)
+		n2 = f2a*u + f2b*(1-u)
+		n1 = -c*n2, where c > 0
+		f1a*t + f1b*(1-t) = -c*f2a*u - c*f2b*(1-u)
+		f1a*t - f1b*t + cu*f2a + c*f2b - cu*f2b = -f1b
+		c*f2b + t*(f1a-f1b) + cu*(f2a-f2b) = -f1b
+
+		M * v = -f1b, where
+
+		M = [ f2b, (f1a-f1b), (f2a-f2b) ] column vectors
+		v = [c, t, cu]
+	*/
+
 	float3x3 A;
 	A.SetCol(0, f2b.xyz()); // c
 	A.SetCol(1, (f1a - f1b).xyz()); // t
@@ -880,8 +894,9 @@ bool AreCompatibleOpposingEdges(const vec &f1a, const vec &f1b, const vec &f2a, 
 	float cu = x[2];
 	if (!success || c <= 0.f || t < 0.f || t > 1.f)
 		return false;
-	float u = cu / c;
-	if (u < 0.f || u > 1.f)
+//	float u = cu / c;
+//	if (u < 0.f || u > 1.f)
+	if (cu < 0.f || cu > c)
 		return false;
 	outN = f1b + (f1a-f1b)*t;
 	return true;
@@ -1167,15 +1182,17 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	std::vector<std::vector<int> > compatibleEdgesAll(edges.size());
 
 #if 1
-	for(size_t i = 0; i < edges.size()-1; ++i) // O(|E|)
-		for(size_t j = i+1; j < edges.size(); ++j) // O(|E|)
+	// Important! And edge can be its own companion edge! So have each edge test itself during iteration.
+	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+		for(size_t j = i; j < edges.size(); ++j) // O(|E|)
 			if (AreEdgesCompatibleForOBB(faceNormals[facesForEdge[i].first], faceNormals[facesForEdge[i].second],
 				faceNormals[facesForEdge[j].first], faceNormals[facesForEdge[j].second]))
 			{
 				compatibleEdges[i].push_back(j);
 
 				compatibleEdgesAll[i].push_back(j);
-				compatibleEdgesAll[j].push_back(i);
+				if (i != j)
+					compatibleEdgesAll[j].push_back(i);
 			}
 #endif
 
