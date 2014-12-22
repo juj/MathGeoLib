@@ -902,9 +902,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 		float t2c = -(a+b)*c;
 		float denom = c*(c+d);
 
+		MoveSign(c, d);
 //			LOGI("t1: %f, t2: %f", t1, t2);
 		//if (denomZero > 0.f && denomZero < 1.f)
-		if ((d > 0.f && c < 0.f && c > -d) || (d < 0.f && c > 0.f && c < -d))
+//		if ((d > 0.f && c < 0.f && c > -d) || (d < 0.f && c > 0.f && c < -d))
+		if (c < 0.f && c > -d)
 		{
 			if (denom > 0.f)
 			{
@@ -1574,7 +1576,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							float num = n.Dot(f3b);
 							float denom = n.Dot(f3b-f3a);
 							MoveSign(num, denom);
-							float v;
+//							float v;
 							/*
 							if (!EqualAbs(denom, 0.f))
 								v = num / denom;
