@@ -1406,7 +1406,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		float dummy;
 		vec dir = f1a.Perpendicular();
 		CLEAR_GRAPH_SEARCH();
-		int startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor, dummy, edges[i].first);
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor, dummy, startingVertex);
 		CLEAR_GRAPH_SEARCH();
 		traverseStack.push_back(startingVertex);
 		while(!traverseStack.empty())
