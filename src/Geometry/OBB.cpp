@@ -1642,23 +1642,25 @@ OBB OBB::FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, cons
 
 OBB OBB::BruteEnclosingOBB(const vec *pointArray, int numPoints)
 {
-	OBB minOBB;
 	Polyhedron convexHull = Polyhedron::ConvexHull(pointArray, numPoints);
-	if (!pointArray || convexHull.v.size() == 0)
+	return BruteEnclosingOBB(convexHull);
+}
+
+OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
+{
+	OBB minOBB;
+	if (convexPolyhedron.v.size() == 0)
 	{
 		minOBB.SetNegativeInfinity();
 		return minOBB;
 	}
-
-	pointArray = (const vec*)&convexHull.v[0];
-	numPoints = convexHull.v.size();
 
 //	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData();
 //	std::vector<int> floodFillVisited(convexHull.v.size());
 //	int floodFillVisitColor = 1;
 
 	std::vector<float2> pts;
-	pts.resize(numPoints);
+	pts.resize(convexPolyhedron.v.size());
 	float minVolume = FLOAT_INF;
 	vec minVolumeEdgeA;
 	vec minVolumeEdgeB;
@@ -1680,7 +1682,7 @@ OBB OBB::BruteEnclosingOBB(const vec *pointArray, int numPoints)
 			vec edge = DIR_VEC(fx, fy, fz);
 
 			vec edgeA, edgeB;
-			float volume = SmallestOBBVolumeJiggle(edge, convexHull, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
+			float volume = SmallestOBBVolumeJiggle(edge, convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
 				jiggleAxisTimes, edgeA, edgeB);
 
 			if (volume < minVolume)
@@ -1691,7 +1693,7 @@ OBB OBB::BruteEnclosingOBB(const vec *pointArray, int numPoints)
 			}
 		}
 
-	return FixedOrientationEnclosingOBB(pointArray, numPoints, minVolumeEdgeA, minVolumeEdgeB);
+	return FixedOrientationEnclosingOBB((const vec *)&convexPolyhedron.v[0], convexPolyhedron.v.size(), minVolumeEdgeA, minVolumeEdgeB);
 }
 
 vec OBB::Size() const
