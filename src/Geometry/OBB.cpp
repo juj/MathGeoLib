@@ -1212,7 +1212,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 	// Compute all sidepodal edges for each edge by performing a graph search. The set of sidepodal edges is
 	// connected in the graph, which lets us avoid having to iterate over each edge pair of the convex hull.
-	for(size_t i = 0; i < edges.size(); ++i)
+	// Total running time is O(|E|*sqrt|E|).
+	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
@@ -1220,10 +1221,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		float dummy;
 		vec dir = f1a.Perpendicular();
 		CLEAR_GRAPH_SEARCH();
-		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor, dummy, startingVertex);
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(log|V|)
 		CLEAR_GRAPH_SEARCH();
 		traverseStack.push_back(startingVertex);
-		while(!traverseStack.empty())
+		while(!traverseStack.empty()) // O(sqrt(|E|)
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
@@ -1264,8 +1265,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t ts = Clock::Tick(););
 
 	// We will later perform set intersection operations on the compatibleEdges arrays, so these must be sorted.
-	for(size_t i = 0; i < compatibleEdges.size(); ++i)
-		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
+	// This takes O(|E|*sqrt|E|*log|E|).
+	for(size_t i = 0; i < compatibleEdges.size(); ++i) // O(|E|)
+		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end()); // Sorting in NlogN, size of each array is sqrt|E|.
 
 	TIMING_TICK(tick_t tb = Clock::Tick(););
 	TIMING("SortCompanionedges: %f msecs", Clock::TimespanToMillisecondsF(ts, tb));
