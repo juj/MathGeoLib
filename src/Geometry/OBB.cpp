@@ -1374,7 +1374,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	int extremeVertexSearchHint2 = 0;
 
 	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the
-	// convex hull from two opposing faces. This is O(|E|)?
+	// convex hull from two opposing faces. This is O(|E|*sqrt|E|*log|V|)?
 	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
@@ -1503,6 +1503,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		);
 
 	// Main algorithm body for computing all search directions where the OBB touches two edges on the same face.
+	// This is O(|F|*sqrt|E|*log|V|)?
 	for (size_t i = 0; i < convexHull.f.size(); ++i) // O(|F|)
 	{
 		vec n1 = faceNormals[i];
