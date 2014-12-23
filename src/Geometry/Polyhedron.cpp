@@ -2017,6 +2017,11 @@ Polyhedron Polyhedron::CreateCapsule(const vec &a, const vec &b, float r, int ve
 		f.v.push_back(verticesPerCap+(i+1)%verticesPerCap);
 		p.f.push_back(f);
 	}
+#ifdef MATH_VEC_IS_FLOAT4
+	for(size_t i = 0; i < p.v.size(); ++i)
+		p.v[i].w = 1.f;
+#endif
+
 	return p;
 }
 
