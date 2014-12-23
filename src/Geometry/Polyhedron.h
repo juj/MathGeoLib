@@ -410,6 +410,8 @@ public:
 	static Polyhedron Icosahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Dodecahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 
+	static Polyhedron CreateCapsule(const vec &a, const vec &b, float r, int verticesPerCap, bool ccwIsFrontFacing = true);
+
 	/// Tests if these two polyhedrons represent the same set of points.
 	/// @note This function is very slow, and should be used only for debugging purposes.
 	/// @note This function mutates this and the given polyhedron in order to make the test more feasible. The set of space represented
