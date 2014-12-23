@@ -1096,21 +1096,17 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		for(size_t j = 0; j < f.v.size(); ++j)
 		{
 			int v1 = f.v[j];
-
 			std::pair<int, int> e = std::make_pair(v0, v1);
-
 			std::unordered_map<std::pair<int, int>, int, hash_edge>::const_iterator iter = vertexPairsToEdges.find(e);
 			if (iter == vertexPairsToEdges.end())
 			{
-				vertexPairsToEdges[std::make_pair(v0, v1)] = (int)edges.size();
-				vertexPairsToEdges[std::make_pair(v1, v0)] = (int)edges.size();
+				vertexPairsToEdges[e] = (int)edges.size();
+				vertexPairsToEdges[std::make_pair(v1, v0)] = (int)edges.size(); // Mark that we know we have seen v0->v1 already.
 				edges.push_back(e);
-				facesForEdge.push_back(std::make_pair(i, i));
+				facesForEdge.push_back(std::make_pair(i, -1)); // The -1 will be filled once we see the edge v1->v0.
 			}
 			else
-			{
 				facesForEdge[iter->second].second = i;
-			}
 			v0 = v1;
 		}
 	}
@@ -1118,14 +1114,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING("Adjoiningfaces: %f msecs", Clock::TimespanToMillisecondsF(t23, t3));
 
 	// Throughout the whole algorithm, this array stores an auxiliary structure for performing graph searches
-	// on the vertices of the convex hull. Conceptually each index stores a boolean whether we have visited
-	// that vertex or not. However storing such booleans is slow, since we would have to perform a linear-time
-	// scan through this array after each search to reset each boolean to unvisited false state. Instead,
-	// store a number, or a "color" for each vertex to specify whether that vertex has been visited, and manage
-	// a global color counter floodFillVisitColor that represents the visited vertices. At any given time, the
-	// vertices that have already been visited have the value floodFillVisited[i] == floodFillVisitColor in them.
-	// This wins constant-time clears of the floodFillVisited array, as we can simply increment the counter to
-	// clear the array.
+	// on the vertices of the convex hull. Conceptually each index of the array stores a boolean whether we 
+	// have visited that vertex or not during the current search. However storing such booleans is slow, since
+	// we would have to perform a linear-time scan through this array before next search to reset each boolean
+	// to unvisited false state. Instead, store a number, called a "color" for each vertex to specify whether
+	// that vertex has been visited, and manage a global color counter floodFillVisitColor that represents the
+	// visited vertices. At any given time, the vertices that have already been visited have the value
+	// floodFillVisited[i] == floodFillVisitColor in them. This gives a win that we can perform constant-time
+	// clears of the floodFillVisited array, by simply incrementing the "color" counter to clear the array.
 	std::vector<int> floodFillVisited(convexHull.v.size());
 	int floodFillVisitColor = 1;
 
@@ -1236,7 +1232,15 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 
 	TIMING_TICK(tick_t t4 = Clock::Tick());
-	TIMING("Antipodalpoints: %f msecs", Clock::TimespanToMillisecondsF(t3, t4));
+
+	TIMING_TICK(
+
+		size_t numTotalAntipodals = 0;
+	for (size_t i = 0; i < antipodalPointsForEdge.size(); ++i)
+		numTotalAntipodals += antipodalPointsForEdge[i].size();
+	);
+
+	TIMING("Antipodalpoints: %f msecs (avg edge has %.3f antipodal points)", Clock::TimespanToMillisecondsF(t3, t4), (float)numTotalAntipodals/edges.size());
 	/*
 	for(size_t i = 0; i < antipodalEdgesForEdge.size(); ++i)
 		for(size_t j = 0; j+1 < antipodalEdgesForEdge[i].size(); ++j)
