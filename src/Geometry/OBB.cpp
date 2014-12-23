@@ -554,24 +554,6 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 	return rectArea * edgeLength;
 }
 
-void GetAdjoiningFaces(const Polyhedron &p, int v0, int v1, int &f0, int &f1)
-{
-	for(size_t i = 0; i < p.f.size(); ++i)
-	{
-		const Polyhedron::Face &f = p.f[i];
-		int i0 = f.v.back();
-		for(size_t j = 0; j < f.v.size(); ++j)
-		{
-			int i1 = f.v[j];
-			if (i0 == v0 && i1 == v1)
-				f0 = i;
-			else if (i0 == v1 && i1 == v0)
-				f1 = i;
-			i0 = i1;
-		}
-	}
-}
-
 // Moves the floating point sign bit from src to dst.
 #ifdef MATH_SSE
 #define MoveSign(dst, src) \
@@ -782,25 +764,6 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 	return nSolutions;
 }
 
-// Represents a 2D point which carries as satellite data the index to the
-// corresponding vertex in the original 3D polyhedron.
-struct Pt : public float2
-{
-	int i;
-};
-
-#if 0
-/// TODO: To Polyhedron.
-static float MaxDistInDirection(const Polyhedron &p, const vec &d, int face)
-{
-	const Polyhedron::Face &f = p.f[face];
-	float maxD = -FLOAT_INF;
-	for(size_t i = 0; i < f.v.size(); ++i)
-		maxD = Max(maxD, d.Dot(p.v[f.v[i]]));
-	return maxD;
-}
-#endif
-
 static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
 {
 	const float epsilon = 1e-3f;
@@ -950,11 +913,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-//#define TIMING(...) ((void)0)
-//#define TIMING_TICK(...) ((void)0)
+#define TIMING(...) ((void)0)
+#define TIMING_TICK(...) ((void)0)
 
-#define TIMING_TICK(...) __VA_ARGS__
-#define TIMING LOGI
+//#define TIMING_TICK(...) __VA_ARGS__
+//#define TIMING LOGI
 
 namespace
 {
@@ -1054,9 +1017,6 @@ bool SortedArrayContains(const std::vector<int> &arr, int i)
 OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 {
 	OBB minOBB;
-#ifdef MATH_VEC_IS_FLOAT4
-	minOBB.r.w = 0.f;
-#endif
 	float minVolume = FLOAT_INF;
 
 	TIMING_TICK(tick_t t1 = Clock::Tick());
@@ -1206,20 +1166,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			{
 				antipodalPointsForEdge[i].push_back(v);
 				for(size_t j = 0; j < n.size(); ++j)
-				{
-					/*
-					int edgeJ = vertexPairsToEdges[std::make_pair(v, n[j])];
-					if ((int)i < edgeJ && v < n[j])
-					{
-						vec n;
-						bool success = AreCompatibleOpposingEdges(f1a, f1b, faceNormals[facesForEdge[edgeJ].first], faceNormals[facesForEdge[edgeJ].second], n);
-						if (success)
-							antipodalEdgesForEdge[i].push_back(std::make_pair(edgeJ, n.Normalized()));
-					}
-					*/
 					if (!HAVE_VISITED_VERTEX(n[j]))
 						traverseStack.push_back(n[j]);
-				}
 			}
 		}
 		// Robustness: If the above search did not find any antipodal points, add the first found extreme
@@ -1236,103 +1184,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			numTotalAntipodals += antipodalPointsForEdge[i].size();
 	);
 	TIMING("Antipodalpoints: %f msecs (avg edge has %.3f antipodal points)", Clock::TimespanToMillisecondsF(t3, t4), (float)numTotalAntipodals/edges.size());
-	/*
-	for(size_t i = 0; i < antipodalEdgesForEdge.size(); ++i)
-		for(size_t j = 0; j+1 < antipodalEdgesForEdge[i].size(); ++j)
-			if (antipodalEdgesForEdge[i][j].first == antipodalEdgesForEdge[i][j+1].first)
-				LOGE("ASFASDFASDF");
-				*/
-#if 0
-	// Precomputation: Compute all potential sidepodal vertices for each edge.
-	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
-	{
-		vec e = (convexHull.v[edges[i].first] - convexHull.v[edges[i].second]).Normalized();
-		vec f1a = faceNormals[facesForEdge[i].first];
-		vec f1b = faceNormals[facesForEdge[i].second];
-
-		float dummy;
-		// Micro-opt: start the search for the extreme vertex from the extreme vertex that was found during the previous iteration for
-		// the previous edge. This slightly speeds up the search since edges have some amount of spatial locality.
-		CLEAR_GRAPH_SEARCH();
-		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, e, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(constant)?
-		CLEAR_GRAPH_SEARCH();
-		traverseStack.push_back(startingVertex);
-		while(!traverseStack.empty()) // In amortized analysis, only a O(sqrt(|V|) number of vertices are sidepodal points for any edge?
-		{
-			int v = traverseStack.back();
-			traverseStack.pop_back();
-
-			MARK_VERTEX_VISITED(v);
-
-			float tMin = 0.f;
-			float tMax = 1.f;
-			const std::vector<int> &n = adjacencyData[v];
-			for(size_t j = 0; j < n.size(); ++j)
-			{
-				/*
-					Is an edge and a vertex compatible to be sidepodal?
-
-					n1 = f1b + (f1a-f1b)*t
-					n2.n1 = 0
-					e { v-vn }
-					n2.e <= 0
-
-					n2=(x,y,z)
-					n2.(f1b + (f1a-f1b)*t) = 0
-					n2.f1b + t*n2.(f1a-f1b) = 0
-
-					if n2.(f1a-f1b) != 0:
-					    t = -n2.f1b / (n2.(f1a-f1b))
-
-					n2.e <= 0
-					x*e.x + y*e.y + z*e.z <= 0
-
-					x*(f1b.x + (f1a.x-f1b.x)*t) + y*(f1b.y + (f1a.y-f1b.y)*t) + z*(f1b.z + (f1a.z-f1b.z)*t) = 0
-					x*e.x + y*e.y + z*e.z + r_e == 0, r_e >= 0
-
-					// XXX v
-
-					n1.e <= 0
-					(f1b + (f1a-f1b)*t).e <= 0
-					t*(f1a-f1b).e <= -f1b.e 
-					if (f1a-f1b).e > 0:
-						t <= -f1b.e / (f1a-f1b).e && t \in [0,1]
-						-f1b.e / (f1a-f1b).e >= 0
-						f1b.e <= 0
-					if (f1a-f1b).e < 0:
-						t >= -f1b.e / (f1a-f1b).e && t \in [0,1]
-						-f1b.e / (f1a-f1b).e <= 1
-						-f1b.e >= (f1a-f1b).e
-						f1b.e + (f1a-f1b).e <= 0 
-					if (f1a-f1b).e == 0:
-						0 <= -f1b.e
-				*/
-				vec e = convexHull.v[v] - convexHull.v[n[j]];
-				float s = (f1a-f1b).Dot(e);
-				float n = -f1b.Dot(e);
-				if (s > 0.f)
-					tMax = Min(tMax, n / s);
-				else if (s < 0.f)
-					tMin = Max(tMin, n / s);
-				else if (n < 0.f)
-					tMax = tMin - 1.f;
-
-				// The interval of possible solutions for t closed?
-				if (tMax < tMin)
-					break;
-			}
-
-			if (tMin <= tMax)
-			{
-				antipodalPointsForEdge[i].push_back(v);
-				for(size_t j = 0; j < n.size(); ++j)
-					if (!HAVE_VISITED_VERTEX(n[j]))
-						traverseStack.push_back(n[j]);
-			}
-		}
-		CLEAR_GRAPH_SEARCH();
-	}
-#endif
 
 	// Stores for each edge i the list of all sidepodal edge indices j that it can form an OBB with.
 	std::vector<std::vector<int> > compatibleEdges(edges.size());
@@ -1359,45 +1210,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			}
 #endif
 
-#if 0
-	for(size_t i = 0; i < compatibleEdgesAll.size(); ++i)
-	{
-		std::vector<int> x = compatibleEdgesAll[i];
-		int numIslands = 0;
-		while(x.size() > 0)
-		{
-			int sizePrev = x.size();
-			++numIslands;
-			traverseStack.push_back(edges[x[0]].first);
-
-			while(traverseStack.size() > 0)
-			{
-				while(!traverseStack.empty())
-				{
-					int v = traverseStack.back();
-					traverseStack.pop_back();
-
-					const std::vector<int> &n = adjacencyData[v];
-					for(size_t j = 0; j < n.size(); ++j)
-					{
-						int vAdj = n[j];
-						int edge = vertexPairsToEdges[std::make_pair(v, vAdj)];
-						int edge2 = vertexPairsToEdges[std::make_pair(vAdj, v)];
-					
-						if (ContainsAndRemove(x, edge) || ContainsAndRemove(x, edge2))
-						{
-							traverseStack.push_back(vAdj);
-						}
-					}
-				}
-			}
-			if (x.size() > 0) LOGI("Island of size %d. %d left.", sizePrev - (int)x.size(), (int)x.size());
-		}
-		if (numIslands > 1) LOGI("Edges in %d islands.", numIslands);
-	}
-#endif
-
-#if 1
 	// Compute all sidepodal edges for each edge by performing a graph search. The set of sidepodal edges is
 	// connected in the graph, which lets us avoid having to iterate over each edge pair of the convex hull.
 	for(size_t i = 0; i < edges.size(); ++i)
@@ -1441,22 +1253,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			}
 		}
 	}
-#endif
 
 	// We will later perform set intersection operations on the compatibleEdges arrays, so these must be sorted.
 	for(size_t i = 0; i < compatibleEdges.size(); ++i)
 		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
-
-#if 0
-	for (size_t i = 0; i < compatibleEdgesAll.size(); ++i)
-	{
-		if (unique(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end()) != compatibleEdgesAll[i].end())
-			LOGW("grageg");
-	}
-
-	for (size_t i = 0; i < compatibleEdgesAll.size(); ++i)
-		compatibleEdgesAll[i].erase( unique(compatibleEdgesAll[i].begin(), compatibleEdgesAll[i].end() ), compatibleEdgesAll[i].end());
-#endif
 
 #if 0
 	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
@@ -1560,7 +1360,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 	TIMING_TICK(tick_t t6 = Clock::Tick());
 	TIMING("Edgetripletconfigs: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t5, t6), numConfigsExplored);
-	TIMING_TICK(t6 = Clock::Tick());
+	TIMING_TICK(
+		t6 = Clock::Tick();
+		int numTwoOpposingFacesConfigs = 0;
+		);
 
 	// Take advantage of spatial locality: start the search for the extreme vertex from the extreme vertex
 	// that was found during the previous iteration for the previous edge. This speeds up the search since
@@ -1570,9 +1373,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	int extremeVertexSearchHint1 = 0;
 	int extremeVertexSearchHint2 = 0;
 
-	TIMING_TICK(int numTwoOpposingFacesConfigs = 0;);
-
-#if 1
 	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the
 	// convex hull from two opposing faces. This is O(|E|)?
 	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
@@ -1697,111 +1497,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 	TIMING_TICK(tick_t t7 = Clock::Tick());
 	TIMING("Edgepairsforfaces: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t6, t7), numTwoOpposingFacesConfigs);
-#endif
-
-#if 0
-	TIMING_TICK(tick_t t66 = Clock::Tick());
-
-	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the convex hull
-	// from two opposing faces. This is O(|E|)?
-	numTwoOpposingFacesConfigs = 0;
-	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
-	{
-		vec f1a = faceNormals[facesForEdge[i].first];
-		vec f1b = faceNormals[facesForEdge[i].second];
-
-		const std::vector<int> &compatibleEdgesI = compatibleEdgesAll[i];
-
-		const std::vector<std::pair<int, vec> > &antipodalEdges = antipodalEdgesForEdge[i];
-		for (size_t j = 0; j < antipodalEdges.size(); ++j) // O(constant)?
-		{
-			int edgeJ = antipodalEdges[j].first;
-			vec n = antipodalEdges[j].second;
-
-			vec f2a = faceNormals[facesForEdge[edgeJ].first];
-			vec f2b = faceNormals[facesForEdge[edgeJ].second];
-
-			const std::vector<int> &compatibleEdgesJ = compatibleEdgesAll[edgeJ];
-
- 			float minN1 = n.Dot(convexHull.v[edges[edgeJ].first]);
-			float maxN1 = n.Dot(convexHull.v[edges[i].first]);
-
-			// Test all mutual compatible edges.
-			size_t s_i = 0;
-			size_t s_j = 0;
-			while (s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(|E|))?
-			{
-				if (compatibleEdgesI[s_i] == compatibleEdgesJ[s_j])
-				{
-					const int edge3 = compatibleEdgesI[s_i];
-					vec f3a = faceNormals[facesForEdge[edge3].first];
-					vec f3b = faceNormals[facesForEdge[edge3].second];
-					// Is edge3 compatible with direction n?
-					// n3 = f3b + (f3a-f3b)*v
-					// n1.n3 = 0
-					// n1.(f3b + (f3a-f3b)*v) = 0
-					// n1.f3b + n1.((f3a-f3b)*v) = 0
-					// n1.f3b = (n1.(f3b-f3a))*v
-					// If n1.(f3b-f3a) != 0:
-					//    v = n1.f3b / n1.(f3b-f3a)
-					// If n1.(f3b-f3a) == 0:
-					//    n1.f3b must be zero as well, then arbitrary v is ok.
-					float num = n.Dot(f3b);
-					float denom = n.Dot(f3b - f3a);
-					float v;
-					if (!EqualAbs(denom, 0.f))
-						v = num / denom;
-					else
-						v = EqualAbs(num, 0.f) ? 0.f : -1.f;
-
-					const float epsilon = 1e-4f;
-					if (v >= 0.f - epsilon && v <= 1.f + epsilon)
-					{
-						vec n3 = (f3b + (f3a - f3b) * v).Normalized();
-						vec n2 = n3.Cross(n).Normalized();
-
-						float minN2, maxN2;
-						CLEAR_GRAPH_SEARCH();
-						extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(log|V|)?
-						CLEAR_GRAPH_SEARCH();
-						extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(log|V|)?
-						minN2 = -minN2;
-						float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
-						const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
-						float minN3 = FLOAT_INF;
-						for (size_t a = 0; a < antipodalsEdge3.size(); ++a)
-							minN3 = Min(minN3, n3.Dot(convexHull.v[antipodalsEdge3[a]]));
-
-						float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
-						++numTwoOpposingFacesConfigs;
-						if (volume < minVolume)
-						{
-							minOBB.pos = ((minN1 + maxN1) * n + (minN2 + maxN2) * n2 + (minN3 + maxN3) * n3) * 0.5f;
-							minOBB.axis[0] = n;
-							minOBB.axis[1] = n2;
-							minOBB.axis[2] = n3;
-							minOBB.r[0] = (maxN1 - minN1) * 0.5f;
-							minOBB.r[1] = (maxN2 - minN2) * 0.5f;
-							minOBB.r[2] = (maxN3 - minN3) * 0.5f;
-							minVolume = volume;
-						}
-					}
-					++s_i;
-					++s_j;
-				}
-				else if (compatibleEdgesI[s_i] < compatibleEdgesJ[s_j])
-					++s_i;
-				else
-					++s_j;
-			}
-		}
-	}
-
-	TIMING_TICK(tick_t t67 = Clock::Tick());
-	TIMING("Edgepairsforfaces_new: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t66, t67), numTwoOpposingFacesConfigs/*(int)dirs.size()*/);
-
-#endif
-
 	TIMING_TICK(
 		tick_t t72 = Clock::Tick();
 		int numTwoSameFacesConfigs = 0;
@@ -1879,7 +1574,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						minN3 = Min(minN3, n3.Dot(convexHull.v[antipodalsEdge3[a]]));
 
 					float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
-					++numTwoSameFacesConfigs;
+					TIMING_TICK(++numTwoSameFacesConfigs;);
 					if (volume < minVolume)
 					{
 						minOBB.pos = ((minN1 + maxN1) * n1 + (minN2 + maxN2) * n2 + (minN3 + maxN3) * n3) * 0.5f;
@@ -1909,249 +1604,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// fix that up at the very last step, if necessary.
 	if (minOBB.axis[0].Cross(minOBB.axis[1]).Dot(minOBB.axis[2]) < 0.f)
 		minOBB.axis[2] = -minOBB.axis[2];
-	return minOBB;
-}
-
-#if 0
-// OLD
-OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
-{
-	OBB minOBB;
 #ifdef MATH_VEC_IS_FLOAT4
 	minOBB.r.w = 0.f;
 #endif
-	float minVolume = FLOAT_INF;
-
-	Polyhedron convexHull = Polyhedron::ConvexHull(pointArray, numPoints);
-	if (!pointArray || convexHull.v.size() == 0)
-	{
-		minOBB.SetNegativeInfinity();
-		return minOBB;
-	}
-
-	// XXXXXXX
-	std::vector<std::pair<int, int> > edges = convexHull.EdgeIndices();
-	std::vector<std::pair<int, int> > facesForEdge;
-	facesForEdge.reserve(edges.size());
-	for(size_t i = 0; i < edges.size(); ++i)
-	{
-		int f0, f1;
-		GetAdjoiningFaces(convexHull, edges[i].first, edges[i].second, f0, f1);
-		facesForEdge.push_back(std::make_pair(f0, f1));
-	}
-
-//	OBB minOBB;
-//	float minOBBVolume = FLOAT_INF;
-	for(size_t i = 0; i < edges.size()-2; ++i)
-		for(size_t j = i+1; j < edges.size()-1; ++j)
-			for(size_t k = j+1; k < edges.size(); ++k)
-				for(int solution = 0; solution < 2; ++solution)
-			{
-				vec e1 = (convexHull.v[edges[i].first] - convexHull.v[edges[i].second]).Normalized();
-				vec e2 = (convexHull.v[edges[j].first] - convexHull.v[edges[j].second]).Normalized();
-				vec e3 = (convexHull.v[edges[k].first] - convexHull.v[edges[k].second]).Normalized();
-				vec f1a = convexHull.FaceNormal(facesForEdge[i].first).Normalized();
-				vec f1b = convexHull.FaceNormal(facesForEdge[i].second).Normalized();
-				vec f2a = convexHull.FaceNormal(facesForEdge[j].first).Normalized();
-				vec f2b = convexHull.FaceNormal(facesForEdge[j].second).Normalized();
-				vec f3a = convexHull.FaceNormal(facesForEdge[k].first).Normalized();
-				vec f3b = convexHull.FaceNormal(facesForEdge[k].second).Normalized();
-
-				vec n1, n2, n3;
-				bool success = ComputeBasis(e1, e2, e3, f1a, f1b, f2a, f2b, f3a, f3b, n1, n2, n3, solution);
-				if (success)
-				{
-					assert(n1.IsPerpendicular(e1));
-					assert(n2.IsPerpendicular(e2));
-					assert(n3.IsPerpendicular(e3));
-					float n1_n2 = n1.Dot(n2);
-					float n1_n3 = n1.Dot(n3);
-					float n2_n3 = n2.Dot(n3);
-					assume(n1.IsPerpendicular(n2));
-					assume(n2.IsPerpendicular(n3));
-					assume(n3.IsPerpendicular(n1));
-					assume((e2-e2.ProjectTo(n1)).IsPerpendicular((e3-e3.ProjectTo(n1))));
-					assume((e1-e1.ProjectTo(n2)).IsPerpendicular((e3-e3.ProjectTo(n2))));
-					assume((e1-e1.ProjectTo(n3)).IsPerpendicular((e2-e2.ProjectTo(n3))));
-
-					OBB obb = OBB::FixedOrientationEnclosingOBB(&convexHull.v[0], convexHull.v.size(), n1, n2);
-//					LOGI("If flush with edges %d(%d-%d), %d(%d-%d), %d(%d-%d), volume is %.9g",
-	//					i, edges[i].first, edges[i].second, j, edges[j].first, edges[j].second,
-//						k, edges[k].first, edges[k].second, obb.Volume());
-					if (obb.Volume() < minVolume)
-					{
-						minOBB = obb;
-						minVolume = obb.Volume();
-//						LOGI("Edges %dx%dx%d is smallest (%.9g)", (int)i, (int)j, (int)k, minVolume);
-					}
-				}
-//				else
-//					LOGI("edges %d(%d-%d), %d(%d-%d), %d(%d-%d) are a failure.",
-//						i, edges[i].first, edges[i].second, j, edges[j].first, edges[j].second,
-//						k, edges[k].first, edges[k].second);
-
-			}
-	// XXXXXXX
-
-//	return minOBB;
-	pointArray = (vec*)&convexHull.v[0];
-	numPoints = convexHull.v.size();
-
-	std::vector<float2> pts;
-	pts.resize(numPoints);
-
-	VecArray dirs;
-	dirs.reserve((numPoints * (numPoints-1)) / 2);
-	/*
-	for(int i = 0; i < numPoints; ++i)
-		for(int j = i+1; j < numPoints; ++j)
-		{
-			vec edge = pointArray[i]-pointArray[j];
-			float oldLength = edge.Normalize();
-			if (edge.z < 0.f)
-				edge = -edge;
-			if (oldLength > 0.f)
-				dirs.push_back(edge);
-		}
-	*/
-	for(size_t i = 0; i < convexHull.f.size(); ++i)
-	{
-		dirs.push_back(convexHull.FaceNormal(i));
-//		LOGI("Must test face normal %s", convexHull.FaceNormal(i).ToString().c_str());
-	}
-//#if 0
-	for(size_t i = 0; i < convexHull.f.size(); ++i)
-	{
-		const Polyhedron::Face &f = convexHull.f[i];
-		int v0 = f.v.back();
-		for(size_t j = 0; j < f.v.size(); ++j)
-		{
-			int v1 = f.v[j];
-			if (v0 < v1)
-			{
-				vec edge1 = (vec)convexHull.v[v1]-(vec)convexHull.v[v0];
-				float len = edge1.Normalize();
-				if (len > 0.f)
-				{
-					// No need to consider edge pairs of the same polyhedron (so start with k=i+1 instead of k=i), because int those cases,
-					// a face of the minimal OBB would be flush with the face of that polyhedron that contains the two edges.
-					for(size_t k = i+1; k < convexHull.f.size(); ++k)
-					{
-						const Polyhedron::Face &g = convexHull.f[k];
-						int w0 = g.v.back();
-						for(size_t l = 0; l < g.v.size(); ++l)
-						{
-							int w1 = g.v[l];
-							if (w0 < w1)
-							{
-								vec edge2 = (vec)convexHull.v[w1]-(vec)convexHull.v[w0];
-								len = edge2.Normalize();
-								if (len > 0.f)// && edge1.IsPerpendicular(edge2, 1e-3f))
-								{
-									vec cross = edge1.Cross(edge2);
-									len = cross.Normalize();
-									if (len > 0.f)
-									{
-//										LOGI("Must test direction %d->%d cross %d->%d. %s", v0, v1, w0, w1, edge1.Cross(edge2).Normalized().ToString().c_str());
-										dirs.push_back(cross);
-									}
-								}
-							}
-							w0 = w1;
-						}
-					}
-				}
-			}
-			v0 = v1;
-		}
-	}
-//#endif
-	/*
-	LineSegmentArray edges = convexHull.Edges();
-	for(size_t i = 0; i < edges.size(); ++i)
-		for(size_t j = i+1; j < edges.size(); ++j)
-			dirs.push_back(((LineSegment)edges[i]).Dir().Cross(((LineSegment)edges[j]).Dir()).Normalized());
-			*/
-/*
-//	LOGI("Got %d directions.", (int)dirs.size());
-#ifdef MATH_CONTAINERLIB_SUPPORT
-	sort::QuickSort(&dirs[0], (int)dirs.size(), LexFloat3Cmp);
-#else
-	qsort(&dirs[0], dirs.size(), sizeof(VecArray::value_type), LexFloat3CmpV);
-#endif
-	size_t nDistinct = 1;
-	for(size_t i = 1; i < dirs.size(); ++i)
-	{
-		vec d = dirs[i];
-		bool removed = false;
-		for(size_t j = 0; j < nDistinct; ++j)
-		{
-			float distX = d.x - dirs[j].x;
-			if (distX > 1e-3f)
-				break;
-			if (d.DistanceSq(dirs[j]) < 1e-6f)
-			{
-				removed = true;
-				break;
-			}
-		}
-		if (!removed)
-			dirs[nDistinct++] = dirs[i];
-	}
-	if (nDistinct != dirs.size())
-	{
-		dirs.erase(dirs.begin() + nDistinct, dirs.end());
-		LOGI("Pruned %d directions (was %d to %d).", nDistinct, (int)dirs.size()+nDistinct, (int)dirs.size());
-	}
-	*/
-//	LOGI("%d dirs.", dirs.size());
-	for(size_t i = 0; i < dirs.size(); ++i)
-	{
-		vec edge = dirs[i];
-
-		int e1, e2;
-		ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
-		float edgeLength = Abs(Dot(pointArray[e1] - pointArray[e2], edge));
-
-		vec u, v;
-		edge.PerpendicularBasis(u, v);
-		for(int k = 0; k < numPoints; ++k)
-			pts[k] = float2(pointArray[k].Dot(u), pointArray[k].Dot(v));
-
-		float2 rectCenter;
-		float2 uDir;
-		float2 vDir;
-		float minU, maxU, minV, maxV;
-		float rectArea = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
-		float volume = rectArea * edgeLength;
-
-		if (volume < minVolume)
-		{
-//			LOGI("Faceis smallest (%.9g)", (int)i, (int)j, (int)k, minVolume);
-//			LOGI("Face %s is smallest. (%.9g)", edge.ToString().c_str(), volume);
-			float2 c10 = (maxV - minV) * vDir;
-			float2 c20 = (maxU - minU) * uDir;
-			float2 center = 0.5f * (uDir * (minU+maxU) + vDir * (minV+maxV));
-			vec C1 = c10.x*u + c10.y*v;
-			vec C2 = c20.x*u + c20.y*v;
-			minOBB.axis[0] = edge;
-			vec rectCenterPos = vec(POINT_VEC_SCALAR(0.f)) + center.x*u + center.y*v;
-			minOBB.pos = Dot(pointArray[e1]+pointArray[e2], edge) * 0.5f * edge + rectCenterPos;
-			minOBB.r[0] = edgeLength * 0.5f;
-			minOBB.r[1] = C1.Normalize()*0.5f;
-			minOBB.r[2] = C2.Normalize()*0.5f;
-			minOBB.axis[1] = C1;
-			minOBB.axis[2] = C2;
-			minVolume = volume;
-		}
-	}
-	/*
-	vec edgeA, edgeB;
-	SmallestOBBVolumeJiggle(minOBB.axis[0], pointArray, numPoints, pts, 3, edgeA, edgeB);
-	return FixedOrientationEnclosingOBB(pointArray, numPoints, edgeA, edgeB);*/
 	return minOBB;
 }
-#endif
 
 OBB OBB::FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, const vec &dir0, const vec &dir1)
 {
