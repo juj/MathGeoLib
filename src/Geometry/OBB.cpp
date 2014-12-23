@@ -913,11 +913,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-#define TIMING(...) ((void)0)
-#define TIMING_TICK(...) ((void)0)
+//#define TIMING(...) ((void)0)
+//#define TIMING_TICK(...) ((void)0)
 
-//#define TIMING_TICK(...) __VA_ARGS__
-//#define TIMING LOGI
+#define TIMING_TICK(...) __VA_ARGS__
+#define TIMING LOGI
 
 namespace
 {
@@ -1254,9 +1254,21 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		}
 	}
 
+	TIMING_TICK(
+		tick_t t5 = Clock::Tick();
+		size_t numTotalEdges = 0;
+		for(size_t i = 0; i < compatibleEdges.size(); ++i)
+			numTotalEdges += compatibleEdges[i].size();
+	);
+	TIMING("Companionedges: %f msecs (%d edges have on average %d companion edges each)", Clock::TimespanToMillisecondsF(t4, t5), (int)compatibleEdges.size(), (int)(numTotalEdges / compatibleEdges.size()));
+	TIMING_TICK(tick_t ts = Clock::Tick(););
+
 	// We will later perform set intersection operations on the compatibleEdges arrays, so these must be sorted.
 	for(size_t i = 0; i < compatibleEdges.size(); ++i)
 		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end());
+
+	TIMING_TICK(tick_t tb = Clock::Tick(););
+	TIMING("SortCompanionedges: %f msecs", Clock::TimespanToMillisecondsF(ts, tb));
 
 #if 0
 	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
@@ -1280,14 +1292,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		LOGI("EDGE %d is compatible with: %s", (int)i, s.c_str());
 	}
 #endif
-
-	TIMING_TICK(
-		tick_t t5 = Clock::Tick();
-		size_t numTotalEdges = 0;
-		for(size_t i = 0; i < compatibleEdges.size(); ++i)
-			numTotalEdges += compatibleEdges[i].size();
-		);
-	TIMING("Companionedges: %f msecs (%d edges have on average %d companion edges each)", Clock::TimespanToMillisecondsF(t4, t5), (int)compatibleEdges.size(), (int)(numTotalEdges/compatibleEdges.size()));
 
 	// Main algorithm body for testing three edges all on adjacent faces of the box.
 	// This is O(|E|^2)?
