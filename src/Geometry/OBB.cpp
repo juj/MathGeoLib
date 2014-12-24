@@ -498,14 +498,6 @@ OBB OBB::PCAEnclosingOBB(const vec * /*pointArray*/, int /*numPoints*/)
 }
 #endif
 
-#define LEX_ORDER(x, y) if ((x) < (y)) return -1; else if ((x) > (y)) return 1;
-int LexFloat3Cmp(const vec &a, const vec &b)
-{
-	LEX_ORDER(a.x, b.x);
-	return 0;
-}
-int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*(const vec*)a, *(const vec*)b); }
-
 float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, std::vector<float2> &pts,
 //	const std::vector<std::vector<int> > &adjacencyData,
 //	std::vector<int> &floodFillVisited,
@@ -916,11 +908,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 //#define OBB_ASSERT_VALIDITY
 //#define OBB_DEBUG_PRINT
 
-//#define TIMING(...) ((void)0)
-//#define TIMING_TICK(...) ((void)0)
+#define TIMING(...) ((void)0)
+#define TIMING_TICK(...) ((void)0)
 
-#define TIMING_TICK(...) __VA_ARGS__
-#define TIMING LOGI
+//#define TIMING_TICK(...) __VA_ARGS__
+//#define TIMING LOGI
 
 namespace
 {
@@ -982,17 +974,6 @@ OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 		return minOBB;
 	}
 	return OptimalEnclosingOBB(convexHull);
-}
-
-bool ContainsAndRemove(std::vector<int> &arr, int val)
-{
-	for(size_t i = 0; i < arr.size(); ++i)
-		if (arr[i] == val)
-		{
-			arr.erase(arr.begin() + i);
-			return true;
-		}
-	return false;
 }
 
 bool SortedArrayContains(const std::vector<int> &arr, int i)
