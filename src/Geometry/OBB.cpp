@@ -913,6 +913,8 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
+#define OBB_ASSERT_VALIDITY
+
 //#define TIMING(...) ((void)0)
 //#define TIMING_TICK(...) ((void)0)
 
@@ -1079,8 +1081,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t t23 = Clock::Tick());
 	TIMING("Facenormalsgen: %f msecs", Clock::TimespanToMillisecondsF(t2, t23));
 
-#if 0
-	// For debugging, assert that face normals are pointing in valid directions:
+#ifdef OBB_ASSERT_VALIDITY
+	// For debugging, assert that face normals in the input Polyhedron are pointing in valid directions:
 	for(size_t i = 0; i < faceNormals.size(); ++i)
 	{
 		vec pointOnFace = convexHull.v[convexHull.f[i].v[0]];
@@ -1088,7 +1090,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		{
 			vec pointDiff = vec(convexHull.v[j]) - pointOnFace;
 			float signedDistance = pointDiff.Dot(faceNormals[i]);
-			assert(signedDistance < 1e-1f);
+			if (signedDistance > 1e-1f)
+				LOGE("Vertex %d is %f units deep on the wrong side of a face: Face plane normals are pointing inside the convex hull?", (int)j, signedDistance);
 		}
 	}
 #endif
@@ -1386,6 +1389,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							minOBB.r[2] = (maxN3 - minN3) * 0.5f;
 							minOBB.pos = (minN1 + minOBB.r[0])*n1[s] + (minN2 + minOBB.r[1])*n2[s] + (minN3 + minOBB.r[2])*n3[s];
 							assert(volume > 0.f);
+#ifdef OBB_ASSERT_VALIDITY
+							OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
+							assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+#endif
 							minVolume = volume;
 						}
 					}
@@ -1519,6 +1526,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 									minOBB.r[1] = (maxN2 - minN2) * 0.5f;
 									minOBB.r[2] = (maxN3 - minN3) * 0.5f;
 									assert(volume > 0.f);
+#ifdef OBB_ASSERT_VALIDITY
+									OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
+									assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+#endif
 									minVolume = volume;
 								}
 							}
@@ -1626,6 +1637,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						minOBB.r[1] = (maxN2 - minN2) * 0.5f;
 						minOBB.r[2] = (maxN3 - minN3) * 0.5f;
 						assert(volume > 0.f);
+#ifdef OBB_ASSERT_VALIDITY
+						OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
+						assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+#endif
 						minVolume = volume;
 					}
 				}
