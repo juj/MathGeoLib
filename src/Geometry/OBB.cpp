@@ -1236,14 +1236,17 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// This is O(|E|^2)
 	// Important! And edge can be its own companion edge! So have each edge test itself during iteration.
 	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	{
+		vec f1a = faceNormals[facesForEdge[i].first];
+		vec f1b = faceNormals[facesForEdge[i].second];
 		for(size_t j = i; j < edges.size(); ++j) // O(|E|)
-			if (AreEdgesCompatibleForOBB(faceNormals[facesForEdge[i].first], faceNormals[facesForEdge[i].second],
-				faceNormals[facesForEdge[j].first], faceNormals[facesForEdge[j].second]))
+			if (AreEdgesCompatibleForOBB(f1a, f1b, faceNormals[facesForEdge[j].first], faceNormals[facesForEdge[j].second]))
 			{
 				compatibleEdges[i].push_back(j);
 				if (i != j)
 					compatibleEdges[j].push_back(i);
 			}
+	}
 #endif
 
 #if 0
