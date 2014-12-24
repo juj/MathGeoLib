@@ -913,7 +913,7 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	return true;
 }
 
-#define OBB_ASSERT_VALIDITY
+//#define OBB_ASSERT_VALIDITY
 //#define OBB_DEBUG_PRINT
 
 //#define TIMING(...) ((void)0)
