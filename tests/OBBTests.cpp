@@ -128,7 +128,7 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case)
 		DIR_VEC(0.40673714876174927f,-0.2665744721889496f,-0.8737865686416626f));
 
 	OBB minOBB = OBB::OptimalEnclosingOBB(points, n);
-	OBB fastOBB = OBB::FastEnclosingOBB(points, n);
+	OBB fastOBB = OBB::BruteEnclosingOBB(points, n);
 
 	for(int i = 0; i < n; ++i)
 		assert1(knownTightOBB.Distance(points[i]) < 1e-5f, knownTightOBB.Distance(points[i]));
