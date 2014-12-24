@@ -1503,6 +1503,16 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	Swap(p.v[2], p.v[v2]);
 	Swap(p.v[3], p.v[v3]);
 
+	// If the initial tetrahedron has zero volume, the whole input set is planar.
+	// In that case, we should solve a 2D convex hull problem.
+	float volume = Abs((vec(p.v[0]) - vec(p.v[3])).Dot((vec(p.v[1]) - vec(p.v[3])).Cross(vec(p.v[2]) - vec(p.v[3])))); // / 6.f; Div by six is not relevant here.
+	if (volume < 1e-4f)
+	{
+		// TODO: Do 2D convex hull.
+		p.v.clear();
+		p.f.clear();
+		return p;
+	}
 	// For each face, maintain a list of its adjacent faces.
 //	std::vector<std::vector<int> > faceAdjacency(4);
 	// For each face, precompute its normal vector.
@@ -1516,14 +1526,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	face.v[0] = 1; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
 
 	// Ensure that the winding order of the generated tetrahedron is correct for each face.
-	vec center = p.v[0];
-	for(size_t i = 1; i < 4; ++i)
-		center += p.v[i];
-
-	center /= 4.f;
-	for(int i = 0; i < (int)p.f.size(); ++i)
-		if (p.FacePlane(i).SignedDistance(center) > 0.f)
-			p.f[i].FlipWindingOrder();
+	if (p.FacePlane(0).SignedDistance(p.v[3]) > 0.f) p.f[0].FlipWindingOrder();
+	if (p.FacePlane(1).SignedDistance(p.v[2]) > 0.f) p.f[1].FlipWindingOrder();
+	if (p.FacePlane(2).SignedDistance(p.v[1]) > 0.f) p.f[2].FlipWindingOrder();
+	if (p.FacePlane(3).SignedDistance(p.v[0]) > 0.f) p.f[3].FlipWindingOrder();
 
 	assert(p.IsClosed());
 	assert(p.FaceIndicesValid());
@@ -1564,10 +1570,16 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	std::vector<std::vector<int> > conflictList(p.f.size());
 
 	// Assign each remaining vertex (vertices 0-3 form the initial hull) to the initial conflict lists.
-	for(size_t i = 4; i < p.v.size(); ++i)
-		for(size_t j = 0; j < p.f.size(); ++j)
-			if (((Plane)facePlanes[j]).IsOnPositiveSide(p.v[i]))
+	for(size_t j = 0; j < p.f.size(); ++j)
+	{
+		vec pointOnFace = p.v[p.f[j].v[0]];
+		for(size_t i = 4; i < p.v.size(); ++i)
+		{
+			float d = Dot((vec)p.v[i] - pointOnFace, ((Plane)facePlanes[j]).normal);
+			if (d > 1e-4f)
 				conflictList[j].push_back(i);
+		}
+	}
 
 	std::vector<int> workStack;
 	if (!conflictList[0].empty()) workStack.push_back(0);
@@ -1594,6 +1606,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		if (conflict.empty())
 			continue;
 
+		vec pointOnFace = p.v[p.f[f].v[0]];
 		// Find the most extreme conflicting vertex on this face.
 		float extremeD = -FLOAT_INF;
 		int extremeCI = -1; // Index of the vertex in the conflict list.
@@ -1603,7 +1616,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 			int vt = conflict[i];
 			if (vt < (int)hullVertices.size() && hullVertices[conflict[i]])
 				continue; // Robustness check: if this vertex is already part of the hull, ignore it.
-			float d = Dot(p.v[conflict[i]], ((Plane)facePlanes[f]).normal);
+			float d = Dot((vec)p.v[conflict[i]] - pointOnFace, ((Plane)facePlanes[f]).normal);
 			if (d > extremeD)
 			{
 				extremeD = d;
@@ -1611,7 +1624,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 				extremeI = conflict[i];
 			}
 		}
-		if (extremeD <= ((Plane)facePlanes[f]).d + 1e-5f)
+//		if (extremeD <= ((Plane)facePlanes[f]).d + 1e-5f)
+		if (extremeD <= 1e-4f)
 			continue;
 //		LOGI("Verted %d is outside hull.", extremeI);
 
@@ -1636,7 +1650,18 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 			{
 				int v1 = f.v[j];
 				int adjFace = edgesToFaces[std::make_pair(v1, v0)];
-				if (((Plane)facePlanes[adjFace]).IsOnPositiveSide(p.v[extremeI])) // Is v0<->v1 an interior edge?
+				/*
+				float d;
+				if (!p.f[adjFace].v.empty())
+				{
+					vec pointOnFace = p.v[p.f[adjFace].v[0]];
+					d = Dot((vec)p.v[extremeI] - pointOnFace, ((Plane)facePlanes[adjFace]).normal);
+				}
+				else
+					d = -1.f;
+				*/
+				if (((Plane)facePlanes[adjFace]).SignedDistance(p.v[extremeI]) > 1e-4f) // Is v0<->v1 an interior edge?
+				//if (d > 0.f)
 				{
 					if (floodFillVisited[adjFace] != floodFillVisitColor) // Add the neighboring face to the visit stack.
 					{
