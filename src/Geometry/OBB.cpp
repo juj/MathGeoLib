@@ -1068,6 +1068,13 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	OBB minOBB;
 	float minVolume = FLOAT_INF;
 
+	// Handle degenerate planar cases up front.
+	if (convexHull.v.size() <= 3 || convexHull.f.size() <= 1)
+	{
+		// TODO
+		minOBB.SetNegativeInfinity();
+		return minOBB;
+	}
 	TIMING_TICK(tick_t t1 = Clock::Tick());
 	// Precomputation: For each vertex in the convex hull, compute their neighboring vertices.
 	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData(); // O(|V|)
