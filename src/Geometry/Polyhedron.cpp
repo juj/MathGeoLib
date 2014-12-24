@@ -510,15 +510,19 @@ bool Polyhedron::IsConvex() const
 		corresponding polygonal convexity test may fail for a pentagram this test may fail for,
 		for example, a pentagram extruded out of its plane and capped at the ends. */
 
-	for(int f = 0; f < NumFaces(); ++f)
+	for(size_t i = 0; i < f.size(); ++i)
 	{
-		Plane p = FacePlane(f);
-		for(int i = 0; i < NumVertices(); ++i)
+		if (f[i].v.empty())
+			continue;
+
+		vec pointOnFace = v[f[i].v[0]];
+		vec faceNormal = FaceNormal(i);
+		for(size_t j = 0; j < v.size(); ++j)
 		{
-			float d = p.SignedDistance(Vertex(i));
-			if (d > 1e-3f) // Tolerate a small epsilon error.
+			float d = faceNormal.Dot(vec(v[j]) - pointOnFace);
+			if (d > 1e-2f)
 			{
-//				LOGW("Distance of vertex %s/%d from plane %s/%d: %f", Vertex(i).ToString().c_str(), i, p.ToString().c_str(), f, d);
+//				LOGW("Distance of vertex %s/%d from plane %s/%d: %f", Vertex(j).ToString().c_str(), (int)j, FacePlane(i).ToString().c_str(), (int)f, d);
 				return false;
 			}
 		}
