@@ -1462,28 +1462,32 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		int v0 = *iter++;
 		int v1 = *iter++;
 		int v2 = *iter;
-		Plane p(pointArray[v0], pointArray[v1], pointArray[v2]);
+		Plane plane(pointArray[v0], pointArray[v1], pointArray[v2]);
 		for(int i = 0; i < numPoints; ++i)
 		{
-			if (!p.Contains(pointArray[i]))
+			if (!plane.Contains(pointArray[i]))
 				extremes.insert(i);
 			if (extremes.size() >= 4)
 				break;
 		}
-	}
 
-	// The degenerate case when all vertices in the input data set are planar.
-	if (extremes.size() == 3)
-	{
-		Face f;
-		for(int i = 0; i < numPoints; ++i)
+		// The degenerate case when all vertices in the input data set are planar.
+		if (extremes.size() == 3)
 		{
-			p.v.push_back(pointArray[i]);
-			f.v.push_back(i);
-		}
-		if (numPoints > 0)
+			p.v.push_back(pointArray[v0]);
+			p.v.push_back(pointArray[v1]);
+			p.v.push_back(pointArray[v2]);
+
+			Face f;
+			f.v.push_back(0);
+			f.v.push_back(1);
+			f.v.push_back(2);
 			p.f.push_back(f);
-		return p;
+			f.v[0] = 2;
+			f.v[2] = 0;
+			p.f.push_back(f);
+			return p;
+		}
 	}
 
 	p.v.insert(p.v.end(), pointArray, pointArray + numPoints);
