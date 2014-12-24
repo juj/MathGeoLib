@@ -1163,6 +1163,16 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// Stores a memory of yet unvisited vertices for current graph search.
 	std::vector<int> traverseStack;
 
+	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	{
+		vec f1a = faceNormals[facesForEdge[i].first];
+		vec f1b = faceNormals[facesForEdge[i].second];
+		for(size_t j = 0; j < convexHull.v.size(); ++j) // O(|V|)
+			if (IsVertexAntipodalToEdge(convexHull, j, adjacencyData[j], f1a, f1b))
+				antipodalPointsForEdge[i].push_back(j);
+	}
+
+#if 0
 	// Since we do several extreme vertex searches, and the search directions have a lot of spatial locality,
 	// always start the search for the next extreme vertex from the extreme vertex that was found during the
 	// previous iteration for the previous edge. This has been profiled to improve overall performance by as
@@ -1202,6 +1212,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		if (antipodalPointsForEdge[i].empty())
 			antipodalPointsForEdge[i].push_back(startingVertex);
 	}
+#endif
 
 	TIMING_TICK(
 		tick_t t4 = Clock::Tick();
