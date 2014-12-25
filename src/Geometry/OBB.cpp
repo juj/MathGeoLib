@@ -908,11 +908,11 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 //#define OBB_ASSERT_VALIDITY
 //#define OBB_DEBUG_PRINT
 
-#define TIMING(...) ((void)0)
-#define TIMING_TICK(...) ((void)0)
+//#define TIMING(...) ((void)0)
+//#define TIMING_TICK(...) ((void)0)
 
-//#define TIMING_TICK(...) __VA_ARGS__
-//#define TIMING LOGI
+#define TIMING_TICK(...) __VA_ARGS__
+#define TIMING LOGI
 
 namespace
 {
@@ -1210,7 +1210,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		if (antipodalPointsForEdge[i].empty())
 		{
 			LOGW("Due to numerical stability issues(?), could not find an antipodal vertex for edge %d! Check the scale of your input dataset! Good scale is having coordinates range e.g. [0.0,100.0]", edges[i]);
-			antipodalPointsForEdge[i].push_back(startingVertex);
+			// Getting here is most likely a bug. Fall back to linear scan, which is very slow.
+			for(size_t j = 0; j < convexHull.v.size(); ++j) // O(|V|)
+				if (IsVertexAntipodalToEdge(convexHull, j, adjacencyData[j], f1a, f1b))
+					antipodalPointsForEdge[i].push_back(j);
+
+//			antipodalPointsForEdge[i].push_back(startingVertex);
 		}
 	}
 #endif
