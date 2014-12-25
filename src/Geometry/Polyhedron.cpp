@@ -1678,8 +1678,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 					vec pointOnFace = p.v[p.f[adjFace].v[0]];
 					d = Dot((vec)p.v[extremeI] - pointOnFace, ((Plane)facePlanes[adjFace]).normal);
 //					if (((Plane)facePlanes[adjFace]).SignedDistance(p.v[extremeI]) > 1e-4f) // Is v0<->v1 an interior edge?
-					bool containsVtx = ContainsAndRemove(conflictList[adjFace], extremeI);
-					if (d > 0.f || containsVtx)
+//					bool containsVtx = ContainsAndRemove(conflictList[adjFace], extremeI);
+					if (d > 0.f/* || containsVtx*/)
 					{
 						//LOGI("Face %d sees vertex %d and is in conflict. (d:%f, containsVtx: %d)", adjFace, extremeI, d, containsVtx?1:0);
 						if (floodFillVisited[adjFace] != floodFillVisitColor) // Add the neighboring face to the visit stack.
