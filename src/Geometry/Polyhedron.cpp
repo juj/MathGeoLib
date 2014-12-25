@@ -217,7 +217,7 @@ vec Polyhedron::ExtremePoint(const vec &direction) const
 }
 
 int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction, 
-	std::vector<int> &floodFillVisited, int floodFillVisitColor,
+	std::vector<unsigned int> &floodFillVisited, unsigned int floodFillVisitColor,
 	float &mostExtremeDistance, int startingVertex) const
 {
 	float curD = direction.Dot(this->v[startingVertex]);
@@ -1428,7 +1428,7 @@ namespace
 	};
 }
 
-bool ContainsAndRemove(std::vector<int> &arr, int val)
+static bool ContainsAndRemove(std::vector<int> &arr, int val)
 {
 	for(size_t i = 0; i < arr.size(); ++i)
 		if (arr[i] == val)

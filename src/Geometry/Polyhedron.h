@@ -166,7 +166,7 @@ public:
 			to being the most extreme vertex in the given direction may speed up the search.
 		@return The index of the most extreme vertex into the specified direction. */
 	int ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction, 
-		std::vector<int> &floodFillVisited, int floodFillVisitColor, float &mostExtremeDistance, int startingVertex = 0) const;
+		std::vector<unsigned int> &floodFillVisited, unsigned int floodFillVisitColor, float &mostExtremeDistance, int startingVertex = 0) const;
 
 	/// Projects this Polyhedron onto the given 1D axis direction vector.
 	/** This function collapses this Polyhedron onto an 1D axis for the purposes of e.g. separate axis test computations.
