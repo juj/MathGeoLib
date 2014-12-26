@@ -1221,6 +1221,20 @@ struct SidepodalVertex
 
 OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 {
+	/* Outline of the algorithm:
+	  0. Compute the convex hull of the point set (given as input to this function) O(VlogV)
+	  1. Compute vertex adjacency data, i.e. given a vertex, return a list of its neighboring vertices. O(V)
+	  2. Precompute face normal direction vectors, since these are needed often. (does not affect big-O complexity, just a micro-opt) O(F)
+	  3. Compute edge adjacency data, i.e. given an edge, return the two indices of its neighboring faces. O(V)
+	  4. Precompute antipodal vertices for each edge. O(A*ElogV), where A is the size of antipodal vertices per edge. A ~ O(1) on average.
+	  5. Precompute all sidepodal edges for each edge. O(E*S), where S is the size of sidepodal edges per edge. S ~ O(sqrtE) on average.
+	     - Sort the sidepodal edges to a linear order so that it's possible to do fast set intersection computations on them. O(E*S*logS), or O(E*sqrtE*logE).
+	  6. Test all configurations where all three edges are on adjacent faces. O(E*S^2) = O(E^2) or if smart with graph search, O(ES) = O(E*sqrtE)?
+	  7. Test all configurations where two edges are on opposing faces, and the third one is on a face adjacent to the two. O(E*sqrtE*logV)?
+	  8. Test all configurations where two edges are on the same face (OBB aligns with a face of the convex hull). O(F*sqrtE*logV).
+	  9. Return the best found OBB.
+	*/
+
 	OBB minOBB;
 	float minVolume = FLOAT_INF;
 
@@ -1233,14 +1247,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 	TIMING_TICK(tick_t t1 = Clock::Tick());
 	// Precomputation: For each vertex in the convex hull, compute their neighboring vertices.
-	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData(); // O(|V|)
+	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData(); // O(V)
 	TIMING_TICK(tick_t t2 = Clock::Tick());
 	TIMING("Adjacencygeneration: %f msecs", Clock::TimespanToMillisecondsF(t1, t2));
 
 	// Precomputation: Compute normalized face direction vectors for each face of the hull.
 	std::vector<vec_storage> faceNormals;
 	faceNormals.reserve(convexHull.NumFaces());
-	for(int i = 0; i < convexHull.NumFaces(); ++i) // O(|F|)
+	for(int i = 0; i < convexHull.NumFaces(); ++i) // O(F)
 		faceNormals.push_back(convexHull.FaceNormal(i));
 
 	TIMING_TICK(tick_t t23 = Clock::Tick());
@@ -1280,7 +1294,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 	// Precomputation: for each edge through vertices (i,j), we need to know
 	// the face indices for the two adjoining faces that share the edge.
-	// This is O(|V|).
+	// This is O(V).
 	for (size_t i = 0; i < convexHull.f.size(); ++i)
 	{
 		const Polyhedron::Face &f = convexHull.f[i];
@@ -1340,11 +1354,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	std::vector<int> traverseStack;
 
 #if 0
-	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	// A naive O(E*V) algorithm for computing all antipodal points for each edge.
+	for (size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
-		for(size_t j = 0; j < convexHull.v.size(); ++j) // O(|V|)
+		for(size_t j = 0; j < convexHull.v.size(); ++j) // O(V)
 			if (IsVertexAntipodalToEdge(convexHull, j, adjacencyData[j], f1a, f1b))
 				antipodalPointsForEdge[i].push_back(j);
 	}
@@ -1359,15 +1374,15 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #if 1
 	// Precomputation: for each edge, we need to compute the list of potential antipodal points (points on
 	// the opposing face of an enclosing OBB of the face that is flush with the given edge of the polyhedron).
-	// This is O(|E|*log(|V|) ?
-	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	// This is O(E*log(V)) ?
+	for (size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
 
 		float dummy;
 		CLEAR_GRAPH_SEARCH(); // ExtremeVertexConvex performs a graph search, initialize the search data structure for it.
-		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(log(|V|)?
+		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(log(V)?
 		CLEAR_GRAPH_SEARCH(); // Search through the graph for all adjacent antipodal vertices.
 		traverseStack.push_back(startingVertex);
 //		MARK_VERTEX_VISITED(startingVertex);
@@ -1398,7 +1413,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		{
 //			LOGW("Due to numerical stability issues(?), could not find an antipodal vertex for edge %d! Check the scale of your input dataset! Good scale is having coordinates range e.g. [0.0,100.0]", edges[i]);
 			// Getting here is most likely a bug. Fall back to linear scan, which is very slow.
-			for(size_t j = 0; j < convexHull.v.size(); ++j) // O(|V|)
+			for(size_t j = 0; j < convexHull.v.size(); ++j) // O(V)
 				if (IsVertexAntipodalToEdge(convexHull, j, adjacencyData[j], f1a, f1b))
 					antipodalPointsForEdge[i].push_back(j);
 
@@ -1440,13 +1455,13 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 #if 0
 	// Precomputation: Compute all potential companion edges for each edge.
-	// This is O(|E|^2)
+	// This is O(E^2)
 	// Important! And edge can be its own companion edge! So have each edge test itself during iteration.
-	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	for(size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
-		for(size_t j = i; j < edges.size(); ++j) // O(|E|)
+		for(size_t j = i; j < edges.size(); ++j) // O(E)
 			if (AreEdgesCompatibleForOBB(f1a, f1b, faceNormals[facesForEdge[j].first], faceNormals[facesForEdge[j].second]))
 			{
 				compatibleEdges[i].push_back(j);
@@ -1456,14 +1471,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 #endif
 
-	// Use a O(E*V) algorithm for sidepodal vertices.
+#ifdef NEW_EDGE3_SEARCH
+	// Use a O(E*V) data structure for sidepodal vertices.
 	unsigned char *sidepodalVertices = new unsigned char[edges.size()*convexHull.v.size()];
 	memset(sidepodalVertices, 0, sizeof(unsigned char)*edges.size()*convexHull.v.size());
 #if 0
 	std::vector<std::vector<SidepodalVertex> > sidepodalVerticesForEdge(edges.size());
 #endif
 
-#ifdef NEW_EDGE3_SEARCH
 	VecArray vertexNormals(convexHull.v.size());
 	for(size_t i = 0; i < convexHull.v.size(); ++i)
 	{
@@ -1476,8 +1491,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #endif
 	// Compute all sidepodal edges for each edge by performing a graph search. The set of sidepodal edges is
 	// connected in the graph, which lets us avoid having to iterate over each edge pair of the convex hull.
-	// Total running time is O(|E|*sqrt|E|).
-	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	// Total running time is O(E*sqrtE).
+	for(size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
@@ -1495,7 +1510,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		CLEAR_GRAPH_SEARCH();
 		traverseStack.push_back(startingVertex);
 //		MARK_VERTEX_VISITED(startingVertex);
-		while(!traverseStack.empty()) // O(sqrt(|E|)
+		while(!traverseStack.empty()) // O(sqrt(E))
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
@@ -1517,8 +1532,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					if ((int)i <= edge)
 					{
 						compatibleEdges[i].push_back(edge);
+#ifdef NEW_EDGE3_SEARCH
 						sidepodalVertices[i*convexHull.v.size()+edges[edge].first] = 1;
 						sidepodalVertices[i*convexHull.v.size()+edges[edge].second] = 1;
+#endif
 #if 0
 						float dx = basis1.Dot(vertexNormals[edges[edge].first]);
 						float dy = basis2.Dot(vertexNormals[edges[edge].first]);
@@ -1543,8 +1560,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							compatibleEdges[edge].push_back(i);
 //							sidepodalVertices[edge].insert(edges[i].first);
 //							sidepodalVertices[edge].insert(edges[i].second);
+#ifdef NEW_EDGE3_SEARCH
 							sidepodalVertices[edge*convexHull.v.size()+edges[i].first] = 1;
 							sidepodalVertices[edge*convexHull.v.size()+edges[i].second] = 1;
+#endif
 //							sidepodalVerticesForEdge[edge].push_back(edges[i].first);
 //							sidepodalVerticesForEdge[edge].push_back(edges[i].second);
 #if 0
@@ -1572,7 +1591,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 
 #if 0
-	for(size_t i = 0; i < sidepodalVerticesForEdge.size(); ++i) // O(|E|)
+	for(size_t i = 0; i < sidepodalVerticesForEdge.size(); ++i) // O(E)
 		std::sort(sidepodalVerticesForEdge[i].begin(), sidepodalVerticesForEdge[i].end());
 #endif
 
@@ -1586,19 +1605,19 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t ts = Clock::Tick(););
 
 	// We will later perform set intersection operations on the compatibleEdges arrays, so these must be sorted.
-	// This takes O(|E|*sqrt|E|*log|E|).
-	for(size_t i = 0; i < compatibleEdges.size(); ++i) // O(|E|)
-		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end()); // Sorting in NlogN, size of each array is sqrt|E|.
+	// This takes O(E*sqrtE*logE).
+	for(size_t i = 0; i < compatibleEdges.size(); ++i) // O(E)
+		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end()); // Sorting in sqrt(E)logE, size of each array is sqrtE.
 
 	TIMING_TICK(tick_t tb = Clock::Tick(););
 	TIMING("SortCompanionedges: %f msecs", Clock::TimespanToMillisecondsF(ts, tb));
 	TIMING_TICK(t5 = Clock::Tick());
 
 #ifdef OBB_DEBUG_PRINT
-	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	for (size_t i = 0; i < edges.size(); ++i)
 	{
 		String s;
-		for (size_t j = 0; j < compatibleEdges[i].size(); ++j) // O(|E|)
+		for (size_t j = 0; j < compatibleEdges[i].size(); ++j)
 		{
 			String s2;
 			s2.SPrintf("%d ", (int)compatibleEdges[i][j]);
@@ -1610,15 +1629,15 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 #ifndef NEW_EDGE3_SEARCH
 	// Main algorithm body for testing three edges all on adjacent faces of the box.
-	// This is O(|E|^2)?
+	// This is O(E^2)?
 	TIMING_TICK(int numConfigsExplored = 0;);
-	for(size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	for(size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
 
 		const std::vector<int> &compatibleEdgesI = compatibleEdges[i];
-		for(size_t j = numSmallerCompatibleEdgeIndices[i] /*to remove symmetry, don't start at 0*/; j < compatibleEdgesI.size(); ++j) // O(sqrt(|E|))?
+		for(size_t j = numSmallerCompatibleEdgeIndices[i] /*to remove symmetry, don't start at 0*/; j < compatibleEdgesI.size(); ++j) // O(sqrt(E))?
 		{
 			int edgeJ = compatibleEdgesI[j];
 			vec f2a = faceNormals[facesForEdge[edgeJ].first];
@@ -1630,7 +1649,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #if 0
 			std::vector<int> compatibleEdgesAll;
 #endif
-			while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(|E|))?
+			while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(E))?
 			{
 				if (compatibleEdgesI[s_i] == compatibleEdgesJ[s_j])
 				{
@@ -2018,8 +2037,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 //	int extremeVertexSearchHint2 = 0;
 
 	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the
-	// convex hull from two opposing faces. This is O(|E|*sqrt|E|*log|V|)?
-	for (size_t i = 0; i < edges.size(); ++i) // O(|E|)
+	// convex hull from two opposing faces. This is O(E*sqrtE*logV)?
+	for (size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
@@ -2057,7 +2076,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					// Test all mutual compatible edges.
 					size_t s_i = 0;
 					size_t s_j = 0;
-					while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(|E|))?
+					while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(E))?
 					{
 						if (compatibleEdgesI[s_i] == compatibleEdgesJ[s_j])
 						{
@@ -2103,9 +2122,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 								float minN2, maxN2;
 								CLEAR_GRAPH_SEARCH();
-								extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+								extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(logV)?
 								CLEAR_GRAPH_SEARCH();
-								extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(log|V|)?
+								extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(logV)?
 								minN2 = -minN2;
 								float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 								const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
@@ -2153,8 +2172,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		);
 
 	// Main algorithm body for computing all search directions where the OBB touches two edges on the same face.
-	// This is O(|F|*sqrt|E|*log|V|)?
-	for (size_t i = 0; i < convexHull.f.size(); ++i) // O(|F|)
+	// This is O(F*sqrtE*logV)?
+	for (size_t i = 0; i < convexHull.f.size(); ++i) // O(F)
 	{
 		vec n1 = faceNormals[i];
 
@@ -2183,7 +2202,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		// Test all mutual compatible edges.
 		size_t s_i = 0;
 		size_t s_j = 0;
-		while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(|E|))?
+		while(s_i < compatibleEdgesI.size() && s_j < compatibleEdgesJ.size()) // O(sqrt(E))?
 		{
 			if (compatibleEdgesI[s_i] == compatibleEdgesJ[s_j])
 			{
@@ -2216,9 +2235,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 					float minN2, maxN2;
 					CLEAR_GRAPH_SEARCH();
-					extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(log|V|)?
+					extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, n2, floodFillVisited, floodFillVisitColor, maxN2, extremeVertexSearchHint1); // O(logV)?
 					CLEAR_GRAPH_SEARCH();
-					extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(log|V|)?
+					extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -n2, floodFillVisited, floodFillVisitColor, minN2, extremeVertexSearchHint2); // O(logV)?
 					minN2 = -minN2;
 					float maxN3 = n3.Dot(convexHull.v[edges[edge3].first]);
 					const std::vector<int> &antipodalsEdge3 = antipodalPointsForEdge[edge3];
@@ -2265,7 +2284,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #ifdef MATH_VEC_IS_FLOAT4
 	minOBB.r.w = 0.f;
 #endif
+#ifdef NEW_EDGE3_SEARCH
 	delete[] sidepodalVertices;
+#endif
 	delete[] vertexPairsToEdges;
 	return minOBB;
 }
