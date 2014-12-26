@@ -1385,14 +1385,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, -f1a, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(log(V)?
 		CLEAR_GRAPH_SEARCH(); // Search through the graph for all adjacent antipodal vertices.
 		traverseStack.push_back(startingVertex);
-//		MARK_VERTEX_VISITED(startingVertex);
+		MARK_VERTEX_VISITED(startingVertex);
 		while(!traverseStack.empty()) // In amortized analysis, only a constant number of vertices are antipodal points for any edge?
 		{
 			int v = traverseStack.back();
 			traverseStack.pop_back();
-			if (HAVE_VISITED_VERTEX(v))
-				continue;
-			MARK_VERTEX_VISITED(v);
 			const std::vector<int> &neighbors = adjacencyData[v];
 			if (IsVertexAntipodalToEdge(convexHull, v, neighbors, f1a, f1b))
 			{
@@ -1402,7 +1399,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					if (!HAVE_VISITED_VERTEX(neighbors[j]))
 					{
 						traverseStack.push_back(neighbors[j]);
-						//MARK_VERTEX_VISITED(neighbors[j]);
+						MARK_VERTEX_VISITED(neighbors[j]);
 					}
 			}
 		}
