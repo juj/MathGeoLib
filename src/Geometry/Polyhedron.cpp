@@ -522,7 +522,8 @@ bool Polyhedron::IsConvex() const
 			float d = faceNormal.Dot(vec(v[j]) - pointOnFace);
 			if (d > 1e-2f)
 			{
-//				LOGW("Distance of vertex %s/%d from plane %s/%d: %f", Vertex(j).ToString().c_str(), (int)j, FacePlane(i).ToString().c_str(), (int)f, d);
+//				LOGW("Distance of vertex %s/%d from face %s/%d: %f", 
+//					Vertex(j).ToString().c_str(), (int)j, FacePlane(i).ToString().c_str(), (int)i, d);
 				return false;
 			}
 		}
