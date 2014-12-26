@@ -1452,7 +1452,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 #endif
 
-#ifdef NEW_EDGE3_SEARCH
 	// Use a O(E*V) algorithm for sidepodal vertices.
 	unsigned char *sidepodalVertices = new unsigned char[edges.size()*convexHull.v.size()];
 	memset(sidepodalVertices, 0, sizeof(unsigned char)*edges.size()*convexHull.v.size());
@@ -1460,6 +1459,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	std::vector<std::vector<SidepodalVertex> > sidepodalVerticesForEdge(edges.size());
 #endif
 
+#ifdef NEW_EDGE3_SEARCH
 	VecArray vertexNormals(convexHull.v.size());
 	for(size_t i = 0; i < convexHull.v.size(); ++i)
 	{
@@ -1469,6 +1469,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			normal += (vec(convexHull.v[i]) - vec(convexHull.v[adjacency[j]])).Normalized();
 		vertexNormals[i] = normal.Normalized();
 	}
+#endif
 	// Compute all sidepodal edges for each edge by performing a graph search. The set of sidepodal edges is
 	// connected in the graph, which lets us avoid having to iterate over each edge pair of the convex hull.
 	// Total running time is O(|E|*sqrt|E|).
@@ -1477,9 +1478,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		vec f1a = faceNormals[facesForEdge[i].first];
 		vec f1b = faceNormals[facesForEdge[i].second];
 
+#ifdef NEW_EDGE3_SEARCH
 		vec deadDirection = (f1a+f1b)*0.5f;
 		vec basis1, basis2;
 		deadDirection.PerpendicularBasis(basis1, basis2);
+#endif
 
 		float dummy;
 		vec dir = f1a.Perpendicular();
@@ -1527,9 +1530,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						{
 							vec f2a = faceNormals[facesForEdge[edge].first];
 							vec f2b = faceNormals[facesForEdge[edge].second];
+#ifdef NEW_EDGE3_SEARCH
 							vec deadDirection2 = (f2a+f2b)*0.5f;
 							vec basis12, basis22;
 							deadDirection2.PerpendicularBasis(basis12, basis22);
+#endif
 
 							compatibleEdges[edge].push_back(i);
 //							sidepodalVertices[edge].insert(edges[i].first);
@@ -1561,7 +1566,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			}
 		}
 	}
-#endif
 
 #if 0
 	for(size_t i = 0; i < sidepodalVerticesForEdge.size(); ++i) // O(|E|)
@@ -2257,9 +2261,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #ifdef MATH_VEC_IS_FLOAT4
 	minOBB.r.w = 0.f;
 #endif
-#ifdef NEW_EDGE3_SEARCH
 	delete[] sidepodalVertices;
-#endif
 	delete[] vertexPairsToEdges;
 	return minOBB;
 }
