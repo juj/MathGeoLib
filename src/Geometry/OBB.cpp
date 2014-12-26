@@ -1219,6 +1219,43 @@ struct SidepodalVertex
 };
 #endif
 
+void FORCE_INLINE TestThreeAdjacentFaces(const vec &n1, const vec &n2, const vec &n3, int edgeI, int edgeJ, int edgeK,
+	const Polyhedron &convexHull, const std::vector<std::pair<int, int> > &edges,
+	const std::vector<std::vector<int> > &antipodalPointsForEdge,
+	float *minVolume, OBB *minOBB)
+{
+	// Compute the most extreme points in each direction.
+	float maxN1 = n1.Dot(convexHull.v[edges[edgeI].first]);
+	float maxN2 = n2.Dot(convexHull.v[edges[edgeJ].first]);
+	float maxN3 = n3.Dot(convexHull.v[edges[edgeK].first]);
+	float minN1 = FLOAT_INF;
+	float minN2 = FLOAT_INF;
+	float minN3 = FLOAT_INF;
+	for(size_t l = 0; l < antipodalPointsForEdge[edgeI].size(); ++l) // O(constant)?
+		minN1 = Min(minN1, n1.Dot(convexHull.v[antipodalPointsForEdge[edgeI][l]]));
+	for(size_t l = 0; l < antipodalPointsForEdge[edgeJ].size(); ++l) // O(constant)?
+		minN2 = Min(minN2, n2.Dot(convexHull.v[antipodalPointsForEdge[edgeJ][l]]));
+	for(size_t l = 0; l < antipodalPointsForEdge[edgeK].size(); ++l) // O(constant)?
+		minN3 = Min(minN3, n3.Dot(convexHull.v[antipodalPointsForEdge[edgeK][l]]));
+	float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
+	if (volume < *minVolume)
+	{
+		minOBB->axis[0] = n1;
+		minOBB->axis[1] = n2;
+		minOBB->axis[2] = n3;
+		minOBB->r[0] = (maxN1 - minN1) * 0.5f;
+		minOBB->r[1] = (maxN2 - minN2) * 0.5f;
+		minOBB->r[2] = (maxN3 - minN3) * 0.5f;
+		minOBB->pos = (minN1 + minOBB->r[0])*n1 + (minN2 + minOBB->r[1])*n2 + (minN3 + minOBB->r[2])*n3;
+		assert(volume > 0.f);
+#ifdef OBB_ASSERT_VALIDITY
+		OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB->axis[0], minOBB->axis[1]);
+		assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+#endif
+		*minVolume = volume;
+	}
+}
+
 OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 {
 	/* Outline of the algorithm:
@@ -1662,40 +1699,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					int nSolutions = ComputeBasis(f1a, f1b, f2a, f2b, f3a, f3b, n1, n2, n3);
 					for(int s = 0; s < nSolutions; ++s) // O(constant), nSolutions == 0, 1 or 2.
 					{
-#if 0
-						if (s == 0)
-							compatibleEdgesAll.push_back(edgeK);
-#endif
-						// Compute the most extreme points in each direction.
-						float maxN1 = n1[s].Dot(convexHull.v[edges[i].first]);
-						float maxN2 = n2[s].Dot(convexHull.v[edges[edgeJ].first]);
-						float maxN3 = n3[s].Dot(convexHull.v[edges[edgeK].first]);
-						float minN1 = FLOAT_INF;
-						float minN2 = FLOAT_INF;
-						float minN3 = FLOAT_INF;
-						for(size_t l = 0; l < antipodalPointsForEdge[i].size(); ++l) // O(constant)?
-							minN1 = Min(minN1, n1[s].Dot(convexHull.v[antipodalPointsForEdge[i][l]]));
-						for(size_t l = 0; l < antipodalPointsForEdge[edgeJ].size(); ++l) // O(constant)?
-							minN2 = Min(minN2, n2[s].Dot(convexHull.v[antipodalPointsForEdge[edgeJ][l]]));
-						for(size_t l = 0; l < antipodalPointsForEdge[edgeK].size(); ++l) // O(constant)?
-							minN3 = Min(minN3, n3[s].Dot(convexHull.v[antipodalPointsForEdge[edgeK][l]]));
-						float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
-						if (volume < minVolume)
-						{
-							minOBB.axis[0] = n1[s];
-							minOBB.axis[1] = n2[s];
-							minOBB.axis[2] = n3[s];
-							minOBB.r[0] = (maxN1 - minN1) * 0.5f;
-							minOBB.r[1] = (maxN2 - minN2) * 0.5f;
-							minOBB.r[2] = (maxN3 - minN3) * 0.5f;
-							minOBB.pos = (minN1 + minOBB.r[0])*n1[s] + (minN2 + minOBB.r[1])*n2[s] + (minN3 + minOBB.r[2])*n3[s];
-							assert(volume > 0.f);
-#ifdef OBB_ASSERT_VALIDITY
-							OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
-							assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
-#endif
-							minVolume = volume;
-						}
+						TestThreeAdjacentFaces(n1[s], n2[s], n3[s], i, edgeJ, edgeK, convexHull, 
+							edges, antipodalPointsForEdge, &minVolume, &minOBB);
 					}
 				}
 				else if (compatibleEdgesI[s_i] < compatibleEdgesJ[s_j])
@@ -1978,37 +1983,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							int nSolutions = ComputeBasis(f1a, f1b, f2a, f2b, f3a, f3b, n1, n2, n3);
 							for(int s = 0; s < nSolutions; ++s) // O(constant), nSolutions == 0, 1 or 2.
 							{
-								// Compute the most extreme points in each direction.
-								float maxN1 = n1[s].Dot(convexHull.v[edges[i].first]);
-								float maxN2 = n2[s].Dot(convexHull.v[edges[edgeJ].first]);
-								float maxN3 = n3[s].Dot(convexHull.v[edges[edgeK].first]);
-								float minN1 = FLOAT_INF;
-								float minN2 = FLOAT_INF;
-								float minN3 = FLOAT_INF;
-								for(size_t l = 0; l < antipodalPointsForEdge[i].size(); ++l) // O(constant)?
-									minN1 = Min(minN1, n1[s].Dot(convexHull.v[antipodalPointsForEdge[i][l]]));
-								for(size_t l = 0; l < antipodalPointsForEdge[edgeJ].size(); ++l) // O(constant)?
-									minN2 = Min(minN2, n2[s].Dot(convexHull.v[antipodalPointsForEdge[edgeJ][l]]));
-								for(size_t l = 0; l < antipodalPointsForEdge[edgeK].size(); ++l) // O(constant)?
-									minN3 = Min(minN3, n3[s].Dot(convexHull.v[antipodalPointsForEdge[edgeK][l]]));
-								float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
-								if (volume < minVolume)
-								{
-									minOBB.axis[0] = n1[s];
-									minOBB.axis[1] = n2[s];
-									minOBB.axis[2] = n3[s];
-									minOBB.r[0] = (maxN1 - minN1) * 0.5f;
-									minOBB.r[1] = (maxN2 - minN2) * 0.5f;
-									minOBB.r[2] = (maxN3 - minN3) * 0.5f;
-									minOBB.pos = (minN1 + minOBB.r[0])*n1[s] + (minN2 + minOBB.r[1])*n2[s] + (minN3 + minOBB.r[2])*n3[s];
-									assert(volume > 0.f);
-#ifdef OBB_ASSERT_VALIDITY
-									OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
-									assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
-#endif
-									minVolume = volume;
-//									LOGI("Enhanced volume to %f", minVolume);
-								}
+								TestThreeAdjacentFaces(n1[s], n2[s], n3[s], i, edgeJ, edgeK, convexHull, 
+									edges, antipodalPointsForEdge, &minVolume, &minOBB);
 							}
 						}
 					}
