@@ -1784,6 +1784,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 #endif
 
+	// Take advantage of spatial locality: start the search for the extreme vertex from the extreme vertex
+	// that was found during the previous iteration for the previous edge. This speeds up the search since
+	// edge directions have some amount of spatial locality and the next extreme vertex is often close
+	// to the previous one. Track two hint variables since we are performing extreme vertex searches to
+	// two opposing directions at the same time.
 	int extremeVertexSearchHint1 = 0;
 	int extremeVertexSearchHint2 = 0;
 #ifdef NEW_EDGE3_SEARCH
@@ -2023,14 +2028,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		t6 = Clock::Tick();
 		int numTwoOpposingFacesConfigs = 0;
 		);
-
-	// Take advantage of spatial locality: start the search for the extreme vertex from the extreme vertex
-	// that was found during the previous iteration for the previous edge. This speeds up the search since
-	// edge directions have some amount of spatial locality and the next extreme vertex is often close
-	// to the previous one. Track two hint variables since we are performing extreme vertex searches to
-	// two opposing directions at the same time.
-//	int extremeVertexSearchHint1 = 0;
-//	int extremeVertexSearchHint2 = 0;
 
 	// Main algorithm body for finding all search directions where the OBB is flush with the edges of the
 	// convex hull from two opposing faces. This is O(E*sqrtE*logV)?
