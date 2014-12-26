@@ -247,6 +247,7 @@ public:
 
 	/// Returns true if this polyhedron is closed and does not have any gaps.
 	/** \note This function performs a quick check, which might not be complete.
+		The running time is O(FlogE) ~ O(VlogV).
 		@see FaceIndicesValid(), IsClosed(), IsConvex(). */
 	bool IsClosed() const;
 
@@ -259,11 +260,13 @@ public:
 	bool IsConvex() const;
 
 	/// Returns true if the Euler formula (V + F - E == 2) holds for this Polyhedron.
-	/** @see NumVertices(), NumEdges(), NumFaces(). */
+	/** The running time is O(E) ~ O(V).
+		@see NumVertices(), NumEdges(), NumFaces(). */
 	bool EulerFormulaHolds() const;
 
 	/// Tests whether all the faces of this polyhedron are non-degenerate (have at least 3 vertices)
 	/// and in case they have more than 3 vertices, tests that the faces are planar.
+	/** The running time is O(F) ~ O(V). */
 	bool FacesAreNondegeneratePlanar(float epsilon = 1e-2f) const;
 
 	/// Clips the line/ray/line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast,

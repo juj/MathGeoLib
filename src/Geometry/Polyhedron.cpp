@@ -467,20 +467,20 @@ void Polyhedron::FlipWindingOrder()
 bool Polyhedron::IsClosed() const
 {
 	std::set<std::pair<int, int> > uniqueEdges;
-	for(int i = 0; i < NumFaces(); ++i)
+	for(int i = 0; i < NumFaces(); ++i) // O(F)
 	{
 		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString());
 		assume(FacePolygon(i).IsSimple());
 		int x = f[i].v.back();
-		for(size_t j = 0; j < f[i].v.size(); ++j)
+		for(size_t j = 0; j < f[i].v.size(); ++j) // O(1)
 		{
 			int y = f[i].v[j];
-			if (uniqueEdges.find(std::make_pair(x, y)) != uniqueEdges.end())
+			if (uniqueEdges.find(std::make_pair(x, y)) != uniqueEdges.end()) // O(logE)
 			{
 				LOGW("The edge (%d,%d) is used twice. Polyhedron is not simple and closed!", x, y);
 				return false; // This edge is being used twice! Cannot be simple and closed.
 			}
-			uniqueEdges.insert(std::make_pair(x, y));
+			uniqueEdges.insert(std::make_pair(x, y)); // O(logE)
 			x = y;
 		}
 	}
@@ -537,18 +537,18 @@ bool Polyhedron::EulerFormulaHolds() const
 
 bool Polyhedron::FacesAreNondegeneratePlanar(float epsilon) const
 {
-	for(int i = 0; i < (int)f.size(); ++i)
+	for(int i = 0; i < (int)f.size(); ++i) // O(F)
 	{
 		const Face &face = f[i];
 		if (face.v.size() < 3)
 			return false;
-		float area = FacePolygon(i).Area();
+		float area = FacePolygon(i).Area(); // O(1)
 		if (!(area > 0.f)) // Test with negation for NaNs.
 			return false;
 		if (face.v.size() >= 4)
 		{
 			Plane facePlane = FacePlane(i);
-			for(int j = 0; j < (int)face.v.size(); ++j)
+			for(int j = 0; j < (int)face.v.size(); ++j) // O(1)
 				if (facePlane.Distance(v[face.v[j]]) > epsilon)
 					return false;
 		}
