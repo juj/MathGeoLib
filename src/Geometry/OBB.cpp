@@ -1506,7 +1506,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		startingVertex = convexHull.ExtremeVertexConvex(adjacencyData, dir, floodFillVisited, floodFillVisitColor, dummy, startingVertex); // O(log|V|)
 		CLEAR_GRAPH_SEARCH();
 		traverseStack.push_back(startingVertex);
-//		MARK_VERTEX_VISITED(startingVertex);
 		while(!traverseStack.empty()) // O(sqrt(E))
 		{
 			int v = traverseStack.back();
@@ -1575,13 +1574,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						}
 					}
 					traverseStack.push_back(vAdj);
-					/*
-					if (!HAVE_VISITED_VERTEX(vAdj))
-					{
-						traverseStack.push_back(vAdj);
-						MARK_VERTEX_VISITED(vAdj);
-					}
-					*/
 				}
 			}
 		}
@@ -1605,6 +1597,13 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// This takes O(E*sqrtE*logE).
 	for(size_t i = 0; i < compatibleEdges.size(); ++i) // O(E)
 		std::sort(compatibleEdges[i].begin(), compatibleEdges[i].end()); // Sorting in sqrt(E)logE, size of each array is sqrtE.
+
+#ifdef OBB_DEBUG_PRINT
+	// Our search on the graph should not have generated any duplicates here.
+	for(size_t i = 0; i < compatibleEdges.size(); ++i)
+		if (std::unique(compatibleEdges[i].begin(), compatibleEdges[i].end()) != compatibleEdges[i].end())
+			LOGE("There are duplicate entries in compatibleEdges array, which should not happen!");
+#endif
 
 	TIMING_TICK(tick_t tb = Clock::Tick(););
 	TIMING("SortCompanionedges: %f msecs", Clock::TimespanToMillisecondsF(ts, tb));
