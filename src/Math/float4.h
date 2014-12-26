@@ -857,7 +857,15 @@ struct float4_storage
 	float4_storage(){}
 	float4_storage(const float4 &rhs)
 	{
-		*reinterpret_cast<float4*>(this) = rhs;
+		// Copy with scalar. TODO: Revisit if this is avoidable.
+		x = rhs.x;
+		y = rhs.y;
+		z = rhs.z;
+		w = rhs.w;
+		// Would like to do the following to get SSE benefit, but
+		// Visual Studio generates unaligned temporaries to this struct
+		// in debug builds, so can't do that.
+		//*reinterpret_cast<float4*>(this) = rhs;
 	}
 	operator float4() const { return *reinterpret_cast<const float4*>(this); }
 };
