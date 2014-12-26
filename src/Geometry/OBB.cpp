@@ -806,18 +806,22 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 			           = a - bc/d
 
 	*/
-	float ac = a+c;
 	float ab = a+b;
+	float ac = a+c;
 	float abcd = ab+c+d;
 	float minVal = Min(a, ab, ac, abcd);
 	float maxVal = Max(a, ab, ac, abcd);
 	if (d != 0.f)
 	{
-		// float v = a - bc/d = (ad - bc)/d, and since we are taking both Min&Max of the result and only examining the sign, 
-		// the condition is symmetric with respect to the sign and we can ignore the division by d.
-		float v = a*d - b*c;
-		minVal = Min(minVal, v);
-		maxVal = Max(maxVal, v);
+		float denomD = Recip(d);
+		float tRange = -b*denomD;
+		float uRange = -c*denomD;
+		if ((tRange >= 0.f && tRange <= 1.f) || (uRange >= 0.f && uRange <= 1.f))
+		{
+			float v = a - b*c*denomD;
+			minVal = Min(minVal, v);
+			maxVal = Max(maxVal, v);
+		}
 	}
 	return minVal <= 0.f && maxVal >= 0.f;
 /*
