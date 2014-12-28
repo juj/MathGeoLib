@@ -406,6 +406,7 @@ public:
 	/// Creates a Polyhedron object that represents the convex hull of the given point array.
 	/// \todo This function is strongly WIP!
 	static Polyhedron ConvexHull(const vec *pointArray, int numPoints);
+	static Polyhedron ConvexHull(const vec *pointArray, int numPoints, LCG &rng);
 
 	static Polyhedron Tetrahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Octahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);

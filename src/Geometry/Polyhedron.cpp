@@ -39,6 +39,8 @@
 #include "Triangle.h"
 #include "Sphere.h"
 #include "Capsule.h"
+#include "../Algorithm/Random/LCG.h"
+#include "../Time/Clock.h"
 
 #include <unordered_map>
 
@@ -510,6 +512,8 @@ bool Polyhedron::IsConvex() const
 		corresponding polygonal convexity test may fail for a pentagram this test may fail for,
 		for example, a pentagram extruded out of its plane and capped at the ends. */
 
+	float farthestD = -FLOAT_INF;
+	int numPointsOutside = 0;
 	for(size_t i = 0; i < f.size(); ++i)
 	{
 		if (f[i].v.empty())
@@ -522,11 +526,19 @@ bool Polyhedron::IsConvex() const
 			float d = faceNormal.Dot(vec(v[j]) - pointOnFace);
 			if (d > 1e-2f)
 			{
-//				LOGW("Distance of vertex %s/%d from face %s/%d: %f", 
+				if (d > farthestD)
+					farthestD = d;
+				++numPointsOutside;
+//					LOGW("Distance of vertex %s/%d from face %s/%d: %f",
 //					Vertex(j).ToString().c_str(), (int)j, FacePlane(i).ToString().c_str(), (int)i, d);
-				return false;
+//				return false;
 			}
 		}
+	}
+	if (numPointsOutside > 0)
+	{
+		LOGW("%d point-planes are outside the face planes. Farthest is at distance %f!", numPointsOutside, farthestD);
+		return false;
 	}
 	return true;
 }
@@ -1450,6 +1462,12 @@ int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*(const ve
 
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
+	LCG rng(Clock::TickU32());
+	return ConvexHull(pointArray, numPoints, rng);
+}
+
+Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng)
+{
 	std::set<int> extremes;
 
 	Polyhedron p;
@@ -1536,7 +1554,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	// For each face, maintain a list of its adjacent faces.
 //	std::vector<std::vector<int> > faceAdjacency(4);
 	// For each face, precompute its normal vector.
-	std::vector<Plane_storage> facePlanes(4);
+	VecArray faceNormals(4);
 
 	Face face;
 	face.v.resize(3);
@@ -1561,10 +1579,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 //	faceAdjacency[1].push_back(2); faceAdjacency[1].push_back(3); faceAdjacency[1].push_back(0);
 //	faceAdjacency[2].push_back(1); faceAdjacency[2].push_back(3); faceAdjacency[2].push_back(0);
 //	faceAdjacency[3].push_back(1); faceAdjacency[3].push_back(2); faceAdjacency[3].push_back(0);
-	facePlanes[0] = p.FacePlane(0);
-	facePlanes[1] = p.FacePlane(1);
-	facePlanes[2] = p.FacePlane(2);
-	facePlanes[3] = p.FacePlane(3);
+	faceNormals[0] = p.FaceNormal(0);
+	faceNormals[1] = p.FaceNormal(1);
+	faceNormals[2] = p.FaceNormal(2);
+	faceNormals[3] = p.FaceNormal(3);
 
 	std::unordered_map<std::pair<int, int>, int, hash_edge> edgesToFaces;
 	for(size_t i = 0; i < p.f.size(); ++i)
@@ -1589,7 +1607,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	// conflicts with, and not all of them.
 	std::vector<std::vector<int> > conflictList(p.f.size());
 
-	const float inPlaneEpsilon = 1e-5f;
+	const float inPlaneEpsilon = 1e-4f;
 
 	// Assign each remaining vertex (vertices 0-3 form the initial hull) to the initial conflict lists.
 	for(size_t j = 0; j < p.f.size(); ++j)
@@ -1597,7 +1615,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		vec pointOnFace = p.v[p.f[j].v[0]];
 		for(size_t i = 4; i < p.v.size(); ++i)
 		{
-			float d = Dot((vec)p.v[i] - pointOnFace, ((Plane)facePlanes[j]).normal);
+			float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
 			if (d > inPlaneEpsilon)
 				conflictList[j].push_back(i);
 		}
@@ -1620,25 +1638,33 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 	std::vector<int> floodFillVisited(p.f.size());
 	int floodFillVisitColor = 1;
 //	p.DumpStructure();
+
 	while(!workStack.empty())
 	{
-		int f = workStack.back();
+		// Choose a random plane in order to avoid a degenerate worst case processing.
+		int fIdx = rng.Int(0, workStack.size() - 1);
+//		int f = workStack[fIdx];
+		int f = workStack.at(fIdx);
+		Swap(workStack[fIdx], workStack.back());
 		workStack.pop_back();
-		std::vector<int> &conflict = conflictList[f];
+		std::vector<int> &conflict = conflictList.at(f);
+//		std::vector<int> &conflict = conflictList[f];
 		if (conflict.empty())
 			continue;
 
-		vec pointOnFace = p.v[p.f[f].v[0]];
+		vec pointOnFace = p.v.at(p.f.at(f).v.at(0));
+//		vec pointOnFace = p.v[p.f[f].v[0]];
 		// Find the most extreme conflicting vertex on this face.
 		float extremeD = -FLOAT_INF;
 		int extremeCI = -1; // Index of the vertex in the conflict list.
 		int extremeI = -1; // Index of the vertex in the convex hull.
 		for(size_t i = 0; i < conflict.size(); ++i)
 		{
-			int vt = conflict[i];
+			int vt = conflict.at(i);
+//			int vt = conflict[i];
 			if (vt < (int)hullVertices.size() && hullVertices[conflict[i]])
 				continue; // Robustness check: if this vertex is already part of the hull, ignore it.
-			float d = Dot((vec)p.v[conflict[i]] - pointOnFace, ((Plane)facePlanes[f]).normal);
+			float d = Dot((vec)p.v[conflict[i]] - pointOnFace, faceNormals[f]);
 			if (d > extremeD)
 			{
 				extremeD = d;
@@ -1648,25 +1674,34 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		}
 		// Remove the most extreme conflicting vertex from the conflict list, because
 		// that vertex will become a part of the convex hull.
-		Swap(conflict[extremeCI], conflict.back());
+		if (extremeCI == -1)
+		{
+			conflict.clear();
+			continue;
+		}
+		Swap(conflict.at(extremeCI), conflict.back());
+//		Swap(conflict[extremeCI], conflict.back());
 		conflict.pop_back();
 
 //		if (extremeD <= ((Plane)facePlanes[f]).d + 1e-5f)
-		if (extremeD < inPlaneEpsilon)
+		if (extremeD <= inPlaneEpsilon)
 			continue;
 //		LOGI("Verted %d is outside hull.", extremeI);
 
-		floodFillVisited[f] = floodFillVisitColor;
+//		floodFillVisited[f] = floodFillVisitColor;
+		floodFillVisited.at(f) = floodFillVisitColor;
 		faceVisitStack.push_back(f);
 		while(!faceVisitStack.empty())
 		{
 			int fi = faceVisitStack.back();
 			faceVisitStack.pop_back();
 			conflictingVertices.insert(conflictList[fi].begin(), conflictList[fi].end());
-			conflictList[fi].clear();
+			conflictList.at(fi).clear();
+//			conflictList[fi].clear();
 
 			// Traverse through each edge of this face to detect whether this is an interior or a boundary face.
-			const Polyhedron::Face &f = p.f[fi];
+			const Polyhedron::Face &f = p.f.at(fi);
+//			const Polyhedron::Face &f = p.f[fi];
 			int v0 = f.v.back();
 			for(size_t j = 0; j < f.v.size(); ++j)
 			{
@@ -1677,16 +1712,17 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 				{
 					float d;
 					vec pointOnFace = p.v[p.f[adjFace].v[0]];
-					d = Dot((vec)p.v[extremeI] - pointOnFace, ((Plane)facePlanes[adjFace]).normal);
+					d = Dot((vec)p.v[extremeI] - pointOnFace, faceNormals[adjFace]);
 //					if (((Plane)facePlanes[adjFace]).SignedDistance(p.v[extremeI]) > 1e-4f) // Is v0<->v1 an interior edge?
 //					bool containsVtx = ContainsAndRemove(conflictList[adjFace], extremeI);
-					if (d > 0.f/* || containsVtx*/)
+					if (d > inPlaneEpsilon/* || containsVtx*/)
 					{
 						//LOGI("Face %d sees vertex %d and is in conflict. (d:%f, containsVtx: %d)", adjFace, extremeI, d, containsVtx?1:0);
 						if (floodFillVisited[adjFace] != floodFillVisitColor) // Add the neighboring face to the visit stack.
 						{
 							faceVisitStack.push_back(adjFace);
-							floodFillVisited[adjFace] = floodFillVisitColor;
+//							floodFillVisited[adjFace] = floodFillVisitColor;
+							floodFillVisited.at(adjFace) = floodFillVisitColor;
 						}
 					}
 					else // v0<->v1 is a boundary edge.
@@ -1700,8 +1736,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 
 			// Mark this face as deleted by setting its size to zero vertices. This is better than erasing the face immediately,
 			// as that incurs memory allocation and bookkeeping costs. The null faces are all removed at the very end in one pass.
-			p.f[fi].v.clear();
-//			LOGI("Face %d removed.", fi);
+			//p.f[fi].v.clear();
+			p.f.at(fi).v.clear();
+			//			LOGI("Face %d removed.", fi);
 		}
 		++floodFillVisitColor;
 
@@ -1722,15 +1759,16 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		// Create new faces to close the boundary.
 		for(size_t i = 0; i < boundaryEdges.size(); ++i)
 		{
+			assert(face.v.size() == 3);
 			face.v[0] = boundaryEdges[i].first; face.v[1] = boundaryEdges[i].second; face.v[2] = extremeI; p.f.push_back(face);
 //			LOGI("Added face %d with vertices %d-%d-%d", (int)p.f.size()-1, face.v[0], face.v[1], face.v[2]);
-			Plane facePlane = p.FacePlane(p.f.size()-1);
-			if (facePlane.IsDegenerate())
+			vec faceNormal = p.FaceNormal(p.f.size()-1);
+			if (faceNormal.IsZero())
 			{
 				LOGW("Face has degenerate vertices %s, %s, %s!", vec(p.v[face.v[0]]).ToString().c_str(), vec(p.v[face.v[1]]).ToString().c_str(), vec(p.v[face.v[2]]).ToString().c_str());
 			}
-			assert(!facePlane.IsDegenerate());
-			facePlanes.push_back(facePlane);
+			assert(!faceNormal.IsZero() && faceNormal.IsFinite());
+			faceNormals.push_back(faceNormal);
 			edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] = p.f.size()-1;
 			edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] = p.f.size()-1;
 			edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] = p.f.size()-1;
@@ -1742,7 +1780,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		// Robustness: flag the new vertex as part of the convex hull.
 		if ((int)hullVertices.size() <= extremeI)
 			hullVertices.insert(hullVertices.end(), extremeI + 1 - hullVertices.size(), false);
-		hullVertices[extremeI] = true;
+		//hullVertices[extremeI] = true;
+		hullVertices.at(extremeI) = true;
 
 		// Redistribute all conflicting points to the new faces.
 		conflictList.insert(conflictList.end(), p.f.size() - oldNumFaces, std::vector<int>());
@@ -1751,26 +1790,43 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 			for(size_t j = oldNumFaces; j < p.f.size(); ++j)
 			{
 				vec pointOnFace = p.v[p.f[j].v[0]];
-				float d = Dot((vec)p.v[*iter] - pointOnFace, ((Plane)facePlanes[j]).normal);
+				float d = Dot((vec)p.v[*iter] - pointOnFace, faceNormals[j]);
 //				if (((Plane)facePlanes[j]).IsOnPositiveSide(p.v[*iter]) && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 				if (d > inPlaneEpsilon && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
-					conflictList[j].push_back(*iter);
+					conflictList.at(j).push_back(*iter);
+//				conflictList[j].push_back(*iter);
 			}
 
 		conflictingVertices.clear();
 
 		// Add new faces that still have conflicting vertices to the work stack for later processing.
 		// The algorithm will terminate once all faces are clear of conflicts.
+		assert(conflictList.size() == p.f.size());
 		for(size_t j = oldNumFaces; j < p.f.size(); ++j)
-			if (!conflictList[j].empty())
-				workStack.push_back(j);
+			if (!conflictList.at(j).empty())
+//				if (!conflictList[j].empty())
+					workStack.push_back(j);
 //	p.DumpStructure();
+
+#if 0
+		for (size_t i = 0; i < p.v.size() && i < hullVertices.size(); ++i)
+			if (hullVertices[i])
+			{
+				for (size_t j = 0; j < p.f.size(); ++j)
+				{
+					if (p.f[j].v.empty()) continue;
+					vec pointOnFace = p.v[p.f[j].v[0]];
+					float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
+					assert(d <= 1e-1f);
+				}
+			}
+#endif
 	}
 
 //	p.DumpStructure();
 
 #ifndef NDEBUG
-	for(size_t i = 0; i < p.f.size(); ++i)
+	for(size_t i = 0; i < conflictList.size(); ++i)
 		assert(conflictList[i].empty());
 #endif
 
