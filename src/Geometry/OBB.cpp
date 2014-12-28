@@ -503,14 +503,16 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 //	const std::vector<std::vector<int> > &adjacencyData,
 //	std::vector<int> &floodFillVisited,
 //	int &floodFillVisitColor,
-	int jiggles, vec &outEdgeA, vec &outEdgeB)
+	vec &outEdgeA, vec &outEdgeB)
 {
 	vec edge = edge_;
-	bool takeC1 = true;
+	int numTimesNotImproved = 0;
 	float rectArea = -1.f, edgeLength = -1.f;
+	float bestVolume = FLOAT_INF;
 	float2 c10, c20;
 	vec u, v;
-	for(int i = 0; i <= jiggles; ++i)
+	vec prevSecondChoice = vec::nan;
+	while(numTimesNotImproved < 2)
 	{
 		int e1, e2;
 		OBB::ExtremePointsAlongDirection(edge, (const vec*)&convexHull.v[0], convexHull.v.size(), e1, e2);
@@ -521,6 +523,7 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 //		edgeLength = emin + emax;
 
 		edge.PerpendicularBasis(u, v);
+
 		for(size_t k = 0; k < convexHull.v.size(); ++k)
 			pts[k] = float2(u.Dot(convexHull.v[k]), v.Dot(convexHull.v[k]));
 
@@ -533,18 +536,23 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 		c10 = (maxV - minV) * vDir;
 		c20 = (maxU - minU) * uDir;
 
-		if (i < jiggles)
+		float volume = rectArea*edgeLength;
+		if (volume + 1e-5f < bestVolume)
 		{
-			if (takeC1)
-				edge = (c10.x*u + c10.y*v).Normalized();
-			else
-				edge = (c20.x*u + c20.y*v).Normalized();
-			takeC1 = !takeC1;
+			bestVolume = volume;
+			edge = (c10.x*u + c10.y*v).Normalized();
+			numTimesNotImproved = 0;
+			prevSecondChoice = (c20.x*u + c20.y*v).Normalized();
+		}
+		else
+		{
+			++numTimesNotImproved;
+			edge = prevSecondChoice;
 		}
 	}
 	outEdgeA = edge;
 	outEdgeB = (c10.x*u + c10.y*v).Normalized();
-	return rectArea * edgeLength;
+	return bestVolume;
 }
 
 // Moves the floating point sign bit from src to dst.
@@ -1057,7 +1065,7 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 
 //#define OBB_ASSERT_VALIDITY
 //#define OBB_DEBUG_PRINT
-#define ENABLE_TIMING
+//#define ENABLE_TIMING
 
 //#define NEW_EDGE3_SEARCH
 
@@ -2309,7 +2317,6 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 	vec minVolumeEdgeA;
 	vec minVolumeEdgeB;
 
-	const int jiggleAxisTimes = 3;
 	const int Y = 256;
 	const int X = 256;
 	for(int y = 0; y < Y; ++y)
@@ -2327,7 +2334,7 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 
 			vec edgeA, edgeB;
 			float volume = SmallestOBBVolumeJiggle(edge, convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
-				jiggleAxisTimes, edgeA, edgeB);
+				edgeA, edgeB);
 
 			if (volume < minVolume)
 			{
