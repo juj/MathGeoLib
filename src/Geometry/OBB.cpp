@@ -1301,7 +1301,26 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	std::vector<vec_storage> faceNormals;
 	faceNormals.reserve(convexHull.NumFaces());
 	for(int i = 0; i < convexHull.NumFaces(); ++i) // O(F)
-		faceNormals.push_back(convexHull.FaceNormal(i));
+	{
+		if (convexHull.f[i].v.size() < 3)
+		{
+			LOGE("Input convex hull contains a degenerate face %d with only %d vertices! Cannot process this!",
+				i, (int)convexHull.f[i].v.size());
+			return minOBB;
+		}
+		vec a = convexHull.v[convexHull.f[i].v[0]];
+		vec b = convexHull.v[convexHull.f[i].v[1]];
+		vec c = convexHull.v[convexHull.f[i].v[2]];
+		vec normal = (b-a).Cross(c-a);
+		float len = normal.Normalize();
+		if (len < 1e-4f)
+		{
+			LOGE("Input convex hull contains a degenerate face %d with zero surface area! Cannot process this!",
+				i);
+			return minOBB;
+		}
+		faceNormals.push_back(normal);
+	}
 
 	TIMING_TICK(tick_t t23 = Clock::Tick());
 	TIMING("Facenormalsgen: %f msecs", Clock::TimespanToMillisecondsF(t2, t23));
@@ -2121,7 +2140,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 									minOBB.r[0] = (maxN1 - minN1) * 0.5f;
 									minOBB.r[1] = (maxN2 - minN2) * 0.5f;
 									minOBB.r[2] = (maxN3 - minN3) * 0.5f;
-									assert(volume > 0.f);
+//									assert(volume > 0.f);
 #ifdef OBB_ASSERT_VALIDITY
 									OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
 									assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
