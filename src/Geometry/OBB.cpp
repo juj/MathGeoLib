@@ -1159,6 +1159,7 @@ bool IsVertexAntipodalToEdge(const Polyhedron &convexHull, int vi, const std::ve
 	float tMax = 1.f;
 
 	vec v = convexHull.v[vi];
+	vec f1a_f1b = f1a-f1b;
 	for(size_t i = 0; i < neighbors.size(); ++i)
 	{
 		/* Is an edge and a vertex compatible to be antipodal?
@@ -1182,7 +1183,7 @@ bool IsVertexAntipodalToEdge(const Polyhedron &convexHull, int vi, const std::ve
 				0 <= -f1b.e
 		*/
 		vec e = v - convexHull.v[neighbors[i]];
-		float s = (f1a-f1b).Dot(e);
+		float s = f1a_f1b.Dot(e);
 		float n = -f1b.Dot(e);
 		const float epsilon = 1e-4f;
 		if (s > epsilon)
@@ -1190,7 +1191,7 @@ bool IsVertexAntipodalToEdge(const Polyhedron &convexHull, int vi, const std::ve
 		else if (s < -epsilon)
 			tMin = Max(tMin, n / s);
 		else if (n < -epsilon)
-			tMax = tMin - 1.f;
+			return false;
 
 		// The interval of possible solutions for t is now degenerate?
 		if (tMax - tMin < -1e-4f)
