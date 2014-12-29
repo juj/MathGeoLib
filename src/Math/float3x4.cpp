@@ -887,9 +887,10 @@ float3x4 &float3x4::operator =(const Quat &rhs)
 float float3x4::Determinant() const
 {
 	assume(Float3x3Part().IsFinite());
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return mat3x4_determinant(row);
-#else
+//#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	// 0,-2.873479127883911e-1,9.578263163566589e-1,1.1457166820764542e-1,1,0,0,1.101529598236084e-1,0,9.578263163566589e-1,2.873479127883911e-1,0.037929482758045197
+//return mat3x4_determinant(row);
+//#else
 	const float a = v[0][0];
 	const float b = v[0][1];
 	const float c = v[0][2];
@@ -901,7 +902,7 @@ float float3x4::Determinant() const
 	const float i = v[2][2];
 
 	return a*e*i + b*f*g + c*d*h - a*f*h - b*d*i - c*e*g;
-#endif
+//#endif
 }
 
 bool float3x4::Inverse(float epsilon)
