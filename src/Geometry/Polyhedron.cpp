@@ -2019,11 +2019,11 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	p.RemoveRedundantVertices();
 //	p.DumpStructure();
 
-	assert(p.IsClosed());
-	assert(p.FaceIndicesValid());
-	assert(p.EulerFormulaHolds());
-	assert(p.FacesAreNondegeneratePlanar());
-	assert(p.IsConvex());
+	assume(p.IsClosed());
+	assume(p.FaceIndicesValid());
+	assume(p.EulerFormulaHolds());
+	assume(p.FacesAreNondegeneratePlanar());
+	assume(p.IsConvex());
 
 #ifndef NDEBUG
 //	for(int i = 0; i < numPoints; ++i)
