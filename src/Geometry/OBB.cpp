@@ -3178,12 +3178,47 @@ void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFaci
 
 void OBB::ToLineList(VertexBuffer &vb) const
 {
-	Array<vec> pos;
-	pos.Resize_pod(NumVerticesInEdgeList());
-	ToEdgeList(&pos[0]);
-	int startIndex = vb.AppendVertices((int)pos.size());
-	for(int i = 0; i < (int)pos.size(); ++i)
-		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
+	if (vb.Declaration()->HasType(VDNormal))
+	{
+		// FacePlane() returns plane normals in order -x, +x, -y, +y, -z, +z
+		// Cornerpoint() returns points in order
+		// 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++. (corresponding the XYZ axis directions).
+
+		// Vertices corresponding to these six faces:
+		int verts[6][4] =
+		{
+			{ 0, 1, 3, 2 }, // -x
+			{ 7, 6, 4, 5 }, // +x
+			{ 0, 1, 5, 4 }, // -y
+			{ 7, 6, 2, 3 }, // +y
+			{ 0, 2, 6, 4 }, // -z
+			{ 7, 5, 1, 3 }  // +z
+		};
+		int si = vb.AppendVertices(2*4*6);
+		for(int face = 0; face < 6; ++face)
+		{
+			float4 faceNormal = DIR_TO_FLOAT4(FacePlane(face).normal);
+			int v0 = verts[face][3];
+			for(int v1i = 0; v1i < 4; ++v1i)
+			{
+				int v1 = verts[face][v1i];
+				vb.Set(si, VDPosition, POINT_TO_FLOAT4(CornerPoint(v0)));
+				vb.Set(si++, VDNormal, faceNormal);
+				vb.Set(si, VDPosition, POINT_TO_FLOAT4(CornerPoint(v1)));
+				vb.Set(si++, VDNormal, faceNormal);
+				v0 = v1;
+			}
+		}
+	}
+	else
+	{
+		Array<vec> pos;
+		pos.Resize_pod(NumVerticesInEdgeList());
+		ToEdgeList(&pos[0]);
+		int startIndex = vb.AppendVertices((int)pos.size());
+		for(int i = 0; i < (int)pos.size(); ++i)
+			vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
+	}
 }
 
 #endif
