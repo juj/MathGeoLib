@@ -571,6 +571,124 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 	vec *n2,
 	vec *n3)
 {
+	const float eps = 1e-4f;
+
+	float T1,T2,U1,U2,V1,V2;
+	{
+		vec a = f1b;
+		vec b = f1a-f1b;
+		vec c = f2b;
+		vec d = f2a-f2b;
+		vec e = f3b;
+		vec f = f3a-f3b;
+
+		float g = a.Dot(c)*d.Dot(e) - a.Dot(d)*c.Dot(e);
+		float h = a.Dot(c)*d.Dot(f) - a.Dot(d)*c.Dot(f);
+		float i = b.Dot(c)*d.Dot(e) - b.Dot(d)*c.Dot(e);
+		float j = b.Dot(c)*d.Dot(f) - b.Dot(d)*c.Dot(f);
+
+		float k = g*b.Dot(e) - a.Dot(e)*i;
+		float l = h*b.Dot(e) + g*b.Dot(f) - a.Dot(f)*i - a.Dot(e)*j;
+		float m = h*b.Dot(f) - a.Dot(f)*j;
+
+		float s = l*l - 4*m*k;
+
+		if (Abs(m) < 1e-4f || Abs(s) < 1e-4f)
+		{
+			// The equation is linear instead.
+
+			if (Abs(l) < 1e-4f)
+				return 0; // Degenerate equation.
+
+			float v = -k / l;
+			if (Abs(i + j*v) < 1e-4f) return 0;
+			if (Abs(d.Dot(e) + d.Dot(f)*v) < 1e-4f) return 0;
+			float t = -(g + h*v) / (i + j*v);
+			float u = -(c.Dot(e) + c.Dot(f)*v) / (d.Dot(e) + d.Dot(f)*v);
+			int nSolutions = 0;
+			if (v >= -eps && t >= -eps && u >= -eps && v <= 1.f + eps && t <= 1.f + eps && u <= 1.f + eps)
+			{
+				n1[0] = (a + b*t).Normalized();
+				n2[0] = (c + d*u).Normalized();
+				n3[0] = (e + f*v).Normalized();
+				if (Abs(n1[0].Dot(n2[0])) < 1e-3f && Abs(n1[0].Dot(n2[1])) < 1e-3f
+					&& Abs(n1[1].Dot(n2[2])) < 1e-3f)
+/*				if (n1[nSolutions].IsPerpendicular(n2[nSolutions])
+					&& n2[nSolutions].IsPerpendicular(n3[nSolutions])
+					&& n1[nSolutions].IsPerpendicular(n3[nSolutions]))*/
+					return 1;//++nSolutions;
+				else
+					return 0;
+				/*
+				{
+
+					LOGE("Linear solution Notperp! %f vs %f vs %f. i + j*v: %f, d.Dot(e) + d.Dot(f)*v: %f", n1[nSolutions].Dot(n2[nSolutions]),
+						n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]),
+						i + j*v, d.Dot(e) + d.Dot(f)*v);
+				}*/
+			}
+			return nSolutions;
+		}
+
+		if (s < 1e-4f)
+			return 0; // Discriminant negative, no solutions for v.
+
+		float sgnL = l < 0 ? -1.f : 1.f;
+		// V1 = (-l + Sqrt(s)) / (2.f * m);
+		V1 = -(l + sgnL*Sqrt(s))/ (2.f*m);
+		V2 = k / (m*V1);
+		//V2 = (-l - Sqrt(s)) / (2.f * m);
+
+		 T1 = -(g + h*V1) / (i + j*V1);
+		 T2 = -(g + h*V2) / (i + j*V2);
+//		if (EqualAbs(i + j*V1, 0.f)) LOGE("i + j*V1 is zero!!");
+//		if (EqualAbs(i + j*V2, 0.f)) LOGE("i + j*V2 is zero!!");
+
+		 U1 = -(c.Dot(e) + c.Dot(f)*V1) / (d.Dot(e) + d.Dot(f)*V1);
+		 U2 = -(c.Dot(e) + c.Dot(f)*V2) / (d.Dot(e) + d.Dot(f)*V2);
+//		if (EqualAbs(d.Dot(e) + d.Dot(f)*V1, 0.f)) LOGE("d.Dot(e) + d.Dot(f)*V1 is zero!!");
+//		if (EqualAbs(d.Dot(e) + d.Dot(f)*V2, 0.f)) LOGE("d.Dot(e) + d.Dot(f)*V2 is zero!!");
+
+		int nSolutions = 0;
+		if (V1 >= -eps && T1 >= -eps && U1 >= -eps && V1 <= 1.f + eps && T1 <= 1.f + eps && U1 <= 1.f + eps)
+		{
+			n1[nSolutions] = (a + b*T1).Normalized();
+			n2[nSolutions] = (c + d*U1).Normalized();
+			n3[nSolutions] = (e + f*V1).Normalized();
+//			++nSolutions;
+
+			if (n1[nSolutions].IsPerpendicular(n2[nSolutions])
+				&& n2[nSolutions].IsPerpendicular(n3[nSolutions])
+				&& n1[nSolutions].IsPerpendicular(n3[nSolutions]))
+				++nSolutions;
+			else
+			{
+				LOGE("Notperp! %f vs %f vs %f, s: %f", n1[nSolutions].Dot(n2[nSolutions]),
+					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]), s);
+			}
+		}
+		if (V2 >= -eps && T2 >= -eps && U2 >= -eps && V2 <= 1.f + eps && T2 <= 1.f + eps && U2 <= 1.f + eps)
+		{
+			n1[nSolutions] = (a + b*T2).Normalized();
+			n2[nSolutions] = (c + d*U2).Normalized();
+			n3[nSolutions] = (e + f*V2).Normalized();
+//			++nSolutions;
+			if (n1[nSolutions].IsPerpendicular(n2[nSolutions])
+				&& n2[nSolutions].IsPerpendicular(n3[nSolutions])
+				&& n1[nSolutions].IsPerpendicular(n3[nSolutions]))
+				++nSolutions;
+			else
+			{
+				LOGE("Notperp! %f vs %f vs %f, s:%f", n1[nSolutions].Dot(n2[nSolutions]),
+					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]), s);
+			}
+		}
+		if (s < 1e-4f && nSolutions == 2)
+			 nSolutions = 1;
+				
+		return nSolutions;
+	}
+#if 0
 	float a1_a2 = f1a.Dot(f2a);
 	float a1_a3 = f1a.Dot(f3a);
 //	float a1_b1 = f1a.Dot(f1b);
@@ -703,6 +821,9 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		float t = (-i-v*k)/(j + v*l);
 		float u = (-e -v*g) / (f + v*h);
 
+		if (v >= -0.1f && v < 1.1f) if (!EqualAbs(V1, v, 1e-2f)) LOGE("V1 %f != v %f", V1, v);
+		if (t >= -0.1f && t < 1.1f) if (!EqualAbs(T1, t, 1e-2f)) LOGE("T1 %f != t %f", T1, t);
+		if (u >= -0.1f && u < 1.1f) if (!EqualAbs(U1, u, 1e-2f)) LOGE("U1 %f != u %f", U1, u);
 		if (t >= 0.f && u >= 0.f && v >= 0.f && t <= 1.f && u <= 1.f && v <= 1.f)
 		{
 			n1[nSolutions] = (f1a*t + f1b*(1-t)).Normalized();
@@ -714,8 +835,8 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 				++nSolutions;
 			else
 			{
-//				LOGE("Notperp! %f vs %f vs %f", n1[nSolutions].Dot(n2[nSolutions]),
-//					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]));
+				LOGE("Notperp! %f vs %f vs %f", n1[nSolutions].Dot(n2[nSolutions]),
+					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]));
 			}
 		}
 
@@ -724,6 +845,10 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		t = (-i-v*k)/(j + v*l);
 		u = (-e -v*g) / (f + v*h);
 
+		if (v >= -0.1f && v < 1.1f) if (!EqualAbs(V2, v, 1e-2f)) LOGE("V2 %f != v %f", V2, v);
+		if (t >= -0.1f && t < 1.1f) if (!EqualAbs(T2, t, 1e-2f)) LOGE("T2 %f != t %f", T2, t);
+		if (u >= -0.1f && u < 1.1f) if (!EqualAbs(U2, u, 1e-2f)) LOGE("U2 %f != u %f", U2, u);
+
 		if (t >= 0.f && u >= 0.f && v >= 0.f && t <= 1.f && u <= 1.f && v <= 1.f)
 		{
 			n1[nSolutions] = (f1a*t + f1b*(1-t)).Normalized();
@@ -735,8 +860,8 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 				++nSolutions;
 			else
 			{
-//				LOGE("Notperp! %f vs %f vs %f", n1[nSolutions].Dot(n2[nSolutions]),
-//					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]));
+				LOGE("Notperp! %f vs %f vs %f", n1[nSolutions].Dot(n2[nSolutions]),
+					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]));
 			}
 		}
 	}
@@ -746,6 +871,10 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		float t = (-i-v*k)/(j + v*l);
 		float u = (-e -v*g) / (f + v*h);
 
+		if (v >= -0.1f && v < 1.1f) if (!EqualAbs(V1, v, 1e-2f)) LOGE("V1' %f != v %f", V1, v);
+		if (t >= -0.1f && t < 1.1f) if (!EqualAbs(T1, t, 1e-2f)) LOGE("T1' %f != t %f", T1, t);
+		if (u >= -0.1f && u < 1.1f) if (!EqualAbs(U1, u, 1e-2f)) LOGE("U1' %f != u %f", U1, u);
+
 		if (t >= 0.f && u >= 0.f && v >= 0.f && t <= 1.f && u <= 1.f && v <= 1.f)
 		{
 			n1[nSolutions] = (f1a*t + f1b*(1-t)).Normalized();
@@ -757,12 +886,13 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 				++nSolutions;
 			else
 			{
-//				LOGE("Notperp! %f vs %f vs %f", n1[nSolutions].Dot(n2[nSolutions]),
-//					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]));
+				LOGE("Notperp! %f vs %f vs %f", n1[nSolutions].Dot(n2[nSolutions]),
+					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]));
 			}
 		}
 	}
 	return nSolutions;
+#endif
 }
 
 static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
@@ -1317,7 +1447,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		{
 			LOGE("Input convex hull contains a degenerate face %d with zero surface area! Cannot process this!",
 				i);
-			return minOBB;
+			//return minOBB;
 		}
 		faceNormals.push_back(normal);
 	}
