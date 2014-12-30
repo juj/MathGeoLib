@@ -2673,14 +2673,54 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceSt
 
 void Polyhedron::ToLineList(VertexBuffer &vb) const
 {
-	LineSegmentArray edges = Edges();
+	std::map<std::pair<int, int>, int> edgesToFaces;
+
+	struct edge { int v0, v1, f0, f1; };
+	std::vector<edge> edges;
+	for (size_t i = 0; i < f.size(); ++i)
+	{
+		const Polyhedron::Face &fc = f[i];
+		int v0 = fc.v.back();
+		for(size_t j = 0; j < fc.v.size(); ++j)
+		{
+			int v1 = fc.v[j];
+			std::pair<int, int> e = std::make_pair(v0, v1);
+			auto iter = edgesToFaces.find(e);
+			if (iter == edgesToFaces.end())
+				edgesToFaces[std::make_pair(v1, v0)] = i;
+			else
+			{
+				int f0 = iter->second;
+				int f1 = i;
+				edge e = { v0, v1, f0, f1 };
+				edges.push_back(e);
+			}
+			v0 = v1;
+		}
+	}
 
 	int startIndex = vb.AppendVertices((int)edges.size()*2);
 	for(int i = 0; i < (int)edges.size(); ++i)
 	{
-		vb.Set(startIndex+2*i, VDPosition, POINT_TO_FLOAT4(edges[i].a));
-		vb.Set(startIndex+2*i+1, VDPosition, POINT_TO_FLOAT4(edges[i].b));
+		vec f0 = FaceNormal(edges[i].f0);
+		vec f1 = FaceNormal(edges[i].f1);
+		vec n = (f0 + f1).Normalized();
+		vb.Set(startIndex+2*i, VDPosition, POINT_TO_FLOAT4(v[edges[i].v0]));
+		vb.Set(startIndex+2*i, VDNormal, DIR_TO_FLOAT4(n));
+		vb.Set(startIndex+2*i+1, VDPosition, POINT_TO_FLOAT4(v[edges[i].v1]));
+		vb.Set(startIndex+2*i+1, VDNormal, DIR_TO_FLOAT4(n));
 	}
+
+#if 0
+	std::vector<std::pair<int, int> > edges = EdgeIndices();
+
+	int startIndex = vb.AppendVertices((int)edges.size()*2);
+	for(int i = 0; i < (int)edges.size(); ++i)
+	{
+		vb.Set(startIndex+2*i, VDPosition, POINT_TO_FLOAT4(v[edges[i].first]));
+		vb.Set(startIndex+2*i+1, VDPosition, POINT_TO_FLOAT4(v[edges[i].second]));
+	}
+#endif
 }
 #endif
 
