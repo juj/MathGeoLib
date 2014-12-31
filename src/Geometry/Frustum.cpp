@@ -294,8 +294,7 @@ void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
 	assume(worldTransform.IsColOrthogonal3()); // Front and up must be orthogonal to each other.
 	assume1(EqualAbs(worldTransform.Determinant(), 1.f), worldTransform.Determinant()); // The matrix cannot contain mirroring.
 
-	// Finally store the passed world matrix as the cached matrix.
-	worldMatrix = worldTransform;
+	WorldMatrixChanged();
 }
 
 float3x4 Frustum::ComputeWorldMatrix() const
