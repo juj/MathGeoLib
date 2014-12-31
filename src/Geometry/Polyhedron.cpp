@@ -222,6 +222,10 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 	std::vector<unsigned int> &floodFillVisited, unsigned int floodFillVisitColor,
 	float &mostExtremeDistance, int startingVertex) const
 {
+#ifdef MATH_NUMSTEPS_STATS
+	numSearchStepsDone = 0;
+	numImprovementsMade = 0;
+#endif
 	float curD = direction.Dot(this->v[startingVertex]);
 	const int *neighbors = &adjacencyData[startingVertex][0];
 	const int *neighborsEnd = neighbors + adjacencyData[startingVertex].size();
@@ -231,12 +235,18 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 	float secondBestD = curD - 1e-3f;
 	while(neighbors != neighborsEnd)
 	{
+#ifdef MATH_NUMSTEPS_STATS
+		++numSearchStepsDone;
+#endif
 		int n = *neighbors++;
 		if (floodFillVisited[n] != floodFillVisitColor)
 		{
 			float d = direction.Dot(this->v[n]);
 			if (d > curD)
 			{
+#ifdef MATH_NUMSTEPS_STATS
+				++numImprovementsMade;
+#endif
 				startingVertex = n;
 				curD = d;
 				floodFillVisited[startingVertex] = floodFillVisitColor;
@@ -255,7 +265,15 @@ int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjace
 	if (secondBest != -1 && floodFillVisited[secondBest] != floodFillVisitColor)
 	{
 		float secondMostExtreme = -FLOAT_INF;
+#ifdef MATH_NUMSTEPS_STATS
+		int numSearchStepsDoneParent = numSearchStepsDone;
+		int numImprovementsMadeParent = numImprovementsMade;
+#endif
 		int secondTry = ExtremeVertexConvex(adjacencyData, direction, floodFillVisited, floodFillVisitColor, secondMostExtreme, secondBest);
+#ifdef MATH_NUMSTEPS_STATS
+		numSearchStepsDone += numSearchStepsDoneParent;
+		numImprovementsMade += numImprovementsMadeParent;
+#endif
 		if (secondMostExtreme > curD)
 		{
 			mostExtremeDistance = secondMostExtreme;

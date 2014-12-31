@@ -165,7 +165,13 @@ public:
 		@param startingVertex [optional] Specifies a hint vertex from where to start the search. Specifying a know vertex that is close
 			to being the most extreme vertex in the given direction may speed up the search.
 		@return The index of the most extreme vertex into the specified direction. */
-	int ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction, 
+
+//#define MATH_NUMSTEPS_STATS
+
+#ifdef MATH_NUMSTEPS_STATS
+	mutable int numSearchStepsDone, numImprovementsMade;
+#endif
+	int ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction,
 		std::vector<unsigned int> &floodFillVisited, unsigned int floodFillVisitColor, float &mostExtremeDistance, int startingVertex = 0) const;
 
 	/// Projects this Polyhedron onto the given 1D axis direction vector.
