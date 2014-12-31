@@ -41,6 +41,7 @@
 #include "Ray.h"
 #include "Triangle.h"
 #include <stdlib.h>
+#include "../Time/Clock.h"
 //#include <unordered_map>
 
 #include <set>
@@ -544,6 +545,8 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 			numTimesNotImproved = 0;
 			prevSecondChoice = (c20.x*u + c20.y*v).Normalized();
 
+//#define NO_JIGGLES
+
 #ifdef NO_JIGGLES
 			edge = prevSecondChoice;
 			break;
@@ -679,8 +682,8 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 				++nSolutions;
 			else
 			{
-				LOGE("Notperp! %f vs %f vs %f, s: %f", n1[nSolutions].Dot(n2[nSolutions]),
-					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]), s);
+//				LOGE("Notperp! %f vs %f vs %f, s: %f", n1[nSolutions].Dot(n2[nSolutions]),
+//					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]), s);
 			}
 		}
 		if (V2 >= -eps && T2 >= -eps && U2 >= -eps && V2 <= 1.f + eps && T2 <= 1.f + eps && U2 <= 1.f + eps)
@@ -700,8 +703,8 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 				++nSolutions;
 			else
 			{
-				LOGE("Notperp! %f vs %f vs %f, s:%f", n1[nSolutions].Dot(n2[nSolutions]),
-					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]), s);
+//				LOGE("Notperp! %f vs %f vs %f, s:%f", n1[nSolutions].Dot(n2[nSolutions]),
+//					n1[nSolutions].Dot(n3[nSolutions]), n2[nSolutions].Dot(n3[nSolutions]), s);
 			}
 		}
 		if (s < 1e-4f && nSolutions == 2)
@@ -1822,6 +1825,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING("Companionedges: %f msecs (%d edges have on average %d companion edges each)", Clock::TimespanToMillisecondsF(t4, t5), (int)compatibleEdges.size(), (int)(numTotalEdges / compatibleEdges.size()));
 	TIMING_TICK(tick_t ts = Clock::Tick(););
 
+#ifdef NEW_EDGE3_SEARCH
+	auto unsortedCompatibleEdges = compatibleEdges;
+#endif
 	// We will later perform set intersection operations on the compatibleEdges arrays, so these must be sorted.
 	// This takes O(E*sqrtE*logE).
 	for(size_t i = 0; i < compatibleEdges.size(); ++i) // O(E)
@@ -1990,10 +1996,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	int extremeVertexSearchHint2 = 0;
 #ifdef NEW_EDGE3_SEARCH
 	TIMING_TICK(
-		int numConfigsExplored = 0;
-		int numBootstrapStepsDone = 0;
-		int numCommonSidepodalStepsDone = 0;
-		int numEdgeSqrtEdges = 0;
+		unsigned long long numConfigsExplored = 0;
+		unsigned long long numBootstrapStepsDone = 0;
+		unsigned long long numCommonSidepodalStepsDone = 0;
+		unsigned long long numEdgeSqrtEdges = 0;
+		unsigned long long numVertexNeighborSearches = 0;
+		unsigned long long numVertexNeighborSearchImprovements = 0;
 		);
 
 	// Stores a memory of yet unvisited vertices that are common sidepodal vertices to both currently chosen edges for current graph search.
@@ -2008,17 +2016,18 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 		vec e1 = (vec(convexHull.v[edges[i].first]) - vec(convexHull.v[edges[i].second])).Normalized();
 
-		const std::vector<int> &compatibleEdgesI = compatibleEdges[i];
+		const std::vector<int> &compatibleEdgesI = unsortedCompatibleEdges[i];//compatibleEdges[i];
 #if 0
 		int commonSidepodalVertexHint = edges[compatibleEdgesI[0]].first;
 
 		int edge3_1 = 0;
 		int edge3_2 = 0;
 #endif
-		for(size_t j = numSmallerCompatibleEdgeIndices[i] /*to remove symmetry, don't start at 0*/; j < compatibleEdgesI.size(); ++j) // O(sqrt(|E|))?
+		for(size_t j = 0; j < compatibleEdgesI.size(); ++j) // O(sqrt(|E|))?
 		{
-			TIMING_TICK(++numEdgeSqrtEdges);
 			int edgeJ = compatibleEdgesI[j];
+			if (edgeJ < i) continue; // Remove symmetry.
+			TIMING_TICK(++numEdgeSqrtEdges);
 			vec f2a = faceNormals[facesForEdge[edgeJ].first];
 			vec f2b = faceNormals[facesForEdge[edgeJ].second];
 
@@ -2056,8 +2065,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			CLEAR_GRAPH_SEARCH();
 			float dummy;
 			extremeVertexSearchHint1 = convexHull.ExtremeVertexConvex(adjacencyData, searchDir, floodFillVisited, floodFillVisitColor, dummy, extremeVertexSearchHint1); // O(log|V|)?
+			TIMING_TICK(numVertexNeighborSearches += convexHull.numSearchStepsDone);
+			TIMING_TICK(numVertexNeighborSearchImprovements += convexHull.numImprovementsMade);
 			CLEAR_GRAPH_SEARCH();
 			extremeVertexSearchHint2 = convexHull.ExtremeVertexConvex(adjacencyData, -searchDir, floodFillVisited, floodFillVisitColor, dummy, extremeVertexSearchHint2); // O(log|V|)?
+			TIMING_TICK(numVertexNeighborSearches += convexHull.numSearchStepsDone);
+			TIMING_TICK(numVertexNeighborSearchImprovements += convexHull.numImprovementsMade);
 
 			int secondSearch = -1;
 			if (sidepodalVertices[edgeJ*convexHull.v.size()+extremeVertexSearchHint1]) traverseStackCommonSidepodals.push_back(extremeVertexSearchHint1);
@@ -2078,6 +2091,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 //			MARK_VERTEX_VISITED(commonSidepodalVertexHint/*edges[edgeJ].first*//*extremeVertexSearchHint1*/);
 			while(!traverseStack.empty())
 			{
+				LOGI("BOOTSTRAPPING!");
 				//int v = traverseStack.back();
 				//traverseStack.pop_back();
 				int v = traverseStack.front();
@@ -2157,10 +2171,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					int vAdj = n[j];
 //					int edgeK = vertexPairsToEdges[std::make_pair(v, vAdj)];					
 					int edgeK = vertexPairsToEdges[v*convexHull.v.size()+vAdj];
-					if (!HAVE_VISITED_VERTEX(vAdj) && sidepodalVertices[i*convexHull.v.size()+vAdj]
+					if (/*!HAVE_VISITED_VERTEX(vAdj) &&*/ sidepodalVertices[i*convexHull.v.size()+vAdj]
 						&& sidepodalVertices[edgeJ*convexHull.v.size()+vAdj])
 					{
-						traverseStackCommonSidepodals.push_back(vAdj);
+						if (!HAVE_VISITED_VERTEX(vAdj))
+							traverseStackCommonSidepodals.push_back(vAdj);
 						//MARK_VERTEX_VISITED(vAdj);
 
 						if (edgeJ <= edgeK)
@@ -2184,11 +2199,15 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			}
 		}
 	}
-	TIMING("Edgetriplets: %d edgesqrts, %d bootstraps (%.3f/edgesqrt), %d sidepodals steps (%.3f/edgesqrt), #third edges: %d (%.3f/edgesqrt)",
+	TIMING("Edgetriplets: %llu edgesqrts, %llu bootstraps (%.3f/edgesqrt), %llu sidepodals steps (%.3f/edgesqrt), "
+		"#third edges: %llu (%.3f/edgesqrt) #vertex steps: %llu (%.3f/edgesqrt) "
+		"#vertex improvements: %.3f/edgesqrt",
 		numEdgeSqrtEdges,
 		numBootstrapStepsDone, (float)numBootstrapStepsDone/numEdgeSqrtEdges,
 		numCommonSidepodalStepsDone, (float)numCommonSidepodalStepsDone/numEdgeSqrtEdges,
-		numConfigsExplored, (float)numConfigsExplored/numEdgeSqrtEdges);
+		numConfigsExplored, (float)numConfigsExplored/numEdgeSqrtEdges,
+		numVertexNeighborSearches, (float)numVertexNeighborSearches/numEdgeSqrtEdges,
+		(float)numVertexNeighborSearchImprovements/numEdgeSqrtEdges);
 #endif
 	TIMING_TICK(tick_t t6 = Clock::Tick());
 	TIMING("Edgetripletconfigs: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t5, t6), numConfigsExplored);
