@@ -58,6 +58,19 @@
 #include "../Math/float4x4_sse.h"
 #endif
 
+#define MATH_ENCLOSINGOBB_DOUBLE_PRECISION
+
+#ifdef MATH_ENCLOSINGOBB_DOUBLE_PRECISION
+#include "../Math/float4d.h"
+typedef float4d cv;
+typedef double cs;
+typedef std::vector<float4d> VecdArray;
+#else
+typedef vec cv;
+typedef float cs;
+typedef VecArray VecdArray;
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 OBB::OBB(const vec &pos, const vec &r, const vec &axis0, const vec &axis1, const vec &axis2)
@@ -1466,7 +1479,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING("Adjacencygeneration: %f msecs", Clock::TimespanToMillisecondsF(t1, t2));
 
 	// Precomputation: Compute normalized face direction vectors for each face of the hull.
-	std::vector<vec_storage> faceNormals;
+	//std::vector<vec_storage> faceNormals;
+	VecArray faceNormals;
 	faceNormals.reserve(convexHull.NumFaces());
 	for(int i = 0; i < convexHull.NumFaces(); ++i) // O(F)
 	{
@@ -1476,18 +1490,18 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				i, (int)convexHull.f[i].v.size());
 			return minOBB;
 		}
-		vec a = convexHull.v[convexHull.f[i].v[0]];
-		vec b = convexHull.v[convexHull.f[i].v[1]];
-		vec c = convexHull.v[convexHull.f[i].v[2]];
-		vec normal = (b-a).Cross(c-a);
-		float len = normal.Normalize();
+		cv a = convexHull.v[convexHull.f[i].v[0]];
+		cv b = convexHull.v[convexHull.f[i].v[1]];
+		cv c = convexHull.v[convexHull.f[i].v[2]];
+		cv normal = (b-a).Cross(c-a);
+		cs len = normal.Normalize();
 		if (len < 1e-4f)
 		{
-			LOGE("Input convex hull contains a degenerate face %d with zero surface area! Cannot process this!",
+			LOGW("Input convex hull contains a very small face %d with zero surface area! Computing OBB may fail!",
 				i);
 			//return minOBB;
 		}
-		faceNormals.push_back(normal);
+		faceNormals.push_back(DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z));
 	}
 
 	TIMING_TICK(tick_t t23 = Clock::Tick());

@@ -1597,7 +1597,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	// If the initial tetrahedron has zero volume, the whole input set is planar.
 	// In that case, we should solve a 2D convex hull problem.
 	cs volume = Abs((cv(p.v[0]) - cv(p.v[3])).Dot((cv(p.v[1]) - cv(p.v[3])).Cross(cv(p.v[2]) - cv(p.v[3])))); // / 6.f; Div by six is not relevant here.
-	if (volume < 1e-4f)
+	if (volume < 1e-6f)
 	{
 		// TODO: Do 2D convex hull.
 		p.v.clear();
@@ -1665,7 +1665,11 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	// For each vertex, maintain a conflict list of faces as well.
 	std::vector<std::set<int> > conflictListVertices(p.v.size());
 
+#ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
+	const double inPlaneEpsilon = 1e-8;
+#else
 	const float inPlaneEpsilon = 1e-4f;
+#endif
 
 	// Assign each remaining vertex (vertices 0-3 form the initial hull) to the initial conflict lists.
 	for(size_t j = 0; j < p.f.size(); ++j)
