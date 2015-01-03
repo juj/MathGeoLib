@@ -166,7 +166,7 @@ public:
 			to being the most extreme vertex in the given direction may speed up the search.
 		@return The index of the most extreme vertex into the specified direction. */
 
-//#define MATH_NUMSTEPS_STATS
+#define MATH_NUMSTEPS_STATS
 
 #ifdef MATH_NUMSTEPS_STATS
 	mutable int numSearchStepsDone, numImprovementsMade;
