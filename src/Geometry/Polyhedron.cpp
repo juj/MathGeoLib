@@ -48,6 +48,19 @@
 #include "VertexBuffer.h"
 #endif
 
+#define MATH_CONVEXHULL_DOUBLE_PRECISION
+
+#ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
+#include "../Math/float4d.h"
+typedef float4d cv;
+typedef double cs;
+typedef std::vector<float4d> VecdArray;
+#else
+typedef vec cv;
+typedef float cs;
+typedef VecArray VecdArray;
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 void Polyhedron::Face::FlipWindingOrder()
@@ -1498,7 +1511,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 
 	Polyhedron p;
 
-	const vec dirs[] =
+	const cv dirs[] =
 	{
 		DIR_VEC(-1, -1, -1),
 		DIR_VEC(1, 0, 0),
@@ -1515,10 +1528,18 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 
 	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
 	{
-		int idx1, idx2;
-		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
-		extremes.insert(idx1);
-//		extremes.insert(idx2);
+		int extremeI = 0;
+		cs largestD = -FLOAT_INF;
+		for(int j = 0; j < numPoints; ++j)
+		{
+			cs d = dirs[i].Dot(pointArray[j]);
+			if (d > largestD)
+			{
+				largestD = d;
+				extremeI = j;
+			}
+		}
+		extremes.insert(extremeI);
 	}
 
 	assume(extremes.size() >= 3);
@@ -1575,7 +1596,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 
 	// If the initial tetrahedron has zero volume, the whole input set is planar.
 	// In that case, we should solve a 2D convex hull problem.
-	float volume = Abs((vec(p.v[0]) - vec(p.v[3])).Dot((vec(p.v[1]) - vec(p.v[3])).Cross(vec(p.v[2]) - vec(p.v[3])))); // / 6.f; Div by six is not relevant here.
+	cs volume = Abs((cv(p.v[0]) - cv(p.v[3])).Dot((cv(p.v[1]) - cv(p.v[3])).Cross(cv(p.v[2]) - cv(p.v[3])))); // / 6.f; Div by six is not relevant here.
 	if (volume < 1e-4f)
 	{
 		// TODO: Do 2D convex hull.
@@ -1586,7 +1607,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	// For each face, maintain a list of its adjacent faces.
 //	std::vector<std::vector<int> > faceAdjacency(4);
 	// For each face, precompute its normal vector.
-	VecArray faceNormals(4);
+	VecdArray faceNormals(4);
 
 	Face face;
 	face.v.resize(3);
@@ -1649,10 +1670,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	// Assign each remaining vertex (vertices 0-3 form the initial hull) to the initial conflict lists.
 	for(size_t j = 0; j < p.f.size(); ++j)
 	{
-		vec pointOnFace = p.v[p.f[j].v[0]];
+		cv pointOnFace = p.v[p.f[j].v[0]];
 		for(size_t i = 4; i < p.v.size(); ++i)
 		{
-			float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
+			cs d = cv(faceNormals[j]).Dot((cv)p.v[i] - pointOnFace);
 			if (d > inPlaneEpsilon)
 			{
 				conflictList[j].push_back(i);
@@ -1709,10 +1730,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		if (conflict.empty())
 			continue;
 
-		vec pointOnFace = p.v.at(p.f.at(f).v.at(0));
+		cv pointOnFace = p.v.at(p.f.at(f).v.at(0));
 //		vec pointOnFace = p.v[p.f[f].v[0]];
 		// Find the most extreme conflicting vertex on this face.
-		float extremeD = -FLOAT_INF;
+		cs extremeD = -FLOAT_INF;
 		int extremeCI = -1; // Index of the vertex in the conflict list.
 		int extremeI = -1; // Index of the vertex in the convex hull.
 		for(size_t i = 0; i < conflict.size(); ++i)
@@ -1721,7 +1742,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 //			int vt = conflict[i];
 			if (vt < (int)hullVertices.size() && hullVertices[vt])
 				continue; // Robustness check: if this vertex is already part of the hull, ignore it.
-			float d = Dot((vec)p.v[vt] - pointOnFace, faceNormals[f]);
+			cs d = cv(faceNormals[f]).Dot((cv)p.v[vt] - pointOnFace);
 			if (d > extremeD)
 			{
 				extremeD = d;
@@ -1797,9 +1818,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 //				LOGI("Edge %d->%d is adjacent face %d", v1, v0, adjFace);
 //				if (!p.f[adjFace].v.empty())
 //				{
-					float d;
-					vec pointOnFace = p.v[p.f[adjFace].v[0]];
-					d = Dot((vec)p.v[extremeI] - pointOnFace, faceNormals[adjFace]);
+					cs d;
+					cv pointOnFace = p.v[p.f[adjFace].v[0]];
+					d = cv(faceNormals[adjFace]).Dot((cv)p.v[extremeI] - pointOnFace);
 //					if (((Plane)facePlanes[adjFace]).SignedDistance(p.v[extremeI]) > 1e-4f) // Is v0<->v1 an interior edge?
 //					bool containsVtx = ContainsAndRemove(conflictList[adjFace], extremeI);
 					if (d > inPlaneEpsilon)
@@ -1900,17 +1921,17 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			face.v[0] = boundaryEdges[i].first; face.v[1] = boundaryEdges[i].second; face.v[2] = extremeI; p.f.push_back(face);
 
 			// Test the dimensions of the new face.
-			vec a = p.v[face.v[0]];
-			vec b = p.v[face.v[1]];
-			vec c = p.v[face.v[2]];
+			cv a = p.v[face.v[0]];
+			cv b = p.v[face.v[1]];
+			cv c = p.v[face.v[2]];
 			if (a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 				LOGW("Creating a degenerate face!");
 
 			C_LOG("Added face %d with vertices %d-%d-%d", (int)p.f.size()-1, face.v[0], face.v[1], face.v[2]);
 			//vec faceNormal = p.FaceNormal(p.f.size()-1);
-			vec faceNormal = (b-a).Cross(c-a);
-			float len = faceNormal.Normalize();
-			if (faceNormal.IsZero() || len < 1e-3f || a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
+			cv faceNormal = (b-a).Cross(c-a);
+			cs len = faceNormal.Normalize();
+			if (len < 1e-3f || a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 			{
 				LOGW("Face has degenerate vertices %s, %s, %s! (normal was of len %f)", vec(p.v[face.v[0]]).ToString().c_str(), vec(p.v[face.v[1]]).ToString().c_str(), vec(p.v[face.v[2]]).ToString().c_str(), len);
 				Tri t;
@@ -1963,8 +1984,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		for(std::set<int>::iterator iter = conflictingVertices.begin(); iter != conflictingVertices.end(); ++iter)
 			for(size_t j = oldNumFaces; j < p.f.size(); ++j)
 			{
-				vec pointOnFace = p.v[p.f[j].v[0]];
-				float d = Dot((vec)p.v[*iter] - pointOnFace, faceNormals[j]);
+				cv pointOnFace = p.v[p.f[j].v[0]];
+				cs d = cv(faceNormals[j]).Dot((cv)p.v[*iter] - pointOnFace);
 //				if (((Plane)facePlanes[j]).IsOnPositiveSide(p.v[*iter]) && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 				if (d > inPlaneEpsilon && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 				{
