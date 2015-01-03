@@ -1369,7 +1369,7 @@ bool IsVertexAntipodalToEdge(const Polyhedron &convexHull, int vi, const std::ve
 			return false;
 
 		// The interval of possible solutions for t is now degenerate?
-		if (tMax - tMin < -1e-4f)
+		if (tMax - tMin < -5e-2f) // -1e-3f has been seen to be too strict here.
 			return false;
 	}
 	return true;
@@ -1395,7 +1395,8 @@ struct SidepodalVertex
 };
 #endif
 
-void FORCE_INLINE TestThreeAdjacentFaces(const vec &n1, const vec &n2, const vec &n3, int edgeI, int edgeJ, int edgeK,
+void FORCE_INLINE TestThreeAdjacentFaces(const vec &n1, const vec &n2, const vec &n3,
+	int edgeI, int edgeJ, int edgeK,
 	const Polyhedron &convexHull, const std::vector<std::pair<int, int> > &edges,
 	const std::vector<std::vector<int> > &antipodalPointsForEdge,
 	float *minVolume, OBB *minOBB)
