@@ -1500,11 +1500,17 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 
 	const vec dirs[] =
 	{
+		DIR_VEC(-1, -1, -1),
+		DIR_VEC(1, 0, 0),
+		DIR_VEC(0, 1, 0),
+		DIR_VEC(0, 0, 1),
+		/*
 		DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
 		DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
 		DIR_VEC(1, -1, 0), DIR_VEC(1, 0, -1), DIR_VEC(0, 1, -1),
 		DIR_VEC(1, 1, 1), DIR_VEC(-1, 1, 1), DIR_VEC(1, -1, 1),
 		DIR_VEC(1, 1, -1)
+		*/
 	};
 
 	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
@@ -1512,7 +1518,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		int idx1, idx2;
 		OBB::ExtremePointsAlongDirection(dirs[i], pointArray, numPoints, idx1, idx2);
 		extremes.insert(idx1);
-		extremes.insert(idx2);
+//		extremes.insert(idx2);
 	}
 
 	assume(extremes.size() >= 3);
