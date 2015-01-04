@@ -526,10 +526,11 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 	float2 c10, c20;
 	vec u, v;
 	vec prevSecondChoice = vec::nan;
+	int numJiggles = 2;
 	while(numTimesNotImproved < 2)
 	{
 		int e1, e2;
-		OBB::ExtremePointsAlongDirection(edge, (const vec*)&convexHull.v[0], convexHull.v.size(), e1, e2);
+		OBB::ExtremePointsAlongDirection(edge, (const vec*)&convexHull.v[0], (int)convexHull.v.size(), e1, e2);
 		edgeLength = Abs(Dot((vec)convexHull.v[e1] - convexHull.v[e2], edge));
 //		float dMin, dMax;
 //		int emin = convexHull.ExtremeVertexConvex(adjacencyData, -edge, floodFillVisited, floodFillVisitColor++, dMin, 0);
@@ -554,14 +555,21 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 		if (volume + 1e-5f < bestVolume)
 		{
 			bestVolume = volume;
-			edge = (c10.x*u + c10.y*v).Normalized();
+			edge = (c10.x*u + c10.y*v);
+			float len = edge.Normalize();
+			if (len <= 0.f)
+				edge = u;
 			numTimesNotImproved = 0;
-			prevSecondChoice = (c20.x*u + c20.y*v).Normalized();
+			prevSecondChoice = (c20.x*u + c20.y*v);
+			len = prevSecondChoice.Normalize();
+			if (len <= 0.f)
+				prevSecondChoice = u;
+			outEdgeA = edge;
+			outEdgeB = prevSecondChoice;
 
 //#define NO_JIGGLES
 
 #ifdef NO_JIGGLES
-			edge = prevSecondChoice;
 			break;
 #endif
 		}
@@ -570,9 +578,10 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 			++numTimesNotImproved;
 			edge = prevSecondChoice;
 		}
+
+		if (--numJiggles <= 0)
+			break;
 	}
-	outEdgeA = edge;
-	outEdgeB = (c10.x*u + c10.y*v).Normalized();
 	return bestVolume;
 }
 
@@ -1330,7 +1339,7 @@ bool SortedArrayContains(const std::vector<int> &arr, int i)
 
 	while(left < right)
 	{
-		int middle = (left + right + 1) >> 1;
+		size_t middle = (left + right + 1) >> 1;
 		if (arr[middle] < i)
 			left = i;
 		else if (arr[middle] > i)
@@ -1469,6 +1478,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	if (convexHull.v.size() <= 3 || convexHull.f.size() <= 1)
 	{
 		// TODO
+		LOGW("Convex hull is degenerate and has only %d vertices/%d faces!", (int)convexHull.v.size(), (int)convexHull.f.size());
 		minOBB.SetNegativeInfinity();
 		return minOBB;
 	}
@@ -1495,12 +1505,15 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		cv c = convexHull.v[convexHull.f[i].v[2]];
 		cv normal = (b-a).Cross(c-a);
 		cs len = normal.Normalize();
+#if 0
 		if (len < 1e-4f)
 		{
 			LOGW("Input convex hull contains a very small face %d with zero surface area! Computing OBB may fail!",
 				i);
 			//return minOBB;
 		}
+#endif
+		MARK_UNUSED(len);
 		faceNormals.push_back(DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z));
 	}
 
@@ -1559,10 +1572,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				vertexPairsToEdges[v1*convexHull.v.size()+v0] = (unsigned int)edges.size();
 //				vertexPairsToEdges[std::make_pair(v1, v0)] = (int)edges.size(); // Mark that we know we have seen v0->v1 already.
 				edges.push_back(e);
-				facesForEdge.push_back(std::make_pair(i, -1)); // The -1 will be filled once we see the edge v1->v0.
+				facesForEdge.push_back(std::make_pair((int)i, -1)); // The -1 will be filled once we see the edge v1->v0.
 			}
 			else
-				facesForEdge[vertexPairsToEdges[v0*convexHull.v.size()+v1]/*iter->second*/].second = i;
+				facesForEdge[vertexPairsToEdges[v0*(int)convexHull.v.size()+v1]/*iter->second*/].second = (int)i;
 			v0 = v1;
 		}
 	}
@@ -1685,7 +1698,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				traverseStackEdges.push_back(std::make_pair(v0, v1));
 			}
 			// Take a random adjacent edge.
-			int nNewEdges = traverseStackEdges.size() - sizeBefore;
+			int nNewEdges = (int)(traverseStackEdges.size() - sizeBefore);
 			if (nNewEdges > 0)
 			{
 				int r = rng.Int(0, nNewEdges - 1);
@@ -1770,8 +1783,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 //			LOGW("Due to numerical stability issues(?), could not find an antipodal vertex for edge %d! Check the scale of your input dataset! Good scale is having coordinates range e.g. [0.0,100.0]", edges[i]);
 			// Getting here is most likely a bug. Fall back to linear scan, which is very slow.
 			for(size_t j = 0; j < convexHull.v.size(); ++j) // O(V)
-				if (IsVertexAntipodalToEdge(convexHull, j, adjacencyData[j], f1a, f1b))
-					antipodalPointsForEdge[i].push_back(j);
+				if (IsVertexAntipodalToEdge(convexHull, (int)j, adjacencyData[j], f1a, f1b))
+					antipodalPointsForEdge[i].push_back((int)j);
 
 //			antipodalPointsForEdge[i].push_back(startingVertex);
 		}
@@ -1915,7 +1928,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							deadDirection2.PerpendicularBasis(basis12, basis22);
 #endif
 
-							compatibleEdges[edge].push_back(i);
+							compatibleEdges[edge].push_back((int)i);
 //							sidepodalVertices[edge].insert(edges[i].first);
 //							sidepodalVertices[edge].insert(edges[i].second);
 #ifdef NEW_EDGE3_SEARCH
@@ -2178,7 +2191,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							int nSolutions = ComputeBasis(f1a, f1b, f2a, f2b, f3a, f3b, n1, n2, n3);
 							for(int s = 0; s < nSolutions; ++s) // O(constant), nSolutions == 0, 1 or 2.
 							{
-								TestThreeAdjacentFaces(n1[s], n2[s], n3[s], i, edgeJ, edgeK, convexHull, 
+								TestThreeAdjacentFaces(n1[s], n2[s], n3[s], (int)i, edgeJ, edgeK, convexHull, 
 									edges, antipodalPointsForEdge, &minVolume, &minOBB);
 							}
 						}
@@ -2838,8 +2851,8 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 	vec minVolumeEdgeA;
 	vec minVolumeEdgeB;
 
-	const int Y = 256;
-	const int X = 256;
+	const int Y = 128;
+	const int X = 128;
 	for(int y = 0; y < Y; ++y)
 		for(int x = 0; x < X; ++x)
 		{
@@ -2865,7 +2878,7 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 			}
 		}
 
-	return FixedOrientationEnclosingOBB((const vec *)&convexPolyhedron.v[0], convexPolyhedron.v.size(), minVolumeEdgeA, minVolumeEdgeB);
+	return FixedOrientationEnclosingOBB((const vec *)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(), minVolumeEdgeA, minVolumeEdgeB);
 }
 
 vec OBB::Size() const

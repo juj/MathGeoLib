@@ -411,8 +411,8 @@ public:
 
 	/// Creates a Polyhedron object that represents the convex hull of the given point array.
 	/// \todo This function is strongly WIP!
-	static Polyhedron ConvexHull(const VecArray &points) { return !points.empty() ? ConvexHull((const vec*)&points[0], points.size()) : Polyhedron(); }
-	static Polyhedron ConvexHull(const VecArray &points, LCG &rng) { return !points.empty() ? ConvexHull((const vec*)&points[0], points.size(), rng) : Polyhedron(); }
+	static Polyhedron ConvexHull(const VecArray &points) { return !points.empty() ? ConvexHull((const vec*)&points[0], (int)points.size()) : Polyhedron(); }
+	static Polyhedron ConvexHull(const VecArray &points, LCG &rng) { return !points.empty() ? ConvexHull((const vec*)&points[0], (int)points.size(), rng) : Polyhedron(); }
 	static Polyhedron ConvexHull(const vec *pointArray, int numPoints);
 	static Polyhedron ConvexHull(const vec *pointArray, int numPoints, LCG &rng);
 

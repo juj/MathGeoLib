@@ -1928,13 +1928,15 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			cv a = p.v[face.v[0]];
 			cv b = p.v[face.v[1]];
 			cv c = p.v[face.v[2]];
+#if 0
 			if (a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 				LOGW("Creating a degenerate face!");
-
+#endif
 			C_LOG("Added face %d with vertices %d-%d-%d", (int)p.f.size()-1, face.v[0], face.v[1], face.v[2]);
 			//vec faceNormal = p.FaceNormal(p.f.size()-1);
 			cv faceNormal = (b-a).Cross(c-a);
 			cs len = faceNormal.Normalize();
+#if 0
 			if (len < 1e-3f || a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 			{
 				LOGW("Face has degenerate vertices %s, %s, %s! (normal was of len %f)", vec(p.v[face.v[0]]).ToString().c_str(), vec(p.v[face.v[1]]).ToString().c_str(), vec(p.v[face.v[2]]).ToString().c_str(), len);
@@ -1945,6 +1947,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				t.faceIndex = (int)p.f.size()-1;
 				degenerateTris.push_back(t);
 			}
+#endif
 			assert(!faceNormal.IsZero() && faceNormal.IsFinite());
 			faceNormals.push_back(faceNormal);
 			assert(extremeI >= hullVertices.size() || !hullVertices[extremeI]);
