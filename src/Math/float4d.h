@@ -62,4 +62,14 @@ public:
 		z *= recipLen;
 		return len;
 	}
+
+	bool IsFinite() const
+	{
+		return MATH_NS::IsFinite(x) && MATH_NS::IsFinite(y) && MATH_NS::IsFinite(z) && MATH_NS::IsFinite(w);
+	}
+
+	bool IsZero(double epsilonSq = 1e-10) const
+	{
+		return Dot(*this) <= epsilonSq;
+	}
 };
