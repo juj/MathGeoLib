@@ -1765,7 +1765,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			const std::vector<int> &neighbors = adjacencyData[v];
 			if (IsVertexAntipodalToEdge(convexHull, v, neighbors, f1a, f1b))
 			{
-				assert(edges[i].first != v && edges[i].second != v);
+				assume(edges[i].first != v && edges[i].second != v);
 				antipodalPointsForEdge[i].push_back(v);
 				for(size_t j = 0; j < neighbors.size(); ++j)
 					if (!HAVE_VISITED_VERTEX(neighbors[j]))
