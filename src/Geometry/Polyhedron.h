@@ -212,8 +212,6 @@ public:
 	OBB MinimalEnclosingOBB() const;
 #endif
 
-	void MergeAdjacentPlanarFaces();
-
 	/// Computes a data structure that specifies adjacent vertices for each vertex.
 	/** In the returned vector of vectors V, the vector V[i] specifies all the vertex indices that vertex i
 		is connected to. */
@@ -246,6 +244,11 @@ public:
 
 	/// Removes all faces from this polyhedron which have two or less vertices in them.
 	void RemoveDegenerateFaces();
+
+	/// Finds all neighboring faces that have identical face normals and merges them together.
+	/// Warning: this introduces T-junctions to the polyhedron, as well as increases the vertex count on the merged faces.
+	/// Use this only as preprocessing when needed.
+	void MergeAdjacentPlanarFaces();
 
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */

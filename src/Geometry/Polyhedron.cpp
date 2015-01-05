@@ -502,6 +502,8 @@ bool Polyhedron::IsClosed() const
 	std::set<std::pair<int, int> > uniqueEdges;
 	for(int i = 0; i < NumFaces(); ++i) // O(F)
 	{
+		if (f[i].v.empty())
+			continue;
 		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString());
 		assume(FacePolygon(i).IsSimple());
 		int x = f[i].v.back();
@@ -2489,7 +2491,222 @@ void Polyhedron::RemoveRedundantVertices()
 
 void Polyhedron::MergeAdjacentPlanarFaces()
 {
-	///\todo
+	VecdArray faceNormals;
+	faceNormals.reserve(f.size());
+
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		Face &face = f[i];
+		if (face.v.size() < 3)
+		{
+			f.erase(f.begin()+i);
+			--i;
+			continue;
+		}
+		cv a = v[face.v[0]];
+		cv b = v[face.v[1]];
+		cv c = v[face.v[2]];
+		cv normal = (b-a).Cross(c-a);
+		normal.Normalize();
+		faceNormals.push_back(normal);
+	}
+
+	std::vector<int> faceGroups(f.size());
+	for(size_t i = 0; i < f.size(); ++i)
+		faceGroups[i] = (int)i;
+
+	std::map<std::pair<int, int>, int> verticesToFaces;
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		Face &face = f[i];
+
+		int v0 = face.v.back();
+		for(size_t j = 0; j < face.v.size(); ++j)
+		{
+			int v1 = face.v[j];
+			verticesToFaces[std::make_pair(v0, v1)] = (int)i;
+			std::map<std::pair<int, int>, int>::iterator neighbor = verticesToFaces.find(std::make_pair(v1, v0));
+			if (neighbor != verticesToFaces.end())
+			{
+				int nf = neighbor->second;
+				if (!f[nf].v.empty())
+				{
+					cv thisNormal = faceNormals[i];
+					cv nghbNormal = faceNormals[nf];
+					if (thisNormal.Dot(nghbNormal) > 1.0 - 1e-5)
+					{
+						// Merge this face to neighboring face.
+						int fg = i;
+						while(faceGroups[fg] != fg)
+							fg = faceGroups[fg];
+						int nfgr = nf;
+						while(faceGroups[nfgr] != nfgr)
+							nfgr = faceGroups[nfgr];
+						faceGroups[fg] = nfgr;
+						break;
+					}
+				}
+			}
+			v0 = v1;
+		}
+	}
+
+	std::vector<std::set<std::pair<int, int> > > newEdgesPerFace(f.size());
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		Face &face = f[i];
+
+		int fg = i;
+		while(faceGroups[fg] != fg)
+			fg = faceGroups[fg];
+
+		int v0 = face.v.back();
+		for(size_t j = 0; j < face.v.size(); ++j)
+		{
+			int v1 = face.v[j];
+
+			if (newEdgesPerFace[fg].find(std::make_pair(v1, v0)) != newEdgesPerFace[fg].end())
+			{
+				newEdgesPerFace[fg].erase(std::make_pair(v1, v0));
+			}
+			else
+			{
+				newEdgesPerFace[fg].insert(std::make_pair(v0, v1));
+			}
+
+			v0 = v1;
+		}
+	}
+
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		Face &face = f[i];
+
+		std::vector<std::pair<int, int> > boundaryEdges(newEdgesPerFace[i].begin(), newEdgesPerFace[i].end());
+		for(size_t i = 0; i < boundaryEdges.size(); ++i)
+			for(size_t j = i+1; j < boundaryEdges.size(); ++j)
+				if (boundaryEdges[i].second == boundaryEdges[j].first)
+				{
+					Swap(boundaryEdges[i+1], boundaryEdges[j]);
+					break;
+				}
+		face.v.clear();
+		for(size_t j = 0; j < boundaryEdges.size(); ++j)
+			face.v.push_back(boundaryEdges[j].first);
+	}
+
+#if 0
+						Face &nghb = f[nf];
+
+						// On this face, vertices v0 and v1 are found at indices t0, t1, and t0 -> t1 goes CCW
+						size_t t0 = (j + face.v.size() - 1) % face.v.size();
+						size_t t1 = j;
+						// On nghb face, vertices v0 and v1 are found at indices n0, n1, and n1 -> n0 goes CCW
+						size_t n0 = std::find(nghb.v.begin(), nghb.v.end(), v0) - nghb.v.begin();
+						size_t n1 = std::find(nghb.v.begin(), nghb.v.end(), v1) - nghb.v.begin();
+						
+						// It is possible that the two faces share multiple edges, so need to find all edges that these share in addition to v0->v1.
+						// Scan forward
+						int numVerticesToErase = 0;
+						while(face.v[t1] == nghb.v[n1])
+						{
+							int Nt1 = (t1+1) % face.v.size();
+							int Nn1 = (n1+nghb.v.size()-1) % nghb.v.size();
+							if (face.v[Nt1] != nghb.v[Nn1])
+								break;
+							t1 = Nt1;
+							n1 = Nn1;
+							++numVerticesToErase;
+						}
+						// Scan backward.
+						while(face.v[t0] == nghb.v[n0])
+						{
+							int Nt0 = (t0+face.v.size()-1) % face.v.size();
+							int Nn0 = (n0+1) % nghb.v.size();
+							if (face.v[Nt0] != nghb.v[Nn0])
+								break;
+							t0 = Nt0;
+							n0 = Nn0;
+							++numVerticesToErase;
+						}
+
+//						LOGI("Merging face %s to face %s at edge %d-%d.", face.ToString().c_str(), nghb.ToString().c_str(), v0, v1);
+						int nvte = numVerticesToErase;
+						while(numVerticesToErase-- > 0)
+						{
+							int idxToErase = (n1 + 1) % nghb.v.size();
+//							LOGI("Vertex %d (at idx %d) on neighbor is internal and will be removed.", nghb.v[idxToErase], idxToErase);
+							nghb.v.erase(nghb.v.begin()+idxToErase);
+							if (n1 >= nghb.v.size())
+								n1 = 0;
+						}
+						if (nvte > 0)
+//						LOGI("After removing internal vertices, nghbface=%s.", nghb.ToString().c_str());
+
+						int k = (t1+1)%face.v.size();
+						int idxToAdd = n1 + 1;
+						while(k != t0)
+						{
+//							LOGI("Adding vertex %d.", face.v[k]);
+							nghb.v.insert(nghb.v.begin() + idxToAdd, face.v[k]);
+							++idxToAdd;
+							k = (k+1)%face.v.size();
+						}
+#if 0
+						for(; v1_n < nghb.v.size(); ++k)
+							if (nghb.v[k] == v1)
+								break;
+						k = (k+1) % nghb.v.size();
+						std::string before = nghb.ToString();
+//						LOGI("");
+						/*
+						for(size_t l = (k+1) % nghb.v.size(); nghb.v[l] != v1; l = (l+1) % nghb.v.size())
+						{
+							face.v.insert(face.v.begin() + j, nghb.v[l]);
+							++j;
+						}
+						*/
+						int atIndex = neighbor->first.first;
+						for(size_t l = (j+1) % face.v.size(); face.v[l] != v0; l = (l+1) % face.v.size())
+						{
+							nghb.v.insert(nghb.v.begin() + k, face.v[l]);
+//							LOGI("Inserted vertex %d to index k:%d from index l:%d", face.v[l], (int)k, (int)l);
+							k = (k+1) % nghb.v.size();
+						}
+#endif
+/*
+						LOGI("Merged face %d to %d. After: %s", (int)i, (int)nf, nghb.ToString().c_str());
+#ifndef NDEBUG
+						{
+							std::vector<int> v2 = nghb.v;
+							std::sort(v2.begin(), v2.end());
+							assert(std::unique(v2.begin(), v2.end()) == v2.end());
+						}
+#endif
+*/
+						int v0 = nghb.v.back();
+						for(size_t j = 0; j < nghb.v.size(); ++j)
+						{
+							int v1 = nghb.v[j];
+							verticesToFaces[std::make_pair(v0, v1)] = (int)nf;
+							v0 = v1;
+						}
+
+						verticesToFaces.erase(std::make_pair(v1, v0));
+						verticesToFaces.erase(std::make_pair(v0, v1));
+
+						f[i].v.clear();
+//						assert(IsClosed());
+						break;
+					}
+				}
+			}
+			v0 = v1;
+		}
+	}
+#endif
+	RemoveDegenerateFaces();
+	assert(IsClosed());
 }
 
 std::vector<std::vector<int> > Polyhedron::GenerateVertexAdjacencyData() const
