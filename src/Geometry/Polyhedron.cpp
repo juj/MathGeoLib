@@ -1705,7 +1705,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	std::vector<std::set<int> > conflictListVertices(p.v.size());
 
 #ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
-	const double inPlaneEpsilon = 1e-8;
+	const double inPlaneEpsilon = 5e-5;
 #else
 	const float inPlaneEpsilon = 1e-4f;
 #endif
