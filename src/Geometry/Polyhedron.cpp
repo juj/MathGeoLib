@@ -212,23 +212,22 @@ cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 	}
 	else if (face.v.size() > 3)
 	{
-		cv a = poly.v[face.v[0]];
-		cv b = poly.v[face.v[1]];
-		cv b_a = b-a;
 		cv bestNormal;
 		cs bestLen = -FLOAT_INF;
-		for(size_t i = 2; i < face.v.size(); ++i)
+		cv a = poly.v[face.v[face.v.size()-2]];
+		cv b = poly.v[face.v.back()];
+		for(size_t i = 0; i < face.v.size()-2; ++i)
 		{
 			cv c = poly.v[face.v[i]];
-			cv normal = b_a.Cross(c-a);
+			cv normal = (c-b).Cross(a-b);
 			float len = normal.Normalize();
-			if (len > 1e-1f)
-				return DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z);
 			if (len > bestLen)
 			{
 				bestLen = len;
 				bestNormal = normal;
 			}
+			a = b;
+			b = c;
 		}
 		assert(bestLen != -FLOAT_INF);
 		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
@@ -1706,7 +1705,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	std::vector<std::set<int> > conflictListVertices(p.v.size());
 
 #ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
-	const double inPlaneEpsilon = 5e-5;
+	const double inPlaneEpsilon = 1e-8;
 #else
 	const float inPlaneEpsilon = 1e-4f;
 #endif
@@ -1998,6 +1997,14 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				== edgesToFaces.end() || edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] == -1);
 			assert(edgesToFaces.find(std::make_pair(extremeI, boundaryEdges[i].first))
 				== edgesToFaces.end() || edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] == -1);
+
+			if (!(edgesToFaces.find(std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second))
+				== edgesToFaces.end() || edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] == -1)
+				|| !(edgesToFaces.find(std::make_pair(boundaryEdges[i].second, extremeI))
+				== edgesToFaces.end() || edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] == -1)
+			 || !(edgesToFaces.find(std::make_pair(extremeI, boundaryEdges[i].first))
+				== edgesToFaces.end() || edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] == -1))
+				LOGW("Convex hull computation failed!");
 
 			edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] = p.f.size()-1;
 			edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] = p.f.size()-1;
@@ -2752,7 +2759,12 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 #endif
 	RemoveDegenerateFaces();
 	RemoveRedundantVertices();
-	assert(IsClosed());
+	assume(IsClosed());
+	assume(IsConvex());
+
+//	for(size_t i = 0; i < f.size(); ++i)
+//		if (f[i].v.size() > 3)
+//			LOGI("Face %d: %s, surface area: %f", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area());
 }
 
 std::vector<std::vector<int> > Polyhedron::GenerateVertexAdjacencyData() const
