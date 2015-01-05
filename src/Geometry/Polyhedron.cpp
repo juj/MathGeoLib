@@ -231,6 +231,48 @@ cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 		}
 		assert(bestLen != -FLOAT_INF);
 		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
+
+#if 0
+		// Find the longest edge.
+		cs bestLenSq = -FLOAT_INF;
+		cv bestEdge;
+		int v0 = face.v.back();
+		int bestV0 = 0;
+		int bestV1 = 0;
+		for(size_t i = 0; i < face.v.size(); ++i)
+		{
+			int v1 = face.v[i];
+			cv edge = cv(poly.v[v1]) - cv(poly.v[v0]);
+			cs lenSq = edge.Normalize();
+			if (lenSq > bestLenSq)
+			{
+				bestLenSq = lenSq;
+				bestEdge = edge;
+				bestV0 = v0;
+				bestV1 = v1;
+			}
+			v0 = v1;
+		}
+
+		cv bestNormal;
+		cs bestLen = -FLOAT_INF;
+		for(size_t i = 0; i < face.v.size(); ++i)
+		{
+			if (face.v[i] == bestV0 || face.v[i] == bestV1)
+				continue;
+			cv edge = cv(poly.v[i]) - cv(poly.v[bestV0]);
+			edge.Normalize();
+			cv normal = bestEdge.Cross(edge);
+			cs len = normal.Normalize();
+			if (len > bestLen)
+			{
+				bestLen = len;
+				bestNormal = normal;
+			}
+		}
+		assert(bestLen != -FLOAT_INF);
+		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
+#endif
 	}
 	else if (face.v.size() == 2)
 		return ((vec)poly.v[face.v[1]]-(vec)poly.v[face.v[0]]).Cross(((vec)poly.v[face.v[0]]-(vec)poly.v[face.v[1]]).Perpendicular()-poly.v[face.v[0]]).Normalized();
@@ -1705,7 +1747,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	std::vector<std::set<int> > conflictListVertices(p.v.size());
 
 #ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
-	const double inPlaneEpsilon = 1e-8;
+	const double inPlaneEpsilon = 1e-5;
 #else
 	const float inPlaneEpsilon = 1e-4f;
 #endif
@@ -2535,6 +2577,18 @@ void Polyhedron::RemoveRedundantVertices()
 	assert(FaceIndicesValid());
 }
 
+void PolyExtremeVertexOnFace(const Polyhedron &poly, int face, const cv &dir, cs &outMin, cs &outMax)
+{
+	outMin = FLOAT_INF;
+	outMax = -FLOAT_INF;
+	for(size_t i = 0; i < poly.f[face].v.size(); ++i)
+	{
+		cs d = dir.Dot(vec(poly.v[poly.f[face].v[i]]));
+		outMin = Min<cs>(outMin, d);
+		outMax = Max<cs>(outMax, d);
+	}
+}
+
 void Polyhedron::MergeAdjacentPlanarFaces()
 {
 	VecdArray faceNormals;
@@ -2582,18 +2636,35 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 				{
 					cv thisNormal = faceNormals[i];
 					cv nghbNormal = faceNormals[nf];
-					if (thisNormal.Dot(nghbNormal) > 1.0 - 1e-10)
+					if (thisNormal.Dot(nghbNormal) > 1.0 - 1e-16)
 					{
-						++numMerges;
-						// Merge this face to neighboring face.
-						int fg = i;
-						while(faceGroups[fg] != fg)
-							fg = faceGroups[fg];
-						int nfgr = nf;
-						while(faceGroups[nfgr] != nfgr)
-							nfgr = faceGroups[nfgr];
-						faceGroups[fg] = nfgr;
-						break;
+						cs eNeg, ePos, nNeg, nPos;
+						PolyExtremeVertexOnFace(*this, i, nghbNormal, eNeg, ePos);
+						PolyExtremeVertexOnFace(*this, nf, nghbNormal, nNeg, nPos);
+						if (Max(ePos, nPos) - Min(eNeg, nNeg) < 1e-8)
+						{
+#if 0
+							LOGI("Face normal for i: %d (%s) is %s, face normal for nf: %d (%s) is %s. Extremes: %f to %f, and %f to %f. Extreme spread after merging: %f",
+								(int)i, f[i].ToString().c_str(), thisNormal.ToFloat4().ToString().c_str(), (int)nf, 
+								f[nf].ToString().c_str(),
+								nghbNormal.ToFloat4().ToString().c_str(),
+								eNeg, ePos, nNeg, nPos, Max(ePos, nPos) - Min(eNeg, nNeg));
+							for(size_t x = 0; x < f[i].v.size(); ++x)
+								LOGI("Vertex %d: %s", (int)x, vec(v[f[i].v[x]]).SerializeToString().c_str());
+							for(size_t x = 0; x < f[nf].v.size(); ++x)
+								LOGI("Vertex %d: %s", (int)x, vec(v[f[nf].v[x]]).SerializeToString().c_str());
+#endif
+							++numMerges;
+							// Merge this face to neighboring face.
+							int fg = i;
+							while(faceGroups[fg] != fg)
+								fg = faceGroups[fg];
+							int nfgr = nf;
+							while(faceGroups[nfgr] != nfgr)
+								nfgr = faceGroups[nfgr];
+							faceGroups[fg] = nfgr;
+							break;
+						}
 					}
 				}
 			}
@@ -2762,9 +2833,16 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 	assume(IsClosed());
 	assume(IsConvex());
 
-//	for(size_t i = 0; i < f.size(); ++i)
-//		if (f[i].v.size() > 3)
-//			LOGI("Face %d: %s, surface area: %f", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area());
+#if 0
+	for(size_t i = 0; i < f.size(); ++i)
+		if (f[i].v.size() > 3)
+		{
+			cv faceNormal = FaceNormal(i);
+			cs n, p;
+			PolyExtremeVertexOnFace(*this, i, faceNormal, n, p);
+			LOGI("Face %d: %s, surface area: %f, normal: %s, extremes: %f to %f", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area(), FaceNormal(i).ToString().c_str(), n, p);
+		}
+#endif
 }
 
 std::vector<std::vector<int> > Polyhedron::GenerateVertexAdjacencyData() const
