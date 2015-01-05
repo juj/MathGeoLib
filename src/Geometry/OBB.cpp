@@ -957,6 +957,27 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
 {
 #if 1
+
+
+#if 0
+	float a1 = Abs(f1a.Dot(f1b));
+	float a2 = Abs(f2a.Dot(f2b));
+	float b1 = Abs(f1a.Dot(f2b));
+	float b2 = Abs(f2a.Dot(f1b));
+/*
+	if ((a1 > 1.f - 5e-3f && a2 < 5e-3f) || (a2 > 1.f - 5e-3f && a1 < 5e-3f))
+		return false;
+	if ((b1 > 1.f - 5e-3f && b2 < 5e-3f) || (b2 > 1.f - 5e-3f && b1 < 5e-3f))
+		return false;
+*/
+	if ((a1 > 1.f - 2e-3f || a1 < 2e-3f) && (a2 > 1.f - 2e-3f || a2 < 2e-3f))
+		return false;
+	if ((b1 > 1.f - 2e-3f || b1 < 2e-3f) && (b2 > 1.f - 2e-3f || b2 < 2e-3f))
+		return false;
+#endif
+
+
+
 	const vec f1a_f1b = f1a-f1b;
 	const vec f2a_f2b = f2a-f2b;
 	float a = f1b.Dot(f2b);
@@ -1533,7 +1554,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			vec pointDiff = vec(convexHull.v[j]) - pointOnFace;
 			float signedDistance = pointDiff.Dot(faceNormals[i]);
 			if (signedDistance > 1e-1f)
-				LOGE("Vertex %d is %f units deep on the wrong side of a face: Face plane normals are pointing inside the convex hull?", (int)j, signedDistance);
+			{
+				// Find how deep there are points on the opposite side.
+				int extremeOpposite = convexHull.ExtremeVertex(-vec(faceNormals[i]));
+				float signedDistanceOpposite = Dot(vec(convexHull.v[extremeOpposite]) - pointOnFace, faceNormals[i]);
+				LOGE("Vertex %d is %f units deep on the wrong side of face %d (which has %d vertices and surface area %f): On the opposite side, extreme signed distance is vtx %d at d %f.", (int)j, signedDistance, 
+					(int)i, (int)convexHull.f[i].v.size(), convexHull.FacePolygon(i).Area(), extremeOpposite, signedDistanceOpposite);
+				break;
+			}
 		}
 	}
 #endif
@@ -1718,7 +1746,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// Stores a memory of yet unvisited vertices for current graph search.
 	std::vector<int> traverseStack;
 
-#if 0
+//#define NAIVE_ANTIPODAL_SEARCH
+
+#ifdef NAIVE_ANTIPODAL_SEARCH
 	// A naive O(E*V) algorithm for computing all antipodal points for each edge.
 	for (size_t i = 0; i < edges.size(); ++i) // O(E)
 	{
@@ -1736,12 +1766,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// much as 15-25%.
 	int startingVertex = 0;
 
-#if 1
-
 	TIMING_TICK(
 		unsigned long long numVertexNeighborSearches = 0;
 		unsigned long long numVertexNeighborSearchImprovements = 0;
 	);
+
+#ifndef NAIVE_ANTIPODAL_SEARCH
 
 	// Precomputation: for each edge, we need to compute the list of potential antipodal points (points on
 	// the opposing face of an enclosing OBB of the face that is flush with the given edge of the polyhedron).
@@ -1820,7 +1850,15 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	// Stores for each edge i the list of all sidepodal edge indices j that it can form an OBB with.
 	std::vector<std::vector<int> > compatibleEdges(edges.size());
 
-#if 0
+#ifdef NEW_EDGE3_SEARCH
+	// Use a O(E*V) data structure for sidepodal vertices.
+	unsigned char *sidepodalVertices = new unsigned char[edges.size()*convexHull.v.size()];
+	memset(sidepodalVertices, 0, sizeof(unsigned char)*edges.size()*convexHull.v.size());
+#endif
+
+//#define NAIVE_SIDEPODAL_SEARCH
+
+#ifdef NAIVE_SIDEPODAL_SEARCH
 	// Precomputation: Compute all potential companion edges for each edge.
 	// This is O(E^2)
 	// Important! And edge can be its own companion edge! So have each edge test itself during iteration.
@@ -1832,19 +1870,25 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			if (AreEdgesCompatibleForOBB(f1a, f1b, faceNormals[facesForEdge[j].first], faceNormals[facesForEdge[j].second]))
 			{
 				compatibleEdges[i].push_back(j);
+#ifdef NEW_EDGE3_SEARCH
+				sidepodalVertices[i*convexHull.v.size()+edges[j].first] = 1;
+				sidepodalVertices[i*convexHull.v.size()+edges[j].second] = 1;
+#endif
 				if (i != j)
+				{
 					compatibleEdges[j].push_back(i);
+#ifdef NEW_EDGE3_SEARCH
+					sidepodalVertices[j*convexHull.v.size()+edges[i].first] = 1;
+					sidepodalVertices[j*convexHull.v.size()+edges[i].second] = 1;
+#endif
+				}
 			}
 	}
-#endif
+#else
 
 #ifdef NEW_EDGE3_SEARCH
-	// Use a O(E*V) data structure for sidepodal vertices.
-	unsigned char *sidepodalVertices = new unsigned char[edges.size()*convexHull.v.size()];
-	memset(sidepodalVertices, 0, sizeof(unsigned char)*edges.size()*convexHull.v.size());
 #if 0
 	std::vector<std::vector<SidepodalVertex> > sidepodalVerticesForEdge(edges.size());
-#endif
 
 	VecArray vertexNormals(convexHull.v.size());
 	for(size_t i = 0; i < convexHull.v.size(); ++i)
@@ -1855,6 +1899,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			normal += (vec(convexHull.v[i]) - vec(convexHull.v[adjacency[j]])).Normalized();
 		vertexNormals[i] = normal.Normalized();
 	}
+#endif
 #endif
 	// Compute all sidepodal edges for each edge by performing a graph search. The set of sidepodal edges is
 	// connected in the graph, which lets us avoid having to iterate over each edge pair of the convex hull.
@@ -1925,10 +1970,12 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						{
 							vec f2a = faceNormals[facesForEdge[edge].first];
 							vec f2b = faceNormals[facesForEdge[edge].second];
+#if 0
 #ifdef NEW_EDGE3_SEARCH
 							vec deadDirection2 = (f2a+f2b)*0.5f;
 							vec basis12, basis22;
 							deadDirection2.PerpendicularBasis(basis12, basis22);
+#endif
 #endif
 
 							compatibleEdges[edge].push_back((int)i);
@@ -1956,6 +2003,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			}
 		}
 	}
+#endif
 
 #if 0
 	for(size_t i = 0; i < sidepodalVerticesForEdge.size(); ++i) // O(E)
