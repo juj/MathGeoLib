@@ -1500,11 +1500,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				i, (int)convexHull.f[i].v.size());
 			return minOBB;
 		}
+		/*
 		cv a = convexHull.v[convexHull.f[i].v[0]];
 		cv b = convexHull.v[convexHull.f[i].v[1]];
 		cv c = convexHull.v[convexHull.f[i].v[2]];
 		cv normal = (b-a).Cross(c-a);
 		cs len = normal.Normalize();
+		*/
+		vec normal = convexHull.FaceNormal(i);
 #if 0
 		if (len < 1e-4f)
 		{
@@ -1513,7 +1516,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			//return minOBB;
 		}
 #endif
-		MARK_UNUSED(len);
+		//MARK_UNUSED(len);
 		faceNormals.push_back(DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z));
 	}
 

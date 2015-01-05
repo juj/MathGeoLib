@@ -197,17 +197,54 @@ Plane Polyhedron::FacePlane(int faceIndex) const
 		return Plane();
 }
 
-vec Polyhedron::FaceNormal(int faceIndex) const
+cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 {
-	const Face &face = f[faceIndex];
-	if (face.v.size() >= 3)
-		return ((vec)v[face.v[1]]-(vec)v[face.v[0]]).Cross((vec)v[face.v[2]]-(vec)v[face.v[0]]).Normalized();
+	const Polyhedron::Face &face = poly.f[faceIndex];
+	if (face.v.size() == 3)
+	{
+		cv a = poly.v[face.v[0]];
+		cv b = poly.v[face.v[1]];
+		cv c = poly.v[face.v[2]];
+		cv normal = (b-a).Cross(c-a);
+		normal.Normalize();
+		return DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z);
+//		return ((vec)v[face.v[1]]-(vec)v[face.v[0]]).Cross((vec)v[face.v[2]]-(vec)v[face.v[0]]).Normalized();
+	}
+	else if (face.v.size() > 3)
+	{
+		cv a = poly.v[face.v[0]];
+		cv b = poly.v[face.v[1]];
+		cv b_a = b-a;
+		cv bestNormal;
+		cs bestLen = -FLOAT_INF;
+		for(size_t i = 2; i < face.v.size(); ++i)
+		{
+			cv c = poly.v[face.v[i]];
+			cv normal = b_a.Cross(c-a);
+			float len = normal.Normalize();
+			if (len > 1e-1f)
+				return DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z);
+			if (len > bestLen)
+			{
+				bestLen = len;
+				bestNormal = normal;
+			}
+		}
+		assert(bestLen != -FLOAT_INF);
+		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
+	}
 	else if (face.v.size() == 2)
-		return ((vec)v[face.v[1]]-(vec)v[face.v[0]]).Cross(((vec)v[face.v[0]]-(vec)v[face.v[1]]).Perpendicular()-v[face.v[0]]).Normalized();
+		return ((vec)poly.v[face.v[1]]-(vec)poly.v[face.v[0]]).Cross(((vec)poly.v[face.v[0]]-(vec)poly.v[face.v[1]]).Perpendicular()-poly.v[face.v[0]]).Normalized();
 	else if (face.v.size() == 1)
 		return DIR_VEC(0,1,0);
 	else
 		return vec::nan;
+}
+
+vec Polyhedron::FaceNormal(int faceIndex) const
+{
+	cv normal = PolyFaceNormal(*this, faceIndex);
+	return DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z);
 }
 
 int Polyhedron::ExtremeVertex(const vec &direction) const
@@ -1936,8 +1973,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 #endif
 			C_LOG("Added face %d with vertices %d-%d-%d", (int)p.f.size()-1, face.v[0], face.v[1], face.v[2]);
 			//vec faceNormal = p.FaceNormal(p.f.size()-1);
-			cv faceNormal = (b-a).Cross(c-a);
-			cs len = faceNormal.Normalize();
+			//cv faceNormal = (b-a).Cross(c-a);
+			//cs len = faceNormal.Normalize();
+			cv faceNormal = PolyFaceNormal(p, p.f.size()-1);
 #if 0
 			if (len < 1e-3f || a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 			{
@@ -2503,18 +2541,21 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 			--i;
 			continue;
 		}
+		/*
 		cv a = v[face.v[0]];
 		cv b = v[face.v[1]];
 		cv c = v[face.v[2]];
 		cv normal = (b-a).Cross(c-a);
 		normal.Normalize();
-		faceNormals.push_back(normal);
+		*/
+		faceNormals.push_back(PolyFaceNormal(*this, i));
 	}
 
 	std::vector<int> faceGroups(f.size());
 	for(size_t i = 0; i < f.size(); ++i)
 		faceGroups[i] = (int)i;
 
+	int numMerges = 0;
 	std::map<std::pair<int, int>, int> verticesToFaces;
 	for(size_t i = 0; i < f.size(); ++i)
 	{
@@ -2533,8 +2574,9 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 				{
 					cv thisNormal = faceNormals[i];
 					cv nghbNormal = faceNormals[nf];
-					if (thisNormal.Dot(nghbNormal) > 1.0 - 1e-5)
+					if (thisNormal.Dot(nghbNormal) > 1.0 - 1e-10)
 					{
+						++numMerges;
 						// Merge this face to neighboring face.
 						int fg = i;
 						while(faceGroups[fg] != fg)
@@ -2550,6 +2592,8 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 			v0 = v1;
 		}
 	}
+
+	LOGI("Merged %d faces to each other.", numMerges);
 
 	std::vector<std::set<std::pair<int, int> > > newEdgesPerFace(f.size());
 	for(size_t i = 0; i < f.size(); ++i)
@@ -2706,6 +2750,7 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 	}
 #endif
 	RemoveDegenerateFaces();
+	RemoveRedundantVertices();
 	assert(IsClosed());
 }
 
