@@ -1532,7 +1532,8 @@ int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*(const ve
 
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
-	LCG rng(Clock::TickU32());
+	//LCG rng(Clock::TickU32());
+	LCG rng(123);
 	return ConvexHull(pointArray, numPoints, rng);
 }
 
