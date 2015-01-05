@@ -72,4 +72,14 @@ public:
 	{
 		return Dot(*this) <= epsilonSq;
 	}
+
+	float4d operator -() const
+	{
+		return float4d(-x, -y, -z, -w);
+	}
+
+	float4 ToFloat4() const
+	{
+		return float4((float)x, (float)y, float(z), float(w));
+	}
 };
