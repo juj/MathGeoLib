@@ -35,7 +35,7 @@
 #include <OgreVector4.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Vector4.h>
+#include <Urho3D/Math/Vector4.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

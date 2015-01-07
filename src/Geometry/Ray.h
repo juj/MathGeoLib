@@ -24,7 +24,7 @@
 #include <OgreRay.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Ray.h>
+#include <Urho3D/Math/Ray.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

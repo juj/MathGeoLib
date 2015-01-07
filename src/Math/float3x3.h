@@ -33,7 +33,7 @@
 #include <LinearMath/btMatrix3x3.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Matrix3.h>
+#include <Urho3D/Math/Matrix3.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
