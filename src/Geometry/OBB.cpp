@@ -964,15 +964,16 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 	float a2 = Abs(f2a.Dot(f2b));
 	float b1 = Abs(f1a.Dot(f2b));
 	float b2 = Abs(f2a.Dot(f1b));
+	const float limitEpsilon = 1e-4f;
 /*
 	if ((a1 > 1.f - 5e-3f && a2 < 5e-3f) || (a2 > 1.f - 5e-3f && a1 < 5e-3f))
 		return false;
 	if ((b1 > 1.f - 5e-3f && b2 < 5e-3f) || (b2 > 1.f - 5e-3f && b1 < 5e-3f))
 		return false;
 */
-	if ((a1 > 1.f - 2e-3f || a1 < 2e-3f) && (a2 > 1.f - 2e-3f || a2 < 2e-3f))
+	if ((a1 > 1.f - limitEpsilon || a1 < limitEpsilon) && (a2 > 1.f - limitEpsilon || a2 < limitEpsilon))
 		return false;
-	if ((b1 > 1.f - 2e-3f || b1 < 2e-3f) && (b2 > 1.f - 2e-3f || b2 < 2e-3f))
+	if ((b1 > 1.f - limitEpsilon || b1 < limitEpsilon) && (b2 > 1.f - limitEpsilon || b2 < limitEpsilon))
 		return false;
 #endif
 
@@ -2124,11 +2125,18 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			TIMING_TICK(numVertexNeighborSearches += convexHull.numSearchStepsDone);
 			TIMING_TICK(numVertexNeighborSearchImprovements += convexHull.numImprovementsMade);
 
+#define SECOND_GUESS_SIDEPODALS
+
 			int secondSearch = -1;
+#ifdef SECOND_GUESS_SIDEPODALS
 			if (sidepodalVertices[edgeJ*convexHull.v.size()+extremeVertexSearchHint1]) traverseStackCommonSidepodals.push_back(extremeVertexSearchHint1);
 			else traverseStack.push_back(extremeVertexSearchHint1);
 			if (sidepodalVertices[edgeJ*convexHull.v.size()+extremeVertexSearchHint2]) traverseStackCommonSidepodals.push_back(extremeVertexSearchHint2);
 			else secondSearch = extremeVertexSearchHint2;//traverseStack.push_back(extremeVertexSearchHint2);
+#else
+			traverseStackCommonSidepodals.push_back(extremeVertexSearchHint1);
+			traverseStackCommonSidepodals.push_back(extremeVertexSearchHint2);
+#endif
 
 			// Bootstrap to a good vertex that is sidepodal to both edges.
 #if 0
@@ -2139,6 +2147,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				traverseStack.push_back(commonSidepodalVertexHint/*edges[edgeJ].first*//*extremeVertexSearchHint1*/);
 #endif
 
+//			if (!traverseStack.empty())
+//				LOGE("Need to bootstrap!");
 			CLEAR_GRAPH_SEARCH();
 //			MARK_VERTEX_VISITED(commonSidepodalVertexHint/*edges[edgeJ].first*//*extremeVertexSearchHint1*/);
 			while(!traverseStack.empty())
@@ -2930,6 +2940,68 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 		}
 
 	return FixedOrientationEnclosingOBB((const vec *)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(), minVolumeEdgeA, minVolumeEdgeB);
+}
+
+OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
+{
+	OBB minOBB;
+	if (convexPolyhedron.v.size() == 0)
+	{
+		minOBB.SetNegativeInfinity();
+		return minOBB;
+	}
+
+	std::vector<std::vector<int> > adjacencyData = convexPolyhedron.GenerateVertexAdjacencyData();
+	std::vector<unsigned int> floodFillVisited(convexPolyhedron.v.size());
+	int floodFillVisitColor = 1;
+
+	float minVolume = FLOAT_INF;
+
+	int v[6] = {};
+	float dst[6] = {};
+	const int S = 256;
+	float inc = 2.f / (float)S;
+	float Z = -1.f;
+	for(int z = 0; z < S; ++z)
+	{
+		float Y = -1.f;
+		for(int y = 0; y < S; ++y)
+		{
+			float X = -1.f;
+			for(int x = 0; x < S; ++x)
+			{
+				float d = 1.f - X*X - Y*Y - Z*Z;
+				X += inc;
+				if (d < -1e-4f) continue;
+				float W = (d > 0.f) ? Sqrt(d) : 0.f;
+				Quat q(X,Y,Z,W);
+				q.Normalize();
+
+				float4x4 m = q.ToFloat4x4();
+				v[0] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(0), floodFillVisited, floodFillVisitColor++, dst[0], v[0]);
+				v[1] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(0), floodFillVisited, floodFillVisitColor++, dst[1], v[1]);
+				v[2] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(1), floodFillVisited, floodFillVisitColor++, dst[2], v[2]);
+				v[3] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(1), floodFillVisited, floodFillVisitColor++, dst[3], v[3]);
+				v[4] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(2), floodFillVisited, floodFillVisitColor++, dst[4], v[4]);
+				v[5] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(2), floodFillVisited, floodFillVisitColor++, dst[5], v[5]);
+				float volume = (dst[0] + dst[1]) * (dst[2] + dst[3]) + (dst[4] + dst[5]);
+				if (volume < minVolume)
+				{
+					minOBB.axis[0] = m.Col(0);
+					minOBB.axis[1] = m.Col(1);
+					minOBB.axis[2] = m.Col(2);
+					minOBB.r[0] = (dst[0] + dst[1]) * 0.5f;
+					minOBB.r[1] = (dst[2] + dst[3]) * 0.5f;
+					minOBB.r[2] = (dst[4] + dst[5]) * 0.5f;
+					minOBB.pos = ((dst[0] - dst[1]) * m.Col(0) + (dst[2] - dst[3]) * m.Col(1) + (dst[4] - dst[5]) * m.Col(2)) * 0.5f;
+					minVolume = volume;
+				}
+			}
+			Y += inc;
+		}
+		Z += inc;
+	}
+	return minOBB;
 }
 
 vec OBB::Size() const
