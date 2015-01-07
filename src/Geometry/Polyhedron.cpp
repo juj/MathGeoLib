@@ -1598,16 +1598,14 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		DIR_VEC(1, 0, 0),
 		DIR_VEC(0, 1, 0),
 		DIR_VEC(0, 0, 1),
-		/*
-		DIR_VEC(1, 0, 0), DIR_VEC(0, 1, 0), DIR_VEC(0, 0, 1),
+
 		DIR_VEC(1, 1, 0), DIR_VEC(1, 0, 1), DIR_VEC(0, 1, 1),
 		DIR_VEC(1, -1, 0), DIR_VEC(1, 0, -1), DIR_VEC(0, 1, -1),
 		DIR_VEC(1, 1, 1), DIR_VEC(-1, 1, 1), DIR_VEC(1, -1, 1),
 		DIR_VEC(1, 1, -1)
-		*/
 	};
 
-	for(size_t i = 0; i < ARRAY_LENGTH(dirs); ++i)
+	for(size_t i = 0; i < ARRAY_LENGTH(dirs) && extremes.size() < 4; ++i)
 	{
 		int extremeI = 0;
 		cs largestD = -FLOAT_INF;
@@ -1623,7 +1621,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		extremes.insert(extremeI);
 	}
 
-	assume(extremes.size() >= 3);
+//	assume(extremes.size() >= 3);
 	if (extremes.size() < 3)
 		return p; // This might happen if there's NaNs in the vertex data, or duplicates.
 
