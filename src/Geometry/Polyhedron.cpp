@@ -212,6 +212,21 @@ cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 	}
 	else if (face.v.size() > 3)
 	{
+		// Use Newell's method of computing the face normal for best stability.
+		// See Christer Ericson, Real-Time Collision Detection, pp. 491-495.
+		cv normal(0, 0, 0, 0);
+		int v0 = face.v.back();
+		for(size_t i = 0; i < face.v.size(); ++i)
+		{
+			int v1 = face.v[i];
+			normal.x += (cs(poly.v[v0].y) - poly.v[v1].y) * (cs(poly.v[v0].z) + poly.v[v1].z); // Project on yz
+			normal.y += (cs(poly.v[v0].z) - poly.v[v1].z) * (cs(poly.v[v0].x) + poly.v[v1].x); // Project on xz
+			normal.z += (cs(poly.v[v0].x) - poly.v[v1].x) * (cs(poly.v[v0].y) + poly.v[v1].y); // Project on xy
+			v0 = v1;
+		}
+		normal.Normalize();
+		return DIR_VEC((float)normal.x, (float)normal.y, (float)normal.z);
+#if 0
 		cv bestNormal;
 		cs bestLen = -FLOAT_INF;
 		cv a = poly.v[face.v[face.v.size()-2]];
@@ -231,6 +246,7 @@ cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 		}
 		assert(bestLen != -FLOAT_INF);
 		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
+#endif
 
 #if 0
 		// Find the longest edge.
