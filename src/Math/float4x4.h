@@ -34,7 +34,7 @@
 #include <QMatrix4x4>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Matrix4.h>
+#include <Urho3D/Math/Matrix4.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

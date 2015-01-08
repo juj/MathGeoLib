@@ -24,7 +24,7 @@
 #include <OgrePlane.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Plane.h>
+#include <Urho3D/Math/Plane.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

@@ -21,7 +21,7 @@
 #include "../Math/float3.h"
 
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Sphere.h>
+#include <Urho3D/Math/Sphere.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

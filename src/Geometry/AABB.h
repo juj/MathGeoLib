@@ -29,7 +29,7 @@
 #include <OgreAxisAlignedBox.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/BoundingBox.h>
+#include <Urho3D/Math/BoundingBox.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

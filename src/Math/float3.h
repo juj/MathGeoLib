@@ -35,7 +35,7 @@
 #include <LinearMath/btVector3.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Vector3.h>
+#include <Urho3D/Math/Vector3.h>
 #endif
 #ifdef MATH_IRRKLANG_INTEROP
 #include <ik_vec3d.h>

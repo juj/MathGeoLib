@@ -33,7 +33,7 @@
 #include <OgreVector2.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Vector2.h>
+#include <Urho3D/Math/Vector2.h>
 #endif
 
 MATH_BEGIN_NAMESPACE

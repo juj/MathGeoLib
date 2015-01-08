@@ -35,7 +35,7 @@
 #include <LinearMath/btQuaternion.h>
 #endif
 #ifdef MATH_URHO3D_INTEROP
-#include <Engine/Math/Quaternion.h>
+#include <Urho3D/Math/Quaternion.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
