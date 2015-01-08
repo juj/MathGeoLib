@@ -1489,6 +1489,7 @@ void FORCE_INLINE TestThreeAdjacentFaces(const vec &n1, const vec &n2, const vec
 	float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
 	if (volume < *minVolume)
 	{
+//		LOGI("Vol: %f, n1: %f %f n2: %f %f n3: %f %f", volume, minN1, maxN1, minN2, maxN2, minN3, maxN3);
 		minOBB->axis[0] = n1;
 		minOBB->axis[1] = n2;
 		minOBB->axis[2] = n3;
@@ -1828,6 +1829,13 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			if (IsVertexAntipodalToEdge(convexHull, v, neighbors, f1a, f1b))
 			{
 				assume(edges[i].first != v && edges[i].second != v);
+				if (edges[i].first == v || edges[i].second == v)
+				{
+					LOGE("Edge %d: %d->%d is antipodal to vertex %d, which is part of the same edge! This should be possible only if the input is degenerate planar!",
+						(int)i, edges[i].first, edges[i].second, v);
+					minOBB.SetNegativeInfinity();
+					return minOBB;
+				}
 				antipodalPointsForEdge[i].push_back(v);
 				for(size_t j = 0; j < neighbors.size(); ++j)
 					if (!HAVE_VISITED_VERTEX(neighbors[j]))
@@ -2074,6 +2082,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	int extremeVertexSearchHint1 = 0;
 	int extremeVertexSearchHint2 = 0;
 	int extremeVertexSearchHint3 = 0;
+	int extremeVertexSearchHint4 = 0;
 	int extremeVertexSearchHint1_b = 0;
 	int extremeVertexSearchHint2_b = 0;
 	int extremeVertexSearchHint3_b = 0;
@@ -2600,9 +2609,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 								}
 
 								float volume = (maxN1 - minN1) * (maxN2 - minN2) * (maxN3 - minN3);
-								TIMING_TICK(++numTwoOpposingFacesConfigs;);
+								TIMING_TICK(++numTwoOpposingFacesConfigs);
 								if (volume < minVolume)
 								{
+//									LOGI("opposingfaces Vol2: %f, n1: %f %f n2: %f %f n3: %f %f", volume, minN1, maxN1, minN2, maxN2, minN3, maxN3);
 									minOBB.pos = ((minN1 + maxN1) * n + (minN2 + maxN2) * n2 + (minN3 + maxN3) * n3) * 0.5f;
 									minOBB.axis[0] = n;
 									minOBB.axis[1] = n2;
@@ -2800,9 +2810,22 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 //		const std::vector<int> &compatibleEdgesJ = compatibleEdges[e2];
 
 		float maxN1 = n1.Dot(convexHull.v[edges[e1].first]);
-		float minN1 = FLOAT_INF;
-		for(size_t j = 0; j < antipodals.size(); ++j)
-			minN1 = Min(minN1, n1.Dot(convexHull.v[antipodals[j]]));
+		float minN1;
+
+		if (antipodals.size() < 20)
+		{
+			minN1 = FLOAT_INF;
+			for(size_t j = 0; j < antipodals.size(); ++j)
+				minN1 = Min(minN1, n1.Dot(convexHull.v[antipodals[j]]));
+		}
+		else
+		{
+			CLEAR_GRAPH_SEARCH();
+			extremeVertexSearchHint4 = convexHull.ExtremeVertexConvex(adjacencyData, -n1, floodFillVisited, floodFillVisitColor, minN1, extremeVertexSearchHint4); // O(logV)?
+			minN1 = -minN1;
+			TIMING_TICK(numVertexNeighborSearches += convexHull.numSearchStepsDone);
+			TIMING_TICK(numVertexNeighborSearchImprovements += convexHull.numImprovementsMade);
+		}
 
 		for(size_t j = 0; j < compatibleEdgesI.size(); ++j)
 		{
@@ -2875,6 +2898,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					TIMING_TICK(++numTwoSameFacesConfigs);
 					if (volume < minVolume)
 					{
+//						LOGI("samefaces Vol: %f, n1: %f %f n2: %f %f n3: %f %f", volume, minN1, maxN1, minN2, maxN2, minN3, maxN3);
 						minOBB.pos = ((minN1 + maxN1) * n1 + (minN2 + maxN2) * n2 + (minN3 + maxN3) * n3) * 0.5f;
 						minOBB.axis[0] = n1;
 						minOBB.axis[1] = n2;

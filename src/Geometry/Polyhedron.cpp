@@ -1989,6 +1989,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			{
 				LOGE("Boundary is not connected: there should be edge %d-%d in the boundary!", prev.second, boundaryEdges[i].first);
 				assert(false);
+				return Polyhedron();
 			}
 			prev = boundaryEdges[i];
 		}
