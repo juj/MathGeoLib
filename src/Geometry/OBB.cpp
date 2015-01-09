@@ -1299,7 +1299,7 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 
 //#define OBB_ASSERT_VALIDITY
 //#define OBB_DEBUG_PRINT
-//#define ENABLE_TIMING
+#define ENABLE_TIMING
 
 #define NEW_EDGE3_SEARCH
 
@@ -1574,9 +1574,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t t23 = Clock::Tick());
 	TIMING("Facenormalsgen: %f msecs", Clock::TimespanToMillisecondsF(t2, t23));
 
-	// Throughout the algorithm, internal edges can all be discarded, so provide a helper macro to test for that.
-#define IS_INTERNAL_EDGE(i) (reinterpret_cast<vec*>(&faceNormals[facesForEdge[i].first])->Dot(faceNormals[facesForEdge[i].second]) > 1.f - 1e-4f)
-
 #ifdef OBB_ASSERT_VALIDITY
 	// For debugging, assert that face normals in the input Polyhedron are pointing in valid directions:
 	for(size_t i = 0; i < faceNormals.size(); ++i)
@@ -1645,6 +1642,17 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	}
 	TIMING_TICK(tick_t t3 = Clock::Tick());
 	TIMING("Adjoiningfaces: %f msecs", Clock::TimespanToMillisecondsF(t23, t3));
+
+	// Throughout the algorithm, internal edges can all be discarded, so provide a helper macro to test for that.
+#define IS_INTERNAL_EDGE(i) (reinterpret_cast<vec*>(&faceNormals[facesForEdge[i].first])->Dot(faceNormals[facesForEdge[i].second]) > 1.f - 1e-4f)
+
+	TIMING_TICK(
+		int numInternalEdges = 0;
+		for(size_t i = 0; i < edges.size(); ++i)
+			if (IS_INTERNAL_EDGE(i))
+				++numInternalEdges;
+	);
+	TIMING("%d/%d (%.2f%%) edges are internal and will be ignored.", numInternalEdges, (int)edges.size(), numInternalEdges * 100.0 / edges.size());
 
 #ifdef OBB_DEBUG_PRINT
 	for(size_t i = 0; i < convexHull.v.size(); ++i)
