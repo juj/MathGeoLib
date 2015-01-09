@@ -1574,6 +1574,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 	TIMING_TICK(tick_t t23 = Clock::Tick());
 	TIMING("Facenormalsgen: %f msecs", Clock::TimespanToMillisecondsF(t2, t23));
 
+	// Throughout the algorithm, internal edges can all be discarded, so provide a helper macro to test for that.
+#define IS_INTERNAL_EDGE(i) (reinterpret_cast<vec*>(&faceNormals[facesForEdge[i].first])->Dot(faceNormals[facesForEdge[i].second]) > 1.f - 1e-4f)
+
 #ifdef OBB_ASSERT_VALIDITY
 	// For debugging, assert that face normals in the input Polyhedron are pointing in valid directions:
 	for(size_t i = 0; i < faceNormals.size(); ++i)
@@ -1747,7 +1750,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					++numSpatialStrips;
 				prevEdgeEnd = e.second;
 			);
-			spatialEdgeOrder.push_back(thisEdge);
+			if (!IS_INTERNAL_EDGE(thisEdge))
+				spatialEdgeOrder.push_back(thisEdge);
 			int v0 = e.second;
 			size_t sizeBefore = traverseStackEdges.size();
 			for(size_t i = 0; i < adjacencyData[v0].size(); ++i)
@@ -1983,11 +1987,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 //				int edge = vertexPairsToEdges[std::make_pair(v, vAdj)];
 				int edge = vertexPairsToEdges[v*convexHull.v.size()+vAdj];
+//				if (IS_INTERNAL_EDGE(edge))
+//					continue; // Edges inside faces with 180 degrees dihedral angles can be ignored.
 				if (AreEdgesCompatibleForOBB(f1a, f1b, faceNormals[facesForEdge[edge].first], faceNormals[facesForEdge[edge].second]))
 				{
 					if ((int)i <= edge)
 					{
-						compatibleEdges[i].push_back(edge);
+						if (!IS_INTERNAL_EDGE(edge))
+							compatibleEdges[i].push_back(edge);
 #ifdef NEW_EDGE3_SEARCH
 						sidepodalVertices[i*convexHull.v.size()+edges[edge].first] = 1;
 						sidepodalVertices[i*convexHull.v.size()+edges[edge].second] = 1;
@@ -2015,7 +2022,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 #endif
 #endif
 
-							compatibleEdges[edge].push_back((int)i);
+							if (!IS_INTERNAL_EDGE(edge))
+								compatibleEdges[edge].push_back((int)i);
 //							sidepodalVertices[edge].insert(edges[i].first);
 //							sidepodalVertices[edge].insert(edges[i].second);
 #ifdef NEW_EDGE3_SEARCH
@@ -2256,8 +2264,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			int oppositeVertex = convexHull.ExtremeVertexConvex(adjacencyData, likelyVertexNormalDir, floodFillVisited, floodFillVisitColor, dummy, likelyVertex); // O(log|V|)?
 #endif
 
-			// No need to clear the graph search with CLEAR_GRAPH_SEARCH() here, since we have visited "uninteresting" vertices only in
-			// the above search, and are continuing from where we left off.
 			CLEAR_GRAPH_SEARCH();
 			while(!traverseStackCommonSidepodals.empty())
 			{
@@ -2273,6 +2279,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					int vAdj = n[j];
 //					int edgeK = vertexPairsToEdges[std::make_pair(v, vAdj)];
 					int edgeK = vertexPairsToEdges[v*convexHull.v.size()+vAdj];
+					if (IS_INTERNAL_EDGE(edgeK))
+						continue; // Edges inside faces with 180 degrees dihedral angles can be ignored.
 					if (/*!HAVE_VISITED_VERTEX(vAdj) &&*/ sidepodalVertices[i*convexHull.v.size()+vAdj]
 						&& sidepodalVertices[edgeJ*convexHull.v.size()+vAdj])
 					{
@@ -2494,6 +2502,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				int edge = vertexPairsToEdges[antipodalVertex*convexHull.v.size()+vAdj];
 				if ((int)i > edge) // We search pairs of edges, so no need to process twice - take the canonical order to be i < edge.
 					continue;
+				if (IS_INTERNAL_EDGE(edge))
+					continue; // Edges inside faces with 180 degrees dihedral angles can be ignored.
 
 				vec f2a = faceNormals[facesForEdge[edge].first];
 				vec f2b = faceNormals[facesForEdge[edge].second];
@@ -2935,7 +2945,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 
 	TIMING_TICK(tick_t t8 = Clock::Tick());
-	TIMING("Facenormalsgen: %f msecs (%d configs)", Clock::TimespanToMillisecondsF(t72, t8), numTwoSameFacesConfigs);
+	TIMING("Faceconfigs: %f msecs (%d configs, %d faces, %f configs/face)", Clock::TimespanToMillisecondsF(t72, t8), numTwoSameFacesConfigs, (int)spatialFaceOrder.size(), (double)numTwoSameFacesConfigs/spatialFaceOrder.size());
 	TIMING("%f vertex neighbor searches per edge, %f improvements", (double)numVertexNeighborSearches/numTwoSameFacesConfigs, (double)numVertexNeighborSearchImprovements/numTwoSameFacesConfigs);
 
 	// The search for edge triplets does not follow cross-product orientation, so
