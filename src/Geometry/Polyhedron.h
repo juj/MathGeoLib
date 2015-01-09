@@ -248,7 +248,8 @@ public:
 	/// Finds all neighboring faces that have identical face normals and merges them together.
 	/// Warning: this introduces T-junctions to the polyhedron, as well as increases the vertex count on the merged faces.
 	/// Use this only as preprocessing when needed.
-	void MergeAdjacentPlanarFaces();
+	/// @return The number of faces that were removed by merging.
+	int MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, float angleEpsilon = 1e-16f, float distanceEpsilon = 1e-8f);
 
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */
@@ -426,6 +427,7 @@ public:
 	static Polyhedron Dodecahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 
 	static Polyhedron CreateCapsule(const vec &a, const vec &b, float r, int verticesPerCap, bool ccwIsFrontFacing = true);
+	static Polyhedron CreateSharpCapsule(const vec &a, const vec &b, float r, float capPointDistance, int verticesPerCap, bool ccwIsFrontFacing = true);
 
 	/// Tests if these two polyhedrons represent the same set of points.
 	/// @note This function is very slow, and should be used only for debugging purposes.

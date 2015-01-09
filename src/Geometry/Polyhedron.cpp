@@ -2502,6 +2502,62 @@ Polyhedron Polyhedron::CreateCapsule(const vec &a, const vec &b, float r, int ve
 	return p;
 }
 
+Polyhedron Polyhedron::CreateSharpCapsule(const vec &a, const vec &b, float r, float capPointDistance, int verticesPerCap, bool ccwIsFrontFacing)
+{
+	Polyhedron p;
+	float angleIncrement = pi*2.f / verticesPerCap;
+	vec basisU, basisV;
+	vec dir = (b-a).Normalized();
+	dir.PerpendicularBasis(basisU, basisV);
+	if (basisU.Cross(basisV).Dot(dir) < 0.f)
+		basisU = -basisU;
+	if (!ccwIsFrontFacing)
+		basisU = -basisU;
+
+	float angle = 0.f;
+	for(int i = 0; i < verticesPerCap; ++i, angle += angleIncrement)
+		p.v.push_back(b + Cos(angle) * r * basisU + Sin(angle) * r * basisV);
+
+	angle = 0.f;
+	for(int i = 0; i < verticesPerCap; ++i, angle += angleIncrement)
+		p.v.push_back(a + Cos(angle) * r * basisU + Sin(angle) * r * basisV);
+
+	p.v.push_back(b + dir * capPointDistance);
+	p.v.push_back(a - dir * capPointDistance);
+#ifdef MATH_VEC_IS_FLOAT4
+	for(size_t i = 0; i < p.v.size(); ++i)
+		p.v[i].w = 1.f;
+#endif
+
+	Face f;
+	for(int i = 0; i < verticesPerCap; ++i)
+	{
+		f.v.clear();
+		f.v.push_back(i);
+		f.v.push_back((i+1)%verticesPerCap);
+		f.v.push_back(p.v.size()-2);
+		p.f.push_back(f);
+	}
+	for(int i = 0; i < verticesPerCap; ++i)
+	{
+		f.v.clear();
+		f.v.push_back(verticesPerCap+(i+1)%verticesPerCap);
+		f.v.push_back(verticesPerCap+i);
+		f.v.push_back(p.v.size()-1);
+		p.f.push_back(f);
+	}
+	for(int i = 0; i < verticesPerCap; ++i)
+	{
+		f.v.clear();
+		f.v.push_back((i+1)%verticesPerCap);
+		f.v.push_back(i);
+		f.v.push_back(verticesPerCap+i);
+		f.v.push_back(verticesPerCap+(i+1)%verticesPerCap);
+		p.f.push_back(f);
+	}
+	return p;
+}
+
 int IntTriCmp(int a, int b)
 {
 	return a - b;
@@ -2604,7 +2660,7 @@ void PolyExtremeVertexOnFace(const Polyhedron &poly, int face, const cv &dir, cs
 	}
 }
 
-void Polyhedron::MergeAdjacentPlanarFaces()
+int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, float angleEpsilon, float distanceEpsilon)
 {
 	VecdArray faceNormals;
 	faceNormals.reserve(f.size());
@@ -2651,12 +2707,14 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 				{
 					cv thisNormal = faceNormals[i];
 					cv nghbNormal = faceNormals[nf];
-					if (thisNormal.Dot(nghbNormal) > 1.0 - 1e-16)
+					if (thisNormal.Dot(nghbNormal) >= 1.0 - angleEpsilon)
 					{
 						cs eNeg, ePos, nNeg, nPos;
 						PolyExtremeVertexOnFace(*this, i, nghbNormal, eNeg, ePos);
-						PolyExtremeVertexOnFace(*this, nf, nghbNormal, nNeg, nPos);
-						if (Max(ePos, nPos) - Min(eNeg, nNeg) < 1e-8)
+//						PolyExtremeVertexOnFace(*this, nf, nghbNormal, nNeg, nPos);
+//						if (Max(ePos, nPos) - Min(eNeg, nNeg) <= distanceEpsilon)
+						PolyExtremeVertexOnFace(*this, nf, thisNormal, nNeg, nPos);
+						if (ePos - eNeg <= distanceEpsilon && nPos - nNeg <= distanceEpsilon)
 						{
 #if 0
 							LOGI("Face normal for i: %d (%s) is %s, face normal for nf: %d (%s) is %s. Extremes: %f to %f, and %f to %f. Extreme spread after merging: %f",
@@ -2721,16 +2779,36 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 		Face &face = f[i];
 
 		std::vector<std::pair<int, int> > boundaryEdges(newEdgesPerFace[i].begin(), newEdgesPerFace[i].end());
-		for(size_t i = 0; i < boundaryEdges.size(); ++i)
-			for(size_t j = i+1; j < boundaryEdges.size(); ++j)
-				if (boundaryEdges[i].second == boundaryEdges[j].first)
+		for(size_t j = 0; j < boundaryEdges.size(); ++j)
+			for(size_t k = j+1; k < boundaryEdges.size(); ++k)
+				if (boundaryEdges[j].second == boundaryEdges[k].first)
 				{
-					Swap(boundaryEdges[i+1], boundaryEdges[j]);
+					Swap(boundaryEdges[j+1], boundaryEdges[k]);
 					break;
 				}
 		face.v.clear();
 		for(size_t j = 0; j < boundaryEdges.size(); ++j)
 			face.v.push_back(boundaryEdges[j].first);
+
+		// Snap all vertices to the plane of the face.
+		if (snapVerticesToMergedPlanes)
+		{
+			//cs d = 0;
+			cs d = -FLOAT_INF;
+			for(size_t j = 0; j < face.v.size(); ++j)
+			{
+				int vtx = face.v[j];
+				//d += faceNormals[i].Dot(vec(v[vtx]));
+				d = Max(d, faceNormals[i].Dot(vec(v[vtx])));
+			}
+			// Average plane position.
+			//d /= (cs)face.v.size();
+			for(size_t j = 0; j < face.v.size(); ++j)
+			{
+				cv vtx = vec(v[face.v[j]]);
+				v[face.v[j]] = (vtx + (d - faceNormals[i].Dot(vtx)) * faceNormals[i]).ToFloat4();
+			}
+		}
 	}
 
 #if 0
@@ -2858,6 +2936,7 @@ void Polyhedron::MergeAdjacentPlanarFaces()
 			LOGI("Face %d: %s, surface area: %f, normal: %s, extremes: %f to %f", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area(), FaceNormal(i).ToString().c_str(), n, p);
 		}
 #endif
+	return numMerges;
 }
 
 std::vector<std::vector<int> > Polyhedron::GenerateVertexAdjacencyData() const
