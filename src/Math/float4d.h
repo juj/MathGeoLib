@@ -32,6 +32,11 @@ public:
 		return x*rhs.x + y*rhs.y + z*rhs.z + w*rhs.w;
 	}
 
+	float4d operator +(const float4d &rhs) const
+	{
+		return float4d(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
+	}
+
 	float4d operator -(const float4d &rhs) const
 	{
 		return float4d(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
@@ -83,3 +88,8 @@ public:
 		return float4((float)x, (float)y, float(z), float(w));
 	}
 };
+
+inline float4d operator *(double scalar, const float4d &vec)
+{
+	return float4d(vec.x*scalar, vec.y*scalar, vec.z*scalar, vec.w*scalar);
+}
