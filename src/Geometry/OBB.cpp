@@ -958,6 +958,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 // This is used to skip certain configurations.
 static bool AreEdgesBad(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
 {
+	return false;
 	float a1 = Abs(f1a.Dot(f1b));
 	float a2 = Abs(f2a.Dot(f2b));
 	float b1 = Abs(f1a.Dot(f2b));
@@ -1299,7 +1300,7 @@ static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &
 
 //#define OBB_ASSERT_VALIDITY
 //#define OBB_DEBUG_PRINT
-#define ENABLE_TIMING
+//#define ENABLE_TIMING
 
 #define NEW_EDGE3_SEARCH
 
@@ -2134,7 +2135,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		for(size_t j = 0; j < compatibleEdgesI.size(); ++j) // O(sqrt(|E|))?
 		{
 			int edgeJ = compatibleEdgesI[j];
-			if (edgeJ < (int)i) continue; // Remove symmetry.
+			if (edgeJ <= (int)i) continue; // Remove symmetry.
 			vec f2a = faceNormals[facesForEdge[edgeJ].first];
 			vec f2b = faceNormals[facesForEdge[edgeJ].second];
 			if (AreEdgesBad(f1a, f1b, f2a, f2b)) continue;
@@ -2296,8 +2297,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 							traverseStackCommonSidepodals.push_back(vAdj);
 						//MARK_VERTEX_VISITED(vAdj);
 
-						if (edgeJ <= edgeK)
-						{			
+						if (edgeJ < edgeK)
+						{
 							// Test edge triplet i, edgeJ, edgeK.
 							vec f3a = faceNormals[facesForEdge[edgeK].first];
 							vec f3b = faceNormals[facesForEdge[edgeK].second];
@@ -2310,7 +2311,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 								int nSolutions = ComputeBasis(f1a, f1b, f2a, f2b, f3a, f3b, n1, n2, n3);
 								for(int s = 0; s < nSolutions; ++s) // O(constant), nSolutions == 0, 1 or 2.
 								{
-									TestThreeAdjacentFaces(n1[s], n2[s], n3[s], (int)i, edgeJ, edgeK, convexHull, 
+									TestThreeAdjacentFaces(n1[s], n2[s], n3[s], (int)i, edgeJ, edgeK, convexHull,
 										edges, antipodalPointsForEdge, &minVolume, &minOBB);
 								}
 							}
@@ -3106,6 +3107,73 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 			Y += inc;
 		}
 		Z += inc;
+	}
+	return minOBB;
+}
+
+OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q)
+{
+	OBB minOBB;
+	if (convexPolyhedron.v.size() == 0)
+	{
+		minOBB.SetNegativeInfinity();
+		return minOBB;
+	}
+
+	std::vector<std::vector<int> > adjacencyData = convexPolyhedron.GenerateVertexAdjacencyData();
+	std::vector<unsigned int> floodFillVisited(convexPolyhedron.v.size());
+	int floodFillVisitColor = 1;
+
+	float minVolume = FLOAT_INF;
+
+	static LCG rng(Clock::Tick());
+	int v[6] = {};
+	float dst[6] = {};
+	float a = 0.f;
+	const int nSteps = 1000000;
+	const float incr = 2.f * pi / nSteps;
+	int nStepsNoProgress = 0;
+	vec unitX = q*vec::unitX;
+	vec u,w;
+	unitX.PerpendicularBasis(u, w);
+	//for(;;)
+	while(nStepsNoProgress < nSteps + 100)
+	{
+		//vec z = u * Cos(a) + w * Sin(a);
+		//z.Normalize();
+		vec z = vec::RandomDir(rng);
+		Quat rot = Quat(z, rng.Float(0.f, 2.f*pi/(360.f*200.f)) /*2.f*pi/(360.f*2000.f)*/);
+		Quat test = rot * q;
+		test.Normalize();
+
+		float4x4 m = test.ToFloat4x4();
+		v[0] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(0), floodFillVisited, floodFillVisitColor++, dst[0], v[0]);
+		v[1] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(0), floodFillVisited, floodFillVisitColor++, dst[1], v[1]);
+		v[2] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(1), floodFillVisited, floodFillVisitColor++, dst[2], v[2]);
+		v[3] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(1), floodFillVisited, floodFillVisitColor++, dst[3], v[3]);
+		v[4] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(2), floodFillVisited, floodFillVisitColor++, dst[4], v[4]);
+		v[5] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(2), floodFillVisited, floodFillVisitColor++, dst[5], v[5]);
+		float volume = (dst[0] + dst[1]) * (dst[2] + dst[3]) + (dst[4] + dst[5]);
+		if (volume < minVolume)
+		{
+//			LOGI("Improved volume from %f to %f.", volume, minVolume);
+			minOBB.axis[0] = m.Col(0);
+			minOBB.axis[1] = m.Col(1);
+			minOBB.axis[2] = m.Col(2);
+			minOBB.r[0] = (dst[0] + dst[1]) * 0.5f;
+			minOBB.r[1] = (dst[2] + dst[3]) * 0.5f;
+			minOBB.r[2] = (dst[4] + dst[5]) * 0.5f;
+			minOBB.pos = ((dst[0] - dst[1]) * m.Col(0) + (dst[2] - dst[3]) * m.Col(1) + (dst[4] - dst[5]) * m.Col(2)) * 0.5f;
+			minVolume = volume;
+
+			q = test;
+			nStepsNoProgress = 0;
+			unitX = q*vec::unitX;
+			unitX.PerpendicularBasis(u, w);
+		}
+		else
+			++nStepsNoProgress;
+		a = Mod(a + incr, 2.f*pi);
 	}
 	return minOBB;
 }

@@ -335,6 +335,7 @@ public:
 	static OBB BruteEnclosingOBB(const Polyhedron &convexPolyhedron);
 
 	static OBB Brute2EnclosingOBB(const Polyhedron &convexPolyhedron);
+	static OBB Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q);
 
 	/// Returns an OBB that is oriented to the coordinate frame specified by vectors dir0 and dir1 and encloses the given point set.
 	static OBB FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, const vec &dir0, const vec &dir1);
