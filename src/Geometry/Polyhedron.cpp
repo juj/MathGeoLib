@@ -2660,7 +2660,7 @@ void PolyExtremeVertexOnFace(const Polyhedron &poly, int face, const cv &dir, cs
 	}
 }
 
-int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, float angleEpsilon, float distanceEpsilon)
+int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool conservativeEnclose, float angleEpsilon, float distanceEpsilon)
 {
 	VecdArray faceNormals;
 	faceNormals.reserve(f.size());
@@ -2793,16 +2793,19 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, float 
 		// Snap all vertices to the plane of the face.
 		if (snapVerticesToMergedPlanes)
 		{
-			//cs d = 0;
-			cs d = -FLOAT_INF;
+			// If conservativeEnclose == true, compute the maximum distance for the plane
+			// so it encloses all the points. Otherwise, compute the average.
+			cs d = conservativeEnclose ? -FLOAT_INF : 0;
 			for(size_t j = 0; j < face.v.size(); ++j)
 			{
 				int vtx = face.v[j];
-				//d += faceNormals[i].Dot(vec(v[vtx]));
-				d = Max(d, faceNormals[i].Dot(vec(v[vtx])));
+				if (conservativeEnclose)
+					d = Max(d, faceNormals[i].Dot(vec(v[vtx])));
+				else
+					d += faceNormals[i].Dot(vec(v[vtx]));
 			}
-			// Average plane position.
-			//d /= (cs)face.v.size();
+			if (!conservativeEnclose)
+				d /= (cs)face.v.size();
 			for(size_t j = 0; j < face.v.size(); ++j)
 			{
 				cv vtx = vec(v[face.v[j]]);

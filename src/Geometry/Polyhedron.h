@@ -249,7 +249,7 @@ public:
 	/// Warning: this introduces T-junctions to the polyhedron, as well as increases the vertex count on the merged faces.
 	/// Use this only as preprocessing when needed.
 	/// @return The number of faces that were removed by merging.
-	int MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, float angleEpsilon = 1e-16f, float distanceEpsilon = 1e-8f);
+	int MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool conservativeEnclose = true, float angleEpsilon = 1e-16f, float distanceEpsilon = 1e-8f);
 
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */
