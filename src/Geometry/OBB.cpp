@@ -2087,7 +2087,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			sprintf(str, "%d ", (int)compatibleEdges[i][j]);
 			s += str;
 		}
-		LOGI("Edge %d is compatible with: %s", (int)i, s.c_str());
+		LOGI("Edge %d:%d->%d is compatible with: %s", (int)i, edges[i].first, edges[i].second, s.c_str());
 	}
 #endif
 
@@ -2814,14 +2814,31 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		// Find two edges on the face. Since we have flexibility to choose from multiple edges of the same face,
 		// choose two that are possibly most opposing to each other, in the hope that their sets of sidepodal
 		// edges are most mutually exclusive as possible, speeding up the search below.
-		int v0 = convexHull.f[i].v[0];
-		int v1 = convexHull.f[i].v[1];
+		int v0, v1;
+		int e1 = -1;
+		v0 = convexHull.f[i].v.back();
+		for(size_t j = 0; j < convexHull.f[i].v.size(); ++j)
+		{
+			v1 = convexHull.f[i].v[j];
+			int e = vertexPairsToEdges[v0*convexHull.v.size()+v1];
+			if (!IS_INTERNAL_EDGE(e))
+			{
+				e1 = e;
+				break;
+			}
+			v0 = v1;
+		}
+		if (e1 == -1)
+			continue; // All edges of this face were degenerate internal edges! Just skip processing the whole face.
+
+//		int v0 = convexHull.f[i].v[0];
+//		int v1 = convexHull.f[i].v[1];
 //		int second = (convexHull.f[i].v.size()+1)>>1;
 //		int v2 = convexHull.f[i].v[second];
 //		int v3 = (second+1) < (int)convexHull.f[i].v.size() ? convexHull.f[i].v[second+1] : v0;
 //		int e1 = vertexPairsToEdges[std::make_pair(v0, v1)];
 //		int e2 = vertexPairsToEdges[std::make_pair(v2, v3)];
-		int e1 = vertexPairsToEdges[v0*convexHull.v.size()+v1];
+//		int e1 = vertexPairsToEdges[v0*convexHull.v.size()+v1];
 //		int e2 = vertexPairsToEdges[v2*convexHull.v.size()+v3];
 
 		const std::vector<int> &antipodals = antipodalPointsForEdge[e1];
@@ -2917,7 +2934,6 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					TIMING_TICK(++numTwoSameFacesConfigs);
 					if (volume < minVolume)
 					{
-//						LOGI("samefaces Vol: %f, n1: %f %f n2: %f %f n3: %f %f", volume, minN1, maxN1, minN2, maxN2, minN3, maxN3);
 						minOBB.pos = ((minN1 + maxN1) * n1 + (minN2 + maxN2) * n2 + (minN3 + maxN3) * n3) * 0.5f;
 						minOBB.axis[0] = n1;
 						minOBB.axis[1] = n2;
@@ -3108,6 +3124,12 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 		}
 		Z += inc;
 	}
+	std::vector<float2> pts;
+	pts.resize(convexPolyhedron.v.size());
+	float volume = SmallestOBBVolumeJiggle(minOBB.axis[2], convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
+		minOBB.axis[0], minOBB.axis[1]);
+	minOBB = OBB::FixedOrientationEnclosingOBB((const vec*)&convexPolyhedron.v[0], convexPolyhedron.v.size(),
+		minOBB.axis[0], minOBB.axis[1]);
 	return minOBB;
 }
 
