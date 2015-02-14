@@ -426,7 +426,7 @@ int Polyhedron::NearestVertex(const vec &point) const
 {
 	int nearest = -1;
 	float nearestDistSq = FLOAT_INF;
-	for(size_t i = 0; i < v.size(); ++i)
+	for(int i = 0; i < (int)v.size(); ++i)
 	{
 		float dSq = point.DistanceSq(v[i]);
 		if (dSq < nearestDistSq)
