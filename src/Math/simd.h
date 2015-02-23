@@ -23,6 +23,9 @@
 #include <stdint.h>
 #include <cstddef>
 #include "Reinterpret.h"
+#ifdef MATH_SSE41
+#include <smmintrin.h>
+#endif
 
 #ifdef MATH_SIMD // If SSE is not enabled, this whole file will not be included.
 
