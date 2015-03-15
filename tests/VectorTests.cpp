@@ -1074,8 +1074,8 @@ BENCHMARK(float2_ConvexHull, "float2_ConvexHull")
 {
 	const int n = 100;
 	float2 h[n];
-	for(int i = 0; i < n; ++i)
-		h[i] = float2::RandomBox(rng, -100.f, 100.f);
+	for(int j = 0; j < n; ++j)
+		h[j] = float2::RandomBox(rng, -100.f, 100.f);
 
 	dummyResultInt += float2::ConvexHullInPlace(h, n);
 }
@@ -1203,8 +1203,8 @@ BENCHMARK(float2_MinAreaRect, "float2::MinAreaRect")
 {
 	const int n = 100;
 	float2 p[n];
-	for(int i = 0; i < n; ++i)
-		p[i] = float2::RandomBox(rng, -100.f, 100.f);
+	for(int j = 0; j < n; ++j)
+		p[j] = float2::RandomBox(rng, -100.f, 100.f);
 
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;

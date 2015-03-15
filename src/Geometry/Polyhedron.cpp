@@ -1316,10 +1316,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 		int v0 = *iter++;
 		int v1 = *iter++;
 		int v2 = *iter;
-		Plane p(pointArray[v0], pointArray[v1], pointArray[v2]);
+		Plane pl(pointArray[v0], pointArray[v1], pointArray[v2]);
 		for(int i = 0; i < numPoints; ++i)
 		{
-			if (!p.Contains(pointArray[i]))
+			if (!pl.Contains(pointArray[i]))
 				extremes.insert(i);
 			if (extremes.size() >= 4)
 				break;

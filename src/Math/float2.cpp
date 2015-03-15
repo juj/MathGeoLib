@@ -609,20 +609,20 @@ int float2::ConvexHullInPlace(float2 *p, int n)
 	// For robustness, remove duplicates of the perspective pivot points.
 	// This is because duplicates on that element will cause the sorting to be nontransitive and break
 	// the whole sort.
-	int d = 0;
+	int unique = 0;
 	for(int i = 1; i < n; ++i)
 		if (!p[i].Equals(p[0]))
-			p[++d] = p[i];
-	n = d+1;
+			p[++unique] = p[i];
+	n = unique+1;
 
 	std::sort(&p[1], &p[n], pred);
 
 	// For robustness, remove duplicate input values.
-	d = 0;
+	unique = 0;
 	for(int i = 1; i < n; ++i)
-		if (!p[i].Equals(p[d]))
-			p[++d] = p[i];
-	n = d+1;
+		if (!p[i].Equals(p[unique]))
+			p[++unique] = p[i];
+	n = unique+1;
 
 	int h = 1; // Points to the index of the last point added to the hull so far. The first two points are in the hull to start.
 
