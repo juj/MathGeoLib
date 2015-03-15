@@ -152,6 +152,8 @@ void PrintToConsoleVariadic(MathLogChannel channel, const char *format, ...)
 	vsnprintf((char *)str, capacity, format, args);
 	str[capacity-1] = 0; // We only support logging a fixed-length string so don't care if we fail/truncate, just make sure we zero-terminate so there won't be any issues.
 	PrintToConsole(channel, str);
+
+	va_end(args);
 }
 
 MATH_END_NAMESPACE
