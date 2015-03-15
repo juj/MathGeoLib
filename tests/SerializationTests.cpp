@@ -476,9 +476,10 @@ UNIQUE_TEST(grisu3)
 	TEST_D_GIVEN(0);
 	TEST_D_GIVEN(5e-324); // min denormal double
 	TEST_D_TO_STR(1.0971427264533918e-308); // grisu3 fails.
-	TEST_D_GIVEN(1.5450561895576771e-308);
+	TEST_D_GIVEN(1.545056189557677e-308);
+    test_double_to_string(1.5450561895576771e-308, "1.545056189557677e-308");
 	TEST_D_TO_STR(4.1878166087191307e-23); // grisu3 fails.
-	test_double_to_string(1.2345e-2, "12345e-6");
+    TEST_D_GIVEN(1.2345e-2);
 	TEST_D_TO_STR(0.0020599371828568034); // grisu3 fails.
 	TEST_D_GIVEN(.5);
 	test_double_to_string(.0009, "9e-4");

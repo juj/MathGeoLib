@@ -282,14 +282,6 @@ static int grisu3(double v, char *buffer, int *length, int *d_exp)
 	return success;
 }
 
-// Returns length of u when written out as a string, u must be in the range of [-9999, 9999].
-static int exp_len(int u)
-{
-	if (u > 0) return u >= 1000 ? 4 : (u >= 100 ? 3 : (u >= 10 ? 2 : 1));
-	else if (u < 0) return u <= -1000 ? 5 : (u <= -100 ? 4 : (u <= -10 ? 3 : 2));
-	else return 1;
-}
-
 static int i_to_str(int val, char *str)
 {
 	int len, i;
@@ -339,8 +331,13 @@ int dtoa_grisu3(double v, char *dst)
 	// If grisu3 was not able to convert the number to a string, then use old sprintf (suboptimal).
 	if (!success) return sprintf(s2, "%.17g", v) + (int)(s2 - dst);
 
+    // We now have an integer string of form "151324135" and a base-10 exponent for that number.
+    // Next, decide the best presentation for that string by whether to use a decimal point, or the scientific exponent notation 'e'.
+    // We don't pick the absolute shortest representation, but pick a balance between readability and shortness, e.g.
+    // 1.545056189557677e-308 could be represented in a shorter form
+    // 1545056189557677e-323 but that would be somewhat unreadable.
 	decimals = MIN(-d_exp, MAX(1, len-1));
-	if (d_exp < 0 && (len >= -d_exp || exp_len(d_exp+decimals)+1 <= exp_len(d_exp))) // Add decimal point?
+	if (d_exp < 0 && len > 1) // Add decimal point?
 	{
 		for(i = 0; i < decimals; ++i) s2[len-i] = s2[len-i-1];
 		s2[len++ - decimals] = '.';
