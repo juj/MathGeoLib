@@ -416,11 +416,13 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	std::string jsonFilename = "test_results.json";
-	for(int i = 1; i+1 < argc; ++i)
-		if (!strcmp(argv[i], "--json"))
-			jsonFilename = argv[i+1]; // Allow overriding the output file name from command line.
-	jsonReport.Create(jsonFilename.c_str());
+	{
+		std::string jsonFilename = "test_results.json";
+		for(int i = 1; i+1 < argc; ++i)
+			if (!strcmp(argv[i], "--json"))
+				jsonFilename = argv[i+1]; // Allow overriding the output file name from command line.
+		jsonReport.Create(jsonFilename.c_str());
+	}
 
 	numTestsRun = numTestsPassed = numTestsWarnings = numTestsFailed = 0;
 
