@@ -320,17 +320,17 @@ void PrintTestRunSummary()
 	LOGI("Done. %d tests run. %d passed, of which %d succeeded with warnings. %d failed.", numTestsRun, numTestsPassed, numTestsWarnings, numTestsFailed);
 	if (numTestsFailed > 0)
 	{
-		LOGE("The following tests failed:");
+		LOGE_NS("The following tests failed:");
 		std::vector<Test> &tests = Tests();
 		for (size_t i = 0; i < tests.size(); ++i)
 		{
 			if (tests[i].result == TestFailed)
-				LOGE("   %s", tests[i].name.c_str());
+				LOGE_NS("   %s", tests[i].name.c_str());
 		}
 	}
 	if (numTestsWarnings > 0)
 	{
-		LOGW("The following tests had some failures:");
+		LOGW_NS("The following tests had some failures:");
 		std::vector<Test> &tests = Tests();
 		int totalFailureCount = 0;
 		int totalPassCount = 0;
@@ -340,12 +340,12 @@ void PrintTestRunSummary()
 			if (t.numFails > 0 && tests[i].result != TestFailed)
 			{
 				float successRate = (t.numPasses + t.numFails > 0) ? (float)t.numPasses * 100.f / (t.numPasses + t.numFails) : 0.f;
-				LOGW("   %s: %d failures, %d passes (%.2f%% success rate).", tests[i].name.c_str(), tests[i].numFails, tests[i].numPasses, successRate);
+				LOGW_NS("   %s: %d failures, %d passes (%.2f%% success rate).", tests[i].name.c_str(), tests[i].numFails, tests[i].numPasses, successRate);
 				totalFailureCount += t.numFails;
 			}
 			totalPassCount += t.numPasses;
 		}
-		LOGW("Total failure count: %d/%d (%f%% of all iterations)", totalFailureCount, totalFailureCount + totalPassCount, totalFailureCount * 100.0 / (totalFailureCount+totalPassCount));
+		LOGW_NS("Total failure count: %d/%d (%f%% of all iterations)", totalFailureCount, totalFailureCount + totalPassCount, totalFailureCount * 100.0 / (totalFailureCount+totalPassCount));
 	}
 }
 
