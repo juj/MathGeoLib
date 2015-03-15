@@ -502,7 +502,7 @@ int LexFloat3Cmp(const vec &a, const vec &b)
 	LEX_ORDER(a.x, b.x);
 	return 0;
 }
-int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*(const vec*)a, *(const vec*)b); }
+int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*reinterpret_cast<const vec*>(a), *reinterpret_cast<const vec*>(b)); }
 
 OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 {
