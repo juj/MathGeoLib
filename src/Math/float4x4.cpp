@@ -1675,7 +1675,7 @@ void float4x4::Transform(float4 *vectorArray, int numVectors, int strideBytes) c
 float4x4 float4x4::operator *(const float3x3 &rhs) const
 {
 	float4x4 r;
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
 	mat4x4_mul_mat3x3_sse(r.row, this->row, rhs.ptr());
 #else
 	const float *c0 = rhs.ptr();
@@ -1707,7 +1707,7 @@ float4x4 float4x4::operator *(const float3x3 &rhs) const
 float4x4 float4x4::operator *(const float3x4 &rhs) const
 {
 	float4x4 r;
-#ifdef MATH_AUTOMATIC_SSE
+#if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
 	mat4x4_mul_mat3x4_sse(r.row, this->row, rhs.row);
 #else
 	const float *c0 = rhs.ptr();
