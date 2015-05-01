@@ -958,7 +958,14 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 // This is used to skip certain configurations.
 static bool AreEdgesBad(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
 {
+	MARK_UNUSED(f1a);
+	MARK_UNUSED(f1b);
+	MARK_UNUSED(f2a);
+	MARK_UNUSED(f2b);
 	return false;
+	// Currently disabled. It's not completely certain if there's a form of this heuristic that
+	// might be perfect, needs more tweaking.
+#if 0 
 	float a1 = Abs(f1a.Dot(f1b));
 	float a2 = Abs(f2a.Dot(f2b));
 	float b1 = Abs(f1a.Dot(f2b));
@@ -976,6 +983,7 @@ static bool AreEdgesBad(const vec &f1a, const vec &f1b, const vec &f2a, const ve
 		return true;
 
 	return false;
+#endif
 }
 
 static bool AreEdgesCompatibleForOBB(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
@@ -2818,22 +2826,25 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 				q.Normalize();
 
 				float4x4 m = q.ToFloat4x4();
-				v[0] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(0), floodFillVisited, floodFillVisitColor++, dst[0], v[0]);
-				v[1] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(0), floodFillVisited, floodFillVisitColor++, dst[1], v[1]);
-				v[2] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(1), floodFillVisited, floodFillVisitColor++, dst[2], v[2]);
-				v[3] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(1), floodFillVisited, floodFillVisitColor++, dst[3], v[3]);
-				v[4] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(2), floodFillVisited, floodFillVisitColor++, dst[4], v[4]);
-				v[5] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(2), floodFillVisited, floodFillVisitColor++, dst[5], v[5]);
+				const vec d0 = FLOAT4_TO_DIR(m.Col(0));
+				const vec d1 = FLOAT4_TO_DIR(m.Col(1));
+				const vec d2 = FLOAT4_TO_DIR(m.Col(2));
+				v[0] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  d0, floodFillVisited, floodFillVisitColor++, dst[0], v[0]);
+				v[1] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -d0, floodFillVisited, floodFillVisitColor++, dst[1], v[1]);
+				v[2] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  d1, floodFillVisited, floodFillVisitColor++, dst[2], v[2]);
+				v[3] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -d1, floodFillVisited, floodFillVisitColor++, dst[3], v[3]);
+				v[4] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  d2, floodFillVisited, floodFillVisitColor++, dst[4], v[4]);
+				v[5] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -d2, floodFillVisited, floodFillVisitColor++, dst[5], v[5]);
 				float volume = (dst[0] + dst[1]) * (dst[2] + dst[3]) + (dst[4] + dst[5]);
 				if (volume < minVolume)
 				{
-					minOBB.axis[0] = m.Col(0);
-					minOBB.axis[1] = m.Col(1);
-					minOBB.axis[2] = m.Col(2);
+					minOBB.axis[0] = d0;
+					minOBB.axis[1] = d1;
+					minOBB.axis[2] = d2;
 					minOBB.r[0] = (dst[0] + dst[1]) * 0.5f;
 					minOBB.r[1] = (dst[2] + dst[3]) * 0.5f;
 					minOBB.r[2] = (dst[4] + dst[5]) * 0.5f;
-					minOBB.pos = ((dst[0] - dst[1]) * m.Col(0) + (dst[2] - dst[3]) * m.Col(1) + (dst[4] - dst[5]) * m.Col(2)) * 0.5f;
+					minOBB.pos = ((dst[0] - dst[1]) * d0 + (dst[2] - dst[3]) * d1 + (dst[4] - dst[5]) * d2) * 0.5f;
 					minVolume = volume;
 				}
 			}
@@ -2843,7 +2854,7 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 	}
 	std::vector<float2> pts;
 	pts.resize(convexPolyhedron.v.size());
-	float volume = SmallestOBBVolumeJiggle(minOBB.axis[2], convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
+	/*float volume = */SmallestOBBVolumeJiggle(minOBB.axis[2], convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
 		minOBB.axis[0], minOBB.axis[1]);
 	minOBB = OBB::FixedOrientationEnclosingOBB((const vec*)&convexPolyhedron.v[0], convexPolyhedron.v.size(),
 		minOBB.axis[0], minOBB.axis[1]);
@@ -2865,7 +2876,7 @@ OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q)
 
 	float minVolume = FLOAT_INF;
 
-	static LCG rng(Clock::Tick());
+	static LCG rng(Clock::TickU32());
 	int v[6] = {};
 	float dst[6] = {};
 	float a = 0.f;
@@ -2886,23 +2897,26 @@ OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q)
 		test.Normalize();
 
 		float4x4 m = test.ToFloat4x4();
-		v[0] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(0), floodFillVisited, floodFillVisitColor++, dst[0], v[0]);
-		v[1] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(0), floodFillVisited, floodFillVisitColor++, dst[1], v[1]);
-		v[2] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(1), floodFillVisited, floodFillVisitColor++, dst[2], v[2]);
-		v[3] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(1), floodFillVisited, floodFillVisitColor++, dst[3], v[3]);
-		v[4] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  m.Col(2), floodFillVisited, floodFillVisitColor++, dst[4], v[4]);
-		v[5] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -m.Col(2), floodFillVisited, floodFillVisitColor++, dst[5], v[5]);
+		const vec d0 = FLOAT4_TO_DIR(m.Col(0));
+		const vec d1 = FLOAT4_TO_DIR(m.Col(1));
+		const vec d2 = FLOAT4_TO_DIR(m.Col(2));
+		v[0] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  d0, floodFillVisited, floodFillVisitColor++, dst[0], v[0]);
+		v[1] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -d0, floodFillVisited, floodFillVisitColor++, dst[1], v[1]);
+		v[2] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  d1, floodFillVisited, floodFillVisitColor++, dst[2], v[2]);
+		v[3] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -d1, floodFillVisited, floodFillVisitColor++, dst[3], v[3]);
+		v[4] = convexPolyhedron.ExtremeVertexConvex(adjacencyData,  d2, floodFillVisited, floodFillVisitColor++, dst[4], v[4]);
+		v[5] = convexPolyhedron.ExtremeVertexConvex(adjacencyData, -d2, floodFillVisited, floodFillVisitColor++, dst[5], v[5]);
 		float volume = (dst[0] + dst[1]) * (dst[2] + dst[3]) + (dst[4] + dst[5]);
 		if (volume < minVolume)
 		{
 //			LOGI("Improved volume from %f to %f.", volume, minVolume);
-			minOBB.axis[0] = m.Col(0);
-			minOBB.axis[1] = m.Col(1);
-			minOBB.axis[2] = m.Col(2);
+			minOBB.axis[0] = d0;
+			minOBB.axis[1] = d1;
+			minOBB.axis[2] = d2;
 			minOBB.r[0] = (dst[0] + dst[1]) * 0.5f;
 			minOBB.r[1] = (dst[2] + dst[3]) * 0.5f;
 			minOBB.r[2] = (dst[4] + dst[5]) * 0.5f;
-			minOBB.pos = ((dst[0] - dst[1]) * m.Col(0) + (dst[2] - dst[3]) * m.Col(1) + (dst[4] - dst[5]) * m.Col(2)) * 0.5f;
+			minOBB.pos = ((dst[0] - dst[1]) * d0 + (dst[2] - dst[3]) * d1 + (dst[4] - dst[5]) * d2) * 0.5f;
 			minVolume = volume;
 
 			q = test;
