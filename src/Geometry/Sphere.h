@@ -286,6 +286,9 @@ public:
 	bool Intersects(const Polyhedron &polyhedron) const;
 	bool Intersects(const Sphere &sphere) const;
 
+	// Computes the set intersection between this Sphere and the given plane, which forms a 2D circle.
+	Circle Intersect(const Plane &plane) const;
+
 	/// Expands this sphere to enclose both the original sphere and the given object.
 	/** This function may adjust both the position and the radius of this sphere to produce a new sphere that encloses
 		both objects. The sphere that results may not be the optimal enclosing sphere.

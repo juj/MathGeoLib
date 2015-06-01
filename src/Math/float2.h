@@ -330,7 +330,7 @@ public:
 
 	/// Tests if two vectors are perpendicular to each other.
 	/** @see IsNormalized(), IsZero(), IsPerpendicular(), Equals(). */
-	bool IsPerpendicular(const float2 &other, float epsilonSq = 1e-8f) const;
+	bool IsPerpendicular(const float2 &other, float epsilonSq = 1e-5f) const;
 
 	/// Tests if two vectors are equal, up to the given epsilon.
 	/** @see IsPerpendicular(). */
@@ -662,5 +662,8 @@ inline float2 Lerp(const float2 &a, const float2 &b, float t) { return a.Lerp(b,
 Q_DECLARE_METATYPE(float2)
 Q_DECLARE_METATYPE(float2*)
 #endif
+
+template<typename T>
+int float2_ConvexHullInPlace(T *p, int n);
 
 MATH_END_NAMESPACE

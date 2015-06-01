@@ -16,6 +16,7 @@
 	@author Jukka Jylänki
 	@brief */
 #include "float2.h"
+#include "float2.inl"
 #include "float3.h"
 #include "float4.h"
 #include "MathFunc.h"
@@ -520,19 +521,6 @@ bool float2::OrientedCCW(const float2 &a, const float2 &b, const float2 &c)
 	return (a.x-c.x)*(b.y-c.y) - (a.y-c.y)*(b.x-c.x) >= 0.f;
 }
 
-class SortByPolarAngle
-{
-public:
-	float2 perspective;
-
-	bool operator()(const float2 &a, const float2 &b) const
-	{
-		float2 A = a - perspective;
-		float2 B = b - perspective;
-		return B.x*A.y < A.x*B.y;
-	}
-};
-
 #ifdef MATH_ENABLE_STL_SUPPORT
 void float2::ConvexHull(const float2 *pointArray, int numPoints, std::vector<float2> &outConvexHull)
 {
@@ -552,107 +540,7 @@ void float2::ConvexHull(const float2 *pointArray, int numPoints, std::vector<flo
 	a lecture by Shai Simonson: http://www.aduni.org/courses/algorithms/index.php?view=cw , lecture 02-13-01. */
 int float2::ConvexHullInPlace(float2 *p, int n)
 {
-	if (n <= 2)
-		return n;
-
-	if (n >= 50)
-	{
-		/* Perform Akl–Toussaint heuristic. The limit n=50 is arbitrary and based on quick profiling:
-		 Without heuristic:
-		   n=10: 1143 ticks
-		   n=50: 8657 ticks
-		   n=100: 19533 ticks
-		 With heuristic:
-		   n=10: 1322 ticks
-		   n=50: 6759 ticks
-		   n=100: 14448 ticks
-		*/
-		int minX = 0, minY = 0, maxX = 0, maxY = 0;
-		for(int i = 1; i < n; ++i)
-		{
-			if (p[i].x < p[minX].x) minX = i;
-			else if (p[i].x > p[maxX].x) maxX = i;
-			if (p[i].y < p[minY].y) minY = i;
-			else if (p[i].y > p[maxY].y) maxY = i;
-		}
-		// Direction vectors which point inside the convex hull.
-		float2 e0 = (p[maxX] - p[minY]).Rotated90CCW();
-		float2 e1 = (p[maxY] - p[maxX]).Rotated90CCW();
-		float2 e2 = (p[minX] - p[maxY]).Rotated90CCW();
-		float2 e3 = (p[minY] - p[minX]).Rotated90CCW();
-
-		// Add a small epsilon so that the four extreme points on the convex hull will not get pruned
-		// due to floating point imprecision.
-		const float eps = 1e-6f;
-		float e0_d = e0.Dot(p[minY]) + eps;
-		float e1_d = e1.Dot(p[maxX]) + eps;
-		float e2_d = e2.Dot(p[maxY]) + eps;
-		float e3_d = e3.Dot(p[minX]) + eps;
-
-		for(int i = 0; i < n; ++i)
-			if (e0.Dot(p[i]) > e0_d && e1.Dot(p[i]) > e1_d && e2.Dot(p[i]) > e2_d && e3.Dot(p[i]) > e3_d)
-				Swap(p[i--], p[--n]);
-	}
-
-	// Find the lowest point of the set.
-	SortByPolarAngle pred;
-	pred.perspective = p[0];
-	int smallestY = 0;
-	for(int i = 1; i < n; ++i)
-		if (p[i].y < pred.perspective.y || (p[i].y == pred.perspective.y && p[i].x < pred.perspective.x))
-		{
-			pred.perspective = p[i];
-			smallestY = i;
-		}
-	Swap(p[0], p[smallestY]);
-
-	// For robustness, remove duplicates of the perspective pivot points.
-	// This is because duplicates on that element will cause the sorting to be nontransitive and break
-	// the whole sort.
-	int unique = 0;
-	for(int i = 1; i < n; ++i)
-		if (!p[i].Equals(p[0]))
-			p[++unique] = p[i];
-	n = unique+1;
-
-	std::sort(&p[1], &p[n], pred);
-
-	// For robustness, remove duplicate input values.
-	unique = 0;
-	for(int i = 1; i < n; ++i)
-		if (!p[i].Equals(p[unique]))
-			p[++unique] = p[i];
-	n = unique+1;
-
-	int h = 1; // Points to the index of the last point added to the hull so far. The first two points are in the hull to start.
-
-	float2 a = p[h] - p[h-1];
-	const float epsilon = 1e-5f;
-	for(int i = 2; i < n; ++i)
-	{
-		// The last two added points determine a line, check which side of that line the next point to be added lies in.
-		float2 d = p[i] - p[h-1];
-		float dir = d.x*a.y - d.y*a.x;
-		// Remove previous points from the convex hull until we have a left turn. Also for numerical stability,
-		// in the case of three collinear points, remove the middle point.
-		while(dir > epsilon || (dir > -epsilon && d.Dot(d) >= a.Dot(a)))
-		{
-			--h;
-			if (h >= 1)
-			{
-				a = p[h] - p[h-1];
-				d = p[i] - p[h-1];
-				dir = d.x*a.y - d.y*a.x;
-			}
-			else
-				break;
-		}
-		p[++h] = p[i];
-		a = p[i] - p[h-1];
-	}
-
-	// Return the number of points on the new hull.
-	return h+1;
+	return float2_ConvexHullInPlace<float2>(p, n);
 }
 
 bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexHull, const float2 &point)
@@ -670,19 +558,33 @@ bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexH
 	return true;
 }
 
-#endif
+#endif // ~MATH_ENABLE_STL_SUPPORT
 
 #define NEXT_P(ptr) ((ptr)+1 < (pEnd) ? (ptr)+1 : (p))
 
 float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV)
 {
 	assume(p || n == 0);
-	if (!p)
-		return 0.f;
+	if (!p || n <= 0)
+	{
+		center = uDir = vDir = float2::nan;
+		minU = maxU = minV = maxV = FLOAT_NAN;
+		return FLOAT_NAN;
+	}
 
 	// As a preparation, need to compute the convex hull so that points are CCW-oriented,
 	// and this also greatly reduces the number of points for performance.
 	n = float2::ConvexHullInPlace(p, n);
+	assert(n > 0);
+	if (n == 1)
+	{
+		center = p[0];
+		uDir = float2(1,0);
+		vDir = float2(0,1);
+		minU = maxU = center.x;
+		minV = maxV = center.y;
+		return 0.f;
+	}
 
 	// e[i] point to the antipodal point pairs: e[0] and e[2] are pairs, so are e[1] and e[3].
 	float2 *e[4] = { p, p, p, p };

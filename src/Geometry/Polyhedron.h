@@ -153,6 +153,27 @@ public:
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
 
+	// Computes the most extreme point of this convex Polyhedron into the given direction.
+	/** @param adjacencyData A precomputed data structure that specifies the adjacency information between the vertices of this Polyhedron.
+			Call GenerateVertexAdjacencyData() to compute this structure.
+		@param direction The direction vector of the direction to find the extreme point. This vector may
+			be unnormalized, but may not be null.
+		@param floodFillVisited A temporary structure to an array of size |V| where each element specifies whether the extreme
+			vertex search has visited that vertex or not. If floodFillVisited[i] == floodFillVisitColor, then the vertex i
+			has been visited, otherwise not.
+		@param mostExtremeDistance [out] Receives the 1D projection distance of the most extreme vertex onto the direction vector.
+		@param startingVertex [optional] Specifies a hint vertex from where to start the search. Specifying a know vertex that is close
+			to being the most extreme vertex in the given direction may speed up the search.
+		@return The index of the most extreme vertex into the specified direction. */
+
+#define MATH_NUMSTEPS_STATS
+
+#ifdef MATH_NUMSTEPS_STATS
+	mutable int numSearchStepsDone, numImprovementsMade;
+#endif
+	int ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction,
+		std::vector<unsigned int> &floodFillVisited, unsigned int floodFillVisitColor, float &mostExtremeDistance, int startingVertex = 0) const;
+
 	/// Projects this Polyhedron onto the given 1D axis direction vector.
 	/** This function collapses this Polyhedron onto an 1D axis for the purposes of e.g. separate axis test computations.
 		The function returns a 1D range [outMin, outMax] denoting the interval of the projection.
@@ -191,7 +212,10 @@ public:
 	OBB MinimalEnclosingOBB() const;
 #endif
 
-	void MergeAdjacentPlanarFaces();
+	/// Computes a data structure that specifies adjacent vertices for each vertex.
+	/** In the returned vector of vectors V, the vector V[i] specifies all the vertex indices that vertex i
+		is connected to. */
+	std::vector<std::vector<int> > GenerateVertexAdjacencyData() const;
 
 	/// Tests if the faces in this polyhedron refer to valid existing vertices.
 	/** This function performs sanity checks on the face indices array.
@@ -218,12 +242,22 @@ public:
 	/// Removes from the vertex array all vertices that are not referred to by any of the faces of this polyhedron.
 	void RemoveRedundantVertices();
 
+	/// Removes all faces from this polyhedron which have two or less vertices in them.
+	void RemoveDegenerateFaces();
+
+	/// Finds all neighboring faces that have identical face normals and merges them together.
+	/// Warning: this introduces T-junctions to the polyhedron, as well as increases the vertex count on the merged faces.
+	/// Use this only as preprocessing when needed.
+	/// @return The number of faces that were removed by merging.
+	int MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool conservativeEnclose = true, float angleEpsilon = 1e-16f, float distanceEpsilon = 1e-8f);
+
 	/// Returns true if this polyhedron has 0 vertices and 0 faces.
 	/** @see FaceIndicesValid(), IsClosed(), IsConvex(). */
 	bool IsNull() const { return v.empty() && f.empty(); }
 
 	/// Returns true if this polyhedron is closed and does not have any gaps.
 	/** \note This function performs a quick check, which might not be complete.
+		The running time is O(FlogE) ~ O(VlogV).
 		@see FaceIndicesValid(), IsClosed(), IsConvex(). */
 	bool IsClosed() const;
 
@@ -236,11 +270,13 @@ public:
 	bool IsConvex() const;
 
 	/// Returns true if the Euler formula (V + F - E == 2) holds for this Polyhedron.
-	/** @see NumVertices(), NumEdges(), NumFaces(). */
+	/** The running time is O(E) ~ O(V).
+		@see NumVertices(), NumEdges(), NumFaces(). */
 	bool EulerFormulaHolds() const;
 
 	/// Tests whether all the faces of this polyhedron are non-degenerate (have at least 3 vertices)
 	/// and in case they have more than 3 vertices, tests that the faces are planar.
+	/** The running time is O(F) ~ O(V). */
 	bool FacesAreNondegeneratePlanar(float epsilon = 1e-2f) const;
 
 	/// Clips the line/ray/line segment specified by L(t) = ptA + t * dir, tFirst <= t <= tLast,
@@ -379,13 +415,19 @@ public:
 
 	/// Creates a Polyhedron object that represents the convex hull of the given point array.
 	/// \todo This function is strongly WIP!
+	static Polyhedron ConvexHull(const VecArray &points) { return !points.empty() ? ConvexHull((const vec*)&points[0], (int)points.size()) : Polyhedron(); }
+	static Polyhedron ConvexHull(const VecArray &points, LCG &rng) { return !points.empty() ? ConvexHull((const vec*)&points[0], (int)points.size(), rng) : Polyhedron(); }
 	static Polyhedron ConvexHull(const vec *pointArray, int numPoints);
+	static Polyhedron ConvexHull(const vec *pointArray, int numPoints, LCG &rng);
 
 	static Polyhedron Tetrahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Octahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Hexahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Icosahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
 	static Polyhedron Dodecahedron(const vec &centerPos = POINT_VEC_SCALAR(0.f), float scale = 1.f, bool ccwIsFrontFacing = true);
+
+	static Polyhedron CreateCapsule(const vec &a, const vec &b, float r, int verticesPerCap, bool ccwIsFrontFacing = true);
+	static Polyhedron CreateSharpCapsule(const vec &a, const vec &b, float r, float capPointDistance, int verticesPerCap, bool ccwIsFrontFacing = true);
 
 	/// Tests if these two polyhedrons represent the same set of points.
 	/// @note This function is very slow, and should be used only for debugging purposes.
@@ -412,6 +454,7 @@ public:
 	TriangleArray Triangulate() const;
 
 	std::string ToString() const;
+	void DumpStructure() const;
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart = 0, int faceEnd = 0x7FFFFFFF) const;

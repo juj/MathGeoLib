@@ -38,6 +38,7 @@
 #include "Polygon.h"
 #include "Polyhedron.h"
 #include "Plane.h"
+#include "Circle.h"
 #include "../Math/float2.h"
 #include "../Math/float3x3.h"
 #include "../Math/float3x4.h"
@@ -447,6 +448,15 @@ vec Sphere::ClosestPoint(const vec &point) const
 	float d = pos.Distance(point);
 	float t = (d >= r ? r : d);
 	return pos + (point - pos) * (t / d);
+}
+
+Circle Sphere::Intersect(const Plane &plane) const
+{
+	Circle c;
+	c.pos = plane.ClosestPoint(pos);
+	c.normal = plane.normal;
+	c.r = Sqrt(r*r - c.pos.DistanceSq(pos));
+	return c;
 }
 
 bool Sphere::Intersects(const Sphere &sphere) const

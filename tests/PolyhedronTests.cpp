@@ -135,3 +135,37 @@ UNIQUE_TEST(Polyhedron_ConvexHull_case)
 	for(int i = 0; i < n; ++i)
 		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
 }
+
+UNIQUE_TEST(Polyhedron_ConvexHull_case2)
+{
+	const int n = 5;
+	vec points[n];
+
+	points[0] = POINT_VEC(-3.f, 0.f, 3.f);
+	points[1] = POINT_VEC(-3.f, 2.f, 3.f);
+	points[2] = POINT_VEC(-4.f, -1.f, -2.f);
+	points[3] = POINT_VEC(2.f, 0.f, 4.f);
+	points[4] = POINT_VEC(-3.f, -1.f, 3.f);
+
+	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
+
+	for(int i = 0; i < n; ++i)
+		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+}
+
+UNIQUE_TEST(Polyhedron_ConvexHull_case3)
+{
+	int n = 6;
+	vec points[6];
+
+	points[0] = POINT_VEC(-3.33244896f, -3.68236303f, 0.578778028f);
+	points[1] = POINT_VEC(-0.233813331f, -4.18689537f, 2.72309422f);
+	points[2] = POINT_VEC(2.5223856f, 4.12852812f, -1.26207304f);
+	points[3] = POINT_VEC(0.871031165f, -3.87308955f, -3.03981566f);
+	points[4] = POINT_VEC(3.69942713f, 0.460758656f, 3.3319571f);
+	points[5] = POINT_VEC(4.75132895f, 1.27033663f, 0.900620997f);
+	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
+
+	for(int i = 0; i < n; ++i)
+		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+}

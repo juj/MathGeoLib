@@ -159,8 +159,8 @@ struct AlignedAllocator;
 struct Triangle_storage;
 struct LineSegment_storage;
 
-// VS2010+VS2012/old C++ standard issue with aligning data inside a std::vector, work around it.
-#if defined(_MSC_VER) && _MSC_VER < 1800 /*VS2013*/
+// Visual Studio will not align data to 16 bytes inside a vector, so use a custom allocator to do it.
+#if defined(_MSC_VER)
 typedef std::vector<Triangle_storage, AlignedAllocator<Triangle_storage, 16> > TriangleArray;
 typedef std::vector<LineSegment_storage, AlignedAllocator<LineSegment_storage, 16> > LineSegmentArray;
 typedef std::vector<float4_storage, AlignedAllocator<float4_storage, 16> > Float4Array;
