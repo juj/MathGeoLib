@@ -889,6 +889,7 @@ float float3x4::Determinant() const
 	assume(Float3x3Part().IsFinite());
 //#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// 0,-2.873479127883911e-1,9.578263163566589e-1,1.1457166820764542e-1,1,0,0,1.101529598236084e-1,0,9.578263163566589e-1,2.873479127883911e-1,0.037929482758045197
+	// TODO: Temporarily disabled for numerical issues. Check this closer and re-enable.
 //return mat3x4_determinant(row);
 //#else
 	const float a = v[0][0];

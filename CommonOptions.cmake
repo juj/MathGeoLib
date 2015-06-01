@@ -90,8 +90,8 @@ if (MSVC)
 
 	# XXX Work around MSVC bug with x64 + /GL + /O2 /arch:AVX, see https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
 	if (MATH_AVX AND CMAKE_SIZEOF_VOID_P EQUAL 8)
-#		set(VS_BUG TRUE)
-#		message(STATUS "NOTE: Whole Program Optimization is disabled due to detected MSVC bug with x64+/O2+/GL+/arch:AVX!")
+		set(VS_BUG TRUE)
+		message(STATUS "NOTE: Whole Program Optimization is disabled due to detected MSVC bug with x64+/O2+/GL+/arch:AVX!")
 	endif()
 	if (NOT VS_BUG)
 		# Whole Program Optimization: Yes (/GL)
