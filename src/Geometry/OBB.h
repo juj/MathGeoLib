@@ -327,7 +327,9 @@ public:
 	static OBB PCAEnclosingOBB(const vec *pointArray, int numPoints);
 #endif
 
-	///\todo This function is strongly WIP! (Works, but is very very slow!)
+	/// Computes the smallest OBB by volume that encloses the given point set.
+	/** This function implements the algorithm from the paper
+		An Exact Algorithm for Finding Minimum Oriented Bounding Boxes, Jukka Jylänki, 2015. Available at http://clb.demon.fi/minobb/ */
 	static OBB OptimalEnclosingOBB(const vec *pointArray, int numPoints);
 	static OBB OptimalEnclosingOBB(const Polyhedron &convexPolyhedron);
 
