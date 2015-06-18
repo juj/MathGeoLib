@@ -1924,8 +1924,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 					v0, v1, edgesToFaces[std::make_pair(v0, v1)],
 					v1, v0, edgesToFaces[std::make_pair(v1, v0)]);
 				std::pair<int,int> eii = std::make_pair(v0, v1);
-				int fii = edgesToFaces[eii];
-				assert(fii == fi);
+				assert(edgesToFaces[eii] == fi);
 				assert(adjFace != fi);
 
 				bool adjFaceIsInConflict = (conflictingFaces.find(adjFace) != conflictingFaces.end());
