@@ -2036,7 +2036,7 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 	pts.resize(convexPolyhedron.v.size());
 	/*float volume = */SmallestOBBVolumeJiggle(minOBB.axis[2], convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
 		minOBB.axis[0], minOBB.axis[1]);
-	minOBB = OBB::FixedOrientationEnclosingOBB((const vec*)&convexPolyhedron.v[0], convexPolyhedron.v.size(),
+	minOBB = OBB::FixedOrientationEnclosingOBB((const vec*)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(),
 		minOBB.axis[0], minOBB.axis[1]);
 	return minOBB;
 }

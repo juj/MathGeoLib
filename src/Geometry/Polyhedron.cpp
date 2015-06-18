@@ -655,7 +655,7 @@ bool Polyhedron::IsConvex() const
 			continue;
 
 		vec pointOnFace = v[f[i].v[0]];
-		vec faceNormal = FaceNormal(i);
+		vec faceNormal = FaceNormal((int)i);
 		for(size_t j = 0; j < v.size(); ++j)
 		{
 			float d = faceNormal.Dot(vec(v[j]) - pointOnFace);
@@ -1758,7 +1758,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		for(size_t j = 0; j < f.v.size(); ++j)
 		{
 			int v1 = f.v[j];
-			edgesToFaces[std::make_pair(v0, v1)] = i;
+			edgesToFaces[std::make_pair(v0, v1)] = (int)i;
 			v0 = v1;
 		}
 	}
@@ -1791,8 +1791,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			cs d = cv(faceNormals[j]).Dot(cv(POINT_TO_FLOAT4(p.v[i])) - pointOnFace);
 			if (d > inPlaneEpsilon)
 			{
-				conflictList[j].push_back(i);
-				conflictListVertices[i].insert(j);
+				conflictList[j].push_back((int)i);
+				conflictListVertices[i].insert((int)j);
 				C_LOG("Vertex %d and face %d are in conflict.", (int)i, (int)j);
 			}
 		}
@@ -1835,7 +1835,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	while(!workStack.empty())
 	{
 		// Choose a random plane in order to avoid a degenerate worst case processing.
-		int fIdx = rng.Int(0, workStack.size() - 1);
+		int fIdx = rng.Int(0, (int)workStack.size() - 1);
 //		int f = workStack[fIdx];
 		int f = workStack.at(fIdx);
 		Swap(workStack[fIdx], workStack.back());
@@ -1861,7 +1861,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			if (d > extremeD)
 			{
 				extremeD = d;
-				extremeCI = i;
+				extremeCI = (int)i;
 				extremeI = vt;
 			}
 		}
@@ -2047,7 +2047,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			//vec faceNormal = p.FaceNormal(p.f.size()-1);
 			//cv faceNormal = (b-a).Cross(c-a);
 			//cs len = faceNormal.Normalize();
-			cv faceNormal = PolyFaceNormal(p, p.f.size()-1);
+			cv faceNormal = PolyFaceNormal(p, (int)p.f.size()-1);
 #if 0
 			if (len < 1e-3f || a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 			{
@@ -2078,9 +2078,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				== edgesToFaces.end() || edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] == -1))
 				LOGW("Convex hull computation failed!");
 
-			edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] = p.f.size()-1;
-			edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] = p.f.size()-1;
-			edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] = p.f.size()-1;
+			edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] = (int)p.f.size()-1;
+			edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] = (int)p.f.size()-1;
+			edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] = (int)p.f.size()-1;
 //			LOGI("New face %d->%d->%d", face.v[0], face.v[1], face.v[2]);
 		}
 		boundaryEdges.clear();
@@ -2117,7 +2117,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				if (d > inPlaneEpsilon && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 				{
 					conflictList.at(j).push_back(*iter);
-					conflictListVertices[*iter].insert(j);
+					conflictListVertices[*iter].insert((int)j);
 //				conflictList[j].push_back(*iter);
 					C_LOG("Vertex %d and face %d are in conflict.", (int)*iter, (int)j);
 				}
@@ -2146,7 +2146,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		for(size_t j = oldNumFaces; j < p.f.size(); ++j)
 			if (!conflictList.at(j).empty())
 //				if (!conflictList[j].empty())
-					workStack.push_back(j);
+					workStack.push_back((int)j);
 //	p.DumpStructure();
 
 #if 0
@@ -2550,7 +2550,7 @@ Polyhedron Polyhedron::CreateSharpCapsule(const vec &a, const vec &b, float r, f
 		f.v.clear();
 		f.v.push_back(i);
 		f.v.push_back((i+1)%verticesPerCap);
-		f.v.push_back(p.v.size()-2);
+		f.v.push_back((int)p.v.size()-2);
 		p.f.push_back(f);
 	}
 	for(int i = 0; i < verticesPerCap; ++i)
@@ -2558,7 +2558,7 @@ Polyhedron Polyhedron::CreateSharpCapsule(const vec &a, const vec &b, float r, f
 		f.v.clear();
 		f.v.push_back(verticesPerCap+(i+1)%verticesPerCap);
 		f.v.push_back(verticesPerCap+i);
-		f.v.push_back(p.v.size()-1);
+		f.v.push_back((int)p.v.size()-1);
 		p.f.push_back(f);
 	}
 	for(int i = 0; i < verticesPerCap; ++i)
@@ -2696,7 +2696,7 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 		cv normal = (b-a).Cross(c-a);
 		normal.Normalize();
 		*/
-		faceNormals.push_back(PolyFaceNormal(*this, i));
+		faceNormals.push_back(PolyFaceNormal(*this, (int)i));
 	}
 
 	std::vector<int> faceGroups(f.size());
@@ -2725,7 +2725,7 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 					if (thisNormal.Dot(nghbNormal) >= 1.0 - angleEpsilon)
 					{
 						cs eNeg, ePos, nNeg, nPos;
-						PolyExtremeVertexOnFace(*this, i, nghbNormal, eNeg, ePos);
+						PolyExtremeVertexOnFace(*this, (int)i, nghbNormal, eNeg, ePos);
 //						PolyExtremeVertexOnFace(*this, nf, nghbNormal, nNeg, nPos);
 //						if (Max(ePos, nPos) - Min(eNeg, nNeg) <= distanceEpsilon)
 						PolyExtremeVertexOnFace(*this, nf, thisNormal, nNeg, nPos);
@@ -2744,7 +2744,7 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 #endif
 							++numMerges;
 							// Merge this face to neighboring face.
-							int fg = i;
+							int fg = (int)i;
 							while(faceGroups[fg] != fg)
 								fg = faceGroups[fg];
 							int nfgr = nf;
@@ -2767,7 +2767,7 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 	{
 		Face &face = f[i];
 
-		int fg = i;
+		int fg = (int)i;
 		while(faceGroups[fg] != fg)
 			fg = faceGroups[fg];
 
@@ -3151,7 +3151,7 @@ void Polyhedron::DumpStructure() const
 		if (f[i].v.empty())
 			LOGI("Face %d: (no vertices)", (int)i);
 		else
-			LOGI("Face %d: %s (area: %f)", (int)i, f[i].ToString().c_str(), FacePolygon(i).Area());
+			LOGI("Face %d: %s (area: %f)", (int)i, f[i].ToString().c_str(), FacePolygon((int)i).Area());
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
