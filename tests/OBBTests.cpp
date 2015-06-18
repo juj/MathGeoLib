@@ -144,7 +144,7 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case)
 //	LOGI("%s", fastOBB.SerializeToCodeString().c_str());
 
 	assert(minOBB.Volume() <= knownTightOBB.Volume());
-	assert(fastOBB.Volume() <= knownTightOBB.Volume());
+	assert(fastOBB.Volume() <= knownTightOBB.Volume()*1.005 /* fastOBB is only an approximation, so allow small 0.5% wiggle room. */);
 	assert(minOBB.Volume() <= fastOBB.Volume());
 }
 
