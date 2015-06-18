@@ -2044,7 +2044,7 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 	return minOBB;
 }
 
-#if defined(_MSC_VER) && defined(MATH_SSE) && _MSC_VER < 1700 // < VS2012
+#if defined(_MSC_VER) && defined(MATH_SSE) && _MSC_VER < 1800 // < VS2013
 // Work around a VS2010 bug "error C2719: 'q': formal parameter with __declspec(align('16')) won't be aligned"
 OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, const Quat &q)
 #else
