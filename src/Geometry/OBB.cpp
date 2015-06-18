@@ -1208,6 +1208,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					LOGE("Edge %d: %d->%d is antipodal to vertex %d, which is part of the same edge! This should be possible only if the input is degenerate planar!",
 						(int)i, edges[i].first, edges[i].second, v);
 					minOBB.SetNegativeInfinity();
+					delete[] vertexPairsToEdges;
 					return minOBB;
 				}
 				antipodalPointsForEdge[i].push_back(v);
