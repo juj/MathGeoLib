@@ -169,7 +169,7 @@ FORCE_INLINE simd4f setx_ps(float f)
 	// On VS2010+AVX generates vmovss+vxorps+vmovss
 	// return _mm_load_ss(&f);
 
-#if _MSC_VER < 1700 // == VS2012
+#if _MSC_VER < 1700 // < VS2012
 	// On VS2010+AVX generates vmovss+vshufps (to broadcast the single element to all channels). Best performance so far for VS2010.
 	// On VS2013 generates a vbroadcastss instruction.
 	return set1_ps(f);

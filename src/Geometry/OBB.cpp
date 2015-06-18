@@ -2043,7 +2043,12 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 	return minOBB;
 }
 
+#if defined(_MSC_VER) && defined(MATH_SSE) && _MSC_VER < 1700 // < VS2012
+// Work around a VS2010 bug "error C2719: 'q': formal parameter with __declspec(align('16')) won't be aligned"
+OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, const Quat &q)
+#else
 OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q)
+#endif
 {
 	OBB minOBB;
 	if (convexPolyhedron.v.size() == 0)
@@ -2068,14 +2073,14 @@ OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q)
 	vec unitX = q*vec::unitX;
 	vec u,w;
 	unitX.PerpendicularBasis(u, w);
-	//for(;;)
+	Quat r = q;
 	while(nStepsNoProgress < nSteps + 100)
 	{
 		//vec z = u * Cos(a) + w * Sin(a);
 		//z.Normalize();
 		vec z = vec::RandomDir(rng);
 		Quat rot = Quat(z, rng.Float(0.f, 2.f*pi/(360.f*200.f)) /*2.f*pi/(360.f*2000.f)*/);
-		Quat test = rot * q;
+		Quat test = rot * r;
 		test.Normalize();
 
 		float4x4 m = test.ToFloat4x4();
@@ -2101,9 +2106,9 @@ OBB OBB::Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q)
 			minOBB.pos = ((dst[0] - dst[1]) * d0 + (dst[2] - dst[3]) * d1 + (dst[4] - dst[5]) * d2) * 0.5f;
 			minVolume = volume;
 
-			q = test;
+			r = test;
 			nStepsNoProgress = 0;
-			unitX = q*vec::unitX;
+			unitX = r*vec::unitX;
 			unitX.PerpendicularBasis(u, w);
 		}
 		else

@@ -337,7 +337,12 @@ public:
 	static OBB BruteEnclosingOBB(const Polyhedron &convexPolyhedron);
 
 	static OBB Brute2EnclosingOBB(const Polyhedron &convexPolyhedron);
+#if defined(_MSC_VER) && defined(MATH_SSE) && _MSC_VER < 1700 // < VS2012
+	// Work around a VS2010 bug "error C2719: 'q': formal parameter with __declspec(align('16')) won't be aligned"
+	static OBB Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, const Quat &q);
+#else
 	static OBB Brute3EnclosingOBB(const Polyhedron &convexPolyhedron, Quat q);
+#endif
 
 	/// Returns an OBB that is oriented to the coordinate frame specified by vectors dir0 and dir1 and encloses the given point set.
 	static OBB FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, const vec &dir0, const vec &dir1);
