@@ -42,7 +42,15 @@
 #include "../Algorithm/Random/LCG.h"
 #include "../Time/Clock.h"
 
+#if __cplusplus > 199711L // Is C++11 or newer?
+#define HAS_UNORDERED_MAP
+#endif
+
+#ifdef HAS_UNORDERED_MAP
 #include <unordered_map>
+#else
+#include <map>
+#endif
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 #include "VertexBuffer.h"
@@ -1603,6 +1611,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 #define C_LOG(...) ((void)0)
 #endif
 
+struct Tri { int v[3]; int faceIndex; };
+
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng)
 {
 	C_LOG("RNG seed: %d", rng.lastNumber);
@@ -1736,7 +1746,11 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	faceNormals[2] = DIR_TO_FLOAT4(p.FaceNormal(2));
 	faceNormals[3] = DIR_TO_FLOAT4(p.FaceNormal(3));
 
+#ifdef HAS_UNORDERED_MAP
 	std::unordered_map<std::pair<int, int>, int, hash_edge> edgesToFaces;
+#else
+	std::map<std::pair<int, int>, int> edgesToFaces;
+#endif
 	for(size_t i = 0; i < p.f.size(); ++i)
 	{
 		const Polyhedron::Face &f = p.f[i];
@@ -1873,7 +1887,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		floodFillVisited.at(f) = floodFillVisitColor;
 		faceVisitStack.push_back(f);
 		faceVisitStack.insert(faceVisitStack.end(), conflictingFaces.begin(), conflictingFaces.end());
-		for(auto iter = conflictingFaces.begin(); iter != conflictingFaces.end(); ++iter)
+		for(std::set<int>::iterator iter = conflictingFaces.begin(); iter != conflictingFaces.end(); ++iter)
 			floodFillVisited.at(*iter) = floodFillVisitColor;
 
 		while(!faceVisitStack.empty())
@@ -2012,7 +2026,6 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			prev = boundaryEdges[i];
 		}
 
-		struct Tri { int v[3]; int faceIndex; };
 		std::vector<Tri> degenerateTris;
 
 		size_t oldNumFaces = p.f.size();
@@ -2022,11 +2035,11 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			assert(face.v.size() == 3);
 			face.v[0] = boundaryEdges[i].first; face.v[1] = boundaryEdges[i].second; face.v[2] = extremeI; p.f.push_back(face);
 
+#if 0
 			// Test the dimensions of the new face.
 			cv a = POINT_TO_FLOAT4(p.v[face.v[0]]);
 			cv b = POINT_TO_FLOAT4(p.v[face.v[1]]);
 			cv c = POINT_TO_FLOAT4(p.v[face.v[2]]);
-#if 0
 			if (a.DistanceSq(b) < 1e-7f || a.DistanceSq(c) < 1e-7f || b.DistanceSq(c) < 1e-7f)
 				LOGW("Creating a degenerate face!");
 #endif
