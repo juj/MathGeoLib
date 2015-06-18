@@ -497,7 +497,6 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 {
 	vec edge = edge_;
 	int numTimesNotImproved = 0;
-	float rectArea = -1.f, edgeLength = -1.f;
 	float bestVolume = FLOAT_INF;
 	float2 c10, c20;
 	vec u, v;
@@ -507,7 +506,7 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 	{
 		int e1, e2;
 		OBB::ExtremePointsAlongDirection(edge, (const vec*)&convexHull.v[0], (int)convexHull.v.size(), e1, e2);
-		edgeLength = Abs(Dot((vec)convexHull.v[e1] - convexHull.v[e2], edge));
+		float edgeLength = Abs(Dot((vec)convexHull.v[e1] - convexHull.v[e2], edge));
 
 		edge.PerpendicularBasis(u, v);
 
@@ -518,7 +517,7 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, st
 		float2 uDir;
 		float2 vDir;
 		float minU, maxU, minV, maxV;
-		rectArea = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
+		float rectArea = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
 
 		c10 = (maxV - minV) * vDir;
 		c20 = (maxU - minU) * uDir;
@@ -577,7 +576,6 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 	const float eps = 1e-4f;
 	const float angleEps = 1e-3f;
 
-	float T1,T2,U1,U2,V1,V2;
 	{
 		vec a = f1b;
 		vec b = f1a-f1b;
@@ -625,14 +623,14 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 			return 0; // Discriminant negative, no solutions for v.
 
 		float sgnL = l < 0 ? -1.f : 1.f;
-		V1 = -(l + sgnL*Sqrt(s))/ (2.f*m);
-		V2 = k / (m*V1);
+		float V1 = -(l + sgnL*Sqrt(s))/ (2.f*m);
+		float V2 = k / (m*V1);
 
-		T1 = -(g + h*V1) / (i + j*V1);
-		T2 = -(g + h*V2) / (i + j*V2);
+		float T1 = -(g + h*V1) / (i + j*V1);
+		float T2 = -(g + h*V2) / (i + j*V2);
 
-		U1 = -(c.Dot(e) + c.Dot(f)*V1) / (d.Dot(e) + d.Dot(f)*V1);
-		U2 = -(c.Dot(e) + c.Dot(f)*V2) / (d.Dot(e) + d.Dot(f)*V2);
+		float U1 = -(c.Dot(e) + c.Dot(f)*V1) / (d.Dot(e) + d.Dot(f)*V1);
+		float U2 = -(c.Dot(e) + c.Dot(f)*V2) / (d.Dot(e) + d.Dot(f)*V2);
 
 		int nSolutions = 0;
 		if (V1 >= -eps && T1 >= -eps && U1 >= -eps && V1 <= 1.f + eps && T1 <= 1.f + eps && U1 <= 1.f + eps)
@@ -1084,14 +1082,14 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 	TIMING_TICK(
 		tick_t tz = Clock::Tick();
-		unsigned long long numSpatialStrips = 0;
-		int prevEdgeEnd = -1);
+		unsigned long long numSpatialStrips = 0);
 
 	// The currently best variant for establishing a spatially coherent traversal order.
 	std::vector<int> spatialFaceOrder;
 	std::vector<int> spatialEdgeOrder;
 	LCG rng(123);
 	{ // Explicit scope for variables that are not needed after this.
+		TIMING_TICK(int prevEdgeEnd = -1);
 		std::vector<std::pair<int, int> > traverseStackEdges;
 		std::vector<unsigned int> visitedEdges(edges.size());
 		std::vector<unsigned int> visitedFaces(convexHull.f.size());
@@ -1759,12 +1757,11 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		// Find two edges on the face. Since we have flexibility to choose from multiple edges of the same face,
 		// choose two that are possibly most opposing to each other, in the hope that their sets of sidepodal
 		// edges are most mutually exclusive as possible, speeding up the search below.
-		int v0, v1;
 		int e1 = -1;
-		v0 = convexHull.f[i].v.back();
+		int v0 = convexHull.f[i].v.back();
 		for(size_t j = 0; j < convexHull.f[i].v.size(); ++j)
 		{
-			v1 = convexHull.f[i].v[j];
+			int v1 = convexHull.f[i].v[j];
 			int e = vertexPairsToEdges[v0*convexHull.v.size()+v1];
 			if (!IS_INTERNAL_EDGE(e))
 			{
