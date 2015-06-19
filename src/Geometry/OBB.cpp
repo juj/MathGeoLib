@@ -1886,6 +1886,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 		minOBB.axis[2] = -minOBB.axis[2];
 #ifdef MATH_VEC_IS_FLOAT4
 	minOBB.r.w = 0.f;
+	minOBB.pos.w = 1.f;
 #endif
 	delete[] sidepodalVertices;
 	delete[] vertexPairsToEdges;
