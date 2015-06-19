@@ -93,6 +93,7 @@ static const __m128i zerochar = _mm_set1_epi8('0');
 #pragma intrinsic(_BitScanForward)
 #endif
 
+#ifdef MATH_SSE41
 // Warning: This is about 5 times slower than the C version! Better to just use the C version.
 int U32ToString_SSE(u32 i, char *str)
 {
@@ -170,6 +171,7 @@ BENCHMARK(U32ToString_SSE, "SSE uint -> string conversion")
 	U32ToString_SSE((u32)pseudoRandom, int_to_string);
 }
 BENCHMARK_END;
+#endif
 
 #endif
 
