@@ -1351,8 +1351,8 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 //						sidepodalVertices[i].insert(edges[edge].second);
 						if ((int)i != edge)
 						{
-							vec f2a = faceNormals[facesForEdge[edge].first];
-							vec f2b = faceNormals[facesForEdge[edge].second];
+//							vec f2a = faceNormals[facesForEdge[edge].first];
+//							vec f2b = faceNormals[facesForEdge[edge].second];
 
 							if (!IS_INTERNAL_EDGE(edge))
 								compatibleEdges[edge].push_back((int)i);
@@ -1436,7 +1436,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 		vec deadDirection = (f1a+f1b)*0.5f;
 
-		vec e1 = (vec(convexHull.v[edges[i].first]) - vec(convexHull.v[edges[i].second])).Normalized();
+//		vec e1 = (vec(convexHull.v[edges[i].first]) - vec(convexHull.v[edges[i].second])).Normalized();
 
 		const std::vector<int> &compatibleEdgesI = compatibleEdges[i];
 
