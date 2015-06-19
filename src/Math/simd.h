@@ -153,6 +153,29 @@ static inline __m128 rsqrt_ps(__m128 x)
 #ifdef MATH_SSE2
 #define set_ps_hex(w, z, y, x) _mm_castsi128_ps(_mm_set_epi32(w, z, y, x))
 #define set1_ps_hex(x) _mm_castsi128_ps(_mm_set1_epi32(x))
+#elif defined(__EMSCRIPTEN__)
+// Workaround a JS engine limitation that it's not possible to store arbitrary bit patterns in floats since JS engines destroy them while canonicalizing NaNs.
+FORCE_INLINE __m128 set_ps_hex(u32 w, u32 z, u32 y, u32 x)
+{
+	union {
+		u32 v[4];
+		__m128 m;
+	} u;
+	u.v[0] = x;
+	u.v[1] = y;
+	u.v[2] = z;
+	u.v[3] = w;
+	return u.m;
+}
+FORCE_INLINE __m128 set1_ps_hex(u32 x)
+{
+	union {
+		u32 v[4];
+		__m128 m;
+	} u;
+	u.v[0] = u.v[1] = u.v[2] = u.v[3] = x;
+	return u.m;
+}
 #else
 #define set_ps_hex(w, z, y, x) _mm_set_ps(ReinterpretAsFloat(w), ReinterpretAsFloat(z), ReinterpretAsFloat(y), ReinterpretAsFloat(x))
 #define set1_ps_hex(x) _mm_set1_ps(ReinterpretAsFloat(x))
@@ -365,9 +388,8 @@ FORCE_INLINE simd4f cmov_ps(simd4f a, simd4f b, simd4f mask)
 #endif
 }
 
-static const float andMaskOneF = ReinterpretAsFloat(0xFFFFFFFFU);
 /// A SSE mask register with x = y = z = 0xFFFFFFFF and w = 0x0.
-static const simd4f sseMaskXYZ = set_ps(0.f, andMaskOneF, andMaskOneF, andMaskOneF);
+static const simd4f sseMaskXYZ = set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU);
 static const simd4f sseSignMask3 = set_ps(0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
 static const simd4f sseSignMask = set_ps(-0.f, -0.f, -0.f, -0.f); // -0.f = 1 << 31
 #ifdef MATH_AVX

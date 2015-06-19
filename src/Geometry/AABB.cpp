@@ -952,7 +952,7 @@ bool AABB::Intersects(const AABB &aabb) const
 	simd4f a = cmpge_ps(minPoint.v, aabb.maxPoint.v);
 	simd4f b = cmpge_ps(aabb.minPoint.v, maxPoint.v);
 	a = or_ps(a, b);
-	a = and_ps(a, set_ps_hex(0, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)); // Mask off results from the W channel.
+	a = and_ps(a, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
 	return _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(a)) != 0;
 #else
 	// Benchmark 'AABBIntersectsAABB_positive': AABB::Intersects(AABB) positive

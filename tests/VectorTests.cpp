@@ -94,10 +94,11 @@ TEST(Float4Normalized3)
 {
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float4 f2 = f.Normalized3();
-	assert(EqualAbs(f2.x, -1.f / Sqrt(14.f)));
+	assert4(EqualAbs(f2.x, -1.f / Sqrt(14.f)), f, f2, -1.f / Sqrt(14.f), f2.LengthSq3());
 	assert(EqualAbs(f2.y, 2.f / Sqrt(14.f)));
 	assert(EqualAbs(f2.z, 3.f / Sqrt(14.f)));
 	assert(EqualAbs(f2.w, 1000.f));
+	assert1(EqualAbs(f2.LengthSq3(), 1.f), f2.LengthSq3());
 }
 
 TEST(Float4Normalize4)
