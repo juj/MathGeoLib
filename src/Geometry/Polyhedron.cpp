@@ -3188,11 +3188,12 @@ void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceSt
 	}
 }
 
+struct edge { int v0, v1, f0, f1; };
+
 void Polyhedron::ToLineList(VertexBuffer &vb) const
 {
 	std::map<std::pair<int, int>, int> edgesToFaces;
 
-	struct edge { int v0, v1, f0, f1; };
 	std::vector<edge> edges;
 	for (size_t i = 0; i < f.size(); ++i)
 	{
@@ -3202,7 +3203,7 @@ void Polyhedron::ToLineList(VertexBuffer &vb) const
 		{
 			int v1 = fc.v[j];
 			std::pair<int, int> e = std::make_pair(v0, v1);
-			auto iter = edgesToFaces.find(e);
+			std::map<std::pair<int, int>, int>::iterator iter = edgesToFaces.find(e);
 			if (iter == edgesToFaces.end())
 				edgesToFaces[std::make_pair(v1, v0)] = (int)i;
 			else
