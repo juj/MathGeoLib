@@ -1595,7 +1595,7 @@ int LexFloat3Cmp(const vec &a, const vec &b)
 	LEX_ORDER(a.x, b.x);
 	return 0;
 }
-int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*(const vec*)a, *(const vec*)b); }
+int LexFloat3CmpV(const void *a, const void *b) { return LexFloat3Cmp(*reinterpret_cast<const vec*>(a), *reinterpret_cast<const vec*>(b)); }
 
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 {
@@ -1611,7 +1611,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints)
 #define C_LOG(...) ((void)0)
 #endif
 
-struct Tri { int v[3]; int faceIndex; };
+//struct Tri { int v[3]; int faceIndex; };
 
 Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng)
 {
@@ -1923,8 +1923,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				C_LOG("Traversing edge %d->%d which belongs to face %d, and edge %d->%d belongs to face %d",
 					v0, v1, edgesToFaces[std::make_pair(v0, v1)],
 					v1, v0, edgesToFaces[std::make_pair(v1, v0)]);
-				std::pair<int,int> eii = std::make_pair(v0, v1);
-				assert(edgesToFaces[eii] == fi);
+				assert(edgesToFaces[std::make_pair(v0, v1)] == fi);
 				assert(adjFace != fi);
 
 				bool adjFaceIsInConflict = (conflictingFaces.find(adjFace) != conflictingFaces.end());
@@ -2025,7 +2024,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			prev = boundaryEdges[i];
 		}
 
+#if 0
 		std::vector<Tri> degenerateTris;
+#endif
 
 		size_t oldNumFaces = p.f.size();
 		// Create new faces to close the boundary.
@@ -3203,11 +3204,11 @@ void Polyhedron::ToLineList(VertexBuffer &vb) const
 			std::pair<int, int> e = std::make_pair(v0, v1);
 			auto iter = edgesToFaces.find(e);
 			if (iter == edgesToFaces.end())
-				edgesToFaces[std::make_pair(v1, v0)] = i;
+				edgesToFaces[std::make_pair(v1, v0)] = (int)i;
 			else
 			{
 				int f0 = iter->second;
-				int f1 = i;
+				int f1 = (int)i;
 				edge e = { v0, v1, f0, f1 };
 				edges.push_back(e);
 			}
