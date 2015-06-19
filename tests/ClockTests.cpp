@@ -49,7 +49,9 @@ UNIQUE_TEST(SubMillisecondPrecision)
 
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
 	MARK_UNUSED(ticksPerMillisecond);
-	assert(ticksPerMillisecond > 1);
+#ifndef MATH_TICK_IS_FLOAT
+	assert1(ticksPerMillisecond > 1, (u32)ticksPerMillisecond);
+#endif
 
 	tick_t minDiff = Clock::TicksPerSec();
 	tick_t prev = Clock::Tick();
