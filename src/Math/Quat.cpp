@@ -419,7 +419,7 @@ void Quat::ToAxisAngle(float4 &axis, float &angle) const
 
 void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
 	SetFromAxisAngle(load_vec3(axis.ptr(), 0.f), angle);
 #else
 	assume1(axis.IsNormalized(), axis);
