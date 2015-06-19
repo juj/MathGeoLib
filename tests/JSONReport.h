@@ -30,6 +30,7 @@ public:
 
 	static std::string CompilerIdentifier() // http://sourceforge.net/p/predef/wiki/Compilers/
 	{
+		char str[2048];
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:6326) // C6326: potential comparison of a constant with another constant http://msdn.microsoft.com/en-us/library/tz3zbzw6.aspx
@@ -47,23 +48,19 @@ public:
 			case 1800: return "VS2013";
 			default:
 			{
-				char str[256];
 				sprintf(str, "MSVC ver. %d", _MSC_VER);
 				return str;
 			}
 		}
 #pragma warning(pop)
 #elif defined(EMSCRIPTEN)
-		char str[256];
 		std::string browserVersion = GetOSDisplayString();
 		sprintf(str, "%s, Clang %s", browserVersion.c_str(), __clang_version__);
 		return str;
 #elif defined(__clang__)
-		char str[256];
 		sprintf(str, "Clang %s", __clang_version__);
 		return str;
 #elif defined(__GNUC__)
-		char str[256];
 		const char *prefix = "";
 #if defined(__MINGW32__)
 		prefix = "MinGW ";
