@@ -62,7 +62,13 @@
 #include "../Math/float4d.h"
 typedef float4d cv;
 typedef double cs;
+
+#if defined(_MSC_VER) && defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
+typedef std::vector<double4_storage, AlignedAllocator<double4_storage, 16> > VecdArray;
+#else
 typedef std::vector<float4d> VecdArray;
+#endif
+
 #else
 typedef vec cv;
 typedef float cs;
@@ -1741,10 +1747,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 //	faceAdjacency[1].push_back(2); faceAdjacency[1].push_back(3); faceAdjacency[1].push_back(0);
 //	faceAdjacency[2].push_back(1); faceAdjacency[2].push_back(3); faceAdjacency[2].push_back(0);
 //	faceAdjacency[3].push_back(1); faceAdjacency[3].push_back(2); faceAdjacency[3].push_back(0);
-	faceNormals[0] = DIR_TO_FLOAT4(p.FaceNormal(0));
-	faceNormals[1] = DIR_TO_FLOAT4(p.FaceNormal(1));
-	faceNormals[2] = DIR_TO_FLOAT4(p.FaceNormal(2));
-	faceNormals[3] = DIR_TO_FLOAT4(p.FaceNormal(3));
+	faceNormals[0] = cv(DIR_TO_FLOAT4(p.FaceNormal(0)));
+	faceNormals[1] = cv(DIR_TO_FLOAT4(p.FaceNormal(1)));
+	faceNormals[2] = cv(DIR_TO_FLOAT4(p.FaceNormal(2)));
+	faceNormals[3] = cv(DIR_TO_FLOAT4(p.FaceNormal(3)));
 
 #ifdef HAS_UNORDERED_MAP
 	std::unordered_map<std::pair<int, int>, int, hash_edge> edgesToFaces;
@@ -2815,16 +2821,16 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 			{
 				int vtx = face.v[j];
 				if (conservativeEnclose)
-					d = Max(d, faceNormals[i].Dot(POINT_TO_FLOAT4(vec(v[vtx]))));
+					d = Max(d, cv(faceNormals[i]).Dot(POINT_TO_FLOAT4(vec(v[vtx]))));
 				else
-					d += faceNormals[i].Dot(POINT_TO_FLOAT4(vec(v[vtx])));
+					d += cv(faceNormals[i]).Dot(POINT_TO_FLOAT4(vec(v[vtx])));
 			}
 			if (!conservativeEnclose)
 				d /= (cs)face.v.size();
 			for(size_t j = 0; j < face.v.size(); ++j)
 			{
 				cv vtx = POINT_TO_FLOAT4(vec(v[face.v[j]]));
-				v[face.v[j]] = FLOAT4_TO_POINT((vtx + (d - faceNormals[i].Dot(vtx)) * faceNormals[i]).ToFloat4());
+				v[face.v[j]] = FLOAT4_TO_POINT((vtx + (d - cv(faceNormals[i]).Dot(vtx)) * cv(faceNormals[i])).ToFloat4());
 			}
 		}
 	}
