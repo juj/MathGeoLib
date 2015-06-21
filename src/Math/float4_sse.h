@@ -18,6 +18,7 @@
 #pragma once
 
 #include "../MathBuildConfig.h"
+#include "float4.h"
 
 #ifdef MATH_SSE
 
@@ -173,4 +174,44 @@ FORCE_INLINE simd4f vec4_safe_normalize3(simd4f vec, simd4f &outLength)
 	return cmov_ps(vec, normalized, sseMaskXYZ); // Return the original .w component to the vector (this function is supposed to preserve original .w).
 }
 
+#ifdef MATH_SSE2
+
+FORCE_INLINE simd2d sum_xy_pd(simd2d m)
+{
+	return add_pd(m, yx_pd(m));
+}
+
+FORCE_INLINE simd2d dot2_pd(simd2d a, simd2d b)
+{
+#ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dppd (dot product) instruction, _mm_dp_pd intrinsic.
+	return _mm_dp_pd(a, b, 0xFF); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
+#else // Otherwise, use SSE2 with individual shuffling.
+	return sum_xy_pd(mul_pd(a, b));
 #endif
+}
+
+FORCE_INLINE simd2d dot4_pd(const simd2d *a, const simd2d *b) // a and b are arrays of two simd2d elements
+{
+	return add_pd(dot2_pd(a[0], b[0]), dot2_pd(a[1], b[1]));
+}
+
+FORCE_INLINE void cross_pd(simd2d *dst, const simd2d *a, const simd2d *b)
+{
+	simd2d a_zy = _mm_shuffle_pd(a[0], a[1], _MM_SHUFFLE2(0, 1));
+	simd2d b_xz = _mm_shuffle_pd(b[1], b[0], _MM_SHUFFLE2(0, 0));
+	simd2d x1 = mul_pd(a_zy, b_xz);
+	simd2d a_xz = _mm_shuffle_pd(a[1], a[0], _MM_SHUFFLE2(0, 0));
+	simd2d b_zy = _mm_shuffle_pd(b[0], b[1], _MM_SHUFFLE2(0, 1));
+	simd2d x2 = mul_pd(a_xz, b_zy);
+	dst[0] = sub_pd(x1, x2);
+
+	simd2d x = a[0];
+	simd2d y = yy_pd(a[0]);
+	simd2d b_x = b[0];
+	simd2d b_y = yy_pd(b[0]);
+	simd2d x3 = sub_pd(mul_pd(x, b_y), mul_pd(y, b_x));
+	dst[1] = _mm_set_sd(s2d_x(x3)); // Zero out the higher component to get w=0.
+}
+#endif // ~MATH_SSE2
+
+#endif // ~MATH_SSE
