@@ -108,7 +108,13 @@ static const simd2d simd2dSignBit = set1_pd(-0.f); // -0.f = 1 << 31
 #define store_pd _mm_store_pd
 #define loadu_pd _mm_loadu_pd
 #define load_pd _mm_load_pd
+#ifdef MATH_SSE3
+// _mm_loaddup_pd == movddup, single instruction
+#define load1_pd _mm_loaddup_pd
+#else
+// _mm_load1_pd == movaps + shuffle, two instructions
 #define load1_pd _mm_load1_pd
+#endif
 #define stream_pd _mm_stream_pd
 #define neg_pd(x) xor_pd((x), simd2dSignBit)
 
