@@ -105,7 +105,12 @@ static const simd2d simd2dSignBit = set1_pd(-0.f); // -0.f = 1 << 31
 
 #define shuffle1_pd(reg, shuffle) _mm_shuffle_pd((reg), (reg), (shuffle))
 #define xx_pd(x) _mm_unpacklo_pd((x), (x))
+#ifdef MATH_SSE3
+// _mm_movedup_pd is better than _mm_unpackhi_pd, since it does not destroy the source operand (under non-AVX).
+#define yy_pd(x) _mm_movedup_pd((x))
+#else
 #define yy_pd(x) _mm_unpackhi_pd((x), (x))
+#endif
 #define yx_pd(x) shuffle1_pd((x), _MM_SHUFFLE2(0, 1))
 #endif
 
