@@ -10,6 +10,10 @@
 
 #define GUARDBAND 1e-2f
 
+#ifdef MATH_ENABLE_NAMESPACE
+using namespace MATH_NS;
+#endif
+
 extern LCG rng;
 
 enum TestResult

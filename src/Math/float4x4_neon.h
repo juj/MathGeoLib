@@ -24,6 +24,8 @@
 #include "float4_neon.h"
 #include "float4x4_sse.h"
 
+MATH_BEGIN_NAMESPACE
+
 #if !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 // Multiplies mat * vec, where mat is a matrix in row-major format.
 FORCE_INLINE simd4f mat4x4_mul_vec4(const simd4f *mat, simd4f vec)
@@ -257,5 +259,7 @@ FORCE_INLINE void mat4x4_negate(simd4f *out, const simd4f *mat)
 	out[3] = negate_ps(mat[3]);
 #endif
 }
+
+MATH_END_NAMESPACE
 
 #endif

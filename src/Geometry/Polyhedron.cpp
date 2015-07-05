@@ -60,6 +60,11 @@
 
 #ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
 #include "../Math/float4d.h"
+#endif
+
+MATH_BEGIN_NAMESPACE
+
+#ifdef MATH_CONVEXHULL_DOUBLE_PRECISION
 typedef float4d cv;
 typedef double cs;
 
@@ -74,8 +79,6 @@ typedef vec cv;
 typedef float cs;
 typedef VecArray VecdArray;
 #endif
-
-MATH_BEGIN_NAMESPACE
 
 void Polyhedron::Face::FlipWindingOrder()
 {

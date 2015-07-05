@@ -17,9 +17,13 @@
 	@brief A double-precision 4-wide vector. */
 #pragma once
 
+#include "../MathBuildConfig.h"
+
 #include "../MathGeoLibFwd.h"
 #include "float4_sse.h"
 #include "MathFunc.h"
+
+MATH_BEGIN_NAMESPACE
 
 class ALIGN16 float4d
 {
@@ -209,3 +213,5 @@ struct double4_storage
 	}
 	operator float4d() const { return *reinterpret_cast<const float4d*>(this); }
 };
+
+MATH_END_NAMESPACE

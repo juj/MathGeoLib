@@ -26,6 +26,8 @@
 
 #include "float4_sse.h"
 
+MATH_BEGIN_NAMESPACE
+
 #ifdef ANDROID
 FORCE_INLINE void vec4_add_float_asm(const void *vec, float f, void *out)
 {
@@ -318,5 +320,7 @@ FORCE_INLINE simd4f vec4_lerp(simd4f a, simd4f b, float t)
 {
 	return vec4_lerp(a, b, set1_ps(t));
 }
+
+MATH_END_NAMESPACE
 
 #endif // ~MATH_SIMD

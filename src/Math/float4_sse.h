@@ -25,6 +25,8 @@
 #include "MathTypes.h"
 #include "SSEMath.h"
 
+MATH_BEGIN_NAMESPACE
+
 // Input: [w,z,y,x], Output: x+y+z in all four channels.
 FORCE_INLINE simd4f sum_xyz_ps(simd4f m)
 {
@@ -213,5 +215,7 @@ FORCE_INLINE void cross_pd(simd2d *dst, const simd2d *a, const simd2d *b)
 	dst[1] = _mm_set_sd(s2d_x(x3)); // Zero out the higher component to get w=0.
 }
 #endif // ~MATH_SSE2
+
+MATH_END_NAMESPACE
 
 #endif // ~MATH_SSE

@@ -61,6 +61,11 @@
 
 #ifdef MATH_ENCLOSINGOBB_DOUBLE_PRECISION
 #include "../Math/float4d.h"
+#endif
+
+MATH_BEGIN_NAMESPACE
+
+#ifdef MATH_ENCLOSINGOBB_DOUBLE_PRECISION
 typedef float4d cv;
 typedef double cs;
 typedef std::vector<float4d> VecdArray;
@@ -69,8 +74,6 @@ typedef vec cv;
 typedef float cs;
 typedef VecArray VecdArray;
 #endif
-
-MATH_BEGIN_NAMESPACE
 
 OBB::OBB(const vec &pos, const vec &r, const vec &axis0, const vec &axis1, const vec &axis2)
 :pos(pos), r(r)
