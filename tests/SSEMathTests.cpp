@@ -445,22 +445,6 @@ RANDOMIZED_TEST(mat4x4_mul_sse)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(mat4x4_mul_sse_2, "test against float4x4_op_mul")
-{
-	mat4x4_mul_sse_2(m2[i].row, m[0].row, m[i].row);
-}
-BENCHMARK_END;
-
-RANDOMIZED_TEST(mat4x4_mul_sse_2)
-{
-	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
-	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
-	float4x4 res;
-	mat4x4_mul_sse_2(res.row, m.row, m2.row);
-	float4x4 res2 = m*m2;
-	assert(res.Equals(res2));
-}
-
 #endif
 
 BENCHMARK(float3_LengthSq, "float3::LengthSq")
