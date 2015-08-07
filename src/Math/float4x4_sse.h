@@ -303,12 +303,88 @@ FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 
 //	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
 }
 
+#ifdef MATH_FMA
+FORCE_INLINE void mat4x4_mul_fma(__m128 *out, const __m128 *m1, const __m128 *m2)
+{
+#ifdef MATH_64BIT // In 64-bit, we have lots of SIMD registers, so use as many as possible.
+// 64-bit, SSE4.1, FMA:
+// Benchmark 'mat4x4_mul_fma': test against float4x4_op_mul
+//   Best: 5.019 nsecs / 16.068 ticks, Avg: 5.320 nsecs, Worst: 7.362 nsecs
+	__m128 m1_0 = m1[0];
+	__m128 m1_1 = m1[1];
+	__m128 m1_2 = m1[2];
+	__m128 m1_3 = m1[3];
+	__m128 m = m2[0];
+	__m128 o1 = _mm_mul_ps(xxxx_ps(m1_0), m);
+	__m128 o2 = _mm_mul_ps(xxxx_ps(m1_1), m);
+	__m128 o3 = _mm_mul_ps(xxxx_ps(m1_2), m);
+	__m128 o4 = _mm_mul_ps(xxxx_ps(m1_3), m);
+	m = m2[1];
+	o1 = _mm_fmadd_ps(yyyy_ps(m1_0), m, o1);
+	o2 = _mm_fmadd_ps(yyyy_ps(m1_1), m, o2);
+	o3 = _mm_fmadd_ps(yyyy_ps(m1_2), m, o3);
+	o4 = _mm_fmadd_ps(yyyy_ps(m1_3), m, o4);
+	m = m2[2];
+	o1 = _mm_fmadd_ps(zzzz_ps(m1_0), m, o1);
+	o2 = _mm_fmadd_ps(zzzz_ps(m1_1), m, o2);
+	o3 = _mm_fmadd_ps(zzzz_ps(m1_2), m, o3);
+	o4 = _mm_fmadd_ps(zzzz_ps(m1_3), m, o4);
+	m = m2[3];
+	out[0] = _mm_fmadd_ps(wwww_ps(m1_0), m, o1);
+	out[1] = _mm_fmadd_ps(wwww_ps(m1_1), m, o2);
+	out[2] = _mm_fmadd_ps(wwww_ps(m1_2), m, o3);
+	out[3] = _mm_fmadd_ps(wwww_ps(m1_3), m, o4);
+#else // Targeting 32-bit, use as few registers as possible to avoid spilling.
+// 32-bit, SSE4.1:
+// Benchmark 'mat4x4_mul_fma': test against float4x4_op_mul
+//   Best: 6.358 nsecs / 19.42 ticks, Avg: 6.461 nsecs, Worst: 9.369 nsecs
+	out[0] = _mm_fmadd_ps(wwww_ps(m1[0]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[0]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[0]), m2[1], _mm_mul_ps(xxxx_ps(m1[0]), m2[0]))));
+	out[1] = _mm_fmadd_ps(wwww_ps(m1[1]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[1]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[1]), m2[1], _mm_mul_ps(xxxx_ps(m1[1]), m2[0]))));
+	out[2] = _mm_fmadd_ps(wwww_ps(m1[2]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[2]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[2]), m2[1], _mm_mul_ps(xxxx_ps(m1[2]), m2[0]))));
+	out[3] = _mm_fmadd_ps(wwww_ps(m1[3]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[3]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[3]), m2[1], _mm_mul_ps(xxxx_ps(m1[3]), m2[0]))));
+#endif
+}
+#endif
+
 FORCE_INLINE void mat4x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
+#ifdef MATH_64BIT // In 64-bit, we have lots of SIMD registers, so use as many as possible.
+// 64-bit, SSE4.1:
+// Benchmark 'mat4x4_mul_sse': test against float4x4_op_mul
+//   Best: 5.354 nsecs / 17.144 ticks, Avg: 5.672 nsecs, Worst: 6.023 nsecs
+	__m128 m1_0 = m1[0];
+	__m128 m1_1 = m1[1];
+	__m128 m1_2 = m1[2];
+	__m128 m1_3 = m1[3];
+	__m128 m = m2[0];
+	__m128 o1 = _mm_mul_ps(xxxx_ps(m1_0), m);
+	__m128 o2 = _mm_mul_ps(xxxx_ps(m1_1), m);
+	__m128 o3 = _mm_mul_ps(xxxx_ps(m1_2), m);
+	__m128 o4 = _mm_mul_ps(xxxx_ps(m1_3), m);
+	m = m2[1];
+	o1 = add_ps(mul_ps(yyyy_ps(m1_0), m), o1);
+	o2 = add_ps(mul_ps(yyyy_ps(m1_1), m), o2);
+	o3 = add_ps(mul_ps(yyyy_ps(m1_2), m), o3);
+	o4 = add_ps(mul_ps(yyyy_ps(m1_3), m), o4);
+	m = m2[2];
+	o1 = add_ps(mul_ps(zzzz_ps(m1_0), m), o1);
+	o2 = add_ps(mul_ps(zzzz_ps(m1_1), m), o2);
+	o3 = add_ps(mul_ps(zzzz_ps(m1_2), m), o3);
+	o4 = add_ps(mul_ps(zzzz_ps(m1_3), m), o4);
+	m = m2[3];
+	out[0] = add_ps(mul_ps(wwww_ps(m1_0), m), o1);
+	out[1] = add_ps(mul_ps(wwww_ps(m1_1), m), o2);
+	out[2] = add_ps(mul_ps(wwww_ps(m1_2), m), o3);
+	out[3] = add_ps(mul_ps(wwww_ps(m1_3), m), o4);
+#else // Targeting 32-bit, use as few registers as possible to avoid spilling.
+// 32-bit, SSE4.1:
+// Benchmark 'mat4x4_mul_sse': test against float4x4_op_mul
+//   Best: 6.692 nsecs / 21.34 ticks, Avg: 7.104 nsecs, Worst: 9.704 nsecs
 	out[0] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[0]), m2[0]), _mm_mul_ps(yyyy_ps(m1[0]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[0]), m2[2]), _mm_mul_ps(wwww_ps(m1[0]), m2[3])));
 	out[1] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[1]), m2[0]), _mm_mul_ps(yyyy_ps(m1[1]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[1]), m2[2]), _mm_mul_ps(wwww_ps(m1[1]), m2[3])));
 	out[2] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[2]), m2[0]), _mm_mul_ps(yyyy_ps(m1[2]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[2]), m2[2]), _mm_mul_ps(wwww_ps(m1[2]), m2[3])));
 	out[3] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[3]), m2[0]), _mm_mul_ps(yyyy_ps(m1[3]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[3]), m2[2]), _mm_mul_ps(wwww_ps(m1[3]), m2[3])));
+#endif
 }
 
 inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)

@@ -231,6 +231,14 @@ if (COMPILER_IS_GCC)
 	endif()
 endif()
 
+if (MATH_FMA3)
+	add_definitions(-DMATH_FMA)
+	if (IS_GCC_LIKE)
+		# http://gcc.gnu.org/onlinedocs/gcc-4.8.2/gcc/i386-and-x86-64-Options.html#i386-and-x86-64-Options
+		add_definitions(-mfma)
+	endif()
+endif()
+
 if (MATH_AVX)
 	add_definitions(-DMATH_AVX)
 	if (MSVC)

@@ -189,3 +189,8 @@ class VertexBuffer;
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <iosfwd>
 #endif
+
+#if defined(_M_X64) || defined(__x86_64__)
+// Are we targeting a 64-bit build?
+#define MATH_64BIT
+#endif

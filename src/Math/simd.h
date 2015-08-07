@@ -63,7 +63,8 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define neg_ps(x) xor_ps((x), simd4fSignBit)
 
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
-/// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2.
+/// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2. This has the advantage of not destroying the input operand, but the disadvantage is that it requires a
+/// float->int->float pipe transition, which costs a clock cycle. Profiling shows this to be a very small win.
 #define shuffle1_ps(reg, shuffle) _mm_castsi128_ps(_mm_shuffle_epi32(_mm_castps_si128((reg)), (shuffle)))
 #else // We only have SSE 1, so must use the slightly worse shufps instruction, which always destroys the input operand - or we have AVX where we can use this operation without destroying input
 #define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((simd4f)(reg), (simd4f)(reg), (shuffle))

@@ -429,6 +429,24 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_3)
 	assert(res.Equals(res2));
 }
 
+#ifdef MATH_FMA
+BENCHMARK(mat4x4_mul_fma, "test against float4x4_op_mul")
+{
+	mat4x4_mul_fma(m2[i].row, m[0].row, m[i].row);
+}
+BENCHMARK_END;
+
+RANDOMIZED_TEST(mat4x4_mul_fma)
+{
+	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 m2 = float4x4::RandomGeneral(rng, -10.f, 10.f);
+	float4x4 res;
+	mat4x4_mul_fma(res.row, m.row, m2.row);
+	float4x4 res2 = m*m2;
+	assert(res.Equals(res2));
+}
+#endif
+
 BENCHMARK(mat4x4_mul_sse, "test against float4x4_op_mul")
 {
 	mat4x4_mul_sse(m2[i].row, m[0].row, m[i].row);
