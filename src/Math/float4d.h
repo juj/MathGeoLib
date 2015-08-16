@@ -112,7 +112,7 @@ public:
 #endif
 	}
 
-	double Normalize()
+	double Normalize4()
 	{
 #if defined(MATH_SSE2) && defined(MATH_AUTOMATIC_SSE)
 		simd2d len = dot4_pd(v, v);
@@ -122,13 +122,24 @@ public:
 		v[1] = mul_pd(v[1], recipLen);
 		return s2d_x(len);
 #else
-		double len = sqrt(x*x + y*y + z*z);
+		double len = sqrt(x*x + y*y + z*z + w*w);
 		double recipLen = 1.0 / len;
 		x *= recipLen;
 		y *= recipLen;
 		z *= recipLen;
 		return len;
 #endif
+	}
+  double Normalize() { return Normalize4(); }
+
+ 	double Normalize3()
+	{
+		double len = sqrt(x*x + y*y + z*z);
+		double recipLen = 1.0 / len;
+		x *= recipLen;
+		y *= recipLen;
+		z *= recipLen;
+		return len;
 	}
 
 	bool IsFinite() const
