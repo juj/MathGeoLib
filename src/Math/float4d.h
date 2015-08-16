@@ -127,6 +127,7 @@ public:
 		x *= recipLen;
 		y *= recipLen;
 		z *= recipLen;
+		w *= recipLen;
 		return len;
 #endif
 	}
