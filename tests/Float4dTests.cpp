@@ -75,11 +75,18 @@ RANDOMIZED_TEST(Float4dCross_random)
 	assert(float4d(f3).Equals(d3));
 }
 
-TEST(Float4dDistanceSq4)
+TEST(Float4dDistance4Sq)
 {
 	float4d f(1.f, 2.f, 3.f, 4.f);
 	float4d f2(-1.f, -2.f, -3.f, -4.f);
-	assert(EqualAbs((float)f.DistanceSq(f2), 120.f));
+	assert(EqualAbs((float)f.Distance4Sq(f2), 120.f));
+}
+
+TEST(Float4dDistance3Sq)
+{
+	float4d f(1.f, 2.f, 3.f, 4.f);
+	float4d f2(-1.f, -2.f, -3.f, -4.f);
+	assert(EqualAbs((float)f.Distance3Sq(f2), 56.f));
 }
 
 TEST(Float4dNormalize4)

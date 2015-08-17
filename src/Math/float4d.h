@@ -95,7 +95,7 @@ public:
 #endif
 	}
 
-	double DistanceSq(const float4d &rhs) const
+	double Distance4Sq(const float4d &rhs) const
 	{
 #if defined(MATH_SSE2) && defined(MATH_AUTOMATIC_SSE)
 		simd2d sub = sub_pd(v[0], rhs.v[0]);
@@ -108,8 +108,18 @@ public:
 		double dx = x - rhs.x;
 		double dy = y - rhs.y;
 		double dz = z - rhs.z;
-		return dx*dx + dy*dy + dz*dz;
+		double dw = w - rhs.w;
+		return dx*dx + dy*dy + dz*dz + dw*dw;
 #endif
+	}
+	double DistanceSq(const float4d &rhs) const { return Distance4Sq(rhs); }
+
+	double Distance3Sq(const float4d &rhs) const
+	{
+		double dx = x - rhs.x;
+		double dy = y - rhs.y;
+		double dz = z - rhs.z;
+		return dx*dx + dy*dy + dz*dz;
 	}
 
 	double Normalize4()
@@ -131,9 +141,9 @@ public:
 		return len;
 #endif
 	}
-  double Normalize() { return Normalize4(); }
+	double Normalize() { return Normalize4(); }
 
- 	double Normalize3()
+		double Normalize3()
 	{
 		double len = sqrt(x*x + y*y + z*z);
 		double recipLen = 1.0 / len;
