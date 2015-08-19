@@ -217,4 +217,14 @@ typedef __m128 simd4f;
 #define MATH_AUTOMATIC_SSE
 #endif
 
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
+// If true, SIMD optimizations are also applied to the float3 class.
+// It is slightly questionable whether this is a great idea, since if one
+// wants to use SIMD, one should always use the float4 class (or the vec type),
+// but benchmarking shows this to also be a slight win, even though the
+// unaligned loads and stores and shuffling that is involved. You might want to
+// try benchmarking the effect of this being enabled vs disabled.
+#define MATH_AUTOMATIC_SIMD_FLOAT3
+#endif
+
 #include "Math/MathTypes.h"

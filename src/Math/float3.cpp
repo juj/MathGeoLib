@@ -121,16 +121,32 @@ float4 float3::Swizzled(int i, int j, int k, int l) const
 
 float float3::LengthSq() const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	simd4f v = load_vec3(ptr(), 0.f);
+	return sum_xyz_float(mul_ps(v, v));
+#else
 	return x*x + y*y + z*z;
+#endif
 }
 
 float float3::Length() const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	simd4f v = load_vec3(ptr(), 0.f);
+	return s4f_x(sqrt_ps(sum_xyz_ps(mul_ps(v, v))));
+#else
 	return Sqrt(LengthSq());
+#endif
 }
 
 float float3::Normalize()
 {
+#if defined(MATH_AUTOMATIC_SIMD_FLOAT3) && defined(MATH_SSE)
+	simd4f origLength;
+	simd4f normalized = vec4_safe_normalize3(load_vec3(ptr(), 0.f), origLength);
+	store_vec3(ptr(), normalized);
+	return s4f_x(origLength);
+#else
 	assume(IsFinite());
 	float length = Length();
 	if (length > 1e-6f)
@@ -143,15 +159,24 @@ float float3::Normalize()
 		Set(1.f, 0.f, 0.f); // We will always produce a normalized vector.
 		return 0; // But signal failure, so user knows we have generated an arbitrary normalization.
 	}
+#endif
 }
 
 float3 float3::Normalized() const
 {
+#if defined(MATH_AUTOMATIC_SIMD_FLOAT3) && defined(MATH_SSE)
+	simd4f origLength;
+	simd4f normalized = vec4_safe_normalize3(load_vec3(ptr(), 0.f), origLength);
+	float3 copy;
+	store_vec3(copy.ptr(), normalized);
+	return copy;
+#else
 	float3 copy = *this;
 	float oldLength = copy.Normalize();
 	assume(oldLength > 0.f && "float3::Normalized() failed!");
 	MARK_UNUSED(oldLength);
 	return copy;
+#endif
 }
 
 float float3::ScaleToLength(float newLength)
@@ -363,37 +388,79 @@ int float3::MaxElementIndex() const
 
 float3 float3::Abs() const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), abs_ps(load_vec3(ptr(), 0.f)));
+	return copy;
+#else
 	return float3(MATH_NS::Abs(x), MATH_NS::Abs(y), MATH_NS::Abs(z));
+#endif
 }
 
 float3 float3::Neg() const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), neg_ps(load_vec3(ptr(), 0.f)));
+	return copy;
+#else
 	return float3(-x, -y, -z);
+#endif
 }
 
 float3 float3::Recip() const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), rcp_ps(load_vec3(ptr(), 0.f)));
+	return copy;
+#else
 	return float3(1.f/x, 1.f/y, 1.f/z);
+#endif
 }
 
 float3 float3::Min(float ceil) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), min_ps(load_vec3(ptr(), 0.f), set1_ps(ceil)));
+	return copy;
+#else
 	return float3(MATH_NS::Min(x, ceil), MATH_NS::Min(y, ceil), MATH_NS::Min(z, ceil));
+#endif
 }
 
 float3 float3::Min(const float3 &ceil) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), min_ps(load_vec3(ptr(), 0.f), load_vec3(ceil.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(MATH_NS::Min(x, ceil.x), MATH_NS::Min(y, ceil.y), MATH_NS::Min(z, ceil.z));
+#endif
 }
 
 float3 float3::Max(float floor) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), max_ps(load_vec3(ptr(), 0.f), set1_ps(floor)));
+	return copy;
+#else
 	return float3(MATH_NS::Max(x, floor), MATH_NS::Max(y, floor), MATH_NS::Max(z, floor));
+#endif
 }
 
 float3 float3::Max(const float3 &floor) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), max_ps(load_vec3(ptr(), 0.f), load_vec3(floor.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(MATH_NS::Max(x, floor.x), MATH_NS::Max(y, floor.y), MATH_NS::Max(z, floor.z));
+#endif
 }
 
 float3 float3::Clamp(const float3 &floor, const float3 &ceil) const
@@ -433,15 +500,25 @@ float3 float3::ClampLength(float minLength, float maxLength) const
 
 float float3::DistanceSq(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	simd4f d = sub_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f));
+	return s4f_x(mul_ps(d, d));
+#else
 	float dx = x - rhs.x;
 	float dy = y - rhs.y;
 	float dz = z - rhs.z;
 	return dx*dx + dy*dy + dz*dz;
+#endif
 }
 
 float float3::Distance(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	simd4f d = sub_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f));
+	return s4f_x(sqrt_ps(mul_ps(d, d)));
+#else
 	return Sqrt(DistanceSq(rhs));
+#endif
 }
 
 float float3::Distance(const Line &rhs) const { return rhs.Distance(POINT_VEC(*this)); }
@@ -456,7 +533,11 @@ float float3::Distance(const Capsule &rhs) const { return rhs.Distance(POINT_VEC
 
 float float3::Dot(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	return dot3_float(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f));
+#else
 	return x * rhs.x + y * rhs.y + z * rhs.z;
+#endif
 }
 
 /** dst = A x B - The standard cross product:
@@ -481,9 +562,15 @@ i x j == -(j x i) == k,
 (k x i) == -(i x k) == j. */
 float3 float3::Cross(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), cross_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(y * rhs.z - z * rhs.y,
 	              z * rhs.x - x * rhs.z,
 	              x * rhs.y - y * rhs.x);
+#endif
 }
 
 float3x3 float3::OuterProduct(const float3 &rhs) const
@@ -491,8 +578,8 @@ float3x3 float3::OuterProduct(const float3 &rhs) const
 	const float3 &u = *this;
 	const float3 &v = rhs;
 	return float3x3(u[0]*v[0], u[0]*v[1], u[0]*v[2],
-					u[1]*v[0], u[1]*v[1], u[1]*v[2],
-					u[2]*v[0], u[2]*v[1], u[2]*v[2]);
+	                u[1]*v[0], u[1]*v[1], u[1]*v[2],
+	                u[2]*v[0], u[2]*v[1], u[2]*v[2]);
 }
 
 float3 float3::Perpendicular(const float3 &hint, const float3 &hint2) const
@@ -520,7 +607,7 @@ float3 float3::AnotherPerpendicular(const float3 &hint, const float3 &hint2) con
 
 void float3::PerpendicularBasis(float3 &outB, float3 &outC) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SIMD_FLOAT3) && defined(MATH_SSE)
 	simd4f v = load_vec3(&x, 0.f);
 	simd4f out1, out2;
 	basis_ps(v, &out1, &out2);
@@ -698,16 +785,24 @@ float3 MUST_USE_RESULT float3::FromScalar(float scalar)
 
 void float3::SetFromScalar(float scalar)
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), set1_ps(scalar));
+#else
 	x = scalar;
 	y = scalar;
 	z = scalar;
+#endif
 }
 
 void float3::Set(float x_, float y_, float z_)
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), set_ps(0.f, z_, y_, x_));
+#else
 	x = x_;
 	y = y_;
 	z = z_;
+#endif
 }
 
 void float3::SetFromSphericalCoordinates(float azimuth, float inclination, float radius)
@@ -823,98 +918,186 @@ float3 MUST_USE_RESULT float3::RandomBox(LCG &lcg, const float3 &minValues, cons
 
 float3 float3::operator +(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), add_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(x + rhs.x, y + rhs.y, z + rhs.z);
+#endif
 }
 
 float3 float3::operator -(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), sub_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(x - rhs.x, y - rhs.y, z - rhs.z);
+#endif
 }
 
 float3 float3::operator -() const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), neg_ps(load_vec3(ptr(), 0.f)));
+	return copy;
+#else
 	return float3(-x, -y, -z);
+#endif
 }
 
 float3 float3::operator *(float scalar) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), mul_ps(load_vec3(ptr(), 0.f), set1_ps(scalar)));
+	return copy;
+#else
 	return float3(x * scalar, y * scalar, z * scalar);
+#endif
 }
 
 float3 operator *(float scalar, const float3 &rhs)
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), mul_ps(load_vec3(rhs.ptr(), 0.f), set1_ps(scalar)));
+	return copy;
+#else
 	return float3(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z);
+#endif
 }
 
 float3 float3::operator /(float scalar) const
 {
 	float invScalar = 1.f / scalar;
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), mul_ps(load_vec3(ptr(), 0.f), set1_ps(invScalar)));
+	return copy;
+#else
 	return float3(x * invScalar, y * invScalar, z * invScalar);
+#endif
 }
 
 float3 &float3::operator +=(const float3 &rhs)
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), add_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+#else
 	x += rhs.x;
 	y += rhs.y;
 	z += rhs.z;
-
+#endif
 	return *this;
 }
 
 float3 &float3::operator -=(const float3 &rhs)
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), sub_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+#else
 	x -= rhs.x;
 	y -= rhs.y;
 	z -= rhs.z;
+#endif
 
 	return *this;
 }
 
 float3 &float3::operator *=(float scalar)
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), mul_ps(load_vec3(ptr(), 0.f), set1_ps(scalar)));
+#else
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;
+#endif
 
 	return *this;
 }
 
 float3 float3::Add(float scalar) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), add_ps(load_vec3(ptr(), 0.f), set1_ps(scalar)));
+	return copy;
+#else
 	return float3(x + scalar, y + scalar, z + scalar);
+#endif
 }
 
 float3 float3::Sub(float scalar) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), sub_ps(load_vec3(ptr(), 0.f), set1_ps(scalar)));
+	return copy;
+#else
 	return float3(x - scalar, y - scalar, z - scalar);
+#endif
 }
 
 float3 float3::SubLeft(float scalar) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), sub_ps(set1_ps(scalar), load_vec3(ptr(), 0.f)));
+	return copy;
+#else
 	return float3(scalar - x, scalar - y, scalar - z);
+#endif
 }
 
 float3 float3::Mul(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), mul_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(x * rhs.x, y * rhs.y, z * rhs.z);
+#endif
 }
 
 float3 float3::Div(const float3 &rhs) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), div_ps(load_vec3(ptr(), 0.f), load_vec3(rhs.ptr(), 0.f)));
+	return copy;
+#else
 	return float3(x / rhs.x, y / rhs.y, z / rhs.z);
+#endif
 }
 
 float3 float3::DivLeft(float scalar) const
 {
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	float3 copy;
+	store_vec3(copy.ptr(), div_ps(set1_ps(scalar), load_vec3(ptr(), 0.f)));
+	return copy;
+#else
 	return float3(scalar / x, scalar / y, scalar / z);
+#endif
 }
 
 float3 &float3::operator /=(float scalar)
 {
 	float invScalar = 1.f / scalar;
+
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), mul_ps(load_vec3(ptr(), 0.f), set1_ps(invScalar)));
+#else
 	x *= invScalar;
 	y *= invScalar;
 	z *= invScalar;
+#endif
 
 	return *this;
 }
