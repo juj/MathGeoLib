@@ -374,7 +374,6 @@ JSONReport jsonReport;
 void RunNextTest()
 {
 	RunOneTest(numTotalRuns, numTrialsPerTimedBlock, &prefixes[0], jsonReport);
-	++nextTestToRun;
 #ifdef __EMSCRIPTEN__
 	if (nextTestToRun >= (int)Tests().size())
 	{
