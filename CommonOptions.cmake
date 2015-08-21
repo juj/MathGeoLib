@@ -231,11 +231,18 @@ if (COMPILER_IS_GCC)
 	endif()
 endif()
 
-if (MATH_FMA3)
+if (MATH_FMA4 or MATH_FMA3)
+	# Between FMA3 and FMA4, the intrinsics are the same so C code doesn't need to know which to call,
+	# it can just call _mm_fmadd_ps(), so this passed #define doesn't need to distinguish.
 	add_definitions(-DMATH_FMA)
+	# However for GCC codegen, it needs to know which instruction set to target:
 	if (IS_GCC_LIKE)
 		# http://gcc.gnu.org/onlinedocs/gcc-4.8.2/gcc/i386-and-x86-64-Options.html#i386-and-x86-64-Options
-		add_definitions(-mfma)
+		if (MATH_FMA4)
+			add_definitions(-mfma4)
+		else()
+			add_definitions(-mfma)
+		endif()
 	endif()
 endif()
 
