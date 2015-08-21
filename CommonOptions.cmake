@@ -231,7 +231,7 @@ if (COMPILER_IS_GCC)
 	endif()
 endif()
 
-if (MATH_FMA4 or MATH_FMA3)
+if (MATH_FMA4 OR MATH_FMA3)
 	# Between FMA3 and FMA4, the intrinsics are the same so C code doesn't need to know which to call,
 	# it can just call _mm_fmadd_ps(), so this passed #define doesn't need to distinguish.
 	add_definitions(-DMATH_FMA)
