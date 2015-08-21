@@ -355,15 +355,35 @@ float Sqrt_Via_Rcp_RSqrt(float x)
 
 #endif
 
+// Quake Inverse Sqrt, from http://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
+// Benchmarked and tested for reference, DON'T USE THIS! It's twice as slow, and a magnitude of 1e3 worse in precision
+// compared to the function RSqrt!
+float QuakeInvSqrt(float x)
+{
+	float xhalf = 0.5f * x;
+	u32 i = ReinterpretAsU32(x);//*(int*)&x; // store floating-point bits in integer
+	i = 0x5f375a86 - (i >> 1); // A better initial value: http://en.wikipedia.org/wiki/Fast_inverse_square_root#History_and_investigation
+	//i = 0x5f3759d5 - (i >> 1); // initial guess for Newton's method
+	x = ReinterpretAsFloat(i);//*(float*)&i; // convert new bits into float
+	x = x*(1.5f - xhalf*x*x); // One round of Newton's method
+	return x;
+}
+
+float QuakeHackSqrt(float f)
+{
+	return f * QuakeInvSqrt(f);
+}
+
 float AnotherHackSqrt(float f)
 {
 	int i = 0x1FBD1DF5 + (*(int*)&f >> 1);
 	return *(float*)&i;
 }
 
+
 UNIQUE_TEST(sqrt_precision)
 {
-	const int C = 10;
+	const int C = 11;
 
 	const float ranges[] = { 1e3f, 1e6f, 1e9f, 1e15f, 1e20f };
 
@@ -391,7 +411,8 @@ UNIQUE_TEST(sqrt_precision)
 			X[7] = s4f_x(sqrt_ps(set1_ps(f)));
 #endif
 			X[8] = sqrtf(f);
-			X[9] = AnotherHackSqrt(f);
+			X[9] = QuakeHackSqrt(f);
+			X[10] = AnotherHackSqrt(f);
 
 			for(int j = 0; j < C; ++j)
 				maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
@@ -422,7 +443,8 @@ UNIQUE_TEST(sqrt_precision)
 #endif
 
 		LOGI("Max relative error with sqrtf: %e", maxRelError[8]);
-		LOGI("Max relative error with AnotherHackSqrt: %e", maxRelError[9]);
+		LOGI("Max relative error with QuakeHackSqrt: %e", maxRelError[9]);
+		LOGI("Max relative error with AnotherHackSqrt: %e", maxRelError[10]);
 	}
 }
 
@@ -476,6 +498,12 @@ BENCHMARK(Sqrt_Via_Rcp_RSqrt, "test against Sqrt")
 BENCHMARK_END;
 #endif
 
+BENCHMARK(QuakeHackSqrt, "test against Sqrt")
+{
+	f[i] = QuakeHackSqrt(pf[i]);
+}
+BENCHMARK_END;
+
 BENCHMARK(AnotherHackSqrt, "test against Sqrt")
 {
 	f[i] = AnotherHackSqrt(pf[i]);
@@ -490,20 +518,6 @@ FORCE_INLINE float recip_sqrtf(float x)
 FORCE_INLINE float sqrtf_recip(float x)
 {
 	return sqrtf(1.f / x);
-}
-
-// Quake Inverse Sqrt, from http://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
-// Benchmarked and tested for reference, DON'T USE THIS! It's twice as slow, and a magnitude of 1e3 worse in precision
-// compared to the function RSqrt!
-float QuakeInvSqrt(float x)
-{
-	float xhalf = 0.5f * x;
-	u32 i = ReinterpretAsU32(x);//*(int*)&x; // store floating-point bits in integer
-	i = 0x5f375a86 - (i >> 1); // A better initial value: http://en.wikipedia.org/wiki/Fast_inverse_square_root#History_and_investigation
-	//i = 0x5f3759d5 - (i >> 1); // initial guess for Newton's method
-	x = ReinterpretAsFloat(i);//*(float*)&i; // convert new bits into float
-	x = x*(1.5f - xhalf*x*x); // One round of Newton's method
-	return x;
 }
 
 UNIQUE_TEST(sqrt_rsqrt_precision)
