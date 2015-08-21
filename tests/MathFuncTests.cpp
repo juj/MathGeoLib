@@ -355,57 +355,75 @@ float Sqrt_Via_Rcp_RSqrt(float x)
 
 #endif
 
+float AnotherHackSqrt(float f)
+{
+	int i = 0x1FBD1DF5 + (*(int*)&f >> 1);
+	return *(float*)&i;
+}
+
 UNIQUE_TEST(sqrt_precision)
 {
-	const int C = 8;
-	float maxRelError[C] = {};
-	float X[C] = {};
+	const int C = 10;
 
-	for(int i = 0; i < 1000000; ++i)
+	const float ranges[] = { 1e3f, 1e6f, 1e9f, 1e15f, 1e20f };
+
+	for(int k = 0; k < sizeof(ranges)/sizeof(ranges[0]); ++k)
 	{
-		float f = rng.Float(0.f, 1e20f);
-		float x = (float)sqrt((double)f); // best precision of the Sqrt.
+		float maxRelError[C] = {};
+		float X[C] = {};
 
-		X[0] = Sqrt(f);
-		X[1] = SqrtFast(f);
-		X[2] = NewtonRhapsonSqrt(f);
+		LOGI("Within range of [0, %e]:", ranges[k]);
+		for(int i = 0; i < 1000000; ++i)
+		{
+			float f = rng.Float(0.f, ranges[k]);
+			float x = (float)sqrt((double)f); // best precision of the Sqrt.
+
+			X[0] = Sqrt(f);
+			X[1] = SqrtFast(f);
+			X[2] = NewtonRhapsonSqrt(f);
 #ifdef MATH_SSE
-		X[3] = NewtonRhapsonSSESqrt(f);
-		X[4] = NewtonRhapsonSSESqrt2(f);
-		X[5] = NewtonRhapsonSSESqrt3(f);
-		X[6] = Sqrt_Via_Rcp_RSqrt(f);
+			X[3] = NewtonRhapsonSSESqrt(f);
+			X[4] = NewtonRhapsonSSESqrt2(f);
+			X[5] = NewtonRhapsonSSESqrt3(f);
+			X[6] = Sqrt_Via_Rcp_RSqrt(f);
 #endif
 #ifdef MATH_SIMD
-		X[7] = s4f_x(sqrt_ps(set1_ps(f)));
+			X[7] = s4f_x(sqrt_ps(set1_ps(f)));
+#endif
+			X[8] = sqrtf(f);
+			X[9] = AnotherHackSqrt(f);
+
+			for(int j = 0; j < C; ++j)
+				maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
+		}
+
+		LOGI("Max relative error with Sqrt: %e", maxRelError[0]);
+		assert(maxRelError[0] < 1e-6f);
+		LOGI("Max relative error with SqrtFast: %e", maxRelError[1]);
+		assert(maxRelError[1] < 1e-3f);
+		LOGI("Max relative error with NewtonRhapsonSqrt: %e", maxRelError[2]);
+		assert(maxRelError[2] < 1e-6f);
+#ifdef MATH_SSE
+		LOGI("Max relative error with NewtonRhapsonSSESqrt: %e", maxRelError[3]);
+		assert(maxRelError[3] < 1e-6f);
+
+		LOGI("Max relative error with NewtonRhapsonSSESqrt2: %e", maxRelError[4]);
+		assert(maxRelError[4] < 1e-6f);
+
+		LOGI("Max relative error with NewtonRhapsonSSESqrt3: %e", maxRelError[5]);
+		assert(maxRelError[5] < 1e-6f);
+
+		LOGI("Max relative error with Sqrt_Via_Rcp_RSqrt: %e", maxRelError[6]);
+		assert(maxRelError[6] < 1e-3f);
+#endif
+#ifdef MATH_SIMD
+		LOGI("Max relative error with sqrt_ps: %e", maxRelError[7]);
+		assert(maxRelError[7] < 1e-6f);
 #endif
 
-		for(int j = 0; j < C; ++j)
-			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
+		LOGI("Max relative error with sqrtf: %e", maxRelError[8]);
+		LOGI("Max relative error with AnotherHackSqrt: %e", maxRelError[9]);
 	}
-
-	LOGI("Max relative error with Sqrt: %e", maxRelError[0]);
-	assert(maxRelError[0] < 1e-6f);
-	LOGI("Max relative error with SqrtFast: %e", maxRelError[1]);
-	assert(maxRelError[1] < 1e-3f);
-	LOGI("Max relative error with NewtonRhapsonSqrt: %e", maxRelError[2]);
-	assert(maxRelError[2] < 1e-6f);
-#ifdef MATH_SSE
-	LOGI("Max relative error with NewtonRhapsonSSESqrt: %e", maxRelError[3]);
-	assert(maxRelError[3] < 1e-6f);
-
-	LOGI("Max relative error with NewtonRhapsonSSESqrt2: %e", maxRelError[4]);
-	assert(maxRelError[4] < 1e-6f);
-
-	LOGI("Max relative error with NewtonRhapsonSSESqrt3: %e", maxRelError[5]);
-	assert(maxRelError[5] < 1e-6f);
-
-	LOGI("Max relative error with Sqrt_Via_Rcp_RSqrt: %e", maxRelError[6]);
-	assert(maxRelError[6] < 1e-3f);
-#endif
-#ifdef MATH_SIMD
-	LOGI("Max relative error with sqrt_ps: %e", maxRelError[7]);
-	assert(maxRelError[7] < 1e-6f);
-#endif
 }
 
 BENCHMARK(Sqrt, "Sqrt")
@@ -457,6 +475,12 @@ BENCHMARK(Sqrt_Via_Rcp_RSqrt, "test against Sqrt")
 }
 BENCHMARK_END;
 #endif
+
+BENCHMARK(AnotherHackSqrt, "test against Sqrt")
+{
+	f[i] = AnotherHackSqrt(pf[i]);
+}
+BENCHMARK_END;
 
 FORCE_INLINE float recip_sqrtf(float x)
 {
