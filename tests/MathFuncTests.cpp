@@ -387,7 +387,7 @@ UNIQUE_TEST(sqrt_precision)
 
 	const float ranges[] = { 1e3f, 1e6f, 1e9f, 1e15f, 1e20f };
 
-	for(int k = 0; k < sizeof(ranges)/sizeof(ranges[0]); ++k)
+	for(size_t k = 0; k < sizeof(ranges)/sizeof(ranges[0]); ++k)
 	{
 		float maxRelError[C] = {};
 		float X[C] = {};
