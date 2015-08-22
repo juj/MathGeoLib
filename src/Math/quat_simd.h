@@ -258,7 +258,7 @@ FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 	__m128 Z = _mm_xor_ps(signz, zzzz_ps(q1));
 	__m128 W = wwww_ps(q1);
 
-	q2 = negate3_ps(q2);
+	q2 = neg3_ps(q2);
 	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
 	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2)); // [y,x,w,z]
 	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1)); // [z,w,x,y]

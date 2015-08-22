@@ -42,6 +42,7 @@
 
 #if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
 #include "../Math/float4_sse.h"
+#include "../Math/float4_neon.h"
 #endif
 
 MATH_BEGIN_NAMESPACE
