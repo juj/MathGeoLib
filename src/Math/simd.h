@@ -77,11 +77,11 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 
 #ifdef MATH_SSE3
 // _mm_moveldup_ps and _mm_movehdup_ps are better than shuffle, since they don't destroy the input operands (under non-AVX).
-#define zzxx_ps(x) _mm_moveldup_ps((x))
-#define wwyy_ps(x) _mm_movehdup_ps((x))
+#define xxzz_ps(x) _mm_moveldup_ps((x))
+#define yyww_ps(x) _mm_movehdup_ps((x))
 #else
-#define zzxx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,0,0))
-#define wwyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,1,1))
+#define xxzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,0,0))
+#define yyww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,1,1))
 #endif
 
 #ifdef MATH_SSE2
