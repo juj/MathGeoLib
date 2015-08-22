@@ -720,18 +720,18 @@ bool Triangle::Intersects(const AABB &aabb) const
 	if (_mm_ucomige_ss(abs_ps(dot4_ps(n, ac)), abs_ps(dot4_ps(h, abs_ps(n))))) return false;
 
 	// {eX, eY, eZ} cross t1
-	simd4f ac_wyxz  = shuffle1_ps(ac,  _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f h_wyxz   = shuffle1_ps(h,   _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f ac_wxzy  = shuffle1_ps(ac,  _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f h_wxzy   = shuffle1_ps(h,   _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f ac_wyxz  = zxyw_ps(ac);
+	simd4f h_wyxz   = zxyw_ps(h);
+	simd4f ac_wxzy  = yzxw_ps(ac);
+	simd4f h_wxzy   = yzxw_ps(h);
 	simd4f bc = sub_ps(b, center);
-	simd4f bc_wyxz  = shuffle1_ps(bc,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f bc_wyxz  = zxyw_ps(bc);
 	simd4f at1 = abs_ps(t1);
-	simd4f t1_wyxz  = shuffle1_ps(t1,  _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f at1_wyxz = shuffle1_ps(at1, _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f bc_wxzy  = shuffle1_ps(bc,  _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f t1_wxzy  = shuffle1_ps(t1,  _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f at1_wxzy = shuffle1_ps(at1, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f t1_wyxz  = zxyw_ps(t1);
+	simd4f at1_wyxz = zxyw_ps(at1);
+	simd4f bc_wxzy  = yzxw_ps(bc);
+	simd4f t1_wxzy  = yzxw_ps(t1);
+	simd4f at1_wxzy = yzxw_ps(at1);
 
 	simd4f d1 = sub_ps(mul_ps(t1_wxzy, ac_wyxz), mul_ps(t1_wyxz, ac_wxzy));
 	simd4f d2 = sub_ps(mul_ps(t1_wxzy, bc_wyxz), mul_ps(t1_wyxz, bc_wxzy));
@@ -746,10 +746,10 @@ bool Triangle::Intersects(const AABB &aabb) const
 	// {eX, eY, eZ} cross t2
 	simd4f t2 = sub_ps(c, b);
 	simd4f at2 = abs_ps(t2);
-	simd4f t2_wyxz  = shuffle1_ps(t2,  _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f at2_wyxz = shuffle1_ps(at2, _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f t2_wxzy  = shuffle1_ps(t2,  _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f at2_wxzy = shuffle1_ps(at2, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f t2_wyxz  = zxyw_ps(t2);
+	simd4f at2_wyxz = zxyw_ps(at2);
+	simd4f t2_wxzy  = yzxw_ps(t2);
+	simd4f at2_wxzy = yzxw_ps(at2);
 
 	d1 = sub_ps(mul_ps(t2_wxzy, ac_wyxz), mul_ps(t2_wyxz, ac_wxzy));
 	d2 = sub_ps(mul_ps(t2_wxzy, bc_wyxz), mul_ps(t2_wyxz, bc_wxzy));
@@ -761,13 +761,13 @@ bool Triangle::Intersects(const AABB &aabb) const
 
 	// {eX, eY, eZ} cross t0
 	simd4f cc = sub_ps(c, center);
-	simd4f cc_wyxz  = shuffle1_ps(cc,  _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f t0_wyxz  = shuffle1_ps(t0,  _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f cc_wyxz  = zxyw_ps(cc);
+	simd4f t0_wyxz  = zxyw_ps(t0);
 	simd4f at0 = abs_ps(t0);
-	simd4f at0_wyxz = shuffle1_ps(at0, _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f at0_wxzy = shuffle1_ps(at0, _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f t0_wxzy  = shuffle1_ps(t0,  _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f cc_wxzy  = shuffle1_ps(cc,  _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f at0_wyxz = zxyw_ps(at0);
+	simd4f at0_wxzy = yzxw_ps(at0);
+	simd4f t0_wxzy  = yzxw_ps(t0);
+	simd4f cc_wxzy  = yzxw_ps(cc);
 
 	d1 = sub_ps(mul_ps(t0_wxzy, ac_wyxz), mul_ps(t0_wyxz, ac_wxzy));
 	d2 = sub_ps(mul_ps(t0_wxzy, cc_wyxz), mul_ps(t0_wyxz, cc_wxzy));

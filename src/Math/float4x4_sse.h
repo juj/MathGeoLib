@@ -797,7 +797,7 @@ inline float mat4x4_determinant(const __m128 *row)
 
 	// Now we are left with a 2x2 matrix in row2_1.zw and row3_1.zw.
 	// D = row2_1.z * row3_1.w - row2_1.w * row3_1.z.
-	__m128 r1 = shuffle1_ps(row2_1, _MM_SHUFFLE(2,3,1,0));
+	__m128 r1 = xywz_ps(row2_1);
 	__m128 r = _mm_mul_ps(r1, row3_1);
 	__m128 a = wwww_ps(r);
 	__m128 b = zzzz_ps(r);
@@ -821,7 +821,7 @@ inline float mat3x4_determinant(const __m128 *row)
 
 	// Now we are left with a 2x2 matrix in row1.yz and row2.yz.
 	// D = row1.y * row2.z - row2.y * row1.z.
-	__m128 r1 = shuffle1_ps(row1, _MM_SHUFFLE(3,1,2,0));
+	__m128 r1 = xzyw_ps(row1);
 	__m128 r = _mm_mul_ps(r1, row2);
 	__m128 a = zzzz_ps(r);
 	__m128 b = yyyy_ps(r);

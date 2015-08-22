@@ -24,7 +24,7 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 #if 0 // The original code converted a quaternion into an hybrid of rotation/translation (bug?)
 	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
 	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
-	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
+	__m128 yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
 	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
 	
 	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
@@ -50,8 +50,8 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
 	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
 	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
-	__m128 t_yzwx = shuffle1_ps(t, _MM_SHUFFLE(0, 3, 2, 1));      // [tx tw tz ty]
-	__m128 second_row = shuffle1_ps(s3, _MM_SHUFFLE(2, 3, 0, 1)); // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
+	__m128 t_yzwx = yzwx_ps(t);                                   // [tx tw tz ty]
+	__m128 second_row = yxwz_ps(s3);                              // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
 	m[1] = second_row;
 	_mm_store_ss((float*)m+7, t_yzwx);
 
@@ -62,7 +62,7 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 #else
 	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
 	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
-	__m128 yyzz2 = shuffle1_ps(q2, _MM_SHUFFLE(2, 2, 1, 1));      // [2z 2z 2y 2y]
+	__m128 yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
 	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
 	
 	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
@@ -86,7 +86,7 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
 	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
 	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
-	__m128 second_row = shuffle1_ps(s3, _MM_SHUFFLE(2, 3, 0, 1)); // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
+	__m128 second_row = yxwz_ps(s3);                              // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
 
 	// Calculate third row
 	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
@@ -110,29 +110,29 @@ FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 
 FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 {
-	__m128 W = wwww_ps(quat);
+	simd4f W = wwww_ps(quat);
 
-//	__m128 qxv = cross_ps(q, vec.v);
-	__m128 a_xzy = shuffle1_ps(quat, _MM_SHUFFLE(3, 0, 2, 1)); // a_xzy = [a.w, a.x, a.z, a.y]
-	__m128 b_yxz = shuffle1_ps(vec, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-	__m128 a_yxz = shuffle1_ps(quat, _MM_SHUFFLE(3, 1, 0, 2)); // a_yxz = [a.w, a.y, a.x, a.z]
-	__m128 b_xzy = shuffle1_ps(vec, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
-	__m128 x = _mm_mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	__m128 y = _mm_mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-	__m128 qxv = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+//	simd4f qxv = cross_ps(q, vec.v);
+	simd4f a_xzy = yzxw_ps(quat); // a_xzy = [a.w, a.x, a.z, a.y]
+	simd4f b_yxz = zxyw_ps(vec); // b_yxz = [b.w, b.y, b.x, b.z]
+	simd4f a_yxz = zxyw_ps(quat); // a_yxz = [a.w, a.y, a.x, a.z]
+	simd4f b_xzy = yzxw_ps(vec); // b_xzy = [b.w, b.x, b.z, b.y]
+	simd4f x = mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
+	simd4f y = mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+	simd4f qxv = sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 
-	__m128 Wv = _mm_mul_ps(W, vec);
-	__m128 s = _mm_add_ps(qxv, Wv);
+	simd4f Wv = mul_ps(W, vec);
+	simd4f s = add_ps(qxv, Wv);
 
 //	s = cross_ps(q, s);
-	__m128 s_yxz = shuffle1_ps(s, _MM_SHUFFLE(3, 1, 0, 2)); // b_yxz = [b.w, b.y, b.x, b.z]
-	__m128 s_xzy = shuffle1_ps(s, _MM_SHUFFLE(3, 0, 2, 1)); // b_xzy = [b.w, b.x, b.z, b.y]
-	x = _mm_mul_ps(a_xzy, s_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	y = _mm_mul_ps(a_yxz, s_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-	s = _mm_sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+	simd4f s_yxz = zxyw_ps(s); // b_yxz = [b.w, b.y, b.x, b.z]
+	simd4f s_xzy = yzxw_ps(s); // b_xzy = [b.w, b.x, b.z, b.y]
+	x = mul_ps(a_xzy, s_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
+	y = mul_ps(a_yxz, s_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+	s = sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 
-	s = _mm_add_ps(s, s);
-	s = _mm_add_ps(s, vec);
+	s = add_ps(s, s);
+	s = add_ps(s, vec);
 	return s;
 }
 
@@ -198,22 +198,22 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	            x*r.y - y*r.x + z*r.w + w*r.z,
 	           -x*r.x - y*r.y - z*r.z + w*r.w); */
 #ifdef MATH_SSE
-	const __m128 signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
-	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));   // [- - + +]
-	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));   // [- + + -]
+	const simd4f signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
+	const simd4f signy = xxww_ps(signx);   // [- - + +]
+	const simd4f signz = wxxw_ps(signx);   // [- + + -]
 
-	__m128 X = _mm_xor_ps(signx, xxxx_ps(q1));
-	__m128 Y = _mm_xor_ps(signy, yyyy_ps(q1));
-	__m128 Z = _mm_xor_ps(signz, zzzz_ps(q1));
-	__m128 W = wwww_ps(q1);
+	simd4f X = xor_ps(signx, xxxx_ps(q1));
+	simd4f Y = xor_ps(signy, yyyy_ps(q1));
+	simd4f Z = xor_ps(signz, zzzz_ps(q1));
+	simd4f W = wwww_ps(q1);
 
-	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
-	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2)); // [y,x,w,z]
-	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1)); // [z,w,x,y]
-	// __m128 r4 = q2;
+	simd4f r1 = wzyx_ps(q2); // [x,y,z,w]
+	simd4f r2 = zwxy_ps(q2); // [y,x,w,z]
+	simd4f r3 = yxwz_ps(q2); // [z,w,x,y]
+	// simd4f r4 = q2;
 
-	return _mm_add_ps(_mm_add_ps(_mm_mul_ps(X, r1), _mm_mul_ps(Y, r2)), 
-	                  _mm_add_ps(_mm_mul_ps(Z, r3), _mm_mul_ps(W, q2)));
+	return add_ps(add_ps(mul_ps(X, r1), mul_ps(Y, r2)),
+	              add_ps(mul_ps(Z, r3), mul_ps(W, q2)));
 #elif defined(ANDROID)
 	simd4f ret;
 	quat_mul_quat_asm(&q1, &q2, &ret);
@@ -250,22 +250,22 @@ FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 	            x*r.x + y*r.y + z*r.z + w*r.w); */
 
 	const __m128 signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
-	const __m128 signy = shuffle1_ps(signx, _MM_SHUFFLE(3,3,0,0));   // [- - + +]
-	const __m128 signz = shuffle1_ps(signx, _MM_SHUFFLE(3,0,0,3));   // [- + + -]
+	const __m128 signy = xxww_ps(signx);   // [- - + +]
+	const __m128 signz = wxxw_ps(signx);   // [- + + -]
 
-	__m128 X = _mm_xor_ps(signx, xxxx_ps(q1));
-	__m128 Y = _mm_xor_ps(signy, yyyy_ps(q1));
-	__m128 Z = _mm_xor_ps(signz, zzzz_ps(q1));
+	__m128 X = xor_ps(signx, xxxx_ps(q1));
+	__m128 Y = xor_ps(signy, yyyy_ps(q1));
+	__m128 Z = xor_ps(signz, zzzz_ps(q1));
 	__m128 W = wwww_ps(q1);
 
 	q2 = neg3_ps(q2);
-	__m128 r1 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 3)); // [x,y,z,w]
-	__m128 r2 = shuffle1_ps(q2, _MM_SHUFFLE(1, 0, 3, 2)); // [y,x,w,z]
-	__m128 r3 = shuffle1_ps(q2, _MM_SHUFFLE(2, 3, 0, 1)); // [z,w,x,y]
+	__m128 r1 = wzyx_ps(q2); // [x,y,z,w]
+	__m128 r2 = zwxy_ps(q2); // [y,x,w,z]
+	__m128 r3 = yxwz_ps(q2); // [z,w,x,y]
 	// __m128 r4 = q2;
 
-	return _mm_add_ps(_mm_add_ps(_mm_mul_ps(X, r1), _mm_mul_ps(Y, r2)), 
-	                  _mm_add_ps(_mm_mul_ps(Z, r3), _mm_mul_ps(W, q2)));
+	return add_ps(add_ps(mul_ps(X, r1), mul_ps(Y, r2)),
+	              add_ps(mul_ps(Z, r3), mul_ps(W, q2)));
 }
 #endif
 

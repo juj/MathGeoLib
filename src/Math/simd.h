@@ -76,17 +76,36 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define shuffle1_ps(reg, shuffle) _mm_shuffle_ps((simd4f)(reg), (simd4f)(reg), (shuffle))
 #endif
 
+// Broadcast a single channel to all channels
 #define xxxx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,0,0,0))
 #define yyyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,1,1))
 #define zzzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,2,2))
 #define wwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,3))
-#define yzxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,2,1))
-
-// Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
-#define axx_bxx_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(0,0,0,0))
-#define ayy_byy_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(1,1,1,1)) // [b.y, b.y, a.y, a.y]
-#define azz_bzz_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(2,2,2,2)) // [b.z, b.z, a.z, a.z]
-
+// Duplicate lo to hi or hi to lo
+#define xyxy_ps(x) _mm_movelh_ps((x), (x))
+#define zwzw_ps(x) _mm_movehl_ps((x), (x))
+// Swap elements in low pair, high pair, or both
+#define yxzw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,2,0,1))
+#define xywz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,3,1,0))
+#define yxwz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,3,0,1))
+// Swap low pair with high pair
+#define zwxy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,0,3,2))
+// Rotate lanes x->y, y->z, z->w, w->x or the other way around
+#define yzwx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,3,2,1))
+#define wxyz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,1,0,3))
+// Swap second and third element
+#define xzyw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,1,2,0))
+// Swap second and third element, and then swap elements in low and high pairs
+#define zxwy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,3,0,2))
+// Reverse whole vector
+#define wzyx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,1,2,3))
+// Duplicate two elements
+#define xxyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,0,0))
+#define xxww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,0,0))
+#define yyzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,1,1))
+#define zzww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,2,2))
+#define xzxz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,0,2,0))
+#define ywyw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,1,3,1))
 #ifdef MATH_SSE3
 // _mm_moveldup_ps and _mm_movehdup_ps are better than shuffle, since they don't destroy the input operands (under non-AVX).
 #define xxzz_ps(x) _mm_moveldup_ps((x))
@@ -95,6 +114,17 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define xxzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,0,0))
 #define yyww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,1,1))
 #endif
+#define wxxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,0,3))
+// Rotate x->y->z or the other direction, but leave w intact in the highest channel.
+#define yzxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,2,1))
+#define zxyw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,1,0,2))
+// Other random-looking swizzles
+#define ywxz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,0,3,1))
+
+// Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
+#define axx_bxx_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(0,0,0,0))
+#define ayy_byy_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(1,1,1,1)) // [b.y, b.y, a.y, a.y]
+#define azz_bzz_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(2,2,2,2)) // [b.z, b.z, a.z, a.z]
 
 #ifdef MATH_SSE2
 #define simd2d __m128d
@@ -397,12 +427,19 @@ FORCE_INLINE simd4f zxwy_ps(simd4f vec) { float32x2x2_t v = vtrn_f32(vget_high_f
 
 // These are not quite 1-cycle swizzles, since they require duplicating the simd vector to another duplicate register to run, at least in GCC 4.6. (TODO: This might be avoidable with inline asm?)
 FORCE_INLINE simd4f xxyy_ps(simd4f vec) { return vzipq_f32(vec, vec).val[0]; } // Also could be done with vget_low_f32+v{uzp/vzip/vtrn}_f32, would that be better?
+#define yyzz_ps(vec) xxyy_ps(yzwx_ps((vec)))
 FORCE_INLINE simd4f zzww_ps(simd4f vec) { return vzipq_f32(vec, vec).val[1]; }
+FORCE_INLINE simd4f xxww_ps(simd4f vec) { float32x2_t xx = vdup_lane_f32(vget_low_f32(vec), 0); float32x2_t ww = vdup_lane_f32(vget_high_f32(vec), 1); return vcombine_f32(xx, ww); }
 FORCE_INLINE simd4f xxzz_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[0]; }
 FORCE_INLINE simd4f yyww_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[1]; }
 FORCE_INLINE simd4f xzxz_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[0]; }
 FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
+#define wxxw_ps(vec) yzwx_ps(xxww_ps((vec)))
+// Rotate x->y->z or the other direction, but leave w intact in the highest channel.
 #define yzxw_ps(vec) xywz_ps(yzwx_ps(vec))
+#define zxyw_ps(vec) xywz_ps(zxwy_ps(vec))
+// Other random-looking swizzles
+#define ywxz_ps(vec) xzyw_ps(yxwz_ps((vec)))
 
 // Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
 #define axx_bxx_ps(a, b) xxzz_ps(vcombine_f32(vget_low_f32((a)), vget_low_f32((b))))

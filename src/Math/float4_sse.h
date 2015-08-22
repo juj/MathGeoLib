@@ -47,8 +47,8 @@ FORCE_INLINE simd4f sum_xyz_ps(simd4f m)
 // Input: [w,z,y,x], Output: x+y+z in three lowest channels, w is undefined.
 FORCE_INLINE simd4f sum_xyz_ps3(simd4f m)
 {
-	simd4f yzx = shuffle1_ps(m, _MM_SHUFFLE(3,0,2,1)); // [_, x, z, y]
-	simd4f zxy = shuffle1_ps(m, _MM_SHUFFLE(3,1,0,2)); // [_, y, x, z]
+	simd4f yzx = yzxw_ps(m); // [_, x, z, y]
+	simd4f zxy = zxyw_ps(m); // [_, y, x, z]
 	simd4f XYZ = add_ps(m, add_ps(yzx, zxy)); // [_, x+y+z, x+y+z, x+y+z]
 	return XYZ; // The three lowest elements will contain the sum x+y+z. Highest element is undefined.
 }
@@ -66,9 +66,9 @@ FORCE_INLINE simd4f sum_xyzw_ps(simd4f m)
 	m = _mm_hadd_ps(m, m); // m = (x+y+z+w, x+y+z+w, x+y+z+w, x+y+z+w).
 	return m; // Each index of the output will contain the sum x+y+z+w.
 #else // We only have SSE 1, and must individually shuffle.
-	simd4f v2 = shuffle1_ps(m, _MM_SHUFFLE(1,0,3,2)); // = [y, x, w, z]
+	simd4f v2 = zwxy_ps(m); // = [y, x, w, z]
 	v2 = add_ps(v2, m); // = [w+y, z+x, y+w, x+z]
-	simd4f v3 = shuffle1_ps(v2, _MM_SHUFFLE(0,3,2,1)); // = [x+z, w+y, z+x, y+w]
+	simd4f v3 = yzwx_ps(v2); // = [x+z, w+y, z+x, y+w]
 	return add_ps(v2, v3); // = [w+y+x+z, z+x+w+y, y+w+z+x, x+z+y+w]
 #endif
 }
@@ -80,9 +80,9 @@ FORCE_INLINE float sum_xyzw_float(simd4f m)
 
 FORCE_INLINE simd4f mul_xyzw_ps(simd4f v)
 {
-	simd4f v2 = shuffle1_ps(v, _MM_SHUFFLE(1, 0, 3, 2)); // v2 = [y, x, w, z]
+	simd4f v2 = zwxy_ps(v); // v2 = [y, x, w, z]
 	v2 = mul_ps(v, v2); // v2 = [w*y, z*x, y*w, x*z]
-	simd4f v3 = shuffle1_ps(v2, _MM_SHUFFLE(2, 1, 0, 3)); // v3 = [z*x, y*w, x*z, w*y]
+	simd4f v3 = wxyz_ps(v2); // v3 = [z*x, y*w, x*z, w*y]
 	return mul_ps(v2, v3); // v3 = [w*y*z*x, z*x*y*w, y*w*x*z, x*z*w*y]
 }
 
@@ -140,12 +140,12 @@ FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
 	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
 	simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
 
-	simd4f v_xzy = shuffle1_ps(v, _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f v_yxz = shuffle1_ps(v, _MM_SHUFFLE(3, 1, 0, 2));
-	simd4f q_xzy = shuffle1_ps(q, _MM_SHUFFLE(3, 0, 2, 1));
+	simd4f v_xzy = yzxw_ps(v);
+	simd4f v_yxz = zxyw_ps(v);
+	simd4f q_xzy = yzxw_ps(q);
 	simd4f b_yxz = sub_ps(mul_ps(q_xzy, v), mul_ps(v_xzy, q));
-	simd4f b = shuffle1_ps(b_yxz, _MM_SHUFFLE(3, 0, 2, 1));
-	simd4f b_xzy = shuffle1_ps(b_yxz, _MM_SHUFFLE(3, 1, 0, 2));
+	simd4f b = yzxw_ps(b_yxz);
+	simd4f b_xzy = zxyw_ps(b_yxz);
 	simd4f c = sub_ps(mul_ps(b_yxz, v_xzy), mul_ps(v_yxz, b_xzy));
 
 	*outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
