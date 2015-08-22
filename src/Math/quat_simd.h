@@ -182,7 +182,8 @@ inline void quat_mul_quat_asm(const void *q1, const void *q2, void *out)
 
 FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 {
-/*	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
+/*
+	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
 	           -x*r.z + y*r.w + z*r.x + w*r.y,
 	            x*r.y - y*r.x + z*r.w + w*r.z,
 	           -x*r.x - y*r.y - z*r.z + w*r.w); */
@@ -201,8 +202,11 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	simd4f r3 = yxwz_ps(q2); // [z,w,x,y]
 	// simd4f r4 = q2;
 
-	return add_ps(add_ps(mul_ps(X, r1), mul_ps(Y, r2)),
-	              add_ps(mul_ps(Z, r3), mul_ps(W, q2)));
+	simd4f out = mul_ps(X, r1);
+	out = madd_ps(Y, r2, out);
+	out = madd_ps(Z, r3, out);
+	out = madd_ps(W, q2, out);
+	return out;
 #elif defined(ANDROID)
 	simd4f ret;
 	quat_mul_quat_asm(&q1, &q2, &ret);
@@ -233,28 +237,32 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 #ifdef MATH_SSE
 FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 {
-/*	return Quat(x*r.w - y*r.z + z*r.y - w*r.x,
+/*
+	return Quat(x*r.w - y*r.z + z*r.y - w*r.x,
 	            x*r.z + y*r.w - z*r.x - w*r.y,
 	           -x*r.y + y*r.x + z*r.w - w*r.z,
 	            x*r.x + y*r.y + z*r.z + w*r.w); */
 
-	const __m128 signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
-	const __m128 signy = xxww_ps(signx);   // [- - + +]
-	const __m128 signz = wxxw_ps(signx);   // [- + + -]
+	const simd4f signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
+	const simd4f signy = xxww_ps(signx);   // [- - + +]
+	const simd4f signz = wxxw_ps(signx);   // [- + + -]
 
-	__m128 X = xor_ps(signx, xxxx_ps(q1));
-	__m128 Y = xor_ps(signy, yyyy_ps(q1));
-	__m128 Z = xor_ps(signz, zzzz_ps(q1));
-	__m128 W = wwww_ps(q1);
+	simd4f X = xor_ps(signx, xxxx_ps(q1));
+	simd4f Y = xor_ps(signy, yyyy_ps(q1));
+	simd4f Z = xor_ps(signz, zzzz_ps(q1));
+	simd4f W = wwww_ps(q1);
 
 	q2 = neg3_ps(q2);
-	__m128 r1 = wzyx_ps(q2); // [x,y,z,w]
-	__m128 r2 = zwxy_ps(q2); // [y,x,w,z]
-	__m128 r3 = yxwz_ps(q2); // [z,w,x,y]
+	simd4f r1 = wzyx_ps(q2); // [x,y,z,w]
+	simd4f r2 = zwxy_ps(q2); // [y,x,w,z]
+	simd4f r3 = yxwz_ps(q2); // [z,w,x,y]
 	// __m128 r4 = q2;
 
-	return add_ps(add_ps(mul_ps(X, r1), mul_ps(Y, r2)),
-	              add_ps(mul_ps(Z, r3), mul_ps(W, q2)));
+	simd4f out = mul_ps(X, r1);
+	out = madd_ps(Y, r2, out);
+	out = madd_ps(Z, r3, out);
+	out = madd_ps(W, q2, out);
+	return out;
 }
 #endif
 
