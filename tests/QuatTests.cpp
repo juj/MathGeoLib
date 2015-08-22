@@ -20,6 +20,14 @@ BENCHMARK(Quat_Transform_float3, "Quat::Transform(float3)")
 }
 BENCHMARK_END;
 
+#ifdef MATH_SSE
+BENCHMARK(quat_transform_vec4, "quat_transform_vec4")
+{
+	v2[i] = quat_transform_vec4(q[i].q, v01[i].v);
+}
+BENCHMARK_END;
+#endif
+
 BENCHMARK(Quat_Transform_float4, "Quat::Transform(float4)")
 {
 	v2[i] = q[i].Transform(v01[i]);
