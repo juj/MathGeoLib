@@ -146,6 +146,14 @@ int FORCE_INLINE allzero_ps(simd4f x)
 }
 #endif
 
+// Multiply-add. These are otherwise identical, except note that the FMA version is specced to have
+// better precision with respect to rounding.
+#ifdef MATH_FMA
+#define madd_ps _mm_fmadd_ps
+#else
+#define madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
+#endif
+
 static inline __m128 load_vec3(const float *ptr, float w)
 {
 	__m128 low = _mm_loadl_pi(_mm_setzero_ps(), (const __m64*)ptr); // [_ _ y x]
@@ -357,6 +365,13 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define load_ps vld1q_f32
 #define load1_ps(ptr) vdupq_n_f32(*(float*)(ptr))
 #define stream_ps vst1q_f32
+
+#if defined(MATH_VFPv4) || defined(MATH_NEONv2)
+#define madd_ps vmlaq_f32
+#else
+#define madd_ps(a, b, c) add_ps(mul_ps((a), (b)), (c))
+#endif
+
 static inline simd4f rcp_ps(simd4f x)
 {
 	simd4f e = vrecpeq_f32(x);

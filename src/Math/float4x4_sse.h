@@ -315,33 +315,33 @@ FORCE_INLINE void mat4x4_mul_fma(__m128 *out, const __m128 *m1, const __m128 *m2
 	__m128 m1_2 = m1[2];
 	__m128 m1_3 = m1[3];
 	__m128 m = m2[0];
-	__m128 o1 = _mm_mul_ps(xxxx_ps(m1_0), m);
-	__m128 o2 = _mm_mul_ps(xxxx_ps(m1_1), m);
-	__m128 o3 = _mm_mul_ps(xxxx_ps(m1_2), m);
-	__m128 o4 = _mm_mul_ps(xxxx_ps(m1_3), m);
+	__m128 o1 = mul_ps(xxxx_ps(m1_0), m);
+	__m128 o2 = mul_ps(xxxx_ps(m1_1), m);
+	__m128 o3 = mul_ps(xxxx_ps(m1_2), m);
+	__m128 o4 = mul_ps(xxxx_ps(m1_3), m);
 	m = m2[1];
-	o1 = _mm_fmadd_ps(yyyy_ps(m1_0), m, o1);
-	o2 = _mm_fmadd_ps(yyyy_ps(m1_1), m, o2);
-	o3 = _mm_fmadd_ps(yyyy_ps(m1_2), m, o3);
-	o4 = _mm_fmadd_ps(yyyy_ps(m1_3), m, o4);
+	o1 = madd_ps(yyyy_ps(m1_0), m, o1);
+	o2 = madd_ps(yyyy_ps(m1_1), m, o2);
+	o3 = madd_ps(yyyy_ps(m1_2), m, o3);
+	o4 = madd_ps(yyyy_ps(m1_3), m, o4);
 	m = m2[2];
-	o1 = _mm_fmadd_ps(zzzz_ps(m1_0), m, o1);
-	o2 = _mm_fmadd_ps(zzzz_ps(m1_1), m, o2);
-	o3 = _mm_fmadd_ps(zzzz_ps(m1_2), m, o3);
-	o4 = _mm_fmadd_ps(zzzz_ps(m1_3), m, o4);
+	o1 = madd_ps(zzzz_ps(m1_0), m, o1);
+	o2 = madd_ps(zzzz_ps(m1_1), m, o2);
+	o3 = madd_ps(zzzz_ps(m1_2), m, o3);
+	o4 = madd_ps(zzzz_ps(m1_3), m, o4);
 	m = m2[3];
-	out[0] = _mm_fmadd_ps(wwww_ps(m1_0), m, o1);
-	out[1] = _mm_fmadd_ps(wwww_ps(m1_1), m, o2);
-	out[2] = _mm_fmadd_ps(wwww_ps(m1_2), m, o3);
-	out[3] = _mm_fmadd_ps(wwww_ps(m1_3), m, o4);
+	out[0] = madd_ps(wwww_ps(m1_0), m, o1);
+	out[1] = madd_ps(wwww_ps(m1_1), m, o2);
+	out[2] = madd_ps(wwww_ps(m1_2), m, o3);
+	out[3] = madd_ps(wwww_ps(m1_3), m, o4);
 #else // Targeting 32-bit, use as few registers as possible to avoid spilling.
 // 32-bit, SSE4.1:
 // Benchmark 'mat4x4_mul_fma': test against float4x4_op_mul
 //   Best: 6.358 nsecs / 19.42 ticks, Avg: 6.461 nsecs, Worst: 9.369 nsecs
-	out[0] = _mm_fmadd_ps(wwww_ps(m1[0]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[0]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[0]), m2[1], _mm_mul_ps(xxxx_ps(m1[0]), m2[0]))));
-	out[1] = _mm_fmadd_ps(wwww_ps(m1[1]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[1]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[1]), m2[1], _mm_mul_ps(xxxx_ps(m1[1]), m2[0]))));
-	out[2] = _mm_fmadd_ps(wwww_ps(m1[2]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[2]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[2]), m2[1], _mm_mul_ps(xxxx_ps(m1[2]), m2[0]))));
-	out[3] = _mm_fmadd_ps(wwww_ps(m1[3]), m2[3], _mm_fmadd_ps(zzzz_ps(m1[3]), m2[2], _mm_fmadd_ps(yyyy_ps(m1[3]), m2[1], _mm_mul_ps(xxxx_ps(m1[3]), m2[0]))));
+	out[0] = madd_ps(wwww_ps(m1[0]), m2[3], madd_ps(zzzz_ps(m1[0]), m2[2], madd_ps(yyyy_ps(m1[0]), m2[1], mul_ps(xxxx_ps(m1[0]), m2[0]))));
+	out[1] = madd_ps(wwww_ps(m1[1]), m2[3], madd_ps(zzzz_ps(m1[1]), m2[2], madd_ps(yyyy_ps(m1[1]), m2[1], mul_ps(xxxx_ps(m1[1]), m2[0]))));
+	out[2] = madd_ps(wwww_ps(m1[2]), m2[3], madd_ps(zzzz_ps(m1[2]), m2[2], madd_ps(yyyy_ps(m1[2]), m2[1], mul_ps(xxxx_ps(m1[2]), m2[0]))));
+	out[3] = madd_ps(wwww_ps(m1[3]), m2[3], madd_ps(zzzz_ps(m1[3]), m2[2], madd_ps(yyyy_ps(m1[3]), m2[1], mul_ps(xxxx_ps(m1[3]), m2[0]))));
 #endif
 }
 #endif
@@ -357,10 +357,10 @@ FORCE_INLINE void mat4x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2
 	__m128 m1_2 = m1[2];
 	__m128 m1_3 = m1[3];
 	__m128 m = m2[0];
-	__m128 o1 = _mm_mul_ps(xxxx_ps(m1_0), m);
-	__m128 o2 = _mm_mul_ps(xxxx_ps(m1_1), m);
-	__m128 o3 = _mm_mul_ps(xxxx_ps(m1_2), m);
-	__m128 o4 = _mm_mul_ps(xxxx_ps(m1_3), m);
+	__m128 o1 = mul_ps(xxxx_ps(m1_0), m);
+	__m128 o2 = mul_ps(xxxx_ps(m1_1), m);
+	__m128 o3 = mul_ps(xxxx_ps(m1_2), m);
+	__m128 o4 = mul_ps(xxxx_ps(m1_3), m);
 	m = m2[1];
 	o1 = add_ps(mul_ps(yyyy_ps(m1_0), m), o1);
 	o2 = add_ps(mul_ps(yyyy_ps(m1_1), m), o2);
@@ -380,46 +380,46 @@ FORCE_INLINE void mat4x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2
 // 32-bit, SSE4.1:
 // Benchmark 'mat4x4_mul_sse': test against float4x4_op_mul
 //   Best: 6.692 nsecs / 21.34 ticks, Avg: 7.104 nsecs, Worst: 9.704 nsecs
-	out[0] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[0]), m2[0]), _mm_mul_ps(yyyy_ps(m1[0]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[0]), m2[2]), _mm_mul_ps(wwww_ps(m1[0]), m2[3])));
-	out[1] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[1]), m2[0]), _mm_mul_ps(yyyy_ps(m1[1]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[1]), m2[2]), _mm_mul_ps(wwww_ps(m1[1]), m2[3])));
-	out[2] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[2]), m2[0]), _mm_mul_ps(yyyy_ps(m1[2]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[2]), m2[2]), _mm_mul_ps(wwww_ps(m1[2]), m2[3])));
-	out[3] = _mm_add_ps(_mm_add_ps(_mm_mul_ps(xxxx_ps(m1[3]), m2[0]), _mm_mul_ps(yyyy_ps(m1[3]), m2[1])), _mm_add_ps(_mm_mul_ps(zzzz_ps(m1[3]), m2[2]), _mm_mul_ps(wwww_ps(m1[3]), m2[3])));
+	out[0] = add_ps(add_ps(mul_ps(xxxx_ps(m1[0]), m2[0]), mul_ps(yyyy_ps(m1[0]), m2[1])), add_ps(mul_ps(zzzz_ps(m1[0]), m2[2]), mul_ps(wwww_ps(m1[0]), m2[3])));
+	out[1] = add_ps(add_ps(mul_ps(xxxx_ps(m1[1]), m2[0]), mul_ps(yyyy_ps(m1[1]), m2[1])), add_ps(mul_ps(zzzz_ps(m1[1]), m2[2]), mul_ps(wwww_ps(m1[1]), m2[3])));
+	out[2] = add_ps(add_ps(mul_ps(xxxx_ps(m1[2]), m2[0]), mul_ps(yyyy_ps(m1[2]), m2[1])), add_ps(mul_ps(zzzz_ps(m1[2]), m2[2]), mul_ps(wwww_ps(m1[2]), m2[3])));
+	out[3] = add_ps(add_ps(mul_ps(xxxx_ps(m1[3]), m2[0]), mul_ps(yyyy_ps(m1[3]), m2[1])), add_ps(mul_ps(zzzz_ps(m1[3]), m2[2]), mul_ps(wwww_ps(m1[3]), m2[3])));
 #endif
 }
 
 inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
-	const __m128 m2_3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+	const __m128 m2_3 = set_ps(1.f, 0.f, 0.f, 0.f);
 
 	__m128 s0 = xxxx_ps(m1[0]);
 	__m128 s1 = yyyy_ps(m1[0]);
 	__m128 s2 = zzzz_ps(m1[0]);
 	__m128 s3 = wwww_ps(m1[0]);
-	__m128 r0 = _mm_mul_ps(s0, m2[0]);
-	__m128 r1 = _mm_mul_ps(s1, m2[1]);
-	__m128 r2 = _mm_mul_ps(s2, m2[2]);
-	__m128 r3 = _mm_mul_ps(s3, m2_3);
-	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	__m128 r0 = mul_ps(s0, m2[0]);
+	__m128 r1 = mul_ps(s1, m2[1]);
+	__m128 r2 = mul_ps(s2, m2[2]);
+	__m128 r3 = mul_ps(s3, m2_3);
+	out[0] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[1]);
 	s1 = yyyy_ps(m1[1]);
 	s2 = zzzz_ps(m1[1]);
 	s3 = wwww_ps(m1[1]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2_3);
+	out[1] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[2]);
 	s1 = yyyy_ps(m1[2]);
 	s2 = zzzz_ps(m1[2]);
 	s3 = wwww_ps(m1[2]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2_3);
+	out[2] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 }
 
 // Multiplies a 4x4 matrix by a 3x4 matrix, producing a 4x4 matrix.
@@ -428,47 +428,47 @@ inline void mat3x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 // @param m2 right-hand side matrix (3 x __m128)
 inline void mat4x4_mul_mat3x4_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
-	const __m128 m2_3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+	const __m128 m2_3 = set_ps(1.f, 0.f, 0.f, 0.f);
 
 	__m128 s0 = xxxx_ps(m1[0]);
 	__m128 s1 = yyyy_ps(m1[0]);
 	__m128 s2 = zzzz_ps(m1[0]);
 	__m128 s3 = wwww_ps(m1[0]);
-	__m128 r0 = _mm_mul_ps(s0, m2[0]);
-	__m128 r1 = _mm_mul_ps(s1, m2[1]);
-	__m128 r2 = _mm_mul_ps(s2, m2[2]);
-	__m128 r3 = _mm_mul_ps(s3, m2_3);
-	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	__m128 r0 = mul_ps(s0, m2[0]);
+	__m128 r1 = mul_ps(s1, m2[1]);
+	__m128 r2 = mul_ps(s2, m2[2]);
+	__m128 r3 = mul_ps(s3, m2_3);
+	out[0] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[1]);
 	s1 = yyyy_ps(m1[1]);
 	s2 = zzzz_ps(m1[1]);
 	s3 = wwww_ps(m1[1]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2_3);
+	out[1] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[2]);
 	s1 = yyyy_ps(m1[2]);
 	s2 = zzzz_ps(m1[2]);
 	s3 = wwww_ps(m1[2]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2_3);
+	out[2] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[3]);
 	s1 = yyyy_ps(m1[3]);
 	s2 = zzzz_ps(m1[3]);
 	s3 = wwww_ps(m1[3]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[3] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2_3);
+	out[3] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 }
 
 // Multiplies a 3x4 matrix by a 4x4 matrix, producing a 4x4 matrix.
@@ -481,31 +481,31 @@ inline void mat3x4_mul_mat4x4_sse(__m128 *out, const __m128 *m1, const __m128 *m
 	__m128 s1 = yyyy_ps(m1[0]);
 	__m128 s2 = zzzz_ps(m1[0]);
 	__m128 s3 = wwww_ps(m1[0]);
-	__m128 r0 = _mm_mul_ps(s0, m2[0]);
-	__m128 r1 = _mm_mul_ps(s1, m2[1]);
-	__m128 r2 = _mm_mul_ps(s2, m2[2]);
-	__m128 r3 = _mm_mul_ps(s3, m2[3]);
-	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	__m128 r0 = mul_ps(s0, m2[0]);
+	__m128 r1 = mul_ps(s1, m2[1]);
+	__m128 r2 = mul_ps(s2, m2[2]);
+	__m128 r3 = mul_ps(s3, m2[3]);
+	out[0] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[1]);
 	s1 = yyyy_ps(m1[1]);
 	s2 = zzzz_ps(m1[1]);
 	s3 = wwww_ps(m1[1]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2[3]);
-	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2[3]);
+	out[1] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[2]);
 	s1 = yyyy_ps(m1[2]);
 	s2 = zzzz_ps(m1[2]);
 	s3 = wwww_ps(m1[2]);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	r3 = _mm_mul_ps(s3, m2[3]);
-	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	r3 = mul_ps(s3, m2[3]);
+	out[2] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	out[3] = m2[3];
 }
@@ -521,27 +521,27 @@ inline void mat3x3_mul_mat4x4_sse(__m128 *out, const float *m1, const __m128 *m2
 	__m128 s0 = xxxx_ps(m1_0);
 	__m128 s1 = yyyy_ps(m1_0);
 	__m128 s2 = zzzz_ps(m1_0);
-	__m128 r0 = _mm_mul_ps(s0, m2[0]);
-	__m128 r1 = _mm_mul_ps(s1, m2[1]);
-	__m128 r2 = _mm_mul_ps(s2, m2[2]);
-	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), r2);
+	__m128 r0 = mul_ps(s0, m2[0]);
+	__m128 r1 = mul_ps(s1, m2[1]);
+	__m128 r2 = mul_ps(s2, m2[2]);
+	out[0] = add_ps(add_ps(r0, r1), r2);
 
 	s0 = wwww_ps(m1_0);
 	__m128 m1_1 = loadu_ps(m1+4);
 	s1 = xxxx_ps(m1_1);
 	s2 = yyyy_ps(m1_1);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), r2);
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	out[1] = add_ps(add_ps(r0, r1), r2);
 
 	s0 = zzzz_ps(m1_1);
 	s1 = wwww_ps(m1_1);
 	s2 = load1_ps(m1+8);
-	r0 = _mm_mul_ps(s0, m2[0]);
-	r1 = _mm_mul_ps(s1, m2[1]);
-	r2 = _mm_mul_ps(s2, m2[2]);
-	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), r2);
+	r0 = mul_ps(s0, m2[0]);
+	r1 = mul_ps(s1, m2[1]);
+	r2 = mul_ps(s2, m2[2]);
+	out[2] = add_ps(add_ps(r0, r1), r2);
 
 	out[3] = m2[3];
 }
@@ -555,47 +555,47 @@ inline void mat4x4_mul_mat3x3_sse(__m128 *out, const __m128 *m1, const float *m2
 	__m128 m2_0 = load_vec3(m2, 0.f);
 	__m128 m2_1 = load_vec3(m2+3, 0.f);
 	__m128 m2_2 = load_vec3(m2+6, 0.f);
-	const __m128 m2_3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
+	const __m128 m2_3 = set_ps(1.f, 0.f, 0.f, 0.f);
 
 	__m128 s0 = xxxx_ps(m1[0]);
 	__m128 s1 = yyyy_ps(m1[0]);
 	__m128 s2 = zzzz_ps(m1[0]);
 	__m128 s3 = wwww_ps(m1[0]);
-	__m128 r0 = _mm_mul_ps(s0, m2_0);
-	__m128 r1 = _mm_mul_ps(s1, m2_1);
-	__m128 r2 = _mm_mul_ps(s2, m2_2);
-	__m128 r3 = _mm_mul_ps(s3, m2_3);
-	out[0] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	__m128 r0 = mul_ps(s0, m2_0);
+	__m128 r1 = mul_ps(s1, m2_1);
+	__m128 r2 = mul_ps(s2, m2_2);
+	__m128 r3 = mul_ps(s3, m2_3);
+	out[0] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[1]);
 	s1 = yyyy_ps(m1[1]);
 	s2 = zzzz_ps(m1[1]);
 	s3 = wwww_ps(m1[1]);
-	r0 = _mm_mul_ps(s0, m2_0);
-	r1 = _mm_mul_ps(s1, m2_1);
-	r2 = _mm_mul_ps(s2, m2_2);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[1] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2_0);
+	r1 = mul_ps(s1, m2_1);
+	r2 = mul_ps(s2, m2_2);
+	r3 = mul_ps(s3, m2_3);
+	out[1] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[2]);
 	s1 = yyyy_ps(m1[2]);
 	s2 = zzzz_ps(m1[2]);
 	s3 = wwww_ps(m1[2]);
-	r0 = _mm_mul_ps(s0, m2_0);
-	r1 = _mm_mul_ps(s1, m2_1);
-	r2 = _mm_mul_ps(s2, m2_2);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[2] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2_0);
+	r1 = mul_ps(s1, m2_1);
+	r2 = mul_ps(s2, m2_2);
+	r3 = mul_ps(s3, m2_3);
+	out[2] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 
 	s0 = xxxx_ps(m1[3]);
 	s1 = yyyy_ps(m1[3]);
 	s2 = zzzz_ps(m1[3]);
 	s3 = wwww_ps(m1[3]);
-	r0 = _mm_mul_ps(s0, m2_0);
-	r1 = _mm_mul_ps(s1, m2_1);
-	r2 = _mm_mul_ps(s2, m2_2);
-	r3 = _mm_mul_ps(s3, m2_3);
-	out[3] = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+	r0 = mul_ps(s0, m2_0);
+	r1 = mul_ps(s1, m2_1);
+	r2 = mul_ps(s2, m2_2);
+	r3 = mul_ps(s3, m2_3);
+	out[3] = add_ps(add_ps(r0, r1), add_ps(r2, r3));
 }
 // Computes the inverse of a 4x4 matrix via direct cofactor expansion.
 /// Returns the determinant of the original matrix, and zero on failure.
