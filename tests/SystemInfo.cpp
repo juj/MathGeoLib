@@ -12,13 +12,23 @@
 
 std::string TrimLeft(std::string str)
 {
-	return str.substr(str.find_first_not_of(" \n\r\t"));
+	size_t pos = str.find_first_not_of(" \n\r\t");
+	if (pos != std::string::npos)
+		return str.substr(pos);
+	else
+		return "";
 }
 
 std::string TrimRight(std::string str)
 {
-	str.erase(str.find_last_not_of(" \n\r\t")+1);
-	return str;
+	size_t pos = str.find_last_not_of(" \n\r\t");
+	if (pos != std::string::npos)
+	{
+		str.erase(pos+1);
+		return str;
+	}
+	else
+		return "";
 }
 
 std::string Trim(std::string str)
