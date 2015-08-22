@@ -769,7 +769,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Neg_simd, "test against Float4_Neg")
 {
-	v3[i] = negate_ps(v[i]);
+	v3[i] = neg_ps(v[i]);
 }
 BENCHMARK_END;
 #endif

@@ -236,7 +236,7 @@ float Quat::InverseAndNormalize()
 void Quat::Conjugate()
 {
 #ifdef MATH_AUTOMATIC_SSE
-	q = negate3_ps(q);
+	q = neg3_ps(q);
 #else
 	x = -x;
 	y = -y;
@@ -247,7 +247,7 @@ void Quat::Conjugate()
 Quat MUST_USE_RESULT Quat::Conjugated() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return negate3_ps(q);
+	return neg3_ps(q);
 #else
 	return Quat(-x, -y, -z, w);
 #endif
@@ -605,7 +605,7 @@ Quat MUST_USE_RESULT Quat::RotateFromTo(const float4 &sourceDirection, const flo
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Best: 12.289 nsecs / 33.144 ticks, Avg: 12.489 nsecs, Worst: 14.210 nsecs
 	simd4f cosAngle = dot4_ps(sourceDirection.v, targetDirection.v);
-	cosAngle = negate3_ps(cosAngle); // [+ - - -]
+	cosAngle = neg3_ps(cosAngle); // [+ - - -]
 	// XYZ channels use the trigonometric formula sin(x/2) = +/-sqrt(0.5-0.5*cosx))
 	// The W channel uses the trigonometric formula cos(x/2) = +/-sqrt(0.5+0.5*cosx))
 	simd4f half = set1_ps(0.5f);
@@ -809,7 +809,7 @@ Quat Quat::operator -(const Quat &rhs) const
 Quat Quat::operator -() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return negate_ps(q);
+	return neg_ps(q);
 #else
 	return Quat(-x, -y, -z, -w);
 #endif

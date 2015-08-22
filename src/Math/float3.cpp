@@ -37,8 +37,16 @@
 #include "../Geometry/Capsule.h"
 #include "MathFunc.h"
 
+#ifdef MATH_SIMD
+#include "simd.h"
+#endif
+
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 #include "float4_sse.h"
+#endif
+
+#ifdef MATH_NEON
+#include "float4_neon.h"
 #endif
 
 MATH_BEGIN_NAMESPACE

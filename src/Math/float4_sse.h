@@ -39,7 +39,7 @@ FORCE_INLINE simd4f sum_xyz_ps(simd4f m)
 	simd4f X = xxxx_ps(m);
 	simd4f Y = yyyy_ps(m);
 	simd4f Z = zzzz_ps(m);
-	simd4f XYZ = add_ps(X, add_ps(Y, Z)); 
+	simd4f XYZ = add_ps(X, add_ps(Y, Z));
 	return XYZ; // Each index of the output will contain the sum x+y+z.
 #endif
 }
@@ -129,17 +129,6 @@ FORCE_INLINE simd4f dot4_ps(simd4f a, simd4f b)
 FORCE_INLINE float dot4_float(simd4f a, simd4f b)
 {
 	return s4f_x(dot4_ps(a, b));
-}
-
-FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
-{
-	simd4f a_xzy = shuffle1_ps(a, _MM_SHUFFLE(3, 0, 2, 1)); // = [a.w, a.x, a.z, a.y]
-	simd4f b_xzy = shuffle1_ps(b, _MM_SHUFFLE(3, 0, 2, 1)); // = [b.w, b.x, b.z, b.y]
-
-	simd4f x_yxz = mul_ps(b_xzy, a); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
-	simd4f y_yxz = mul_ps(a_xzy, b); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
-
-	return shuffle1_ps(sub_ps(x_yxz, y_yxz), _MM_SHUFFLE(3, 0, 2, 1)); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
 FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)

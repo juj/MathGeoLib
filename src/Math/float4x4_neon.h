@@ -253,10 +253,10 @@ FORCE_INLINE void mat4x4_negate(simd4f *out, const simd4f *mat)
 	o[0] = _mm256_sub_ps(zero, m[0]);
 	o[1] = _mm256_sub_ps(zero, m[1]);
 #else
-	out[0] = negate_ps(mat[0]);
-	out[1] = negate_ps(mat[1]);
-	out[2] = negate_ps(mat[2]);
-	out[3] = negate_ps(mat[3]);
+	out[0] = neg_ps(mat[0]);
+	out[1] = neg_ps(mat[1]);
+	out[2] = neg_ps(mat[2]);
+	out[3] = neg_ps(mat[3]);
 #endif
 }
 

@@ -680,7 +680,7 @@ FORCE_INLINE void mat3x4_inverse_orthonormal(const __m128 *mat, __m128 *out)
 	tx = _mm_mul_ps(tx, mat[0]);
 	ty = _mm_mul_ps(ty, mat[1]);
 	tz = _mm_mul_ps(tz, mat[2]);
-	__m128 vec = negate_ps(_mm_add_ps(_mm_add_ps(tx, ty), tz));
+	__m128 vec = neg_ps(_mm_add_ps(_mm_add_ps(tx, ty), tz));
 
 	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]); // [11,01,10,00]
 	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]); // [ty,tx,12,02]
@@ -714,7 +714,7 @@ FORCE_INLINE void mat3x4_inverse_orthogonal_uniformscale(const __m128 *mat, __m1
 	tx = mul_ps(tx, m0);
 	ty = mul_ps(ty, m1);
 	tz = mul_ps(tz, m2);
-	simd4f vec = negate_ps(add_ps(add_ps(tx, ty), tz));
+	simd4f vec = neg_ps(add_ps(add_ps(tx, ty), tz));
 
 	simd4f tmp0 = _mm_unpacklo_ps(m0, m1); // [11,01,10,00]
 	simd4f tmp1 = _mm_unpackhi_ps(m0, m1); // [ty,tx,12,02]
@@ -747,7 +747,7 @@ FORCE_INLINE void mat3x4_inverse_colorthogonal(const __m128 *mat, __m128 *out)
 	tx = mul_ps(tx, m0);
 	ty = mul_ps(ty, m1);
 	tz = mul_ps(tz, m2);
-	simd4f vec = negate_ps(add_ps(add_ps(tx, ty), tz));
+	simd4f vec = neg_ps(add_ps(add_ps(tx, ty), tz));
 
 	simd4f tmp0 = _mm_unpacklo_ps(m0, m1); // [11,01,10,00]
 	simd4f tmp1 = _mm_unpackhi_ps(m0, m1); // [ty,tx,12,02]

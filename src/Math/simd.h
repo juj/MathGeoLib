@@ -60,7 +60,13 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define load_ps _mm_load_ps
 #define load1_ps _mm_load1_ps
 #define stream_ps _mm_stream_ps
-#define neg_ps(x) xor_ps((x), simd4fSignBit)
+
+// NOTE: This version was benchmarked to be minutely better than the sub_ps(zero_ps) version on a SSE 4.1 capable system in OBB::ClosestPoint(point):
+// sub_ps&zero_ps: Best: 8.833 nsecs / 24 ticks, Avg: 9.044 nsecs, Worst: 9.217 nsecs
+// xor_ps&signMask: Best: 8.833 nsecs / 23.768 ticks, Avg: 8.975 nsecs, Worst: 9.601 nsecs
+// However the memory load is still worrying, so using the zero_ps still for now.
+//#define neg_ps(x) _mm_xor_ps((x), sseSignMask)
+#define neg_ps(x) sub_ps(zero_ps(), (x))
 
 #if defined(MATH_SSE2) && !defined(MATH_AVX) // We can use the pshufd instruction, which was introduced in SSE2 32-bit integer ops.
 /// Swizzles/permutes a single SSE register into another SSE register. Requires SSE2. This has the advantage of not destroying the input operand, but the disadvantage is that it requires a
@@ -74,6 +80,7 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define yyyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,1,1))
 #define zzzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,2,2))
 #define wwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,3))
+#define yzxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,2,1))
 
 #ifdef MATH_SSE3
 // _mm_moveldup_ps and _mm_movehdup_ps are better than shuffle, since they don't destroy the input operands (under non-AVX).
@@ -146,12 +153,14 @@ int FORCE_INLINE allzero_ps(simd4f x)
 }
 #endif
 
-// Multiply-add. These are otherwise identical, except note that the FMA version is specced to have
+// Multiply-add. These are otherwise identical, except that the FMA version is specced to have
 // better precision with respect to rounding.
 #ifdef MATH_FMA
 #define madd_ps _mm_fmadd_ps
+#define msub_ps _mm_fmsub_ps
 #else
 #define madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
+#define msub_ps(a, b, c) _mm_sub_ps(_mm_mul_ps((a), (b)), (c))
 #endif
 
 static inline __m128 load_vec3(const float *ptr, float w)
@@ -200,7 +209,6 @@ static inline __m128 rsqrt_ps(__m128 x)
 #define cmpgt_ps _mm_cmpgt_ps
 #define cmple_ps _mm_cmple_ps
 #define cmplt_ps _mm_cmplt_ps
-#define negate3_ps(x) xor_ps(x, sseSignMask3)
 
 /// Returns the lowest element of the given sse register as a float.
 /// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
@@ -337,22 +345,51 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 
 #define add_ps vaddq_f32
 #define sub_ps vsubq_f32
+#define neg_ps vnegq_f32
 #define mul_ps vmulq_f32
-#define div_ps(a, b) ((a) / (b))
 #define min_ps vminq_f32
 #define max_ps vmaxq_f32
 #define s4f_to_s4i(s4f) vreinterpretq_u32_f32((s4f))
 #define s4i_to_s4f(s4i) vreinterpretq_f32_u32((s4i))
 #define and_ps(x, y) s4i_to_s4f(vandq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
-#define andnot_ps(x, y) s4i_to_s4f(vbicq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
+#define andnot_ps(x, y) s4i_to_s4f(vbicq_u32(s4f_to_s4i(y), s4f_to_s4i(x)))
 #define or_ps(x, y) s4i_to_s4f(vorrq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
 #define xor_ps(x, y) s4i_to_s4f(veorq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
 #define ornot_ps(x, y) s4i_to_s4f(vornq_u32(s4f_to_s4i(x), s4f_to_s4i(y)))
 
 #define s4f_x(vec) vgetq_lane_f32((vec), 0)
 #define s4f_y(vec) vgetq_lane_f32((vec), 1)
-#define s4f_z(vec) vgetq_lane_f32((vec), 0)
-#define s4f_w(vec) vgetq_lane_f32((vec), 1)
+#define s4f_z(vec) vgetq_lane_f32((vec), 2)
+#define s4f_w(vec) vgetq_lane_f32((vec), 3)
+
+// These are all expected to compile down to a single 1-cycle instruction. Reference: http://community.arm.com/groups/processors/blog/2012/03/13/coding-for-neon--part-5-rearranging-vectors
+// Duplicate lo to hi or hi to lo
+FORCE_INLINE simd4f xyxy_ps(simd4f vec) { float32x2_t xy = vget_low_f32(vec); return vcombine_f32(xy, xy); }
+FORCE_INLINE simd4f zwzw_ps(simd4f vec) { float32x2_t zw = vget_high_f32(vec); return vcombine_f32(zw, zw); }
+// Swap elements in low pair, high pair, or both
+FORCE_INLINE simd4f yxzw_ps(simd4f vec) { float32x2_t xy = vget_low_f32(vec); float32x2_t zw = vget_high_f32(vec); return vcombine_f32(vrev64_f32(xy), zw); }
+FORCE_INLINE simd4f xywz_ps(simd4f vec) { float32x2_t xy = vget_low_f32(vec); float32x2_t zw = vget_high_f32(vec); return vcombine_f32(xy, vrev64_f32(zw)); }
+#define yxwz_ps vrev64q_f32
+// Swap low pair with high pair
+FORCE_INLINE simd4f zwxy_ps(simd4f vec) { float32x2_t xy = vget_low_f32(vec); float32x2_t zw = vget_high_f32(vec); return vcombine_f32(zw, xy); } // Should compiled down to a single "vswp d0, d1" instruction
+// Rotate lanes x->y, y->z, z->w, w->x or the other way around
+FORCE_INLINE simd4f yzwx_ps(simd4f vec) { uint32x4_t i = s4f_to_s4i(vec); return s4i_to_s4f(vextq_u32(i, i, 1)); }
+FORCE_INLINE simd4f wxyz_ps(simd4f vec) { uint32x4_t i = s4f_to_s4i(vec); return s4i_to_s4f(vextq_u32(i, i, 3)); }
+// Swap second and third element
+FORCE_INLINE simd4f xzyw_ps(simd4f vec) { float32x2x2_t v = vtrn_f32(vget_low_f32(vec), vget_high_f32(vec)); return vcombine_f32(v.val[0], v.val[1]); }
+// Swap second and third element, and then swap elements in low and high pairs
+FORCE_INLINE simd4f zxwy_ps(simd4f vec) { float32x2x2_t v = vtrn_f32(vget_high_f32(vec), vget_low_f32(vec)); return vcombine_f32(v.val[0], v.val[1]); }
+// Reverse whole vector (2 cycles, vrev64q followed by vswp)
+#define wzyx_ps(vec) zwxy_ps(yxwz_ps((vec)))
+
+// These are not quite 1-cycle swizzles, since they require duplicating the simd vector to another duplicate register to run, at least in GCC 4.6. (TODO: This might be avoidable with inline asm?)
+FORCE_INLINE simd4f xxyy_ps(simd4f vec) { return vzipq_f32(vec, vec).val[0]; } // Also could be done with vget_low_f32+v{uzp/vzip/vtrn}_f32, would that be better?
+FORCE_INLINE simd4f zzww_ps(simd4f vec) { return vzipq_f32(vec, vec).val[1]; }
+FORCE_INLINE simd4f xxzz_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[0]; }
+FORCE_INLINE simd4f yyww_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[1]; }
+FORCE_INLINE simd4f xzxz_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[0]; }
+FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
+#define yzxw_ps(vec) xywz_ps(yzwx_ps(vec))
 
 #define set1_ps vdupq_n_f32
 #define setx_ps vdupq_n_f32
@@ -368,11 +405,13 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 
 #if defined(MATH_VFPv4) || defined(MATH_NEONv2)
 #define madd_ps vmlaq_f32
+#define msub_ps vmlsq_f32
 #else
 #define madd_ps(a, b, c) add_ps(mul_ps((a), (b)), (c))
+#define msub_ps(a, b, c) sub_ps(mul_ps((a), (b)), (c))
 #endif
 
-static inline simd4f rcp_ps(simd4f x)
+static FORCE_INLINE simd4f rcp_ps(simd4f x)
 {
 	simd4f e = vrecpeq_f32(x);
 	e = vmulq_f32(e, vrecpsq_f32(x, e));
@@ -380,7 +419,15 @@ static inline simd4f rcp_ps(simd4f x)
 	return e;
 }
 
-static inline simd4f rsqrt_ps(simd4f x)
+static FORCE_INLINE simd4f div_ps(simd4f num, simd4f denom)
+{
+        simd4f e = vrecpeq_f32(denom);
+        e = vmulq_f32(e, vrecpsq_f32(denom, e));
+        e = vmulq_f32(e, vrecpsq_f32(denom, e));
+        return vmulq_f32(num, e);
+}
+
+static FORCE_INLINE simd4f rsqrt_ps(simd4f x)
 {
 	simd4f e = vrsqrteq_f32(x);
 	e = vmulq_f32(e, vrsqrtsq_f32(x, vmulq_f32(e, e)));
@@ -442,6 +489,19 @@ FORCE_INLINE simd4f pos_from_scalar_ps(float scalar)
 	return vsetq_lane_f32(1.f, vdupq_n_f32(scalar), 3);
 }
 
+FORCE_INLINE simd4f load_vec3(const float *ptr, float w)
+{
+	float32x2_t low = vld1_f32(ptr); // [y x]
+	float32x2_t high = (float32x2_t) { ptr[2], w }; // [w z]
+	return vcombine_f32(low, high); // [w z y x]
+}
+
+FORCE_INLINE void store_vec3(float *ptr, simd4f v)
+{
+	vst1_f32(ptr, vget_low_f32(v)); // store x & y
+	vst1q_lane_f32(ptr+2, v, 2); // store z
+}
+
 #endif // ~MATH_NEON
 
 // TODO: Which is better codegen - use simd4fZero constant everywhere, or explicitly refer to zero_ps() everywhere,
@@ -451,13 +511,7 @@ const simd4f simd4fOne      = set1_ps(1.f);
 const simd4f simd4fMinusOne = set1_ps(-1.f);
 const simd4f simd4fEpsilon  = set1_ps(1e-4f);
 
-// NOTE: This version was benchmarked to be minutely better than the sub_ps(zero_ps) version on a SSE 4.1 capable system in OBB::ClosestPoint(point):
-// sub_ps&zero_ps: Best: 8.833 nsecs / 24 ticks, Avg: 9.044 nsecs, Worst: 9.217 nsecs
-// xor_ps&signMask: Best: 8.833 nsecs / 23.768 ticks, Avg: 8.975 nsecs, Worst: 9.601 nsecs
-// However the memory load is still worrying, so using the zero_ps still for now.
-//#define negate_ps(x) _mm_xor_ps(x, sseSignMask)
-
-#define negate_ps(x) sub_ps(zero_ps(), (x))
+#define neg3_ps(x) xor_ps((x), sseSignMask3)
 
 // If mask[i] == 0, then output index i from a, otherwise mask[i] must be 0xFFFFFFFF, and output index i from b.
 FORCE_INLINE simd4f cmov_ps(simd4f a, simd4f b, simd4f mask)

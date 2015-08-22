@@ -2183,11 +2183,11 @@ vec OBB::ClosestPoint(const vec &targetPoint) const
 	simd4f d = sub_ps(targetPoint.v, pos.v);
 	simd4f x = xxxx_ps(r.v);
 	simd4f closestPoint = pos.v;
-	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[0].v), x), negate_ps(x)), axis[0].v));
+	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[0].v), x), neg_ps(x)), axis[0].v));
 	simd4f y = yyyy_ps(r.v);
-	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[1].v), y), negate_ps(y)), axis[1].v));
+	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[1].v), y), neg_ps(y)), axis[1].v));
 	simd4f z = zzzz_ps(r.v);
-	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[2].v), z), negate_ps(z)), axis[2].v));
+	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[2].v), z), neg_ps(z)), axis[2].v));
 	return closestPoint;
 #else
 	// Best: 33.412 nsecs / 89.952 ticks, Avg: 33.804 nsecs, Worst: 34.180 nsecs

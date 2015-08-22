@@ -659,7 +659,7 @@ float4 float4::Abs() const
 float4 float4::Neg3() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return negate3_ps(v);
+	return neg3_ps(v);
 #else
 	return float4(-x, -y, -z, w);
 #endif
@@ -668,7 +668,7 @@ float4 float4::Neg3() const
 float4 float4::Neg4() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return negate_ps(v);
+	return neg_ps(v);
 #else
 	return float4(-x, -y, -z, -w);
 #endif
@@ -1322,7 +1322,7 @@ float4 float4::operator -(const float4 &rhs) const
 float4 float4::operator -() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return negate_ps(v);
+	return neg_ps(v);
 #else
 	return float4(-x, -y, -z, -w);
 #endif

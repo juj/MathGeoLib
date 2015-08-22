@@ -112,6 +112,17 @@ FORCE_INLINE simd4f vec4_recip(simd4f vec)
 #endif
 }
 
+FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
+{
+	simd4f a_xzy = yzxw_ps(a); // = [a.w, a.x, a.z, a.y]
+	simd4f b_xzy = yzxw_ps(b); // = [b.w, b.x, b.z, b.y]
+
+	simd4f x_yxz = mul_ps(b_xzy, a); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
+	simd4f y_yxz = mul_ps(a_xzy, b); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
+
+	return yzxw_ps(sub_ps(x_yxz, y_yxz)); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+}
+
 #ifdef MATH_NEON
 inline std::string ToString(uint8x8x2_t vec)
 {
@@ -149,10 +160,22 @@ FORCE_INLINE simd4f vec4_permute(simd4f vec, int i, int j, int k, int l)
 
 #ifdef MATH_NEON
 
-FORCE_INLINE float sum_xyzw_float(simd4f vec)
+FORCE_INLINE simd4f sum_xyzw_ps(simd4f vec)
 {
 	float32x2_t r = vadd_f32(vget_high_f32(vec), vget_low_f32(vec));
-	return vget_lane_f32(vpadd_f32(r, r), 0);
+	r = vpadd_f32(r, r);
+	return vcombine_f32(r, r);
+}
+
+FORCE_INLINE simd4f sum_xyz_ps3(simd4f m)
+{
+	return sum_xyzw_ps(vsetq_lane_f32(0.f, m, 3));
+}
+#define sum_xyz_ps sum_xyz_ps3
+
+FORCE_INLINE float sum_xyzw_float(simd4f vec)
+{
+        return vgetq_lane_f32(sum_xyzw_ps(vec), 0);
 }
 
 FORCE_INLINE float mul_xyzw_float(simd4f vec)
@@ -161,13 +184,6 @@ FORCE_INLINE float mul_xyzw_float(simd4f vec)
 	float32x2_t hi = vget_high_f32(vec);
 	float32x2_t mul = vmul_f32(lo, hi);
 	return vget_lane_f32(mul, 0) * vget_lane_f32(mul, 1); ///\todo Can this be optimized somehow?
-}
-
-FORCE_INLINE simd4f negate3_ps(simd4f vec)
-{
-	static const ALIGN16 uint32_t indexData[4] = { 0x80000000UL, 0x80000000UL, 0x80000000UL, 0 };
-	static const uint64x2_t mask = vld1q_u64((const uint64_t*)indexData);
-	return vreinterpretq_f32_u64(veorq_u64(vreinterpretq_u64_f32(vec), mask));
 }
 
 FORCE_INLINE float sum_xyz_float(simd4f vec)
