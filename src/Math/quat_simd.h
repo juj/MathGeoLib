@@ -110,27 +110,16 @@ FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 
 FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 {
-	simd4f W = wwww_ps(quat);
-
-//	simd4f qxv = cross_ps(q, vec.v);
-	simd4f a_xzy = yzxw_ps(quat); // a_xzy = [a.w, a.x, a.z, a.y]
-	simd4f b_yxz = zxyw_ps(vec); // b_yxz = [b.w, b.y, b.x, b.z]
-	simd4f a_yxz = zxyw_ps(quat); // a_yxz = [a.w, a.y, a.x, a.z]
-	simd4f b_xzy = yzxw_ps(vec); // b_xzy = [b.w, b.x, b.z, b.y]
-	simd4f x = mul_ps(a_xzy, b_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	simd4f y = mul_ps(a_yxz, b_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
-	simd4f qxv = sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
-
+	const simd4f W = wwww_ps(quat);
+	const simd4f a_yzx = yzxw_ps(quat);
+	simd4f x = mul_ps(quat, yzxw_ps(vec));
+	simd4f y = mul_ps(a_yzx, vec);
+	simd4f qxv = sub_ps(x, y);
 	simd4f Wv = mul_ps(W, vec);
-	simd4f s = add_ps(qxv, Wv);
-
-//	s = cross_ps(q, s);
-	simd4f s_yxz = zxyw_ps(s); // b_yxz = [b.w, b.y, b.x, b.z]
-	simd4f s_xzy = yzxw_ps(s); // b_xzy = [b.w, b.x, b.z, b.y]
-	x = mul_ps(a_xzy, s_yxz); // [a.w*b.w, a.x*b.y, a.z*b.x, a.y*b.z]
-	y = mul_ps(a_yxz, s_xzy); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+	simd4f s = add_ps(qxv, zxyw_ps(Wv));
+	y = zxyw_ps(mul_ps(quat, s)); // [a.w*b.w, a.y*b.x, a.x*b.z, a.z*b.y]
+	x = mul_ps(a_yzx, s);
 	s = sub_ps(x, y); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
-
 	s = add_ps(s, s);
 	s = add_ps(s, vec);
 	return s;
