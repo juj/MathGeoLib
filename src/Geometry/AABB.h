@@ -33,12 +33,11 @@
 #endif
 
 MATH_BEGIN_NAMESPACE
-
 /// A 3D axis-aligned bounding box.
 /** This data structure can be used to represent coarse bounds of objects, in situations where detailed triangle-level
 	computations can be avoided. In physics systems, bounding boxes are used as an efficient early-out test for geometry
 	intersection queries.
-	
+
 	The 'axis-aligned' part in the name means that the local axes of this bounding box are restricted to align with the
 	axes of the world space coordinate system. This makes computations involving AABB's very fast, since AABB's cannot
 	be arbitrarily oriented in the space with respect to each other.
@@ -66,7 +65,7 @@ public:
 	/// Constructs this AABB to enclose the given OBB.
 	/** This constructor computes the optimal minimum volume AABB that encloses the given OBB.
 		@note Since an AABB cannot generally represent an OBB, this conversion is not exact, but the returned AABB
-			specifies a larger volume.			
+			specifies a larger volume.
 		@see class OBB. */
 	explicit AABB(const OBB &obb);
 
@@ -107,7 +106,7 @@ public:
 		@see SetCenter(), class OBB. */
 	void SetFrom(const OBB &obb);
 
-	// Computes the minimal enclosing AABB of the given polyhedron.		
+	// Computes the minimal enclosing AABB of the given polyhedron.
 	/* This function computes the smallest AABB (in terms of volume) that contains the given polyhedron, and stores
 		the result in this structure.
 		@note An AABB cannot generally exactly represent a polyhedron. Converting a polyhedron to an AABB loses some
@@ -484,7 +483,7 @@ public:
 	{
 		return (numFacesX*numFacesY + numFacesX*numFacesZ + numFacesY*numFacesZ)*2*6;
 	}
-	
+
 	/// Generates an edge list representation of the edges of this AABB.
 	/** @param outPos [out] An array that contains space for at least 24 vertices (NumVerticesInEdgeList()).
 		@see Triangulate(), Edge(), NumVerticesInEdgeList(). */
@@ -552,7 +551,7 @@ public:
 	bool IntersectLineAABB(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const;
 
 	bool IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const;
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float tNear, float tFar) const;
 #endif
 

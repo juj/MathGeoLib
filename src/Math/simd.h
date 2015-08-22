@@ -82,6 +82,11 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define wwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,3))
 #define yzxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,2,1))
 
+// Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
+#define axx_bxx_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(0,0,0,0))
+#define ayy_byy_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(1,1,1,1)) // [b.y, b.y, a.y, a.y]
+#define azz_bzz_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(2,2,2,2)) // [b.z, b.z, a.z, a.z]
+
 #ifdef MATH_SSE3
 // _mm_moveldup_ps and _mm_movehdup_ps are better than shuffle, since they don't destroy the input operands (under non-AVX).
 #define xxzz_ps(x) _mm_moveldup_ps((x))
@@ -209,6 +214,8 @@ static inline __m128 rsqrt_ps(__m128 x)
 #define cmpgt_ps _mm_cmpgt_ps
 #define cmple_ps _mm_cmple_ps
 #define cmplt_ps _mm_cmplt_ps
+
+#define comieq_ss _mm_comieq_ss
 
 /// Returns the lowest element of the given sse register as a float.
 /// @note When compiling with /arch:SSE or newer, it is expected that this function is a no-op "cast", since
@@ -363,6 +370,12 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define s4f_w(vec) vgetq_lane_f32((vec), 3)
 
 // These are all expected to compile down to a single 1-cycle instruction. Reference: http://community.arm.com/groups/processors/blog/2012/03/13/coding-for-neon--part-5-rearranging-vectors
+
+// Broadcast a single lane to all lanes
+#define xxxx_ps(a) vdupq_lane_f32(vget_low_f32((a)), 0)
+#define yyyy_ps(a) vdupq_lane_f32(vget_low_f32((a)), 1)
+#define zzzz_ps(a) vdupq_lane_f32(vget_high_f32((a)), 0)
+#define wwww_ps(a) vdupq_lane_f32(vget_high_f32((a)), 1)
 // Duplicate lo to hi or hi to lo
 FORCE_INLINE simd4f xyxy_ps(simd4f vec) { float32x2_t xy = vget_low_f32(vec); return vcombine_f32(xy, xy); }
 FORCE_INLINE simd4f zwzw_ps(simd4f vec) { float32x2_t zw = vget_high_f32(vec); return vcombine_f32(zw, zw); }
@@ -390,6 +403,11 @@ FORCE_INLINE simd4f yyww_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[1]; }
 FORCE_INLINE simd4f xzxz_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[0]; }
 FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
 #define yzxw_ps(vec) xywz_ps(yzwx_ps(vec))
+
+// Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
+#define axx_bxx_ps(a, b) xxzz_ps(vcombine_f32(vget_low_f32((a)), vget_low_f32((b))))
+#define ayy_byy_ps(a, b) yyww_ps(vcombine_f32(vget_low_f32((a)), vget_low_f32((b)))) // [b.y, b.y, a.y, a.y]
+#define azz_bzz_ps(a, b) xxzz_ps(vcombine_f32(vget_high_f32((a)), vget_high_f32((b)))) // [b.z, b.z, a.z, a.z]
 
 #define set1_ps vdupq_n_f32
 #define setx_ps vdupq_n_f32
@@ -437,11 +455,12 @@ static FORCE_INLINE simd4f rsqrt_ps(simd4f x)
 
 static inline simd4f sqrt_ps(simd4f x) { return mul_ps(x, rsqrt_ps(x)); }
 
-#define cmpeq_ps(a, b) vreinterpretq_f32_u32(vceqq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
-#define cmpge_ps(a, b) vreinterpretq_f32_u32(vcgeq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
-#define cmpgt_ps(a, b) vreinterpretq_f32_u32(vcgtq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
-#define cmple_ps(a, b) vreinterpretq_f32_u32(vcleq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
-#define cmplt_ps(a, b) vreinterpretq_f32_u32(vcltq_u32(vreinterpretq_u32_f32((a)), vreinterpretq_u32_f32((b))))
+#define cmpeq_ps(a, b) vreinterpretq_f32_u32(vceqq_f32((a), (b)))
+#define cmpge_ps(a, b) vreinterpretq_f32_u32(vcgeq_f32((a), (b)))
+#define cmpgt_ps(a, b) vreinterpretq_f32_u32(vcgtq_f32((a), (b)))
+#define cmple_ps(a, b) vreinterpretq_f32_u32(vcleq_f32((a), (b)))
+#define cmplt_ps(a, b) vreinterpretq_f32_u32(vcltq_f32((a), (b)))
+#define comieq_ss(a, b) ((s4f_x((a)) == s4f_x((b))) ? 1 : 0)
 
 // This might not be the most efficient form, and typically it is better to avoid this in NEON, and instead
 // prefer the scattering/gathering loads and stores instead.
@@ -500,6 +519,16 @@ FORCE_INLINE void store_vec3(float *ptr, simd4f v)
 {
 	vst1_f32(ptr, vget_low_f32(v)); // store x & y
 	vst1q_lane_f32(ptr+2, v, 2); // store z
+}
+
+FORCE_INLINE uint32_t allzero_ps(simd4f v)
+{
+	float32x2_t xy = vget_low_f32(v);
+	float32x2_t zw = vget_high_f32(v);
+	uint32x2_t orr = vorr_u32(vreinterpret_u32_f32(xy), vreinterpret_u32_f32(zw));
+	uint32_t a = vget_lane_u32(orr, 0);
+	uint32_t b = vget_lane_u32(orr, 1);
+	return ((a|b) == 0) ? 1 : 0;
 }
 
 #endif // ~MATH_NEON

@@ -524,7 +524,7 @@ void AABB::TransformAsAABB(const float4x4 &transform)
 	assume(transform.HasUniformScale());
 	assume(transform.Row(3).Equals(0,0,0,1));
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	AABBTransformAsAABB_SIMD(*this, transform);
 #else
 	AABBTransformAsAABB(*this, transform);
@@ -597,7 +597,7 @@ bool AABB::Contains(const vec &point) const
 // already "hot" in the registers. Therefore favoring the SSE version over the scalar version
 // when possible.
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	// Benchmark 'AABBContains_positive': AABB::Contains(point) positive
 	//    Best: 2.048 nsecs / 3.5128 ticks, Avg: 2.241 nsecs, Worst: 4.277 nsecs
 	// Benchmark 'AABBContains_negative': AABB::Contains(point) negative
@@ -628,7 +628,7 @@ bool AABB::Contains(const LineSegment &lineSegment) const
 
 bool AABB::Contains(const vec &aabbMinPoint, const vec &aabbMaxPoint) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	simd4f a = cmplt_ps(aabbMinPoint, minPoint);
 	simd4f b = cmpgt_ps(aabbMaxPoint, maxPoint);
 	a = or_ps(a, b);
@@ -688,7 +688,7 @@ bool AABB::Intersects(const Line &line) const
 	float tNear = -FLOAT_INF;
 	float tFar = FLOAT_INF;
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	return IntersectLineAABB_SSE(line.pos, line.dir, tNear, tFar);
 #else
 	return IntersectLineAABB_CPP(line.pos, line.dir, tNear, tFar);
@@ -700,7 +700,7 @@ bool AABB::Intersects(const Ray &ray) const
 	float tNear = 0;
 	float tFar = FLOAT_INF;
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	return IntersectLineAABB_SSE(ray.pos, ray.dir, tNear, tFar);
 #else
 	return IntersectLineAABB_CPP(ray.pos, ray.dir, tNear, tFar);
@@ -717,7 +717,7 @@ bool AABB::Intersects(const LineSegment &lineSegment) const
 	float invLen = 1.f / len;
 	dir *= invLen;
 	float tNear = 0.f, tFar = len;
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 	return IntersectLineAABB_SSE(lineSegment.a, dir, tNear, tFar);
 #else
 	return IntersectLineAABB_CPP(lineSegment.a, dir, tNear, tFar);
@@ -794,7 +794,7 @@ bool AABB::IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &
 	return tNear <= tFar;
 }
 
-#ifdef MATH_SSE
+#ifdef MATH_SIMD
 bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, float tNear, float tFar) const
 {
 	assume(rayDir.IsNormalized4());
@@ -860,13 +860,13 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	// If the ray is parallel to one of the axes, replace the slab range for that axis
 	// with [-inf, inf] range instead. (which is a no-op in the comparisons below)
 	nearD = cmov_ps(nearD, floatNegInf, zeroDirections);
-	farD = cmov_ps(farD , floatInf, zeroDirections);
+	farD = cmov_ps(farD, floatInf, zeroDirections);
 
 	// Next, we need to compute horizontally max(nearD[0], nearD[1], nearD[2]) and min(farD[0], farD[1], farD[2])
 	// to see if there is an overlap in the hit ranges.
-	simd4f v1 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(0, 0, 0, 0)); // [f1 f1 n1 n1]
-	simd4f v2 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(1, 1, 1, 1)); // [f2 f2 n2 n2]
-	simd4f v3 = _mm_shuffle_ps(nearD, farD, _MM_SHUFFLE(2, 2, 2, 2)); // [f3 f3 n3 n3]
+	simd4f v1 = axx_bxx_ps(nearD, farD); // [f1 f1 n1 n1]
+	simd4f v2 = ayy_byy_ps(nearD, farD); // [f2 f2 n2 n2]
+	simd4f v3 = azz_bzz_ps(nearD, farD); // [f3 f3 n3 n3]
 	nearD = max_ps(v1, max_ps(v2, v3));
 	farD = min_ps(v1, min_ps(v2, v3));
 	farD = wwww_ps(farD); // Unpack the result from high offset in the register.
@@ -874,7 +874,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	farD = min_ps(farD, setx_ps(tFar));
 
 	// Finally, test if the ranges overlap.
-	simd4f rangeIntersects = _mm_cmple_ss(nearD, farD);
+	simd4f rangeIntersects = cmple_ps(nearD, farD); // Only x channel used, higher ones ignored.
 
 	// To store out out the interval of intersection, uncomment the following:
 	// These are disabled, since without these, the whole function runs without a single memory store,
@@ -898,7 +898,7 @@ bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, flo
 	// parallel to some cardinal axis.
 	simd4f intersects = andnot_ps(zeroDirections, rangeIntersects);
 	simd4f epsilonMasked = and_ps(epsilon, intersects);
-	return _mm_comieq_ss(epsilon, epsilonMasked) != 0;
+	return comieq_ss(epsilon, epsilonMasked) != 0;
 }
 #endif
 
@@ -943,7 +943,7 @@ bool AABB::Intersects(const Plane &plane) const
 
 bool AABB::Intersects(const AABB &aabb) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE41)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	// Benchmark 'AABBIntersectsAABB_positive': AABB::Intersects(AABB) positive
 	//    Best: 2.229 nsecs / 3.848 ticks, Avg: 2.409 nsecs, Worst: 4.457 nsecs
 	// Benchmark 'AABBIntersectsAABB_random': AABB::Intersects(AABB) random
@@ -953,7 +953,7 @@ bool AABB::Intersects(const AABB &aabb) const
 	simd4f b = cmpge_ps(aabb.minPoint.v, maxPoint.v);
 	a = or_ps(a, b);
 	a = and_ps(a, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
-	return _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(a)) != 0;
+	return allzero_ps(a) != 0;
 #else
 	// Benchmark 'AABBIntersectsAABB_positive': AABB::Intersects(AABB) positive
 	//    Best: 2.108 nsecs / 3.588 ticks, Avg: 2.310 nsecs, Worst: 5.481 nsecs
@@ -1018,7 +1018,7 @@ void AABB::ProjectToAxis(const vec &axis, float &dMin, float &dMax) const
 	vec c = (minPoint + maxPoint) * 0.5f;
 	vec e = maxPoint - c;
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	vec absAxis = axis.Abs();
 	float r = Abs(e.Dot(absAxis));
 #else
@@ -1158,7 +1158,7 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 				float v = (float)y / (numFacesV);
 				float u2 = (float)(x+1) / (numFacesU);
 				float v2 = (float)(y+1) / (numFacesV);
-			
+
 				outPos[i]   = FacePoint(face, u, v);
 				outPos[i+1] = FacePoint(face, u, v2);
 				outPos[i+2] = FacePoint(face, u2, v);
