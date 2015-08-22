@@ -158,6 +158,7 @@ float Quat::Normalize()
 	simd4f isZero = cmplt_ps(lenSq, simd4fEpsilon); // Was the length zero?
 	simd4f normalized = mul_ps(q, len); // Normalize.
 	q = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
+	len = cmov_ps(len, zero_ps(), isZero); // If length == 0, output zero as length.
 	return s4f_x(len);
 #else
 	float length = Length();

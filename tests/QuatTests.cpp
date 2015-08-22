@@ -202,6 +202,37 @@ RANDOMIZED_TEST(Quat_RotateFromTo_float4)
 	assert2(v2.Equals(v2_), v2, v2_);
 }
 
+TEST(QuatNormalize)
+{
+	Quat q(-1.f, 2.f, 3.f, 4.f);
+	float oldLength = q.Normalize();
+	MARK_UNUSED(oldLength);
+	assertcmp(oldLength, >, 0);
+	assert(EqualAbs(q.x, -1.f / Sqrt(30.f)));
+	assert(EqualAbs(q.y, 2.f / Sqrt(30.f)));
+	assert(EqualAbs(q.z, 3.f / Sqrt(30.f)));
+	assert(EqualAbs(q.w, 4.f / Sqrt(30.f)));
+
+	Quat q2(0,0,0, 0.f);
+	oldLength = q2.Normalize();
+	MARK_UNUSED(oldLength);
+	assert(oldLength == 0.f);
+	assert(q2.x == 1.f);
+	assert(q2.y == 0.f);
+	assert(q2.z == 0.f);
+	assert(q2.w == 0.f);
+}
+
+TEST(QuatNormalized)
+{
+	Quat q(-1.f, 2.f, 3.f, -4.f);
+	Quat q2 = q.Normalized();
+	assert(EqualAbs(q2.x, -1.f / Sqrt(30.f)));
+	assert(EqualAbs(q2.y, 2.f / Sqrt(30.f)));
+	assert(EqualAbs(q2.z, 3.f / Sqrt(30.f)));
+	assert(EqualAbs(q2.w, -4.f / Sqrt(30.f)));
+}
+
 #ifdef ANDROID
 RANDOMIZED_TEST(quat_mul_quat_asm)
 {
