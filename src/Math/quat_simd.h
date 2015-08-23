@@ -26,7 +26,7 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
 	__m128 yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
 	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
-	
+
 	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
 	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
 	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
@@ -64,7 +64,7 @@ inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
 	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
 	__m128 yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
 	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
-	
+
 	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
 	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
 	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
@@ -108,6 +108,8 @@ FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
 	m[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 }
 
+#endif // ~MATH_SSE
+
 FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 {
 	const simd4f W = wwww_ps(quat);
@@ -125,9 +127,7 @@ FORCE_INLINE simd4f quat_transform_vec4(simd4f quat, simd4f vec)
 	return s;
 }
 
-#endif // ~MATH_SSE
-
-#ifdef ANDROID
+#if defined(ANDROID) && defined(MATH_NEON)
 inline void quat_mul_quat_asm(const void *q1, const void *q2, void *out)
 {
 /*	return Quat(x*r.w + y*r.z - z*r.y + w*r.x,
@@ -207,11 +207,11 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	out = madd_ps(Z, r3, out);
 	out = madd_ps(W, q2, out);
 	return out;
-#elif defined(ANDROID)
+#elif defined(ANDROID) && defined(MATH_NEON)
 	simd4f ret;
 	quat_mul_quat_asm(&q1, &q2, &ret);
 	return ret;
-#else // NEON
+#elif defined(MATH_NEON)
 	static const float32x4_t signx = set_ps_hex_const(0x80000000u, 0, 0x80000000u, 0);
 	static const float32x4_t signy = set_ps_hex_const(0x80000000u, 0x80000000u, 0, 0);
 	static const float32x4_t signz = set_ps_hex_const(0x80000000u, 0, 0, 0x80000000u);
@@ -234,7 +234,6 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 #endif
 }
 
-#ifdef MATH_SSE
 FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 {
 /*
@@ -264,7 +263,6 @@ FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 	out = madd_ps(W, q2, out);
 	return out;
 }
-#endif
 
 MATH_END_NAMESPACE
 
