@@ -282,7 +282,12 @@ unsigned long long GetTotalSystemPhysicalMemory()
 std::string GetProcessorBrandName()
 {
 	std::string r = RunProcess("cat /proc/cpuinfo");
-	return Trim(FindLine(FindLine(r, "vendor_id"),":"));
+	std::string vendor_id = Trim(FindLine(FindLine(r, "vendor_id"),":"));
+	// Slightly hacky mechanism to report generic ARM procesors that don't have a vendor_id in their /proc/cpuinfo.
+	if (vendor_id.empty() && !Trim(FindLine(GetProcessorCPUIDString(), "ARM")).empty())
+		return "ARM";
+	else
+		return "Unknown";
 }
 
 std::string GetProcessorCPUIDString()
