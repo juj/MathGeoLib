@@ -393,7 +393,7 @@ UNIQUE_TEST(sqrt_precision)
 		float X[C] = {};
 
 		LOGI("Within range of [0, %e]:", ranges[k]);
-		for(int i = 0; i < 1000000; ++i)
+		for(int i = 0; i < 100000; ++i)
 		{
 			float f = rng.Float(0.f, ranges[k]);
 			float x = (float)sqrt((double)f); // best precision of the Sqrt.
