@@ -223,13 +223,13 @@ float3x4 operator *(const float3x4 &lhs, const ScaleOp &rhs)
 float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
 {
 	float4x4 ret;
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	simd4f x = xxxx_ps(lhs.scale.v);
 	simd4f y = yyyy_ps(lhs.scale.v);
 	simd4f z = zzzz_ps(lhs.scale.v);
-	ret.row[0] = _mm_mul_ps(rhs.row[0], x);
-	ret.row[1] = _mm_mul_ps(rhs.row[1], y);
-	ret.row[2] = _mm_mul_ps(rhs.row[2], z);
+	ret.row[0] = mul_ps(rhs.row[0], x);
+	ret.row[1] = mul_ps(rhs.row[1], y);
+	ret.row[2] = mul_ps(rhs.row[2], z);
 	ret.row[3] = rhs.row[3];
 #else
 	ret[0][0] = rhs[0][0] * lhs.scale.x; ret[0][1] = rhs[0][1] * lhs.scale.x; ret[0][2] = rhs[0][2] * lhs.scale.x; ret[0][3] = rhs[0][3] * lhs.scale.x;

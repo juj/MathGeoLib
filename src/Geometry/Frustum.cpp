@@ -635,14 +635,14 @@ vec Frustum::ClosestPoint(const vec &point) const
 		assert(right.IsNormalized());
 		vec d = point - frustumCenter;
 		vec closestPoint = frustumCenter;
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 		// Best: 21.506 nsecs / 57.224 ticks, Avg: 21.683 nsecs, Worst: 22.659 nsecs
 		simd4f z = set1_ps(frontHalfSize);
-		closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d.v, front.v), z), neg_ps(z)), front.v));
+		closestPoint = madd_ps(max_ps(min_ps(dot4_ps(d.v, front.v), z), neg_ps(z)), front.v, closestPoint);
 		simd4f y = set1_ps(halfHeight);
-		closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d.v, up.v), y), neg_ps(y)), up.v));
+		closestPoint = madd_ps(max_ps(min_ps(dot4_ps(d.v, up.v), y), neg_ps(y)), up.v, closestPoint);
 		simd4f x = set1_ps(halfWidth);
-		closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d.v, right.v), x), neg_ps(x)), right.v));
+		closestPoint = madd_ps(max_ps(min_ps(dot4_ps(d.v, right.v), x), neg_ps(x)), right.v, closestPoint);
 #else
 		// Best: 30.724 nsecs / 82.192 ticks, Avg: 31.069 nsecs, Worst: 39.172 nsecs
 		closestPoint += Clamp(Dot(d, front), -frontHalfSize, frontHalfSize) * front;

@@ -733,10 +733,10 @@ bool Triangle::Intersects(const AABB &aabb) const
 	simd4f t1_wxzy  = yzxw_ps(t1);
 	simd4f at1_wxzy = yzxw_ps(at1);
 
-	simd4f d1 = sub_ps(mul_ps(t1_wxzy, ac_wyxz), mul_ps(t1_wyxz, ac_wxzy));
-	simd4f d2 = sub_ps(mul_ps(t1_wxzy, bc_wyxz), mul_ps(t1_wyxz, bc_wxzy));
+	simd4f d1 = msub_ps(t1_wxzy, ac_wyxz, mul_ps(t1_wyxz, ac_wxzy));
+	simd4f d2 = msub_ps(t1_wxzy, bc_wyxz, mul_ps(t1_wyxz, bc_wxzy));
 	simd4f tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
-	simd4f r = abs_ps(add_ps(mul_ps(h_wyxz, at1_wxzy), mul_ps(h_wxzy, at1_wyxz)));
+	simd4f r = abs_ps(madd_ps(h_wyxz, at1_wxzy, mul_ps(h_wxzy, at1_wyxz)));
 	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
 	// Note: The three masks of W channel could be omitted if cmplt_ps was used instead of cmple_ps, but
 	// want to be strict here and define that AABB and Triangle which touch at a vertex should not intersect.
@@ -751,10 +751,10 @@ bool Triangle::Intersects(const AABB &aabb) const
 	simd4f t2_wxzy  = yzxw_ps(t2);
 	simd4f at2_wxzy = yzxw_ps(at2);
 
-	d1 = sub_ps(mul_ps(t2_wxzy, ac_wyxz), mul_ps(t2_wyxz, ac_wxzy));
-	d2 = sub_ps(mul_ps(t2_wxzy, bc_wyxz), mul_ps(t2_wyxz, bc_wxzy));
+	d1 = msub_ps(t2_wxzy, ac_wyxz, mul_ps(t2_wyxz, ac_wxzy));
+	d2 = msub_ps(t2_wxzy, bc_wyxz, mul_ps(t2_wyxz, bc_wxzy));
 	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
-	r = abs_ps(add_ps(mul_ps(h_wyxz, at2_wxzy), mul_ps(h_wxzy, at2_wyxz)));
+	r = abs_ps(madd_ps(h_wyxz, at2_wxzy, mul_ps(h_wxzy, at2_wyxz)));
 	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
 	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
 	if (!allzero_ps(cmp)) return false;
@@ -769,10 +769,10 @@ bool Triangle::Intersects(const AABB &aabb) const
 	simd4f t0_wxzy  = yzxw_ps(t0);
 	simd4f cc_wxzy  = yzxw_ps(cc);
 
-	d1 = sub_ps(mul_ps(t0_wxzy, ac_wyxz), mul_ps(t0_wyxz, ac_wxzy));
-	d2 = sub_ps(mul_ps(t0_wxzy, cc_wyxz), mul_ps(t0_wyxz, cc_wxzy));
+	d1 = msub_ps(t0_wxzy, ac_wyxz, mul_ps(t0_wyxz, ac_wxzy));
+	d2 = msub_ps(t0_wxzy, cc_wyxz, mul_ps(t0_wyxz, cc_wxzy));
 	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
-	r = abs_ps(add_ps(mul_ps(h_wyxz, at0_wxzy), mul_ps(h_wxzy, at0_wyxz)));
+	r = abs_ps(madd_ps(h_wyxz, at0_wxzy, mul_ps(h_wxzy, at0_wyxz)));
 	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
 	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
 	return allzero_ps(cmp) != 0;

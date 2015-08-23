@@ -485,7 +485,7 @@ void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
 {
 	simd4f minPt = aabb.minPoint;
 	simd4f maxPt = aabb.maxPoint;
-	simd4f centerPoint = mul_ps(add_ps(minPt, maxPt), set1_ps(0.5f));
+	simd4f centerPoint = muls_ps(add_ps(minPt, maxPt), 0.5f);
 	simd4f halfSize = sub_ps(centerPoint, minPt);
 	simd4f newCenter = mat4x4_mul_vec4(m.row, centerPoint);
 

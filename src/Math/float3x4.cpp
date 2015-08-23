@@ -539,7 +539,7 @@ void float3x4::ScaleRow3(int row, float scalar)
 void float3x4::ScaleRow(int r, float scalar)
 {
 #ifdef MATH_SIMD
-	row[r] = mul_ps(row[r], set1_ps(scalar));
+	row[r] = muls_ps(row[r], scalar);
 #else
 	Row(r) *= scalar;
 #endif

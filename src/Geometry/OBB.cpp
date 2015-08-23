@@ -2178,16 +2178,16 @@ float3x4 OBB::LocalToWorld() const
 /// The implementation of this function is from Christer Ericson's Real-Time Collision Detection, p.133.
 vec OBB::ClosestPoint(const vec &targetPoint) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	// Best: 8.833 nsecs / 24 ticks, Avg: 9.044 nsecs, Worst: 9.217 nsecs
 	simd4f d = sub_ps(targetPoint.v, pos.v);
 	simd4f x = xxxx_ps(r.v);
 	simd4f closestPoint = pos.v;
-	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[0].v), x), neg_ps(x)), axis[0].v));
+	closestPoint = madd_ps(max_ps(min_ps(dot4_ps(d, axis[0].v), x), neg_ps(x)), axis[0].v, closestPoint);
 	simd4f y = yyyy_ps(r.v);
-	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[1].v), y), neg_ps(y)), axis[1].v));
+	closestPoint = madd_ps(max_ps(min_ps(dot4_ps(d, axis[1].v), y), neg_ps(y)), axis[1].v, closestPoint);
 	simd4f z = zzzz_ps(r.v);
-	closestPoint = add_ps(closestPoint, mul_ps(max_ps(min_ps(dot4_ps(d, axis[2].v), z), neg_ps(z)), axis[2].v));
+	closestPoint = madd_ps(max_ps(min_ps(dot4_ps(d, axis[2].v), z), neg_ps(z)), axis[2].v, closestPoint);
 	return closestPoint;
 #else
 	// Best: 33.412 nsecs / 89.952 ticks, Avg: 33.804 nsecs, Worst: 34.180 nsecs

@@ -442,8 +442,7 @@ void Quat::SetFromAxisAngle(const float4 &axis, float angle)
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
 	// Best: 26.499 nsecs / 71.024 ticks, Avg: 26.856 nsecs, Worst: 27.651 nsecs
-	simd4f half = set1_ps(0.5f);
-	simd4f halfAngle = mul_ps(set1_ps(angle), half);
+	simd4f halfAngle = set1_ps(0.5f*angle);
 	simd4f sinAngle, cosAngle;
 	sincos_ps(halfAngle, &sinAngle, &cosAngle);
 	simd4f quat = mul_ps(axis, sinAngle);
@@ -610,7 +609,7 @@ Quat MUST_USE_RESULT Quat::RotateFromTo(const float4 &sourceDirection, const flo
 	// XYZ channels use the trigonometric formula sin(x/2) = +/-sqrt(0.5-0.5*cosx))
 	// The W channel uses the trigonometric formula cos(x/2) = +/-sqrt(0.5+0.5*cosx))
 	simd4f half = set1_ps(0.5f);
-	simd4f cosSinHalfAngle = sqrt_ps(add_ps(half, mul_ps(half, cosAngle))); // [cos(x/2), sin(x/2), sin(x/2), sin(x/2)]
+	simd4f cosSinHalfAngle = sqrt_ps(madd_ps(half, cosAngle, half)); // [cos(x/2), sin(x/2), sin(x/2), sin(x/2)]
 	simd4f axis = cross_ps(sourceDirection.v, targetDirection.v);
 	simd4f recipLen = rsqrt_ps(dot4_ps(axis, axis));
 	axis = mul_ps(axis, recipLen); // [0 z y x]
