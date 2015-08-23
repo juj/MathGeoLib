@@ -114,12 +114,15 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 #define xxzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,0,0))
 #define yyww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,1,1))
 #endif
+#define yxxy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,0,0,1))
 #define wxxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,0,3))
 // Rotate x->y->z or the other direction, but leave w intact in the highest channel.
 #define yzxw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,0,2,1))
 #define zxyw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,1,0,2))
 // Other random-looking swizzles
 #define ywxz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,0,3,1))
+#define zwww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,3,2))
+#define zzyx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,1,2,2))
 
 // Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
 #define axx_bxx_ps(a, b) _mm_shuffle_ps((a), (b), _MM_SHUFFLE(0,0,0,0))
@@ -434,12 +437,16 @@ FORCE_INLINE simd4f xxzz_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[0]; }
 FORCE_INLINE simd4f yyww_ps(simd4f vec) { return vtrnq_f32(vec, vec).val[1]; }
 FORCE_INLINE simd4f xzxz_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[0]; }
 FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
-#define wxxw_ps(vec) yzwx_ps(xxww_ps((vec)))
+#define yxxy_ps(vec) wxyz_ps(xxyy_ps((vec)))
+#define wxxw_ps(vec) wxyz_ps(xxww_ps((vec)))
 // Rotate x->y->z or the other direction, but leave w intact in the highest channel.
 #define yzxw_ps(vec) xywz_ps(yzwx_ps(vec))
 #define zxyw_ps(vec) xywz_ps(zxwy_ps(vec))
 // Other random-looking swizzles
 #define ywxz_ps(vec) xzyw_ps(yxwz_ps((vec)))
+// TODO: Fix something better here
+#define zwww_ps(vec) set_ps(s4f_w((vec)), s4f_w((vec)), s4f_w((vec)), s4f_z((vec)))
+#define zzyx_ps(vec) set_ps(s4f_x((vec)), s4f_y((vec)), s4f_z((vec)), s4f_z((vec)))
 
 // Duplicates the lowest channel of 'a' twice to low pair, and lowest channel of 'b' twice, to high pair. I.e. returns [b.x, b.x, a.x, a.x].
 #define axx_bxx_ps(a, b) xxzz_ps(vcombine_f32(vget_low_f32((a)), vget_low_f32((b))))

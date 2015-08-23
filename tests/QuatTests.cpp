@@ -158,6 +158,21 @@ BENCHMARK(quat_mul_quat_asm, "test against Quat_op_mul_Quat")
 BENCHMARK_END
 #endif
 
+RANDOMIZED_TEST(Quat_Mul_Quat)
+{
+	Quat q = Quat::RotateY(pi/2.f);
+	Quat q2 = Quat::RotateX(pi/2.f);
+	Quat q3 = q2*q;
+	float4 v = float4::RandomDir(rng);
+	float4 v2 = q3*v;
+	float4 v3 = q2*(q*v);
+	float3x3 m = q.ToFloat3x3();
+	float3x3 m2 = q2.ToFloat3x3();
+	float4 v4 = m2*m*v;
+	assert(v2.Equals(v3));
+	assert(v2.Equals(v4));
+}
+
 RANDOMIZED_TEST(quat_mul_quat)
 {
 	Quat q = Quat::RandomRotation(rng);

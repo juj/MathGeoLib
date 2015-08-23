@@ -13,96 +13,96 @@ MATH_BEGIN_NAMESPACE
 
 /// Converts a quaternion to a row-major matrix.
 /// From http://renderfeather.googlecode.com/hg-history/034a1900d6e8b6c92440382658d2b01fc732c5de/Doc/optimized%20Matrix%20quaternion%20conversion.pdf
-inline void quat_to_mat3x4(__m128 q, __m128 t, __m128 *m)
+inline void quat_to_mat3x4(simd4f q, simd4f t, simd4f *m)
 {
 	// Constants:
 	const u32 sign = 0x80000000UL;
-	const __m128 sseX0 = set_ps_hex(sign, sign, sign, 0);
-	const __m128 sseX1 = set_ps_hex(sign, sign, 0, sign);
-	__m128 one = _mm_set_ps(0, 0, 0, 1);
+	const simd4f sseX0 = set_ps_hex(sign, sign, sign, 0);
+	const simd4f sseX1 = set_ps_hex(sign, sign, 0, sign);
+	simd4f one = set_ps(0, 0, 0, 1);
 
 #if 0 // The original code converted a quaternion into an hybrid of rotation/translation (bug?)
-	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
-	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
-	__m128 yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
-	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
+	simd4f q2 = add_ps(q, q);                                     // [2w 2z 2y 2x]
+	simd4f yxxy = yxxy_ps(q);                                     // [ y  x  x  y]
+	simd4f yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
+	simd4f yy_xy_xz_yz_2 = mul_ps(yxxy, yyzz2);                   // [2yz 2xz 2xy 2yy]
 
-	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
-	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
-	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
+	simd4f zwww = zwww_ps(q);                                     // [w w w z]
+	simd4f zzyx2 = zzyx_ps(q2);                                   // [2x 2y 2z 2z]
+	simd4f zz_wz_wy_wx_2 = mul_ps(zwww, zzyx2);                   // [2xw 2yw 2zw 2zz]
 
-	__m128 xx2 = _mm_mul_ss(q, q2);                               // [2xx]
+	simd4f xx2 = _mm_mul_ss(q, q2);                               // [2xx]
 
 	// Calculate last two elements of the third row.
-	__m128 one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
-	__m128 one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
-	__m128 one_m_xx_yy_2_0_tz_tw = _mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
+	simd4f one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
+	simd4f one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
+	simd4f one_m_xx_yy_2_0_tz_tw = _mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
 
 	// Calculate first row
-	__m128 m_yy_xy_xz_yz_2 = _mm_xor_ps(yy_xy_xz_yz_2, sseX0);     // [-2yz -2xz -2xy   2yy]
-	__m128 m_zz_wz_wy_wx_2 = _mm_xor_ps(zz_wz_wy_wx_2, sseX1);     // [-2xw -2yw  2zw  -2zz]
-	__m128 m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
-	__m128 first_row = _mm_sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
+	simd4f m_yy_xy_xz_yz_2 = xor_ps(yy_xy_xz_yz_2, sseX0);         // [-2yz -2xz -2xy   2yy]
+	simd4f m_zz_wz_wy_wx_2 = xor_ps(zz_wz_wy_wx_2, sseX1);         // [-2xw -2yw  2zw  -2zz]
+	simd4f m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
+	simd4f first_row = sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
 	m[0] = first_row;
 	_mm_store_ss((float*)m+3, t);
 
 	// Calculate second row
-	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
-	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
-	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
-	__m128 t_yzwx = yzwx_ps(t);                                   // [tx tw tz ty]
-	__m128 second_row = yxwz_ps(s3);                              // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
+	simd4f s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
+	simd4f s2 = xor_ps(m_zz_one_wz_wy_wx_2, sseX0);               // [2xw 2yw -2zw 1-2zz]
+	simd4f s3 = sub_ps(s2, s1);                                   // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
+	simd4f t_yzwx = yzwx_ps(t);                                   // [tx tw tz ty]
+	simd4f second_row = yxwz_ps(s3);                              // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
 	m[1] = second_row;
 	_mm_store_ss((float*)m+7, t_yzwx);
 
 	// Calculate third row
-	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
-	__m128 t2 = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [tz 1-2xx-2yy 2yz-2xw 2yw+2xz]
+	simd4f t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
+	simd4f t2 = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [tz 1-2xx-2yy 2yz-2xw 2yw+2xz]
 	m[2] = t2;
 #else
-	__m128 q2 = _mm_add_ps(q, q);                                 // [2w 2z 2y 2x]
-	__m128 yxxy = shuffle1_ps(q, _MM_SHUFFLE(1, 0, 0, 1));        // [ y  x  x  y]
-	__m128 yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
-	__m128 yy_xy_xz_yz_2 = _mm_mul_ps(yxxy, yyzz2);               // [2yz 2xz 2xy 2yy]
+	simd4f q2 = add_ps(q, q);                                     // [2w 2z 2y 2x]
+	simd4f yxxy = yxxy_ps(q);                                     // [ y  x  x  y]
+	simd4f yyzz2 = yyzz_ps(q2);                                   // [2z 2z 2y 2y]
+	simd4f yy_xy_xz_yz_2 = mul_ps(yxxy, yyzz2);                   // [2yz 2xz 2xy 2yy]
 
-	__m128 zwww = shuffle1_ps(q, _MM_SHUFFLE(3, 3, 3, 2));        // [w w w z]
-	__m128 zzyx2 = shuffle1_ps(q2, _MM_SHUFFLE(0, 1, 2, 2));      // [2x 2y 2z 2z]
-	__m128 zz_wz_wy_wx_2 = _mm_mul_ps(zwww, zzyx2);               // [2xw 2yw 2zw 2zz]
+	simd4f zwww = zwww_ps(q);                                     // [w w w z]
+	simd4f zzyx2 = zzyx_ps(q2);                                   // [2x 2y 2z 2z]
+	simd4f zz_wz_wy_wx_2 = mul_ps(zwww, zzyx2);                   // [2xw 2yw 2zw 2zz]
 
-	__m128 xx2 = _mm_mul_ss(q, q2);                               // [2xx]
+	simd4f xx2 = _mm_mul_ss(q, q2);                               // [2xx]
 
 	// Calculate last two elements of the third row.
-	__m128 one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
-	__m128 one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
-	__m128 one_m_xx_yy_2_0_tz_tw = one_m_xx_yy_2;//_mm_shuffle_ps(one_m_xx_yy_2, t, _MM_SHUFFLE(3, 2, 1, 0)); // [tw tz 0 1-2xx-2yy]
+	simd4f one_m_xx2 = _mm_sub_ss(one, xx2);                      // [0 0 0 1-2xx]
+	simd4f one_m_xx_yy_2 = _mm_sub_ss(one_m_xx2, yy_xy_xz_yz_2);  // [0 0 0 1-2xx-2yy]
+	simd4f one_m_xx_yy_2_0_tz_tw = one_m_xx_yy_2;                 // [tw tz 0 1-2xx-2yy]
 
 	// Calculate first row
-	__m128 m_yy_xy_xz_yz_2 = _mm_xor_ps(yy_xy_xz_yz_2, sseX0);     // [-2yz -2xz -2xy   2yy]
-	__m128 m_zz_wz_wy_wx_2 = _mm_xor_ps(zz_wz_wy_wx_2, sseX1);     // [-2xw -2yw  2zw  -2zz]
-	__m128 m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
-	__m128 first_row = _mm_sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
+	simd4f m_yy_xy_xz_yz_2 = xor_ps(yy_xy_xz_yz_2, sseX0);         // [-2yz -2xz -2xy   2yy]
+	simd4f m_zz_wz_wy_wx_2 = xor_ps(zz_wz_wy_wx_2, sseX1);         // [-2xw -2yw  2zw  -2zz]
+	simd4f m_zz_one_wz_wy_wx_2 = _mm_add_ss(m_zz_wz_wy_wx_2, one); // [-2xw -2yw  2zw 1-2zz]
+	simd4f first_row = sub_ps(m_zz_one_wz_wy_wx_2, m_yy_xy_xz_yz_2); // [2yz-2xw 2xz-2yw 2xy+2zw 1-2zz-2yy]
 
 	// Calculate second row
-	__m128 s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
-	__m128 s2 = _mm_xor_ps(m_zz_one_wz_wy_wx_2, sseX0);           // [2xw 2yw -2zw 1-2zz]
-	__m128 s3 = _mm_sub_ps(s2, s1);                               // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
-	__m128 second_row = yxwz_ps(s3);                              // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
+	simd4f s1 = _mm_move_ss(m_yy_xy_xz_yz_2, xx2);                // [-2yz -2xz -2xy 2xx]
+	simd4f s2 = xor_ps(m_zz_one_wz_wy_wx_2, sseX0);               // [2xw 2yw -2zw 1-2zz]
+	simd4f s3 = sub_ps(s2, s1);                                   // [2xw+2yz 2yw+2xz 2xy-2zw 1-2zz-2xx]
+	simd4f second_row = yxwz_ps(s3);                              // [2yw+2xz 2xw+2yz 1-2zz-2xx 2xy-2zw]
 
 	// Calculate third row
-	__m128 t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
-	__m128 third_row = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [0 1-2xx-2yy 2yz-2xw 2yw+2xz]
+	simd4f t1 = _mm_movehl_ps(first_row, second_row);             // [2yz-2xw 2xz-2yw 2yw+2xz 2xw+2yz]
+	simd4f third_row = _mm_shuffle_ps(t1, one_m_xx_yy_2_0_tz_tw, _MM_SHUFFLE(2, 0, 3, 1)); // [0 1-2xx-2yy 2yz-2xw 2yw+2xz]
 
-	__m128 tmp0 = _mm_unpacklo_ps(first_row, second_row);
-	__m128 tmp2 = _mm_unpacklo_ps(third_row, t);
-	__m128 tmp1 = _mm_unpackhi_ps(first_row, second_row);
-	__m128 tmp3 = _mm_unpackhi_ps(third_row, t);
+	simd4f tmp0 = _mm_unpacklo_ps(first_row, second_row);
+	simd4f tmp2 = _mm_unpacklo_ps(third_row, t);
+	simd4f tmp1 = _mm_unpackhi_ps(first_row, second_row);
+	simd4f tmp3 = _mm_unpackhi_ps(third_row, t);
 	m[0] = _mm_movelh_ps(tmp0, tmp2);
 	m[1] = _mm_movehl_ps(tmp2, tmp0);
 	m[2] = _mm_movelh_ps(tmp1, tmp3);
 #endif
 }
 
-FORCE_INLINE void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m)
+FORCE_INLINE void quat_to_mat4x4(simd4f q, simd4f t, simd4f *m)
 {
 	quat_to_mat3x4(q, t, m);
 	m[3] = set_ps(1.f, 0.f, 0.f, 0.f);
@@ -255,7 +255,7 @@ FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 	simd4f r1 = wzyx_ps(q2); // [x,y,z,w]
 	simd4f r2 = zwxy_ps(q2); // [y,x,w,z]
 	simd4f r3 = yxwz_ps(q2); // [z,w,x,y]
-	// __m128 r4 = q2;
+	// simd4f r4 = q2;
 
 	simd4f out = mul_ps(X, r1);
 	out = madd_ps(Y, r2, out);
