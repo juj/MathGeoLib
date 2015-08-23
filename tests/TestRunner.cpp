@@ -390,8 +390,18 @@ int main(int argc, char **argv)
 	argc_ = argc;
 	argv_ = argv;
 
-	TestData::InitTestData();
-
+	try
+	{
+		TestData::InitTestData();
+	} catch(const std::exception &e)
+	{
+		LOGE("std::exception was thrown during initialization of test runner data! Unable to launch tests!\n%s", e.what());
+		return 99999;
+	} catch(...)
+	{
+		LOGE("Unknown exception was thrown during initialization of test runner data! Unable to launch tests!");
+		return 99999;
+	}
 	numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
 	numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
 #ifdef EMSCRIPTEN
