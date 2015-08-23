@@ -69,7 +69,11 @@ FORCE_INLINE simd4f vec4_sub_vec4(simd4f vec, simd4f vec2)
 
 FORCE_INLINE simd4f vec4_mul_float(simd4f vec, float f)
 {
+#ifdef MATH_SSE
 	return mul_ps(vec, set1_ps(f));
+#elif defined(MATH_NEON)
+	return vmulq_n_f32(vec, f);
+#endif
 }
 
 FORCE_INLINE simd4f vec4_mul_vec4(simd4f vec, simd4f vec2)
@@ -117,33 +121,32 @@ FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 	simd4f a_xzy = yzxw_ps(a); // = [a.w, a.x, a.z, a.y]
 	simd4f b_xzy = yzxw_ps(b); // = [b.w, b.x, b.z, b.y]
 
-	simd4f x_yxz = mul_ps(b_xzy, a); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
 	simd4f y_yxz = mul_ps(a_xzy, b); // [a.w*b.w, a.z*b.x, a.y*b.z, a.x*b.y]
 
-	return yzxw_ps(sub_ps(x_yxz, y_yxz)); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
+	return yzxw_ps(msub_ps(b_xzy, a, y_yxz)); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
 FORCE_INLINE simd4f dot4_ps(simd4f a, simd4f b);
 
 FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
 {
-        simd4f a = abs_ps(v);
-        simd4f a_min = min_ps(a, min_ps(yyyy_ps(a), zwzw_ps(a))); // Horizontal min of x,y,z
-        a_min = xxxx_ps(a_min); // Broadcast to all elements.
-        a = cmple_ps(a, a_min); // Mask 0xFFFFFFFF to channels that contain the min element.
-        // Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
-        simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
+	simd4f a = abs_ps(v);
+	simd4f a_min = min_ps(a, min_ps(yyyy_ps(a), zwzw_ps(a))); // Horizontal min of x,y,z
+	a_min = xxxx_ps(a_min); // Broadcast to all elements.
+	a = cmple_ps(a, a_min); // Mask 0xFFFFFFFF to channels that contain the min element.
+	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
+	simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
 
-        simd4f v_xzy = yzxw_ps(v);
-        simd4f v_yxz = zxyw_ps(v);
-        simd4f q_xzy = yzxw_ps(q);
-        simd4f b_yxz = sub_ps(mul_ps(q_xzy, v), mul_ps(v_xzy, q));
-        simd4f b = yzxw_ps(b_yxz);
-        simd4f b_xzy = zxyw_ps(b_yxz);
-        simd4f c = sub_ps(mul_ps(b_yxz, v_xzy), mul_ps(v_yxz, b_xzy));
+	simd4f v_xzy = yzxw_ps(v);
+	simd4f v_yxz = zxyw_ps(v);
+	simd4f q_xzy = yzxw_ps(q);
+	simd4f b_yxz = msub_ps(q_xzy, v, mul_ps(v_xzy, q));
+	simd4f b = yzxw_ps(b_yxz);
+	simd4f b_xzy = zxyw_ps(b_yxz);
+	simd4f c = msub_ps(b_yxz, v_xzy, mul_ps(v_yxz, b_xzy));
 
-        *outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
-        *outC = mul_ps(c, rsqrt_ps(dot4_ps(c, c)));
+	*outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
+	*outC = mul_ps(c, rsqrt_ps(dot4_ps(c, c)));
 }
 
 #ifdef MATH_NEON
@@ -198,7 +201,7 @@ FORCE_INLINE simd4f sum_xyz_ps3(simd4f m)
 
 FORCE_INLINE float sum_xyzw_float(simd4f vec)
 {
-        return vgetq_lane_f32(sum_xyzw_ps(vec), 0);
+	return vgetq_lane_f32(sum_xyzw_ps(vec), 0);
 }
 
 FORCE_INLINE float mul_xyzw_float(simd4f vec)
@@ -352,7 +355,7 @@ FORCE_INLINE simd4f vec3_normalize(simd4f vec)
 FORCE_INLINE simd4f vec4_lerp(simd4f a, simd4f b, simd4f t)
 {
 	// a*(1-t) + b*t = a - t*a + t*b = a + t*(b-a)
-	return add_ps(a, mul_ps(t, sub_ps(b, a)));
+	return madd_ps(t, sub_ps(b, a), a);
 }
 
 FORCE_INLINE simd4f vec4_lerp(simd4f a, simd4f b, float t)
