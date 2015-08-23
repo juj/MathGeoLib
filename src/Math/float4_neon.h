@@ -42,71 +42,6 @@ FORCE_INLINE void vec4_add_float_asm(const void *vec, float f, void *out)
 }
 #endif
 
-FORCE_INLINE simd4f vec4_add_float(simd4f vec, float f)
-{
-	return add_ps(vec, set1_ps(f));
-}
-
-FORCE_INLINE simd4f vec4_add_vec4(simd4f vec, simd4f vec2)
-{
-	return add_ps(vec, vec2);
-}
-
-FORCE_INLINE simd4f vec4_sub_float(simd4f vec, float f)
-{
-	return sub_ps(vec, set1_ps(f));
-}
-
-FORCE_INLINE simd4f float_sub_vec4(float f, simd4f vec)
-{
-	return sub_ps(set1_ps(f), vec);
-}
-
-FORCE_INLINE simd4f vec4_sub_vec4(simd4f vec, simd4f vec2)
-{
-	return sub_ps(vec, vec2);
-}
-
-FORCE_INLINE simd4f vec4_mul_vec4(simd4f vec, simd4f vec2)
-{
-	return mul_ps(vec, vec2);
-}
-
-FORCE_INLINE simd4f vec4_div_float(simd4f vec, float f)
-{
-#ifdef MATH_SSE
-	return div_ps(vec, set1_ps(f));
-#elif defined(MATH_NEON)
-	simd4f v = set1_ps(f);
-	simd4f rcp = vrecpeq_f32(v);
-	rcp = mul_ps(vrecpsq_f32(v, rcp), rcp);
-	return mul_ps(vec, rcp);
-#endif
-}
-
-FORCE_INLINE simd4f float_div_vec4(float f, simd4f vec)
-{
-#ifdef MATH_SSE
-	return div_ps(set1_ps(f), vec);
-#elif defined(MATH_NEON)
-	simd4f rcp = vrecpeq_f32(vec);
-	rcp = mul_ps(vrecpsq_f32(vec, rcp), rcp);
-	return mul_ps(set1_ps(f), rcp);
-#endif
-}
-
-FORCE_INLINE simd4f vec4_recip(simd4f vec)
-{
-#ifdef MATH_SSE
-	simd4f e = _mm_rcp_ps(vec); // Do one iteration of Newton-Rhapson: e_n = 2*e - x*e^2
-	return sub_ps(_mm_add_ps(e, e), mul_ps(vec, mul_ps(e,e)));
-#elif defined(MATH_NEON)
-	simd4f rcp = vrecpeq_f32(vec);
-	rcp = mul_ps(vrecpsq_f32(vec, rcp), rcp);
-	return rcp;
-#endif
-}
-
 FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 {
 	simd4f a_xzy = yzxw_ps(a); // = [a.w, a.x, a.z, a.y]
@@ -284,18 +219,6 @@ FORCE_INLINE simd4f vec3_length_sq_ps(simd4f vec)
 	return dot3_ps(vec, vec);
 }
 
-FORCE_INLINE simd4f vec4_rsqrt(simd4f vec)
-{
-#ifdef MATH_SSE
-	simd4f e = _mm_rsqrt_ps(vec); // Initial estimate
-	simd4f e3 = mul_ps(mul_ps(e,e), e); // Do one iteration of Newton-Rhapson: e_n = e + 0.5 * (e - x * e^3)
-	return _mm_add_ps(e, mul_ps(set1_ps(0.5f), sub_ps(e, mul_ps(vec, e3))));
-#elif defined(MATH_NEON)
-	float32x4_t r = vrsqrteq_f32(vec);
-	return mul_ps(vrsqrtsq_f32(mul_ps(r, r), vec), r);
-#endif
-}
-
 FORCE_INLINE float vec4_length_float(simd4f vec)
 {
 	return s4f_x(sqrt_ps(dot4_ps(vec, vec)));
@@ -308,7 +231,7 @@ FORCE_INLINE simd4f vec4_length_ps(simd4f vec)
 
 FORCE_INLINE simd4f vec4_normalize(simd4f vec)
 {
-	return mul_ps(vec, vec4_rsqrt(vec4_length_sq_ps(vec)));
+	return mul_ps(vec, rsqrt_ps(vec4_length_sq_ps(vec)));
 }
 
 FORCE_INLINE float vec3_length_float(simd4f vec)
@@ -328,7 +251,7 @@ FORCE_INLINE simd4f vec3_length_ps3(simd4f vec)
 
 FORCE_INLINE simd4f vec3_normalize(simd4f vec)
 {
-	return mul_ps(vec, vec4_rsqrt(vec3_length_sq_ps(vec)));
+	return mul_ps(vec, rsqrt_ps(vec3_length_sq_ps(vec)));
 }
 
 // T should be a 4-vector containing the lerp weight [w,w,w,w] in all channels.

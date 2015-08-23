@@ -678,7 +678,7 @@ float4 float4::Recip3() const
 float4 float4::Recip4() const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_recip(v);
+	return rcp_ps(v);
 #else
 	return float4(1.f/x, 1.f/y, 1.f/z, 1.f/w);
 #endif
@@ -1344,7 +1344,7 @@ float4 operator *(float scalar, const float4 &rhs)
 float4 float4::operator /(float scalar) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_div_float(v, scalar);
+	return div_ps(v, set1_ps(scalar));
 #else
 	float invScalar = 1.f / scalar;
 	return float4(x * invScalar, y * invScalar, z * invScalar, w * invScalar);
@@ -1396,7 +1396,7 @@ float4 &float4::operator *=(float scalar)
 float4 &float4::operator /=(float scalar)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec4_div_float(v, scalar);
+	v = div_ps(v, set1_ps(scalar));
 #else
 	float invScalar = 1.f / scalar;
 	x *= invScalar;
@@ -1411,7 +1411,7 @@ float4 &float4::operator /=(float scalar)
 float4 float4::Add(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_add_float(v, s);
+	return add_ps(v, set1_ps(s));
 #else
 	return float4(x + s, y + s, z + s, w + s);
 #endif
@@ -1420,7 +1420,7 @@ float4 float4::Add(float s) const
 float4 float4::Sub(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_sub_float(v, s);
+	return sub_ps(v, set1_ps(s));
 #else
 	return float4(x - s, y - s, z - s, w - s);
 #endif
@@ -1429,7 +1429,7 @@ float4 float4::Sub(float s) const
 float4 float4::SubLeft(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return float_sub_vec4(s, v);
+	return sub_ps(set1_ps(s), v);
 #else
 	return float4(s - x, s - y, s - z, s - w);
 #endif
@@ -1438,7 +1438,7 @@ float4 float4::SubLeft(float s) const
 float4 float4::DivLeft(float s) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return float_div_vec4(s, v);
+	return div_ps(set1_ps(s), v);
 #else
 	return float4(s / x, s / y, s / z, s / w);
 #endif

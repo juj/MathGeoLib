@@ -138,7 +138,7 @@ UNIQUE_TEST(inline_asm_add_3)
 
 BENCHMARK(float4_add_neon_intrinsics_once, "test against float4_op_add")
 {
-	v3[i] = vec4_add_vec4(v[i], v2[i]);
+	v3[i] = add_ps(v[i], v2[i]);
 }
 BENCHMARK_END;
 
@@ -188,9 +188,9 @@ BENCHMARK_END;
 
 BENCHMARK(float4_add_neon_intrinsics_threetimes, "neon")
 {
-	v3[i] = vec4_add_vec4(v[i], v2[i]);
-	v3[i] = vec4_add_vec4(v2[i], v3[i]);
-	v3[i] = vec4_add_vec4(v[i], v3[i]);
+	v3[i] = add_ps(v[i], v2[i]);
+	v3[i] = add_ps(v2[i], v3[i]);
+	v3[i] = add_ps(v[i], v3[i]);
 }
 BENCHMARK_END;
 

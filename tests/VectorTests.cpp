@@ -622,7 +622,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Add_simd, "test against Float4_Add")
 {
-	v3[i] = vec4_add_vec4(v[i], v2[i]);
+	v3[i] = add_ps(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
@@ -642,7 +642,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Sub_simd, "test against Float4_Sub")
 {
-	v3[i] = vec4_sub_vec4(v[i], v2[i]);
+	v3[i] = sub_ps(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
@@ -715,7 +715,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Mul_float4_simd, "test against Float4_Mul_float4")
 {
-	v3[i] = vec4_mul_vec4(v[i], v2[i]);
+	v3[i] = mul_ps(v[i], v2[i]);
 }
 BENCHMARK_END;
 #endif
@@ -729,7 +729,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Div_simd, "test against Float4_Div")
 {
-	v3[i] = vec4_div_float(v[i], f[i]);
+	v3[i] = div_ps(v[i], set1_ps(f[i]));
 }
 BENCHMARK_END;
 #endif

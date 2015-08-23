@@ -483,13 +483,7 @@ static FORCE_INLINE simd4f rcp_ps(simd4f x)
 	return e;
 }
 
-static FORCE_INLINE simd4f div_ps(simd4f num, simd4f denom)
-{
-        simd4f e = vrecpeq_f32(denom);
-        e = vmulq_f32(e, vrecpsq_f32(denom, e));
-        e = vmulq_f32(e, vrecpsq_f32(denom, e));
-        return vmulq_f32(num, e);
-}
+#define div_ps(num, denom) mul_ps((num), rcp_ps((denom)))
 
 static FORCE_INLINE simd4f rsqrt_ps(simd4f x)
 {

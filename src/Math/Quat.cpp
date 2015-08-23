@@ -154,7 +154,7 @@ float Quat::Normalize()
 {
 #ifdef MATH_AUTOMATIC_SSE
 	simd4f lenSq = vec4_length_sq_ps(q);
-	simd4f len = vec4_rsqrt(lenSq);
+	simd4f len = rsqrt_ps(lenSq);
 	simd4f isZero = cmplt_ps(lenSq, simd4fEpsilon); // Was the length zero?
 	simd4f normalized = mul_ps(q, len); // Normalize.
 	q = cmov_ps(normalized, float4::unitX.v, isZero); // If length == 0, output the vector (1,0,0,0).
@@ -847,7 +847,7 @@ Quat Quat::operator /(float scalar) const
 	assume(!EqualAbs(scalar, 0.f));
 
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_div_float(q, scalar);
+	return div_ps(q, set1_ps(scalar));
 #else
 	return *this * (1.f / scalar);
 #endif
