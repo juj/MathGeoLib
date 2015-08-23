@@ -499,14 +499,16 @@ static FORCE_INLINE simd4f rsqrt_ps(simd4f x)
 	return e;
 }
 
-static inline simd4f sqrt_ps(simd4f x) { return mul_ps(x, rsqrt_ps(x)); }
-
 #define cmpeq_ps(a, b) vreinterpretq_f32_u32(vceqq_f32((a), (b)))
 #define cmpge_ps(a, b) vreinterpretq_f32_u32(vcgeq_f32((a), (b)))
 #define cmpgt_ps(a, b) vreinterpretq_f32_u32(vcgtq_f32((a), (b)))
 #define cmple_ps(a, b) vreinterpretq_f32_u32(vcleq_f32((a), (b)))
 #define cmplt_ps(a, b) vreinterpretq_f32_u32(vcltq_f32((a), (b)))
 #define comieq_ss(a, b) ((s4f_x((a)) == s4f_x((b))) ? 1 : 0)
+
+FORCE_INLINE simd4f cmov_ps(simd4f a, simd4f b, simd4f mask);
+
+static inline simd4f sqrt_ps(simd4f x) { return cmov_ps(mul_ps(x, rsqrt_ps(x)), zero_ps(), cmpeq_ps(x, zero_ps())); }
 
 // This might not be the most efficient form, and typically it is better to avoid this in NEON, and instead
 // prefer the scattering/gathering loads and stores instead.

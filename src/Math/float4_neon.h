@@ -296,25 +296,14 @@ FORCE_INLINE simd4f vec4_rsqrt(simd4f vec)
 #endif
 }
 
-FORCE_INLINE simd4f vec4_sqrt(simd4f vec)
-{
-#ifdef MATH_SSE
-	return _mm_sqrt_ps(vec);
-#else
-	// Fast version, but does not work when x == 0!
-	///\todo Exact sqrt for NEON!
-	return mul_ps(vec, vec4_rsqrt(vec));
-#endif
-}
-
 FORCE_INLINE float vec4_length_float(simd4f vec)
 {
-	return s4f_x(vec4_sqrt(dot4_ps(vec, vec)));
+	return s4f_x(sqrt_ps(dot4_ps(vec, vec)));
 }
 
 FORCE_INLINE simd4f vec4_length_ps(simd4f vec)
 {
-	return vec4_sqrt(dot4_ps(vec, vec));
+	return sqrt_ps(dot4_ps(vec, vec));
 }
 
 FORCE_INLINE simd4f vec4_normalize(simd4f vec)
@@ -324,17 +313,17 @@ FORCE_INLINE simd4f vec4_normalize(simd4f vec)
 
 FORCE_INLINE float vec3_length_float(simd4f vec)
 {
-	return s4f_x(vec4_sqrt(dot3_ps3(vec, vec)));
+	return s4f_x(sqrt_ps(dot3_ps3(vec, vec)));
 }
 
 FORCE_INLINE simd4f vec3_length_ps(simd4f vec)
 {
-	return vec4_sqrt(dot3_ps(vec, vec));
+	return sqrt_ps(dot3_ps(vec, vec));
 }
 
 FORCE_INLINE simd4f vec3_length_ps3(simd4f vec)
 {
-	return vec4_sqrt(dot3_ps3(vec, vec));
+	return sqrt_ps(dot3_ps3(vec, vec));
 }
 
 FORCE_INLINE simd4f vec3_normalize(simd4f vec)

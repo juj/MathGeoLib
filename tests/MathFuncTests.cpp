@@ -380,6 +380,12 @@ float AnotherHackSqrt(float f)
 	return *(float*)&i;
 }
 
+UNIQUE_TEST(SqrtVals)
+{
+	assert(Sqrt(-0.f) == 0.f);
+	assert(Sqrt(0.f) == 0.f);
+	assert(Sqrt(1.f) == 1.f);
+}
 
 UNIQUE_TEST(sqrt_precision)
 {
