@@ -123,12 +123,35 @@ FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 	return yzxw_ps(sub_ps(x_yxz, y_yxz)); // [0, a.x*b.y - a.y*b.x, a.z*b.x - a.x*b.z, a.y*b.z - a.z*b.y]
 }
 
+FORCE_INLINE simd4f dot4_ps(simd4f a, simd4f b);
+
+FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
+{
+        simd4f a = abs_ps(v);
+        simd4f a_min = min_ps(a, min_ps(yyyy_ps(a), zwzw_ps(a))); // Horizontal min of x,y,z
+        a_min = xxxx_ps(a_min); // Broadcast to all elements.
+        a = cmple_ps(a, a_min); // Mask 0xFFFFFFFF to channels that contain the min element.
+        // Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
+        simd4f q = and_ps(a, set_ps(0.f, 1.f, 1.f, 1.f));
+
+        simd4f v_xzy = yzxw_ps(v);
+        simd4f v_yxz = zxyw_ps(v);
+        simd4f q_xzy = yzxw_ps(q);
+        simd4f b_yxz = sub_ps(mul_ps(q_xzy, v), mul_ps(v_xzy, q));
+        simd4f b = yzxw_ps(b_yxz);
+        simd4f b_xzy = zxyw_ps(b_yxz);
+        simd4f c = sub_ps(mul_ps(b_yxz, v_xzy), mul_ps(v_yxz, b_xzy));
+
+        *outB = mul_ps(b, rsqrt_ps(dot4_ps(b, b)));
+        *outC = mul_ps(c, rsqrt_ps(dot4_ps(c, c)));
+}
+
 #ifdef MATH_NEON
 inline std::string ToString(uint8x8x2_t vec)
 {
 	uint8_t *v = (uint8_t*)&vec;
 	char str[256];
-	sprintf(str, "[%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X | %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X]", 
+	sprintf(str, "[%02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X | %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X]",
 		(int)v[15], (int)v[14], (int)v[13], (int)v[12], (int)v[11], (int)v[10], (int)v[9], (int)v[8], (int)v[7], (int)v[6], (int)v[5], (int)v[4], (int)v[3], (int)v[2], (int)v[1], (int)v[0]);
 	return str;
 }
