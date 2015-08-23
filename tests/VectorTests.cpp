@@ -662,7 +662,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Mul_simd, "test against Float4_Mul")
 {
-	v3[i] = vec4_mul_float(v[i], f[i]);
+	v3[i] = muls_ps(v[i], f[i]);
 }
 BENCHMARK_END;
 #endif
@@ -701,7 +701,7 @@ BENCHMARK_END;
 #ifdef MATH_SIMD
 BENCHMARK(Float4_Mul_sse, "test against Float4_Mul")
 {
-	v3[i].v = vec4_mul_float(v[i].v, f[i]);
+	v3[i].v = muls_ps(v[i].v, f[i]);
 }
 BENCHMARK_END;
 #endif

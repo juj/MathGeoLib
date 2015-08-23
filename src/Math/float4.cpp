@@ -1326,7 +1326,7 @@ float4 float4::operator -() const
 float4 float4::operator *(float scalar) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_mul_float(v, scalar);
+	return muls_ps(v, scalar);
 #else
 	return float4(x * scalar, y * scalar, z * scalar, w * scalar);
 #endif
@@ -1335,7 +1335,7 @@ float4 float4::operator *(float scalar) const
 float4 operator *(float scalar, const float4 &rhs)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_mul_float(rhs.v, scalar);
+	return muls_ps(rhs.v, scalar);
 #else
 	return float4(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z, scalar * rhs.w);
 #endif
@@ -1382,7 +1382,7 @@ float4 &float4::operator -=(const float4 &rhs)
 float4 &float4::operator *=(float scalar)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec4_mul_float(v, scalar);
+	v = muls_ps(v, scalar);
 #else
 	x *= scalar;
 	y *= scalar;

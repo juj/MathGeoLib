@@ -41,6 +41,7 @@ MATH_BEGIN_NAMESPACE
 #define mul_ps _mm_mul_ps
 #define div_ps _mm_div_ps
 #define set1_ps _mm_set1_ps
+#define muls_ps(vec, scalar) mul_ps((vec), set1_ps((scalar)))
 /// Sets the vector in order (w, z, y, x).
 #define set_ps _mm_set_ps
 static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
@@ -387,6 +388,7 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #define sub_ps vsubq_f32
 #define neg_ps vnegq_f32
 #define mul_ps vmulq_f32
+#define muls_ps vmulq_n_f32
 #define min_ps vminq_f32
 #define max_ps vmaxq_f32
 #define s4f_to_s4i(s4f) vreinterpretq_u32_f32((s4f))

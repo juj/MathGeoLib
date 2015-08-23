@@ -67,15 +67,6 @@ FORCE_INLINE simd4f vec4_sub_vec4(simd4f vec, simd4f vec2)
 	return sub_ps(vec, vec2);
 }
 
-FORCE_INLINE simd4f vec4_mul_float(simd4f vec, float f)
-{
-#ifdef MATH_SSE
-	return mul_ps(vec, set1_ps(f));
-#elif defined(MATH_NEON)
-	return vmulq_n_f32(vec, f);
-#endif
-}
-
 FORCE_INLINE simd4f vec4_mul_vec4(simd4f vec, simd4f vec2)
 {
 	return mul_ps(vec, vec2);

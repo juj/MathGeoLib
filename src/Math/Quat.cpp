@@ -819,7 +819,7 @@ Quat Quat::operator -() const
 Quat Quat::operator *(float scalar) const
 {
 #ifdef MATH_AUTOMATIC_SSE
-	return vec4_mul_float(q, scalar);
+	return muls_ps(q, scalar);
 #else
 	return Quat(x * scalar, y * scalar, z * scalar, w * scalar);
 #endif
