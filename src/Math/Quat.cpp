@@ -69,7 +69,7 @@ Quat::Quat(float x_, float y_, float z_, float w_)
 
 vec Quat::WorldX() const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return FLOAT4_TO_DIR(quat_transform_vec4(q, float4::unitX));
 #else
 	return DIR_VEC(this->Transform(1.f, 0.f, 0.f));
@@ -78,7 +78,7 @@ vec Quat::WorldX() const
 
 vec Quat::WorldY() const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return FLOAT4_TO_DIR(quat_transform_vec4(q, float4::unitY));
 #else
 	return DIR_VEC(this->Transform(0.f, 1.f, 0.f));
@@ -87,7 +87,7 @@ vec Quat::WorldY() const
 
 vec Quat::WorldZ() const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return FLOAT4_TO_DIR(quat_transform_vec4(q, float4::unitZ));
 #else
 	return DIR_VEC(this->Transform(0.f, 0.f, 1.f));
@@ -257,7 +257,7 @@ Quat MUST_USE_RESULT Quat::Conjugated() const
 float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
 	assume2(this->IsNormalized(), *this, this->LengthSq());
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return float4(quat_transform_vec4(q, load_vec3(vec.ptr(), 0.f))).xyz();
 #else
 	///\todo Optimize/benchmark the scalar path not to generate a matrix!
@@ -268,7 +268,7 @@ float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 
 float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return float4(quat_transform_vec4(q, set_ps(0.f, z, y, x))).xyz();
 #else
 	return Transform(float3(x, y, z));
@@ -279,7 +279,7 @@ float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 {
 	assume(vec.IsWZeroOrOne());
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return quat_transform_vec4(q, vec);
 #else
 	return float4(Transform(vec.x, vec.y, vec.z), vec.w);
