@@ -74,3 +74,37 @@ UNIQUE_TEST(SubMillisecondPrecision)
 	assert(minDiff > 0);
 	assert(minDiff < ticksPerMillisecond/2); // Smallest met quantity must be less than half a millisecond.
 }
+
+volatile tick_t dummyGlobalTicks = 0;
+
+BENCHMARK(Clock_Tick, "Time taken by 10x Clock::Tick()s")
+{
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+	dummyGlobalTicks += Clock::Tick();
+}
+BENCHMARK_END;
+
+volatile unsigned long long dummyGlobalTsc = 0;
+
+BENCHMARK(Clock_Rdtsc, "Time taken by 10x Clock::Rdtsc()s")
+{
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+	dummyGlobalTsc += Clock::Rdtsc();
+}
+BENCHMARK_END;
