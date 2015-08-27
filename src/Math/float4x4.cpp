@@ -74,9 +74,9 @@ float4x4::float4x4(const float3x4 &m)
 	row[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 #else
 	Set(m.At(0,0), m.At(0,1), m.At(0,2), m.At(0,3),
-		m.At(1,0), m.At(1,1), m.At(1,2), m.At(1,3),
-		m.At(2,0), m.At(2,1), m.At(2,2), m.At(2,3),
-		      0.f,       0.f,       0.f,     1.f);
+	    m.At(1,0), m.At(1,1), m.At(1,2), m.At(1,3),
+	    m.At(2,0), m.At(2,1), m.At(2,2), m.At(2,3),
+	          0.f,       0.f,       0.f,     1.f);
 #endif
 }
 
@@ -102,7 +102,7 @@ float4x4::float4x4(const float4 &col0, const float4 &col1, const float4 &col2, c
 float4x4::float4x4(const Quat &orientation)
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	quat_to_mat4x4(orientation.q, _mm_set_ps(1, 0, 0, 0), row);
+	quat_to_mat4x4(orientation.q, set_ps(1, 0, 0, 0), row);
 #else
 	SetRotatePart(orientation);
 	SetRow(3, 0, 0, 0, 1);
@@ -413,25 +413,25 @@ float3 float4x4::GetScale() const
 float4x4 float4x4::ShearX(float yFactor, float zFactor)
 {
 	return float4x4(1.f, yFactor, zFactor, 0.f,
-					0.f, 1.f, 0.f, 0.f,
-					0.f, 0.f, 1.f, 0.f,
-					0.f, 0.f, 0.f, 1.f);
+	                0.f,     1.f,     0.f, 0.f,
+	                0.f,     0.f,     1.f, 0.f,
+	                0.f,     0.f,     0.f, 1.f);
 }
 
 float4x4 float4x4::ShearY(float xFactor, float zFactor)
 {
-	return float4x4(1.f, 0.f, 0.f, 0.f,
-					xFactor, 1.f, zFactor, 0.f,
-					0.f, 0.f, 1.f, 0.f,
-					0.f, 0.f, 0.f, 1.f);
+	return float4x4(    1.f, 0.f,     0.f, 0.f,
+	                xFactor, 1.f, zFactor, 0.f,
+	                    0.f, 0.f,     1.f, 0.f,
+	                    0.f, 0.f,     0.f, 1.f);
 }
 
 float4x4 float4x4::ShearZ(float xFactor, float yFactor)
 {
-	return float4x4(1.f, 0.f, 0.f, 0.f,
-					0.f, 1.f, 0.f, 0.f,
-					xFactor, yFactor, 1.f, 0.f,
-					0.f, 0.f, 0.f, 1.f);
+	return float4x4(    1.f,     0.f, 0.f, 0.f,
+	                    0.f,     1.f, 0.f, 0.f,
+	                xFactor, yFactor, 1.f, 0.f,
+	                    0.f,     0.f, 0.f, 1.f);
 }
 
 float4x4 float4x4::Mirror(const Plane &p)
@@ -772,8 +772,8 @@ void float4x4::ScaleCol(int col, float scalar)
 CONST_WIN32 float3x3 float4x4::Float3x3Part() const
 {
 	return float3x3(v[0][0], v[0][1], v[0][2],
-					v[1][0], v[1][1], v[1][2],
-					v[2][0], v[2][1], v[2][2]);
+	                v[1][0], v[1][1], v[1][2],
+	                v[2][0], v[2][1], v[2][2]);
 }
 
 float3x4 &float4x4::Float3x4Part()
@@ -957,9 +957,9 @@ void float4x4::SetCol(int column, float m_0c, float m_1c, float m_2c, float m_3c
 }
 
 void float4x4::Set(float _00, float _01, float _02, float _03,
-				   float _10, float _11, float _12, float _13,
-				   float _20, float _21, float _22, float _23,
-				   float _30, float _31, float _32, float _33)
+                   float _10, float _11, float _12, float _13,
+                   float _20, float _21, float _22, float _23,
+                   float _30, float _31, float _32, float _33)
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	mat4x4_set(row, _00, _01, _02, _03,
@@ -1018,9 +1018,9 @@ void float4x4::Set(int row, int col, float value)
 void float4x4::SetIdentity()
 {
 	Set(1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1);
+	    0,1,0,0,
+	    0,0,1,0,
+	    0,0,0,1);
 }
 
 void float4x4::Set3x3Part(const float3x3 &r)
@@ -1265,7 +1265,7 @@ float4x4 &float4x4::operator =(const TranslateOp &rhs)
 	Set(1.f,   0,   0, rhs.offset.x,
 	      0, 1.f,   0, rhs.offset.y,
 	      0,   0, 1.f, rhs.offset.z,
-	      0,   0,   0,   1.f);
+	      0,   0,   0,          1.f);
 
 	return *this;
 }
@@ -1312,8 +1312,8 @@ float3x3 float4x4::SubMatrix(int i, int j) const
 	int c2 = SKIPNUM(2, j);
 
 	return float3x3(v[r0][c0], v[r0][c1], v[r0][c2],
-					v[r1][c0], v[r1][c1], v[r1][c2],
-					v[r2][c0], v[r2][c1], v[r2][c2]);
+	                v[r1][c0], v[r1][c1], v[r1][c2],
+	                v[r2][c0], v[r2][c1], v[r2][c2]);
 }
 
 float float4x4::Minor(int i, int j) const
@@ -1553,8 +1553,8 @@ float3 float4x4::TransformPos(float x, float y, float z) const
 	return mat3x4_mul_vec(row, set_ps(1.f, z, y, x));
 #else
 	return float3(DOT4POS_xyz(Row(0), x,y,z),
-				  DOT4POS_xyz(Row(1), x,y,z),
-				  DOT4POS_xyz(Row(2), x,y,z));
+	              DOT4POS_xyz(Row(1), x,y,z),
+	              DOT4POS_xyz(Row(2), x,y,z));
 #endif
 }
 
@@ -1925,21 +1925,21 @@ bool float4x4::IsIdentity(float epsilon) const
 bool float4x4::IsLowerTriangular(float epsilon) const
 {
 	return EqualAbs(v[0][1], 0.f, epsilon)
-		&& EqualAbs(v[0][2], 0.f, epsilon)
-		&& EqualAbs(v[0][3], 0.f, epsilon)
-		&& EqualAbs(v[1][2], 0.f, epsilon)
-		&& EqualAbs(v[1][3], 0.f, epsilon)
-		&& EqualAbs(v[2][3], 0.f, epsilon);
+	    && EqualAbs(v[0][2], 0.f, epsilon)
+	    && EqualAbs(v[0][3], 0.f, epsilon)
+	    && EqualAbs(v[1][2], 0.f, epsilon)
+	    && EqualAbs(v[1][3], 0.f, epsilon)
+	    && EqualAbs(v[2][3], 0.f, epsilon);
 }
 
 bool float4x4::IsUpperTriangular(float epsilon) const
 {
 	return EqualAbs(v[1][0], 0.f, epsilon)
-		&& EqualAbs(v[2][0], 0.f, epsilon)
-		&& EqualAbs(v[3][0], 0.f, epsilon)
-		&& EqualAbs(v[2][1], 0.f, epsilon)
-		&& EqualAbs(v[3][1], 0.f, epsilon)
-		&& EqualAbs(v[3][2], 0.f, epsilon);
+	    && EqualAbs(v[2][0], 0.f, epsilon)
+	    && EqualAbs(v[3][0], 0.f, epsilon)
+	    && EqualAbs(v[2][1], 0.f, epsilon)
+	    && EqualAbs(v[3][1], 0.f, epsilon)
+	    && EqualAbs(v[3][2], 0.f, epsilon);
 }
 
 bool float4x4::IsInvertible(float epsilon) const
@@ -1993,15 +1993,15 @@ bool float4x4::HasUniformScale(float epsilon) const
 bool float4x4::IsRowOrthogonal3(float epsilon) const
 {
 	return Row3(0).IsPerpendicular(Row3(1), epsilon)
-		&& Row3(0).IsPerpendicular(Row3(2), epsilon)
-		&& Row3(1).IsPerpendicular(Row3(2), epsilon);
+	    && Row3(0).IsPerpendicular(Row3(2), epsilon)
+	    && Row3(1).IsPerpendicular(Row3(2), epsilon);
 }
 
 bool float4x4::IsColOrthogonal3(float epsilon) const
 {
 	return Col3(0).IsPerpendicular(Col3(1), epsilon)
-		&& Col3(0).IsPerpendicular(Col3(2), epsilon)
-		&& Col3(1).IsPerpendicular(Col3(2), epsilon);
+	    && Col3(0).IsPerpendicular(Col3(2), epsilon)
+	    && Col3(1).IsPerpendicular(Col3(2), epsilon);
 }
 
 bool float4x4::IsOrthonormal3(float epsilon) const
