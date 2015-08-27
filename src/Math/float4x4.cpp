@@ -1272,7 +1272,7 @@ float4x4 &float4x4::operator =(const TranslateOp &rhs)
 
 float float4x4::Determinant3() const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return mat3x4_determinant(row);
 #else
 	assume(Float3x3Part().IsFinite());
@@ -1292,7 +1292,7 @@ float float4x4::Determinant3() const
 
 float float4x4::Determinant4() const
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return mat4x4_determinant(row);
 #else
 	assume(IsFinite());

@@ -760,76 +760,68 @@ FORCE_INLINE void mat3x4_inverse_colorthogonal(const __m128 *mat, __m128 *out)
  // out[3] = assumed to be [1,0,0,0] - no need to write back.
 }
 
-FORCE_INLINE __m128 NewtonRhapsonRecipStep(__m128 recip, __m128 estimate)
-{
-	// Do one iteration of Newton-Rhapson:
-	// e_n = 2*e - x*e^2
-	__m128 e2 = _mm_mul_ps(estimate, estimate);
-	return _mm_sub_ps(_mm_add_ps(estimate, estimate), _mm_mul_ps(recip, e2));
-}
+#endif
 
-FORCE_INLINE __m128 NewtonRhapsonRecip(__m128 recip)
-{
-	__m128 estimate = _mm_rcp_ps(recip);
-	return NewtonRhapsonRecipStep(recip, estimate);
-}
+#ifdef MATH_SIMD
 
-/// Computes the determinant of a 4x4 matrix. 
-inline float mat4x4_determinant(const __m128 *row)
+inline float mat4x4_determinant(const simd4f *row)
 {
-	__m128 s = xxxx_ps(NewtonRhapsonRecip(row[0]));
+	simd4f s = xxxx_ps(rcp_ps(row[0]));
 	// row[0].x has a factor of the final determinant.
-	__m128 row0 = _mm_mul_ps(s, row[0]);
+	simd4f row0 = mul_ps(s, row[0]);
 	s = xxxx_ps(row[1]);
-	__m128 row1 = _mm_sub_ps(row[1], _mm_mul_ps(s, row0));
+	simd4f row1 = sub_ps(row[1], mul_ps(s, row0));
 	s = xxxx_ps(row[2]);
-	__m128 row2 = _mm_sub_ps(row[2], _mm_mul_ps(s, row0));
+	simd4f row2 = sub_ps(row[2], mul_ps(s, row0));
 	s = xxxx_ps(row[3]);
-	__m128 row3 = _mm_sub_ps(row[3], _mm_mul_ps(s, row0));
+	simd4f row3 = sub_ps(row[3], mul_ps(s, row0));
 
 	// row1.y has a factor of the final determinant.
-	s = yyyy_ps(NewtonRhapsonRecip(row1));
-	__m128 row1_1 = _mm_mul_ps(s, row1);
+	s = yyyy_ps(rcp_ps(row1));
+	simd4f row1_1 = mul_ps(s, row1);
 	s = yyyy_ps(row2);
-	__m128 row2_1 = _mm_sub_ps(row2, _mm_mul_ps(s, row1_1));
+	simd4f row2_1 = sub_ps(row2, mul_ps(s, row1_1));
 	s = yyyy_ps(row3);
-	__m128 row3_1 = _mm_sub_ps(row3, _mm_mul_ps(s, row1_1));
+	simd4f row3_1 = sub_ps(row3, mul_ps(s, row1_1));
 
 	// Now we are left with a 2x2 matrix in row2_1.zw and row3_1.zw.
 	// D = row2_1.z * row3_1.w - row2_1.w * row3_1.z.
-	__m128 r1 = xywz_ps(row2_1);
-	__m128 r = _mm_mul_ps(r1, row3_1);
-	__m128 a = wwww_ps(r);
-	__m128 b = zzzz_ps(r);
-	__m128 d1 = _mm_sub_ss(a, b);
-	__m128 d2 = row[0];
-	__m128 d3 = yyyy_ps(row1);
-	__m128 d = _mm_mul_ss(d1, _mm_mul_ss(d2, d3));
+	simd4f r1 = xywz_ps(row2_1);
+	simd4f r = mul_ps(r1, row3_1);
+	simd4f a = wwww_ps(r);
+	simd4f b = zzzz_ps(r);
+	simd4f d1 = sub_ps(a, b); // TODO: sub_ss
+	simd4f d2 = row[0];
+	simd4f d3 = yyyy_ps(row1);
+	simd4f d = mul_ps(d1, mul_ps(d2, d3)); // TODO: mul_ss + sub_ss
 	return s4f_x(d);
 }
 
 /// Computes the determinant of a 3x4 matrix stored in row-major format. (Treated as a square matrix with last row [0,0,0,1])
-inline float mat3x4_determinant(const __m128 *row)
+inline float mat3x4_determinant(const simd4f *row)
 {
-	__m128 s = xxxx_ps(NewtonRhapsonRecip(row[0]));
+	simd4f s = xxxx_ps(rcp_ps(row[0]));
 	// row[0].x has a factor of the final determinant.
-	__m128 row0 = _mm_mul_ps(s, row[0]);
+	simd4f row0 = mul_ps(s, row[0]);
 	s = xxxx_ps(row[1]);
-	__m128 row1 = _mm_sub_ps(row[1], _mm_mul_ps(s, row0));
+	simd4f row1 = sub_ps(row[1], mul_ps(s, row0));
 	s = xxxx_ps(row[2]);
-	__m128 row2 = _mm_sub_ps(row[2], _mm_mul_ps(s, row0));
+	simd4f row2 = sub_ps(row[2], mul_ps(s, row0));
 
 	// Now we are left with a 2x2 matrix in row1.yz and row2.yz.
 	// D = row1.y * row2.z - row2.y * row1.z.
-	__m128 r1 = xzyw_ps(row1);
-	__m128 r = _mm_mul_ps(r1, row2);
-	__m128 a = zzzz_ps(r);
-	__m128 b = yyyy_ps(r);
-	__m128 d1 = _mm_sub_ss(a, b);
-	__m128 d2 = row[0];
-	__m128 d = _mm_mul_ss(d1, d2);
+	simd4f r1 = xzyw_ps(row1);
+	simd4f r = mul_ps(r1, row2);
+	simd4f a = zzzz_ps(r);
+	simd4f b = yyyy_ps(r);
+	simd4f d1 = sub_ps(a, b); // TODO: sub_ss
+	simd4f d2 = row[0];
+	simd4f d = mul_ps(d1, d2); // TODO: mul_ss
 	return s4f_x(d);
 }
+
+#endif
+#ifdef MATH_SSE
 
 inline void mat3x4_transpose(const __m128 *src, __m128 *dst)
 {
