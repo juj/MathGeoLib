@@ -870,7 +870,7 @@ void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 
 // Require VS2012 for the following line - VS2010 fails at internal compiler error, see
 // http://clb.demon.fi:8113/builders/vs2010-MathGeoLib-32bit-SSE4.1/builds/379/steps/Compile%20MathGeoLib-32bit-Release/logs/stdio
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE) && _MSC_VER >= 1700
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD) && (!defined(_MSC_VER) || _MSC_VER >= 1700)
 	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
 	v[row][0] = m_r0;
@@ -972,7 +972,7 @@ void float4x4::Set(const float4x4 &rhs)
 #ifdef MATH_AVX
 	row2[0] = rhs.row2[0];
 	row2[1] = rhs.row2[1];
-#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#elif defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -1028,7 +1028,7 @@ void float4x4::Set3x4Part(const float3x4 &r)
 {
 	assume(r.IsFinite());
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	row[0] = r.row[0];
 	row[1] = r.row[1];
 	row[2] = r.row[2];
@@ -1081,7 +1081,7 @@ void float4x4::SwapRows(int row1, int row2)
 		return; // Benign failure
 #endif
 
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	Swap(row[row1], row[row2]);
 #else
 	Swap(v[row1][0], v[row2][0]);
@@ -1182,7 +1182,7 @@ float4x4 &float4x4::operator =(const float3x3 &rhs)
 
 float4x4 &float4x4::operator =(const float3x4 &rhs)
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
@@ -1214,7 +1214,7 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 #elif defined(MATH_SSE) */
 
 #if defined(MATH_AUTOMATIC_SSE)
-	
+
 #if !defined(ANDROID) // Android NEON doesn't currently use aligned loads.
 	assert(IS16ALIGNED(this));
 	assert(IS16ALIGNED(&rhs));
@@ -1259,7 +1259,7 @@ float4x4 &float4x4::operator =(const TranslateOp &rhs)
 	      0, 1.f,   0, rhs.offset.y,
 	      0,   0, 1.f, rhs.offset.z,
 	      0,   0,   0,   1.f);
-	
+
 	return *this;
 }
 
