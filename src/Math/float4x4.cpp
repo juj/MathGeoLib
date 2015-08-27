@@ -45,17 +45,24 @@ float4x4::float4x4(float _00, float _01, float _02, float _03,
                    float _30, float _31, float _32, float _33)
 {
 	Set(_00, _01, _02, _03,
-		_10, _11, _12, _13,
-		_20, _21, _22, _23,
-		_30, _31, _32, _33);
+	    _10, _11, _12, _13,
+	    _20, _21, _22, _23,
+	    _30, _31, _32, _33);
 }
 
 float4x4::float4x4(const float3x3 &m)
 {
+#ifdef MATH_AUTOMATIC_SSE
+	row[0] = load_vec3(m.ptr(), 0.f);
+	row[1] = load_vec3(m.ptr() + 3, 0.f);
+	row[2] = load_vec3(m.ptr() + 6, 0.f);
+	row[3] = set_ps(1.f, 0.f, 0.f, 0.f);
+#else
 	Set(m.At(0,0), m.At(0,1), m.At(0,2), 0.f,
-		m.At(1,0), m.At(1,1), m.At(1,2), 0.f,
-		m.At(2,0), m.At(2,1), m.At(2,2), 0.f,
-		      0.f,       0.f,       0.f, 1.f);
+	    m.At(1,0), m.At(1,1), m.At(1,2), 0.f,
+	    m.At(2,0), m.At(2,1), m.At(2,2), 0.f,
+	          0.f,       0.f,       0.f, 1.f);
+#endif
 }
 
 float4x4::float4x4(const float3x4 &m)
@@ -954,7 +961,7 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 				   float _20, float _21, float _22, float _23,
 				   float _30, float _31, float _32, float _33)
 {
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	mat4x4_set(row, _00, _01, _02, _03,
 	                _10, _11, _12, _13,
 	                _20, _21, _22, _23,
