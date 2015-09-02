@@ -195,11 +195,19 @@ int FORCE_INLINE allzero_ps(simd4f x)
 // Multiply-add. These are otherwise identical, except that the FMA version is specced to have
 // better precision with respect to rounding.
 #ifdef MATH_FMA
+// Multiply-add: a*b + c
 #define madd_ps _mm_fmadd_ps
+// Multiply-negate-add: c - a*b
+#define mnadd_ps _mm_fnmadd_ps
+// Multiply-sub: a*b - c
 #define msub_ps _mm_fmsub_ps
+// Multiply-negate-sub: -c - a*b
+#define mnsub_ps _mm_fnmsub_ps
 #else
-#define madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
-#define msub_ps(a, b, c) _mm_sub_ps(_mm_mul_ps((a), (b)), (c))
+#define madd_ps(a, b, c) add_ps(mul_ps((a), (b)), (c))
+#define mnadd_ps(a, b, c) add_ps(neg_ps(mul_ps((a), (b))), (c))
+#define msub_ps(a, b, c) sub_ps(mul_ps((a), (b)), (c))
+#define mnsub_ps(a, b, c) sub_ps(neg_ps(mul_ps((a), (b))), (c))
 #endif
 
 static inline __m128 load_vec3(const float *ptr, float w)
@@ -468,11 +476,19 @@ FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
 #define stream_ps vst1q_f32
 
 #if defined(MATH_VFPv4) || defined(MATH_NEONv2)
+// Multiply-add: a*b + c
 #define madd_ps vmlaq_f32
+// Multiply-negate-add: c - a*b == -(-c + a*b)
+#define mnadd_ps(a, b, c) neg_ps(vmlsq_f32((a), (b), (c)))
+// Multiply-sub: a*b - c
 #define msub_ps vmlsq_f32
+// Multiply-negate-sub: -c - a*b = -(c + a*b)
+#define mnsub_ps(a, b, c) neg_ps(vmlaq_f32((a), (b), (c)))
 #else
 #define madd_ps(a, b, c) add_ps(mul_ps((a), (b)), (c))
+#define mnadd_ps(a, b, c) add_ps(neg_ps(mul_ps((a), (b))), (c))
 #define msub_ps(a, b, c) sub_ps(mul_ps((a), (b)), (c))
+#define mnsub_ps(a, b, c) sub_ps(neg_ps(mul_ps((a), (b))), (c))
 #endif
 
 static FORCE_INLINE simd4f rcp_ps(simd4f x)
