@@ -2494,36 +2494,27 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 	// A.x <cross> B.x
 	// A.x <cross> B.y
 	// A.x <cross> B.z
-	simd4f ra = mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,1,1,1)), AbsR[2]);
-	ra = add_ps(ra, mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,2,2,2)), AbsR[1]));
-	simd4f rb = mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[0], _MM_SHUFFLE(3,1,2,2)));
-	rb = add_ps(rb, mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[0], _MM_SHUFFLE(3,0,0,1))));
-	simd4f lhs = mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,2,2,2)), R[1]);
-	lhs = sub_ps(lhs, mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,1,1,1)), R[2]));
+	simd4f ra = madd_ps(shuffle1_ps(r, _MM_SHUFFLE(3,1,1,1)), AbsR[2], mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,2,2,2)), AbsR[1]));
+	simd4f rb = madd_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[0], _MM_SHUFFLE(3,1,2,2)), mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[0], _MM_SHUFFLE(3,0,0,1))));
+	simd4f lhs = msub_ps(shuffle1_ps(t, _MM_SHUFFLE(3,2,2,2)), R[1], mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,1,1,1)), R[2]));
 	res = cmpgt_ps(abs_ps(lhs), add_ps(ra, rb));
 	if (!allzero_ps(res)) return false;
 
 	// A.y <cross> B.x
 	// A.y <cross> B.y
 	// A.y <cross> B.z
-	ra = mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,0,0,0)), AbsR[2]);
-	ra = add_ps(ra, mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,2,2,2)), AbsR[0]));
-	rb = mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[1], _MM_SHUFFLE(3,1,2,2)));
-	rb = add_ps(rb, mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[1], _MM_SHUFFLE(3,0,0,1))));
-	lhs = mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,0,0,0)), R[2]);
-	lhs = sub_ps(lhs, mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,2,2,2)), R[0]));
+	ra = madd_ps(shuffle1_ps(r, _MM_SHUFFLE(3,0,0,0)), AbsR[2], mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,2,2,2)), AbsR[0]));
+	rb = madd_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[1], _MM_SHUFFLE(3,1,2,2)), mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[1], _MM_SHUFFLE(3,0,0,1))));
+	lhs = msub_ps(shuffle1_ps(t, _MM_SHUFFLE(3,0,0,0)), R[2], mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,2,2,2)), R[0]));
 	res = cmpgt_ps(abs_ps(lhs), add_ps(ra, rb));
 	if (!allzero_ps(res)) return false;
 
 	// A.z <cross> B.x
 	// A.z <cross> B.y
 	// A.z <cross> B.z
-	ra = mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,0,0,0)), AbsR[1]);
-	ra = add_ps(ra, mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,1,1,1)), AbsR[0]));
-	rb = mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[2], _MM_SHUFFLE(3,1,2,2)));
-	rb = add_ps(rb, mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[2], _MM_SHUFFLE(3,0,0,1))));
-	lhs = mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,1,1,1)), R[0]);
-	lhs = sub_ps(lhs, mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,0,0,0)), R[1]));
+	ra = madd_ps(shuffle1_ps(r, _MM_SHUFFLE(3,0,0,0)), AbsR[1], mul_ps(shuffle1_ps(r, _MM_SHUFFLE(3,1,1,1)), AbsR[0]));
+	rb = madd_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,0,0,1)), shuffle1_ps(AbsR[2], _MM_SHUFFLE(3,1,2,2)), mul_ps(shuffle1_ps(b.r, _MM_SHUFFLE(3,1,2,2)), shuffle1_ps(AbsR[2], _MM_SHUFFLE(3,0,0,1))));
+	lhs = msub_ps(shuffle1_ps(t, _MM_SHUFFLE(3,1,1,1)), R[0], mul_ps(shuffle1_ps(t, _MM_SHUFFLE(3,0,0,0)), R[1]));
 	res = cmpgt_ps(abs_ps(lhs), add_ps(ra, rb));
 	return allzero_ps(res) != 0;
 
