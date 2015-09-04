@@ -101,10 +101,10 @@ static const simd4f simd4fSignBit = set1_ps(-0.f); // -0.f = 1 << 31
 // Reverse whole vector
 #define wzyx_ps(x) shuffle1_ps((x), _MM_SHUFFLE(0,1,2,3))
 // Duplicate two elements
-#define xxyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,0,0))
+#define xxyy_ps(x) shuffle1_ps((x), _MM_SHUFFLE(1,1,0,0)) // This is the same as _mm_unpacklo_ps, but pshufd is probably better(?)
 #define xxww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,0,0))
 #define yyzz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,2,1,1))
-#define zzww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,2,2))
+#define zzww_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,3,2,2)) // This the same as _mm_unpackhi_ps, but pshufd is probably better(?)
 #define xzxz_ps(x) shuffle1_ps((x), _MM_SHUFFLE(2,0,2,0))
 #define ywyw_ps(x) shuffle1_ps((x), _MM_SHUFFLE(3,1,3,1))
 #ifdef MATH_SSE3

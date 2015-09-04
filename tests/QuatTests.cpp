@@ -177,9 +177,9 @@ RANDOMIZED_TEST(quat_mul_quat)
 {
 	Quat q = Quat::RandomRotation(rng);
 	Quat q2 = Quat::RandomRotation(rng);
-	Quat correct = q * q2;
+	Quat correct = Quat(q.ToFloat3x3() * q2.ToFloat3x3());
 	Quat q3 = quat_mul_quat(q.q, q2.q);
-	assert(q3.Equals(correct));
+	assert(q3.Equals(correct) || q3.Equals(correct.Neg()));
 }
 
 RANDOMIZED_TEST(Quat_ToAxisAngle_float3)

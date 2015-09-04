@@ -185,12 +185,11 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	           -x*r.z + y*r.w + z*r.x + w*r.y,
 	            x*r.y - y*r.x + z*r.w + w*r.z,
 	           -x*r.x - y*r.y - z*r.z + w*r.w); */
-#ifdef MATH_SSE
-	const simd4f signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
-	const simd4f signy = xxww_ps(signx);   // [- - + +]
-	const simd4f signz = wxxw_ps(signx);   // [- + + -]
+#if defined(MATH_SSE)
+	const simd4f signy = set_ps_hex(0x80000000u, 0x80000000u, 0, 0); // [- - + +]
+	const simd4f signz = wxxw_ps(signy);   // [- + + -]
 
-	simd4f X = xor_ps(signx, xxxx_ps(q1));
+	simd4f X = xxxx_ps(q1);
 	simd4f Y = xor_ps(signy, yyyy_ps(q1));
 	simd4f Z = xor_ps(signz, zzzz_ps(q1));
 	simd4f W = wwww_ps(q1);
@@ -201,7 +200,13 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	// simd4f r4 = q2;
 
 	simd4f out = mul_ps(X, r1);
-	out = madd_ps(Y, r2, out);
+#ifdef MATH_FMA
+	// _mm_fmsubadd_ps can avoid one shuffle and xor(!)
+	out = _mm_fmsubadd_ps(Y, r2, out);
+#else
+	const simd4f signx = xzxz_ps(signy); // [- + - +]
+	out = madd_ps(Y, r2, xor_ps(signx, out));
+#endif
 	out = madd_ps(Z, r3, out);
 	out = madd_ps(W, q2, out);
 	return out;
