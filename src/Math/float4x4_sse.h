@@ -603,7 +603,7 @@ inline void mat4x4_mul_mat3x3_sse(__m128 *out, const __m128 *m1, const float *m2
 	msub_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
 	        shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0)), \
 	        mul_ps(shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
-	              _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
+	               _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
 FORCE_INLINE float mat4x4_inverse(const simd4f *mat, simd4f *out)
 {
 	simd4f f1 = MAT_COFACTOR(mat, 3, 2);
@@ -632,35 +632,35 @@ FORCE_INLINE float mat4x4_inverse(const simd4f *mat, simd4f *out)
 }
 
 #define MAT3x4_COFACTOR(mat, i, j) \
-	_mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
-	           shuffle1_ps(_mm_shuffle_ps(mat_3, mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0))), \
-	           _mm_mul_ps(shuffle1_ps(_mm_shuffle_ps(mat_3, mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
-	           _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
-FORCE_INLINE float mat3x4_inverse(const __m128 *mat, __m128 *out)
+	msub_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
+	        shuffle1_ps(_mm_shuffle_ps(mat_3, mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0)), \
+	        mul_ps(shuffle1_ps(_mm_shuffle_ps(mat_3, mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
+	               _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
+FORCE_INLINE float mat3x4_inverse(const simd4f *mat, simd4f *out)
 {
 	///\todo There might be a way to exploit here that the last row is a [0,0,0,1], and avoid some computations.
-	__m128 mat_3 = set_ps(1.f, 0.f, 0.f, 0.f);
-	__m128 f1 = MAT3x4_COFACTOR(mat, 3, 2);
-	__m128 f2 = MAT3x4_COFACTOR(mat, 3, 1);
-	__m128 f3 = MAT3x4_COFACTOR(mat, 2, 1);
-	__m128 f4 = MAT3x4_COFACTOR(mat, 3, 0);
-	__m128 f5 = MAT3x4_COFACTOR(mat, 2, 0);
-	__m128 f6 = MAT3x4_COFACTOR(mat, 1, 0);
-	__m128 v1 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(0,0,0,0)), _MM_SHUFFLE(2,2,2,0));
-	__m128 v2 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(1,1,1,1)), _MM_SHUFFLE(2,2,2,0));
-	__m128 v3 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(2,2,2,2)), _MM_SHUFFLE(2,2,2,0));
-	__m128 v4 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(3,3,3,3)), _MM_SHUFFLE(2,2,2,0));
-	const __m128 s1 = _mm_set_ps(-0.0f,  0.0f, -0.0f,  0.0f);
-	const __m128 s2 = _mm_set_ps( 0.0f, -0.0f,  0.0f, -0.0f);
-	__m128 r1 = _mm_xor_ps(s1, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v2, f1), _mm_mul_ps(v3, f2)), _mm_mul_ps(v4, f3)));
-	__m128 r2 = _mm_xor_ps(s2, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f1), _mm_mul_ps(v3, f4)), _mm_mul_ps(v4, f5)));
-	__m128 r3 = _mm_xor_ps(s1, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f2), _mm_mul_ps(v2, f4)), _mm_mul_ps(v4, f6)));
-	__m128 r4 = _mm_xor_ps(s2, _mm_add_ps(_mm_sub_ps(_mm_mul_ps(v1, f3), _mm_mul_ps(v2, f5)), _mm_mul_ps(v3, f6)));
-	__m128 det = dot4_ps(mat[0], _mm_movelh_ps(_mm_unpacklo_ps(r1, r2), _mm_unpacklo_ps(r3, r4)));
-	__m128 rcp = _mm_rcp_ps(det);
-	out[0] = _mm_mul_ps(r1, rcp);
-	out[1] = _mm_mul_ps(r2, rcp);
-	out[2] = _mm_mul_ps(r3, rcp);
+	simd4f mat_3 = set_ps(1.f, 0.f, 0.f, 0.f);
+	simd4f f1 = MAT3x4_COFACTOR(mat, 3, 2);
+	simd4f f2 = MAT3x4_COFACTOR(mat, 3, 1);
+	simd4f f3 = MAT3x4_COFACTOR(mat, 2, 1);
+	simd4f f4 = MAT3x4_COFACTOR(mat, 3, 0);
+	simd4f f5 = MAT3x4_COFACTOR(mat, 2, 0);
+	simd4f f6 = MAT3x4_COFACTOR(mat, 1, 0);
+	simd4f v1 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(0,0,0,0)), _MM_SHUFFLE(2,2,2,0));
+	simd4f v2 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(1,1,1,1)), _MM_SHUFFLE(2,2,2,0));
+	simd4f v3 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(2,2,2,2)), _MM_SHUFFLE(2,2,2,0));
+	simd4f v4 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(3,3,3,3)), _MM_SHUFFLE(2,2,2,0));
+	const simd4f s1 = set_ps(-0.0f,  0.0f, -0.0f,  0.0f);
+	const simd4f s2 = wzyx_ps(s1); // [+ - + -]
+	simd4f r1 = xor_ps(s1, madd_ps(v4, f3, msub_ps(v2, f1, mul_ps(v3, f2))));
+	simd4f r2 = xor_ps(s2, madd_ps(v4, f5, msub_ps(v1, f1, mul_ps(v3, f4))));
+	simd4f r3 = xor_ps(s1, madd_ps(v4, f6, msub_ps(v1, f2, mul_ps(v2, f4))));
+	simd4f r4 = xor_ps(s2, madd_ps(v3, f6, msub_ps(v1, f3, mul_ps(v2, f5))));
+	simd4f det = dot4_ps(mat[0], _mm_movelh_ps(_mm_unpacklo_ps(r1, r2), _mm_unpacklo_ps(r3, r4)));
+	simd4f rcp = _mm_rcp_ps(det);
+	out[0] = mul_ps(r1, rcp);
+	out[1] = mul_ps(r2, rcp);
+	out[2] = mul_ps(r3, rcp);
 	return s4f_x(det);
 }
 
