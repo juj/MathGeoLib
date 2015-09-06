@@ -734,7 +734,7 @@ FORCE_INLINE void mat3x4_inverse_colorthogonal(const __m128 *mat, __m128 *out)
 	// mat[2]: [tz,22,21,20]
 	// mat[3]: assumed to be [1,0,0,0] - not read.
 
-	simd4f scale = rcp_ps(add_ps(mul_ps(mat[0], mat[0]), add_ps(mul_ps(mat[1], mat[1]), mul_ps(mat[2], mat[2]))));
+	simd4f scale = rcp_ps(madd_ps(mat[0], mat[0], madd_ps(mat[1], mat[1], mul_ps(mat[2], mat[2]))));
 
 	// First get the translation part (tx,ty,tz) from the original matrix,
 	// and compute T=-M^(-1).
@@ -744,10 +744,9 @@ FORCE_INLINE void mat3x4_inverse_colorthogonal(const __m128 *mat, __m128 *out)
 	simd4f m0 = mul_ps(scale, mat[0]);
 	simd4f m1 = mul_ps(scale, mat[1]);
 	simd4f m2 = mul_ps(scale, mat[2]);
-	tx = mul_ps(tx, m0);
-	ty = mul_ps(ty, m1);
-	tz = mul_ps(tz, m2);
-	simd4f vec = neg_ps(add_ps(add_ps(tx, ty), tz));
+	simd4f vec = mul_ps(tx, m0);
+	vec = madd_ps(ty, m1, vec);
+	vec = mnsub_ps(tz, m2, vec);
 
 	simd4f tmp0 = _mm_unpacklo_ps(m0, m1); // [11,01,10,00]
 	simd4f tmp1 = _mm_unpackhi_ps(m0, m1); // [ty,tx,12,02]
@@ -757,7 +756,7 @@ FORCE_INLINE void mat3x4_inverse_colorthogonal(const __m128 *mat, __m128 *out)
 	out[0] = _mm_movelh_ps(tmp0, tmp2);            // [Tx,20,10,00]
 	out[1] = _mm_movehl_ps(tmp2, tmp0);            // [Ty,21,11,01]
 	out[2] = _mm_movelh_ps(tmp1, tmp3);            // [Tz,22 12,02]
- // out[3] = assumed to be [1,0,0,0] - no need to write back.
+	// out[3] = assumed to be [1,0,0,0] - no need to write back.
 }
 
 #endif
@@ -770,19 +769,19 @@ inline float mat4x4_determinant(const simd4f *row)
 	// row[0].x has a factor of the final determinant.
 	simd4f row0 = mul_ps(s, row[0]);
 	s = xxxx_ps(row[1]);
-	simd4f row1 = sub_ps(row[1], mul_ps(s, row0));
+	simd4f row1 = mnadd_ps(s, row0, row[1]);
 	s = xxxx_ps(row[2]);
-	simd4f row2 = sub_ps(row[2], mul_ps(s, row0));
+	simd4f row2 = mnadd_ps(s, row0, row[2]);
 	s = xxxx_ps(row[3]);
-	simd4f row3 = sub_ps(row[3], mul_ps(s, row0));
+	simd4f row3 = mnadd_ps(s, row0, row[3]);
 
 	// row1.y has a factor of the final determinant.
 	s = yyyy_ps(rcp_ps(row1));
 	simd4f row1_1 = mul_ps(s, row1);
 	s = yyyy_ps(row2);
-	simd4f row2_1 = sub_ps(row2, mul_ps(s, row1_1));
+	simd4f row2_1 = mnadd_ps(s, row1_1, row2);
 	s = yyyy_ps(row3);
-	simd4f row3_1 = sub_ps(row3, mul_ps(s, row1_1));
+	simd4f row3_1 = mnadd_ps(s, row1_1, row3);
 
 	// Now we are left with a 2x2 matrix in row2_1.zw and row3_1.zw.
 	// D = row2_1.z * row3_1.w - row2_1.w * row3_1.z.
