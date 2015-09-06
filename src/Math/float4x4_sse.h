@@ -803,9 +803,9 @@ inline float mat3x4_determinant(const simd4f *row)
 	// row[0].x has a factor of the final determinant.
 	simd4f row0 = mul_ps(s, row[0]);
 	s = xxxx_ps(row[1]);
-	simd4f row1 = sub_ps(row[1], mul_ps(s, row0));
+	simd4f row1 = mnadd_ps(s, row0, row[1]);
 	s = xxxx_ps(row[2]);
-	simd4f row2 = sub_ps(row[2], mul_ps(s, row0));
+	simd4f row2 = mnadd_ps(s, row0, row[2]);
 
 	// Now we are left with a 2x2 matrix in row1.yz and row2.yz.
 	// D = row1.y * row2.z - row2.y * row1.z.
