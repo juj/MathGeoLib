@@ -600,10 +600,10 @@ inline void mat4x4_mul_mat3x3_sse(__m128 *out, const __m128 *m1, const float *m2
 // Computes the inverse of a 4x4 matrix via direct cofactor expansion.
 /// Returns the determinant of the original matrix, and zero on failure.
 #define MAT_COFACTOR(mat, i, j) \
-	sub_ps(mul_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
-	              shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0))), \
-	       mul_ps(shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
-	             _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
+	msub_ps(_mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(j,j,j,j)), \
+	        shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(i,i,i,i)), _MM_SHUFFLE(2,0,0,0)), \
+	        mul_ps(shuffle1_ps(_mm_shuffle_ps(mat[3], mat[2], _MM_SHUFFLE(j,j,j,j)), _MM_SHUFFLE(2,0,0,0)), \
+	              _mm_shuffle_ps(mat[2], mat[1], _MM_SHUFFLE(i,i,i,i))))
 FORCE_INLINE float mat4x4_inverse(const simd4f *mat, simd4f *out)
 {
 	simd4f f1 = MAT_COFACTOR(mat, 3, 2);
@@ -618,10 +618,10 @@ FORCE_INLINE float mat4x4_inverse(const simd4f *mat, simd4f *out)
 	simd4f v4 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(3,3,3,3)), _MM_SHUFFLE(2,2,2,0));
 	const simd4f s1 = _mm_set_ps(-0.0f,  0.0f, -0.0f,  0.0f);
 	const simd4f s2 = _mm_set_ps( 0.0f, -0.0f,  0.0f, -0.0f);
-	simd4f r1 = xor_ps(s1, add_ps(sub_ps(mul_ps(v2, f1), mul_ps(v3, f2)), mul_ps(v4, f3)));
-	simd4f r2 = xor_ps(s2, add_ps(sub_ps(mul_ps(v1, f1), mul_ps(v3, f4)), mul_ps(v4, f5)));
-	simd4f r3 = xor_ps(s1, add_ps(sub_ps(mul_ps(v1, f2), mul_ps(v2, f4)), mul_ps(v4, f6)));
-	simd4f r4 = xor_ps(s2, add_ps(sub_ps(mul_ps(v1, f3), mul_ps(v2, f5)), mul_ps(v3, f6)));
+	simd4f r1 = xor_ps(s1, madd_ps(v4, f3, msub_ps(v2, f1, mul_ps(v3, f2))));
+	simd4f r2 = xor_ps(s2, madd_ps(v4, f5, msub_ps(v1, f1, mul_ps(v3, f4))));
+	simd4f r3 = xor_ps(s1, madd_ps(v4, f6, msub_ps(v1, f2, mul_ps(v2, f4))));
+	simd4f r4 = xor_ps(s2, madd_ps(v3, f6, msub_ps(v1, f3, mul_ps(v2, f5))));
 	simd4f det = dot4_ps(mat[0], _mm_movelh_ps(_mm_unpacklo_ps(r1, r2), _mm_unpacklo_ps(r3, r4)));
 	simd4f rcp = rcp_ps(det);
 	out[0] = mul_ps(r1, rcp);
