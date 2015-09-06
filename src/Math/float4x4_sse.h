@@ -616,8 +616,8 @@ FORCE_INLINE float mat4x4_inverse(const simd4f *mat, simd4f *out)
 	simd4f v2 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(1,1,1,1)), _MM_SHUFFLE(2,2,2,0));
 	simd4f v3 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(2,2,2,2)), _MM_SHUFFLE(2,2,2,0));
 	simd4f v4 = shuffle1_ps(_mm_shuffle_ps(mat[1], mat[0], _MM_SHUFFLE(3,3,3,3)), _MM_SHUFFLE(2,2,2,0));
-	const simd4f s1 = _mm_set_ps(-0.0f,  0.0f, -0.0f,  0.0f);
-	const simd4f s2 = _mm_set_ps( 0.0f, -0.0f,  0.0f, -0.0f);
+	const simd4f s1 = set_ps(-0.0f,  0.0f, -0.0f,  0.0f);
+	const simd4f s2 = wzyx_ps(s1); // [+ - + -]
 	simd4f r1 = xor_ps(s1, madd_ps(v4, f3, msub_ps(v2, f1, mul_ps(v3, f2))));
 	simd4f r2 = xor_ps(s2, madd_ps(v4, f5, msub_ps(v1, f1, mul_ps(v3, f4))));
 	simd4f r3 = xor_ps(s1, madd_ps(v4, f6, msub_ps(v1, f2, mul_ps(v2, f4))));
