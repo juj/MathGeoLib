@@ -665,7 +665,7 @@ FORCE_INLINE float mat3x4_inverse(const __m128 *mat, __m128 *out)
 }
 
 /// Inverts a 3x4 affine transformation matrix (in row-major format) that only consists of rotation (+possibly mirroring) and translation.
-FORCE_INLINE void mat3x4_inverse_orthonormal(const __m128 *mat, __m128 *out)
+FORCE_INLINE void mat3x4_inverse_orthonormal(const simd4f *mat, simd4f *out)
 {
 	// mat[0]: [tx,02,01,00]
 	// mat[1]: [ty,12,11,10]
@@ -674,27 +674,26 @@ FORCE_INLINE void mat3x4_inverse_orthonormal(const __m128 *mat, __m128 *out)
 
 	// First get the translation part (tx,ty,tz) from the original matrix,
 	// and compute T=-M^(-1).
-	__m128 tx = wwww_ps(mat[0]);
-	__m128 ty = wwww_ps(mat[1]);
-	__m128 tz = wwww_ps(mat[2]);
-	tx = _mm_mul_ps(tx, mat[0]);
-	ty = _mm_mul_ps(ty, mat[1]);
-	tz = _mm_mul_ps(tz, mat[2]);
-	__m128 vec = neg_ps(_mm_add_ps(_mm_add_ps(tx, ty), tz));
+	simd4f tx = wwww_ps(mat[0]);
+	simd4f ty = wwww_ps(mat[1]);
+	simd4f tz = wwww_ps(mat[2]);
+	simd4f vec = mul_ps(tx, mat[0]);
+	vec = madd_ps(ty, mat[1], vec);
+	vec = mnsub_ps(tz, mat[2], vec);
 
-	__m128 tmp0 = _mm_unpacklo_ps(mat[0], mat[1]); // [11,01,10,00]
-	__m128 tmp1 = _mm_unpackhi_ps(mat[0], mat[1]); // [ty,tx,12,02]
-	__m128 tmp2 = _mm_unpacklo_ps(mat[2], vec);    // [Ty,21,Tx,20]
-	__m128 tmp3 = _mm_unpackhi_ps(mat[2], vec);    // [ _,23,Tz,22]
+	simd4f tmp0 = _mm_unpacklo_ps(mat[0], mat[1]); // [11,01,10,00]
+	simd4f tmp1 = _mm_unpackhi_ps(mat[0], mat[1]); // [ty,tx,12,02]
+	simd4f tmp2 = _mm_unpacklo_ps(mat[2], vec);    // [Ty,21,Tx,20]
+	simd4f tmp3 = _mm_unpackhi_ps(mat[2], vec);    // [ _,23,Tz,22]
 
 	out[0] = _mm_movelh_ps(tmp0, tmp2);            // [Tx,20,10,00]
 	out[1] = _mm_movehl_ps(tmp2, tmp0);            // [Ty,21,11,01]
 	out[2] = _mm_movelh_ps(tmp1, tmp3);            // [Tz,22 12,02]
- // out[3] = assumed to be [1,0,0,0] - no need to write back.
+	// out[3] = assumed to be [1,0,0,0] - no need to write back.
 }
 
 /// Inverts a 3x4 affine transformation matrix (in row-major format) that only consists of rotation (+possibly mirroring), uniform scale and translation.
-FORCE_INLINE void mat3x4_inverse_orthogonal_uniformscale(const __m128 *mat, __m128 *out)
+FORCE_INLINE void mat3x4_inverse_orthogonal_uniformscale(const simd4f *mat, simd4f *out)
 {
 	// mat[0]: [tx,02,01,00]
 	// mat[1]: [ty,12,11,10]
@@ -711,10 +710,9 @@ FORCE_INLINE void mat3x4_inverse_orthogonal_uniformscale(const __m128 *mat, __m1
 	simd4f m0 = mul_ps(scale, mat[0]);
 	simd4f m1 = mul_ps(scale, mat[1]);
 	simd4f m2 = mul_ps(scale, mat[2]);
-	tx = mul_ps(tx, m0);
-	ty = mul_ps(ty, m1);
-	tz = mul_ps(tz, m2);
-	simd4f vec = neg_ps(add_ps(add_ps(tx, ty), tz));
+	simd4f vec = mul_ps(tx, m0);
+	vec = madd_ps(ty, m1, vec);
+	vec = mnsub_ps(tz, m2, vec);
 
 	simd4f tmp0 = _mm_unpacklo_ps(m0, m1); // [11,01,10,00]
 	simd4f tmp1 = _mm_unpackhi_ps(m0, m1); // [ty,tx,12,02]
@@ -727,7 +725,7 @@ FORCE_INLINE void mat3x4_inverse_orthogonal_uniformscale(const __m128 *mat, __m1
  // out[3] = assumed to be [1,0,0,0] - no need to write back.
 }
 
-FORCE_INLINE void mat3x4_inverse_colorthogonal(const __m128 *mat, __m128 *out)
+FORCE_INLINE void mat3x4_inverse_colorthogonal(const simd4f *mat, simd4f *out)
 {
 	// mat[0]: [tx,02,01,00]
 	// mat[1]: [ty,12,11,10]
@@ -822,13 +820,13 @@ inline float mat3x4_determinant(const simd4f *row)
 #endif
 #ifdef MATH_SSE
 
-inline void mat3x4_transpose(const __m128 *src, __m128 *dst)
+inline void mat3x4_transpose(const simd4f *src, simd4f *dst)
 {
-	__m128 src3 = _mm_setzero_ps(); // w component should be 1, but since it won't get stored, it doesn't matter, so we can just create zeros.
-	__m128 tmp0 = _mm_unpacklo_ps(src[0], src[1]);
-	__m128 tmp2 = _mm_unpacklo_ps(src[2], src3);
-	__m128 tmp1 = _mm_unpackhi_ps(src[0], src[1]);
-	__m128 tmp3 = _mm_unpackhi_ps(src[2], src3);
+	simd4f src3 = zero_ps(); // w component should be 1, but since it won't get stored, it doesn't matter, so we can just create zeros.
+	simd4f tmp0 = _mm_unpacklo_ps(src[0], src[1]);
+	simd4f tmp2 = _mm_unpacklo_ps(src[2], src3);
+	simd4f tmp1 = _mm_unpackhi_ps(src[0], src[1]);
+	simd4f tmp3 = _mm_unpackhi_ps(src[2], src3);
 	dst[0] = _mm_movelh_ps(tmp0, tmp2);
 	dst[1] = _mm_movehl_ps(tmp2, tmp0);
 	dst[2] = _mm_movelh_ps(tmp1, tmp3);
