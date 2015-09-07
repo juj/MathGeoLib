@@ -88,10 +88,12 @@ if (MSVC)
 		set(relLinkFlags "${relLinkFlags} /OPT:REF")
 	endif()
 
-	# XXX Work around MSVC bug with x64 + /GL + /O2 /arch:AVX, see https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
-	if (MATH_AVX AND CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(VS_BUG TRUE)
-		message(STATUS "NOTE: Whole Program Optimization is disabled due to detected MSVC bug with x64+/O2+/GL+/arch:AVX!")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0.31101.0)
+		# XXX Work around MSVC bug with x64 + /GL + /O2 /arch:AVX, see https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
+		if (MATH_AVX AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+			set(VS_BUG TRUE)
+			message(STATUS "NOTE: Whole Program Optimization is disabled due to detected MSVC bug with x64+/O2+/GL+/arch:AVX! Install VS2013 Update 4 or newer to avoid this issue.") # First fix was actually in VS2013 Update 2 already, but don't know what the version of that compiler was.
+		endif()
 	endif()
 	if (NOT VS_BUG)
 		# Whole Program Optimization: Yes (/GL)
