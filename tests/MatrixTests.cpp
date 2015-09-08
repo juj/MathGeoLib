@@ -332,8 +332,6 @@ RANDOMIZED_TEST(Float4x4Inverse)
 
 	float4x4 A2 = A;
 	bool success = A2.Inverse();
-	A2 = A;
-	success = A2.Inverse();
 	assert(success || mayFail);
 	MARK_UNUSED(success);
 	MARK_UNUSED(mayFail);

@@ -1050,9 +1050,11 @@ UNIQUE_TEST(float2_ConvexHull_Case)
 	float2 h[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
 	int numPointsInConvexHull = float2::ConvexHullInPlace(h, 4);
 	assert(numPointsInConvexHull == 4);
+	MARK_UNUSED(numPointsInConvexHull);
 
 	for(int i = 0; i < 4; ++i)
 		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
+	MARK_UNUSED(p);
 	assert(float2::ConvexHullContains(h, numPointsInConvexHull, float2(0,0)));
 }
 
@@ -1066,6 +1068,7 @@ RANDOMIZED_TEST(float2_ConvexHull)
 
 	int numPointsInConvexHull = float2::ConvexHullInPlace(h, n);
 	assert(numPointsInConvexHull >= 3);
+	MARK_UNUSED(numPointsInConvexHull);
 
 	for(int i = 0; i < n; ++i)
 		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
@@ -1188,6 +1191,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case_4)
 
 	for(int i = 0; i < n; ++i)
 		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+	MARK_UNUSED(numPointsInConvexHull);
 
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;
@@ -1243,6 +1247,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case_5)
 
 	for(int i = 0; i < n; ++i)
 		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+	MARK_UNUSED(numPointsInConvexHull);
 
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;
@@ -1321,6 +1326,7 @@ p[13] = float2(-4.599999904632568,-2.510286331176758);
 
 	for(int i = 0; i < n; ++i)
 		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+	MARK_UNUSED(numPointsInConvexHull);
 
 	float2 center, uDir, vDir;
 	float minU, maxU, minV, maxV;
