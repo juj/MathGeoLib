@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
-cmake_policy(SET CMP0054 NEW) # Don't expand vars inside quotes, i.e. don't expand a line of form: ''if ("MSVC")'', but require ''if ("${MSVC}")''
+
+if (CMAKE_VERSION VERSION_GREATER 3.0.99999) # Want to say "version >= 3.1", but no idea how to achieve that otherwise.
+	cmake_policy(SET CMP0054 NEW) # Don't expand vars inside quotes, i.e. don't expand a line of form: ''if ("MSVC")'', but require ''if ("${MSVC}")''
+endif()
 
 project(MathGeoLib)
 
