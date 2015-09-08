@@ -486,9 +486,9 @@ float4 float4::ScaledToLength3(float newLength) const
 {
 	assume(!IsZero3());
 
-	float4 v = *this;
-	v.ScaleToLength3(newLength);
-	return v;
+	float4 vtx = *this;
+	vtx.ScaleToLength3(newLength);
+	return vtx;
 }
 
 float float4::ScaleToLength(float newLength)
@@ -501,9 +501,9 @@ float float4::ScaleToLength(float newLength)
 
 float4 float4::ScaledToLength(float newLength) const
 {
-	float4 v = *this;
-	v.ScaleToLength(newLength);
-	return v;
+	float4 vtx = *this;
+	vtx.ScaleToLength(newLength);
+	return vtx;
 }
 
 bool float4::IsFinite() const
@@ -883,12 +883,12 @@ float4 float4::Cross3(const float4 &rhs) const
 
 float4x4 float4::OuterProduct(const float4 &rhs) const
 {
-	const float4 &u = *this;
-	const float4 &v = rhs;
-	return float4x4(u[0]*v[0], u[0]*v[1], u[0]*v[2], u[0]*v[3],
-					u[1]*v[0], u[1]*v[1], u[1]*v[2], u[1]*v[3],
-					u[2]*v[0], u[2]*v[1], u[2]*v[2], u[2]*v[3],
-					u[3]*v[0], u[3]*v[1], u[3]*v[2], u[3]*v[3]);
+	const float4 &i = *this;
+	const float4 &j = rhs;
+	return float4x4(i[0]*j[0], i[0]*j[1], i[0]*j[2], i[0]*j[3],
+					i[1]*j[0], i[1]*j[1], i[1]*j[2], i[1]*j[3],
+					i[2]*j[0], i[2]*j[1], i[2]*j[2], i[2]*j[3],
+					i[3]*j[0], i[3]*j[1], i[3]*j[2], i[3]*j[3]);
 }
 
 float4 float4::Perpendicular3(const float3 &hint, const float3 &hint2) const
@@ -897,12 +897,12 @@ float4 float4::Perpendicular3(const float3 &hint, const float3 &hint2) const
 	assume(EqualAbs(w, 0));
 	assume(hint.IsNormalized());
 	assume(hint2.IsNormalized());
-	float3 v = this->Cross3(hint).xyz();
-	float len = v.Normalize();
+	float3 perp = this->Cross3(hint).xyz();
+	float len = perp.Normalize();
 	if (len == 0)
 		return float4(hint2, 0);
 	else
-		return float4(v, 0);
+		return float4(perp, 0);
 }
 
 float4 float4::Perpendicular(const float4 &hint, const float4 &hint2) const
@@ -911,26 +911,26 @@ float4 float4::Perpendicular(const float4 &hint, const float4 &hint2) const
 	assume(EqualAbs(w, 0));
 	assume(hint.IsNormalized());
 	assume(hint2.IsNormalized());
-	float4 v = this->Cross(hint);
-	float len = v.Normalize();
+	float4 perp = this->Cross(hint);
+	float len = perp.Normalize();
 	if (len == 0)
 		return hint2;
 	else
-		return v;
+		return perp;
 }
 
 float4 float4::AnotherPerpendicular3(const float3 &hint, const float3 &hint2) const
 {
 	float4 firstPerpendicular = Perpendicular3(hint, hint2);
-	float4 v = this->Cross3(firstPerpendicular);
-	return v.Normalized3();
+	float4 perp = this->Cross3(firstPerpendicular);
+	return perp.Normalized3();
 }
 
 float4 float4::AnotherPerpendicular(const float4 &hint, const float4 &hint2) const
 {
 	float4 firstPerpendicular = Perpendicular(hint, hint2);
-	float4 v = this->Cross(firstPerpendicular);
-	return v.Normalized();
+	float4 perp = this->Cross(firstPerpendicular);
+	return perp.Normalized();
 }
 
 void float4::PerpendicularBasis(float4 &outB, float4 &outC) const
@@ -1205,10 +1205,10 @@ float4 MUST_USE_RESULT float4::FromSphericalCoordinates(float azimuth, float inc
 
 void float4::SetFromSphericalCoordinates(float azimuth, float inclination)
 {
-	float4 v, s, c;
-	v.x = inclination;
-	v.y = azimuth;
-	SinCos2(v, s, c);
+	float4 vec, s, c;
+	vec.x = inclination;
+	vec.y = azimuth;
+	SinCos2(vec, s, c);
 	x = c.x * s.y;
 	y = -s.x;
 	z = c.x * c.y;
@@ -1225,12 +1225,12 @@ float4 MUST_USE_RESULT float4::FromSphericalCoordinates(float azimuth, float inc
 float3 float4::ToSphericalCoordinates() const
 {
 	// R_y * R_x * (0,0,length) = (cosx*siny, -sinx, cosx*cosy).
-	float4 v = *this;
-	float len = v.Normalize();
+	float4 vec = *this;
+	float len = vec.Normalize();
 	if (len <= 1e-5f)
 		return float3::zero;
-	float azimuth = atan2(v.x, v.z);
-	float inclination = asin(-v.y);
+	float azimuth = atan2(vec.x, vec.z);
+	float inclination = asin(-vec.y);
 	return float3(azimuth, inclination, len);
 }
 

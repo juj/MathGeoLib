@@ -397,7 +397,7 @@ float LerpMod(float a, float b, float mod, float t)
 
 float InvLerp(float a, float b, float x)
 {
-	assume(Abs(b-a) > eps);
+	assume(Abs(b-a) > 1e-5f);
 	return (x - a) / (b - a);
 }
 

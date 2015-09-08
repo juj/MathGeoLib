@@ -1164,8 +1164,8 @@ void float3x3::BatchTransform(float3 *pointArray, int numPoints, int stride) con
 	u8 *data = reinterpret_cast<u8*>(pointArray);
 	for(int i = 0; i < numPoints; ++i)
 	{
-		float3 *v = reinterpret_cast<float3*>(data + stride*i);
-		*v = *this * *v;
+		float3 *vtx = reinterpret_cast<float3*>(data + stride*i);
+		*vtx = *this * *vtx;
 	}
 }
 
@@ -1191,8 +1191,8 @@ void float3x3::BatchTransform(float4 *vectorArray, int numVectors, int stride) c
 	u8 *data = reinterpret_cast<u8*>(vectorArray);
 	for(int i = 0; i < numVectors; ++i)
 	{
-		float4 *v = reinterpret_cast<float4*>(data + stride*i);
-		*v = *this * *v;
+		float4 *vtx = reinterpret_cast<float4*>(data + stride*i);
+		*vtx = *this * *vtx;
 	}
 }
 

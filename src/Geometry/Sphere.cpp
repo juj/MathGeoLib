@@ -327,7 +327,7 @@ Sphere WelzlSphere(const vec *pts, int numPoints, vec *support, int numSupports)
 */
 
 // The epsilon value used for enclosing sphere computations.
-static const float epsilon = 1e-4f;
+static const float sEpsilon = 1e-4f;
 
 Sphere Sphere::OptimalEnclosingSphere(const vec *pts, int numPoints)
 {
@@ -354,7 +354,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec *pts, int numPoints)
 	bool expendable[4] = { true, true, true, true };
 	// The so-far constructed minimal sphere.
 	Sphere s = OptimalEnclosingSphere(pts[sp[0]], pts[sp[1]], pts[sp[2]], pts[sp[3]]);
-	float rSq = s.r * s.r + epsilon;
+	float rSq = s.r * s.r + sEpsilon;
 	for(int i = 4; i < numPoints; ++i)
 	{
 		if (i == sp[0] || i == sp[1] || i == sp[2] || i == sp[3])
@@ -365,7 +365,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec *pts, int numPoints)
 		{
 			int redundant;
 			s = OptimalEnclosingSphere(pts[sp[0]], pts[sp[1]], pts[sp[2]], pts[sp[3]], pts[i], redundant);
-			rSq = s.r*s.r + epsilon;
+			rSq = s.r*s.r + sEpsilon;
 			// A sphere is uniquely defined by four points, so one of the five points passed in above is
 			// now redundant, and can be removed from the support set.
 			if (redundant != 4 && (sp[redundant] < i || expendable[redundant]))
@@ -991,7 +991,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b)
 
 	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 	// really contain the points (note that the points must be sufficiently near enough to the origin)
-	s.r += epsilon;
+	s.r += sEpsilon;
 
 	mathassert(s.Contains(a));
 	mathassert(s.Contains(b));
@@ -1216,10 +1216,10 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c)
 
 	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 	// really contain the points (note that the points must be sufficiently near enough to the origin)
-	sphere.r += 2.f * epsilon; // We test against one epsilon, so expand by two epsilons.
+	sphere.r += 2.f * sEpsilon; // We test against one epsilon, so expand by two epsilons.
 
 #ifdef MATH_ASSERT_CORRECTNESS
-	if (!sphere.Contains(a, epsilon) || !sphere.Contains(b, epsilon) || !sphere.Contains(c, epsilon))
+	if (!sphere.Contains(a, sEpsilon) || !sphere.Contains(b, sEpsilon) || !sphere.Contains(c, sEpsilon))
 	{
 		LOGE("Pos: %s, r: %f", sphere.pos.ToString().c_str(), sphere.r);
 		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(sphere.pos));
@@ -1284,10 +1284,10 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, 
 
 		// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 		// really contain the points (note that the points must be sufficiently near enough to the origin)
-		sphere.r += 2.f*epsilon; // We test against one epsilon, so expand using 2 epsilons.
+		sphere.r += 2.f*sEpsilon; // We test against one epsilon, so expand using 2 epsilons.
 
 #ifdef MATH_ASSERT_CORRECTNESS
-	if (!sphere.Contains(a, epsilon) || !sphere.Contains(b, epsilon) || !sphere.Contains(c, epsilon) || !sphere.Contains(d, epsilon))
+	if (!sphere.Contains(a, sEpsilon) || !sphere.Contains(b, sEpsilon) || !sphere.Contains(c, sEpsilon) || !sphere.Contains(d, sEpsilon))
 	{
 		LOGE("Pos: %s, r: %f", sphere.pos.ToString().c_str(), sphere.r);
 		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(sphere.pos));
@@ -1305,31 +1305,31 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, 
                                       int &redundantPoint)
 {
 	Sphere s = OptimalEnclosingSphere(b,c,d,e);
-	if (s.Contains(a, epsilon))
+	if (s.Contains(a, sEpsilon))
 	{
 		redundantPoint = 0;
 		return s;
 	}
 	s = OptimalEnclosingSphere(a,c,d,e);
-	if (s.Contains(b, epsilon))
+	if (s.Contains(b, sEpsilon))
 	{
 		redundantPoint = 1;
 		return s;
 	}
 	s = OptimalEnclosingSphere(a,b,d,e);
-	if (s.Contains(c, epsilon))
+	if (s.Contains(c, sEpsilon))
 	{
 		redundantPoint = 2;
 		return s;
 	}
 	s = OptimalEnclosingSphere(a,b,c,e);
-	if (s.Contains(d, epsilon))
+	if (s.Contains(d, sEpsilon))
 	{
 		redundantPoint = 3;
 		return s;
 	}
 	s = OptimalEnclosingSphere(a,b,c,d);
-	mathassert(s.Contains(e, epsilon));
+	mathassert(s.Contains(e, sEpsilon));
 	redundantPoint = 4;
 	return s;
 }

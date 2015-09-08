@@ -634,31 +634,31 @@ bool Plane::IntersectLinePlane(const vec &planeNormal, float planeD, const vec &
 }
 
 
-bool Plane::Intersects(const Ray &ray, float *d) const
+bool Plane::Intersects(const Ray &ray, float *dist) const
 {
 	float t;
 	bool success = IntersectLinePlane(normal, this->d, ray.pos, ray.dir, t);
-	if (d)
-		*d = t;
+	if (dist)
+		*dist = t;
 	return success && t >= 0.f;
 }
 
-bool Plane::Intersects(const Line &line, float *d) const
+bool Plane::Intersects(const Line &line, float *dist) const
 {
 	float t;
 	bool intersects = IntersectLinePlane(normal, this->d, line.pos, line.dir, t);
-	if (d)
-		*d = t;
+	if (dist)
+		*dist = t;
 	return intersects;
 }
 
-bool Plane::Intersects(const LineSegment &lineSegment, float *d) const
+bool Plane::Intersects(const LineSegment &lineSegment, float *dist) const
 {
 	float t;
 	bool success = IntersectLinePlane(normal, this->d, lineSegment.a, lineSegment.Dir(), t);
 	const float lineSegmentLength = lineSegment.Length();
-	if (d)
-		*d = t / lineSegmentLength;
+	if (dist)
+		*dist = t / lineSegmentLength;
 	return success && t >= 0.f && t <= lineSegmentLength;
 }
 

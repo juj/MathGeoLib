@@ -39,7 +39,6 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 
 //	hitTriangleIndex = -1;
 //	float3 pt;
-	const float inf = FLOAT_INF;
 	__m256 nearestD = _mm256_set1_ps(inf);
 #ifdef MATH_GEN_UV
 	__m256 nearestU = _mm256_set1_ps(inf);

@@ -196,8 +196,8 @@ Polygon Polyhedron::FacePolygon(int faceIndex) const
 #endif
 
 	p.p.reserve(f[faceIndex].v.size());
-	for(size_t v = 0; v < f[faceIndex].v.size(); ++v)
-		p.p.push_back(Vertex(f[faceIndex].v[v]));
+	for(size_t i = 0; i < f[faceIndex].v.size(); ++i)
+		p.p.push_back(Vertex(f[faceIndex].v[i]));
 	return p;
 }
 
@@ -523,11 +523,11 @@ vec Polyhedron::ConvexCentroid() const
 		const Face &fa = f[i];
 		if (fa.v.size() < 3)
 			continue;
-		for(int v = 0; v < (int)fa.v.size()-2; ++v)
+		for(int j = 0; j < (int)fa.v.size()-2; ++j)
 		{
-			vec a = Vertex(fa.v[v]);
-			vec b = Vertex(fa.v[v+1]);
-			vec c = Vertex(fa.v[v+2]);
+			vec a = Vertex(fa.v[j]);
+			vec b = Vertex(fa.v[j+1]);
+			vec c = Vertex(fa.v[j+2]);
 			vec center = (a + b + c + arbitraryCenterVertex) * 0.25f;
 			float volume = Abs((a - arbitraryCenterVertex).Dot((b - arbitraryCenterVertex).Cross(c - arbitraryCenterVertex))); // This is actually volume*6, but can ignore the scale.
 			totalVolume += volume;
@@ -1699,16 +1699,18 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 
 	p.v.insert(p.v.end(), pointArray, pointArray + numPoints);
 
-	std::set<int>::iterator iter = extremes.begin();
-	int v0 = *iter; ++iter;
-	int v1 = *iter; ++iter;
-	int v2 = *iter; ++iter;
-	int v3 = *iter;
-	assert(v0 < v1 && v1 < v2 && v2 < v3);
-	Swap(p.v[0], p.v[v0]);
-	Swap(p.v[1], p.v[v1]);
-	Swap(p.v[2], p.v[v2]);
-	Swap(p.v[3], p.v[v3]);
+	{
+		std::set<int>::iterator iter = extremes.begin();
+		int v0 = *iter; ++iter;
+		int v1 = *iter; ++iter;
+		int v2 = *iter; ++iter;
+		int v3 = *iter;
+		assert(v0 < v1 && v1 < v2 && v2 < v3);
+		Swap(p.v[0], p.v[v0]);
+		Swap(p.v[1], p.v[v1]);
+		Swap(p.v[2], p.v[v2]);
+		Swap(p.v[3], p.v[v3]);
+	}
 
 	// If the initial tetrahedron has zero volume, the whole input set is planar.
 	// In that case, we should solve a 2D convex hull problem.
@@ -1910,16 +1912,16 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 //			conflictList[fi].clear();
 
 			// Traverse through each edge of this face to detect whether this is an interior or a boundary face.
-			const Polyhedron::Face &f = p.f.at(fi);
+			const Polyhedron::Face &pf = p.f.at(fi);
 
-			if (f.v.empty())
+			if (pf.v.empty())
 				continue;
 
 //			const Polyhedron::Face &f = p.f[fi];
-			int v0 = f.v.back();
-			for(size_t j = 0; j < f.v.size(); ++j)
+			int v0 = pf.v.back();
+			for(size_t j = 0; j < pf.v.size(); ++j)
 			{
-					int v1 = f.v[j];
+					int v1 = pf.v[j];
 				int adjFace = edgesToFaces[std::make_pair(v1, v0)];
 #ifdef CONVEXHULL_VERBOSE
 				p.DumpStructure();
@@ -1941,8 +1943,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 //				if (!p.f[adjFace].v.empty())
 //				{
 					cs d;
-					cv pointOnFace = POINT_TO_FLOAT4(p.v[p.f[adjFace].v[0]]);
-					d = cv(faceNormals[adjFace]).Dot(cv(POINT_TO_FLOAT4(p.v[extremeI])) - pointOnFace);
+					cv ptOnFace = POINT_TO_FLOAT4(p.v[p.f[adjFace].v[0]]);
+					d = cv(faceNormals[adjFace]).Dot(cv(POINT_TO_FLOAT4(p.v[extremeI])) - ptOnFace);
 //					if (((Plane)facePlanes[adjFace]).SignedDistance(p.v[extremeI]) > 1e-4f) // Is v0<->v1 an interior edge?
 //					bool containsVtx = ContainsAndRemove(conflictList[adjFace], extremeI);
 					if (d > inPlaneEpsilon)
@@ -1991,13 +1993,12 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			{
 				for(std::set<int>::iterator fi = conflictingFaces.begin(); fi != conflictingFaces.end(); ++fi)
 				{
-					int f = *fi;
-					std::set<int>::iterator iter = conflictListVertices[v].find(f);
+					std::set<int>::iterator iter = conflictListVertices[v].find(*fi);
 					//assert(iter3 != conflictListVertices[*iter].end());
 					if (iter != conflictListVertices[v].end())
 					{
 						C_LOG("Vertex %d no longer with face %d, because the face was removed.", 
-							v, f);
+							v, *fi);
 						conflictListVertices[v].erase(iter);
 					}
 				}
@@ -2120,8 +2121,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		for(std::set<int>::iterator iter = conflictingVertices.begin(); iter != conflictingVertices.end(); ++iter)
 			for(size_t j = oldNumFaces; j < p.f.size(); ++j)
 			{
-				cv pointOnFace = POINT_TO_FLOAT4(p.v[p.f[j].v[0]]);
-				cs d = cv(faceNormals[j]).Dot(cv(POINT_TO_FLOAT4(p.v[*iter])) - pointOnFace);
+				cv ptOnFace = POINT_TO_FLOAT4(p.v[p.f[j].v[0]]);
+				cs d = cv(faceNormals[j]).Dot(cv(POINT_TO_FLOAT4(p.v[*iter])) - ptOnFace);
 //				if (((Plane)facePlanes[j]).IsOnPositiveSide(p.v[*iter]) && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 				if (d > inPlaneEpsilon && (*iter >= (int)hullVertices.size() || !hullVertices[*iter]))
 				{

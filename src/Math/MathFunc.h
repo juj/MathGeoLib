@@ -521,10 +521,10 @@ FORCE_INLINE bool Equal(const T &a, const T &b)
 }
 
 /** Compares the two values for equality up to a small epsilon. */
-template<> bool FORCE_INLINE Equal(const float &a, const float &b) { return Abs(a-b) <= eps; }
-template<> bool FORCE_INLINE Equal(const double &a, const double &b) { return Abs(a-b) <= eps; }
+template<> bool FORCE_INLINE Equal(const float &a, const float &b) { return Abs(a-b) <= c_eps; }
+template<> bool FORCE_INLINE Equal(const double &a, const double &b) { return Abs(a-b) <= c_eps; }
 #ifndef EMSCRIPTEN // long double is not supported.
-template<> bool FORCE_INLINE Equal(const long double &a, const long double &b) { return Abs(a-b) <= eps; }
+template<> bool FORCE_INLINE Equal(const long double &a, const long double &b) { return Abs(a-b) <= c_eps; }
 #endif
 
 /** Compares the two values for equality, allowing the given amount of absolute error. */

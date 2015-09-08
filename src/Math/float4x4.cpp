@@ -599,123 +599,123 @@ float4x4 float4x4::ComplementaryProjection() const
 	return float4x4::identity - *this;
 }
 
-MatrixProxy<float4x4::Cols> &float4x4::operator[](int row)
+MatrixProxy<float4x4::Cols> &float4x4::operator[](int rowIndex)
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
+	if (rowIndex < 0 || rowIndex >= Rows)
+		rowIndex = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return *(reinterpret_cast<MatrixProxy<Cols>*>(v[row]));
+	return *(reinterpret_cast<MatrixProxy<Cols>*>(v[rowIndex]));
 }
 
-const MatrixProxy<float4x4::Cols> &float4x4::operator[](int row) const
+const MatrixProxy<float4x4::Cols> &float4x4::operator[](int rowIndex) const
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
+	if (rowIndex < 0 || rowIndex >= Rows)
+		rowIndex = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[row]));
+	return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[rowIndex]));
 }
 
-float &float4x4::At(int row, int col)
+float &float4x4::At(int rowIndex, int colIndex)
 {
-	assume(row >= 0);
-	assume(row < Rows);
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows || col < 0 || col >= Cols)
+	if (rowIndex < 0 || rowIndex >= Rows || colIndex < 0 || colIndex >= Cols)
 		return v[0][0]; // Benign failure, return the first element.
 #endif
-	return v[row][col];
+	return v[rowIndex][colIndex];
 }
 
-CONST_WIN32 float float4x4::At(int row, int col) const
+CONST_WIN32 float float4x4::At(int rowIndex, int colIndex) const
 {
-	assume(row >= 0);
-	assume(row < Rows);
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows || col < 0 || col >= Cols)
+	if (rowIndex < 0 || rowIndex >= Rows || colIndex < 0 || colIndex >= Cols)
 		return FLOAT_NAN;
 #endif
-	return v[row][col];
+	return v[rowIndex][colIndex];
 }
 
-float4 &float4x4::Row(int row)
+float4 &float4x4::Row(int rowIndex)
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
+	if (rowIndex < 0 || rowIndex >= Rows)
+		rowIndex = 0; // Benign failure, just give the first rowIndex.
 #endif
 
-	return reinterpret_cast<float4 &>(v[row]);
+	return reinterpret_cast<float4 &>(v[rowIndex]);
 }
 
-const float4 &float4x4::Row(int row) const
+const float4 &float4x4::Row(int rowIndex) const
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
+	if (rowIndex < 0 || rowIndex >= Rows)
+		rowIndex = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return reinterpret_cast<const float4 &>(v[row]);
+	return reinterpret_cast<const float4 &>(v[rowIndex]);
 }
 
-float3 &float4x4::Row3(int row)
+float3 &float4x4::Row3(int rowIndex)
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
+	if (rowIndex < 0 || rowIndex >= Rows)
+		rowIndex = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return reinterpret_cast<float3 &>(v[row]);
+	return reinterpret_cast<float3 &>(v[rowIndex]);
 }
 
-const float3 &float4x4::Row3(int row) const
+const float3 &float4x4::Row3(int rowIndex) const
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
+	if (rowIndex < 0 || rowIndex >= Rows)
+		rowIndex = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return reinterpret_cast<const float3 &>(v[row]);
+	return reinterpret_cast<const float3 &>(v[rowIndex]);
 }
 
-CONST_WIN32 float4 float4x4::Col(int col) const
+CONST_WIN32 float4 float4x4::Col(int colIndex) const
 {
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (col < 0 || col >= Cols)
+	if (colIndex < 0 || colIndex >= Cols)
 		return float4::nan;
 #endif
-	return float4(v[0][col], v[1][col], v[2][col], v[3][col]);
+	return float4(v[0][colIndex], v[1][colIndex], v[2][colIndex], v[3][colIndex]);
 }
 
-CONST_WIN32 float3 float4x4::Col3(int col) const
+CONST_WIN32 float3 float4x4::Col3(int colIndex) const
 {
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (col < 0 || col >= Cols)
+	if (colIndex < 0 || colIndex >= Cols)
 		return float3::nan;
 #endif
-	return float3(v[0][col], v[1][col], v[2][col]);
+	return float3(v[0][colIndex], v[1][colIndex], v[2][colIndex]);
 }
 
 CONST_WIN32 float4 float4x4::Diagonal() const
@@ -728,45 +728,45 @@ CONST_WIN32 float3 float4x4::Diagonal3() const
 	return float3(v[0][0], v[1][1], v[2][2]);
 }
 
-void float4x4::ScaleRow3(int row, float scalar)
+void float4x4::ScaleRow3(int rowIndex, float scalar)
 {
 	assume(MATH_NS::IsFinite(scalar));
-	Row3(row) *= scalar;
+	Row3(rowIndex) *= scalar;
 }
 
-void float4x4::ScaleRow(int row, float scalar)
+void float4x4::ScaleRow(int rowIndex, float scalar)
 {
 	assume(MATH_NS::IsFinite(scalar));
-	Row(row) *= scalar;
+	Row(rowIndex) *= scalar;
 }
 
-void float4x4::ScaleCol3(int col, float scalar)
+void float4x4::ScaleCol3(int colIndex, float scalar)
 {
 	assume(MATH_NS::IsFinite(scalar));
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (col < 0 || col >= Cols)
+	if (colIndex < 0 || colIndex >= Cols)
 		return; // Benign failure
 #endif
-	v[0][col] *= scalar;
-	v[1][col] *= scalar;
-	v[2][col] *= scalar;
+	v[0][colIndex] *= scalar;
+	v[1][colIndex] *= scalar;
+	v[2][colIndex] *= scalar;
 }
 
-void float4x4::ScaleCol(int col, float scalar)
+void float4x4::ScaleCol(int colIndex, float scalar)
 {
 	assume(MATH_NS::IsFinite(scalar));
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (col < 0 || col >= Cols)
+	if (colIndex < 0 || colIndex >= Cols)
 		return; // Benign failure
 #endif
-	v[0][col] *= scalar;
-	v[1][col] *= scalar;
-	v[2][col] *= scalar;
-	v[3][col] *= scalar;
+	v[0][colIndex] *= scalar;
+	v[1][colIndex] *= scalar;
+	v[2][colIndex] *= scalar;
+	v[3][colIndex] *= scalar;
 }
 
 CONST_WIN32 float3x3 float4x4::Float3x3Part() const
@@ -811,79 +811,79 @@ float3 float4x4::WorldZ() const
 	return Col3(2);
 }
 
-void float4x4::SetRow3(int row, const float3 &rowVector)
+void float4x4::SetRow3(int rowIndex, const float3 &rowVector)
 {
-	SetRow3(row, rowVector.x, rowVector.y, rowVector.z);
+	SetRow3(rowIndex, rowVector.x, rowVector.y, rowVector.z);
 }
 
-void float4x4::SetRow3(int row, const float *data)
+void float4x4::SetRow3(int rowIndex, const float *data)
 {
 	assume(data);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!data)
 		return;
 #endif
-	SetRow3(row, data[0], data[1], data[2]);
+	SetRow3(rowIndex, data[0], data[1], data[2]);
 }
 
-void float4x4::SetRow3(int row, float m_r0, float m_r1, float m_r2)
+void float4x4::SetRow3(int rowIndex, float m_r0, float m_r1, float m_r2)
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 	assume(MATH_NS::IsFinite(m_r0));
 	assume(MATH_NS::IsFinite(m_r1));
 	assume(MATH_NS::IsFinite(m_r2));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
+	if (rowIndex < 0 || rowIndex >= Rows)
 		return; // Benign failure
 #endif
-	v[row][0] = m_r0;
-	v[row][1] = m_r1;
-	v[row][2] = m_r2;
+	v[rowIndex][0] = m_r0;
+	v[rowIndex][1] = m_r1;
+	v[rowIndex][2] = m_r2;
 }
 
-void float4x4::SetRow(int row, const float3 &rowVector, float m_r3)
+void float4x4::SetRow(int rowIndex, const float3 &rowVector, float m_r3)
 {
-	SetRow(row, rowVector.x, rowVector.y, rowVector.z, m_r3);
+	SetRow(rowIndex, rowVector.x, rowVector.y, rowVector.z, m_r3);
 }
 
-void float4x4::SetRow(int row, const float4 &rowVector)
+void float4x4::SetRow(int rowIndex, const float4 &rowVector)
 {
-	SetRow(row, rowVector.x, rowVector.y, rowVector.z, rowVector.w);
+	SetRow(rowIndex, rowVector.x, rowVector.y, rowVector.z, rowVector.w);
 }
 
-void float4x4::SetRow(int row, const float *data)
+void float4x4::SetRow(int rowIndex, const float *data)
 {
 	assume(data);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
 	if (!data)
 		return;
 #endif
-	SetRow(row, data[0], data[1], data[2], data[3]);
+	SetRow(rowIndex, data[0], data[1], data[2], data[3]);
 }
 
-void float4x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
+void float4x4::SetRow(int rowIndex, float m_r0, float m_r1, float m_r2, float m_r3)
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
 	assume(MATH_NS::IsFinite(m_r0));
 	assume(MATH_NS::IsFinite(m_r1));
 	assume(MATH_NS::IsFinite(m_r2));
 	assume(MATH_NS::IsFinite(m_r3));
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
+	if (rowIndex < 0 || rowIndex >= Rows)
 		return; // Benign failure
 #endif
 
 // Require VS2012 for the following line - VS2010 fails at internal compiler error, see
 // http://clb.demon.fi:8113/builders/vs2010-MathGeoLib-32bit-SSE4.1/builds/379/steps/Compile%20MathGeoLib-32bit-Release/logs/stdio
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD) && (!defined(_MSC_VER) || _MSC_VER >= 1700)
-	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
+	this->row[rowIndex] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
-	v[row][0] = m_r0;
-	v[row][1] = m_r1;
-	v[row][2] = m_r2;
-	v[row][3] = m_r3;
+	v[rowIndex][0] = m_r0;
+	v[rowIndex][1] = m_r1;
+	v[rowIndex][2] = m_r2;
+	v[rowIndex][3] = m_r3;
 #endif
 }
 
@@ -989,30 +989,30 @@ void float4x4::Set(const float4x4 &rhs)
 #endif
 }
 
-void float4x4::Set(const float *v)
+void float4x4::Set(const float *p)
 {
-	assume(v);
+	assume(p);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!v)
+	if (!p)
 		return;
 #endif
-	Set( v[0],  v[1],  v[2],  v[3],
-	     v[4],  v[5],  v[6],  v[7],
-	     v[8],  v[9], v[10], v[11],
-	    v[12], v[13], v[14], v[15]);
+	Set( p[0],  p[1],  p[2],  p[3],
+	     p[4],  p[5],  p[6],  p[7],
+	     p[8],  p[9], p[10], p[11],
+	    p[12], p[13], p[14], p[15]);
 }
 
-void float4x4::Set(int row, int col, float value)
+void float4x4::Set(int rowIndex, int colIndex, float value)
 {
-	assume(row >= 0);
-	assume(row < Rows);
-	assume(col >= 0);
-	assume(col < Cols);
+	assume(rowIndex >= 0);
+	assume(rowIndex < Rows);
+	assume(colIndex >= 0);
+	assume(colIndex < Cols);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows || col < 0 || col >= Cols)
+	if (rowIndex < 0 || rowIndex >= Rows || colIndex < 0 || colIndex >= Cols)
 		return; // Benign failure
 #endif
-	v[row][col] = value;
+	v[rowIndex][colIndex] = value;
 }
 
 void float4x4::SetIdentity()
@@ -1077,40 +1077,40 @@ void float4x4::SwapColumns3(int col1, int col2)
 	Swap(v[2][col1], v[2][col2]);
 }
 
-void float4x4::SwapRows(int row1, int row2)
+void float4x4::SwapRows(int r1, int r2)
 {
-	assume(row1 >= 0);
-	assume(row1 < Rows);
-	assume(row2 >= 0);
-	assume(row2 < Rows);
+	assume(r1 >= 0);
+	assume(r1 < Rows);
+	assume(r2 >= 0);
+	assume(r2 < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
+	if (r1 < 0 || r1 >= Rows || r2 < 0 || r2 >= Rows)
 		return; // Benign failure
 #endif
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
-	Swap(row[row1], row[row2]);
+	Swap(row[r1], row[r2]);
 #else
-	Swap(v[row1][0], v[row2][0]);
-	Swap(v[row1][1], v[row2][1]);
-	Swap(v[row1][2], v[row2][2]);
-	Swap(v[row1][3], v[row2][3]);
+	Swap(v[r1][0], v[r2][0]);
+	Swap(v[r1][1], v[r2][1]);
+	Swap(v[r1][2], v[r2][2]);
+	Swap(v[r1][3], v[r2][3]);
 #endif
 }
 
-void float4x4::SwapRows3(int row1, int row2)
+void float4x4::SwapRows3(int r1, int r2)
 {
-	assume(row1 >= 0);
-	assume(row1 < Rows);
-	assume(row2 >= 0);
-	assume(row2 < Rows);
+	assume(r1 >= 0);
+	assume(r1 < Rows);
+	assume(r2 >= 0);
+	assume(r2 < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row1 < 0 || row1 >= Rows || row2 < 0 || row2 >= Rows)
+	if (r1 < 0 || r1 >= Rows || r2 < 0 || r2 >= Rows)
 		return; // Benign failure
 #endif
-	Swap(v[row1][0], v[row2][0]);
-	Swap(v[row1][1], v[row2][1]);
-	Swap(v[row1][2], v[row2][2]);
+	Swap(v[r1][0], v[r2][0]);
+	Swap(v[r1][1], v[r2][1]);
+	Swap(v[r1][2], v[r2][2]);
 }
 
 void float4x4::SetTranslatePart(float tx, float ty, float tz)
@@ -1509,29 +1509,29 @@ void float4x4::RemoveScale()
 /// Algorithm from Eric Lengyel's Mathematics for 3D Game Programming & Computer Graphics, 2nd Ed.
 void float4x4::Pivot()
 {
-	int row = 0;
+	int rowIndex = 0;
 
 	for(int col = 0; col < Cols; ++col)
 	{
-		int greatest = row;
+		int greatest = rowIndex;
 
-		// find the row k with k >= 1 for which Mkj has the largest absolute value.
-		for(int i = row; i < Rows; ++i)
+		// find the rowIndex k with k >= 1 for which Mkj has the largest absolute value.
+		for(int i = rowIndex; i < Rows; ++i)
 			if (MATH_NS::Abs(v[i][col]) > MATH_NS::Abs(v[greatest][col]))
 				greatest = i;
 
 		if (!EqualAbs(v[greatest][col], 0))
 		{
-			if (row != greatest)
-				SwapRows(row, greatest); // the greatest now in row
+			if (rowIndex != greatest)
+				SwapRows(rowIndex, greatest); // the greatest now in rowIndex
 
-			ScaleRow(row, 1.f/v[row][col]);
+			ScaleRow(rowIndex, 1.f/v[rowIndex][col]);
 
 			for(int r = 0; r < Rows; ++r)
-				if (r != row)
-					SetRow(r, Row(r) - Row(row) * v[r][col]);
+				if (r != rowIndex)
+					SetRow(r, Row(r) - Row(rowIndex) * v[r][col]);
 
-			++row;
+			++rowIndex;
 		}
 	}
 }
@@ -1615,8 +1615,8 @@ void float4x4::TransformPos(float3 *pointArray, int numPoints, int strideBytes) 
 	u8 *data = reinterpret_cast<u8*>(pointArray);
 	for(int i = 0; i < numPoints; ++i)
 	{
-		float3 *v = reinterpret_cast<float3*>(data);
-		*v = this->TransformPos(*v);
+		float3 *vtx = reinterpret_cast<float3*>(data);
+		*vtx = this->TransformPos(*vtx);
 		data += strideBytes;
 	}
 }
@@ -1644,8 +1644,8 @@ void float4x4::TransformDir(float3 *dirArray, int numVectors, int strideBytes) c
 	u8 *data = reinterpret_cast<u8*>(dirArray);
 	for(int i = 0; i < numVectors; ++i)
 	{
-		float3 *v = reinterpret_cast<float3*>(data);
-		*v = this->TransformDir(*v);
+		float3 *vtx = reinterpret_cast<float3*>(data);
+		*vtx = this->TransformDir(*vtx);
 		data += strideBytes;
 	}
 }
@@ -1673,8 +1673,8 @@ void float4x4::Transform(float4 *vectorArray, int numVectors, int strideBytes) c
 	u8 *data = reinterpret_cast<u8*>(vectorArray);
 	for(int i = 0; i < numVectors; ++i)
 	{
-		float4 *v = reinterpret_cast<float4*>(data);
-		*v = *this * *v;
+		float4 *vtx = reinterpret_cast<float4*>(data);
+		*vtx = *this * *vtx;
 		data += strideBytes;
 	}
 }

@@ -1500,9 +1500,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				MARK_VERTEX_VISITED(v);
 				TIMING_TICK(++numBootstrapStepsDone);
 				const std::vector<int> &n = adjacencyData[v];
-				for(size_t j = 0; j < n.size(); ++j)
+				for(size_t k = 0; k < n.size(); ++k)
 				{
-					int vAdj = n[j];
+					int vAdj = n[k];
 					if (!HAVE_VISITED_VERTEX(vAdj) && sidepodalVertices[i*convexHull.v.size()+vAdj])
 					{
 						if (sidepodalVertices[edgeJ*convexHull.v.size()+vAdj])
@@ -1533,9 +1533,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					continue;
 				MARK_VERTEX_VISITED(v);
 				const std::vector<int> &n = adjacencyData[v];
-				for(size_t j = 0; j < n.size(); ++j)
+				for(size_t k = 0; k < n.size(); ++k)
 				{
-					int vAdj = n[j];
+					int vAdj = n[k];
 //					int edgeK = vertexPairsToEdges[std::make_pair(v, vAdj)];
 					int edgeK = vertexPairsToEdges[v*convexHull.v.size()+vAdj];
 					if (IS_INTERNAL_EDGE(edgeK))
@@ -2639,15 +2639,15 @@ bool OBB::Intersects(const Plane &p) const
 bool OBB::Intersects(const Ray &ray) const
 {
 	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
-	Ray r = WorldToLocal() * ray;
-	return aabb.Intersects(r);
+	Ray localRay = WorldToLocal() * ray;
+	return aabb.Intersects(localRay);
 }
 
 bool OBB::Intersects(const Ray &ray, float &dNear, float &dFar) const
 {
 	AABB aabb(POINT_VEC_SCALAR(0.f), Size());
-	Ray r = WorldToLocal() * ray;
-	return aabb.Intersects(r, dNear, dFar);
+	Ray localRay = WorldToLocal() * ray;
+	return aabb.Intersects(localRay, dNear, dFar);
 }
 
 bool OBB::Intersects(const Line &line) const

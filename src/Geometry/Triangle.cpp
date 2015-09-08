@@ -170,14 +170,14 @@ vec Triangle::Point(float u, float v, float w) const
 	return u * a + v * b + w * c;
 }
 
-vec Triangle::Point(const float3 &b) const
+vec Triangle::Point(const float3 &uvw) const
 {
-	return Point(b.x, b.y, b.z);
+	return Point(uvw.x, uvw.y, uvw.z);
 }
 
-vec Triangle::Point(const float2 &b) const
+vec Triangle::Point(const float2 &uv) const
 {
-	return Point(b.x, b.y);
+	return Point(uv.x, uv.y);
 }
 
 vec Triangle::Centroid() const

@@ -218,7 +218,7 @@ void TriangleMesh::Set(const Polyhedron &polyhedron)
 	}
 }
 
-void TriangleMesh::Set(const float *triangleMesh, int numTriangles, int vertexSizeBytes)
+void TriangleMesh::Set(const float *triangleMesh, int numTris, int vtxSizeBytes)
 {
 #ifndef MATH_AUTOMATIC_SSE // TODO: Restore support for this when MATH_AUTOMATIC_SSE is defined!
 	if (simdCapability == SIMD_AVX)
@@ -227,7 +227,7 @@ void TriangleMesh::Set(const float *triangleMesh, int numTriangles, int vertexSi
 		SetSoA4(triangleMesh, numTriangles, vertexSizeBytes);
 	else
 #endif
-		SetAoS(triangleMesh, numTriangles, vertexSizeBytes);
+		SetAoS(triangleMesh, numTris, vtxSizeBytes);
 }
 
 float TriangleMesh::IntersectRay(const Ray &ray) const
@@ -299,33 +299,33 @@ void TriangleMesh::ReallocVertexBuffer(int numTris, int vertexSizeBytes_)
 	numTriangles = numTris;
 }
 
-void TriangleMesh::SetAoS(const float *vertexData, int numTriangles, int vertexSizeBytes)
+void TriangleMesh::SetAoS(const float *vertexData, int numTris, int vtxSizeBytes)
 {
-	ReallocVertexBuffer(numTriangles, vertexSizeBytes);
+	ReallocVertexBuffer(numTris, vtxSizeBytes);
 #ifdef _DEBUG
 	vertexDataLayout = 0; // AoS
 #endif
 
-	memcpy(data, vertexData, numTriangles * 3 * vertexSizeBytes);
+	memcpy(data, vertexData, numTris * 3 * vtxSizeBytes);
 }
 
-void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles, int vertexSizeBytes)
+void TriangleMesh::SetSoA4(const float *vertexData, int numTris, int vtxSizeBytes)
 {
-	ReallocVertexBuffer(numTriangles, 3*sizeof(float));
+	ReallocVertexBuffer(numTris, 3*sizeof(float));
 #ifdef _DEBUG
 	vertexDataLayout = 1; // SoA4
 #endif
 
-	assert(vertexSizeBytes % 4 == 0);
-	int vertexSizeFloats = vertexSizeBytes / 4;
+	assert(vtxSizeBytes % 4 == 0);
+	int vertexSizeFloats = vtxSizeBytes / 4;
 	int triangleSizeFloats = vertexSizeFloats * 3;
-	assert(numTriangles % 4 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
+	assert(numTris % 4 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
 	// To xxxx yyyy zzzz xxxx yyyy zzzz xxxx yyyy zzzz
 
 	float *o = data;
-	for(int i = 0; i + 4 <= numTriangles; i += 4) // 4 triangles at a time
+	for(int i = 0; i + 4 <= numTris; i += 4) // 4 triangles at a time
 	{
 		for (int j = 0; j < 3; ++j) // v0,v1,v2
 		{
@@ -345,7 +345,7 @@ void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles, int vertex
 
 #ifdef SOA_HAS_EDGES
 	o = data;
-	for(int i = 0; i + 4 <= numTriangles; i += 4)
+	for(int i = 0; i + 4 <= numTris; i += 4)
 	{
 		for(int j = 12; j < 24; ++j)
 			o[j] -= o[j-12];
@@ -356,23 +356,23 @@ void TriangleMesh::SetSoA4(const float *vertexData, int numTriangles, int vertex
 #endif
 }
 
-void TriangleMesh::SetSoA8(const float *vertexData, int numTriangles, int vertexSizeBytes)
+void TriangleMesh::SetSoA8(const float *vertexData, int numTris, int vtxSizeBytes)
 {
-	ReallocVertexBuffer(numTriangles, 3*sizeof(float));
+	ReallocVertexBuffer(numTris, 3*sizeof(float));
 #ifdef _DEBUG
 	vertexDataLayout = 2; // SoA8
 #endif
 
-	assert(vertexSizeBytes % 4 == 0);
-	int vertexSizeFloats = vertexSizeBytes / 4;
+	assert(vtxSizeBytes % 4 == 0);
+	int vertexSizeFloats = vtxSizeBytes / 4;
 	int triangleSizeFloats = vertexSizeFloats * 3;
-	assert(numTriangles % 8 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
+	assert(numTris % 8 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
 	// To xxxxxxxx yyyyyyyy zzzzzzzz xxxxxxxx yyyyyyyy zzzzzzzz xxxxxxxx yyyyyyyy zzzzzzzz
 
 	float *o = data;
-	for(int i = 0; i + 8 <= numTriangles; i += 8) // 8 triangles at a time.
+	for(int i = 0; i + 8 <= numTris; i += 8) // 8 triangles at a time.
 	{
 		for (int j = 0; j < 3; ++j) // v0, v1, v2
 		{
@@ -396,7 +396,7 @@ void TriangleMesh::SetSoA8(const float *vertexData, int numTriangles, int vertex
 
 #ifdef SOA_HAS_EDGES
 	o = data;
-	for(int i = 0; i + 8 <= numTriangles; i += 8)
+	for(int i = 0; i + 8 <= numTris; i += 8)
 	{
 		for(int j = 24; j < 48; ++j)
 			o[j] -= o[j-24];

@@ -160,20 +160,20 @@ public:
 	bool IsFinite() const;
 
 	/// Generates a point inside this capsule.
-	/** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
-		@param a A normalized value between [0,1]. This specifies the normalized directed angle of the point position around the capsule line segment.
-		@param d A normalized value between [0,1]. This specifies the normalized distance of the point position from the capsule line segment.
+	/** @param height A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
+		@param angle A normalized value between [0,1]. This specifies the normalized directed angle of the point position around the capsule line segment.
+		@param dist A normalized value between [0,1]. This specifies the normalized distance of the point position from the capsule line segment.
 		@note This function does not generate points inside this capsule uniformly, as (l,a,d) ranges uniformly over [0,1]^3.
 		@see UniformPointPerhapsInside(), RandomPointInside(). */
-	vec PointInside(float l, float a, float d) const;
+	vec PointInside(float height, float angle, float dist) const;
 
 	/// Generates a point that perhaps lies inside this capsule.
-	/** @param l A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
+	/** @param height A normalized value between [0,1]. This specifies the point position along the height line of this capsule.
 		@param x A normalized value between [0,1]. This specifies the x coordinate on the plane of the circle cross-section specified by l.
 		@param y A normalized value between [0,1]. This specifies the y coordinate on the plane of the circle cross-section specified by l.
 		@note This function will generate points uniformly, but they do not necessarily lie inside the capsule.
 		@see PointInside(). */
-	vec UniformPointPerhapsInside(float l, float x, float y) const;
+	vec UniformPointPerhapsInside(float height, float x, float y) const;
 
 	/// Returns the Sphere defining the 'bottom' section of this Capsule (corresponding to the endpoint l.a)
 	Sphere SphereA() const;

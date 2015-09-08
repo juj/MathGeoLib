@@ -33,6 +33,10 @@ Frustum *FrustumArray();
 
 void InitTestData();
 
+#ifdef _MSC_VER
+#pragma warning(disable:4459) // C4459: declaration of 'f' hides global declaration
+#endif
+
 extern float *f;
 extern float *pf;
 extern float *uf;

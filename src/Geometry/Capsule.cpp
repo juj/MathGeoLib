@@ -170,15 +170,15 @@ bool Capsule::IsFinite() const
 	return l.IsFinite() && MATH_NS::IsFinite(r);
 }
 
-vec Capsule::PointInside(float l, float a, float d) const
+vec Capsule::PointInside(float height, float angle, float dist) const
 {
-	Circle c = CrossSection(l);
-	return c.GetPoint(a*2.f*pi, d);
+	Circle c = CrossSection(height);
+	return c.GetPoint(angle*2.f*pi, dist);
 }
 
-vec Capsule::UniformPointPerhapsInside(float l, float x, float y) const
+vec Capsule::UniformPointPerhapsInside(float height, float x, float y) const
 {
-	return MinimalEnclosingOBB().PointInside(l, x, y);
+	return MinimalEnclosingOBB().PointInside(height, x, y);
 }
 
 Sphere Capsule::SphereA() const

@@ -266,12 +266,12 @@ float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 #endif
 }
 
-float3 MUST_USE_RESULT Quat::Transform(float x, float y, float z) const
+float3 MUST_USE_RESULT Quat::Transform(float X, float Y, float Z) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
-	return float4(quat_transform_vec4(q, set_ps(0.f, z, y, x))).xyz();
+	return float4(quat_transform_vec4(q, set_ps(0.f, Z, Y, X))).xyz();
 #else
-	return Transform(float3(x, y, z));
+	return Transform(float3(X, Y, Z));
 #endif
 }
 
@@ -373,15 +373,15 @@ float3 MUST_USE_RESULT Quat::SlerpVectorAbs(const float3 &from, const float3 &to
 float MUST_USE_RESULT Quat::AngleBetween(const Quat &target) const
 {
 	assume(this->IsInvertible());
-	Quat q = target / *this;
-	return q.Angle();
+	Quat delta = target / *this;
+	return delta.Angle();
 }
 
 vec MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 {
 	assume(this->IsInvertible());
-	Quat q = target / *this;
-	return q.Axis();
+	Quat delta = target / *this;
+	return delta.Axis();
 }
 
 void Quat::ToAxisAngle(float3 &axis, float &angle) const

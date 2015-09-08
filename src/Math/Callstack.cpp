@@ -4,6 +4,10 @@
 #if defined(WIN32) && defined(_MSC_VER) && !defined(WIN8RT)
 
 #include "../Math/InclWindows.h"
+
+// The DbgHelp.h file leaks the following warning, make it quiet:
+// C:\Program Files(x86)\Windows Kits\8.1\Include\um\DbgHelp.h(1544) : warning C4091 : 'typedef ' : ignored on left of '' when no variable is declared
+#pragma warning(disable:4091) // C4091: 'typedef ': ignored on left of '' when no variable is declared
 #include <DbgHelp.h>
 
 #pragma comment(lib, "dbghelp.lib")

@@ -40,7 +40,6 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 	assert(vertexDataLayout == 1); // Must be SoA4 structured!
 #endif
 	
-	const float inf = FLOAT_INF;
 	__m128 nearestD = _mm_set1_ps(inf);
 #ifdef MATH_GEN_UV
 	__m128 nearestU = _mm_set1_ps(inf);

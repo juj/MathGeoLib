@@ -156,11 +156,11 @@ public:
 
 						// Find if this vertex is duplicate of an existing vertex.
 						bool found = false;
-						for(size_t m = 0; m < ph.v.size(); ++m)
-							if (vec(ph.v[m]).Equals(corner))
+						for(size_t l = 0; l < ph.v.size(); ++l)
+							if (vec(ph.v[l]).Equals(corner))
 							{
 								found = true;
-								pt.ptIndex = (int)m;
+								pt.ptIndex = (int)l;
 								break;
 							}
 
@@ -195,46 +195,46 @@ public:
 		else if (ph.v.size() == 2)
 		{
 			// Create a degenerate face that's an edge.
-			Polyhedron::Face f;
-			f.v.push_back(0);
-			f.v.push_back(1);
-			ph.f.push_back(f);
+			Polyhedron::Face face;
+			face.v.push_back(0);
+			face.v.push_back(1);
+			ph.f.push_back(face);
 			return ph;
 		}
 		else if (ph.v.size() == 3)
 		{
 			// Create a degenerate face that's a triangle.
-			Polyhedron::Face f;
-			f.v.push_back(0);
-			f.v.push_back(1);
-			f.v.push_back(2);
-			ph.f.push_back(f);
+			Polyhedron::Face face;
+			face.v.push_back(0);
+			face.v.push_back(1);
+			face.v.push_back(2);
+			ph.f.push_back(face);
 			return ph;
 		}
 
 		// Connect the edges in each face using selection sort.
 		for(int i = 0; i < N; ++i)
 		{
-			std::vector<CornerPt> &p = faces[i];
-			if (p.size() < 3)
+			std::vector<CornerPt> &pt = faces[i];
+			if (pt.size() < 3)
 				continue;
-			for(size_t j = 0; j < p.size()-1; ++j)
+			for(size_t j = 0; j < pt.size()-1; ++j)
 			{
-				CornerPt &prev = p[j];
+				CornerPt &prev = pt[j];
 				bool found = false;
-				for(size_t k = j+1; k < p.size(); ++k)
+				for(size_t k = j+1; k < pt.size(); ++k)
 				{
-					CornerPt &cur = p[k];
+					CornerPt &cur = pt[k];
 					if (cur.j == prev.k)
 					{
-						Swap(cur, p[j+1]);
+						Swap(cur, pt[j+1]);
 						found = true;
 						break;
 					}
 					if (cur.k == prev.k)
 					{
 						Swap(cur.j, cur.k);
-						Swap(cur, p[j+1]);
+						Swap(cur, pt[j+1]);
 						found = true;
 						break;
 					}
@@ -242,25 +242,22 @@ public:
 				assert(found);
 				MARK_UNUSED(found);
 			}
-			assert(p[0].j == p[p.size()-1].k);
-			if (p.size() >= 3)
+			assert(pt[0].j == pt[pt.size()-1].k);
+			Polyhedron::Face face;
+			for(size_t j = 0; j < pt.size(); ++j)
 			{
-				Polyhedron::Face f;
-				for(size_t j = 0; j < p.size(); ++j)
-				{
-					f.v.push_back(p[j].ptIndex);
-				}
-				ph.f.push_back(f);
+				face.v.push_back(pt[j].ptIndex);
 			}
+			ph.f.push_back(face);
 		}
 
 		// Fix up winding directions.
 		for(size_t i = 0; i < ph.f.size(); ++i)
 		{
-			Plane p = ph.FacePlane((int)i);
+			Plane face = ph.FacePlane((int)i);
 			for(size_t j = 0; j < ph.v.size(); ++j)
 			{
-				if (p.SignedDistance(ph.v[j]) > 1e-3f)
+				if (face.SignedDistance(ph.v[j]) > 1e-3f)
 				{
 					ph.f[i].FlipWindingOrder();
 					break;

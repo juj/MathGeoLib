@@ -38,8 +38,8 @@ public:
 	/// specified geometry.
 	/// @param vertexSizeBytes The size (stride) of a single vertex in memory.
 	void Set(const float *triangleMesh, int numTriangles, int vertexSizeBytes);
-	void Set(const float3 *triangleMesh, int numTriangles) { Set(reinterpret_cast<const float *>(triangleMesh), numTriangles, sizeof(float3)); }
-	void Set(const Triangle *triangleMesh, int numTriangles) { Set(reinterpret_cast<const float *>(triangleMesh), numTriangles, sizeof(Triangle)/3); }
+	void Set(const float3 *triangleMesh, int numTris) { Set(reinterpret_cast<const float *>(triangleMesh), numTris, sizeof(float3)); }
+	void Set(const Triangle *triangleMesh, int numTris) { Set(reinterpret_cast<const float *>(triangleMesh), numTris, sizeof(Triangle)/3); }
 
 	void Set(const Polyhedron &polyhedron);
 

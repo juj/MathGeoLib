@@ -204,7 +204,7 @@ public:
 
 	/// Adds a vector to this vector. [IndexTitle: Add/Sub/Mul/Div]
 	/// @return (x+v.x, y+v.y, z+v.z, w+v.w).
-	float4 Add(const float4 &v) const { return *this + v; }
+	float4 Add(const float4 &rhs) const { return *this + rhs; }
 
 	/// Adds the vector (s,s,s,s) to this vector.
 	/// @note Mathematically, the addition of a vector and scalar is not defined in linear space structures,
@@ -214,7 +214,7 @@ public:
 
 	/// Subtracts a vector from this vector. [similarOverload: Add] [hideIndex]
 	/// @return (x-v.x, y-v.y, z-v.z, w-v.w).
-	float4 Sub(const float4 &v) const { return *this - v; }
+	float4 Sub(const float4 &rhs) const { return *this - rhs; }
 
 	/// Subtracts the vector (s,s,s,s) from this vector. [similarOverload: Add] [hideIndex]
 	/// @note Mathematically, the subtraction of a vector by a scalar is not defined in linear space structures,

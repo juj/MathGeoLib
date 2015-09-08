@@ -309,12 +309,12 @@ public:
 		the line of intersection. This pointer may be null.
 		@return True if the given object intersects with this plane. */
 	bool Intersects(const Plane &plane, Line *outLine = 0) const;
-	/** @param d [out] If specified, this parameter will receive the parametric distance of
+	/** @param dist [out] If specified, this parameter will receive the parametric distance of
 			the intersection point along the line object. Use the GetPoint(d) function of the line class
 			to get the actual point of intersection. This pointer may be null. */
-	bool Intersects(const Ray &ray, float *d = 0) const;
-	bool Intersects(const Line &line, float *d = 0) const;
-	bool Intersects(const LineSegment &lineSegment, float *d = 0) const;
+	bool Intersects(const Ray &ray, float *dist = 0) const;
+	bool Intersects(const Line &line, float *dist = 0) const;
+	bool Intersects(const LineSegment &lineSegment, float *dist = 0) const;
 	bool Intersects(const Sphere &sphere) const;
 	bool Intersects(const AABB &aabb) const;
 	bool Intersects(const OBB &obb) const;
