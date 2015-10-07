@@ -290,21 +290,55 @@ Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 {
 	assume(0.f <= t && t <= 1.f);
 
-#ifdef MATH_AUTOMATIC_SSE
-	return vec4_lerp(q, b.q, t);
-#else
-	return *this * (1.f - t) + b * t;
-#endif
+	// TODO: SSE
+	float angle = this->Dot(b);
+	if (angle >= 0.f) // Make sure we rotate the shorter arc.
+		return (*this * (1.f - t) + b * t).Normalized();
+	else
+		return (*this * (t - 1.f) + b * t).Normalized();
 }
 
-/** Implementation based on the math in the book Watt, Policarpo. 3D Games: Real-time rendering and Software Technology, pp. 383-386. */
 Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 {
-	///\todo SSE.
 	assume(0.f <= t && t <= 1.f);
 	assume(IsNormalized());
 	assume(q2.IsNormalized());
 
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
+	simd4f angle = dot4_ps(q, q2.q); // <q, q2.q>
+	simd4f neg = cmplt_ps(angle, zero_ps()); // angle < 0?
+	neg = and_ps(neg, set1_ps_hex(0x80000000)); // Convert 0/0xFFFFFFFF mask to a 0x/0x80000000 mask.
+//	neg = s4i_to_s4f(_mm_slli_epi32(s4f_to_s4i(neg), 31)); // A SSE2-esque way to achieve the above would be this, but this seems to clock slower (12.04 clocks vs 11.97 clocks)
+	angle = xor_ps(angle, neg); // if angle was negative, make it positive.
+	simd4f one = set1_ps(1.f);
+	angle = min_ps(angle, one); // If user passed t > 1 or t < -1, clamp the range.
+
+	// Compute a fast polynomial approximation to arccos(angle).
+	// arccos(x): (-0.69813170079773212f * x * x - 0.87266462599716477f) * x + 1.5707963267948966f;
+	angle = madd_ps(msub_ps(mul_ps(set1_ps(-0.69813170079773212f), angle), angle, set1_ps(0.87266462599716477f)), angle, set1_ps(1.5707963267948966f));
+
+	// Shuffle an appropriate vector from 't' and 'angle' for computing two sines in one go.
+	simd4f T = _mm_set_ss(t); // (.., t)
+	simd4f oneSubT = sub_ps(one, T); // (.., 1-t)
+	T = _mm_movelh_ps(T, oneSubT); // (.., 1-t, .., t)
+	angle = mul_ps(angle, T); // (.., (1-t)*angle, .., t*angle)
+
+	// Compute a fast polynomial approximation to sin(t*angle) and sin((1-t)*angle).
+	// Here could use "angle = sin_ps(angle);" for precision, but favor speed instead with the following polynomial expansion:
+	// sin(x): ((5.64311797634681035370e-03 * x * x - 1.55271410633428644799e-01) * x * x + 9.87862135574673806965e-01) * x
+	simd4f angle2 = mul_ps(angle, angle);
+	angle = mul_ps(angle, madd_ps(madd_ps(angle2, set1_ps(5.64311797634681035370e-03f), set1_ps(-1.55271410633428644799e-01f)), angle2, set1_ps(9.87862135574673806965e-01f)));
+
+	// Compute the final lerp factors a and b to scale q and q2.
+	simd4f a = zzzz_ps(angle);
+	simd4f b = xxxx_ps(angle);
+	a = xor_ps(a, neg);
+	a = mul_ps(q, a);
+	a = madd_ps(q2, b, a);
+
+	// The lerp above generates an unnormalized quaternion which needs to be renormalized.
+	return mul_ps(a, rsqrt_ps(dot4_ps(a, a)));
+#else
 	float angle = this->Dot(q2);
 	float sign = 1.f; // Multiply by a sign of +/-1 to guarantee we rotate the shorter arc.
 	if (angle < 0.f)
@@ -315,25 +349,23 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 
 	float a;
 	float b;
-	if (angle <= 0.97f) // perform spherical linear interpolation.
+	if (angle < 0.999) // perform spherical linear interpolation.
 	{
-		angle = Acos(angle); // After this, angle is in the range pi/2 -> 0 as the original angle variable ranged from 0 -> 1.
+		// angle = Acos(angle); // After this, angle is in the range pi/2 -> 0 as the original angle variable ranged from 0 -> 1.
+		angle = (-0.69813170079773212f * angle * angle - 0.87266462599716477f) * angle + 1.5707963267948966f;
 
-		float angleT = t*angle;
-
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
-		// Compute three sines in one go with SSE.
-		simd4f s = set_ps(0.f, angleT, angle - angleT, angle);
-		s = sin_ps(s);
-		simd4f denom = xxxx_ps(s);
-		s = div_ps(s, denom);
-		a = s4f_y(s);
-		b = s4f_z(s);
+		float ta = t*angle;
+#ifdef MATH_USE_SINCOS_LOOKUPTABLE
+		// If Sin() is based on a lookup table, prefer that over polynomial approximation.
+		float st = Sin(angleT);
+		float sat = Sin(angle - angleT);
 #else
-		float s[3] = { Sin(angle), Sin(angle - angleT), Sin(angleT) };
-		float c = 1.f / s[0];
-		a = s[1] * c;
-		b = s[2] * c;
+		// Not using a lookup table, manually compute the two sines by using a very rough approximation.
+		float ta2 = ta*ta;
+		b = ((5.64311797634681035370e-03f * ta2 - 1.55271410633428644799e-01f) * ta2 + 9.87862135574673806965e-01f) * ta;
+		a = angle - ta;
+		float a2 = a*a;
+		a = ((5.64311797634681035370e-03f * a2 - 1.55271410633428644799e-01f) * a2 + 9.87862135574673806965e-01f) * a;
 #endif
 	}
 	else // If angle is close to taking the denominator to zero, resort to linear interpolation (and normalization).
@@ -341,8 +373,9 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 		a = 1.f - t;
 		b = t;
 	}
-	
+	// Lerp and renormalize.
 	return (*this * (a * sign) + q2 * b).Normalized();
+#endif
 }
 
 float3 MUST_USE_RESULT Quat::SlerpVector(const float3 &from, const float3 &to, float t)
@@ -374,6 +407,7 @@ float MUST_USE_RESULT Quat::AngleBetween(const Quat &target) const
 {
 	assume(this->IsInvertible());
 	Quat delta = target / *this;
+	delta.Normalize();
 	return delta.Angle();
 }
 
@@ -381,6 +415,7 @@ vec MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 {
 	assume(this->IsInvertible());
 	Quat delta = target / *this;
+	delta.Normalize();
 	return delta.Axis();
 }
 

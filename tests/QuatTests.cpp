@@ -70,6 +70,92 @@ BENCHMARK(Quat_Slerp, "Quat::Slerp")
 }
 BENCHMARK_END;
 
+Quat PreciseSlerp(const Quat &a, const Quat &b, float t)
+{
+	double angle = a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w;
+	double sign = 1.0;
+	if (angle < 0)
+	{
+		angle = -angle;
+		sign = -1.0;
+	}
+
+	double A;
+	double B;
+	if (angle <= 1.0) // perform spherical linear interpolation.
+	{
+		angle = acos(angle); // After this, angle is in the range pi/2 -> 0 as the original angle variable ranged from 0 -> 1.
+
+		double angleT = t*angle;
+
+		double s[3] = { sin(angle), sin(angle - angleT), sin(angleT) };
+		double c = 1.0 / s[0];
+		A = s[1] * c;
+		B = s[2] * c;
+	}
+	else // If angle is close to taking the denominator to zero, resort to linear interpolation (and normalization).
+	{
+		A = 1.0 - t;
+		B = t;
+	}
+
+	Quat C;
+	C.x = (float)(a.x*A*sign + b.x*B);
+	C.y = (float)(a.y*A*sign + b.y*B);
+	C.z = (float)(a.z*A*sign + b.z*B);
+	C.w = (float)(a.w*A*sign + b.w*B);
+	return C.Normalized();
+}
+
+UNIQUE_TEST(Quat_Slerp_precision)
+{
+	float maxError = 0;
+	float maxLerpError = 0;
+	float magnitudeError = 0;
+	for (int i = 0; i < 10000; ++i)
+	{
+		Quat q = Quat::RandomRotation(rng);
+		Quat q2 = Quat::RandomRotation(rng);
+		float t = rng.Float01Incl();
+		Quat correct = PreciseSlerp(q, q2, t);
+		Quat fast = q.Slerp(q2, t);
+		magnitudeError = Max(magnitudeError, Abs(1.f - fast.LengthSq()));
+		Quat lerp = q.Lerp(q2, t);
+		maxLerpError = Max(maxLerpError, RadToDeg(correct.AngleBetween(lerp)));
+		maxError = Max(maxError, RadToDeg(correct.AngleBetween(fast)));
+	}
+	LOGI("Maximum quaternion slerp error: %f degrees. (%.2f%% error relative to nlerp). Squared magnitude error: %f", maxError, maxError * 100.0f / maxLerpError, magnitudeError);
+}
+
+UNIQUE_TEST(Quat_Slerp_perf)
+{
+	tick_t min = 9999999999;
+	const int nIters = 100;
+	const int nSamples = 30000;
+	float4 res;
+	for (int i = 0; i < nIters; ++i)
+	{
+		Quat q = Quat::RandomRotation(rng);
+		Quat q2 = Quat::RandomRotation(rng);
+
+		float f = 0.f;
+		tick_t t0 = Clock::Tick();
+		for (int j = 0; j < nSamples; ++j)
+		{
+			// AVX+FMA3: 10.289649 nsecs
+			// Scalar: 13.228866 nsecs
+			Quat q3 = q.Slerp(q2, f);
+			// Precise: 58.709194 nsecs
+			//Quat q3 = PreciseSlerp(q, q2, f);
+			res += q3.CastToFloat4();
+			f += 0.1f / nSamples;
+		}
+		tick_t t1 = Clock::Tick();
+		min = Min(min, t1 - t0);
+	}
+	printf("Min: %f nsecs. %s", Clock::TicksToMillisecondsF(min)* 1000000.0f / nSamples, res.ToString().c_str());
+}
+
 RANDOMIZED_TEST(Quat_SetFromAxisAngle)
 {
 	float3 axis = float3::RandomDir(rng);

@@ -19,6 +19,7 @@
 
 #include "../MathBuildConfig.h"
 #include "SSEMath.h"
+#include "float4.h"
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
@@ -333,6 +334,11 @@ public:
 	float4x4 MUST_USE_RESULT ToFloat4x4() const;
 	float4x4 MUST_USE_RESULT ToFloat4x4(const float3 &translation) const;
 	float4x4 MUST_USE_RESULT ToFloat4x4(const float4 &translation) const;
+
+	/// Returns the elements of this quaternion casted to a float4.
+	/** @note The returned vector does not have a direct geometric meaning, e.g. it does not
+		represent a direction vector or a magnitude or similar. */
+	float4 CastToFloat4() const { return float4(x, y, z, w); }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 	/// Returns "(x,y,z,w)".
