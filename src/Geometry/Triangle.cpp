@@ -707,8 +707,8 @@ bool Triangle::Intersects(const AABB &aabb) const
 
 	simd4f cmp = cmpge_ps(tMin, aabb.maxPoint.v);
 	cmp = or_ps(cmp, cmple_ps(tMax, aabb.minPoint.v));
-	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
-	if (!allzero_ps(cmp)) return false;
+	// Mask off results from the W channel and test if all were zero.
+	if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
 
 	simd4f center = mul_ps(add_ps(aabb.minPoint.v, aabb.maxPoint.v), set1_ps(0.5f));
 	simd4f h = sub_ps(aabb.maxPoint.v, center);
@@ -740,8 +740,8 @@ bool Triangle::Intersects(const AABB &aabb) const
 	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
 	// Note: The three masks of W channel could be omitted if cmplt_ps was used instead of cmple_ps, but
 	// want to be strict here and define that AABB and Triangle which touch at a vertex should not intersect.
-	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
-	if (!allzero_ps(cmp)) return false;
+	// Mask off results from the W channel and test if all were zero.
+	if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
 
 	// {eX, eY, eZ} cross t2
 	simd4f t2 = sub_ps(c, b);
@@ -756,8 +756,8 @@ bool Triangle::Intersects(const AABB &aabb) const
 	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
 	r = abs_ps(madd_ps(h_wyxz, at2_wxzy, mul_ps(h_wxzy, at2_wyxz)));
 	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
-	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
-	if (!allzero_ps(cmp)) return false;
+	// Mask off results from the W channel and test if all were zero.
+	if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
 
 	// {eX, eY, eZ} cross t0
 	simd4f cc = sub_ps(c, center);
@@ -774,8 +774,8 @@ bool Triangle::Intersects(const AABB &aabb) const
 	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
 	r = abs_ps(madd_ps(h_wyxz, at0_wxzy, mul_ps(h_wxzy, at0_wyxz)));
 	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
-	cmp = and_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
-	return allzero_ps(cmp) != 0;
+	// Mask off results from the W channel and test if all were zero.
+	if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
 #else
 	// Benchmark 'Triangle_intersects_AABB': Triangle::Intersects(AABB)
 	//    Best: 17.282 nsecs / 46.496 ticks, Avg: 17.804 nsecs, Worst: 18.434 nsecs

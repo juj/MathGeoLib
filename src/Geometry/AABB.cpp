@@ -952,8 +952,7 @@ bool AABB::Intersects(const AABB &aabb) const
 	simd4f a = cmpge_ps(minPoint.v, aabb.maxPoint.v);
 	simd4f b = cmpge_ps(aabb.minPoint.v, maxPoint.v);
 	a = or_ps(a, b);
-	a = and_ps(a, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)); // Mask off results from the W channel.
-	return allzero_ps(a) != 0;
+	return a_and_b_allzero_ps(a, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)) != 0; // Mask off results from the W channel.
 #else
 	// Benchmark 'AABBIntersectsAABB_positive': AABB::Intersects(AABB) positive
 	//    Best: 2.108 nsecs / 3.588 ticks, Avg: 2.310 nsecs, Worst: 5.481 nsecs

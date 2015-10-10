@@ -181,7 +181,11 @@ static const simd2d simd2dSignBit = set1_pd(-0.f); // -0.f = 1 << 31
 // Warning: this SSE1 version is more like "all finite without nans" instead of "allzero", because
 // it does not detect finite non-zero floats. Call only for inputs that are either all 0xFFFFFFFF or 0.
 #define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
-#elif defined(MATH_SSE)
+// Returns true if all the bits in (a&b) are zero.
+#define a_and_b_allzero_ps(a, b) _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(b))
+// Returns true if all the bits in (a&~b) are zero.
+#define a_and_not_b_allzero_ps(a, b) _mm_testc_si128(_mm_castps_si128(a), _mm_castps_si128(b))
+#else
 int FORCE_INLINE allzero_ps(simd4f x)
 {
 	simd4f y = _mm_movehl_ps(x, x);
@@ -198,6 +202,10 @@ int FORCE_INLINE allzero_ps(simd4f x)
 	return _mm_ucomige_ss(x, x);
 #endif
 }
+// Returns true if all the bits in (a&b) are zero.
+#define a_and_b_allzero_ps(a, b) allzero_ps(and_ps((a), (b)))
+// Returns true if all the bits in (a&~b) are zero.
+#define a_and_not_b_allzero_ps(a, b) allzero_ps(andnot_ps((a), (b)))
 #endif
 
 // Multiply-add. These are otherwise identical, except that the FMA version is specced to have
