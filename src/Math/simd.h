@@ -181,6 +181,8 @@ static const simd2d simd2dSignBit = set1_pd(-0.f); // -0.f = 1 << 31
 // Warning: this SSE1 version is more like "all finite without nans" instead of "allzero", because
 // it does not detect finite non-zero floats. Call only for inputs that are either all 0xFFFFFFFF or 0.
 #define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
+// Returns true if all the bits in the given float are set.
+#define allone_ps(x) _mm_test_all_ones(_mm_castps_si128((x)))
 // Returns true if all the bits in (a&b) are zero.
 #define a_and_b_allzero_ps(a, b) _mm_testz_si128(_mm_castps_si128(a), _mm_castps_si128(b))
 // Returns true if all the bits in (a&~b) are zero.
@@ -202,11 +204,28 @@ int FORCE_INLINE allzero_ps(simd4f x)
 	return _mm_ucomige_ss(x, x);
 #endif
 }
-// Returns true if all the bits in (a&b) are zero.
+int FORCE_INLINE allone_ps(simd4f x)
+{
+	simd4f y = _mm_movehl_ps(x, x);
+	x = and_ps(x, y);
+#ifdef MATH_SSE2
+	return _mm_cvtsi128_si64(_mm_castps_si128(x)) == -1LL;
+#else
+	y = yyyy_ps(x);
+	x = and_ps(x, y);
+#ifdef _DEBUG
+	// In this construction in SSE1, we can't detect NaNs, so test that those don't occur.
+	assume(ReinterpretAsU32(_mm_cvtss_f32(x)) == 0xFFFFFFFF || !IsNan(ReinterpretAsU32(_mm_cvtss_f32(x))));
+#endif
+	return !_mm_ucomige_ss(x, x);
+#endif
+}
 #define a_and_b_allzero_ps(a, b) allzero_ps(and_ps((a), (b)))
-// Returns true if all the bits in (a&~b) are zero.
 #define a_and_not_b_allzero_ps(a, b) allzero_ps(andnot_ps((a), (b)))
 #endif
+// For convenience, define the following aliases to help ease reading SIMD conditionals.
+#define anyzero_ps(x) (!allone_ps((x))
+#define anyone_ps(x) (!allzero_ps(x))
 
 // Multiply-add. These are otherwise identical, except that the FMA version is specced to have
 // better precision with respect to rounding.
