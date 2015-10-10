@@ -192,7 +192,7 @@ int FORCE_INLINE allzero_ps(simd4f x)
 {
 	simd4f y = _mm_movehl_ps(x, x);
 	x = or_ps(x, y);
-#ifdef MATH_SSE2
+#if defined(MATH_SSE2) && defined(MATH_64BIT)
 	return _mm_cvtsi128_si64(_mm_castps_si128(x)) == 0;
 #else
 	y = yyyy_ps(x);
@@ -208,7 +208,7 @@ int FORCE_INLINE allone_ps(simd4f x)
 {
 	simd4f y = _mm_movehl_ps(x, x);
 	x = and_ps(x, y);
-#ifdef MATH_SSE2
+#if defined(MATH_SSE2) && defined(MATH_64BIT)
 	return _mm_cvtsi128_si64(_mm_castps_si128(x)) == -1LL;
 #else
 	y = yyyy_ps(x);
