@@ -184,9 +184,9 @@ static const simd2d simd2dSignBit = set1_pd(-0.f); // -0.f = 1 << 31
 // it does not detect finite non-zero floats. Call only for inputs that are either all 0xFFFFFFFF or 0.
 int FORCE_INLINE allzero_ps(simd4f x)
 {
-	simd4f y = _mm_movehl_ps(y, x);
+	simd4f y = _mm_movehl_ps(x, x);
 	x = or_ps(x, y);
-	simd4f y = yyyy_ps(x);
+	y = yyyy_ps(x);
 	x = or_ps(x, y);
 	return _mm_ucomige_ss(x, x);
 }
