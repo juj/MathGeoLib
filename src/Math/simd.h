@@ -177,18 +177,26 @@ static const simd2d simd2dSignBit = set1_pd(-0.f); // -0.f = 1 << 31
 #endif
 
 #ifdef MATH_SSE41
-#define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
-#elif defined(MATH_SSE)
-// Given a input vector of either 0xFFFFFFFF or 0, returns a nonzero integer of all lanes were zero.
+// Returns true if all the bits in the given float vector are zero, when interpreted as an integer.
 // Warning: this SSE1 version is more like "all finite without nans" instead of "allzero", because
 // it does not detect finite non-zero floats. Call only for inputs that are either all 0xFFFFFFFF or 0.
+#define allzero_ps(x) _mm_testz_si128(_mm_castps_si128((x)), _mm_castps_si128((x)))
+#elif defined(MATH_SSE)
 int FORCE_INLINE allzero_ps(simd4f x)
 {
 	simd4f y = _mm_movehl_ps(x, x);
 	x = or_ps(x, y);
+#ifdef MATH_SSE2
+	return _mm_cvtsi128_si64(_mm_castps_si128(x)) == 0;
+#else
 	y = yyyy_ps(x);
 	x = or_ps(x, y);
+#ifdef _DEBUG
+	// In this construction in SSE1, we can't detect NaNs, so test that those don't occur.
+	assume(ReinterpretAsU32(_mm_cvtss_f32(x)) == 0xFFFFFFFF || !IsNan(ReinterpretAsU32(_mm_cvtss_f32(x))));
+#endif
 	return _mm_ucomige_ss(x, x);
+#endif
 }
 #endif
 
