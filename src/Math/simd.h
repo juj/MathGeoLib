@@ -376,6 +376,36 @@ FORCE_INLINE simd4f setx_ps(float f)
 	// return s;
 }
 
+/// Replaces the x channel (lowest lane) in the given vector with the given float x, i.e. returns [vec.w, vec.z, vec.y, x]
+FORCE_INLINE simd4f setx_ps(const simd4f &vec, float x)
+{
+	return _mm_move_ss(vec, _mm_set_ss(x));
+}
+
+/// Replaces the y channel in the given vector with the given float y, i.e. returns [vec.w, vec.z, y, vec.x]
+FORCE_INLINE simd4f sety_ps(const simd4f &vec, float y)
+{
+	simd4f tmp = _mm_set_ss(y); // [0, 0, 0, y]
+	tmp = _mm_shuffle_ps(tmp, vec, _MM_SHUFFLE(0, 0, 0, 0)); // [vec.x, vec.x, y, y]
+	return _mm_shuffle_ps(tmp, vec, _MM_SHUFFLE(3, 2, 0, 2)); // [vec.w, vec.z, y, vec.x]
+}
+
+/// Replaces the z channel in the given vector with the given float z, i.e. returns [vec.w, z, vec.y, vec.x]
+FORCE_INLINE simd4f setz_ps(const simd4f &vec, float z)
+{
+	simd4f tmp = _mm_set_ss(z); // [0, 0, 0, z]
+	tmp = _mm_shuffle_ps(tmp, vec, _MM_SHUFFLE(3, 3, 0, 0)); // [vec.w, vec.w, z, z]
+	return _mm_shuffle_ps(vec, tmp, _MM_SHUFFLE(3, 0, 1, 0)); // [vec.w, z, vec.y, vec.x]
+}
+
+/// Replaces the w channel in the given vector with the given float w, i.e. returns [w, vec.z, vec.y, vec.x]
+FORCE_INLINE simd4f setw_ps(const simd4f &vec, float w)
+{
+	simd4f tmp = _mm_set_ss(w); // [0, 0, 0, w]
+	tmp = _mm_shuffle_ps(tmp, vec, _MM_SHUFFLE(2, 2, 0, 0)); // [vec.z, vec.z, w, w]
+	return _mm_shuffle_ps(vec, tmp, _MM_SHUFFLE(0, 3, 1, 0)); // [w, vec.z, vec.y, vec.x]
+}
+
 /// Returns a direction vector (w == 0) with xyz all set to the same scalar value.
 FORCE_INLINE simd4f dir_from_scalar_ps(float scalar)
 {
@@ -499,7 +529,21 @@ FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
 #define azz_bzz_ps(a, b) xxzz_ps(vcombine_f32(vget_high_f32((a)), vget_high_f32((b)))) // [b.z, b.z, a.z, a.z]
 
 #define set1_ps vdupq_n_f32
-#define setx_ps vdupq_n_f32
+
+FORCEINLINE simd4f setx_ps(float f)
+{
+	return vdupq_n_f32(f);
+}
+
+FORCEINLINE simd4f setx_ps(const simd4f &vec, float x)
+{
+	return vsetq_lane_f32(x, vec, 0);
+}
+
+#define sety_ps(vec, y) vsetq_lane_f32((y), (vec), 1)
+#define setz_ps(vec, z) vsetq_lane_f32((z), (vec), 2)
+#define setw_ps(vec, w) vsetq_lane_f32((w), (vec), 3)
+
 #define abs_ps vabsq_f32
 #define zero_ps() vdupq_n_f32(0.f)
 
