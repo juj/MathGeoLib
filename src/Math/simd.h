@@ -240,7 +240,7 @@ int FORCE_INLINE allone_ps(simd4f x)
 #define mnsub_ps _mm_fnmsub_ps
 #else
 #define madd_ps(a, b, c) add_ps(mul_ps((a), (b)), (c))
-#define mnadd_ps(a, b, c) add_ps(neg_ps(mul_ps((a), (b))), (c))
+#define mnadd_ps(a, b, c) sub_ps((c), mul_ps((a), (b)))
 #define msub_ps(a, b, c) sub_ps(mul_ps((a), (b)), (c))
 #define mnsub_ps(a, b, c) sub_ps(neg_ps(mul_ps((a), (b))), (c))
 #endif
