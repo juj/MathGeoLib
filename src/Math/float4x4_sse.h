@@ -102,19 +102,6 @@ inline __m128 colmajor_mat4x4_muldir_sse1(const __m128 *matrix, __m128 vector)
 	return _mm_add_ps(_mm_add_ps(x, y), z);
 }
 
-inline __m128 colmajor_mat4x4_mul_sse1_2(const __m128 *matrix, __m128 vector)
-{
-	__m128 x = xxxx_ps(vector);
-	__m128 y = yyyy_ps(vector);
-	__m128 z = zzzz_ps(vector);
-	__m128 w = wwww_ps(vector);
-	x = _mm_mul_ps(x, matrix[0]);
-	y = _mm_mul_ps(y, matrix[1]);
-	z = _mm_mul_ps(z, matrix[2]);
-	w = _mm_mul_ps(w, matrix[3]);
-
-	return _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
-}
 
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 inline __m128 mat4x4_mul_sse(const __m128 *matrix, __m128 vector)

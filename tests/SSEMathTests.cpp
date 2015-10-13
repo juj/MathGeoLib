@@ -329,22 +329,6 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1)
 	assert(res.Equals(res2));
 }
 
-BENCHMARK(colmajor_mat4x4_mul_sse1_2, "test against float4x4_mul_float4")
-{
-	v2[i] = colmajor_mat4x4_mul_sse1_2(tpm[i].row, v[i]);
-}
-BENCHMARK_END;
-
-RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1_2)
-{
-	float4x4 m = float4x4::RandomGeneral(rng, -10.f, 10.f);
-	float4x4 tpm = m.Transposed();
-	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
-	float4 res = colmajor_mat4x4_mul_sse1_2(tpm.row, v);
-	float4 res2 = m*v;
-	assert(res.Equals(res2));
-}
-
 #ifdef MATH_AVX
 
 BENCHMARK(colmajor_mat4x4_mul_avx, "test against float4x4_mul_float4")
