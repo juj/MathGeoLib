@@ -29,23 +29,6 @@ MATH_BEGIN_NAMESPACE
 void quat_to_mat4x4(__m128 q, __m128 t, __m128 *m);
 
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
-#ifdef MATH_SSE41 // If we have SSE 4.1, we can use the dpps (dot product) instruction, _mm_dp_ps intrinsic.
-// Note: There is an indication that this version is slower than the SSE3 version. Be sure to profile.
-inline __m128 mat4x4_mul_sse41(const __m128 *matrix, __m128 vector)
-{
-	__m128 x = _mm_dp_ps(matrix[0], vector, 0xF0 | 0x0F); // Choose to multiply x, y, z and w (0xF0 = 1111 0000), and store the output to all indices (0x0F == 0000 1111).
-	__m128 y = _mm_dp_ps(matrix[1], vector, 0xF0 | 0x0F);
-	__m128 z = _mm_dp_ps(matrix[2], vector, 0xF0 | 0x0F);
-	__m128 w = _mm_dp_ps(matrix[3], vector, 0xF0 | 0x0F);
-
-	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]
-	__m128 zw = _mm_movelh_ps(z, w); // zw = [ _, w, _, z]
-
-	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
-}
-#endif
-
-/// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 #ifdef MATH_SSE3 // If we have SSE3, we can repeatedly use haddps to accumulate the result.
 inline __m128 mat4x4_mul_sse3(const __m128 *matrix, __m128 vector)
 {
@@ -89,6 +72,7 @@ inline __m128 colmajor_mat4x4_mul_sse1(const __m128 *matrix, __m128 vector)
 	return _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
 }
 
+#if 0
 /// Transforms a direction vector (w == 0) by the given matrix in column-major format.
 inline __m128 colmajor_mat4x4_muldir_sse1(const __m128 *matrix, __m128 vector)
 {
@@ -101,7 +85,7 @@ inline __m128 colmajor_mat4x4_muldir_sse1(const __m128 *matrix, __m128 vector)
 
 	return _mm_add_ps(_mm_add_ps(x, y), z);
 }
-
+#endif
 
 /// Compute the product M*v, where M is a 4x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 inline __m128 mat4x4_mul_sse(const __m128 *matrix, __m128 vector)
@@ -149,193 +133,6 @@ inline float3 mat3x4_mul_vec(const __m128 *matrix, __m128 vector)
 	row1 = _mm_movehl_ps(tmp2, tmp0); \
 	row2 = _mm_movelh_ps(tmp1, tmp3); \
 	row3 = _mm_movehl_ps(tmp3, tmp1);
-
-FORCE_INLINE void mat4x4_mul_dpps(__m128 *out, const __m128 *m1, const __m128 *m2)
-{
-	// Transpose m2:
-	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
-	// m2[1] = [ 13, 12, 11, 10 ] --> [ 31, 21, 11, 01 ]
-	// m2[2] = [ 23, 22, 21, 20 ] --> [ 32, 22, 12, 02 ]
-	//         [ 33, 32, 31, 30 ]     [ 33, 23, 13, 03 ]
-
-	__m128 low1 = _mm_movelh_ps(m2[0], m2[1]); // = [ 11, 10, 01, 00 ]
-	__m128 low2 = _mm_movelh_ps(m2[2], m2[3]); // = [ 31, 30, 21, 20 ]
-	__m128 hi1 = _mm_movehl_ps(m2[1], m2[0]);  // = [ 13, 12, 03, 02 ]
-	__m128 hi2 = _mm_movehl_ps(m2[3], m2[2]);  // = [ 33, 32, 23, 22 ]
-
-	__m128 row1 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(2, 0, 2, 0)); // = [30, 20, 10, 00]
-	__m128 row2 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(3, 1, 3, 1)); // = [31, 21, 11, 01]
-	__m128 row3 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(2, 0, 2, 0));   // = [32, 22, 12, 02]
-	__m128 row4 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(3, 1, 3, 1));   // = [33, 23, 13, 03]
-
-	__m128 _00 = dot4_ps(m1[0], row1);
-	__m128 _01 = dot4_ps(m1[0], row2);
-	__m128 _02 = dot4_ps(m1[0], row3);
-	__m128 _03 = dot4_ps(m1[0], row4);
-	out[0] = pack_4ss_to_ps(_00, _01, _02, _03);
-
-	__m128 _10 = dot4_ps(m1[1], row1);
-	__m128 _11 = dot4_ps(m1[1], row2);
-	__m128 _12 = dot4_ps(m1[1], row3);
-	__m128 _13 = dot4_ps(m1[1], row4);
-	out[1] = pack_4ss_to_ps(_10, _11, _12, _13);
-
-	__m128 _20 = dot4_ps(m1[2], row1);
-	__m128 _21 = dot4_ps(m1[2], row2);
-	__m128 _22 = dot4_ps(m1[2], row3);
-	__m128 _23 = dot4_ps(m1[2], row4);
-	out[2] = pack_4ss_to_ps(_20, _21, _22, _23);
-
-	__m128 _30 = dot4_ps(m1[3], row1);
-	__m128 _31 = dot4_ps(m1[3], row2);
-	__m128 _32 = dot4_ps(m1[3], row3);
-	__m128 _33 = dot4_ps(m1[3], row4);
-	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
-}
-
-FORCE_INLINE void mat4x4_mul_dpps_2(__m128 *out, const __m128 *m1, const __m128 *m2)
-{
-	// Transpose m2:
-	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
-	// m2[1] = [ 13, 12, 11, 10 ] --> [ 31, 21, 11, 01 ]
-	// m2[2] = [ 23, 22, 21, 20 ] --> [ 32, 22, 12, 02 ]
-	//         [ 33, 32, 31, 30 ]     [ 33, 23, 13, 03 ]
-	__m128 row1 = m2[0];
-	__m128 row2 = m2[1];
-	__m128 row3 = m2[2];
-	__m128 row4 = m2[3];
-	_mm_transpose_matrix_intel(row1, row2, row3, row4);
-
-	__m128 _00 = dot4_ps(m1[0], row1);
-	__m128 _01 = dot4_ps(m1[0], row2);
-	__m128 _02 = dot4_ps(m1[0], row3);
-	__m128 _03 = dot4_ps(m1[0], row4);
-	out[0] = pack_4ss_to_ps(_00, _01, _02, _03);
-
-	__m128 _10 = dot4_ps(m1[1], row1);
-	__m128 _11 = dot4_ps(m1[1], row2);
-	__m128 _12 = dot4_ps(m1[1], row3);
-	__m128 _13 = dot4_ps(m1[1], row4);
-	out[1] = pack_4ss_to_ps(_10, _11, _12, _13);
-
-	__m128 _20 = dot4_ps(m1[2], row1);
-	__m128 _21 = dot4_ps(m1[2], row2);
-	__m128 _22 = dot4_ps(m1[2], row3);
-	__m128 _23 = dot4_ps(m1[2], row4);
-	out[2] = pack_4ss_to_ps(_20, _21, _22, _23);
-
-	__m128 _30 = dot4_ps(m1[3], row1);
-	__m128 _31 = dot4_ps(m1[3], row2);
-	__m128 _32 = dot4_ps(m1[3], row3);
-	__m128 _33 = dot4_ps(m1[3], row4);
-	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
-}
-
-FORCE_INLINE void mat4x4_mul_dpps_3(__m128 *out, const __m128 *m1, const __m128 *m2)
-{
-	// Transpose m2:
-	// m2[0] = [ 03, 02, 01, 00 ]     [ 30, 20, 10, 00 ]
-	// m2[1] = [ 13, 12, 11, 10 ] --> [ 31, 21, 11, 01 ]
-	// m2[2] = [ 23, 22, 21, 20 ] --> [ 32, 22, 12, 02 ]
-	//         [ 33, 32, 31, 30 ]     [ 33, 23, 13, 03 ]
-
-	__m128 low1 = _mm_movelh_ps(m2[0], m2[1]); // = [ 11, 10, 01, 00 ]
-	__m128 low2 = _mm_movelh_ps(m2[2], m2[3]); // = [ 31, 30, 21, 20 ]
-	__m128 hi1 = _mm_movehl_ps(m2[1], m2[0]);  // = [ 13, 12, 03, 02 ]
-	__m128 hi2 = _mm_movehl_ps(m2[3], m2[2]);  // = [ 33, 32, 23, 22 ]
-
-	__m128 row1 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(2, 0, 2, 0)); // = [30, 20, 10, 00]
-	__m128 row2 = _mm_shuffle_ps(low1, low2, _MM_SHUFFLE(3, 1, 3, 1)); // = [31, 21, 11, 01]
-	__m128 row3 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(2, 0, 2, 0));   // = [32, 22, 12, 02]
-	__m128 row4 = _mm_shuffle_ps(hi1, hi2, _MM_SHUFFLE(3, 1, 3, 1));   // = [33, 23, 13, 03]
-
-	__m128 _00 = dot4_ps(m1[0], row1);
-	__m128 _01 = dot4_ps(m1[0], row2);
-	__m128 _02 = dot4_ps(m1[0], row3);
-	__m128 _03 = dot4_ps(m1[0], row4);
-
-	__m128 xy = _mm_movelh_ps(_00, _01); // xy = [ _, y, _, x]
-	__m128 zw = _mm_movelh_ps(_02, _03); // zw = [ _, w, _, z]
-	out[0] = _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
-
-//	out[0] = pack_4ss_to_ps(_00, _01, _02, _03);
-
-	__m128 _10 = dot4_ps(m1[1], row1);
-	__m128 _11 = dot4_ps(m1[1], row2);
-	__m128 _12 = dot4_ps(m1[1], row3);
-	__m128 _13 = dot4_ps(m1[1], row4);
-
-	__m128 xy2 = _mm_movelh_ps(_10, _11); // xy = [ _, y, _, x]
-	__m128 zw2 = _mm_movelh_ps(_12, _13); // zw = [ _, w, _, z]
-	out[1] = _mm_shuffle_ps(xy2, zw2, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
-
-//	out[1] = pack_4ss_to_ps(_10, _11, _12, _13);
-
-	__m128 _20 = dot4_ps(m1[2], row1);
-	__m128 _21 = dot4_ps(m1[2], row2);
-	__m128 _22 = dot4_ps(m1[2], row3);
-	__m128 _23 = dot4_ps(m1[2], row4);
-
-	__m128 xy3 = _mm_movelh_ps(_20, _21); // xy = [ _, y, _, x]
-	__m128 zw3 = _mm_movelh_ps(_22, _23); // zw = [ _, w, _, z]
-	out[2] = _mm_shuffle_ps(xy3, zw3, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
-
-//	out[2] = pack_4ss_to_ps(_20, _21, _22, _23);
-
-	__m128 _30 = dot4_ps(m1[3], row1);
-	__m128 _31 = dot4_ps(m1[3], row2);
-	__m128 _32 = dot4_ps(m1[3], row3);
-	__m128 _33 = dot4_ps(m1[3], row4);
-
-	__m128 xy4 = _mm_movelh_ps(_30, _31); // xy = [ _, y, _, x]
-	__m128 zw4 = _mm_movelh_ps(_32, _33); // zw = [ _, w, _, z]
-	out[3] = _mm_shuffle_ps(xy4, zw4, _MM_SHUFFLE(2, 0, 2, 0)); // ret = [w, z, y, x]
-
-//	out[3] = pack_4ss_to_ps(_30, _31, _32, _33);
-}
-
-#ifdef MATH_FMA
-FORCE_INLINE void mat4x4_mul_fma(__m128 *out, const __m128 *m1, const __m128 *m2)
-{
-#ifdef MATH_64BIT // In 64-bit, we have lots of SIMD registers, so use as many as possible.
-// 64-bit, SSE4.1, FMA:
-// Benchmark 'mat4x4_mul_fma': test against float4x4_op_mul
-//   Best: 5.019 nsecs / 16.068 ticks, Avg: 5.320 nsecs, Worst: 7.362 nsecs
-	__m128 m1_0 = m1[0];
-	__m128 m1_1 = m1[1];
-	__m128 m1_2 = m1[2];
-	__m128 m1_3 = m1[3];
-	__m128 m = m2[0];
-	__m128 o1 = mul_ps(xxxx_ps(m1_0), m);
-	__m128 o2 = mul_ps(xxxx_ps(m1_1), m);
-	__m128 o3 = mul_ps(xxxx_ps(m1_2), m);
-	__m128 o4 = mul_ps(xxxx_ps(m1_3), m);
-	m = m2[1];
-	o1 = madd_ps(yyyy_ps(m1_0), m, o1);
-	o2 = madd_ps(yyyy_ps(m1_1), m, o2);
-	o3 = madd_ps(yyyy_ps(m1_2), m, o3);
-	o4 = madd_ps(yyyy_ps(m1_3), m, o4);
-	m = m2[2];
-	o1 = madd_ps(zzzz_ps(m1_0), m, o1);
-	o2 = madd_ps(zzzz_ps(m1_1), m, o2);
-	o3 = madd_ps(zzzz_ps(m1_2), m, o3);
-	o4 = madd_ps(zzzz_ps(m1_3), m, o4);
-	m = m2[3];
-	out[0] = madd_ps(wwww_ps(m1_0), m, o1);
-	out[1] = madd_ps(wwww_ps(m1_1), m, o2);
-	out[2] = madd_ps(wwww_ps(m1_2), m, o3);
-	out[3] = madd_ps(wwww_ps(m1_3), m, o4);
-#else // Targeting 32-bit, use as few registers as possible to avoid spilling.
-// 32-bit, SSE4.1:
-// Benchmark 'mat4x4_mul_fma': test against float4x4_op_mul
-//   Best: 6.358 nsecs / 19.42 ticks, Avg: 6.461 nsecs, Worst: 9.369 nsecs
-	out[0] = madd_ps(wwww_ps(m1[0]), m2[3], madd_ps(zzzz_ps(m1[0]), m2[2], madd_ps(yyyy_ps(m1[0]), m2[1], mul_ps(xxxx_ps(m1[0]), m2[0]))));
-	out[1] = madd_ps(wwww_ps(m1[1]), m2[3], madd_ps(zzzz_ps(m1[1]), m2[2], madd_ps(yyyy_ps(m1[1]), m2[1], mul_ps(xxxx_ps(m1[1]), m2[0]))));
-	out[2] = madd_ps(wwww_ps(m1[2]), m2[3], madd_ps(zzzz_ps(m1[2]), m2[2], madd_ps(yyyy_ps(m1[2]), m2[1], mul_ps(xxxx_ps(m1[2]), m2[0]))));
-	out[3] = madd_ps(wwww_ps(m1[3]), m2[3], madd_ps(zzzz_ps(m1[3]), m2[2], madd_ps(yyyy_ps(m1[3]), m2[1], mul_ps(xxxx_ps(m1[3]), m2[0]))));
-#endif
-}
-#endif
 
 FORCE_INLINE void mat4x4_mul_sse(__m128 *out, const __m128 *m1, const __m128 *m2)
 {
