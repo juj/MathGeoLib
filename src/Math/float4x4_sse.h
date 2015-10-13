@@ -104,14 +104,17 @@ inline __m128 mat4x4_mul_sse(const __m128 *matrix, __m128 vector)
 /// Compute the product M*v, where M is a 3x4 matrix denoted by an array of 4 __m128's, and v is a 4x1 vector.
 inline __m128 mat3x4_mul_sse(const __m128 *matrix, __m128 vector)
 {
-	__m128 x = dot4_ps(matrix[0], vector);
-	__m128 y = dot4_ps(matrix[1], vector);
-	__m128 z = dot4_ps(matrix[2], vector);
-
-	// Take the 'w' component of the vector unmodified.
-	__m128 xy = _mm_movelh_ps(x, y); // xy = [ _, y, _, x]
-	__m128 zw = _mm_movehl_ps(vector, z); // zw = [ w, _, z, _]
-	return _mm_shuffle_ps(xy, zw, _MM_SHUFFLE(3, 1, 2, 0)); // ret = [w, z, y, x]
+	__m128 x = _mm_mul_ps(matrix[0], vector);
+	__m128 y = _mm_mul_ps(matrix[1], vector);
+	__m128 t0 = _mm_unpacklo_ps(x, y);
+	__m128 t1 = _mm_unpackhi_ps(x, y);
+	t0 = _mm_add_ps(t0, t1);
+	__m128 z = _mm_mul_ps(matrix[2], vector);
+	__m128 w = _mm_mul_ps(_mm_set_ps(1.f, 0.f, 0.f, 0.f), vector);
+	__m128 t2 = _mm_unpacklo_ps(z, w);
+	__m128 t3 = _mm_unpackhi_ps(z, w);
+	t2 = _mm_add_ps(t2, t3);
+	return _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 }
 
 inline float3 mat3x4_mul_vec(const __m128 *matrix, __m128 vector)
