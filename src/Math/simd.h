@@ -450,6 +450,18 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 }
 #endif
 
+// Returns the vector [a.x+a.y+a.z+a.w, b.x+b.y+b.z+b.w, c.x+c.y+c.z+c.w, d.x+d.y+d.z+d.w]
+FORCE_INLINE simd4f hadd4_ps(simd4f a, simd4f b, simd4f c, simd4f d)
+{
+	simd4f t0 = _mm_unpacklo_ps(a, b);
+	simd4f t1 = _mm_unpackhi_ps(a, b);
+	t0 = add_ps(t0, t1);
+	simd4f t2 = _mm_unpacklo_ps(c, d);
+	simd4f t3 = _mm_unpackhi_ps(c, d);
+	t2 = add_ps(t2, t3);
+	return add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
+}
+
 #elif defined(MATH_NEON)
 
 #include <arm_neon.h>
@@ -666,6 +678,13 @@ FORCE_INLINE uint32_t allzero_ps(simd4f v)
 	uint32_t a = vget_lane_u32(orr, 0);
 	uint32_t b = vget_lane_u32(orr, 1);
 	return ((a|b) == 0) ? 1 : 0;
+}
+
+FORCE_INLINE simd4f hadd4_ps(simd4f a, simd4f b, simd4f c, simd4f d)
+{
+	// Most likely possible to do better.
+	_MM_TRANSPOSE4_PS(a, b, c, d);
+	return add_ps(add_ps(a, b), add_ps(c, d));
 }
 
 #endif // ~MATH_NEON

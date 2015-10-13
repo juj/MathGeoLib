@@ -486,17 +486,14 @@ void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
 	simd4f minPt = aabb.minPoint;
 	simd4f maxPt = aabb.maxPoint;
 	simd4f centerPoint = muls_ps(add_ps(minPt, maxPt), 0.5f);
-	simd4f halfSize = sub_ps(centerPoint, minPt);
 	simd4f newCenter = mat4x4_mul_vec4(m.row, centerPoint);
 
+	simd4f halfSize = sub_ps(centerPoint, minPt);
 	simd4f x = abs_ps(mul_ps(m.row[0], halfSize));
 	simd4f y = abs_ps(mul_ps(m.row[1], halfSize));
 	simd4f z = abs_ps(mul_ps(m.row[2], halfSize));
 	simd4f w = zero_ps();
-	_MM_TRANSPOSE4_PS(x, y, z, w); // Contains 2x unpacklo's, 2x unpackhi's, 2x movelh's and 2x movehl's. (or 8 shuffles, depending on the compiler)
-
-	simd4f newDir = add_ps(add_ps(x, y), add_ps(z, w));
-
+	simd4f newDir = hadd4_ps(x, y, z, w);
 	aabb.minPoint = sub_ps(newCenter, newDir);
 	aabb.maxPoint = add_ps(newCenter, newDir);
 }
