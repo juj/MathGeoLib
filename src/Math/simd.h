@@ -547,12 +547,12 @@ FORCE_INLINE simd4f ywyw_ps(simd4f vec) { return vuzpq_f32(vec, vec).val[1]; }
 
 #define set1_ps vdupq_n_f32
 
-FORCEINLINE simd4f setx_ps(float f)
+FORCE_INLINE simd4f setx_ps(float f)
 {
 	return vdupq_n_f32(f);
 }
 
-FORCEINLINE simd4f setx_ps(const simd4f &vec, float x)
+FORCE_INLINE simd4f setx_ps(const simd4f &vec, float x)
 {
 	return vsetq_lane_f32(x, vec, 0);
 }
