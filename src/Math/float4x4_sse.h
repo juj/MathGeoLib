@@ -119,11 +119,8 @@ inline __m128 mat3x4_mul_sse(const __m128 *matrix, __m128 vector)
 
 inline float3 mat3x4_mul_vec(const __m128 *matrix, __m128 vector)
 {
-	__m128 x = dot4_ps(matrix[0], vector);
-	__m128 y = dot4_ps(matrix[1], vector);
-	__m128 z = dot4_ps(matrix[2], vector);
-
-	return float3(s4f_x(x), s4f_x(y), s4f_x(z));
+	__m128 vec = mat3x4_mul_sse(matrix, vector);
+	return float3(s4f_x(vec), s4f_y(vec), s4f_z(vec));
 }
 
 #define _mm_transpose_matrix_intel(row0, row1, row2, row3) \
