@@ -451,7 +451,12 @@ FORCE_INLINE simd4f modf_ps(simd4f x, simd4f mod)
 #endif
 
 // Returns the vector [a.x+a.y+a.z+a.w, b.x+b.y+b.z+b.w, c.x+c.y+c.z+c.w, d.x+d.y+d.z+d.w]
+#if defined(_MSC_VER) && defined(MATH_SSE) && _MSC_VER < 1800 // < VS2013
+// Work around a VS2010 bug "error C2719: 'd': formal parameter with __declspec(align('16')) won't be aligned"
+FORCE_INLINE simd4f hadd4_ps(simd4f a, simd4f b, simd4f c, const simd4f &d)
+#else
 FORCE_INLINE simd4f hadd4_ps(simd4f a, simd4f b, simd4f c, simd4f d)
+#endif
 {
 	simd4f t0 = _mm_unpacklo_ps(a, b);
 	simd4f t1 = _mm_unpackhi_ps(a, b);
