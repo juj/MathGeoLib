@@ -17,6 +17,7 @@
 	@brief Common mathematical functions. */
 #pragma once
 
+#include "../MathBuildConfig.h"
 #include "myassert.h"
 #include <math.h>
 #include <cmath>

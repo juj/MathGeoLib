@@ -4,7 +4,9 @@
 
 #include "../src/MathGeoLib.h"
 #include "../src/Math/myassert.h"
+#ifdef MATH_WITH_GRISU3
 #include "../src/Math/grisu3.h"
+#endif
 #include "TestRunner.h"
 #include "ObjectGenerators.h"
 #include "TestData.h"
@@ -429,6 +431,7 @@ std::string U64Str(uint64_t u)
 	return str;
 }
 
+#ifdef MATH_WITH_GRISU3
 void test_double_to_string(double d, const char *d_in_src)
 {
 	std::string s = dtoa_grisu3_string(d);
@@ -515,7 +518,7 @@ RANDOMIZED_TEST(grisu3_random)
 	double d = *(double*)&u;
 	test_double_to_string(d, 0);
 }
-
+#endif
 char dummy_str[256] = {};
 
 // Benchmark 'dtoa_sprintf': dtoa_sprintf
@@ -526,6 +529,7 @@ BENCHMARK(dtoa_sprintf, "dtoa_sprintf")
 }
 BENCHMARK_END;
 
+#ifdef MATH_WITH_GRISU3
 // Benchmark 'dtoa_grisu': dtoa_grisu
 //    Best: 213.828 nsecs / 363.596 ticks, Avg: 229.754 nsecs, Worst: 338.511 nsecs
 BENCHMARK(dtoa_grisu3, "dtoa_grisu3")
@@ -533,6 +537,7 @@ BENCHMARK(dtoa_grisu3, "dtoa_grisu3")
 	dtoa_grisu3(f[i], dummy_str);
 }
 BENCHMARK_END;
+#endif
 
 BENCHMARK(float4_SerializeToString, "float4::SerializeToString")
 {

@@ -129,6 +129,10 @@
 #error Defines MATH_LEFTHANDED_CAMERA and MATH_RIGHTHANDED_CAMERA are mutually exclusive!
 #endif
 
+// Choose which internally provided features to build MathGeoLib with.
+// Comment these out to configure what to build.
+#define MATH_WITH_GRISU3
+
 // Uncomment to specify the SIMD instruction set level in use.
 //#define MATH_AVX
 //#define MATH_SSE41
