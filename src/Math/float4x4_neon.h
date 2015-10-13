@@ -40,7 +40,7 @@ FORCE_INLINE simd4f mat4x4_mul_vec4(const simd4f *mat, simd4f vec)
 #elif defined(MATH_SSE3)
 	return mat4x4_mul_sse3(mat, vec);
 #else
-	return mat4x4_mul_sse(mat, vec);
+	return mat4x4_mul_sse1(mat, vec);
 #endif
 }
 #endif
