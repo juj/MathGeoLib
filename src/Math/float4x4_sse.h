@@ -64,11 +64,15 @@ inline __m128 mat4x4_mul_sse1(const __m128 *matrix, __m128 vector)
 {
 	__m128 x = _mm_mul_ps(matrix[0], vector);
 	__m128 y = _mm_mul_ps(matrix[1], vector);
+	__m128 t0 = _mm_unpacklo_ps(x, y);
+	__m128 t1 = _mm_unpackhi_ps(x, y);
+	t0 = _mm_add_ps(t0, t1);
 	__m128 z = _mm_mul_ps(matrix[2], vector);
 	__m128 w = _mm_mul_ps(matrix[3], vector);
-	_MM_TRANSPOSE4_PS(x, y, z, w); // Contains 2x unpacklo's, 2x unpackhi's, 2x movelh's and 2x movehl's. (or 8 shuffles, depending on the compiler)
-
-	return _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
+	__m128 t2 = _mm_unpacklo_ps(z, w);
+	__m128 t3 = _mm_unpackhi_ps(z, w);
+	t2 = _mm_add_ps(t2, t3);
+	return _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 }
 
 inline __m128 colmajor_mat4x4_mul_sse1(const __m128 *matrix, __m128 vector)
