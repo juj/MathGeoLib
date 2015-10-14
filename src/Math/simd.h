@@ -692,8 +692,8 @@ FORCE_INLINE uint32_t allone_ps(simd4f v)
 	float32x2_t xy = vget_low_f32(v);
 	float32x2_t zw = vget_high_f32(v);
 	uint32x2_t andd = vand_u32(vreinterpret_u32_f32(xy), vreinterpret_u32_f32(zw));
-	uint32_t a = vget_lane_u32(orr, 0);
-	uint32_t b = vget_lane_u32(orr, 1);
+	uint32_t a = vget_lane_u32(andd, 0);
+	uint32_t b = vget_lane_u32(andd, 1);
 	return ((a&b) == 0xFFFFFFFFU) ? 1 : 0;
 }
 
