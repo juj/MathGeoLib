@@ -685,6 +685,21 @@ FORCE_INLINE uint32_t allzero_ps(simd4f v)
 	return ((a|b) == 0) ? 1 : 0;
 }
 
+#define a_and_b_allzero_ps(a, b) allzero_ps(and_ps((a), (b)))
+
+FORCE_INLINE uint32_t allone_ps(simd4f v)
+{
+	float32x2_t xy = vget_low_f32(v);
+	float32x2_t zw = vget_high_f32(v);
+	uint32x2_t andd = vand_u32(vreinterpret_u32_f32(xy), vreinterpret_u32_f32(zw));
+	uint32_t a = vget_lane_u32(orr, 0);
+	uint32_t b = vget_lane_u32(orr, 1);
+	return ((a&b) == 0xFFFFFFFFU) ? 1 : 0;
+}
+
+#define anyzero_ps(x) (!allone_ps((x))
+#define anyone_ps(x) (!allzero_ps(x))
+
 FORCE_INLINE simd4f hadd4_ps(simd4f a, simd4f b, simd4f c, simd4f d)
 {
 	// Most likely possible to do better.
