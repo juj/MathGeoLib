@@ -14,7 +14,18 @@ BENCHMARK(Sphere_RandomPointOnSurface, "Sphere::RandomPointOnSurface")
 	v[i] = POINT_TO_FLOAT4(s.RandomPointOnSurface(rng));
 }
 BENCHMARK_END;
- 
+
+UNIQUE_TEST(Sphere_RandomPointOnSurface_small)
+{
+	Sphere s(POINT_VEC_SCALAR(10.f), 0.f);
+	vec v = s.RandomPointOnSurface(rng);
+	assert(v.Equals(10.f, 10.f, 10.f, 1.f));
+
+	s = Sphere(POINT_VEC_SCALAR(10.f), 0.0001f);
+	v = s.RandomPointOnSurface(rng);
+	assert(v.Distance(POINT_VEC_SCALAR(10.f)) <= 0.0002f);
+}
+
 // Implement an alternative method for generating a random point on the surface of a Sphere that uses
 // a closed formula for uniform geometric distribution instead of rejection sampling, which Sphere::RandomPointOnSurface uses.
 // See here: http://mathworld.wolfram.com/SpherePointPicking.html

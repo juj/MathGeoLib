@@ -951,7 +951,6 @@ vec Sphere::RandomPointInside(LCG &lcg)
 
 vec Sphere::RandomPointOnSurface(LCG &lcg)
 {
-	assume(r > 1e-3f);
 	vec v = vec::zero;
 	// Rejection sampling analysis: The unit sphere fills ~52.4% of the volume of its enclosing box, so this
 	// loop is expected to take only very few iterations before succeeding.
@@ -961,7 +960,7 @@ vec Sphere::RandomPointOnSurface(LCG &lcg)
 		v.y = lcg.FloatNeg1_1();
 		v.z = lcg.FloatNeg1_1();
 		float lenSq = v.LengthSq();
-		if (lenSq >= 1e-6f && lenSq <= r*r)
+		if (lenSq >= 1e-6f && lenSq <= 1.f)
 			return pos + (r / Sqrt(lenSq)) * v;
 	}
 	// Astronomically small probability to reach here, and if we do so, the provided random number generator must have been in a bad state.
