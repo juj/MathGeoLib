@@ -152,6 +152,10 @@ public:
 			corner point of this Polyhedron.
 		@see CornerPoint(). */
 	vec ExtremePoint(const vec &direction) const;
+	vec ExtremePoint(const vec &direction, float &projectionDistance) const;
+
+	/// Quickly returns an arbitrary point inside this AABB. Used in GJK intersection test.
+	vec AnyPointFast() const { return v[0]; }
 
 	// Computes the most extreme point of this convex Polyhedron into the given direction.
 	/** @param adjacencyData A precomputed data structure that specifies the adjacency information between the vertices of this Polyhedron.

@@ -342,6 +342,13 @@ vec Polyhedron::ExtremePoint(const vec &direction) const
 	return Vertex(ExtremeVertex(direction));
 }
 
+vec Polyhedron::ExtremePoint(const vec &direction, float &projectionDistance) const
+{
+	vec extremePoint = ExtremePoint(direction);
+	projectionDistance = extremePoint.Dot(direction);
+	return extremePoint;
+}
+
 int Polyhedron::ExtremeVertexConvex(const std::vector<std::vector<int> > &adjacencyData, const vec &direction, 
 	std::vector<unsigned int> &floodFillVisited, unsigned int floodFillVisitColor,
 	float &mostExtremeDistance, int startingVertex) const
