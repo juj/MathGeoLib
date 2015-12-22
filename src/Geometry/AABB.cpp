@@ -408,7 +408,8 @@ vec AABB::HalfSize() const
 
 float AABB::Volume() const
 {
-	return Size().ProductOfElements();
+	vec sz = Size();
+	return sz.x * sz.y * sz.z;
 }
 
 float AABB::SurfaceArea() const

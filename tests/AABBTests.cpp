@@ -259,4 +259,10 @@ UNIQUE_TEST(OBBIsDegenerate)
 	assert(!o.IsFinite());
 }
 
+UNIQUE_TEST(AABB_Volume)
+{
+	AABB a(POINT_VEC_SCALAR(-1.f), POINT_VEC_SCALAR(1.f));
+	assert(a.Volume() == 8.f);
+}
+
 MATH_END_NAMESPACE
