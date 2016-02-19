@@ -357,8 +357,8 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 		float ta = t*angle;
 #ifdef MATH_USE_SINCOS_LOOKUPTABLE
 		// If Sin() is based on a lookup table, prefer that over polynomial approximation.
-		float st = Sin(angleT);
-		float sat = Sin(angle - angleT);
+		a = Sin(angle - ta);
+		b = Sin(ta);
 #else
 		// Not using a lookup table, manually compute the two sines by using a very rough approximation.
 		float ta2 = ta*ta;
