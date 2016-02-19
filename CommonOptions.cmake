@@ -88,7 +88,7 @@ if (MSVC)
 		set(relLinkFlags "${relLinkFlags} /OPT:REF")
 	endif()
 
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0.31101.0)
+	if (MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0.31101.0)
 		# XXX Work around MSVC bug with x64 + /GL + /O2 /arch:AVX, see https://connect.microsoft.com/VisualStudio/feedback/details/814682/visual-studio-2013-x64-compiler-generates-faulty-code-with-gl-o2-arch-avx-flags-enabled
 		if (MATH_AVX AND CMAKE_SIZEOF_VOID_P EQUAL 8)
 			set(VS_BUG TRUE)
