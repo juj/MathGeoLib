@@ -92,7 +92,7 @@ Init_fast_cossin_table static_initializer;
 static inline float sin_lookuptable(float n)
 {
 	int i = (int)(n * (HALF_MAX_CIRCLE_ANGLE / PI));
-	if (i < 0) return fast_cossin_table[MAX_CIRCLE_ANGLE - ((-i) & MASK_MAX_CIRCLE_ANGLE)];
+	if (i < 0) return -fast_cossin_table[(-i) & MASK_MAX_CIRCLE_ANGLE];
 	else return fast_cossin_table[i & MASK_MAX_CIRCLE_ANGLE];
 }
 

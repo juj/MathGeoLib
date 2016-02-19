@@ -1273,3 +1273,25 @@ UNIQUE_TEST(LSB_U64)
 	asserteq(LSB64((u64)63), 0x7FFFFFFFFFFFFFFFULL);
 	asserteq(LSB64((u64)64), 0xFFFFFFFFFFFFFFFFULL);
 }
+
+UNIQUE_TEST(Sin_lookuptable)
+{
+	asserteq(Sin(0.f), 0.f);
+	assert1(EqualAbs(Sin(pi), 0.f, 1e-7f), Sin(pi));
+	assert1(EqualAbs(Sin(-pi), 0.f, 1e-7f), Sin(-pi));
+	assert1(EqualAbs(Sin(-37.6991577f), 0.f, 1e-4f), Sin(-37.6991577f));
+	assert1(EqualAbs(Sin(pi/2.f), 1.f, 1e-7f), Sin(pi/2.f));
+	assert1(EqualAbs(Sin(-pi/2.f), -1.f, 1e-4f), Sin(-pi/2.f));
+	assert1(EqualAbs(Sin(pi/4.f), 1.f/Sqrt(2.f), 1e-4f), Sin(pi/4.f));
+}
+
+UNIQUE_TEST(Cos_lookuptable)
+{
+	asserteq(Cos(0.f), 1.f);
+	assert1(EqualAbs(Cos(pi), -1.f, 1e-7f), Cos(pi));
+	assert1(EqualAbs(Cos(-pi), -1.f, 1e-7f), Cos(-pi));
+	assert1(EqualAbs(Cos(-37.6991577f), 1.f, 1e-4f), Cos(-37.6991577f));
+	assert1(EqualAbs(Cos(pi / 2.f), 0.f, 1e-7f), Cos(pi / 2.f));
+	assert1(EqualAbs(Cos(-pi / 2.f), -0.f, 1e-4f), Cos(-pi / 2.f));
+	assert1(EqualAbs(Cos(pi / 4.f), 1.f/Sqrt(2.f), 1e-4f), Cos(pi / 4.f));
+}
