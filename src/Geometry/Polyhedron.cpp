@@ -3227,8 +3227,8 @@ void Polyhedron::ToLineList(VertexBuffer &vb) const
 			{
 				int f0 = iter->second;
 				int f1 = (int)i;
-				edge e = { v0, v1, f0, f1 };
-				edges.push_back(e);
+				edge e2 = { v0, v1, f0, f1 };
+				edges.push_back(e2);
 			}
 			v0 = v1;
 		}
