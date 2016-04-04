@@ -64,9 +64,9 @@
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
 		{ \
-			const char *error = #x " in " __FILE__ ":" STRINGIZE(__LINE__); \
-			MARK_UNUSED(error); /* Appease cppcheck to not complain that error is unused. */ \
-			RuntimeFailure(error); \
+			const char *error_ = #x " in " __FILE__ ":" STRINGIZE(__LINE__); \
+			MARK_UNUSED(error_); /* Appease cppcheck to not complain that error is unused. */ \
+			RuntimeFailure(error_); \
 		} \
 	MULTI_LINE_MACRO_END
 
@@ -74,9 +74,9 @@
 	MULTI_LINE_MACRO_BEGIN \
 		if ((x) != (y)) \
 		{ \
-			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			RuntimeFailure(std_stringstream.str().c_str()); \
+			std::stringstream std_stringstream_; \
+			std_stringstream_ << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
+			RuntimeFailure(std_stringstream_.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
 
@@ -84,9 +84,9 @@
 	MULTI_LINE_MACRO_BEGIN \
 		if (!((x) cmp (y))) \
 		{ \
-			std::stringstream std_stringstream; \
-			std_stringstream << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			RuntimeFailure(std_stringstream.str().c_str()); \
+			std::stringstream std_stringstream_; \
+			std_stringstream_ << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
+			RuntimeFailure(std_stringstream_.str().c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
 

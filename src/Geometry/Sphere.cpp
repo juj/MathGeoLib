@@ -1475,17 +1475,17 @@ Sphere operator *(const Quat &transform, const Sphere &sphere)
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void Sphere::Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacing) const
 {
-	Array<vec> pos;
+	Array<vec> position;
 	Array<vec> normal;
 	Array<float2> uv;
-	pos.Resize_pod(numVertices);
+	position.Resize_pod(numVertices);
 	normal.Resize_pod(numVertices);
 	uv.Resize_pod(numVertices);
-	Triangulate(pos.beginptr(), normal.beginptr(), uv.beginptr(), numVertices, ccwIsFrontFacing);
+	Triangulate(position.beginptr(), normal.beginptr(), uv.beginptr(), numVertices, ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
-	for(int i = 0; i < (int)pos.size(); ++i)
+	for(int i = 0; i < (int)position.size(); ++i)
 	{
-		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(position[i]));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
 			vb.Set(startIndex+i, VDNormal, DIR_TO_FLOAT4(normal[i]));
 		if (vb.Declaration()->TypeOffset(VDUV) >= 0)

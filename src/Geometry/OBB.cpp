@@ -2779,18 +2779,18 @@ OBB OBB::FromString(const char *str, const char **outEndStr)
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFacing) const
 {
-	Array<vec> pos;
+	Array<vec> position;
 	Array<vec> normal;
 	Array<float2> uv;
 	int numVertices = (x*y+y*z+x*z)*2*6;
-	pos.Resize_pod(numVertices);
+	position.Resize_pod(numVertices);
 	normal.Resize_pod(numVertices);
 	uv.Resize_pod(numVertices);
-	Triangulate(x,y,z, &pos[0], &normal[0], &uv[0], ccwIsFrontFacing);
+	Triangulate(x,y,z, &position[0], &normal[0], &uv[0], ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
-	for(int i = 0; i < (int)pos.size(); ++i)
+	for(int i = 0; i < (int)position.size(); ++i)
 	{
-		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
+		vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(position[i]));
 		if (vb.Declaration()->TypeOffset(VDNormal) >= 0)
 			vb.Set(startIndex+i, VDNormal, DIR_TO_FLOAT4(normal[i]));
 		if (vb.Declaration()->TypeOffset(VDUV) >= 0)
@@ -2834,12 +2834,12 @@ void OBB::ToLineList(VertexBuffer &vb) const
 	}
 	else
 	{
-		Array<vec> pos;
-		pos.Resize_pod(NumVerticesInEdgeList());
-		ToEdgeList(&pos[0]);
-		int startIndex = vb.AppendVertices((int)pos.size());
-		for(int i = 0; i < (int)pos.size(); ++i)
-			vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(pos[i]));
+		Array<vec> position;
+		position.Resize_pod(NumVerticesInEdgeList());
+		ToEdgeList(&position[0]);
+		int startIndex = vb.AppendVertices((int)position.size());
+		for(int i = 0; i < (int)position.size(); ++i)
+			vb.Set(startIndex+i, VDPosition, POINT_TO_FLOAT4(position[i]));
 	}
 }
 

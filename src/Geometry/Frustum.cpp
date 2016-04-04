@@ -506,20 +506,20 @@ bool Frustum::Contains(const vec &point) const
 #else
 	// SSE 4.1 32-bit: Best: 7.681 nsecs / 21.096 ticks, Avg : 7.954 nsecs, Worst : 9.217 nsecs
 	const float eps = 1e-3f;
-	const float pos = 1.f + eps;
-	const float neg = -pos;
+	const float position = 1.f + eps;
+	const float neg = -position;
 	vec projected = Project(point);
 	if (projectiveSpace == FrustumSpaceD3D)
 	{
-		return neg <= projected.x && projected.x <= pos &&
-			neg <= projected.y && projected.y <= pos &&
-			-eps <= projected.z && projected.z <= pos;
+		return neg <= projected.x && projected.x <= position &&
+			neg <= projected.y && projected.y <= position &&
+			-eps <= projected.z && projected.z <= position;
 	}
 	else if (projectiveSpace == FrustumSpaceGL)
 	{
-		return neg <= projected.x && projected.x <= pos &&
-			neg <= projected.y && projected.y <= pos &&
-			neg <= projected.z && projected.z <= pos;
+		return neg <= projected.x && projected.x <= position &&
+			neg <= projected.y && projected.y <= position &&
+			neg <= projected.z && projected.z <= position;
 	}
 	else
 	{
