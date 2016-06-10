@@ -48,7 +48,7 @@ LCG::LCG()
 	- RANDU                               mul = 65539                   mod = 2^31  */
 void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 {
-	assume((seed != 0 || inc != 0) && "Initializing LCG with seed=0 && inc=0 results in an infinite series of 0s!");
+	if (seed == 0 && inc == 0) seed = 1; // If we have a pure multiplicative LCG, then can't have 0 starting seed, since that would generate a stream of all zeros.
 #ifndef MATH_SILENT_ASSUME
 	if (inc == 0 && (mul % mod == 0 || mod % mul == 0))
 		LOGW("Warning: Multiplier %u and modulus %u are not compatible since one is a multiple of the other and the increment == 0!", mul, mod);
