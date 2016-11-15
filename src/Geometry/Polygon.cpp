@@ -481,6 +481,30 @@ bool Polygon::Contains2D(const LineSegment &localSpaceLineSegment) const
 	return Contains(MapFrom2D(localSpaceLineSegment.a.xy()));
 }
 
+bool Polygon::Intersects2D(const LineSegment &localSpaceLineSegment) const
+{
+	if (p.size() < 3)
+		return false;
+
+	const vec basisU = BasisU();
+	const vec basisV = BasisV();
+	const vec origin = p[0];
+
+	LineSegment edge;
+	edge.a = POINT_VEC(Dot(p.back(), basisU), Dot(p.back(), basisV), 0); // map to 2D
+	for (int i = 0; i < (int)p.size(); ++i)
+	{
+		edge.b = POINT_VEC(Dot(p[i], basisU), Dot(p[i], basisV), 0); // map to 2D
+		if (edge.Intersects(localSpaceLineSegment))
+			return true;
+		edge.a = edge.b;
+	}
+
+	// The line segment did not intersect with any of the polygon edges, so either the whole line segment is inside
+	// the polygon, or it is fully outside the polygon. Test one point of the line segment to determine which.
+	return Contains(MapFrom2D(localSpaceLineSegment.a.xy()));
+}
+
 bool Polygon::Intersects(const Line &line) const
 {
 	float d;
@@ -500,9 +524,18 @@ bool Polygon::Intersects(const Ray &ray) const
 bool Polygon::Intersects(const LineSegment &lineSegment) const
 {
 	Plane plane = PlaneCCW();
-	float t;
-	bool intersects = Plane::IntersectLinePlane(plane.normal, plane.d, lineSegment.a, lineSegment.b - lineSegment.a, t);
-	if (!intersects || t < 0.f || t > 1.f)
+
+	// Compute line-plane intersection (unroll Plane::IntersectLinePlane())
+	float denom = Dot(plane.normal, lineSegment.b - lineSegment.a);
+
+	if (Abs(denom) < 1e-4f) // The plane of the polygon and the line are planar? Do the test in 2D.
+		return Intersects2D(LineSegment(POINT_VEC(MapTo2D(lineSegment.a), 0), POINT_VEC(MapTo2D(lineSegment.b), 0)));
+
+	// The line segment properly intersects the plane of the polygon, so there is exactly one
+	// point of intersection between the plane of the polygon and the line segment. Test that intersection point against
+	// the line segment end points.
+	float t = (plane.d - Dot(plane.normal, lineSegment.a)) / denom;
+	if (t < 0.f || t > 1.f)
 		return false;
 
 	return Contains(lineSegment.GetPoint(t));

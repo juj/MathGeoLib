@@ -81,17 +81,21 @@ UNIQUE_TEST(Polygon_Intersects_LineSegment_2D)
 
 	LineSegment contained(POINT_VEC(0.5f, 0.5f, 0), POINT_VEC(0.5f, 0.75f, 0));
 	LineSegment intersecting(POINT_VEC(0.5f, 0.5f, 0), POINT_VEC(0.5f, 1.5f, 0));
+	LineSegment intersecting2(POINT_VEC(-0.5f, 0.5f, 0), POINT_VEC(1.5f, 0.5f, 0));
 	LineSegment noncontained(POINT_VEC(1.5f, 1.5f, 0), POINT_VEC(1.5f, 2.5f, 0));
 
-	assert(p.Intersects(intersecting));
 	assert(p.Intersects(contained));
+	assert(p.Intersects(intersecting));
+	assert(p.Intersects(intersecting2));
 	assert(!p.Intersects(noncontained));
 
 	assert(p.Contains(contained));
 	assert(!p.Contains(intersecting));
+	assert(!p.Contains(intersecting2));
 	assert(!p.Contains(noncontained));
 
 	assert(p.Contains2D(contained));
 	assert(!p.Contains2D(intersecting));
+	assert(!p.Contains2D(intersecting2));
 	assert(!p.Contains2D(noncontained));
 }

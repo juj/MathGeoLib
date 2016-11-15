@@ -281,11 +281,17 @@ public:
 	//todo Add RTCD, p. 202.
 	//bool ContainsConvex(const vec &worldSpacePoint, float polygonThickness = 1e-3f) const;
 
-	/// Tests if the given object, expressed in the local space of this polygon, is fully contained inside this polyhedron.
+	/// Tests if the given object, expressed in the local space of this polygon, is fully contained inside this polygon.
 	/** This test is exactly like in Contains(), except it is performed in 2D in the local space of this polygon.
 		@see Contains(), MapTo2D().
 		@todo Add Contains2D(Circle/Disc/Triangle/Polygon). */
 	bool Contains2D(const LineSegment &localSpaceLineSegment) const;
+
+	/// Tests if the given object, expressed in the local space of this polygon, is fully contained inside this polygon.
+	/** This test is exactly like in Intersects(), except it is performed in 2D in the local space of this polygon.
+		@see Contains(), MapTo2D().
+		@todo Add Intersects2D(Circle/Disc/Triangle/Polygon). */
+	bool Intersects2D(const LineSegment &localSpaceLineSegment) const;
 
 	/// Tests whether this polygon and the given object intersect.
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
