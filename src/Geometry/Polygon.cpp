@@ -462,15 +462,23 @@ bool Polygon::Contains2D(const LineSegment &localSpaceLineSegment) const
 	if (p.size() < 3)
 		return false;
 
-///\todo Reimplement this!
-//	if (!Contains2D(localSpaceLineSegment.a.xy()) || !Contains2D(localSpaceLineSegment.b.xy()))
-//		return false;
+	const vec basisU = BasisU();
+	const vec basisV = BasisV();
+	const vec origin = p[0];
 
-	for(int i = 0; i < (int)p.size(); ++i)
-		if (Edge2D(i).Intersects(localSpaceLineSegment))
+	LineSegment edge;
+	edge.a = POINT_VEC(Dot(p.back(), basisU), Dot(p.back(), basisV), 0); // map to 2D
+	for (int i = 0; i < (int)p.size(); ++i)
+	{
+		edge.b = POINT_VEC(Dot(p[i], basisU), Dot(p[i], basisV), 0); // map to 2D
+		if (edge.Intersects(localSpaceLineSegment))
 			return false;
+		edge.a = edge.b;
+	}
 
-	return true;
+	// The line segment did not intersect with any of the polygon edges, so either the whole line segment is inside
+	// the polygon, or it is fully outside the polygon. Test one point of the line segment to determine which.
+	return Contains(MapFrom2D(localSpaceLineSegment.a.xy()));
 }
 
 bool Polygon::Intersects(const Line &line) const

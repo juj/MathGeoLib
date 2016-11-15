@@ -69,3 +69,29 @@ UNIQUE_TEST(Triangle_ContainsPoint)
 
 	assert(t.Contains(pt));
 }
+
+UNIQUE_TEST(Polygon_Intersects_LineSegment_2D)
+{
+	Polygon p;
+	p.p.push_back(POINT_VEC(0, 0, 0));
+	p.p.push_back(POINT_VEC(1, 0, 0));
+	p.p.push_back(POINT_VEC(1, 1, 0));
+	p.p.push_back(POINT_VEC(0, 1, 0));
+	assert(p.IsPlanar());
+
+	LineSegment contained(POINT_VEC(0.5f, 0.5f, 0), POINT_VEC(0.5f, 0.75f, 0));
+	LineSegment intersecting(POINT_VEC(0.5f, 0.5f, 0), POINT_VEC(0.5f, 1.5f, 0));
+	LineSegment noncontained(POINT_VEC(1.5f, 1.5f, 0), POINT_VEC(1.5f, 2.5f, 0));
+
+	assert(p.Intersects(intersecting));
+	assert(p.Intersects(contained));
+	assert(!p.Intersects(noncontained));
+
+	assert(p.Contains(contained));
+	assert(!p.Contains(intersecting));
+	assert(!p.Contains(noncontained));
+
+	assert(p.Contains2D(contained));
+	assert(!p.Contains2D(intersecting));
+	assert(!p.Contains2D(noncontained));
+}
