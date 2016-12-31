@@ -245,6 +245,12 @@ public:
 	/// Returns true if the triangle defined by the three given points is degenerate.
 	static bool IsDegenerate(const vec &p1, const vec &p2, const vec &p3, float epsilon = 1e-3f);
 
+	/// In some templated algorithms, the input can either be a Triangle or a Polygon. Provide trivial Polygon-specific API
+	/// for compatibility in those template functions.
+	bool IsConvex() const { return true; }
+	bool IsPlanar() const { return true; }
+	bool IsSimple() const { return true; }
+
 	/// Tests if the given object is fully contained inside this triangle.
 	/** @param triangleThickness An epsilon threshold value to use for this test. triangleThicknessSq is the squared version of this parameter.
 			This specifies the maximum distance the given object can lie from the plane defined by this triangle.

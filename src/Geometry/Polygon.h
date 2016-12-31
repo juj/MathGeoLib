@@ -264,9 +264,10 @@ public:
 //	bool HasCollinearEdges() const;
 
 	/// Tests if the given object, expressed in global (world) space, is fully contained inside this polygon.
-	/** Only call this function if the polygon is planar.
-		This test is performed in global space of this polygon, i.e. by specifying the other object in global (world)
+	/** This test is performed in global space of this polygon, i.e. by specifying the other object in global (world)
 		space coordinates.
+		@note For the containment tests, this Polygon can either be simple or non-simple (self-intersecting), but
+			it must always be planar.
 		@param point The point to test for containment.
 		@param polygonThickness Since a polygon is a 2D object in a 3D space, a threshold value is used to
 			allow floating-point inaccuracies. This parameter defines how much "thickness" to give to the polygon
@@ -300,6 +301,9 @@ public:
 		@note These functions assume that this polygon might be concave, which requires a significantly slower test. If
 			you know ahead of time that this polygon is convex, you can instead use one of the faster ConvexIntersects()
 			functions.
+		@note These tests (as well as any other functions of the Polygon class that relate to the specific set of points
+			defined by the polygon) assume that this Polygon is planar, because non-planar Polygons do not have a well-defined area.
+			The Polygon can however be non-simple (self-intersecting).
 		@return True if an intersection occurs or one of the objects is contained inside the other, false otherwise.
 		@see ConvexIntersects(), Contains(), ClosestPoint(), Distance().
 		@todo Add Intersects(Circle/Disc). */

@@ -377,7 +377,7 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 //	float lenSq = normal.LengthSq(); ///\todo Could we treat basisU and basisV unnormalized here?
 	float dot = normal.Dot(vec(p[0]) - worldSpacePoint);
 	if (dot*dot > polygonThicknessSq)
-		return false;
+		return false; // The point is not even within the plane of the polygon - can't be contained.
 
 	int numIntersections = 0;
 
@@ -387,6 +387,7 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 	// centered to lie in the origin.
 	// If the test ray (0,0) -> (+inf, 0) intersects exactly an odd number of polygon edge segments, then the query point must have been
 	// inside the polygon. The test ray is chosen like that to avoid all extra per-edge computations.
+	// This method works for both simple and non-simple (self-intersecting) polygons.
 	vec vt = vec(p.back()) - worldSpacePoint;
 	float2 p0 = float2(Dot(vt, basisU), Dot(vt, basisV));
 	if (Abs(p0.y) < epsilon)

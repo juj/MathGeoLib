@@ -99,3 +99,42 @@ UNIQUE_TEST(Polygon_Intersects_LineSegment_2D)
 	assert(!p.Contains2D(intersecting2));
 	assert(!p.Contains2D(noncontained));
 }
+
+UNIQUE_TEST(Polygon_Intersects_Polygon_2D)
+{
+	Polygon p;
+	p.p.push_back(POINT_VEC(156.644623f, -3.16135454f, 0));
+	p.p.push_back(POINT_VEC(160.721878f, 18.5124626f, 0));
+	p.p.push_back(POINT_VEC(169.520157f, -3.80513144f, 0));
+	assert(p.IsPlanar());
+	assert(p.IsSimple());
+
+	Polygon p2;
+	p2.p.push_back(POINT_VEC(30.0000019f, 0, 0));
+	p2.p.push_back(POINT_VEC(30.2276134f, 4.43845034f, 0));
+	p2.p.push_back(POINT_VEC(225.f, -10.f, 0));
+	p2.p.push_back(POINT_VEC(225.2276f, -5.56155014f, 0));
+	assert(p2.IsPlanar());
+	assert(!p2.IsSimple());
+
+	// p2 is a self-intersecting polygon. The convex hull of that Polygon would intersect p, but p2 itself does not intersect p.
+	assert(!p.Intersects(p2));
+	assert(!p2.Intersects(p));
+	assert(!p.Contains(p2));
+	assert(!p2.Contains(p));
+
+	// Test that the rewinded version of p2 which has its vertices so that it does not self-intersect, does correctly return
+	// intersection with p.
+	Polygon p3;
+	p3.p.push_back(POINT_VEC(30.0000019f, 0, 0));
+	p3.p.push_back(POINT_VEC(30.2276134f, 4.43845034f, 0));
+	p3.p.push_back(POINT_VEC(225.2276f, -5.56155014f, 0));
+	p3.p.push_back(POINT_VEC(225.f, -10.f, 0));
+	assert(p3.IsPlanar());
+	assert(p3.IsSimple());
+
+	assert(p3.Intersects(p));
+	assert(p.Intersects(p3));
+	assert(!p3.Contains(p));
+	assert(!p.Contains(p3));
+}
