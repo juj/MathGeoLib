@@ -6,10 +6,33 @@ endif()
 
 project(MathGeoLib)
 
+set(MATHGEOLIB_MAJOR_VERSION 1)
+set(MATHGEOLIB_MINOR_VERSION 5)
+set(MATHGEOLIB_PATCH_VERSION 0)
+set(MATHGEOLIB_VERSION
+  ${MATHGEOLIB_MAJOR_VERSION}.${MATHGEOLIB_MINOR_VERSION}.${MATHGEOLIB_PATCH_VERSION})
+
+#Define cmake install path
+if(WIN32 AND NOT CYGWIN)
+  set(DEF_INSTALL_CMAKE_DIR CMake)
+else()
+  set(DEF_INSTALL_CMAKE_DIR lib/cmake/${PROJECT_NAME})
+endif()
+set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+  "Installation directory for CMake files")
+
+# Make relative paths absolute (needed later on)
+foreach(p LIB BIN INCLUDE CMAKE)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
+
 include(CommonOptions.cmake)
 
 # N.B. These exist for inter-opping to other libraries written by the author.
-# Feel free to remove. 
+# Feel free to remove.
 include_directories(../CodeLib/src)
 include_directories(../GraphicsEngine/src)
 
@@ -45,20 +68,58 @@ else()
 endif()
 
 if (LINUX)
-	# clock_gettime() is found from the library librt on linux. 
+	# clock_gettime() is found from the library librt on linux.
 	target_link_libraries(MathGeoLib rt)
 endif()
 
 if (WIN8RT)
 	set_target_properties(MathGeoLib PROPERTIES VS_WINRT_EXTENSIONS TRUE)
 	# Ignore warning LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
-	#    since we are not authoring any WinRT components from this code. 
+	#    since we are not authoring any WinRT components from this code.
 	set_target_properties(MathGeoLib PROPERTIES STATIC_LIBRARY_FLAGS "/ignore:4264")
 endif()
 
 # install lib and header files if testing is disabled
 if (NOT MATH_TESTS_EXECUTABLE)
-	install (TARGETS MathGeoLib DESTINATION "lib")
+	install (TARGETS MathGeoLib
+	  EXPORT ${PROJECT_NAME}Targets
+	  ARCHIVE DESTINATION lib
+	  LIBRARY DESTINATION lib
+	  RUNTIME DESTINATION bin)
 	install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.h")
 	install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.inl")
 endif (NOT MATH_TESTS_EXECUTABLE)
+
+# Handle CMake Config
+# Add all targets to the build-tree export set
+export(TARGETS ${PROJECT_NAME}
+  FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
+
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE ${PROJECT_NAME})
+
+# Create the ${PROJECT_NAME}Config.cmake and ${PROJECT_NAME}ConfigVersion files
+file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
+   "${INSTALL_INCLUDE_DIR}/include")
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+configure_file(${PROJECT_NAME}Config.cmake.in
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" @ONLY)
+# ... for the install tree
+set(CONF_INCLUDE_DIRS "\${MATHGEOLIB_CMAKE_DIR}/${REL_INCLUDE_DIR}/${PROJECT_NAME}")
+configure_file(${PROJECT_NAME}Config.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake" @ONLY)
+# ... for both
+configure_file(${PROJECT_NAME}ConfigVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake" @ONLY)
+
+# Install the ${PROJECT_NAME}Config.cmake and ${PROJECT_NAME}ConfigVersion.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+# Install the export set for use with the install-tree
+install(EXPORT ${PROJECT_NAME}Targets DESTINATION
+  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
