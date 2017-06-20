@@ -52,7 +52,7 @@ UNIQUE_TEST(GetMaxSimultaneousThreads)
 	assert(GetMaxSimultaneousThreads() > 0);
 }
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 
 UNIQUE_TEST(DetectBrowser)
 {

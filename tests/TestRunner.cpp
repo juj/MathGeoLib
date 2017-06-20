@@ -404,7 +404,7 @@ int main(int argc, char **argv)
 	}
 	numTotalRuns = (argc >= 2) ? atoi(argv[1]) : 100;
 	numTrialsPerTimedBlock = (argc >= 3) ? atoi(argv[2]) : 100;
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 	numTotalRuns = numTrialsPerTimedBlock = 10;
 #endif
 	for(int i = 3; i < argc; ++i)

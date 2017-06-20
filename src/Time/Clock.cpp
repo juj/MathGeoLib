@@ -15,7 +15,7 @@
 /** @file Clock.cpp
 	@brief */
 
-#if defined(__unix__) || defined(__native_client__) || defined(EMSCRIPTEN) || defined(ANDROID) || defined(__APPLE__) || defined (__CYGWIN__)
+#if defined(__unix__) || defined(__native_client__) || defined(__EMSCRIPTEN__) || defined(ANDROID) || defined(__APPLE__) || defined (__CYGWIN__)
 #include <time.h>
 #include <errno.h>
 #include <string.h>
@@ -26,7 +26,7 @@
 #include "../Math/InclWindows.h"
 #endif
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -102,7 +102,7 @@ void Clock::Sleep(int milliseconds)
 #pragma warning(Clock::Sleep has not been implemented!)
 #elif defined(WIN32)
 	::Sleep(milliseconds);
-#elif !defined(__native_client__) && !defined(EMSCRIPTEN)
+#elif !defined(__native_client__) && !defined(__EMSCRIPTEN__)
 	// http://linux.die.net/man/2/nanosleep
 	timespec ts;
 	ts.tv_sec = milliseconds / 1000;
@@ -225,7 +225,7 @@ tick_t Clock::Tick()
 	struct timespec res;
 	clock_gettime(CLOCK_REALTIME, &res);
 	return 1000000000ULL*res.tv_sec + (tick_t)res.tv_nsec;
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 
 #ifdef MATH_TICK_IS_FLOAT
 	return (tick_t)emscripten_get_now();
@@ -273,7 +273,7 @@ tick_t Clock::TicksPerSec()
 {
 #if defined(ANDROID)
 	return 1000000000ULL; // 1e9 == nanoseconds.
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 
 #ifdef MATH_TICK_IS_FLOAT
 	return (tick_t)1000.0;

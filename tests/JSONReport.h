@@ -53,7 +53,7 @@ public:
 			}
 		}
 #pragma warning(pop)
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 		std::string browserVersion = GetOSDisplayString();
 		sprintf(str, "%s, Clang %s", browserVersion.c_str(), __clang_version__);
 		return str;
@@ -97,7 +97,7 @@ public:
 		return "iOS";
 #elif defined(APPLE_OSX) || defined(__APPLE__)
 		return "OSX";
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 		return "Emscripten";
 #elif defined(__FLASHPLAYER__)
 		return "Flash";
@@ -146,7 +146,7 @@ public:
 #else
 		return simd + "(manual)";
 #endif
-#elif defined(__native_client__) || defined(EMSCRIPTEN) || defined(__FLASHPLAYER__)
+#elif defined(__native_client__) || defined(__EMSCRIPTEN__) || defined(__FLASHPLAYER__)
 		return ""; // These platforms don't have SIMD option, so don't report the absence of it either.
 #else
 		return "No SIMD";
@@ -184,7 +184,7 @@ public:
 	{
 		Finish(); // If we happened to have an old one..
 
-#if !defined(ANDROID) && !defined(EMSCRIPTEN) && !defined(WIN8PHONE) && !defined(APPLE_IOS) && !defined(NACL) && !defined(NPAPI) // Virtual FS archs output to screen.
+#if !defined(ANDROID) && !defined(__EMSCRIPTEN__) && !defined(WIN8PHONE) && !defined(APPLE_IOS) && !defined(NACL) && !defined(NPAPI) // Virtual FS archs output to screen.
 		handle = fopen(filename, "w");
 		if (!handle)
 			LOGE("Failed to open file '%s'!", filename);

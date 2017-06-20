@@ -150,7 +150,7 @@ TEST(CXX11StdFinite)
 	assert(isfinite(5.0));
 
 
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(std::isfinite(5.0L));
 	assert(isfinite(5.0L));
 #endif
@@ -158,7 +158,7 @@ TEST(CXX11StdFinite)
 }
 #endif
 
-#if !defined(EMSCRIPTEN)
+#if !defined(__EMSCRIPTEN__)
 struct U80
 {
 	union
@@ -203,7 +203,7 @@ UNIQUE_TEST(FloatRepresentation)
 	// Commented out - Valgrind does not support long double and gives a false positive if the following code is run,
 	// so just for simplicity, leave this test out.
 	/*
-#if !defined(EMSCRIPTEN)
+#if !defined(__EMSCRIPTEN__)
 	LOGI("sizeof(long double): %d", (int)sizeof(long double));
 	LOGI("LDBL_DIG: %d, LDBL_MANT_DIG: %d", (int)LDBL_DIG, (int)LDBL_MANT_DIG);
 #if !defined(__MINGW32__) // MinGW doesn't support printing out long doubles
@@ -220,7 +220,7 @@ TEST(IsFinite)
 	assert(IsFinite(5));
 	assert(IsFinite(5.f));
 	assert(IsFinite(5.0));
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(IsFinite(5.0L));
 #endif
 
@@ -232,7 +232,7 @@ TEST(IsFinite)
 	assert(!IsFinite((double)FLOAT_INF));
 	assert(IsFinite((double)FLT_MAX));
 
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(!IsFinite((long double)FLOAT_NAN));
 	assert(!IsFinite((long double)FLOAT_INF));
 	assert(IsFinite((long double)FLT_MAX));
@@ -243,7 +243,7 @@ TEST(IsNan)
 {
 	assert(!IsNan(5.f));
 	assert(!IsNan(5.0));
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(!IsNan(5.0L));
 #endif
 
@@ -255,7 +255,7 @@ TEST(IsNan)
 	assert(!IsNan((double)FLOAT_INF));
 	assert(!IsNan((double)FLT_MAX));
 
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(IsNan((long double)FLOAT_NAN));
 	assert(!IsNan((long double)FLOAT_INF));
 	assert(!IsNan((long double)FLT_MAX));
@@ -266,7 +266,7 @@ TEST(IsInf)
 {
 	assert(!IsInf(5.f));
 	assert(!IsInf(5.0));
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(!IsInf(5.0L));
 #endif
 
@@ -280,7 +280,7 @@ TEST(IsInf)
 	assert(IsInf(-(double)FLOAT_INF));
 	assert(!IsInf((double)FLT_MAX));
 
-#ifndef EMSCRIPTEN // long double is not supported.
+#ifndef __EMSCRIPTEN__ // long double is not supported.
 	assert(!IsInf((long double)FLOAT_NAN));
 	assert(IsInf((long double)FLOAT_INF));
 	assert(IsInf(-(long double)FLOAT_INF));
@@ -1102,7 +1102,7 @@ BENCHMARK(Min_ternary, "Min with ternary")
 BENCHMARK_END;
 
 // Test Emscripten-specific effects of a function call.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 float __attribute__((noinline)) Min_funccall(float a, float b)
 {
 	return MinTernary(a, b);

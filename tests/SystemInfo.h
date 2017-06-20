@@ -25,7 +25,7 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long dwCPU);
 
 void CpuId(int *outInfo, int infoType);
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 
 class BrowserVersion
 {

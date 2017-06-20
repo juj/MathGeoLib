@@ -336,7 +336,7 @@ unsigned long GetCPUSpeedFromRegistry(unsigned long /*dwCPU*/)
 	}
 }
 
-#elif defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__)
 
 #include <emscripten.h>
 

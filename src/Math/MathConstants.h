@@ -34,7 +34,7 @@
 #define NOT_NECESSARILY_USED
 #endif
 
-#if defined(_MSC_VER) || defined(EMSCRIPTEN)
+#if defined(_MSC_VER) || defined(__EMSCRIPTEN__)
 #define FLOAT_NAN ((float)std::numeric_limits<float>::quiet_NaN())
 #define FLOAT_INF ((float)std::numeric_limits<float>::infinity())
 #else

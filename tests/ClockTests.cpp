@@ -35,7 +35,7 @@ UNIQUE_TEST(Clock_RdTsc)
 
 UNIQUE_TEST(SubMillisecondPrecision)
 {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 	if (IsChromeBrowserOnWin32())
 	{
 		// Newest version failure was observed in is 31.0.1600.1.
