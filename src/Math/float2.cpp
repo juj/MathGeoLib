@@ -1,4 +1,4 @@
-/* Copyright Jukka Jyl‰nki
+/* Copyright Jukka Jyl√§nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file float2.cpp
-	@author Jukka Jyl‰nki
+	@author Jukka Jyl√§nki
 	@brief */
 #include "float2.h"
 #include "float2.inl"
@@ -331,22 +331,22 @@ float2 float2::Recip() const
 
 float2 float2::Min(float floor) const
 {
-	return float2(MATH_NS::Min(x, floor),  MATH_NS::Min(x, floor));
+	return float2(MATH_NS::Min(x, floor),  MATH_NS::Min(y, floor));
 }
 
 float2 float2::Min(const float2 &floor) const
 {
-	return float2(MATH_NS::Min(x, floor.x),  MATH_NS::Min(x, floor.x));
+	return float2(MATH_NS::Min(x, floor.x),  MATH_NS::Min(y, floor.y));
 }
 
 float2 float2::Max(float ceil) const
 {
-	return float2(MATH_NS::Max(x, ceil),  MATH_NS::Max(x, ceil));
+	return float2(MATH_NS::Max(x, ceil),  MATH_NS::Max(y, ceil));
 }
 
 float2 float2::Max(const float2 &ceil) const
 {
-	return float2(MATH_NS::Max(x, ceil.x),  MATH_NS::Max(x, ceil.x));
+	return float2(MATH_NS::Max(x, ceil.x),  MATH_NS::Max(y, ceil.y));
 }
 
 float2 float2::Clamp(const float2 &floor, const float2 &ceil) const
