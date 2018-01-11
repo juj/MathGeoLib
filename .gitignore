@@ -23,3 +23,5 @@ doc/xml/
 *.tlog
 *.unsuccessfulbuild
 *.vcxproj
+build/
+
