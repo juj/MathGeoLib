@@ -1847,6 +1847,18 @@ vec Triangle::ClosestPoint(const Triangle &other, vec *otherPt) const
 	dSq = pt.DistanceSq(other.c);
 	if (dSq < closestDSq) closestThis = pt, closestOther = other.c, closestDSq = dSq;
 
+	pt = other.ClosestPoint(this->a);
+	dSq = pt.DistanceSq(this->a);
+	if (dSq < closestDSq) closestOther = pt, closestThis = this->a, closestDSq = dSq;
+
+	pt = other.ClosestPoint(this->b);
+	dSq = pt.DistanceSq(this->b);
+	if (dSq < closestDSq) closestOther = pt, closestThis = this->b, closestDSq = dSq;
+
+	pt = other.ClosestPoint(this->c);
+	dSq = pt.DistanceSq(this->c);
+	if (dSq < closestDSq) closestOther = pt, closestThis = this->c, closestDSq = dSq;
+
 	LineSegment l1[3] = { LineSegment(a,b), LineSegment(a,c), LineSegment(b,c) };
 	LineSegment l2[3] = { LineSegment(other.a,other.b), LineSegment(other.a,other.c), LineSegment(other.b,other.c) };
 	float d, d2;
