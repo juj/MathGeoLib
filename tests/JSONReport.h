@@ -89,8 +89,6 @@ public:
 	{
 #ifdef __ANDROID__
 		return "Android";
-#elif defined(__native_client__)
-		return "Native Client";
 #elif defined(__linux__) || defined(LINUX)
 		return "Linux";
 #elif defined(APPLE_IOS)
@@ -99,8 +97,6 @@ public:
 		return "OSX";
 #elif defined(__EMSCRIPTEN__)
 		return "Emscripten";
-#elif defined(__FLASHPLAYER__)
-		return "Flash";
 #elif defined(__unix__)
 		return "Unix";
 #elif defined(WIN32)
@@ -146,8 +142,8 @@ public:
 #else
 		return simd + "(manual)";
 #endif
-#elif defined(__native_client__) || defined(__EMSCRIPTEN__) || defined(__FLASHPLAYER__)
-		return ""; // These platforms don't have SIMD option, so don't report the absence of it either.
+#elif defined(__EMSCRIPTEN__)
+		return ""; // Emscripten does not have a SIMD option (yet), so don't report the absence of it.
 #else
 		return "No SIMD";
 #endif
@@ -184,7 +180,7 @@ public:
 	{
 		Finish(); // If we happened to have an old one..
 
-#if !defined(ANDROID) && !defined(__EMSCRIPTEN__) && !defined(WIN8PHONE) && !defined(APPLE_IOS) && !defined(NACL) && !defined(NPAPI) // Virtual FS archs output to screen.
+#if !defined(ANDROID) && !defined(__EMSCRIPTEN__) && !defined(WIN8PHONE) && !defined(APPLE_IOS) // Virtual FS archs output to screen.
 		handle = fopen(filename, "w");
 		if (!handle)
 			LOGE("Failed to open file '%s'!", filename);
