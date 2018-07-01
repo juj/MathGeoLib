@@ -216,7 +216,7 @@ tick_t Clock::ApplicationStartupTick()
 */
 unsigned long Clock::Time()
 {
-	return (unsigned long)(Tick() - appStartTime);
+	return (unsigned long)((Tick() - appStartTime) * 1000 / Clock::TicksPerSec());
 }
 
 tick_t Clock::Tick()
