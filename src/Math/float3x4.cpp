@@ -1612,6 +1612,33 @@ std::string float3x4::ToString2() const
 
 	return std::string(str);
 }
+
+bool IsNeutralCLocale();
+
+float3x4 float3x4::FromString(const char *str, const char **outEndStr)
+{
+	assert(IsNeutralCLocale());
+	assume(str);
+	if (!str)
+		return float3x4::nan;
+	MATH_SKIP_WORD(str, "float3x4");
+	MATH_SKIP_WORD(str, "(");
+	float3x4 m;
+	for (int i = 0; i < 12; ++i)
+	{
+		m.ptr()[i] = DeserializeFloat(str, &str);
+		MATH_SKIP_WORD(str, "(");
+		MATH_SKIP_WORD(str, ")");
+	}
+	if (*str == ')')
+		++str;
+	if (*str == ',')
+		++str;
+	if (outEndStr)
+		*outEndStr = str;
+	return m;
+}
+
 #endif
 
 float3 float3x4::ToEulerXYX() const { float3 f; ExtractEulerXYX(*this, f[0], f[1], f[2]); return f; }

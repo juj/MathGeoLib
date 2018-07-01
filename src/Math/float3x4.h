@@ -752,6 +752,8 @@ public:
 	std::string SerializeToString() const;
 
 	std::string ToString2() const;
+
+	static float3x4 FromString(const char *str, const char **outEndStr = 0);
 #endif
 
 	/// Extracts the rotation part of this matrix into Euler rotation angles (in radians). [indexTitle: ToEuler***]
