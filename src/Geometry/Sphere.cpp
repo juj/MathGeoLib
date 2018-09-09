@@ -1478,9 +1478,9 @@ void Sphere::Triangulate(VertexBuffer &vb, int numVertices, bool ccwIsFrontFacin
 	Array<vec> position;
 	Array<vec> normal;
 	Array<float2> uv;
-	position.Resize_pod(numVertices);
-	normal.Resize_pod(numVertices);
-	uv.Resize_pod(numVertices);
+	position.Resize_unspecified(numVertices);
+	normal.Resize_unspecified(numVertices);
+	uv.Resize_unspecified(numVertices);
 	Triangulate(position.beginptr(), normal.beginptr(), uv.beginptr(), numVertices, ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
 	for(int i = 0; i < (int)position.size(); ++i)

@@ -2783,9 +2783,9 @@ void OBB::Triangulate(VertexBuffer &vb, int x, int y, int z, bool ccwIsFrontFaci
 	Array<vec> normal;
 	Array<float2> uv;
 	int numVertices = (x*y+y*z+x*z)*2*6;
-	position.Resize_pod(numVertices);
-	normal.Resize_pod(numVertices);
-	uv.Resize_pod(numVertices);
+	position.Resize_unspecified(numVertices);
+	normal.Resize_unspecified(numVertices);
+	uv.Resize_unspecified(numVertices);
 	Triangulate(x,y,z, &position[0], &normal[0], &uv[0], ccwIsFrontFacing);
 	int startIndex = vb.AppendVertices(numVertices);
 	for(int i = 0; i < (int)position.size(); ++i)
@@ -2835,7 +2835,7 @@ void OBB::ToLineList(VertexBuffer &vb) const
 	else
 	{
 		Array<vec> position;
-		position.Resize_pod(NumVerticesInEdgeList());
+		position.Resize_unspecified(NumVerticesInEdgeList());
 		ToEdgeList(&position[0]);
 		int startIndex = vb.AppendVertices((int)position.size());
 		for(int i = 0; i < (int)position.size(); ++i)
