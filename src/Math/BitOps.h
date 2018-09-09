@@ -71,7 +71,7 @@ template<>
 class LSBT<32>
 {
 public:
-	static const u32 val = 0xFFFFFFFF;
+	static const u32 val = 0xFFFFFFFFU;
 };
 
 template<>
@@ -90,7 +90,7 @@ inline u32 LSB(u32 bits)
 {
 	assert(bits <= 32);
 	if (bits >= 32)
-		return 0xFFFFFFFF;
+		return 0xFFFFFFFFU;
 	return (1U << bits) - 1;
 }
 
