@@ -127,7 +127,10 @@ MATH_END_NAMESPACE
 #define assume_failed(message) throw std::runtime_error((message))
 #elif defined(MATH_ASSERT_ON_ASSUME)
 #define assume(x) assert(x)
-#define assume_failed(message) assert(false && #message)
+#define assume_failed(message) do { \
+		LOGE("Assumption %s failed! in file %s, line %d!", message, __FILE__, __LINE__); \
+		assert(false); \
+	} while(0) 
 #elif defined(MATH_SILENT_ASSUME)
 #define assume(x) ((void)0)
 #define assume_failed(message) ((void)0)
@@ -147,7 +150,7 @@ MATH_END_NAMESPACE
 #define assume1(x, print1) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(((#x ", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
 	MULTI_LINE_MACRO_END
 #define assert1 assume1
@@ -155,7 +158,7 @@ MATH_END_NAMESPACE
 #define assume2(x, print1, print2) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(((#x ", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (", " #print2 ": ") + MATH_NS::ObjToString(print2) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
 	MULTI_LINE_MACRO_END
@@ -164,7 +167,7 @@ MATH_END_NAMESPACE
 #define assume3(x, print1, print2, print3) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(((#x ", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (", " #print2 ": ") + MATH_NS::ObjToString(print2) + \
 			                  (", " #print3 ": ") + MATH_NS::ObjToString(print3) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
@@ -174,7 +177,7 @@ MATH_END_NAMESPACE
 #define assume4(x, print1, print2, print3, print4) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(((#x ", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (", " #print2 ": ") + MATH_NS::ObjToString(print2) + \
 			                  (", " #print3 ": ") + MATH_NS::ObjToString(print3) + \
 			                  (", " #print4 ": ") + MATH_NS::ObjToString(print4) + \
