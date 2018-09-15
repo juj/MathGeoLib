@@ -17,6 +17,7 @@
 	@brief */
 #include "TransformOps.h"
 #include "MathFunc.h"
+#include "float2.h"
 #include "float4.h"
 #include "float3x3.h"
 #include "float3x4.h"
@@ -114,6 +115,11 @@ float4x4 operator *(const float4x4 &lhs, const TranslateOp &rhs)
 	float4x4 r = lhs;
 	r.SetTranslatePart(lhs.TransformPos(DIR_TO_FLOAT3(rhs.Offset())));
 	return r;
+}
+
+ScaleOp::ScaleOp(const float2 &scaleXY, float scaleZ)
+:scale(DIR_VEC(scaleXY.x, scaleXY.y, scaleZ))
+{
 }
 
 ScaleOp::ScaleOp(float sx, float sy, float sz)

@@ -79,6 +79,7 @@ public:
 	ScaleOp() {}
 
 	/// Constructs a ScaleOp with the given scale factors.
+	explicit ScaleOp(const float2 &scaleXY, float scaleZ);
 	explicit ScaleOp(const float3 &scale);
 	explicit ScaleOp(const float4 &scale);
 	ScaleOp(float sx, float sy, float sz);
