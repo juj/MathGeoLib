@@ -166,6 +166,17 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 	return stack;
 }
 
+#elif defined(__EMSCRIPTEN__)
+
+#include <emscripten.h>
+
+std::string GetCallstack(const char *indent, const char *ignoreFilter)
+{
+	char str[1024] = {};
+	emscripten_get_callstack(EM_LOG_JS_STACK, str, sizeof(str));
+	return str;
+}
+
 #else
 
 std::string GetCallstack(const char *indent, const char *ignoreFilter)
