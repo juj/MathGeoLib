@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "MathFunc.h"
+#include "float2.h"
 #include "float3.h"
 #include "float4.h"
 #include "float3x3.h"
@@ -1103,6 +1104,26 @@ void float3x4::RemoveScale()
 	MARK_UNUSED(z);
 }
 
+float2 float3x4::TransformPos(const float2 &pointVector) const
+{
+#ifdef MATH_SSE
+	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, pointVector.y, pointVector.x));
+#else
+	return TransformPos(pointVector.x, pointVector.y);
+#endif
+}
+
+float2 float3x4::TransformPos(float x, float y) const
+{
+#ifdef MATH_SSE
+	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, y, x));
+#else
+	assume(Equal(v[2][3], 0.f));
+	return float2(DOT2_xy(v[0], x,y) + v[0][3],
+	              DOT2_xy(v[1], x,y) + v[1][3]);
+#endif
+}
+
 float3 float3x4::TransformPos(const float3 &pointVector) const
 {
 #ifdef MATH_SSE
@@ -1115,11 +1136,30 @@ float3 float3x4::TransformPos(const float3 &pointVector) const
 float3 float3x4::TransformPos(float x, float y, float z) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(1, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(1.f, z, y, x));
 #else
 	return float3(DOT3_xyz(v[0], x,y,z) + v[0][3],
 				  DOT3_xyz(v[1], x,y,z) + v[1][3],
 				  DOT3_xyz(v[2], x,y,z) + v[2][3]);
+#endif
+}
+
+float2 float3x4::TransformDir(const float2 &directionVector) const
+{
+#ifdef MATH_SSE
+	return mat3x4_mul_vec(row, set_ps(0.f, 0.f, directionVector.y, directionVector.x));
+#else
+	return TransformDir(directionVector.x, directionVector.y);
+#endif
+}
+
+float2 float3x4::TransformDir(float x, float y) const
+{
+#ifdef MATH_SSE
+	return mat3x4_mul_vec(row, set_ps(0, 0, y, x));
+#else
+	return float2(DOT2_xy(v[0], x,y),
+	              DOT2_xy(v[1], x,y));
 #endif
 }
 
@@ -1736,12 +1776,14 @@ float3x4 float3x4::Mul(const float3x3 &rhs) const { return *this * rhs; }
 float3x4 float3x4::Mul(const float3x4 &rhs) const { return *this * rhs; }
 float4x4 float3x4::Mul(const float4x4 &rhs) const { return *this * rhs; }
 float3x4 float3x4::Mul(const Quat &rhs) const { return *this * rhs; }
+float2 float3x4::MulPos(const float2 &pointVector) const { return this->TransformPos(pointVector); }
 float3 float3x4::MulPos(const float3 &pointVector) const { return this->TransformPos(pointVector); }
 float4 float3x4::MulPos(const float4 &pointVector) const
 {
 	assume(!EqualAbs(pointVector.w, 0.f));
 	return this->Transform(pointVector);
 }
+float2 float3x4::MulDir(const float2 &directionVector) const { return this->TransformDir(directionVector); }
 float3 float3x4::MulDir(const float3 &directionVector) const { return this->TransformDir(directionVector); }
 float4 float3x4::MulDir(const float4 &directionVector) const
 {

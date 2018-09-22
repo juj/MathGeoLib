@@ -44,6 +44,13 @@ MATH_BEGIN_NAMESPACE
 /// @see DOT3(), DOT4().
 #define DOT2(v1, v2) ((v1)[0] * (v2)[0] + (v1)[1] * (v2)[1])
 
+/// Computes the dot product of a float2 and another vector given by two floats.
+/// @param v1 A vector of type float2, or a C array of two elements.
+/// @param x The x component of a second vector.
+/// @param y The y component of a second vector.
+/// @see DOT2().
+#define DOT2_xy(v1, x, y) ((v1)[0] * (x) + (v1)[1] * (y))
+
 /// Computes the dot product of two 3D vectors, the elements are accessed using array notation.
 /// @param v1 A vector of type float3, or a C array of three elements.
 /// @param v2 A vector of type float3, or a C array of three elements.

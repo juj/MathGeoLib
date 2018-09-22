@@ -610,15 +610,19 @@ public:
 	/// Transforms the given point vector by this matrix M , i.e. returns M * (x, y, z, 1).
 	/** The suffix "Pos" in this function means that the w component of the input vector is assumed to be 1, i.e. the input
 		vector represents a point (a position). */
+	float2 TransformPos(const float2 &pointVector) const;
 	float3 TransformPos(const float3 &pointVector) const;
 	float3 TransformPos(float x, float y, float z) const;
+	float2 TransformPos(float x, float y) const;
 
 	/// Transforms the given direction vector by this matrix M , i.e. returns M * (x, y, z, 0).
 	/** The suffix "Dir" in this function just means that the w component of the input vector is assumed to be 0, i.e. the
 		input vector represents a direction. The input vector does not need to be normalized. */
 	float4 TransformDir(const float4 &directionVector) const;
 	float3 TransformDir(const float3 &directionVector) const;
+	float2 TransformDir(const float2 &directionVector) const;
 	float3 TransformDir(float x, float y, float z) const;
+	float2 TransformDir(float x, float y) const;
 
 	/// Transforms the given 4-vector by this matrix M, i.e. returns M * (x, y, z, w).
 	float4 Transform(const float4 &vector) const;
@@ -803,8 +807,10 @@ public:
 	float3x4 Mul(const float3x4 &rhs) const;
 	float4x4 Mul(const float4x4 &rhs) const;
 	float3x4 Mul(const Quat &rhs) const;
+	float2 MulPos(const float2 &pointVector) const;
 	float3 MulPos(const float3 &pointVector) const;
 	float4 MulPos(const float4 &pointVector) const;
+	float2 MulDir(const float2 &directionVector) const;
 	float3 MulDir(const float3 &directionVector) const;
 	float4 MulDir(const float4 &directionVector) const;
 	float4 Mul(const float4 &vector) const;
