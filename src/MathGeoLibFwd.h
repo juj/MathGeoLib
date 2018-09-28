@@ -20,6 +20,10 @@
 #include "MathBuildConfig.h"
 #include "Math/MathNamespace.h"
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
+#include "Memory/TypeTraits.h"
+#endif
+
 #include <stddef.h>
 
 // Very annoying to have to do this, but <iosfwd> doesn't have a fwddecl for std::vector,
@@ -193,4 +197,42 @@ class VertexBuffer;
 #if defined(_M_X64) || defined(__x86_64__)
 // Are we targeting a 64-bit build?
 #define MATH_64BIT
+#endif
+
+#ifdef MATH_CONTAINERLIB_SUPPORT
+REGISTER_POD(MATH_NS::float2);
+REGISTER_POD(MATH_NS::float3);
+REGISTER_POD(MATH_NS::float4);
+REGISTER_POD(MATH_NS::float2x2);
+REGISTER_POD(MATH_NS::float2x3);
+REGISTER_POD(MATH_NS::float3x3);
+REGISTER_POD(MATH_NS::float3x4);
+REGISTER_POD(MATH_NS::float4x4);
+REGISTER_POD(MATH_NS::Quat);
+REGISTER_POD(MATH_NS::TranslateOp);
+REGISTER_POD(MATH_NS::ScaleOp);
+//REGISTER_POD(MATH_NS::PBVolume<N>);
+REGISTER_POD(MATH_NS::AABB);
+REGISTER_POD(MATH_NS::Capsule);
+REGISTER_POD(MATH_NS::Circle);
+REGISTER_POD(MATH_NS::Cone);
+REGISTER_POD(MATH_NS::Cylinder);
+REGISTER_POD(MATH_NS::Ellipsoid);
+REGISTER_POD(MATH_NS::Frustum);
+REGISTER_POD(MATH_NS::HitInfo);
+REGISTER_POD(MATH_NS::Line);
+REGISTER_POD(MATH_NS::LineSegment);
+REGISTER_POD(MATH_NS::OBB);
+REGISTER_POD(MATH_NS::Plane);
+REGISTER_POD(MATH_NS::Polygon);
+REGISTER_POD(MATH_NS::Polyhedron);
+REGISTER_POD(MATH_NS::Polynomial);
+REGISTER_POD(MATH_NS::Ray);
+REGISTER_POD(MATH_NS::Sphere);
+REGISTER_POD(MATH_NS::Torus);
+REGISTER_POD(MATH_NS::Triangle);
+REGISTER_POD(MATH_NS::LCG);
+REGISTER_POD(MATH_NS::float4_storage);
+REGISTER_POD(MATH_NS::Triangle_storage);
+REGISTER_POD(MATH_NS::LineSegment_storage);
 #endif
