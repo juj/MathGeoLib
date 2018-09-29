@@ -110,6 +110,11 @@ void Clock::Sleep(int milliseconds)
 	int ret = nanosleep(&ts, NULL);
 	if (ret == -1)
 		LOGI("nanosleep returned -1! Reason: %s(%d).", strerror(errno), (int)errno);
+#elif defined(__EMSCRIPTEN_PTHREADS__)
+	emscripten_thread_sleep(milliseconds);
+#elif defined(__EMSCRIPTEN__)
+	/*NO-OP, cannot sleep*/
+	MARK_UNUSED(milliseconds);
 #else
 #warning Clock::Sleep has not been implemented!
 #endif
