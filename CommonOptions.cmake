@@ -118,6 +118,14 @@ if (MSVC)
 	set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
 	set(CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO} ${relLinkFlags}")
 
+	# Suppress Visual Studio linker warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
+	# This happens on .cpp compilation units that do not contain any public symbols in them, e.g. PBVolume.cpp. We do not want to add dummy symbols to that file, and do want to have a file in the project
+	# that only includes PBVolume.h and nothing else, to make sure that PBVolume.h can be #included on its own. Therefore suppress this warning.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4221")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /ignore:4221")
+	set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /ignore:4221")
+	set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
+
 	if (GENERATE_ASM_LISTING)
 		set(outputAsmCodeFlags "/FAs /Fa$(IntDir) /GL")
 		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE} ${outputAsmCodeFlags}")
