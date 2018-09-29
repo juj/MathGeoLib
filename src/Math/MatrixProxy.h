@@ -30,14 +30,14 @@ private:
 	float v[Cols];
 
 public:
-	CONST_WIN32 float operator[](int col) const
+	CONST_WIN32 FORCE_INLINE float operator[](int col) const
 	{
 		assert(col >= 0);
 		assert(col < Cols);
 
 		return v[col];
 	}
-	float &operator[](int col)
+	FORCE_INLINE float &operator[](int col)
 	{
 		assert(col >= 0);
 		assert(col < Cols);
