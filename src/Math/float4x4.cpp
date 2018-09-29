@@ -1113,11 +1113,11 @@ void float4x4::SwapRows3(int r1, int r2)
 	Swap(v[r1][2], v[r2][2]);
 }
 
-void float4x4::SetTranslatePart(float tx, float ty, float tz)
+void float4x4::SetTranslatePart(float translateX, float translateY, float translateZ)
 {
-	v[0][3] = tx;
-	v[1][3] = ty;
-	v[2][3] = tz;
+	v[0][3] = translateX;
+	v[1][3] = translateY;
+	v[2][3] = translateZ;
 }
 
 void float4x4::SetTranslatePart(const float3 &offset)
@@ -1341,9 +1341,9 @@ float float4x4::Minor(int i, int j) const
 float4x4 float4x4::Adjugate() const
 {
 	float4x4 a;
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			a[y][x] = (((x+y) & 1) != 0) ? -Minor(y, x) : Minor(y, x);
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			a[iy][ix] = (((ix+iy) & 1) != 0) ? -Minor(iy, ix) : Minor(iy, ix);
 
 	return a;
 }
@@ -1497,13 +1497,13 @@ void float4x4::Orthonormalize3(int c0, int c1, int c2)
 void float4x4::RemoveScale()
 {
 	///\todo SSE
-	float x = Row3(0).Normalize();
-	float y = Row3(1).Normalize();
-	float z = Row3(2).Normalize();
-	assume(x != 0 && y != 0 && z != 0 && "float4x4::RemoveScale failed!");
-	MARK_UNUSED(x);
-	MARK_UNUSED(y);
-	MARK_UNUSED(z);
+	float tx = Row3(0).Normalize();
+	float ty = Row3(1).Normalize();
+	float tz = Row3(2).Normalize();
+	assume(tx != 0 && ty != 0 && tz != 0 && "float4x4::RemoveScale failed!");
+	MARK_UNUSED(tx);
+	MARK_UNUSED(ty);
+	MARK_UNUSED(tz);
 }
 
 /// Algorithm from Eric Lengyel's Mathematics for 3D Game Programming & Computer Graphics, 2nd Ed.
@@ -1546,15 +1546,15 @@ float3 float4x4::TransformPos(const float3 &pointVector) const
 #endif
 }
 
-float3 float4x4::TransformPos(float x, float y, float z) const
+float3 float4x4::TransformPos(float tx, float ty, float tz) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return mat3x4_mul_vec(row, set_ps(1.f, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(1.f, tz, ty, tx));
 #else
-	return float3(DOT4POS_xyz(Row(0), x,y,z),
-	              DOT4POS_xyz(Row(1), x,y,z),
-	              DOT4POS_xyz(Row(2), x,y,z));
+	return float3(DOT4POS_xyz(Row(0), tx, ty, tz),
+	              DOT4POS_xyz(Row(1), tx, ty, tz),
+	              DOT4POS_xyz(Row(2), tx, ty, tz));
 #endif
 }
 
@@ -1568,15 +1568,15 @@ float3 float4x4::TransformDir(const float3 &directionVector) const
 #endif
 }
 
-float3 float4x4::TransformDir(float x, float y, float z) const
+float3 float4x4::TransformDir(float tx, float ty, float tz) const
 {
 	assume(!this->ContainsProjection()); // This function does not divide by w or output it, so cannot have projection.
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
-	return mat3x4_mul_vec(row, set_ps(0.f, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(0.f, tz, ty, tx));
 #else
-	return float3(DOT4DIR_xyz(Row(0), x,y,z),
-	              DOT4DIR_xyz(Row(1), x,y,z),
-	              DOT4DIR_xyz(Row(2), x,y,z));
+	return float3(DOT4DIR_xyz(Row(0), tx, ty, tz),
+	              DOT4DIR_xyz(Row(1), tx, ty, tz),
+	              DOT4DIR_xyz(Row(2), tx, ty, tz));
 #endif
 }
 
@@ -1905,18 +1905,18 @@ float4x4 &float4x4::operator -=(const float4x4 &rhs)
 
 bool float4x4::IsFinite() const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			if (!MATH_NS::IsFinite(v[y][x]))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			if (!MATH_NS::IsFinite(v[iy][ix]))
 				return false;
 	return true;
 }
 
 bool float4x4::IsIdentity(float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], (x == y) ? 1.f : 0.f, epsilon))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			if (!EqualAbs(v[iy][ix], (ix == iy) ? 1.f : 0.f, epsilon))
 				return false;
 
 	return true;
@@ -1951,18 +1951,18 @@ bool float4x4::IsInvertible(float epsilon) const
 
 bool float4x4::IsSymmetric(float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = y+1; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], v[x][y], epsilon))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = iy+1; ix < Cols; ++ix)
+			if (!EqualAbs(v[iy][ix], v[ix][iy], epsilon))
 				return false;
 	return true;
 }
 
 bool float4x4::IsSkewSymmetric(float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = y; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], -v[x][y], epsilon))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = iy; ix < Cols; ++ix)
+			if (!EqualAbs(v[iy][ix], -v[ix][iy], epsilon))
 				return false;
 	return true;
 }
@@ -2012,9 +2012,9 @@ bool float4x4::IsOrthonormal3(float epsilon) const
 
 bool float4x4::Equals(const float4x4 &other, float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], other[y][x], epsilon))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			if (!EqualAbs(v[iy][ix], other[iy][ix], epsilon))
 				return false;
 	return true;
 }
@@ -2151,9 +2151,9 @@ float4x4 float4x4::Abs() const
 	ret.row[2] = abs_ps(row[2]);
 	ret.row[3] = abs_ps(row[3]);
 #else
-	for(int y = 0; y < 4; ++y)
-		for(int x = 0; x < 4; ++x)
-			ret.v[y][x] = MATH_NS::Abs(v[y][x]);
+	for(int iy = 0; iy < 4; ++iy)
+		for(int ix = 0; ix < 4; ++ix)
+			ret.v[iy][ix] = MATH_NS::Abs(v[iy][ix]);
 #endif
 	return ret;
 }

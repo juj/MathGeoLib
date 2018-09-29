@@ -77,7 +77,27 @@ public:
 	enum { Cols = 3 };
 
 	/// Stores the data in this matrix in row-major format. [noscript]
-	float v[Rows][Cols];
+	union
+	{
+		float v[Rows][Cols];
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4201) // warning C4201: nonstandard extension used: nameless struct/union
+#endif
+		// Alias into the array of elements to allow accessing items from this matrix directly for convenience.
+		// This gives human-readable names to the individual matrix elements:
+		struct
+		{
+			float  scaleX, shearXy, shearXz;
+			float shearYx,  scaleY, shearYz;
+			float shearZx, shearZy,  scaleZ;
+		};
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+		// where scaleX/Y/Z specify how much principal axes are scaled by,
+		// and shearAb specify how much shearing occurs towards axis A from axis b (when vector is multiplied via M*v convention)
+	};
 
 	/// A constant matrix that has zeroes in all its entries.
 	static const float3x3 zero;

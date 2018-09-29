@@ -73,15 +73,30 @@ public:
 
 	/// Stores the data in this matrix in row-major format.
 	/** [noscript] */
-#if defined(MATH_SIMD)
 	union
 	{
-#endif
 		float v[Rows][Cols];
 #if defined(MATH_SIMD)
 		simd4f row[3];
-	};
 #endif
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4201) // warning C4201: nonstandard extension used: nameless struct/union
+#endif
+		// Alias into the array of elements to allow accessing items from this matrix directly for convenience.
+		// This gives human-readable names to the individual matrix elements:
+		struct
+		{
+			float  scaleX, shearXy, shearXz, x;
+			float shearYx,  scaleY, shearYz, y;
+			float shearZx, shearZy,  scaleZ, z;
+		};
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+		// where scaleX/Y/Z specify how much principal axes are scaled by, x/y/z specify translation (position) on the axes,
+		// and shearAb specify how much shearing occurs towards axis A from axis b (when vector is multiplied via M*v convention)
+	};
 
 	/// A constant matrix that has zeroes in all its entries.
 	static const float3x4 zero;
@@ -426,7 +441,7 @@ public:
 	/// Sets the translation part of this matrix.
 	/** This function sets the translation part of this matrix. These are the three first elements of the fourth column.
 		All other entries are left untouched. */
-	void SetTranslatePart(float tx, float ty, float tz) { SetCol(3, tx, ty, tz); }
+	void SetTranslatePart(float translateX, float translateY, float translateZ) { SetCol(3, translateX, translateY, translateZ); }
 	void SetTranslatePart(const float3 &offset) { SetCol(3, offset); }
 
 	/// Sets the 3-by-3 part of this matrix to perform rotation about the positive X axis which passes through

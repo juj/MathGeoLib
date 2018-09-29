@@ -1095,13 +1095,13 @@ void float3x4::Orthonormalize(int c0, int c1, int c2)
 void float3x4::RemoveScale()
 {
 	///\todo SSE.
-	float x = Row3(0).Normalize();
-	float y = Row3(1).Normalize();
-	float z = Row3(2).Normalize();
-	assume(x != 0 && y != 0 && z != 0 && "float3x4::RemoveScale failed!");
-	MARK_UNUSED(x);
-	MARK_UNUSED(y);
-	MARK_UNUSED(z);
+	float tx = Row3(0).Normalize();
+	float ty = Row3(1).Normalize();
+	float tz = Row3(2).Normalize();
+	assume(tx != 0 && ty != 0 && tz != 0 && "float3x4::RemoveScale failed!");
+	MARK_UNUSED(tx);
+	MARK_UNUSED(ty);
+	MARK_UNUSED(tz);
 }
 
 float2 float3x4::TransformPos(const float2 &pointVector) const
@@ -1113,14 +1113,14 @@ float2 float3x4::TransformPos(const float2 &pointVector) const
 #endif
 }
 
-float2 float3x4::TransformPos(float x, float y) const
+float2 float3x4::TransformPos(float tx, float ty) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, y, x));
+	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, ty, tx));
 #else
 	assume(Equal(v[2][3], 0.f));
-	return float2(DOT2_xy(v[0], x,y) + v[0][3],
-	              DOT2_xy(v[1], x,y) + v[1][3]);
+	return float2(DOT2_xy(v[0], tx, ty) + v[0][3],
+	              DOT2_xy(v[1], tx, ty) + v[1][3]);
 #endif
 }
 
@@ -1133,14 +1133,14 @@ float3 float3x4::TransformPos(const float3 &pointVector) const
 #endif
 }
 
-float3 float3x4::TransformPos(float x, float y, float z) const
+float3 float3x4::TransformPos(float tx, float ty, float tz) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(1.f, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(1.f, tz, ty, tx));
 #else
-	return float3(DOT3_xyz(v[0], x,y,z) + v[0][3],
-				  DOT3_xyz(v[1], x,y,z) + v[1][3],
-				  DOT3_xyz(v[2], x,y,z) + v[2][3]);
+	return float3(DOT3_xyz(v[0], tx, ty, tz) + v[0][3],
+				  DOT3_xyz(v[1], tx, ty, tz) + v[1][3],
+				  DOT3_xyz(v[2], tx, ty, tz) + v[2][3]);
 #endif
 }
 
@@ -1153,13 +1153,13 @@ float2 float3x4::TransformDir(const float2 &directionVector) const
 #endif
 }
 
-float2 float3x4::TransformDir(float x, float y) const
+float2 float3x4::TransformDir(float tx, float ty) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(0, 0, y, x));
+	return mat3x4_mul_vec(row, set_ps(0, 0, ty, tx));
 #else
-	return float2(DOT2_xy(v[0], x,y),
-	              DOT2_xy(v[1], x,y));
+	return float2(DOT2_xy(v[0], tx, ty),
+	              DOT2_xy(v[1], tx, ty));
 #endif
 }
 
@@ -1172,14 +1172,14 @@ float3 float3x4::TransformDir(const float3 &directionVector) const
 #endif
 }
 
-float3 float3x4::TransformDir(float x, float y, float z) const
+float3 float3x4::TransformDir(float tx, float ty, float tz) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(0, z, y, x));
+	return mat3x4_mul_vec(row, set_ps(0, tz, ty, tx));
 #else
-	return float3(DOT3_xyz(v[0], x,y,z),
-				  DOT3_xyz(v[1], x,y,z),
-				  DOT3_xyz(v[2], x,y,z));
+	return float3(DOT3_xyz(v[0], tx, ty, tz),
+				  DOT3_xyz(v[1], tx, ty, tz),
+				  DOT3_xyz(v[2], tx, ty, tz));
 #endif
 }
 
@@ -1423,9 +1423,9 @@ float3x4 float3x4::operator -() const
 	r.row[1] = sub_ps(z, row[1]);
 	r.row[2] = sub_ps(z, row[2]);
 #else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			r[y][x] = -v[y][x];
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			r[iy][ix] = -v[iy][ix];
 #endif
 
 	return r;
@@ -1439,9 +1439,9 @@ float3x4 &float3x4::operator *=(float scalar)
 	row[1] = mul_ps(row[1], s);
 	row[2] = mul_ps(row[2], s);
 #else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] *= scalar;
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			v[iy][ix] *= scalar;
 #endif
 
 	return *this;
@@ -1460,9 +1460,9 @@ float3x4 &float3x4::operator /=(float scalar)
 	row[2] = mul_ps(row[2], s);
 #else
 	float invScalar = 1.f / scalar;
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] *= invScalar;
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			v[iy][ix] *= invScalar;
 #endif
 
 	return *this;
@@ -1475,9 +1475,9 @@ float3x4 &float3x4::operator +=(const float3x4 &rhs)
 	row[1] = add_ps(row[1], rhs.row[1]);
 	row[2] = add_ps(row[2], rhs.row[2]);
 #else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] += rhs[y][x];
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			v[iy][ix] += rhs[iy][ix];
 #endif
 
 	return *this;
@@ -1490,9 +1490,9 @@ float3x4 &float3x4::operator -=(const float3x4 &rhs)
 	row[1] = sub_ps(row[1], rhs.row[1]);
 	row[2] = sub_ps(row[2], rhs.row[2]);
 #else
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			v[y][x] -= rhs[y][x];
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			v[iy][ix] -= rhs[iy][ix];
 #endif
 
 	return *this;
@@ -1500,18 +1500,18 @@ float3x4 &float3x4::operator -=(const float3x4 &rhs)
 
 bool float3x4::IsFinite() const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			if (!MATH_NS::IsFinite(v[y][x]))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			if (!MATH_NS::IsFinite(v[iy][ix]))
 				return false;
 	return true;
 }
 
 bool float3x4::IsIdentity(float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], (x == y) ? 1.f : 0.f, epsilon))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			if (!EqualAbs(v[iy][ix], (ix == iy) ? 1.f : 0.f, epsilon))
 				return false;
 
 	return true;
@@ -1601,9 +1601,9 @@ bool float3x4::IsOrthonormal(float epsilon) const
 
 bool float3x4::Equals(const float3x4 &other, float epsilon) const
 {
-	for(int y = 0; y < Rows; ++y)
-		for(int x = 0; x < Cols; ++x)
-			if (!EqualAbs(v[y][x], other[y][x], epsilon))
+	for(int iy = 0; iy < Rows; ++iy)
+		for(int ix = 0; ix < Cols; ++ix)
+			if (!EqualAbs(v[iy][ix], other[iy][ix], epsilon))
 				return false;
 	return true;
 }
