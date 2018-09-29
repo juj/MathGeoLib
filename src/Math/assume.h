@@ -26,7 +26,7 @@
 
 #ifndef MARK_UNUSED
 /// If a variable is labelled with this directive, the compiler should not emit a warning even if it is unused in the code.
-#define MARK_UNUSED(x) ((void)x)
+#define MARK_UNUSED(...) ((void)((void)__VA_ARGS__))
 #endif
 
 #ifdef __GNUC__

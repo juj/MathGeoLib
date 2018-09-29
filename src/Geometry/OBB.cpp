@@ -669,10 +669,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 // This is used to skip certain configurations.
 static bool AreEdgesBad(const vec &f1a, const vec &f1b, const vec &f2a, const vec &f2b)
 {
-	MARK_UNUSED(f1a);
-	MARK_UNUSED(f1b);
-	MARK_UNUSED(f2a);
-	MARK_UNUSED(f2b);
+	MARK_UNUSED(f1a, f1b, f2a, f2b);
 	return false;
 	// Currently disabled. It's not completely certain if there's a form of this heuristic that
 	// might be perfect, needs more tweaking.

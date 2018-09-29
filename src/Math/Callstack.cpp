@@ -1,5 +1,6 @@
 #include "Callstack.h"
 #include <string>
+#include "Math/assume.h"
 
 #if defined(WIN32) && defined(_MSC_VER) && !defined(WIN8RT)
 
@@ -172,6 +173,8 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 
 std::string GetCallstack(const char *indent, const char *ignoreFilter)
 {
+	MARK_UNUSED(indent); // TODO Proper indentation
+	MARK_UNUSED(ignoreFilter); // TODO Support ignoreFilter
 	char str[1024] = {};
 	emscripten_get_callstack(EM_LOG_JS_STACK, str, sizeof(str));
 	return str;

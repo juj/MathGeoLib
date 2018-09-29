@@ -1501,9 +1501,7 @@ void float4x4::RemoveScale()
 	float ty = Row3(1).Normalize();
 	float tz = Row3(2).Normalize();
 	assume(tx != 0 && ty != 0 && tz != 0 && "float4x4::RemoveScale failed!");
-	MARK_UNUSED(tx);
-	MARK_UNUSED(ty);
-	MARK_UNUSED(tz);
+	MARK_UNUSED(tx, ty, tz);
 }
 
 /// Algorithm from Eric Lengyel's Mathematics for 3D Game Programming & Computer Graphics, 2nd Ed.

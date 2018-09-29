@@ -1099,9 +1099,7 @@ void float3x4::RemoveScale()
 	float ty = Row3(1).Normalize();
 	float tz = Row3(2).Normalize();
 	assume(tx != 0 && ty != 0 && tz != 0 && "float3x4::RemoveScale failed!");
-	MARK_UNUSED(tx);
-	MARK_UNUSED(ty);
-	MARK_UNUSED(tz);
+	MARK_UNUSED(tx, ty, tz);
 }
 
 float2 float3x4::TransformPos(const float2 &pointVector) const
