@@ -18,7 +18,12 @@
 #pragma once
 
 #include "../MathGeoLibFwd.h"
+#include "../Math/float2.h"
 #include "../Math/float3.h"
+
+#ifdef MATH_CONTAINERLIB_SUPPORT
+#include "Container/Array.h"
+#endif
 
 MATH_BEGIN_NAMESPACE
 
@@ -61,5 +66,20 @@ bool SATIntersect(const A &a, const B &b)
 		}
 	return true;
 }
+
+void ProjectionInterval2D(const float2 &normal, const float2 *pts, int numPts, float &minE, float &maxE);
+bool SATCollide2D(const float2 *a, int numA, const float2 *b, int numB);
+
+#ifdef MATH_CONTAINERLIB_SUPPORT
+inline void ProjectionInterval2D(const float2 &normal, const Array<float2> &pts, float &minE, float &maxE)
+{
+	ProjectionInterval2D(normal, pts.ptr(), (int)pts.size(), minE, maxE);
+}
+
+inline bool SATCollide2D(const Array<float2> &a, const Array<float2> &b)
+{
+	return SATCollide2D(a.ptr(), (int)a.size(), b.ptr(), (int)b.size());
+}
+#endif
 
 MATH_END_NAMESPACE
