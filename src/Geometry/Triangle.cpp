@@ -17,6 +17,7 @@
 	@brief Implementation for the Triangle geometry object. */
 #include "Triangle.h"
 #include "../Math/MathFunc.h"
+#include "../Math/Swap.h"
 #include "../Math/float2.h"
 #include "../Math/float3.h"
 #include "../Math/float3x3.h"

@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "MathFunc.h"
+#include "Swap.h"
 #include "float3.h"
 #include "float4.h"
 #include "float3x3.h"

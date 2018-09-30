@@ -18,6 +18,7 @@
 #include "Capsule.h"
 #include "../Math/MathConstants.h"
 #include "../Math/MathFunc.h"
+#include "../Math/Swap.h"
 #include "../Math/float3x3.h"
 #include "../Math/float3x4.h"
 #include "../Math/float4x4.h"

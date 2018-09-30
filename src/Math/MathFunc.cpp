@@ -16,6 +16,7 @@
 	@author Jukka Jylänki
 	@brief Common mathematical functions. */
 #include "MathFunc.h"
+#include "Swap.h"
 #include "SSEMath.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <utility>

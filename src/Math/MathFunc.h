@@ -481,15 +481,6 @@ FORCE_INLINE T Max(const T &a, const T &b, const T &c, const T &d)
 	return Max(Max(a, b), Max(c, d));
 }
 
-/// Swaps the two values.
-template<typename T>
-FORCE_INLINE void Swap(T &a, T &b)
-{
-	T temp = a;
-	a = b;
-	b = temp;
-}
-
 /** @return True if a > b. */
 template<typename T>
 FORCE_INLINE bool GreaterThan(const T &a, const T &b)
