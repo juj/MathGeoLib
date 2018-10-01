@@ -1,4 +1,5 @@
 #include "MiniFloat.h"
+#include "Math/Reinterpret.h"
 #include <assert.h>
 
 float Float16ToFloat32(uint16_t float16)
@@ -19,7 +20,7 @@ float Float16ToFloat32(uint16_t float16)
 
 	uint32_t value = sign | (exponent << 23) | mantissa;
 
-	return *(float*)&value;
+	return ReinterpretAsFloat(value);
 }
 
 uint16_t Float32ToFloat16(float float32)
@@ -53,7 +54,7 @@ uint16_t Float32ToFloat16(float float32)
 	// QNaN/SNaN: Reducing bits loses data from the custom NaN payload field. If mantissaBits == 0, cannot differentiat
 	//            between QNaN and SNaN.
 
-	uint32_t v = *(uint32_t*)&float32;
+	uint32_t v = ReinterpretAsU32(float32);
 	uint32_t biasedExponent = (v & 0x7F800000) >> 23;
 	uint32_t mantissa = v & 0x7FFFFF;
 	uint32_t sign = (v & 0x80000000) >> 16; // If true, the float is negative.
@@ -101,7 +102,7 @@ uint32_t Float32ToMiniFloat(bool signBit, int exponentBits, int mantissaBits, in
 	assert(exponentBits <= 8);
 	assert(mantissaBits > 0);
 	assert(mantissaBits <= 23);
-	uint32_t v = *(uint32_t*)&value;
+	uint32_t v = ReinterpretAsU32(value);
 	uint32_t biasedExponent = (v & 0x7F800000) >> 23;
 	uint32_t mantissa = v & 0x7FFFFF;
 	bool sign = (v & 0x80000000) != 0; // If true, the float is negative.
@@ -173,5 +174,5 @@ float MiniFloatToFloat32(bool signBit, int exponentBits, int mantissaBits, int e
 
 	uint32_t value = (sign ? 0x80000000U : 0) | (exponent << 23) | mantissa;
 
-	return *(float*)&value;
+	return ReinterpretAsFloat(value);
 }
