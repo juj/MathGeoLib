@@ -5,9 +5,8 @@ MATH_BEGIN_NAMESPACE
 void ProjectionInterval2D(const float2 &normal, const float2 *pts, int numPts, float &minE, float &maxE)
 {
 	assert(numPts > 0 && pts);
-	minE = INFINITY;
-	maxE = -INFINITY;
-	for(int i = 0; i < numPts; ++i)
+	minE = maxE = pts[0].Dot(normal);
+	for(int i = 1; i < numPts; ++i)
 	{
 		float d = pts[i].Dot(normal);
 		minE = Min(minE, d);
@@ -19,10 +18,10 @@ bool SATCollide2D(const float2 *a, int numA, const float2 *b, int numB)
 {
 	assert(numA > 0 && a);
 	assert(numB > 0 && b);
-	int prev = numA-1;
 	float2 normal;
 	float min1, max1, min2, max2;
 
+	int prev = numA-1;
 	for(int i = 0; i < numA; ++i)
 	{
 		normal = (a[i] - a[prev]).Perp();
