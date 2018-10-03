@@ -25,6 +25,7 @@
 
 #include "myassert.h"
 #include "float2.h"
+#include "float4.h"
 #ifdef MATH_WITH_GRISU3
 #include "grisu3.h"
 #endif

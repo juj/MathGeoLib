@@ -801,4 +801,11 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 vec PointVecFromString(const char *str, const char **outEndStr = 0);
 vec DirVecFromString(const char *str, const char **outEndStr = 0);
 
+/// Converts the given amount of degrees into radians.
+/// 180 degrees equals pi, 360 degrees is a full circle, and equals 2pi.
+FORCE_INLINE float3 DegToRad(const float3 &degrees) { return degrees * (pi / 180.f); }
+
+/// Converts the given amount of radians into degrees.
+FORCE_INLINE float3 RadToDeg(const float3 &radians) { return radians * (180.f / pi); }
+
 MATH_END_NAMESPACE

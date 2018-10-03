@@ -26,7 +26,6 @@
 
 #include "MathTypes.h"
 #include "MathConstants.h"
-#include "float3.h"
 #include "Reinterpret.h"
 #include "SSEMath.h"
 
@@ -119,11 +118,9 @@ MATH_BEGIN_NAMESPACE
 
 /// Converts the given amount of degrees into radians.
 /// 180 degrees equals pi, 360 degrees is a full circle, and equals 2pi.
-FORCE_INLINE float3 DegToRad(const float3 &degrees) { return degrees * (pi / 180.f); }
 FORCE_INLINE float DegToRad(float degrees) { return degrees * (pi / 180.f); }
 
 /// Converts the given amount of radians into degrees.
-FORCE_INLINE float3 RadToDeg(const float3 &radians) { return radians * (180.f / pi); }
 FORCE_INLINE float RadToDeg(float radians) { return radians * (180.f / pi); }
 
 /// Computes the function sin(x).
