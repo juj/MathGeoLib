@@ -1,4 +1,4 @@
-/* Copyright Jukka Jyl‰nki
+/* Copyright Jukka Jyl√§nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file OBB.cpp
-	@author Jukka Jyl‰nki
+	@author Jukka Jyl√§nki
 	@brief Implementation for the Oriented Bounding Box (OBB) geometry object. */
 #include "OBB.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -2482,7 +2482,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 	// Test the three major axes of the OBB b.
 	simd4f transpR[3];
 	mat3x4_transpose(R, transpR);
-	vec l = abs_ps(mat3x4_mul_sse(transpR, r));
+	vec l = abs_ps(mat3x4_mul_sse(transpR, t));
 	simd4f transpAbsR[3];
 	mat3x4_transpose(AbsR, transpAbsR);
 	vec s = mat3x4_mul_sse(transpAbsR, r);
