@@ -27,7 +27,7 @@ MATH_BEGIN_NAMESPACE
 	with respect to the global world coordinate system. This allows OBBs to more tightly bound objects than AABB2Ds do,
 	which always align with the world space axes. This flexibility has the drawback that the geometry tests and operations
 	involving OBB2Ds are more costly, and representing an OBB2D in memory takes more space (15 floats vs 6 floats). */
-class OBB
+class OBB2D
 {
 public:
 	/// The center position of this OBB.
