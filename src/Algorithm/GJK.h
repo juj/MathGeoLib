@@ -24,24 +24,24 @@ MATH_BEGIN_NAMESPACE
 
 vec UpdateSimplex(vec *s, int &n);
 
-#define SUPPORT(dir) (a.ExtremePoint(dir, maxS) - b.ExtremePoint(-dir, minS));
+#define SUPPORT(dir, minS, maxS) (a.ExtremePoint(dir, maxS) - b.ExtremePoint(-dir, minS));
 
 template<typename A, typename B>
 bool GJKIntersect(const A &a, const B &b)
 {
 	vec support[4];
-	float maxS, minS;
 	// Start with an arbitrary point in the Minkowski set shape.
 	support[0] = a.AnyPointFast() - b.AnyPointFast();
-	vec d = -support[0]; // First search direction is straight toward the origin from the found point.
-	if (d.LengthSq() < 1e-7f) // Robustness check: Test if the first arbitrary point we guessed produced the zero vector we are looking for!
+	if (support[0].LengthSq() < 1e-7f) // Robustness check: Test if the first arbitrary point we guessed produced the zero vector we are looking for!
 		return true;
+	vec d = -support[0]; // First search direction is straight toward the origin from the found point.
 	int n = 1; // Stores the current number of points in the search simplex.
 	int nIterations = 50; // Robustness check: Limit the maximum number of iterations to perform to avoid infinite loop if types A or B are buggy!
 	while(nIterations-- > 0)
 	{
 		// Compute the extreme point to the direction d in the Minkowski set shape.
-		vec newSupport = SUPPORT(d);
+		float maxS, minS;
+		vec newSupport = SUPPORT(d, minS, maxS);
 #ifdef MATH_VEC_IS_FLOAT4
 		assume(newSupport.w == 0.f);
 #endif
@@ -50,6 +50,7 @@ bool GJKIntersect(const A &a, const B &b)
 		if (minS + maxS < 0.f)
 			return false;
 		// Add the newly evaluated point to the search simplex.
+		assert(n < 4);
 		support[n++] = newSupport;
 		// Examine the current simplex, prune a redundant part of it, and produce the next search direction.
 		d = UpdateSimplex(support, n);
