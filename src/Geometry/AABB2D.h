@@ -25,8 +25,10 @@
 
 MATH_BEGIN_NAMESPACE
 
-struct AABB2D
+class AABB2D
 {
+public:
+
 	AABB2D() { }
 	AABB2D(const float2 &minPt, const float2 &maxPt)
 	:minPoint(minPt),
