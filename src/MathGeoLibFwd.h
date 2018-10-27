@@ -103,6 +103,10 @@ class ScaleOp;
 class Triangle;
 class LCG;
 
+class AABB2D;
+class LineSegment2D;
+class Triangle2D;
+
 struct float4_storage;
 
 #define IS16ALIGNED(x) ((((uintptr_t)(x)) & 0xF) == 0)
@@ -147,10 +151,16 @@ struct float4_storage;
 #define MATH_VEC_IS_FLOAT4
 #endif
 
+typedef ALIGN16 float4 vec2d;
+typedef float4_storage vec2d_storage;
+
 typedef ALIGN16 float4 vec;
 typedef float4_storage vec_storage;
 
 #else
+
+typedef float2 vec2d;
+typedef float2 vec2d_storage;
 
 typedef float3 vec;
 typedef float3 vec_storage;
