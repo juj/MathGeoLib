@@ -61,26 +61,23 @@ void Triangle2D::Translate(const vec2d &offset)
 
 void Triangle2D::Transform(const float3x3 &transform)
 {
-	/// @todo Optimize
-	a = transform.Transform(a.x, a.y, 0.f).xy();
-	b = transform.Transform(b.x, b.y, 0.f).xy();
-	c = transform.Transform(c.x, c.y, 0.f).xy();
+	a = Mul2D(transform, a);
+	b = Mul2D(transform, b);
+	c = Mul2D(transform, c);
 }
 
 void Triangle2D::Transform(const float3x4 &transform)
 {
-	/// @todo Optimize
-	a = transform.TransformPos(a.x, a.y, 0.f).xy();
-	b = transform.TransformPos(b.x, b.y, 0.f).xy();
-	c = transform.TransformPos(c.x, c.y, 0.f).xy();
+	a = MulPos2D(transform, a);
+	b = MulPos2D(transform, b);
+	c = MulPos2D(transform, c);
 }
 
 void Triangle2D::Transform(const float4x4 &transform)
 {
-	/// @todo Optimize
-	a = transform.TransformPos(a.x, a.y, 0.f).xy();
-	b = transform.TransformPos(b.x, b.y, 0.f).xy();
-	c = transform.TransformPos(c.x, c.y, 0.f).xy();
+	a = MulPos2D(transform, a);
+	b = MulPos2D(transform, b);
+	c = MulPos2D(transform, c);
 }
 
 /// Implementation from Christer Ericson's Real-Time Collision Detection, pp. 51-52.
@@ -1739,11 +1736,11 @@ Triangle2D Triangle2D::FromString(const char *str, const char **outEndStr)
 	Triangle2D t;
 	MATH_SKIP_WORD(str, "Triangle2D(");
 	MATH_SKIP_WORD(str, "a:(");
-	t.a = PointVecFromString(str, &str).xy();
+	t.a = POINT_TO_FLOAT4(PointVecFromString(str, &str)).ToVec2D();
 	MATH_SKIP_WORD(str, " b:(");
-	t.b = PointVecFromString(str, &str).xy();
+	t.b = POINT_TO_FLOAT4(PointVecFromString(str, &str)).ToVec2D();
 	MATH_SKIP_WORD(str, " c:(");
-	t.c = PointVecFromString(str, &str).xy();
+	t.c = POINT_TO_FLOAT4(PointVecFromString(str, &str)).ToVec2D();
 	if (outEndStr)
 		*outEndStr = str;
 	return t;

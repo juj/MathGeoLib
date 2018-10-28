@@ -1,6 +1,6 @@
 #include "Callstack.h"
 #include <string>
-#include "Math/assume.h"
+#include "assume.h"
 
 #if defined(WIN32) && defined(_MSC_VER) && !defined(WIN8RT)
 

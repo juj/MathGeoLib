@@ -29,6 +29,8 @@
 #include "../Geometry/AABB.h"
 #include "../Geometry/Sphere.h"
 #include "../Algorithm/Random/LCG.h"
+#include "float3x3.h"
+#include "float3x4.h"
 #include "float4x4.h"
 #include "MathFunc.h"
 #include "SSEMath.h"
@@ -1470,6 +1472,13 @@ std::ostream &operator <<(std::ostream &out, const float4 &rhs)
 	return out;
 }
 #endif
+
+float4 Perp2D(const float4 &v) { return float4(v.xy().Perp(), v.z, v.w); }
+float4 Mul2D(const float3x3 &transform, const float4 &v) { return transform.Mul(v); }
+float4 MulPos2D(const float3x4 &transform, const float4 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 1.f)); }
+float4 MulPos2D(const float4x4 &transform, const float4 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 1.f)); }
+float4 MulDir2D(const float3x4 &transform, const float4 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 0.f)); }
+float4 MulDir2D(const float4x4 &transform, const float4 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 0.f)); }
 
 const float4 float4::zero = float4(0, 0, 0, 0);
 const float4 float4::one = float4(1, 1, 1, 1);

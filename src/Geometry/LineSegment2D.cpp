@@ -23,6 +23,7 @@
 #include "../Math/float4x4.h"
 #include "OBB2D.h"
 #include "../Math/Quat.h"
+#include "../Math/Swap.h"
 #if 0
 #include "Ray2D.h"
 #include "Line2D.h"
@@ -546,9 +547,9 @@ LineSegment2D LineSegment2D::FromString(const char *str, const char **outEndStr)
 	LineSegment2D l;
 	MATH_SKIP_WORD(str, "LineSegment2D(");
 	MATH_SKIP_WORD(str, "a:(");
-	l.a = PointVecFromString(str, &str).xy();
+	l.a = POINT_TO_FLOAT4(PointVecFromString(str, &str)).ToVec2D();
 	MATH_SKIP_WORD(str, " b:(");
-	l.b = PointVecFromString(str, &str).xy();
+	l.b = POINT_TO_FLOAT4(PointVecFromString(str, &str)).ToVec2D();
 	if (outEndStr)
 		*outEndStr = str;
 	return l;

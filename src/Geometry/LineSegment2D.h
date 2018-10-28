@@ -18,7 +18,7 @@
 #pragma once
 
 #include "../MathGeoLibFwd.h"
-#include "../Math/float2.h"
+#include "../Math/vec2d.h"
 
 MATH_BEGIN_NAMESPACE
 

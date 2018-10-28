@@ -39,3 +39,4 @@
 #include "Rect.h"
 #include "SSEMath.h"
 #include "TransformOps.h"
+#include "Swap.h"

@@ -5,6 +5,7 @@
 #include "../src/Math/myassert.h"
 #include "TestRunner.h"
 #include "TestData.h"
+#include "../src/Math/float2.h"
 #include "../src/Math/float4_sse.h"
 #include "../src/Math/float4_neon.h"
 

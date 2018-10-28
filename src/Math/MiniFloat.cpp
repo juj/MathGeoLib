@@ -1,5 +1,5 @@
 #include "MiniFloat.h"
-#include "Math/Reinterpret.h"
+#include "Reinterpret.h"
 #include <assert.h>
 
 float Float16ToFloat32(uint16_t float16)

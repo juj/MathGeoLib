@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sstream>
-#include "../Math/float2.h"
+#include "../Math/vec2d.h"
 #include "../Math/MathConstants.h"
 #include "../Math/myassert.h"
 
@@ -9,7 +9,7 @@
 struct Polygon2DRef
 {
 public:
-	const float2 *points;
+	const vec2d *points;
 	int numPoints;
 
 	FORCE_INLINE vec2d AnyPointFast() const

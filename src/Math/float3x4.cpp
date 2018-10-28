@@ -1108,7 +1108,7 @@ void float3x4::RemoveScale()
 float2 float3x4::TransformPos(const float2 &pointVector) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, pointVector.y, pointVector.x));
+	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, pointVector.y, pointVector.x)).xy();
 #else
 	return TransformPos(pointVector.x, pointVector.y);
 #endif
@@ -1117,7 +1117,7 @@ float2 float3x4::TransformPos(const float2 &pointVector) const
 float2 float3x4::TransformPos(float tx, float ty) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, ty, tx));
+	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, ty, tx)).xy();
 #else
 	assume(Equal(v[2][3], 0.f));
 	return float2(DOT2_xy(v[0], tx, ty) + v[0][3],
@@ -1148,7 +1148,7 @@ float3 float3x4::TransformPos(float tx, float ty, float tz) const
 float2 float3x4::TransformDir(const float2 &directionVector) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(0.f, 0.f, directionVector.y, directionVector.x));
+	return mat3x4_mul_vec(row, set_ps(0.f, 0.f, directionVector.y, directionVector.x)).xy();
 #else
 	return TransformDir(directionVector.x, directionVector.y);
 #endif
@@ -1157,7 +1157,7 @@ float2 float3x4::TransformDir(const float2 &directionVector) const
 float2 float3x4::TransformDir(float tx, float ty) const
 {
 #ifdef MATH_SSE
-	return mat3x4_mul_vec(row, set_ps(0, 0, ty, tx));
+	return mat3x4_mul_vec(row, set_ps(0, 0, ty, tx)).xy();
 #else
 	return float2(DOT2_xy(v[0], tx, ty),
 	              DOT2_xy(v[1], tx, ty));
@@ -1419,10 +1419,10 @@ float3x4 float3x4::operator -() const
 	float3x4 r;
 
 #ifdef MATH_SIMD
-	simd4f z = zero_ps();
-	r.row[0] = sub_ps(z, row[0]);
-	r.row[1] = sub_ps(z, row[1]);
-	r.row[2] = sub_ps(z, row[2]);
+	const simd4f zeroVec = zero_ps();
+	r.row[0] = sub_ps(zeroVec, row[0]);
+	r.row[1] = sub_ps(zeroVec, row[1]);
+	r.row[2] = sub_ps(zeroVec, row[2]);
 #else
 	for(int iy = 0; iy < Rows; ++iy)
 		for(int ix = 0; ix < Cols; ++ix)

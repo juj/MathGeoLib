@@ -261,6 +261,10 @@ public:
 	/// Returns the (x, y, z) part of this vector.
 	float3 xyz() const;
 
+	/// Reinterpret-casts this float4 to a vec2d, which is either a float2 if building without SSE/NEON enabled,
+	/// or a float4 if building with SSE enabled. (practically projects this 4D vector to 2D x-y part).
+	FORCE_INLINE const vec2d &ToVec2D() const { return *reinterpret_cast<const vec2d*>(this); }
+
 	/// Reinterpret-casts the (x, y, z) part of this vector.
 	/** @note This aliases into this float4! Use xyz() to make a copy.
 		@see xyz() */
@@ -899,6 +903,13 @@ inline float4 Clamp(const float4 &a, float floor, float ceil) { return a.Clamp(f
 inline float4 Clamp(const float4 &a, const float4 &floor, const float4 &ceil) { return a.Clamp(floor, ceil); }
 inline float4 Clamp01(const float4 &a) { return a.Clamp01(); }
 inline float4 Lerp(const float4 &a, const float4 &b, float t) { return a.Lerp(b, t); }
+
+float4 Perp2D(const float4 &v);
+float4 Mul2D(const float3x3 &transform, const float4 &v);
+float4 MulPos2D(const float3x4 &transform, const float4 &v);
+float4 MulPos2D(const float4x4 &transform, const float4 &v);
+float4 MulDir2D(const float3x4 &transform, const float4 &v);
+float4 MulDir2D(const float4x4 &transform, const float4 &v);
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float4)

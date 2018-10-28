@@ -216,6 +216,12 @@ public:
 	float2 yx() const { return float2(y,x); } ///< [similarOverload: xx] [hideIndex]
 	float2 yy() const { return float2(y,y); } ///< [similarOverload: xx] [hideIndex]
 
+#ifndef MATH_VEC_IS_FLOAT4
+	/// Reinterpret-casts this float4 to a vec2d, which is either a float2 if building without SSE/NEON enabled,
+	/// or a float4 if building with SSE enabled. (practically projects this 4D vector to 2D x-y part).
+	FORCE_INLINE const vec2d &ToVec2D() const { return *this; }
+#endif
+
 	/// Performs a swizzled access to this vector.
 	/** For example, Swizzled(2,1,0) return float3(z,y,x). Swizzled(2,2,2,2) returns float4(z,z,z,z).
 		@param i Chooses the element of this vector to pick for the x value of the returned vector, in the range [0, 2].
@@ -657,6 +663,13 @@ inline float2 Clamp(const float2 &a, float floor, float ceil) { return a.Clamp(f
 inline float2 Clamp(const float2 &a, const float2 &floor, const float2 &ceil) { return a.Clamp(floor, ceil); }
 inline float2 Clamp01(const float2 &a) { return a.Clamp01(); }
 inline float2 Lerp(const float2 &a, const float2 &b, float t) { return a.Lerp(b, t); }
+
+inline float2 Perp2D(const float2 &v) { return v.Perp(); }
+float2 Mul2D(const float3x3 &transform, const float2 &v);
+float2 MulPos2D(const float3x4 &transform, const float2 &v);
+float2 MulDir2D(const float3x4 &transform, const float2 &v);
+float2 MulPos2D(const float4x4 &transform, const float2 &v);
+float2 MulDir2D(const float4x4 &transform, const float2 &v);
 
 #ifdef MATH_QT_INTEROP
 Q_DECLARE_METATYPE(float2)

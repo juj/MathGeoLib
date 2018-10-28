@@ -19,6 +19,9 @@
 #include "float2.inl"
 #include "float3.h"
 #include "float4.h"
+#include "float3x3.h"
+#include "float3x4.h"
+#include "float4x4.h"
 #include "MathFunc.h"
 #include "../Algorithm/Random/LCG.h"
 #include "assume.h"
@@ -778,6 +781,12 @@ std::ostream &operator <<(std::ostream &out, const float2 &rhs)
 	return out;
 }
 #endif
+
+float2 Mul2D(const float3x3 &transform, const float2 &v) { return transform.Transform(v.x, v.y, 0.f).xy(); }
+float2 MulPos2D(const float3x4 &transform, const float2 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 1.f)).xy(); }
+float2 MulPos2D(const float4x4 &transform, const float2 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 1.f)).xy(); }
+float2 MulDir2D(const float3x4 &transform, const float2 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 0.f)).xy(); }
+float2 MulDir2D(const float4x4 &transform, const float2 &v) { return transform.Transform(float4(v.x, v.y, 0.f, 0.f)).xy(); }
 
 const float2 float2::zero = float2(0, 0);
 const float2 float2::one = float2(1, 1);

@@ -67,7 +67,7 @@ bool GJKIntersect2D(const A &a, const B &b)
 	return false; // Report no intersection.
 }
 
-inline bool GJKIntersect2D(const float2 *a, int numA, const float2 *b, int numB)
+inline bool GJKIntersect2D(const vec2d *a, int numA, const vec2d *b, int numB)
 {
 	Polygon2DRef p1 { a, numA };
 	Polygon2DRef p2 { b, numB };
@@ -75,7 +75,7 @@ inline bool GJKIntersect2D(const float2 *a, int numA, const float2 *b, int numB)
 }
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
-inline bool GJKIntersect2D(const Array<float2> &a, const Array<float2> &b)
+inline bool GJKIntersect2D(const Array<vec2d> &a, const Array<vec2d> &b)
 {
 	Polygon2DRef p1 { a.ptr(), (int)a.size() };
 	Polygon2DRef p2 { b.ptr(), (int)b.size() };

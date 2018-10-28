@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "../Math/float2.h"
+#include "../Math/vec2d.h"
 #include "../Math/float3.h"
 #include "../Math/MathConstants.h"
 
@@ -30,21 +30,22 @@ class AABB2D
 public:
 
 	AABB2D() { }
-	AABB2D(const float2 &minPt, const float2 &maxPt)
+
+	AABB2D(const vec2d &minPt, const vec2d &maxPt)
 	:minPoint(minPt),
 	maxPoint(maxPt)
 	{
 	}
 
-	float2 minPoint;
-	float2 maxPoint;
+	vec2d minPoint;
+	vec2d maxPoint;
 
 	float Width() const { return maxPoint.x - minPoint.x; }
 	float Height() const { return maxPoint.y - minPoint.y; }
 
-	float DistanceSq(const float2 &pt) const
+	float DistanceSq(const vec2d &pt) const
 	{
-		float2 cp = pt.Clamp(minPoint, maxPoint);
+		vec2d cp = pt.Clamp(minPoint, maxPoint);
 		return cp.DistanceSq(pt);
 	}
 
@@ -54,7 +55,7 @@ public:
 		maxPoint.SetFromScalar(-FLOAT_INF);
 	}
 
-	void Enclose(const float2 &point)
+	void Enclose(const vec2d &point)
 	{
 		minPoint = Min(minPoint, point);
 		maxPoint = Max(maxPoint, point);
@@ -74,7 +75,7 @@ public:
 			&& rhs.maxPoint.x <= maxPoint.x && rhs.maxPoint.y <= maxPoint.y;
 	}
 
-	bool Contains(const float2 &pt) const
+	bool Contains(const vec2d &pt) const
 	{
 		return pt.x >= minPoint.x && pt.y >= minPoint.y
 			&& pt.x <= maxPoint.x && pt.y <= maxPoint.y;
@@ -101,17 +102,17 @@ public:
 		return minPoint.IsFinite() && maxPoint.IsFinite() && minPoint.MinElement() > -1e5f && maxPoint.MaxElement() < 1e5f;
 	}
 
-	float2 PosInside(const float2 &normalizedPos) const
+	vec2d PosInside(const vec2d &normalizedPos) const
 	{
 		return minPoint + normalizedPos.Mul(maxPoint - minPoint);
 	}
 
-	float2 ToNormalizedLocalSpace(const float2 &pt) const
+	vec2d ToNormalizedLocalSpace(const vec2d &pt) const
 	{
 		return (pt - minPoint).Div(maxPoint - minPoint);
 	}
 
-	AABB2D operator +(const float2 &pt) const
+	AABB2D operator +(const vec2d &pt) const
 	{
 		AABB2D a;
 		a.minPoint = minPoint + pt;
@@ -119,7 +120,7 @@ public:
 		return a;
 	}
 
-	AABB2D operator -(const float2 &pt) const
+	AABB2D operator -(const vec2d &pt) const
 	{
 		AABB2D a;
 		a.minPoint = minPoint - pt;
@@ -136,8 +137,6 @@ public:
 	}
 #endif
 };
-
-inline AABB2D GetAABB2D(const float3 &pt) { return AABB2D(pt.xy(), pt.xy()); }
 
 inline bool Contains(const AABB2D &aabb, const float3 &pt)
 {

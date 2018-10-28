@@ -59,7 +59,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 #endif
 
 		vec2d d01 = s[1] - s[0];
-		vec2d newSearchDir = d01.Perp();
+		vec2d newSearchDir = Perp2D(d01);
 		if (newSearchDir.LengthSq() > 1e-7f)
 		{
 			return Dot(newSearchDir, s[0]) <= 0.f ? newSearchDir : -newSearchDir; // Case 2)
@@ -117,7 +117,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 		vec2d d12 = s[2]-s[1];
 		vec2d d02 = s[2]-s[0];
 
-		vec2d e12 = d12.Perp();
+		vec2d e12 = Perp2D(d12);
 		if (Dot(d02, e12) <= 0.f) e12 = -e12;
 		float t12 = Dot(s[1], e12);
 		if (t12 < 0.f)
@@ -132,7 +132,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 			n = 2;
 			return newDir;
 		}
-		vec2d e02 = d02.Perp();
+		vec2d e02 = Perp2D(d02);
 		if (Dot(d12, e02) <= 0.f) e02 = -e02;
 		float t02 = Dot(s[0], e02);
 		if (t02 < 0.f)
