@@ -49,11 +49,6 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO     "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${optFlags
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${optFlags}")
 
 if (MSVC)
-	# Exception handling model: Catch C++ exceptions only, assume that "extern C" functions will never throw a C++ exception.
-	add_definitions(/EHsc)
-	# Ignore noisy VS warnings that complain about bad std library functions (for now?)
-	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
 	# Perform extremely aggressive optimization on Release builds:
 	# Flags on Visual Studio 2010 and newer:
 	# Runtime library: Multi-threaded (/MT) as opposed to default 'Multi-threaded DLL' - static runtime library allows better LTCG inlining opportunities.
@@ -71,6 +66,11 @@ if (MSVC)
 
 	# Set up flags that affect ABI and linking to other projects as well, but only in unit test runner:
 	if (MATH_TESTS_EXECUTABLE)
+		# Exception handling model: Catch C++ exceptions only, assume that "extern C" functions will never throw a C++ exception.
+		add_definitions(/EHsc)
+		# Ignore noisy VS warnings that complain about bad std library functions (for now?)
+		add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 		set(relFlags "${relFlags} /MT")
 
 		# Disable all forms of MSVC debug iterator checking in new and old Visual Studios.
