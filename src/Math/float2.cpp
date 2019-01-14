@@ -551,11 +551,9 @@ bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexH
 	int j = numPointsInConvexHull-1;
 	for(int i = 0; i < numPointsInConvexHull; ++i)
 	{
-		float2 d = (convexHull[i] - convexHull[j]).Rotated90CCW(); // Points inwards the convex hull.
-		float2 n = point - convexHull[j];
-		if (n.IsZero()) return true;
-		if (n.Dot(d) < 0.f)
+		if (PerpDot2D(convexHull[j], convexHull[i], point) <= -1e-5f)
 			return false;
+
 		j = i;
 	}
 	return true;

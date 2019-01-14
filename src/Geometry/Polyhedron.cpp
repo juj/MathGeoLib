@@ -621,7 +621,7 @@ bool Polyhedron::IsClosed() const
 	std::set<std::pair<int, int> > uniqueEdges;
 	for(int i = 0; i < NumFaces(); ++i) // O(F)
 	{
-		if (f[i].v.empty())
+		if (f[i].v.size() <= 1)
 			continue;
 		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString());
 		assume(FacePolygon(i).IsSimple());
@@ -629,12 +629,14 @@ bool Polyhedron::IsClosed() const
 		for(size_t j = 0; j < f[i].v.size(); ++j) // O(1)
 		{
 			int y = f[i].v[j];
-			if (uniqueEdges.find(std::make_pair(x, y)) != uniqueEdges.end()) // O(logE)
+			std::pair<int, int> edge = std::make_pair(x, y);
+			if (uniqueEdges.find(edge) != uniqueEdges.end()) // O(logE)
 			{
 				LOGW("The edge (%d,%d) is used twice. Polyhedron is not simple and closed!", x, y);
+				LOGW("Polyhedron: %s", this->ToString().c_str());
 				return false; // This edge is being used twice! Cannot be simple and closed.
 			}
-			uniqueEdges.insert(std::make_pair(x, y)); // O(logE)
+			uniqueEdges.insert(edge); // O(logE)
 			x = y;
 		}
 	}
@@ -1738,15 +1740,19 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	Face face;
 	face.v.resize(3);
 	face.v[0] = 0; face.v[1] = 1; face.v[2] = 2; p.f.push_back(face);
-	face.v[0] = 0; face.v[1] = 1; face.v[2] = 3; p.f.push_back(face);
+	face.v[0] = 3; face.v[1] = 1; face.v[2] = 0; p.f.push_back(face);
 	face.v[0] = 0; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
-	face.v[0] = 1; face.v[1] = 2; face.v[2] = 3; p.f.push_back(face);
+	face.v[0] = 3; face.v[1] = 2; face.v[2] = 1; p.f.push_back(face);
 
 	// Ensure that the winding order of the generated tetrahedron is correct for each face.
-	if (p.FacePlane(0).SignedDistance(p.v[3]) > 0.f) p.f[0].FlipWindingOrder();
-	if (p.FacePlane(1).SignedDistance(p.v[2]) > 0.f) p.f[1].FlipWindingOrder();
-	if (p.FacePlane(2).SignedDistance(p.v[1]) > 0.f) p.f[2].FlipWindingOrder();
-	if (p.FacePlane(3).SignedDistance(p.v[0]) > 0.f) p.f[3].FlipWindingOrder();
+	float4 tetraD = float4(p.FacePlane(0).SignedDistance(p.v[3]), p.FacePlane(1).SignedDistance(p.v[2]), p.FacePlane(2).SignedDistance(p.v[1]), p.FacePlane(3).SignedDistance(p.v[0]));
+	if (tetraD.MaxElement() > 0 && tetraD.MaxElement() > -tetraD.MinElement())
+	{
+		p.f[0].FlipWindingOrder();
+		p.f[1].FlipWindingOrder();
+		p.f[2].FlipWindingOrder();
+		p.f[3].FlipWindingOrder();
+	}
 
 	assert(p.IsClosed());
 	assert(p.FaceIndicesValid());
@@ -1808,6 +1814,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		for(size_t i = 4; i < p.v.size(); ++i)
 		{
 			cs d = cv(faceNormals[j]).Dot(cv(POINT_TO_FLOAT4(p.v[i])) - pointOnFace);
+			C_LOG("Vertex idx %d is at distance %f from initial convex hull plane idx %d (in plane epsilon=%f)", (int)i, (float)d, (int)j, inPlaneEpsilon);
 			if (d > inPlaneEpsilon)
 			{
 				conflictList[j].push_back((int)i);
@@ -1842,7 +1849,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			vec pointOnFace = p.v[p.f[j].v[0]];
 			for(size_t i = 0; i < p.v.size(); ++i)
 			{
-				float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
+				float d = Dot((vec)p.v[i] - pointOnFace, ((float4d)faceNormals[j]).ToFloat4());
 				if (d > inPlaneEpsilon)
 					LOG(MathLogWarningNoCallstack, "Vertex %d is at distance %f from face %d.", (int)i, d, (int)j);
 //				else
@@ -1961,7 +1968,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				if (adjFaceIsInConflict)
 				{
 					C_LOG("Neighbor face %d (%s) of face %d (%s) sees vertex %d and is in conflict. (d:%f, adjFaceIsInConflict: %d). Edge %d->%d must be an inner edge",
-						adjFace, p.f[adjFace].ToString().c_str(), fi, f.ToString().c_str(), extremeI, d, adjFaceIsInConflict, v0, v1);
+						adjFace, p.f[adjFace].ToString().c_str(), fi, p.f[f].ToString().c_str(), extremeI, d, adjFaceIsInConflict, v0, v1);
 					if (floodFillVisited[adjFace] != floodFillVisitColor) // Add the neighboring face to the visit stack.
 					{
 						faceVisitStack.push_back(adjFace);
@@ -1972,7 +1979,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				else // v0<->v1 is a boundary edge.
 				{
 					C_LOG("Neighbor face %d (%s) of face %d (%s) does not see vertex %d. Edge %d->%d is then a boundary edge.", 
-						adjFace, p.f[adjFace].ToString().c_str(), fi, f.ToString().c_str(), extremeI, v0, v1);
+						adjFace, p.f[adjFace].ToString().c_str(), fi, p.f[f].ToString().c_str(), extremeI, v0, v1);
 					boundaryEdges.push_back(std::make_pair(v0, v1));
 				}
 				v0 = v1;
@@ -2036,6 +2043,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			if (prev.second != boundaryEdges[i].first)
 			{
 				LOGE("Boundary is not connected: there should be edge %d-%d in the boundary!", prev.second, boundaryEdges[i].first);
+				LOGE("Boundary:");
+				for(size_t b = 0; b < boundaryEdges.size(); ++b)
+					LOGE("%d->%d", (int)boundaryEdges[b].first, boundaryEdges[b].second);
+				LOGE("Polyhedron: %s", p.ToString().c_str());
 				assert(false);
 				return Polyhedron();
 			}
@@ -2147,10 +2158,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	for(size_t j = 0; j < p.f.size(); ++j)
 		if (!p.f[j].v.empty())
 		{
-			vec pointOnFace = p.v[p.f[j].v[0]];
+			vec ptOnFace = p.v[p.f[j].v[0]];
 			for(size_t i = 0; i < p.v.size(); ++i)
 			{
-				float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
+				float d = Dot((vec)p.v[i] - ptOnFace, ((float4d)faceNormals[j]).ToFloat4());
 				if (d > inPlaneEpsilon)
 					LOG(MathLogWarningNoCallstack, "Vertex %d is at distance %f from face %d.", (int)i, d, (int)j);
 //				else
@@ -2196,7 +2207,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			vec pointOnFace = p.v[p.f[j].v[0]];
 			for(size_t i = 0; i < p.v.size(); ++i)
 			{
-				float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
+				float d = Dot((vec)p.v[i] - pointOnFace, ((float4d)faceNormals[j]).ToFloat4());
 				if (d > inPlaneEpsilon)
 					LOG(MathLogErrorNoCallstack, "Vertex %d is at distance %f from face %d.", (int)i, d, (int)j);
 				else
@@ -2223,6 +2234,12 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	for(size_t i = 0; i < p.v.size(); ++i)
 		assume1(p.v[i].w == 1.f && vec(p.v[i]).IsFinite(), vec(p.v[i]));
 #endif
+#endif
+
+#ifdef CONVEXHULL_VERBOSE
+	LOGI("Final convex hull: %s", p.ToString().c_str());
+	for(int i = 0; i < numPoints; ++i)
+		LOGI("Original point %d: %s distance to hull: %f (convex hull contains the point: non-convex check: %s, convex check: %s)", i, pointArray[i].ToString().c_str(), p.Distance(pointArray[i]), p.Contains(pointArray[i]) ? "true" : "false", p.ContainsConvex(pointArray[i]) ? "true" : "false");
 #endif
 
 	return p;
@@ -3157,6 +3174,18 @@ std::string Polyhedron::ToString() const
 		if (i != 0)
 			ss << ",";
 		ss << v[i];
+	}
+	ss << "; " << f.size() << " faces:";
+	for(size_t i = 0; i < f.size(); ++i)
+	{
+		if (i != 0)
+			ss << ", ";
+		for(size_t j = 0; j < f[i].v.size(); ++j)
+		{
+			if (j != 0)
+				ss << "-";
+			ss << f[i].v[j];
+		}
 	}
 	ss << ")";
 	return ss.str();

@@ -496,69 +496,113 @@ void OBB::ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int
 	}
 }
 
-float SmallestOBBVolumeJiggle(const vec &edge_, const Polyhedron &convexHull, std::vector<float2> &pts,
+OBB SmallestOBBVolumeOneEdgeFixed(const vec &edge, const vec *pointArray, int numPoints)
+{
+	vec u, v;
+	edge.PerpendicularBasis(u, v);
+
+	std::vector<float2> pts;
+	pts.resize(numPoints);
+	for(size_t k = 0; k < numPoints; ++k)
+		pts[k] = float2(u.Dot(pointArray[k]), v.Dot(pointArray[k]));
+
+	float2 rectCenter;
+	float2 uDir;
+	float2 vDir;
+	float minU, maxU, minV, maxV;
+	float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
+	vec basisU = uDir.x * u + uDir.y * v;
+	vec basisV = vDir.x * u + vDir.y * v;
+	assume2(basisU.IsPerpendicular(basisV), basisU, basisV);
+	return OBB::FixedOrientationEnclosingOBB(pointArray, numPoints, basisU, basisV);
+}
+
+float SmallestOBBVolumeJiggle(const vec &edge_, const vec *pointArray, int numPoints, std::vector<float2> &pts,
 	vec &outEdgeA, vec &outEdgeB)
 {
+	assume(numPoints >= 3);
 	vec edge = edge_;
 	int numTimesNotImproved = 0;
 	float bestVolume = FLOAT_INF;
-	float2 c10, c20;
-	vec u, v;
-	vec prevSecondChoice = vec::nan;
-	int numJiggles = 2;
-	while(numTimesNotImproved < 2)
+	vec edgeFirstChoice, edgeSecondChoice;
+	pts.resize(numPoints);
+	while(numTimesNotImproved <= 1)
 	{
 		int e1, e2;
-		OBB::ExtremePointsAlongDirection(edge, (const vec*)&convexHull.v[0], (int)convexHull.v.size(), e1, e2);
-		float edgeLength = Abs(Dot((vec)convexHull.v[e1] - convexHull.v[e2], edge));
+		OBB::ExtremePointsAlongDirection(edge, pointArray, numPoints, e1, e2);
+		float edgeLength = Abs(Dot(pointArray[e1] - pointArray[e2], edge));
 
+		vec u, v;
 		edge.PerpendicularBasis(u, v);
 
-		for(size_t k = 0; k < convexHull.v.size(); ++k)
-			pts[k] = float2(u.Dot(convexHull.v[k]), v.Dot(convexHull.v[k]));
+		for(size_t k = 0; k < numPoints; ++k)
+			pts[k] = float2(u.Dot(pointArray[k]), v.Dot(pointArray[k]));
 
 		float2 rectCenter;
 		float2 uDir;
 		float2 vDir;
 		float minU, maxU, minV, maxV;
-		float rectArea = float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
 
-		c10 = (maxV - minV) * vDir;
-		c20 = (maxU - minU) * uDir;
+		float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
+		assume(uDir.IsNormalized());
+		assume(vDir.IsNormalized());
+		assume(uDir.IsPerpendicular(vDir));
+		float2 c10 = (maxV - minV) * vDir;
+		float2 c20 = (maxU - minU) * uDir;
 
-		float volume = rectArea*edgeLength;
-		if (volume + 1e-5f < bestVolume)
+		vec edge1BackIn3D = (c10.x*u + c10.y*v);
+		vec edge2BackIn3D = (c20.x*u + c20.y*v);
+
+		float volume = edge1BackIn3D.Length() * edge2BackIn3D.Length() * edgeLength;
+
+		if (volume < bestVolume)
 		{
 			bestVolume = volume;
-			edge = (c10.x*u + c10.y*v);
-			float len = edge.Normalize();
-			if (len <= 0.f)
-				edge = u;
-			numTimesNotImproved = 0;
-			prevSecondChoice = (c20.x*u + c20.y*v);
-			len = prevSecondChoice.Normalize();
-			if (len <= 0.f)
-				prevSecondChoice = u;
+			edgeFirstChoice = (uDir.x*u + uDir.y*v);
+			assume(edgeFirstChoice.IsPerpendicular(edge));
+			float len = edgeFirstChoice.Normalize();
+			assert(len > 0.f);
+
+			edgeSecondChoice = (vDir.x*u + vDir.y*v);
+			len = edgeSecondChoice.Normalize();
+			assert(len > 0.f);
+
+			assume3(edgeSecondChoice.IsPerpendicular(edge), edgeSecondChoice, edge, edgeSecondChoice.Dot(edge));
+			assume3(edgeSecondChoice.IsPerpendicular(edgeFirstChoice), edgeSecondChoice, edgeFirstChoice, edgeSecondChoice.Dot(edgeFirstChoice));
 			outEdgeA = edge;
-			outEdgeB = prevSecondChoice;
-
-// Enable for a dirty hack to experiment with performance.
-//#define NO_JIGGLES
-
-#ifdef NO_JIGGLES
-			break;
-#endif
+			outEdgeB = edge = edgeFirstChoice;
+			numTimesNotImproved = 0;
 		}
 		else
 		{
 			++numTimesNotImproved;
-			edge = prevSecondChoice;
+			edge = edgeSecondChoice;
 		}
-
-		if (--numJiggles <= 0)
-			break;
 	}
 	return bestVolume;
+}
+
+OBB SmallestOBBVolume2DPlanar(const vec *pointArray, int numPoints)
+{
+	vec commonPlaneNormal = vec::zero;
+	for(int i = 2; i < numPoints; ++i)
+	{
+		vec normal = (pointArray[i] - pointArray[i-2]).Cross(pointArray[i] - pointArray[i-1]);
+		if (normal.Normalize() > 0.f)
+		{
+			if (commonPlaneNormal.Dot(normal) >= 0)
+				commonPlaneNormal += normal;
+			else
+				commonPlaneNormal -= normal;
+			commonPlaneNormal.Normalize();
+		}
+	}
+	std::vector<float2> pts;
+	pts.resize(numPoints);
+	vec edgeA, edgeB;
+	SmallestOBBVolumeJiggle(commonPlaneNormal, pointArray, numPoints, pts, edgeA, edgeB);
+	return OBB::FixedOrientationEnclosingOBB(pointArray, numPoints, edgeA, edgeB);
+//	return SmallestOBBVolumeOneEdgeFixed(edgeA, pointArray, numPoints);
 }
 
 // Moves the floating point sign bit from src to dst.
@@ -803,18 +847,47 @@ bool AreCompatibleOpposingEdges(const vec &f1a, const vec &f1b, const vec &f2a, 
 
 OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 {
+	assert(pointArray);
+	assert(numPoints >= 0);
+
 	// Precomputation: Generate the convex hull of the input point set. This is because
 	// we need vertex-edge-face connectivity information about the convex hull shape, and
 	// this also allows discarding all points in the interior of the input hull, which
 	// are irrelevant.
 	Polyhedron convexHull = Polyhedron::ConvexHull(pointArray, numPoints);
-	if (!pointArray || convexHull.v.size() == 0)
+	if (convexHull.v.size() <= 3 || convexHull.f.size() <= 1)
 	{
-		OBB minOBB;
-		minOBB.SetNegativeInfinity();
-		return minOBB;
+		switch(numPoints)
+		{
+			case 1:
+			{
+				OBB o;
+				o.pos = pointArray[0];
+				o.r = vec::zero;
+				o.axis[0] = vec::unitX;
+				o.axis[1] = vec::unitY;
+				o.axis[2] = vec::unitZ;
+				return o;
+			}
+			case 2:
+			{
+				OBB o;
+				o.pos = (pointArray[0] + pointArray[1]) * 0.5f;
+				o.axis[0] = pointArray[1] - pointArray[0];
+				o.axis[0].PerpendicularBasis(o.axis[1], o.axis[2]);
+				float diameter = o.axis[0].Normalize();
+				o.r = DIR_VEC(diameter * 0.5f, 0.f, 0.f);
+				return o;
+			}
+			default:
+				return SmallestOBBVolume2DPlanar(pointArray, numPoints);
+		}
 	}
-	return OptimalEnclosingOBB(convexHull);
+	OBB optimalObb = OptimalEnclosingOBB(convexHull);
+	if (optimalObb.IsDegenerate()) // OptimalEnclosingOBB() returns a degenerate box if the input is very close to planar, but that was not detected above in the convex hull computation.
+		return SmallestOBBVolume2DPlanar(pointArray, numPoints);
+	else
+		return optimalObb;
 }
 
 bool SortedArrayContains(const std::vector<int> &arr, int i)
@@ -1204,14 +1277,24 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			const std::vector<int> &neighbors = adjacencyData[v];
 			if (IsVertexAntipodalToEdge(convexHull, v, neighbors, f1a, f1b))
 			{
-				assume(edges[i].first != v && edges[i].second != v);
 				if (edges[i].first == v || edges[i].second == v)
 				{
+					/* 
 					LOGE("Edge %d: %d->%d is antipodal to vertex %d, which is part of the same edge! This should be possible only if the input is degenerate planar!",
 						(int)i, edges[i].first, edges[i].second, v);
-					minOBB.SetNegativeInfinity();
+					*/
 					delete[] vertexPairsToEdges;
-					return minOBB;
+					// Input set is degenerate planar. Return an invalid OBB.
+					OBB degenerateObb;
+					degenerateObb.SetNegativeInfinity();
+					return degenerateObb;
+
+					// We could automatically compute a planar box here, but in order to be able to do that robustly,
+					// one should definitely compute the planar box on the source input set, and not on a convex hull
+					// computed from that input set. So it is possible that this computed box from convexHull will
+					// be bad due to float imprecision. Instead, caller should call SmallestOBBVolume2DPlanar() on
+					// the source point set if they want to get a flat OBB from the input point set.
+					/////return SmallestOBBVolume2DPlanar((const vec*)&convexHull.v[0], (int)convexHull.v.size());
 				}
 				antipodalPointsForEdge[i].push_back(v);
 				for(size_t j = 0; j < neighbors.size(); ++j)
@@ -1901,6 +1984,7 @@ OBB OBB::FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, cons
 {
 	assume(dir0.IsNormalized());
 	assume(dir1.IsNormalized());
+	assume(dir0.IsPerpendicular(dir1));
 
 	int d0, d1;
 	float mind0, maxd0, mind1, maxd1, mind2, maxd2;
@@ -1913,17 +1997,30 @@ OBB OBB::FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, cons
 	float rd2 = (maxd2 - mind2) * 0.5f;
 	OBB minOBB;
 	minOBB.pos = (mind0 + rd0) * dir0 + (mind1 + rd1) * dir1 + (mind2 + rd2) * edgeC;
+#ifdef MATH_VEC_IS_FLOAT4
+	minOBB.pos.w = 1.f;
+#endif
 	minOBB.axis[0] = dir0;
 	minOBB.axis[1] = dir1;
 	minOBB.axis[2] = edgeC;
 	minOBB.r = DIR_VEC(rd0, rd1, rd2);
+
 	return minOBB;
 }
 
 OBB OBB::BruteEnclosingOBB(const vec *pointArray, int numPoints)
 {
 	Polyhedron convexHull = Polyhedron::ConvexHull(pointArray, numPoints);
-	return BruteEnclosingOBB(convexHull);
+	OBB minOBB = BruteEnclosingOBB(convexHull);
+	if (minOBB.IsDegenerate())
+		return AABB::MinimalEnclosingAABB(pointArray, numPoints).ToOBB();
+	else
+	{
+		return OBB::FixedOrientationEnclosingOBB(pointArray, numPoints, minOBB.axis[0], minOBB.axis[1]);
+		// TODO: Use this instead? Though due to float imprecision, the above verifying computation generates
+		// a box that better encloses the input point set.
+//		return minOBB;
+	}
 }
 
 OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
@@ -1938,12 +2035,11 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 //	std::vector<std::vector<int> > adjacencyData = convexHull.GenerateVertexAdjacencyData();
 //	std::vector<int> floodFillVisited(convexHull.v.size());
 //	int floodFillVisitColor = 1;
-
+	vec minVolumeEdgeA;
+	vec minVolumeEdgeB;
 	std::vector<float2> pts;
 	pts.resize(convexPolyhedron.v.size());
 	float minVolume = FLOAT_INF;
-	vec minVolumeEdgeA;
-	vec minVolumeEdgeB;
 
 	const int Y = 128;
 	const int X = 128;
@@ -1959,13 +2055,15 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 			float fz = Sqrt(1.0f - lenSq);
 
 			vec edge = DIR_VEC(fx, fy, fz);
+			assert(edge.IsNormalized());
 
 			vec edgeA, edgeB;
-			float volume = SmallestOBBVolumeJiggle(edge, convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
+			float volume = SmallestOBBVolumeJiggle(edge, (const vec*)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(), pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
 				edgeA, edgeB);
 
 			if (volume < minVolume)
 			{
+				assert3(edgeA.IsPerpendicular(edgeB), edgeA, edgeB, edgeA.Dot(edgeB));
 				minVolumeEdgeA = edgeA;
 				minVolumeEdgeB = edgeB;
 				minVolume = volume;
@@ -2039,7 +2137,7 @@ OBB OBB::Brute2EnclosingOBB(const Polyhedron &convexPolyhedron)
 	}
 	std::vector<float2> pts;
 	pts.resize(convexPolyhedron.v.size());
-	/*float volume = */SmallestOBBVolumeJiggle(minOBB.axis[2], convexPolyhedron, pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
+	/*float volume = */SmallestOBBVolumeJiggle(minOBB.axis[2], (const vec*)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(), pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
 		minOBB.axis[0], minOBB.axis[1]);
 	minOBB = OBB::FixedOrientationEnclosingOBB((const vec*)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(),
 		minOBB.axis[0], minOBB.axis[1]);
@@ -2172,7 +2270,12 @@ float3x4 OBB::LocalToWorld() const
 	m.SetCol(2, axis[2].ptr());
 	vec p = pos - axis[0] * r.x - axis[1] * r.y - axis[2] * r.z;
 	m.SetCol(3, p.ptr());
-	assume(m.IsOrthonormal());
+	assume1(m.Row3(0).IsNormalized(), m.Row3(0));
+	assume1(m.Row3(1).IsNormalized(), m.Row3(1));
+	assume1(m.Row3(2).IsNormalized(), m.Row3(2));
+	assume3(m.Col(0).IsPerpendicular(m.Col(1)), m.Col(0), m.Col(1), m.Col(0).Dot(m.Col(1)));
+	assume3(m.Col(0).IsPerpendicular(m.Col(2)), m.Col(0), m.Col(2), m.Col(0).Dot(m.Col(2)));
+	assume3(m.Col(1).IsPerpendicular(m.Col(2)), m.Col(1), m.Col(2), m.Col(1).Dot(m.Col(2)));
 	return m;
 }
 

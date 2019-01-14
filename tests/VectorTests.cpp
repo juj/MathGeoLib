@@ -1053,10 +1053,40 @@ UNIQUE_TEST(float2_ConvexHull_Case)
 	assert(numPointsInConvexHull == 4);
 	MARK_UNUSED(numPointsInConvexHull);
 
-	for(int i = 0; i < 4; ++i)
+	for(int i = 0; i < numPointsInConvexHull; ++i)
 		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
 	MARK_UNUSED(p);
 	assert(float2::ConvexHullContains(h, numPointsInConvexHull, float2(0,0)));
+}
+
+UNIQUE_TEST(float2_ConvexHull_Case2)
+{
+	std::vector<float2> pts;
+	pts.push_back(float2(-13.965818, 24.836142));
+	pts.push_back(float2(-10.308306, 14.270721));
+	pts.push_back(float2(-44.626469, 113.405243));
+	pts.push_back(float2(-72.140152, 192.883652));
+	int numPointsInConvexHull = float2::ConvexHullInPlace(&pts[0], pts.size());
+	assert(numPointsInConvexHull == 4);
+	MARK_UNUSED(numPointsInConvexHull);
+
+	for(int i = 0; i < numPointsInConvexHull; ++i)
+		assert(float2::ConvexHullContains(&pts[0], numPointsInConvexHull, pts[i]));
+}
+
+UNIQUE_TEST(float2_ConvexHull_Case3)
+{
+	std::vector<float2> pts;
+	pts.push_back(float2(-10.283741, -147.214920));
+	pts.push_back(float2(-0.912153, -130.096695));
+	pts.push_back(float2(60.997635, -17.011709));
+	pts.push_back(float2(61.076935, -16.866882));
+	int numPointsInConvexHull = float2::ConvexHullInPlace(&pts[0], pts.size());
+	assert(numPointsInConvexHull == 3);
+	MARK_UNUSED(numPointsInConvexHull);
+
+	for(int i = 0; i < numPointsInConvexHull; ++i)
+		assert(float2::ConvexHullContains(&pts[0], numPointsInConvexHull, pts[i]));
 }
 
 RANDOMIZED_TEST(float2_ConvexHull)
