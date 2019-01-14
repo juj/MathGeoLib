@@ -664,11 +664,15 @@ bool Triangle::Intersects(const AABB &aabb) const
 	simd4f d2 = msub_ps(t1_wxzy, bc_wyxz, mul_ps(t1_wyxz, bc_wxzy));
 	simd4f tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
 	simd4f r = abs_ps(madd_ps(h_wyxz, at1_wxzy, mul_ps(h_wxzy, at1_wyxz)));
-	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
-	// Note: The three masks of W channel could be omitted if cmplt_ps was used instead of cmple_ps, but
-	// want to be strict here and define that AABB and Triangle which touch at a vertex should not intersect.
-	// Mask off results from the W channel and test if all were zero.
-	if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
+	cmp = cmplt_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	if (!allzero_ps(cmp)) return false;
+
+	// Note: the above semantics with cmplt_ps() vs cmple_ps() is quite delicate. cmple_ps might be usable
+	// to define AABB and Triangle touching at a vertex to intersect, but it has troubles when the Triangle
+	// is parallel to one of the cardinal axes. (see Triangle_Intersects_AABB_Case* tests)
+	// To do the cmple_ps approach, would mask off results from the W channel and test if all were zero.
+	// cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	// if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
 
 	// {eX, eY, eZ} cross t2
 	simd4f t2 = sub_ps(c, b);
@@ -682,9 +686,8 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = msub_ps(t2_wxzy, bc_wyxz, mul_ps(t2_wyxz, bc_wxzy));
 	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
 	r = abs_ps(madd_ps(h_wyxz, at2_wxzy, mul_ps(h_wxzy, at2_wyxz)));
-	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
-	// Mask off results from the W channel and test if all were zero.
-	if (!a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU))) return false;
+	cmp = cmplt_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	if (!allzero_ps(cmp)) return false;
 
 	// {eX, eY, eZ} cross t0
 	simd4f cc = sub_ps(c, center);
@@ -700,9 +703,8 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = msub_ps(t0_wxzy, cc_wyxz, mul_ps(t0_wyxz, cc_wxzy));
 	tc = mul_ps(add_ps(d1, d2), set1_ps(0.5f));
 	r = abs_ps(madd_ps(h_wyxz, at0_wxzy, mul_ps(h_wxzy, at0_wyxz)));
-	cmp = cmple_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
-	// Mask off results from the W channel and test if all were zero.
-	return a_and_b_allzero_ps(cmp, set_ps_hex(0, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU)) != 0;
+	cmp = cmplt_ps(add_ps(r, abs_ps(sub_ps(tc, d1))), abs_ps(tc));
+	return allzero_ps(cmp) != 0;
 #else
 	// Benchmark 'Triangle_intersects_AABB': Triangle::Intersects(AABB)
 	//    Best: 17.282 nsecs / 46.496 ticks, Avg: 17.804 nsecs, Worst: 18.434 nsecs
@@ -752,7 +754,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	float d2 = t[0].y * cc.z - t[0].z * cc.y;
 	float tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[0].z + h.z * at[0].y);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eX <cross> t[1]
@@ -760,7 +762,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[1].y * bc.z - t[1].z * bc.y;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[1].z + h.z * at[1].y);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eX <cross> t[2]
@@ -768,7 +770,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[2].y * bc.z - t[2].z * bc.y;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[2].z + h.z * at[2].y);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eY <cross> t[0]
@@ -776,7 +778,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[0].z * cc.x - t[0].x * cc.z;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.x * at[0].z + h.z * at[0].x);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eY <cross> t[1]
@@ -784,7 +786,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[1].z * bc.x - t[1].x * bc.z;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.x * at[1].z + h.z * at[1].x);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eY <cross> t[2]
@@ -792,7 +794,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[2].z * bc.x - t[2].x * bc.z;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.x * at[2].z + h.z * at[2].x);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eZ <cross> t[0]
@@ -800,7 +802,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[0].x * cc.y - t[0].y * cc.x;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[0].x + h.x * at[0].y);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eZ <cross> t[1]
@@ -808,7 +810,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[1].x * bc.y - t[1].y * bc.x;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[1].x + h.x * at[1].y);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// eZ <cross> t[2]
@@ -816,7 +818,7 @@ bool Triangle::Intersects(const AABB &aabb) const
 	d2 = t[2].x * bc.y - t[2].y * bc.x;
 	tc = (d1 + d2) * 0.5f;
 	r = Abs(h.y * at[2].x + h.x * at[2].y);
-	if (r + Abs(tc - d1) <= Abs(tc))
+	if (r + Abs(tc - d1) < Abs(tc))
 		return false;
 
 	// No separating axis exists, the AABB and triangle intersect.
