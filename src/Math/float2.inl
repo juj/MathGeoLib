@@ -45,7 +45,7 @@ template<typename T>
 float PerpDot2D(const T &o, const T &a, const T &b)
 {
 	// 2D convex hull algorithm is very sensitive to numerical precision, so compute perp-dot products in double precision.
-	return ((double)a.x - (double)o.x) * ((double)b.y - (double)o.y) - ((double)a.y - (double)o.y) * ((double)b.x - (double)o.x);
+	return (float)(((double)a.x - (double)o.x) * ((double)b.y - (double)o.y) - ((double)a.y - (double)o.y) * ((double)b.x - (double)o.x));
 
 	// Single precision for fast code:
 //	return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
