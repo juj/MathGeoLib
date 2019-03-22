@@ -509,7 +509,7 @@ LineSegment2D operator *(const Quat &transform, const LineSegment2D &l)
 std::string LineSegment2D::ToString() const
 {
 	char str[256];
-	sprintf(str, "LineSegment2D(a:(%.2f, %.2f) b:(%.2f, %.2f))",
+	sprintf_s(str, 256,"LineSegment2D(a:(%.2f, %.2f) b:(%.2f, %.2f))",
 		a.x, a.y, b.x, b.y);
 	return str;
 }

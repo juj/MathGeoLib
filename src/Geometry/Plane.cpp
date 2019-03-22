@@ -916,7 +916,7 @@ Plane operator *(const Quat &transform, const Plane &plane)
 std::string Plane::ToString() const
 {
 	char str[256];
-	sprintf(str, "Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
+	sprintf_s(str, 256,"Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
 	return str;
 }
 
@@ -935,7 +935,7 @@ std::string Plane::SerializeToString() const
 std::string Plane::SerializeToCodeString() const
 {
 	char str[256];
-	sprintf(str, "%.9g", d);
+	sprintf_s(str, 256,"%.9g", d);
 	return "Plane(" + normal.SerializeToCodeString() + "," + str + ")";
 }
 

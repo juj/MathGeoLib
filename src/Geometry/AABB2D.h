@@ -132,7 +132,7 @@ public:
 	std::string ToString() const
 	{
 		char str[256];
-		sprintf(str, "AABB2D(Min:(%.2f, %.2f) Max:(%.2f, %.2f))", minPoint.x, minPoint.y, maxPoint.x, maxPoint.y);
+		sprintf_s(str,256, "AABB2D(Min:(%.2f, %.2f) Max:(%.2f, %.2f))", minPoint.x, minPoint.y, maxPoint.x, maxPoint.y);
 		return str;
 	}
 #endif

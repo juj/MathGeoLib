@@ -1126,7 +1126,7 @@ std::string FrustumTypeToString(FrustumType t)
 std::string Frustum::ToString() const
 {
 	char str[256];
-	sprintf(str, "Frustum(%s pos:(%.2f, %.2f, %.2f) front:(%.2f, %.2f, %.2f), up:(%.2f, %.2f, %.2f), near: %.2f, far: %.2f, %s: %.2f, %s: %.2f)",
+	sprintf_s(str, 256,"Frustum(%s pos:(%.2f, %.2f, %.2f) front:(%.2f, %.2f, %.2f), up:(%.2f, %.2f, %.2f), near: %.2f, far: %.2f, %s: %.2f, %s: %.2f)",
 		FrustumTypeToString(type).c_str(), pos.x, pos.y, pos.z, front.x, front.y, front.z,
 		up.x, up.y, up.z, nearPlaneDistance, farPlaneDistance,
 		type == OrthographicFrustum ? "ortho width:" : "hFov",

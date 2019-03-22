@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file float3.cpp
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief */
 #include "float3.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -239,7 +239,7 @@ bool IsNeutralCLocale();
 std::string float3::ToString() const
 {
 	char str[256];
-	sprintf(str, "(%.3f, %.3f, %.3f)", x, y, z);
+	sprintf_s(str, 256,"(%.3f, %.3f, %.3f)", x, y, z);
 	return std::string(str);
 }
 

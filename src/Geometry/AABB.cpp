@@ -1205,7 +1205,7 @@ void AABB::ToEdgeList(vec *outPos) const
 std::string AABB::ToString() const
 {
 	char str[256];
-	sprintf(str, "AABB(Min:(%.2f, %.2f, %.2f) Max:(%.2f, %.2f, %.2f))", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
+	sprintf_s(str, 256,"AABB(Min:(%.2f, %.2f, %.2f) Max:(%.2f, %.2f, %.2f))", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
 	return str;
 }
 
