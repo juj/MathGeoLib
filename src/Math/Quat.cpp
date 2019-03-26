@@ -769,7 +769,7 @@ bool IsNeutralCLocale();
 std::string MUST_USE_RESULT Quat::ToString() const
 {
 	char str[256];
-	sprintf(str, "(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
+	sprintf_s(str, 256,"(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
 	return str;
 }
 
@@ -779,7 +779,7 @@ std::string MUST_USE_RESULT Quat::ToString2() const
 	float angle;
 	ToAxisAngle(axis, angle);
 	char str[256];
-	sprintf(str, "Quat(axis:(%.2f,%.2f,%.2f) angle:%2.f)", axis.x, axis.y, axis.z, RadToDeg(angle));
+	sprintf_s(str, 256,"Quat(axis:(%.2f,%.2f,%.2f) angle:%2.f)", axis.x, axis.y, axis.z, RadToDeg(angle));
 	return str;
 }
 
