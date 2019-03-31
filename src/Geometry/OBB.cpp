@@ -503,7 +503,7 @@ OBB SmallestOBBVolumeOneEdgeFixed(const vec &edge, const vec *pointArray, int nu
 
 	std::vector<float2> pts;
 	pts.resize(numPoints);
-	for(size_t k = 0; k < numPoints; ++k)
+	for(int k = 0; k < numPoints; ++k)
 		pts[k] = float2(u.Dot(pointArray[k]), v.Dot(pointArray[k]));
 
 	float2 rectCenter;
@@ -535,7 +535,7 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const vec *pointArray, int numPo
 		vec u, v;
 		edge.PerpendicularBasis(u, v);
 
-		for(size_t k = 0; k < numPoints; ++k)
+		for(int k = 0; k < numPoints; ++k)
 			pts[k] = float2(u.Dot(pointArray[k]), v.Dot(pointArray[k]));
 
 		float2 rectCenter;
