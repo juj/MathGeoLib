@@ -68,7 +68,7 @@ bool FitCircleThroughPoints(const float2 &ab, const float2 &ac, float &s, float 
 
 	   Now, without loss of generality, assume that the point a lies at origin (translate the origin
 	   of the coordinate system to be centered at the point a), i.e. make the substitutions
-	   A = (0,0,0), B = b-a, C = c-a, and we have:and we have:
+	   A = (0,0), B = b-a, C = c-a, and we have
 
 	      BP == B^2/2,            (1')
 	      CP == C^2/2 and         (2')
@@ -110,59 +110,42 @@ bool FitCircleThroughPoints(const float2 &ab, const float2 &ac, float &s, float 
 // The epsilon value used for enclosing circle computations.
 static const float sEpsilon = 1e-4f;
 
+// Uncomment for internal debugging
+// #define DEBUG_MINCIRCLE
+
 /** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, const float2 &c, const float2 &d, int &redundantPoint)
 {
 	Circle2D circle;
 
-	float s, t;
-	const float2 ab = b - a;
-	const float2 ac = c - a;
-	bool success = FitCircleThroughPoints(ab, ac, s, t);
-	if (!success || s < 0.f || t < 0.f || s + t > 1.f)
-	{
-		redundantPoint = 3;
-		circle = OptimalEnclosingCircle(a, b, c);
-		if (!circle.Contains(d))
-		{
-			redundantPoint = 2;
-			circle = OptimalEnclosingCircle(a, b, d);
-			if (!circle.Contains(c))
-			{
-				redundantPoint = 1;
-				circle = OptimalEnclosingCircle(a, c, d);
-				if (!circle.Contains(b))
-				{
-					redundantPoint = 0;
-					circle = OptimalEnclosingCircle(b, c, d);
-					circle.r = Max(circle.r, a.Distance(circle.pos) + 1e-3f); // For numerical stability, expand the radius of the circle so it certainly contains the fourth point.
-					assume(circle.Contains(a));
-				}
-			}
-		}
-	}
-	/* // Note: Trying to approach the problem like this, like was in the triangle case, is flawed:
-	if (s < 0.f)
-		circle = OptimalEnclosingSphere(a, c, d);
-	else if (t < 0.f)
-		circle = OptimalEnclosingSphere(a, b, d);
-	else if (u < 0.f)
-		circle = OptimalEnclosingSphere(a, b, c);
-	else if (s + t + u > 1.f)
-		circle = OptimalEnclosingSphere(b, c, d); */
-	else // The fitted circle is inside the convex hull of the vertices (a,b,c,d), so it must be optimal.
-	{
-		const float2 center = s * ab + t * ac;
-
-		circle.pos = a + center;
-		// Mathematically, the following would be correct, but it suffers from floating point inaccuracies,
-		// since it only tests distance against one point.
-		//circle.r = center.Length();
-
-		// For robustness, take the radius to be the distance to the farthest point (though the distance are all
-		// equal).
-		circle.r = Sqrt(Max(circle.pos.DistanceSq(a), circle.pos.DistanceSq(b), circle.pos.DistanceSq(c), circle.pos.DistanceSq(d)));
-	}
+    redundantPoint = 3;
+    circle = OptimalEnclosingCircle(a, b, c);
+    if (!circle.Contains(d))
+    {
+        redundantPoint = 2;
+        circle = OptimalEnclosingCircle(a, b, d);
+        if (!circle.Contains(c))
+        {
+            redundantPoint = 1;
+            circle = OptimalEnclosingCircle(a, c, d);
+            if (!circle.Contains(b))
+            {
+#ifdef DEBUG_MINCIRCLE
+                // TODO: By construction, the circle should always go through point 'a', but does not seem to be the case
+                LOGI("Distances: %f, %f, %f, %f", OptimalEnclosingCircle(a, b, c).SignedDistance(d),
+                     OptimalEnclosingCircle(a, b, d).SignedDistance(c),
+                     OptimalEnclosingCircle(a, c, d).SignedDistance(b),
+                     OptimalEnclosingCircle(b, c, d).SignedDistance(a)
+                     );
+                assert(false);
+#endif
+                redundantPoint = 0;
+                circle = OptimalEnclosingCircle(b, c, d);
+                circle.r = Max(circle.r, a.Distance(circle.pos) + 1e-3f); // For numerical stability, expand the radius of the circle so it certainly contains the fourth point.
+                assume(circle.Contains(a));
+            }
+        }
+    }
 
 	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 	// really contain the points (note that the points must be sufficiently near enough to the origin)
@@ -178,6 +161,13 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 		LOGE("D: %s, dist: %f", d.ToString().c_str(), d.Distance(circle.pos));
 		mathassert(false);
 	}
+    float maxDist = Max(circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c), circle.pos.Distance(d));
+    int numMaxDistance = 0;
+    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(d), maxDist, 1e-2f)) ++numMaxDistance;
+    assert1(numMaxDistance >= 2, numMaxDistance);
 #endif
 
 	return circle;
@@ -195,13 +185,30 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 	bool areCollinear = Abs(ab.PerpDot(ac)) < 1e-4f; // Manually test that we don't try to fit circle to three collinear points.
 	if (areCollinear)
 	{
-		circle.pos = (b + c) * 0.5f;
-		circle.r = b.Distance(c) * 0.5f;
-		circle.r = Max(circle.r, a.Distance(circle.pos)); // For numerical stability, expand the radius of the circle so it certainly contains the third point.
+        if (ab.Dot(ac) > 0.f)
+        {
+            float adb = a.DistanceSq(b);
+            float adc = a.DistanceSq(c);
+            if (adb > adc)
+            {
+                circle.pos = (a+b)*0.5f;
+                circle.r = Sqrt(adb)*0.5f;
+            }
+            else
+            {
+                circle.pos = (a+c)*0.5f;
+                circle.r = Sqrt(adc)*0.5f;
+            }
+        }
+        else
+        {
+            circle.pos = (b+c)*0.5f;
+            circle.r = circle.pos.Distance(c)*0.5f;
+        }
 	}
 	else
 	{
-		bool success = !areCollinear && FitCircleThroughPoints(ab, ac, s, t);
+		bool success = FitCircleThroughPoints(ab, ac, s, t);
 		if (!success || Abs(s) > 10000.f || Abs(t) > 10000.f) // If s and t are very far from the triangle, do a manual box fitting for numerical stability.
 		{
 			float2 minPt = Min(a, b, c);
@@ -254,6 +261,20 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(circle.pos));
 		mathassert(false);
 	}
+    float maxDist = Max(circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c));
+    int numMaxDistance = 0;
+    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-2f)) ++numMaxDistance;
+    if (!(numMaxDistance == 2 || numMaxDistance == 3))
+    {
+        LOGI("%s", circle.ToString().c_str());
+        LOGI("%s", a.ToString().c_str());
+        LOGI("%s", b.ToString().c_str());
+        LOGI("%s", c.ToString().c_str());
+    }
+    assert4(numMaxDistance == 2 || numMaxDistance == 3, numMaxDistance,
+            circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c));
 #endif
 	return circle;
 }
@@ -278,6 +299,16 @@ bool Circle2D::Contains(const float2 &point, float epsilon) const
 	return pos.DistanceSq(point) <= r * r + epsilon;
 }
 
+float Circle2D::Distance(const float2 &point) const
+{
+    return Max(0.f, pos.Distance(point) - r);
+}
+
+float Circle2D::SignedDistance(const float2 &point) const
+{
+    return pos.Distance(point) - r;
+}
+
 Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoints)
 {
 	// Start off by computing the convex hull of the points, which prunes many points off from the problem space.
@@ -285,27 +316,74 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
 	memcpy(pts, pointArray, sizeof(float2)*numPoints);
 	numPoints = float2_ConvexHullInPlace(pts, numPoints);
 
-	int numForward = 0;
+#ifdef DEBUG_MINCIRCLE
+    float2 *pts2 = new float2[numPoints];
+    memcpy(pts2, pts, sizeof(float2)*numPoints);
+    LOGI("%d", numPoints);
+    for(int i = 0; i < numPoints; ++i)
+        LOGI("%s", pts[i].SerializeToCodeString().c_str());
+    LOGI("%d points", numPoints);
+#endif
+    int numForward = 0;
 
 	Circle2D minCircle = OptimalEnclosingCircle(pts[0], pts[1], pts[2]);
-
-	for(int i = 3; i < numPoints; ++i)
+    for(int i = 3; i < numPoints; ++i)
 	{
+#ifdef DEBUG_MINCIRCLE
+        LOGI("Current circle: %s", minCircle.ToString().c_str());
+        LOGI("Testing pt idx=%d: %s, dist to current circle: %f", i, pts[i].ToString().c_str(), pts[i].Distance(minCircle.pos) - minCircle.r);
+#endif
 		if (minCircle.Contains(pts[i]))
 			continue;
 		float2 newImportantPoint = pts[i];
+#ifdef DEBUG_MINCIRCLE
+        LOGI("%d is not contained", i);
+        LOGI("newImportantPoint: %s, numForward=%d", newImportantPoint.ToString().c_str(), numForward);
+#endif
 		if (i > numForward)
 			pts[i] = pts[numForward];
-		for(int j = numForward; j > 0; --j)
+		for(int j = Min(i, numForward); j > 0; --j)
 			pts[j] = pts[j-1];
 		pts[0] = newImportantPoint;
 		int redundantPoint = 0;
 		minCircle = OptimalEnclosingCircle(pts[0], pts[1], pts[2], pts[3], redundantPoint);
-		Swap(pts[redundantPoint], pts[3]);
+        float2 redundantPt = pts[redundantPoint];
+
+        for(int j = redundantPoint; j < 3; ++j)
+            pts[j] = pts[j+1];
+        pts[3] = redundantPt;
+
+        // TODO: This would be faster than the above:
+		//Swap(pts[redundantPoint], pts[3]);
 		if (i > numForward)
 			++numForward;
-		i = 2;
+		i = 3;
+        assert(minCircle.Contains(pts[0]));
+        assert(minCircle.Contains(pts[1]));
+        assert(minCircle.Contains(pts[2]));
+        assert(minCircle.Contains(pts[3]));
+#ifdef DEBUG_MINCIRCLE
+        LOGI("New circle, distances:");
+        for(int j = 0; j <= numPoints; ++j)
+            LOGI("%s: %f", pts[j].SerializeToString().c_str(), minCircle.SignedDistance(pts[j]));
+#endif
 	}
+#ifdef DEBUG_MINCIRCLE
+    for(int i = 0; i < numPoints; ++i)
+        if (!minCircle.Contains(pts2[i]))
+        {
+            LOGI("%d", numPoints);
+            for(int j = 0; j < numPoints; ++j)
+                LOGI("%s", pts2[j].SerializeToCodeString().c_str());
+            break;
+        }
+#endif
+
+#ifdef DEBUG_MINCIRCLE
+    LOGI("Final pts:");
+    for(int i = 0; i < numPoints; ++i)
+        LOGI("%s", pts[i].SerializeToString().c_str());
+#endif
 	delete[] pts;
 	return minCircle;
 }
@@ -320,6 +398,11 @@ float2 Circle2D::RandomPointInside(LCG &lcg)
 	{
 		v.x = lcg.Float(-r, r);
 		v.y = lcg.Float(-r, r);
+#ifdef DEBUG_MINCIRCLE
+        // Generate easy test cases
+        v.x = (float)(int)v.x;
+        v.y = (float)(int)v.y;
+#endif
 		if (v.LengthSq() <= r * r)
 			return pos + v;
 	}

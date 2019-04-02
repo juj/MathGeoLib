@@ -69,16 +69,16 @@ bool GJKIntersect2D(const A &a, const B &b)
 
 inline bool GJKIntersect2D(const vec2d *a, int numA, const vec2d *b, int numB)
 {
-	Polygon2DRef p1 { a, numA };
-	Polygon2DRef p2 { b, numB };
+	Polygon2DRef p1 = { a, numA };
+	Polygon2DRef p2 = { b, numB };
 	return GJKIntersect2D(p1, p2);
 }
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
 inline bool GJKIntersect2D(const Array<vec2d> &a, const Array<vec2d> &b)
 {
-	Polygon2DRef p1 { a.ptr(), (int)a.size() };
-	Polygon2DRef p2 { b.ptr(), (int)b.size() };
+	Polygon2DRef p1 = { a.ptr(), (int)a.size() };
+	Polygon2DRef p2 = { b.ptr(), (int)b.size() };
 	return GJKIntersect2D(p1, p2);
 }
 #endif
