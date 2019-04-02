@@ -29,6 +29,7 @@
 #include "AABB2D.h"
 #include "Capsule.h"
 #include "Circle.h"
+#include "Circle2D.h"
 #include "Frustum.h"
 #include "GeometryAll.h"
 #include "HitInfo.h"
