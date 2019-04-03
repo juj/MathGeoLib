@@ -1887,7 +1887,7 @@ Triangle operator *(const Quat &transform, const Triangle &triangle)
 std::string Triangle::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))",
+	sprintf_s(str,sizeof(str),"Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))",
 		a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
 	return str;
 }
@@ -1895,15 +1895,15 @@ std::string Triangle::ToString() const
 std::string Triangle::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
-	s = SerializeFloat(a.y, s); *s = ','; ++s;
-	s = SerializeFloat(a.z, s); *s = ','; ++s;
-	s = SerializeFloat(b.x, s); *s = ','; ++s;
-	s = SerializeFloat(b.y, s); *s = ','; ++s;
-	s = SerializeFloat(b.z, s); *s = ','; ++s;
-	s = SerializeFloat(c.x, s); *s = ','; ++s;
-	s = SerializeFloat(c.y, s); *s = ','; ++s;
-	s = SerializeFloat(c.z, s);
+	char *s = SerializeFloat(a.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(a.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(a.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(c.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(c.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(c.z, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

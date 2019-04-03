@@ -34,7 +34,7 @@ static std::string GetSymbolName(void *address, HANDLE hProcess)
 		{
 			// SymGetLineFromAddr64 returned success
 			char str[128];
-			sprintf_s(str, 128,":%u: ", line.LineNumber);
+			sprintf_s(str,sizeof(str),":%u: ", line.LineNumber);
 			return std::string(line.FileName) + str + pSymbol->Name;
 		}
 		else

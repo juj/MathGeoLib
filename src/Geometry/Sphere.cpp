@@ -1391,7 +1391,7 @@ Sphere Sphere::FitThroughPoints(const vec &a, const vec &b, const vec &c, const 
 std::string Sphere::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)",
+	sprintf_s(str,sizeof(str),"Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)",
 		pos.x, pos.y, pos.z, r);
 	return str;
 }
@@ -1399,10 +1399,10 @@ std::string Sphere::ToString() const
 std::string Sphere::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(pos.x, str); *s = ','; ++s;
-	s = SerializeFloat(pos.y, s); *s = ','; ++s;
-	s = SerializeFloat(pos.z, s); *s = ','; ++s;
-	s = SerializeFloat(r, s);
+	char *s = SerializeFloat(pos.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(pos.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(pos.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(r, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
@@ -1411,7 +1411,7 @@ std::string Sphere::SerializeToString() const
 std::string Sphere::SerializeToCodeString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"%.9g", r);
+	sprintf_s(str,sizeof(str),"%.9g", r);
 	return "Sphere(" + pos.SerializeToCodeString() + "," + str + ")";
 }
 

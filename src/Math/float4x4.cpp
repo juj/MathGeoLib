@@ -2029,7 +2029,7 @@ bool float4x4::ContainsProjection(float epsilon) const
 std::string float4x4::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)",
+	sprintf_s(str,sizeof(str),"(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)",
 		v[0][0], v[0][1], v[0][2], v[0][3],
 		v[1][0], v[1][1], v[1][2], v[1][3],
 		v[2][0], v[2][1], v[2][2], v[2][3],
@@ -2041,22 +2041,22 @@ std::string float4x4::ToString() const
 std::string float4x4::SerializeToString() const
 {
 	char str[512];
-	char *s = SerializeFloat(v[0][0], str); *s = ','; ++s;
-	s = SerializeFloat(v[0][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[0][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[0][3], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][3], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][3], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][3], s);
+	char *s = SerializeFloat(v[0][0], str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(v[0][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[0][2], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[0][3], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][0], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][2], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][3], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][0], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][2], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][3], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[3][0], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[3][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[3][2], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[3][3], s,sizeof(str)-(s-str));
 	assert(s+1 - str < 512);
 	MARK_UNUSED(s);
 	return str;
@@ -2065,7 +2065,7 @@ std::string float4x4::SerializeToString() const
 std::string float4x4::ToString2() const
 {
 	char str[256];
-	sprintf_s(str,256, "float4x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
+	sprintf_s(str,sizeof(str), "float4x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
 		v[0][0], v[1][0], v[2][0], v[3][0],
 		v[0][1], v[1][1], v[2][1], v[3][1],
 		v[0][2], v[1][2], v[2][2], v[3][2],

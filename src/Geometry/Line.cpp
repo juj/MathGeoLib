@@ -360,19 +360,19 @@ Line operator *(const Quat &transform, const Line &l)
 std::string Line::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Line(Pos:(%.2f, %.2f, %.2f) Dir:(%.3f, %.3f, %.3f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+	sprintf_s(str,sizeof(str),"Line(Pos:(%.2f, %.2f, %.2f) Dir:(%.3f, %.3f, %.3f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
 }
 
 std::string Line::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(pos.x, str); *s = ','; ++s;
-	s = SerializeFloat(pos.y, s); *s = ','; ++s;
-	s = SerializeFloat(pos.z, s); *s = ','; ++s;
-	s = SerializeFloat(dir.x, s); *s = ','; ++s;
-	s = SerializeFloat(dir.y, s); *s = ','; ++s;
-	s = SerializeFloat(dir.z, s);
+	char *s = SerializeFloat(pos.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(pos.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(pos.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(dir.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(dir.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(dir.z, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

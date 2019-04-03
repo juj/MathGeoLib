@@ -1427,7 +1427,7 @@ bool float3x3::Equals(const float3x3 &other, float epsilon) const
 std::string float3x3::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)",
+	sprintf_s(str,sizeof(str),"(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)",
 		v[0][0], v[0][1], v[0][2],
 		v[1][0], v[1][1], v[1][2],
 		v[2][0], v[2][1], v[2][2]);
@@ -1438,15 +1438,15 @@ std::string float3x3::ToString() const
 std::string float3x3::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(v[0][0], str); *s = ','; ++s;
-	s = SerializeFloat(v[0][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[0][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][2], s);
+	char *s = SerializeFloat(v[0][0], str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(v[0][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[0][2], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][0], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[1][2], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][0], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][1], s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(v[2][2], s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
@@ -1455,7 +1455,7 @@ std::string float3x3::SerializeToString() const
 std::string float3x3::ToString2() const
 {
 	char str[256];
-	sprintf_s(str, 256,"float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)",
+	sprintf_s(str,sizeof(str),"float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)",
 		v[0][0], v[1][0], v[2][0],
 		v[0][1], v[1][1], v[2][1],
 		v[0][2], v[1][2], v[2][2]);

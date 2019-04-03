@@ -242,15 +242,15 @@ bool IsNeutralCLocale()
 std::string float2::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"(%f, %f)", x, y);
+	sprintf_s(str,sizeof(str),"(%f, %f)", x, y);
 	return std::string(str);
 }
 
 std::string float2::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(x, str); *s = ','; ++s;
-	s = SerializeFloat(y, s);
+	char *s = SerializeFloat(x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(y, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

@@ -769,7 +769,7 @@ bool IsNeutralCLocale();
 std::string MUST_USE_RESULT Quat::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
+	sprintf_s(str,sizeof(str),"(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
 	return str;
 }
 
@@ -779,17 +779,17 @@ std::string MUST_USE_RESULT Quat::ToString2() const
 	float angle;
 	ToAxisAngle(axis, angle);
 	char str[256];
-	sprintf_s(str, 256,"Quat(axis:(%.2f,%.2f,%.2f) angle:%2.f)", axis.x, axis.y, axis.z, RadToDeg(angle));
+	sprintf_s(str,sizeof(str),"Quat(axis:(%.2f,%.2f,%.2f) angle:%2.f)", axis.x, axis.y, axis.z, RadToDeg(angle));
 	return str;
 }
 
 std::string MUST_USE_RESULT Quat::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(x, str); *s = ','; ++s;
-	s = SerializeFloat(y, s); *s = ','; ++s;
-	s = SerializeFloat(z, s); *s = ','; ++s;
-	s = SerializeFloat(w, s);
+	char *s = SerializeFloat(x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(w, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

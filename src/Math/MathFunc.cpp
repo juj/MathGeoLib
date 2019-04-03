@@ -564,7 +564,7 @@ float DeserializeFloat(const char *str, const char **outEndStr)
 	{
 		str += strlen("NaN("); //MATH_SKIP_WORD(str, "NaN(");
 		u32 x;
-		int n = sscanf(str, "%X", (unsigned int *)&x);
+		int n = sscanf_s(str,"%X", (unsigned int *)&x);
 		if (n != 1)
 			return FLOAT_NAN;
 		while(*str != 0)

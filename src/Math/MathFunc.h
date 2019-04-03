@@ -566,7 +566,7 @@ FORCE_INLINE bool IsNan(long double value) { return IsNan((double)value); }
 #endif
 
 /// Serializes a float to a string.
-char *SerializeFloat(float f, char *dstStr);
+char *SerializeFloat(float f, char *dstStr,size_t dst_length);
 
 /// Deserializes a float from the given string.
 /** @param str The source string buffer to deserialize. If this is a null pointer or an empty string, then NaN is returned.

@@ -12,7 +12,7 @@
 std::string dtoa_grisu3_string(double v)
 {
 	char str[32];
-	int len = dtoa_grisu3(v, str,32);
+	int len = dtoa_grisu3(v, str,sizeof(str));
 	assert(len > 0 && len < 25);
 	assert(str[len] == '\0');
 	((void)len);

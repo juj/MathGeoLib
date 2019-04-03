@@ -1696,7 +1696,7 @@ Triangle2D operator *(const float4x4 &transform, const Triangle2D &triangle)
 std::string Triangle2D::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Triangle2D(a:(%.2f, %.2f) b:(%.2f, %.2f) c:(%.2f, %.2f))",
+	sprintf_s(str,sizeof(str),"Triangle2D(a:(%.2f, %.2f) b:(%.2f, %.2f) c:(%.2f, %.2f))",
 		a.x, a.y, b.x, b.y, c.x, c.y);
 	return str;
 }
@@ -1704,12 +1704,12 @@ std::string Triangle2D::ToString() const
 std::string Triangle2D::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
-	s = SerializeFloat(a.y, s); *s = ','; ++s;
-	s = SerializeFloat(b.x, s); *s = ','; ++s;
-	s = SerializeFloat(b.y, s); *s = ','; ++s;
-	s = SerializeFloat(c.x, s); *s = ','; ++s;
-	s = SerializeFloat(c.y, s);
+	char *s = SerializeFloat(a.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(a.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(c.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(c.y, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

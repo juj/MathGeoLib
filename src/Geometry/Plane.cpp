@@ -916,17 +916,17 @@ Plane operator *(const Quat &transform, const Plane &plane)
 std::string Plane::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
+	sprintf_s(str,sizeof(str),"Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
 	return str;
 }
 
 std::string Plane::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(normal.x, str); *s = ','; ++s;
-	s = SerializeFloat(normal.y, s); *s = ','; ++s;
-	s = SerializeFloat(normal.z, s); *s = ','; ++s;
-	s = SerializeFloat(d, s);
+	char *s = SerializeFloat(normal.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(normal.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(normal.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(d, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
@@ -935,7 +935,7 @@ std::string Plane::SerializeToString() const
 std::string Plane::SerializeToCodeString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"%.9g", d);
+	sprintf_s(str,sizeof(str),"%.9g", d);
 	return "Plane(" + normal.SerializeToCodeString() + "," + str + ")";
 }
 

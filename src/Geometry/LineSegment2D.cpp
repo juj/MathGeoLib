@@ -509,7 +509,7 @@ LineSegment2D operator *(const Quat &transform, const LineSegment2D &l)
 std::string LineSegment2D::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"LineSegment2D(a:(%.2f, %.2f) b:(%.2f, %.2f))",
+	sprintf_s(str,sizeof(str),"LineSegment2D(a:(%.2f, %.2f) b:(%.2f, %.2f))",
 		a.x, a.y, b.x, b.y);
 	return str;
 }
@@ -517,10 +517,10 @@ std::string LineSegment2D::ToString() const
 std::string LineSegment2D::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
-	s = SerializeFloat(a.y, s); *s = ','; ++s;
-	s = SerializeFloat(b.x, s); *s = ','; ++s;
-	s = SerializeFloat(b.y, s);
+	char *s = SerializeFloat(a.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(a.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.y, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

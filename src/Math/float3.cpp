@@ -239,16 +239,16 @@ bool IsNeutralCLocale();
 std::string float3::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"(%.3f, %.3f, %.3f)", x, y, z);
+	sprintf_s(str,sizeof(str),"(%.3f, %.3f, %.3f)", x, y, z);
 	return std::string(str);
 }
 
 std::string float3::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(x, str); *s = ','; ++s;
-	s = SerializeFloat(y, s); *s = ','; ++s;
-	s = SerializeFloat(z, s);
+	char *s = SerializeFloat(x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(z, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

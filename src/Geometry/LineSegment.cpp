@@ -439,7 +439,7 @@ LineSegment operator *(const Quat &transform, const LineSegment &l)
 std::string LineSegment::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"LineSegment(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f))",
+	sprintf_s(str,sizeof(str),"LineSegment(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f))",
 		a.x, a.y, a.z, b.x, b.y, b.z);
 	return str;
 }
@@ -447,12 +447,12 @@ std::string LineSegment::ToString() const
 std::string LineSegment::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
-	s = SerializeFloat(a.y, s); *s = ','; ++s;
-	s = SerializeFloat(a.z, s); *s = ','; ++s;
-	s = SerializeFloat(b.x, s); *s = ','; ++s;
-	s = SerializeFloat(b.y, s); *s = ','; ++s;
-	s = SerializeFloat(b.z, s);
+	char *s = SerializeFloat(a.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(a.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(a.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(b.z, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;

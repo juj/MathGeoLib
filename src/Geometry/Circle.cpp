@@ -254,7 +254,7 @@ VecArray Circle::IntersectsFaces(const OBB &obb) const
 std::string Circle::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)",
+	sprintf_s(str,sizeof(str),"Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)",
 		pos.x, pos.y, pos.z, normal.x, normal.y, normal.z, r);
 	return str;
 }

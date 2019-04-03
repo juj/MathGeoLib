@@ -449,20 +449,20 @@ bool Capsule::Intersects(const Polyhedron &polyhedron) const
 std::string Capsule::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"Capsule(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f), r:%.2f)", l.a.x, l.a.y, l.a.z, l.b.x, l.b.y, l.b.z, r);
+	sprintf_s(str,sizeof(str),"Capsule(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f), r:%.2f)", l.a.x, l.a.y, l.a.z, l.b.x, l.b.y, l.b.z, r);
 	return str;
 }
 
 std::string Capsule::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(l.a.x, str); *s = ','; ++s;
-	s = SerializeFloat(l.a.y, s); *s = ','; ++s;
-	s = SerializeFloat(l.a.z, s); *s = ','; ++s;
-	s = SerializeFloat(l.b.x, s); *s = ','; ++s;
-	s = SerializeFloat(l.b.y, s); *s = ','; ++s;
-	s = SerializeFloat(l.b.z, s); *s = ','; ++s;
-	s = SerializeFloat(r, s);
+	char *s = SerializeFloat(l.a.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(l.a.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(l.a.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(l.b.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(l.b.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(l.b.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(r, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
@@ -471,7 +471,7 @@ std::string Capsule::SerializeToString() const
 std::string Capsule::SerializeToCodeString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"%.9g", r);
+	sprintf_s(str,sizeof(str),"%.9g", r);
 	return "Capsule(" + l.SerializeToCodeString() + "," + str + ")";
 }
 

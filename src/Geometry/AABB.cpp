@@ -1205,19 +1205,19 @@ void AABB::ToEdgeList(vec *outPos) const
 std::string AABB::ToString() const
 {
 	char str[256];
-	sprintf_s(str, 256,"AABB(Min:(%.2f, %.2f, %.2f) Max:(%.2f, %.2f, %.2f))", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
+	sprintf_s(str,sizeof(str),"AABB(Min:(%.2f, %.2f, %.2f) Max:(%.2f, %.2f, %.2f))", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
 	return str;
 }
 
 std::string AABB::SerializeToString() const
 {
 	char str[256];
-	char *s = SerializeFloat(minPoint.x, str); *s = ','; ++s;
-	s = SerializeFloat(minPoint.y, s); *s = ','; ++s;
-	s = SerializeFloat(minPoint.z, s); *s = ','; ++s;
-	s = SerializeFloat(maxPoint.x, s); *s = ','; ++s;
-	s = SerializeFloat(maxPoint.y, s); *s = ','; ++s;
-	s = SerializeFloat(maxPoint.z, s);
+	char *s = SerializeFloat(minPoint.x, str,sizeof(str)); *s = ','; ++s;
+	s = SerializeFloat(minPoint.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(minPoint.z, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(maxPoint.x, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(maxPoint.y, s,sizeof(str)-(s-str)); *s = ','; ++s;
+	s = SerializeFloat(maxPoint.z, s,sizeof(str)-(s-str));
 	assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
