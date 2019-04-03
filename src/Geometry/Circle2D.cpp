@@ -32,35 +32,37 @@ Circle2D::Circle2D(const float2 &center, float radius)
 
 // Helper function to compute the minimal circle that contains the given three points.
 // To avoid extra Sqrt() operations in hot inner loops, this function returns a Circle2D structure that has its radius squared (caller needs to compute circle.r = Sqrt(circle.r) to use)
-static Circle2D MakeCircleSq(float denom, float AB_AC, float AB, float AC, const float2 &a, const float2 &b, const float2 &c, const float2 &ab, const float2 &ac)
+static Circle2D MakeCircleSq(float AB, float AC, const float2 &ab, const float2 &ac)
 {
+    const float AB_AC = Dot(ab,ac);
+    float denom = AB*AC - AB_AC*AB_AC;
     if (Abs(denom) < 1e-5f) // Each of a, b and c lie on a straight line?
     {
         if (AB_AC > 0.f)
-            return AB > AC ? Circle2D((a+b)*0.5f, AB*0.25f) : Circle2D((a+c)*0.5f, AC*0.25f);
+            return AB > AC ? Circle2D(ab*0.5f, AB*0.25f) : Circle2D(ac*0.5f, AC*0.25f);
         else
-            return Circle2D((b+c)*0.5f, (AB + AC - 2.f*AB_AC)*0.25f);
+            return Circle2D((ab+ac)*0.5f, (AB + AC - 2.f*AB_AC)*0.25f);
     }
     denom = 0.5f / denom;
     float s = (AC * AB - AB_AC * AC) * denom;
     float t = (AC * AB - AB_AC * AB) * denom;
     if (s < 0.f)
-        return Circle2D((a + c) * 0.5f, AC * 0.25f);
+        return Circle2D(ac * 0.5f, AC * 0.25f);
     else if (t < 0.f)
-        return Circle2D((a + b) * 0.5f, AB * 0.25f);
+        return Circle2D(ab * 0.5f, AB * 0.25f);
     else if (s + t > 1.f)
-        return Circle2D((b + c) * 0.5f, (AB + AC - 2.f*AB_AC)*0.25f);
+        return Circle2D((ab + ac) * 0.5f, (AB + AC - 2.f*AB_AC)*0.25f);
     else
     {
         const float2 center = s * ab + t * ac;
-        return Circle2D(a + center, center.LengthSq());
+        return Circle2D(center, center.LengthSq());
     }
 }
 
 // Finds minimum circle that encloses a-d, with the preknowledge that a is not contained in minimal
 // circle that encloses b-d. One of three points b-c will be redundant to define this new enclosing
 // circle, that will be swapped in-place with a.
-static Circle2D SmallestCircleSqEnclosing4Points(float2 &a, float2 &b, float2 &c, float2 &d)
+static Circle2D SmallestCircleSqEnclosing4Points(const float2 &a, const float2 &b, const float2 &c, const float2 &d, int &redundantIndex)
 {
     // Find the smallest circle that encloses each of a, b, c and d.
     // As prerequisite, we know that a is not contained by smallest circle that encloses b, c and d, enforce that precondition.
@@ -72,42 +74,36 @@ static Circle2D SmallestCircleSqEnclosing4Points(float2 &a, float2 &b, float2 &c
 
     float2 ab = b - a;
     float2 ac = c - a;
+    float2 ad = d - a;
     const float AB = Dot(ab,ab);
     const float AC = Dot(ac,ac);
 
     Circle2D circle[3];
     float sqd[3];
 
-    const float AB_AC = Dot(ab,ac);
-    float denomABC = AB*AC - AB_AC*AB_AC;
-    circle[0] = MakeCircleSq(denomABC, AB_AC, AB, AC, a, b, c, ab, ac);
-    sqd[0] = (circle[0].pos - d).LengthSq() - circle[0].r;
+    circle[0] = MakeCircleSq(AB, AC, ab, ac);
+    sqd[0] = (circle[0].pos - ad).LengthSq() - circle[0].r;
     if (sqd[0] <= 0.f)
     {
-        Swap(a, d);
+        redundantIndex = 2;
         return circle[0];
     }
 
-    float2 ad = d - a;
     const float AD = Dot(ad,ad);
 
-    const float AB_AD = Dot(ab,ad);
-    float denomABD = AB*AD - AB_AD*AB_AD;
-    circle[1] = MakeCircleSq(denomABD, AB_AD, AB, AD, a, b, d, ab, ad);
-    sqd[1] = (circle[1].pos - c).LengthSq() - circle[1].r;
+    circle[1] = MakeCircleSq(AB, AD, ab, ad);
+    sqd[1] = (circle[1].pos - ac).LengthSq() - circle[1].r;
     if (sqd[1] <= 0.f)
     {
-        Swap(a, c);
+        redundantIndex = 1;
         return circle[1];
     }
 
-    const float AC_AD = Dot(ac,ad);
-    float denomACD = AC*AD - AC_AD*AC_AD;
-    circle[2] = MakeCircleSq(denomACD, AC_AD, AC, AD, a, c, d, ac, ad);
-    sqd[2] = (circle[2].pos - b).LengthSq() - circle[2].r;
+    circle[2] = MakeCircleSq(AC, AD, ac, ad);
+    sqd[2] = (circle[2].pos - ab).LengthSq() - circle[2].r;
     if (sqd[2] <= 0.f)
     {
-        Swap(a, b);
+        redundantIndex = 0;
         return circle[2];
     }
     
@@ -117,20 +113,20 @@ static Circle2D SmallestCircleSqEnclosing4Points(float2 &a, float2 &b, float2 &c
     int ci;
     if (sqd[0] <= sqd[1] && sqd[0] <= sqd[2])
     {
-        Swap(a, d);
+        redundantIndex = 2;
         ci = 0;
     }
     else if (sqd[1] <= sqd[2])
     {
-        Swap(a, c);
+        redundantIndex = 1;
         ci = 1;
     }
     else
     {
-        Swap(a, b);
+        redundantIndex = 0;
         ci = 2;
     }
-    circle[ci].r = Max(circle[ci].pos.DistanceSq(a), circle[ci].pos.DistanceSq(b), circle[ci].pos.DistanceSq(c), circle[ci].pos.DistanceSq(d));
+    circle[ci].r = Max(circle[ci].pos.LengthSq(), circle[ci].pos.DistanceSq(ab), circle[ci].pos.DistanceSq(ac), circle[ci].pos.DistanceSq(ad));
     return circle[ci];
 }
 
@@ -290,7 +286,10 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
         // A circle is defined by at most three points, so one of the resulting points is redundant.
         // Swap points around so that pts[0]-pts[2] define the new minimum circle, and pts[i] will
         // have the redundant point.
-        minCircle = SmallestCircleSqEnclosing4Points(pts[i], pts[0], pts[1], pts[2]);
+        int redundantIndex;
+        minCircle = SmallestCircleSqEnclosing4Points(pts[i], pts[0], pts[1], pts[2], redundantIndex);
+        minCircle.pos += pts[i];
+        Swap(pts[i], pts[redundantIndex]);
         // For robustness, apply epsilon after square root.
         minCircle.r = Sqrt(minCircle.r) + 1e-3f;
         r2 = minCircle.r*minCircle.r;
