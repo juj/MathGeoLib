@@ -41,7 +41,7 @@ Circle2D::Circle2D(const float2 &center, float radius)
 		are collinear, in which case there does not exist a circle that passes through the three given points. */
 bool FitCircleThroughPoints(const float2 &ab, const float2 &ac, float &s, float &t)
 {
-	/* The task is to compute the minimal radius circle through the three points
+	/* The task is to compute the circle that touches the three points
 	   a, b and c. (Note that this is not necessarily the minimal radius circle enclosing
 	   the points a, b and c!)
 
@@ -60,9 +60,7 @@ bool FitCircleThroughPoints(const float2 &ab, const float2 &ac, float &s, float 
 	      (b-a)p == (b^2 - a^2)/2 and       (1)
 	      (c-a)p == (c^2 - a^2)/2.          (2)
 
-	   Additionally, the center point of the circle must lie on the same plane as the triangle
-	   defined by the points a, b and c. Therefore, the point p can be represented as a 2D
-	   barycentric coordinates (s,t) as follows:
+	   Further, the point p can be represented as 2D barycentric coordinates (s,t) as follows:
 
 	      p == a + s*(b-a) + t*(c-a).        (3)
 
@@ -70,9 +68,9 @@ bool FitCircleThroughPoints(const float2 &ab, const float2 &ac, float &s, float 
 	   of the coordinate system to be centered at the point a), i.e. make the substitutions
 	   A = (0,0), B = b-a, C = c-a, and we have
 
-	      BP == B^2/2,            (1')
-	      CP == C^2/2 and         (2')
-	       P == s*B + t*C.        (3') */
+	      Bp == B^2/2,            (1')
+	      Cp == C^2/2 and         (2')
+	       p == s*B + t*C.        (3') */
 
 	const float BB = Dot(ab,ab);
 	const float CC = Dot(ac,ac);
@@ -173,106 +171,70 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 	return circle;
 }
 
-/** For reference, see http://realtimecollisiondetection.net/blog/?p=20 . */
 Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, const float2 &c)
 {
-	Circle2D circle;
-
-	float2 ab = b - a;
-	float2 ac = c - a;
-
-	float s, t;
-	bool areCollinear = Abs(ab.PerpDot(ac)) < 1e-4f; // Manually test that we don't try to fit circle to three collinear points.
-	if (areCollinear)
-	{
-        if (ab.Dot(ac) > 0.f)
+    Circle2D circle;
+    float2 ab = b - a;
+    float2 ac = c - a;
+    float s, t;
+    const float BB = Dot(ab,ab);
+    const float CC = Dot(ac,ac);
+    const float BC = Dot(ab,ac);
+    float denom = BB*CC - BC*BC;
+        
+    if (Abs(denom) < 1e-5f) // Each of a, b and c lie on a straight line?
+    {
+        if (BC > 0.f)
         {
-            float adb = a.DistanceSq(b);
-            float adc = a.DistanceSq(c);
-            if (adb > adc)
+            if (BB > CC)
             {
                 circle.pos = (a+b)*0.5f;
-                circle.r = Sqrt(adb)*0.5f;
+                circle.r = Sqrt(BB)*0.5f;
             }
             else
             {
                 circle.pos = (a+c)*0.5f;
-                circle.r = Sqrt(adc)*0.5f;
+                circle.r = Sqrt(CC)*0.5f;
             }
         }
         else
         {
+            // ||b-c|| = ||(b-a+a-c)|| == ||(b-a)+(c-a)||==||ab-ac||=Dot(ab,ab)-2Dot(ab,ac)+Dot(ac,ac)
             circle.pos = (b+c)*0.5f;
-            circle.r = circle.pos.Distance(c);
+            circle.r = Sqrt(BB + CC - 2.f*BC)*0.5f;
         }
-	}
-	else
-	{
-		bool success = FitCircleThroughPoints(ab, ac, s, t);
-		if (!success || Abs(s) > 10000.f || Abs(t) > 10000.f) // If s and t are very far from the triangle, do a manual box fitting for numerical stability.
-		{
-			float2 minPt = Min(a, b, c);
-			float2 maxPt = Max(a, b, c);
-			circle.pos = (minPt + maxPt) * 0.5f;
-			circle.r = circle.pos.Distance(minPt);
-		}
-		else if (s < 0.f)
-		{
-			circle.pos = (a + c) * 0.5f;
-			circle.r = a.Distance(c) * 0.5f;
-			circle.r = Max(circle.r, b.Distance(circle.pos)); // For numerical stability, expand the radius of the circle so it certainly contains the third point.
-		}
-		else if (t < 0.f)
-		{
-			circle.pos = (a + b) * 0.5f;
-			circle.r = a.Distance(b) * 0.5f;
-			circle.r = Max(circle.r, c.Distance(circle.pos)); // For numerical stability, expand the radius of the circle so it certainly contains the third point.
-		}
-		else if (s + t > 1.f)
-		{
-			circle.pos = (b + c) * 0.5f;
-			circle.r = b.Distance(c) * 0.5f;
-			circle.r = Max(circle.r, a.Distance(circle.pos)); // For numerical stability, expand the radius of the circle so it certainly contains the third point.
-		}
-		else
-		{
-			const float2 center = s * ab + t * ac;
-			circle.pos = a + center;
-			// For robustness, take the radius to be the distance to the farthest point (though the distance are all
-			// equal).
-			circle.r = Sqrt(Max(center.LengthSq(), center.DistanceSq(ab), center.DistanceSq(ac)));
-		}
-	}
-
-	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
-	// really contain the points (note that the points must be sufficiently near enough to the origin)
-	circle.r += 2.f * sEpsilon; // We test against one epsilon, so expand by two epsilons.
-
-#ifdef MATH_ASSERT_CORRECTNESS
-	if (!circle.Contains(a, sEpsilon) || !circle.Contains(b, sEpsilon) || !circle.Contains(c, sEpsilon))
-	{
-		LOGI("Pos: %s, r: %f", circle.pos.ToString().c_str(), circle.r);
-		LOGI("A: %s, dist: %f", a.ToString().c_str(), a.Distance(circle.pos));
-		LOGI("B: %s, dist: %f", b.ToString().c_str(), b.Distance(circle.pos));
-		LOGI("C: %s, dist: %f", c.ToString().c_str(), c.Distance(circle.pos));
-		mathassert(false);
-	}
-    float maxDist = Max(circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c));
-    int numMaxDistance = 0;
-    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-1f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-1f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-1f)) ++numMaxDistance;
-    if (!(numMaxDistance == 2 || numMaxDistance == 3))
-    {
-        LOGI("%s", circle.ToString().c_str());
-        LOGI("%s", a.ToString().c_str());
-        LOGI("%s", b.ToString().c_str());
-        LOGI("%s", c.ToString().c_str());
     }
-    assert4(numMaxDistance == 2 || numMaxDistance == 3, numMaxDistance,
-            circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c));
-#endif
-	return circle;
+    else
+    {
+        denom = 0.5f / denom;
+        s = (CC * BB - BC * CC) * denom;
+        t = (CC * BB - BC * BB) * denom;
+        if (s < 0.f)
+        {
+            circle.pos = (a + c) * 0.5f;
+            circle.r = a.Distance(c) * 0.5f;
+        }
+        else if (t < 0.f)
+        {
+            circle.pos = (a + b) * 0.5f;
+            circle.r = a.Distance(b) * 0.5f;
+        }
+        else if (s + t > 1.f)
+        {
+            circle.pos = (b + c) * 0.5f;
+            circle.r = b.Distance(c) * 0.5f;
+        }
+        else
+        {
+            const float2 center = s * ab + t * ac;
+            circle.pos = a + center;
+            circle.r = center.Length();
+        }
+    }
+    // For robustness, take the radius to be the distance to the farthest point. (comment the following line out if fast performance is desired instead)
+    circle.r = Sqrt(Max(circle.pos.DistanceSq(a), circle.pos.DistanceSq(b), circle.pos.DistanceSq(c)));
+    circle.r += 1e-5f;
+    return circle;
 }
 
 bool Circle2D::IsFinite() const
@@ -305,15 +267,36 @@ float Circle2D::SignedDistance(const float2 &point) const
     return pos.Distance(point) - r;
 }
 
+float Circle2D::SignedDistanceSq(const float2 &point) const
+{
+    return pos.DistanceSq(point) - r*r;
+}
+
 Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoints)
 {
+    assert(pointArray || numPoints == 0);
+    
+    // Special case handling for 0-3 points.
+    switch(numPoints)
+    {
+        case 0: return Circle2D(float2::nan, -FLOAT_INF);
+        case 1: return Circle2D(pointArray[0], 0.f);
+        case 2:
+        {
+            float2 center = (pointArray[0] + pointArray[1]) * 0.5f;
+            float r = Sqrt(Max(center.DistanceSq(pointArray[0]), center.DistanceSq(pointArray[1]))) + 1e-5f;
+            return Circle2D(center, r);
+        }
+        case 3: return Circle2D::OptimalEnclosingCircle(pointArray[0], pointArray[1], pointArray[2]);
+    }
+    
 	// Start off by computing the convex hull of the points, which prunes many points off from the problem space.
 	float2 *pts = new float2[numPoints];
 	memcpy(pts, pointArray, sizeof(float2)*numPoints);
 	numPoints = float2_ConvexHullInPlace(pts, numPoints);
 
-    // Fast start: Compute bounding box extents (min/max x and y) as fast guesses for the optimal
-    // bounding box extents.
+    // Use initial bounding box extents (min/max x and y) as fast guesses for the optimal
+    // bounding sphere extents.
     for(int i = 0; i < numPoints; ++i)
     {
         if (pts[0].x < pts[i].x) Swap(pts[0], pts[i]);

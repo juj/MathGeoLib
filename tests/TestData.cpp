@@ -121,7 +121,7 @@ Circle2D *Circle2DArray()
         arr = AlignedNew<Circle2D>(testrunner_numItersPerTest + UNROLL_LOOP_PADDING);
         for (int i = 0; i < testrunner_numItersPerTest + UNROLL_LOOP_PADDING; ++i)
         {
-            arr[i] = RandomCircle2DContainingPoint(lcg, float2::zero, lcg.Float(0.001f, 10.f));
+            arr[i] = RandomCircle2DContainingPoint(lcg, float2::zero, lcg.Float(0.1f, 10.f));
         }
     }
     return arr;

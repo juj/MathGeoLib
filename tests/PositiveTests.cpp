@@ -79,7 +79,7 @@ Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius)
 
 Circle2D RandomCircle2DContainingPoint(LCG &lcg, const float2 &pt, float maxRadius)
 {
-	Circle2D c(pt, lcg.Float(1.f, maxRadius));
+	Circle2D c(pt, lcg.Float(0.1f, Max(0.1f, maxRadius)));
 	c.pos += float2::RandomDir(lcg, Max(0.f, c.r - 1e-2f));
 #if 0
     // Generate easy test cases

@@ -72,6 +72,7 @@ public:
      @todo Add Sphere::Distance(Polygon/Circle/Disc/Frustum/Polyhedron). */
     float Distance(const float2 &point) const;
     float SignedDistance(const float2 &point) const;
+    float SignedDistanceSq(const float2 &point) const;
 
 	/// Computes the minimal bounding circle for three points.
 	/** This function computes the smallest volume circle that contains the given three points. The smallest
