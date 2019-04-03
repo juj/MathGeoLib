@@ -112,6 +112,21 @@ Frustum *FrustumArray()
 	return arr;
 }
 
+Circle2D *Circle2DArray()
+{
+    LCG lcg(Clock::TickU32());
+    static Circle2D *arr;
+    if (!arr)
+    {
+        arr = AlignedNew<Circle2D>(testrunner_numItersPerTest + UNROLL_LOOP_PADDING);
+        for (int i = 0; i < testrunner_numItersPerTest + UNROLL_LOOP_PADDING; ++i)
+        {
+            arr[i] = RandomCircle2DContainingPoint(lcg, float2::zero, lcg.Float(0.001f, 10.f));
+        }
+    }
+    return arr;
+}
+
 float *FloatArray()
 {
 	LCG lcg;
@@ -316,7 +331,8 @@ float4x4 *m2 = 0;
 const float4x4 *om = 0;
 const float4x4 *ogm = 0;
 float4x4 *tpm = 0;
-float2 *fl_2 = 0;
+const float2 *fl_2 = 0;
+float2 *u_fl_2 = 0;
 const float4 *nv = 0;
 const float4 *nv2 = 0;
 float4 *v = 0;
@@ -329,6 +345,8 @@ Quat *q2 = 0;
 AABB *aabb = 0;
 OBB *obb = 0;
 Frustum *frustum = 0;
+const Circle2D *circle2d = 0;
+Circle2D *ucircle2d = 0;
 
 void InitTestData()
 {
@@ -341,6 +359,7 @@ void InitTestData()
 	ogm = OrthogonalMatrixArray();
 	tpm = TransposedMatrixArray();
 	fl_2 = Float2Array();
+    u_fl_2 = Float2Array();
 	nv = NormalizedVectorArray();
 	nv2 = NormalizedVectorArray2();
 	v = VectorArray();
@@ -353,6 +372,8 @@ void InitTestData()
 	aabb = AABBArray();
 	obb = OBBArray();
 	frustum = FrustumArray();
+    circle2d = Circle2DArray();
+    ucircle2d = Circle2DArray();
 }
 
 class FreeTestData

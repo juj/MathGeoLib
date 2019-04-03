@@ -2,16 +2,15 @@
 #include "../src/MathGeoLib.h"
 #include "../tests/TestRunner.h"
 #include "../tests/TestData.h"
+#include "../tests/ObjectGenerators.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
 using namespace TestData;
 
-Circle2D RandomCircle2DContainingPoint(const float2 &pt, float maxRadius);
-
 RANDOMIZED_TEST(Circle2D_OptimalEnclosingCircle_Random)
 {
-	Circle2D c = RandomCircle2DContainingPoint(float2::RandomBox(rng, -100.f, 100.f), rng.Float(1.f, 100.f));
+	Circle2D c = RandomCircle2DContainingPoint(rng, float2::RandomBox(rng, -100.f, 100.f), rng.Float(1.f, 100.f));
 	std::vector<float2> pts;
 	for(int i = 0; i < 100; ++i)
 		pts.push_back(c.RandomPointInside(rng));
@@ -150,3 +149,9 @@ UNIQUE_TEST(Circle2D_OptimalEnclosingCircle_Case6)
     assert(EqualAbs(circle.pos.x, -127.111092f));
     assert(EqualAbs(circle.pos.y, 57.3470802f));
 }
+
+BENCHMARK(Circle2D_OptimalEnclosingCircle_bench, "Circle2D::OptimalEnclosingCircle()")
+{
+    ucircle2d[i] = Circle2D::OptimalEnclosingCircle(fl_2, testrunner_numItersPerTest);
+}
+BENCHMARK_END

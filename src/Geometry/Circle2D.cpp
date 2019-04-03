@@ -312,6 +312,16 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
 	memcpy(pts, pointArray, sizeof(float2)*numPoints);
 	numPoints = float2_ConvexHullInPlace(pts, numPoints);
 
+    // Fast start: Compute bounding box extents (min/max x and y) as fast guesses for the optimal
+    // bounding box extents.
+    for(int i = 0; i < numPoints; ++i)
+    {
+        if (pts[0].x < pts[i].x) Swap(pts[0], pts[i]);
+        if (pts[1].x > pts[i].x) Swap(pts[1], pts[i]);
+        if (pts[2].y < pts[i].y) Swap(pts[2], pts[i]);
+        if (pts[3].y > pts[i].y) Swap(pts[3], pts[i]);
+    }
+
 #ifdef DEBUG_MINCIRCLE_FAILS
     float2 *pts2 = new float2[numPoints];
     memcpy(pts2, pts, sizeof(float2)*numPoints);
@@ -325,15 +335,20 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
     int numForward = 0;
 
 	Circle2D minCircle = OptimalEnclosingCircle(pts[0], pts[1], pts[2]);
+    float r2 = minCircle.r*minCircle.r;
     for(int i = 3; i < numPoints; ++i)
 	{
 #ifdef DEBUG_MINCIRCLE
         LOGI("Current circle: %s", minCircle.ToString().c_str());
         LOGI("Testing pt idx=%d: %s, dist to current circle: %f", i, pts[i].ToString().c_str(), pts[i].Distance(minCircle.pos) - minCircle.r);
 #endif
-		if (minCircle.Contains(pts[i]))
+        // Do a minCircle.Contains(pts[i]) check without recomputing the squared radius of the minimum
+        // circle each time.
+        float d2 = (pts[i] - minCircle.pos).LengthSq();
+		if (d2 <= r2)
 			continue;
-		float2 newImportantPoint = pts[i];
+
+        float2 newImportantPoint = pts[i];
 #ifdef DEBUG_MINCIRCLE
         LOGI("%d is not contained", i);
         LOGI("newImportantPoint: %s, numForward=%d", newImportantPoint.ToString().c_str(), numForward);
@@ -345,6 +360,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
 		pts[0] = newImportantPoint;
 		int redundantPoint = 0;
 		minCircle = OptimalEnclosingCircle(pts[0], pts[1], pts[2], pts[3], redundantPoint);
+        r2 = minCircle.r*minCircle.r;
         float2 redundantPt = pts[redundantPoint];
 
         for(int j = redundantPoint; j < 3; ++j)

@@ -918,13 +918,13 @@ static float2 sinfcosf(float angleRadians)
 
 BENCHMARK(Sin_Cos, "Sin()+Cos()")
 {
-	fl_2[i] = Sin_Cos(pf[i]);
+	u_fl_2[i] = Sin_Cos(pf[i]);
 }
 BENCHMARK_END;
 
 BENCHMARK(sinfcosf, "sinfcosf")
 {
-	fl_2[i] = sinfcosf(pf[i]);
+	u_fl_2[i] = sinfcosf(pf[i]);
 }
 BENCHMARK_END;
 
@@ -939,7 +939,7 @@ float2 sincos_ps_float2(float angleRadians)
 
 BENCHMARK(sincos_ps, "sincos_ps")
 {
-	fl_2[i] = sincos_ps_float2(pf[i]);
+	u_fl_2[i] = sincos_ps_float2(pf[i]);
 }
 BENCHMARK_END;
 

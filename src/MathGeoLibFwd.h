@@ -82,6 +82,7 @@ class PBVolume;
 class AABB;
 class Capsule;
 class Circle;
+class Circle2D;
 class Cone;
 class Cylinder;
 class Ellipsoid;
