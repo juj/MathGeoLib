@@ -60,7 +60,7 @@ static inline Circle2D MakeCircleSq(float denom, float AB_AC, float AB, float AC
 // Finds minimum circle that encloses a-d, with the preknowledge that a is not contained in minimal
 // circle that encloses b-d. One of three points b-c will be redundant to define this new enclosing
 // circle, that will be swapped in-place with a.
-static Circle2D SmallestCircleEnclosing4Points(float2 &a, float2 &b, float2 &c, float2 &d)
+static Circle2D SmallestCircleSqEnclosing4Points(float2 &a, float2 &b, float2 &c, float2 &d)
 {
     // Find the smallest circle that encloses each of a, b, c and d.
     // As prerequisite, we know that a is not contained by smallest circle that encloses b, c and d, enforce that precondition.
@@ -85,7 +85,6 @@ static Circle2D SmallestCircleEnclosing4Points(float2 &a, float2 &b, float2 &c, 
     if (sqd[0] <= 0.f)
     {
         Swap(a, d);
-        circle[0].r = Sqrt(circle[0].r);
         return circle[0];
     }
 
@@ -99,7 +98,6 @@ static Circle2D SmallestCircleEnclosing4Points(float2 &a, float2 &b, float2 &c, 
     if (sqd[1] <= 0.f)
     {
         Swap(a, c);
-        circle[1].r = Sqrt(circle[1].r);
         return circle[1];
     }
 
@@ -110,7 +108,6 @@ static Circle2D SmallestCircleEnclosing4Points(float2 &a, float2 &b, float2 &c, 
     if (sqd[2] <= 0.f)
     {
         Swap(a, b);
-        circle[2].r = Sqrt(circle[2].r);
         return circle[2];
     }
     
@@ -133,7 +130,7 @@ static Circle2D SmallestCircleEnclosing4Points(float2 &a, float2 &b, float2 &c, 
         Swap(a, b);
         ci = 2;
     }
-    circle[ci].r = Sqrt(Max(circle[ci].pos.DistanceSq(a), circle[ci].pos.DistanceSq(b), circle[ci].pos.DistanceSq(c), circle[ci].pos.DistanceSq(d))) + 1e-5f;
+    circle[ci].r = Max(circle[ci].pos.DistanceSq(a), circle[ci].pos.DistanceSq(b), circle[ci].pos.DistanceSq(c), circle[ci].pos.DistanceSq(d));
     return circle[ci];
 }
 
@@ -289,8 +286,9 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
         // A circle is defined by at most three points, so one of the resulting points is redundant.
         // Swap points around so that pts[0]-pts[2] define the new minimum circle, and pts[i] will
         // have the redundant point.
-        minCircle = SmallestCircleEnclosing4Points(pts[i], pts[0], pts[1], pts[2]);
-        minCircle.r += 1e-3f;
+        minCircle = SmallestCircleSqEnclosing4Points(pts[i], pts[0], pts[1], pts[2]);
+        // For robustness, apply epsilon after square root.
+        minCircle.r = Sqrt(minCircle.r) + 1e-3f;
         r2 = minCircle.r*minCircle.r;
 
         // Start again from scratch: pts[0]-pts[2] now has the new candidate.
