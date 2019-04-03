@@ -32,7 +32,7 @@ Circle2D::Circle2D(const float2 &center, float radius)
 
 // Helper function to compute the minimal circle that contains the given three points.
 // To avoid extra Sqrt() operations in hot inner loops, this function returns a Circle2D structure that has its radius squared (caller needs to compute circle.r = Sqrt(circle.r) to use)
-static inline Circle2D MakeCircleSq(float denom, float AB_AC, float AB, float AC, const float2 &a, const float2 &b, const float2 &c, const float2 &ab, const float2 &ac)
+static Circle2D MakeCircleSq(float denom, float AB_AC, float AB, float AC, const float2 &a, const float2 &b, const float2 &c, const float2 &ab, const float2 &ac)
 {
     if (Abs(denom) < 1e-5f) // Each of a, b and c lie on a straight line?
     {
