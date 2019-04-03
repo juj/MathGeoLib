@@ -199,7 +199,7 @@ public:
 		enclosing sphere may not pass through all the four points that are specified. */
 	static Sphere OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, const vec &d);
 
-	/// Computes the minimal bounding sphere for four points.
+	/// Computes the minimal bounding sphere for five points.
 	/** This function computes the smallest volume sphere that contains the given five points.
 		@param redundantPoint [out] Since a sphere is characterized by four points, one of the given points
 			will necessarily be redundant and not part of the support set of the minimal enclosing sphere. This

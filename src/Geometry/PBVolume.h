@@ -20,6 +20,7 @@
 
 #include "../Math/float3.h"
 #include "../Math/assume.h"
+#include "../Math/Swap.h"
 #include "AABB.h"
 #include "Plane.h"
 #include "Sphere.h"

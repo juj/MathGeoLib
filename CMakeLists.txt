@@ -88,7 +88,6 @@ if (NOT MATH_TESTS_EXECUTABLE)
 	  RUNTIME DESTINATION bin)
 	install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.h")
 	install (DIRECTORY "src/" DESTINATION "include/MathGeoLib" FILES_MATCHING PATTERN "*.inl")
-endif (NOT MATH_TESTS_EXECUTABLE)
 
 # Handle CMake Config
 # Add all targets to the build-tree export set
@@ -123,3 +122,5 @@ install(FILES
 # Install the export set for use with the install-tree
 install(EXPORT ${PROJECT_NAME}Targets DESTINATION
   "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+endif (NOT MATH_TESTS_EXECUTABLE)

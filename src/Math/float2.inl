@@ -33,6 +33,17 @@
 #include <algorithm>
 #endif
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
+#include "Algorithm/Sort/Sort.h"
+
+template<typename T>
+int TriCmpPred(const T &a, const T &b)
+{
+    return (a.x < b.x || (a.x == b.x && a.y < b.y)) ? -1 : 1;
+}
+
+#endif
+
 MATH_BEGIN_NAMESPACE
 
 template<typename T>
@@ -66,7 +77,13 @@ int float2_ConvexHullInPlace(T *p, int n)
 	assert(n >= 0);
 	if (n <= 1) return n > 0 ? n : 0;
 
+#ifdef MATH_CONTAINERLIB_SUPPORT
+    sort::CocktailSort(p, n, LexSortPred<T>);
+#elif defined(MATH_ENABLE_STL_SUPPORT)
 	std::sort(p, p + n, LexSortPred<T>);
+#else
+#error TODO qsort or something
+#endif
 
 	const float eps = 1e-6f;
 
