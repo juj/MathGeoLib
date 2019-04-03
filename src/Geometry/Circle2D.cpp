@@ -154,19 +154,19 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 #ifdef MATH_ASSERT_CORRECTNESS
 	if (!circle.Contains(a, sEpsilon) || !circle.Contains(b, sEpsilon) || !circle.Contains(c, sEpsilon) || !circle.Contains(d, sEpsilon))
 	{
-		LOGE("Pos: %s, r: %f", circle.pos.ToString().c_str(), circle.r);
-		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(circle.pos));
-		LOGE("B: %s, dist: %f", b.ToString().c_str(), b.Distance(circle.pos));
-		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(circle.pos));
-		LOGE("D: %s, dist: %f", d.ToString().c_str(), d.Distance(circle.pos));
+		LOGI("Pos: %s, r: %f", circle.pos.ToString().c_str(), circle.r);
+		LOGI("A: %s, dist: %f", a.ToString().c_str(), a.Distance(circle.pos));
+		LOGI("B: %s, dist: %f", b.ToString().c_str(), b.Distance(circle.pos));
+		LOGI("C: %s, dist: %f", c.ToString().c_str(), c.Distance(circle.pos));
+		LOGI("D: %s, dist: %f", d.ToString().c_str(), d.Distance(circle.pos));
 		mathassert(false);
 	}
     float maxDist = Max(circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c), circle.pos.Distance(d));
     int numMaxDistance = 0;
-    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-2f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-2f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-2f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(d), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-1f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-1f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-1f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(d), maxDist, 1e-1f)) ++numMaxDistance;
     assert1(numMaxDistance >= 2, numMaxDistance);
 #endif
 
@@ -203,7 +203,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
         else
         {
             circle.pos = (b+c)*0.5f;
-            circle.r = circle.pos.Distance(c)*0.5f;
+            circle.r = circle.pos.Distance(c);
         }
 	}
 	else
@@ -238,13 +238,9 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 		{
 			const float2 center = s * ab + t * ac;
 			circle.pos = a + center;
-			// Mathematically, the following would be correct, but it suffers from floating point inaccuracies,
-			// since it only tests distance against one point.
-			//circle.r = center.Length();
-
 			// For robustness, take the radius to be the distance to the farthest point (though the distance are all
 			// equal).
-			circle.r = Sqrt(Max(circle.pos.DistanceSq(a), circle.pos.DistanceSq(b), circle.pos.DistanceSq(c)));
+			circle.r = Sqrt(Max(center.LengthSq(), center.DistanceSq(ab), center.DistanceSq(ac)));
 		}
 	}
 
@@ -255,17 +251,17 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
 #ifdef MATH_ASSERT_CORRECTNESS
 	if (!circle.Contains(a, sEpsilon) || !circle.Contains(b, sEpsilon) || !circle.Contains(c, sEpsilon))
 	{
-		LOGE("Pos: %s, r: %f", circle.pos.ToString().c_str(), circle.r);
-		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(circle.pos));
-		LOGE("B: %s, dist: %f", b.ToString().c_str(), b.Distance(circle.pos));
-		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(circle.pos));
+		LOGI("Pos: %s, r: %f", circle.pos.ToString().c_str(), circle.r);
+		LOGI("A: %s, dist: %f", a.ToString().c_str(), a.Distance(circle.pos));
+		LOGI("B: %s, dist: %f", b.ToString().c_str(), b.Distance(circle.pos));
+		LOGI("C: %s, dist: %f", c.ToString().c_str(), c.Distance(circle.pos));
 		mathassert(false);
 	}
     float maxDist = Max(circle.pos.Distance(a), circle.pos.Distance(b), circle.pos.Distance(c));
     int numMaxDistance = 0;
-    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-2f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-2f)) ++numMaxDistance;
-    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-2f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(a), maxDist, 1e-1f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(b), maxDist, 1e-1f)) ++numMaxDistance;
+    if (EqualAbs(circle.pos.Distance(c), maxDist, 1e-1f)) ++numMaxDistance;
     if (!(numMaxDistance == 2 || numMaxDistance == 3))
     {
         LOGI("%s", circle.ToString().c_str());
@@ -316,9 +312,11 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
 	memcpy(pts, pointArray, sizeof(float2)*numPoints);
 	numPoints = float2_ConvexHullInPlace(pts, numPoints);
 
-#ifdef DEBUG_MINCIRCLE
+#ifdef DEBUG_MINCIRCLE_FAILS
     float2 *pts2 = new float2[numPoints];
     memcpy(pts2, pts, sizeof(float2)*numPoints);
+#endif
+#ifdef DEBUG_MINCIRCLE
     LOGI("%d", numPoints);
     for(int i = 0; i < numPoints; ++i)
         LOGI("%s", pts[i].SerializeToCodeString().c_str());
@@ -368,7 +366,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
             LOGI("%s: %f", pts[j].SerializeToString().c_str(), minCircle.SignedDistance(pts[j]));
 #endif
 	}
-#ifdef DEBUG_MINCIRCLE
+#ifdef DEBUG_MINCIRCLE_FAILS
     for(int i = 0; i < numPoints; ++i)
         if (!minCircle.Contains(pts2[i]))
         {
@@ -398,7 +396,7 @@ float2 Circle2D::RandomPointInside(LCG &lcg)
 	{
 		v.x = lcg.Float(-r, r);
 		v.y = lcg.Float(-r, r);
-#ifdef DEBUG_MINCIRCLE
+#if 0
         // Generate easy test cases
         v.x = (float)(int)v.x;
         v.y = (float)(int)v.y;

@@ -17,7 +17,7 @@ RANDOMIZED_TEST(Circle2D_OptimalEnclosingCircle_Random)
 		pts.push_back(c.RandomPointInside(rng));
 
 	Circle2D optimalEnclosingCircle = Circle2D::OptimalEnclosingCircle(&pts[0], (int)pts.size());
-	assert2(optimalEnclosingCircle.r <= c.r + 1e-4f, optimalEnclosingCircle.r, c.r);
+	assert2(optimalEnclosingCircle.r <= c.r + 1e-3f, optimalEnclosingCircle.r, c.r);
 	for (size_t i = 0; i < pts.size(); ++i)
 		assert3(optimalEnclosingCircle.Contains(pts[i]), optimalEnclosingCircle, pts[i], pts[i].Distance(optimalEnclosingCircle.pos) - optimalEnclosingCircle.r);
 	assert2(optimalEnclosingCircle.Contains(c.pos), optimalEnclosingCircle, c.pos);
@@ -132,4 +132,21 @@ UNIQUE_TEST(Circle2D_OptimalEnclosingCircle_Case5)
     assert(EqualAbs(circle.r, 0.5f, 1e-2f));
     assert(EqualAbs(circle.pos.x, 0.5f));
     assert(EqualAbs(circle.pos.y, 0.f));
+}
+
+UNIQUE_TEST(Circle2D_OptimalEnclosingCircle_Case6)
+{
+    float2 pts[] = {
+        float2(-50.f, 78.f),
+        float2(-205.f, 40.f),
+        float2(-204.f, 36.f)
+    };
+
+    Circle2D circle = Circle2D::OptimalEnclosingCircle(pts[0], pts[1], pts[2]);
+    assert(circle.Contains(pts[0]));
+    assert(circle.Contains(pts[1]));
+    assert(circle.Contains(pts[2]));
+    assert(EqualAbs(circle.r, 79.8291626f));
+    assert(EqualAbs(circle.pos.x, -127.111092f));
+    assert(EqualAbs(circle.pos.y, 57.3470802f));
 }
