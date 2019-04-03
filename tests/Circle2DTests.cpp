@@ -12,7 +12,7 @@ RANDOMIZED_TEST(Circle2D_OptimalEnclosingCircle_Random)
 {
 	Circle2D c = RandomCircle2DContainingPoint(rng, float2::RandomBox(rng, -100.f, 100.f), rng.Float(1.f, 100.f));
 	std::vector<float2> pts;
-	for(int i = 0; i < 1000; ++i)
+	for(int i = 0; i < 100; ++i)
 		pts.push_back(c.RandomPointInside(rng));
 
 	Circle2D optimalEnclosingCircle = Circle2D::OptimalEnclosingCircle(&pts[0], (int)pts.size());
@@ -157,7 +157,6 @@ UNIQUE_TEST(Circle2D_OptimalEnclosingCircle_Case6)
 
 BENCHMARK(Circle2D_OptimalEnclosingCircle_bench, "Circle2D::OptimalEnclosingCircle()")
 {
-//    LOGI("%d", testrunner_numItersPerTest);
     ucircle2d[i] = Circle2D::OptimalEnclosingCircle(fl_2, testrunner_numItersPerTest);
 }
 BENCHMARK_END
