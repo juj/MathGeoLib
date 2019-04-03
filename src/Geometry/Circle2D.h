@@ -79,8 +79,6 @@ public:
 		enclosing circle may not pass through all the three points that are specified. */
 	static Circle2D OptimalEnclosingCircle(const float2 &a, const float2 &b, const float2 &c);
 
-	static Circle2D OptimalEnclosingCircle(const float2 &a, const float2 &b, const float2 &c, const float2 &d, int &redundantPoint);
-
 	/// Computes the minimal bounding circle for the given point array.
 	/** This function implements Emo Welzl's optimal enclosing circle algorithm.
 		See "Smallest enclosing disks (balls and ellipsoids)", Lecture Notes in Computer Science 555 (1991) pp. 359-370.

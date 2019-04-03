@@ -56,11 +56,14 @@ static inline Circle2D MakeCircle(float denom, float AB_AC, float AB, float AC, 
     }
 }
 
-Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, const float2 &c, const float2 &d, int &redundantPoint)
+// Finds minimum circle that encloses a-d, with the preknowledge that a is not contained in minimal
+// circle that encloses b-d. One of three points b-c will be redundant to define this new enclosing
+// circle, that will be swapped in-place with a.
+static Circle2D SmallestCircleEnclosing4Points(float2 &a, float2 &b, float2 &c, float2 &d)
 {
     // Find the smallest circle that encloses each of a, b, c and d.
     // As prerequisite, we know that a is not contained by smallest circle that encloses b, c and d, enforce that precondition.
-    assert1(!OptimalEnclosingCircle(b, c, d).Contains(a, -1e-1f), OptimalEnclosingCircle(b, c, d).SignedDistanceSq(a));
+    assert1(!Circle2D::OptimalEnclosingCircle(b, c, d).Contains(a, -1e-1f), Circle2D::OptimalEnclosingCircle(b, c, d).SignedDistanceSq(a));
     
     const float toleranceEpsilon = 1e-3f;
 
@@ -83,7 +86,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
     sqd[0] = circle[0].SignedDistanceSq(d);
     if (sqd[0] <= 0.f)
     {
-        redundantPoint = 3;
+        Swap(a, d);
         return circle[0];
     }
 
@@ -97,7 +100,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
     sqd[1] = circle[1].SignedDistanceSq(c);
     if (sqd[1] <= 0.f)
     {
-        redundantPoint = 2;
+        Swap(a, c);
         return circle[1];
     }
 
@@ -108,7 +111,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
     sqd[2] = circle[2].SignedDistanceSq(b);
     if (sqd[2] <= 0.f)
     {
-        redundantPoint = 1;
+        Swap(a, b);
         return circle[2];
     }
     
@@ -118,17 +121,17 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
     int ci;
     if (sqd[0] <= sqd[1] && sqd[0] <= sqd[2])
     {
-        redundantPoint = 3;
+        Swap(a, d);
         ci = 0;
     }
     else if (sqd[1] <= sqd[2])
     {
-        redundantPoint = 2;
+        Swap(a, c);
         ci = 1;
     }
     else
     {
-        redundantPoint = 1;
+        Swap(a, b);
         ci = 2;
     }
     circle[ci].r = Sqrt(Max(circle[ci].pos.DistanceSq(a), circle[ci].pos.DistanceSq(b), circle[ci].pos.DistanceSq(c), circle[ci].pos.DistanceSq(d))) + 1e-5f;
@@ -270,43 +273,32 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
         if (pts[3].y > pts[i].y) Swap(pts[3], pts[i]);
     }
 
-    int numForward = 3;
-
+    // Compute the minimal enclosing circle for the first three points.
 	Circle2D minCircle = OptimalEnclosingCircle(pts[0], pts[1], pts[2]);
     float r2 = minCircle.r*minCircle.r;
+
+    // Iteratively include the remaining points to the minimal circle.
     for(int i = 3; i < numPoints; ++i)
 	{
-        // Do a minCircle.Contains(pts[i]) check without recomputing the squared radius of the minimum
-        // circle each time.
+        // If the new point is already inside the current bounding circle, it can be skipped
         float d2 = (pts[i] - minCircle.pos).LengthSq();
 		if (d2 <= r2)
 			continue;
 
-        float2 newImportantPoint = pts[i];
-
-        if (i > numForward)
-			pts[i] = pts[numForward];
-		for(int j = Min(i, numForward); j > 0; --j)
-			pts[j] = pts[j-1];
-		pts[0] = newImportantPoint;
-        int redundantPoint;
-		minCircle = OptimalEnclosingCircle(pts[0], pts[1], pts[2], pts[3], redundantPoint);
+        // The new point is outside the current bounding circle defined by pts[0]-pts[2].
+        // Compute a new bounding circle that encloses pts[0]-pts[2] and the new point pts[i].
+        // A circle is defined by at most three points, so one of the resulting points is redundant.
+        // Swap points around so that pts[0]-pts[2] define the new minimum circle, and pts[i] will
+        // have the redundant point.
+        minCircle = SmallestCircleEnclosing4Points(pts[i], pts[0], pts[1], pts[2]);
         r2 = minCircle.r*minCircle.r;
 
-        float2 redundantPt = pts[redundantPoint];
-        for(int j = redundantPoint; j < 3; ++j)
-            pts[j] = pts[j+1];
-        pts[3] = redundantPt;
+        // Start again from scratch: pts[0]-pts[2] now has the new candidate.
+        i = 2;
 
-        // TODO: This would be faster than the above:
-		//Swap(pts[redundantPoint], pts[3]);
-		if (i > numForward)
-			++numForward;
-		i = 3;
-        assert1(minCircle.Contains(pts[0], 1e-3f), minCircle.SignedDistance(pts[0]));
-        assert1(minCircle.Contains(pts[1], 1e-3f), minCircle.SignedDistance(pts[1]));
-        assert1(minCircle.Contains(pts[2], 1e-3f), minCircle.SignedDistance(pts[2]));
-        assert1(minCircle.Contains(pts[3], 1e-3f), minCircle.SignedDistance(pts[3]));
+        mathassert1(minCircle.Contains(pts[0], 1e-3f), minCircle.SignedDistance(pts[0]));
+        mathassert1(minCircle.Contains(pts[1], 1e-3f), minCircle.SignedDistance(pts[1]));
+        mathassert1(minCircle.Contains(pts[2], 1e-3f), minCircle.SignedDistance(pts[2]));
 	}
 	delete[] pts;
 	return minCircle;

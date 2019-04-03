@@ -189,8 +189,16 @@ MATH_END_NAMESPACE
 // that all forms of optimizations inside the math library produce proper results.
 #ifdef MATH_ASSERT_CORRECTNESS
 #define mathassert(x) assert(x)
+#define mathassert1 assert1
+#define mathassert2 assert2
+#define mathassert3 assert3
+#define mathassert4 assert4
 #else
 #define mathassert(x) ((void)0)
+#define mathassert1(...) ((void)0)
+#define mathassert2(...) ((void)0)
+#define mathassert3(...) ((void)0)
+#define mathassert4(...) ((void)0)
 #endif
 
 // Kill both assume() and mathassert() macros in OPTIMIZED_RELEASE builds.
