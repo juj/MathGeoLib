@@ -533,21 +533,21 @@ float PowInt(float base, int exponent)
 		return PowUInt(base, (u32)exponent);
 }
 
-char *SerializeFloat(float f, char *dstStr)
+char *SerializeFloat(float f, char *dstStr,size_t dst_length)
 {
 	if (!IsNan(f))
 	{
 #ifdef MATH_WITH_GRISU3
-		int numChars = dtoa_grisu3((double)f, dstStr);
+		int numChars = dtoa_grisu3((double)f, dstStr,dst_length);
 		return dstStr + numChars;
 #else
-		return dstStr + sprintf(dstStr, "%.17g", f);
+		return dstStr + sprintf_s(dstStr,dst_length,"%.17g", f);
 #endif
 	}
 	else
 	{
 		u32 u = ReinterpretAsU32(f);
-		int numChars = sprintf(dstStr, "NaN(%8X)", (unsigned int)u);
+		int numChars = sprintf_s(dstStr,dst_length,"NaN(%8X)", (unsigned int)u);
 		return dstStr + numChars;
 	}
 }

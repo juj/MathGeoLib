@@ -20,7 +20,7 @@ extern "C"
 		The dst pointer may not be null.
 	@return the number of characters written to dst, excluding the null terminator (which
 		is always written) is returned here. */
-int dtoa_grisu3(double v, char *dst);
+int dtoa_grisu3(double v, char *dst,size_t dst_length);
 
 }
 

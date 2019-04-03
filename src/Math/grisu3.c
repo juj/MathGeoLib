@@ -311,7 +311,7 @@ static int i_to_str(int val, char *str)
 	return (int)(s - begin);
 }
 
-int dtoa_grisu3(double v, char *dst)
+int dtoa_grisu3(double v, char *dst,size_t dst_length)
 {
 	int d_exp, len, success, decimals, i;
 	uint64_t u64 = CAST_U64(v);
@@ -319,7 +319,7 @@ int dtoa_grisu3(double v, char *dst)
 	assert(dst);
 
 	// Prehandle NaNs
-	if ((u64 << 1) > 0xFFE0000000000000ULL) return sprintf(dst, "NaN(%08X%08X)", (uint32_t)(u64 >> 32), (uint32_t)u64);
+	if ((u64 << 1) > 0xFFE0000000000000ULL) return sprintf_s(dst,dst_length, "NaN(%08X%08X)", (uint32_t)(u64 >> 32), (uint32_t)u64);
 	// Prehandle negative values.
 	if ((u64 & D64_SIGN) != 0) { *s2++ = '-'; v = -v; u64 ^= D64_SIGN; }
 	// Prehandle zero.
@@ -329,7 +329,7 @@ int dtoa_grisu3(double v, char *dst)
 
 	success = grisu3(v, s2, &len, &d_exp);
 	// If grisu3 was not able to convert the number to a string, then use old sprintf (suboptimal).
-	if (!success) return sprintf(s2, "%.17g", v) + (int)(s2 - dst);
+	if (!success) return sprintf_s(s2, dst_length,"%.17g", v) + (int)(s2 - dst);
 
     // We now have an integer string of form "151324135" and a base-10 exponent for that number.
     // Next, decide the best presentation for that string by whether to use a decimal point, or the scientific exponent notation 'e'.
