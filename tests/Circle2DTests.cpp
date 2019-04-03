@@ -85,7 +85,7 @@ UNIQUE_TEST(Circle2D_OptimalEnclosingCircle_Case3)
      LOGI("%f", pts3[i].Distance(s.pos));
 #endif
     
-    assert1(EqualAbs(circle.r, 25.2714f), circle.r);
+    assert1(EqualAbs(circle.r, 25.2722f), circle.r);
     assert(EqualAbs(circle.pos.x, -103.81974792480469f));
     assert(EqualAbs(circle.pos.y, 63.85783767700195f));
 
@@ -118,7 +118,7 @@ UNIQUE_TEST(Circle2D_OptimalEnclosingCircle_Case4)
         LOGI("%f", pts3[i].Distance(s.pos));
 #endif
 
-    assert1(EqualAbs(circle.r, 62.6988f), circle.r);
+    assert1(EqualAbs(circle.r, 62.6996f), circle.r);
     assert(EqualAbs(circle.pos.x, 133.76840209960938f));
     assert(EqualAbs(circle.pos.y, 41.58528137207031f));
 
