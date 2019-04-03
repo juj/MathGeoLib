@@ -146,25 +146,29 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 &a, const float2 &b, cons
         
     if (Abs(denom) < 1e-5f) // Each of a, b and c lie on a straight line?
     {
+        // Locate the midpoint between a,b and c.
+        circle.pos = (AB_AC > 0.f ? a+(AB>AC?b:c) : b+c) * 0.5f;
+        /*
         if (AB_AC > 0.f)
         {
             if (AB > AC)
             {
                 circle.pos = (a+b)*0.5f;
-                //circle.r = Sqrt(AB)*0.5f;
+                circle.r = Sqrt(AB)*0.5f;
             }
             else
             {
                 circle.pos = (a+c)*0.5f;
-                //circle.r = Sqrt(AC)*0.5f;
+                circle.r = Sqrt(AC)*0.5f;
             }
         }
         else
         {
             // ||b-c|| = ||(b-a+a-c)|| == ||(b-a)+(c-a)||==||ab-ac||=Dot(ab,ab)-2Dot(ab,ac)+Dot(ac,ac)
-            circle.pos = (b+c)*0.5f;
-            //circle.r = Sqrt(AB + AC - 2.f*AB_AC)*0.5f;
+            circle.pos = b+c;
+            circle.r = Sqrt(AB + AC - 2.f*AB_AC)*0.5f;
         }
+         */
     }
     else
     {
