@@ -46,7 +46,7 @@ extern float4x4 *m2;
 extern const float4x4 *om;
 extern const float4x4 *ogm;
 extern float4x4 *tpm;
-extern float2 *fl_2;
+extern const float2 *fl_2;
 extern float2 *u_fl_2;
 extern const float4 *nv;
 extern const float4 *nv2;
