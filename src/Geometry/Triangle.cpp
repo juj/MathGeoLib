@@ -434,7 +434,7 @@ float Triangle::IntersectLineTri(const vec &linePos, const vec &lineDir,
 		return FLOAT_INF;
 
 	// Barycentric u and v are in limits, the ray intersects the triangle.
-	
+
 	// Output signed distance from ray to triangle.
 	return vE2.Dot(vQ) * recipDet;
 //	return (det < 0.f) ? IntersectBackface : IntersectFrontface;
@@ -963,7 +963,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 
 	vec pt2 = ClosestPoint(lineSegment.a);
 	vec pt3 = ClosestPoint(lineSegment.b);
-	
+
 	float D1 = pt1.DistanceSq(lineSegment.GetPoint(d1));
 	float D2 = pt2.DistanceSq(lineSegment.a);
 	float D3 = pt3.DistanceSq(lineSegment.b);
@@ -1887,7 +1887,7 @@ Triangle operator *(const Quat &transform, const Triangle &triangle)
 std::string Triangle::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))",
+    snprintf(str,sizeof(str),"Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))",
 		a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
 	return str;
 }

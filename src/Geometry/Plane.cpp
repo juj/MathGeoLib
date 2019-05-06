@@ -609,7 +609,7 @@ bool Plane::IntersectLinePlane(const vec &planeNormal, float planeD, const vec &
 	                     <planeNormal, linePos + t*lineDir> == planeD, or
 	    <planeNormal, linePos> + t * <planeNormal, lineDir> == planeD, or
 	                                                      t == (planeD - <planeNormal, linePos>) / <planeNormal, lineDir>,
-	
+
 	                                                           assuming that <planeNormal, lineDir> != 0.
 
 	If <planeNormal, lineDir> == 0, then the line is parallel to the plane, and either no intersection occurs, or the whole line
@@ -916,7 +916,7 @@ Plane operator *(const Quat &transform, const Plane &plane)
 std::string Plane::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
+    snprintf(str,sizeof(str),"Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
 	return str;
 }
 
@@ -935,7 +935,7 @@ std::string Plane::SerializeToString() const
 std::string Plane::SerializeToCodeString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"%.9g", d);
+    snprintf(str,sizeof(str),"%.9g", d);
 	return "Plane(" + normal.SerializeToCodeString() + "," + str + ")";
 }
 

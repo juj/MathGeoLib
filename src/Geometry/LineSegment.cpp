@@ -439,7 +439,7 @@ LineSegment operator *(const Quat &transform, const LineSegment &l)
 std::string LineSegment::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"LineSegment(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f))",
+    snprintf(str,sizeof(str),"LineSegment(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f))",
 		a.x, a.y, a.z, b.x, b.y, b.z);
 	return str;
 }

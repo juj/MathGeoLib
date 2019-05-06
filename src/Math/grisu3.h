@@ -1,4 +1,4 @@
-/* This file is part of an implementation of the "grisu3" double to string
+﻿/* This file is part of an implementation of the "grisu3" double to string
 	conversion algorithm described in the research paper
 
 	"Printing Floating-Point Numbers Quickly And Accurately with Integers"
@@ -20,7 +20,7 @@ extern "C"
 		The dst pointer may not be null.
 	@return the number of characters written to dst, excluding the null terminator (which
 		is always written) is returned here. */
-int dtoa_grisu3(double v, char *dst,size_t dst_length);
+int dtoa_grisu3(double v, char *dst,unsigned int dst_length);
 
 }
 

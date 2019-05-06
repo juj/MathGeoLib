@@ -239,7 +239,7 @@ VecArray Circle::IntersectsFaces(const OBB &obb) const
 {
 	VecArray intersectionPoints;
 	for(int i = 0; i < 6; ++i)
-	{		
+	{
 		Plane p = obb.FacePlane(i);
 		vec pt1, pt2;
 		int numIntersections = Intersects(p, &pt1, &pt2);
@@ -254,7 +254,7 @@ VecArray Circle::IntersectsFaces(const OBB &obb) const
 std::string Circle::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)",
+    snprintf(str,sizeof(str),"Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)",
 		pos.x, pos.y, pos.z, normal.x, normal.y, normal.z, r);
 	return str;
 }

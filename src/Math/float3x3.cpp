@@ -639,7 +639,7 @@ float3x3 float3x3::LookAt(const float3 &localForward, const float3 &targetDirect
 	// we need to compute the real world space up vector that the "head" of the object will point
 	// towards when the model is looking towards the desired target direction.
 	float3 perpWorldUp = targetDirection.Cross(worldRight).Normalized();
-	
+
 	// B. Now we have an orthonormal linear basis { worldRight, perpWorldUp, targetDirection } for the desired target orientation.
 
 	// We want to build a matrix M that performs the following mapping:
@@ -652,7 +652,7 @@ float3x3 float3x3::LookAt(const float3 &localForward, const float3 &targetDirect
 	// the bases A and B are orthonormal with the same handedness.
 
 	// Below, use the notation that (a,b,c) is a 3x3 matrix with a as its first column, b second, and c third.
-	
+
 	// By algebraic manipulation, we can rewrite conditions 1, 2 and 3 in a matrix form:
 	//        M * (localRight, localUp, localForward) = (worldRight, perpWorldUp, targetDirection)
 	// or     M = (worldRight, perpWorldUp, targetDirection) * (localRight, localUp, localForward)^{-1}.
@@ -1039,7 +1039,7 @@ bool float3x3::InverseSymmetric()
 	if (EqualAbs(det, 0.f))
 		return false;
 	det = 1.f / det;
-	
+
 	// The inverse of a symmetric matrix will also be symmetric, so can avoid some computations altogether.
 
 	v[0][0] = det * df_ee;
@@ -1427,7 +1427,7 @@ bool float3x3::Equals(const float3x3 &other, float epsilon) const
 std::string float3x3::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)",
+    snprintf(str,sizeof(str),"(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)",
 		v[0][0], v[0][1], v[0][2],
 		v[1][0], v[1][1], v[1][2],
 		v[2][0], v[2][1], v[2][2]);
@@ -1455,7 +1455,7 @@ std::string float3x3::SerializeToString() const
 std::string float3x3::ToString2() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)",
+    snprintf(str,sizeof(str),"float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)",
 		v[0][0], v[1][0], v[2][0],
 		v[0][1], v[1][1], v[2][1],
 		v[0][2], v[1][2], v[2][2]);

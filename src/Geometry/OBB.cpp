@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+﻿/* Copyright Jukka Jylänki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -306,7 +306,7 @@ LineSegment OBB::Edge(int edgeIndex) const
 }
 
 vec OBB::CornerPoint(int cornerIndex) const
-{	
+{
 	assume(0 <= cornerIndex && cornerIndex <= 7);
 	switch(cornerIndex)
 	{
@@ -704,7 +704,7 @@ int ComputeBasis(const vec &f1a, const vec &f1b,
 		}
 		if (s < 1e-4f && nSolutions == 2)
 			 nSolutions = 1;
-				
+
 		return nSolutions;
 	}
 }
@@ -720,7 +720,7 @@ static bool AreEdgesBad(const vec &f1a, const vec &f1b, const vec &f2a, const ve
 	return false;
 	// Currently disabled. It's not completely certain if there's a form of this heuristic that
 	// might be perfect, needs more tweaking.
-#if 0 
+#if 0
 	float a1 = Abs(f1a.Dot(f1b));
 	float a2 = Abs(f2a.Dot(f2b));
 	float b1 = Abs(f1a.Dot(f2b));
@@ -928,7 +928,7 @@ bool IsVertexAntipodalToEdge(const Polyhedron &convexHull, int vi, const std::ve
 
 			n1.e <= 0
 			(f1b + (f1a-f1b)*t).e <= 0
-			t*(f1a-f1b).e <= -f1b.e 
+			t*(f1a-f1b).e <= -f1b.e
 			if (f1a-f1b).e > 0:
 				t <= -f1b.e / (f1a-f1b).e && t \in [0,1]
 				-f1b.e / (f1a-f1b).e >= 0
@@ -937,7 +937,7 @@ bool IsVertexAntipodalToEdge(const Polyhedron &convexHull, int vi, const std::ve
 				t >= -f1b.e / (f1a-f1b).e && t \in [0,1]
 				-f1b.e / (f1a-f1b).e <= 1
 				-f1b.e >= (f1a-f1b).e
-				f1b.e + (f1a-f1b).e <= 0 
+				f1b.e + (f1a-f1b).e <= 0
 			if (f1a-f1b).e == 0:
 				0 <= -f1b.e
 		*/
@@ -1063,7 +1063,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 				// Find how deep there are points on the opposite side.
 				int extremeOpposite = convexHull.ExtremeVertex(-vec(faceNormals[i]));
 				float signedDistanceOpposite = Dot(vec(convexHull.v[extremeOpposite]) - pointOnFace, faceNormals[i]);
-				LOGE("Vertex %d is %f units deep on the wrong side of face %d (which has %d vertices and surface area %f): On the opposite side, extreme signed distance is vtx %d at d %f.", (int)j, signedDistance, 
+				LOGE("Vertex %d is %f units deep on the wrong side of face %d (which has %d vertices and surface area %f): On the opposite side, extreme signed distance is vtx %d at d %f.", (int)j, signedDistance,
 					(int)i, (int)convexHull.f[i].v.size(), convexHull.FacePolygon(i).Area(), extremeOpposite, signedDistanceOpposite);
 				break;
 			}
@@ -1279,7 +1279,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 			{
 				if (edges[i].first == v || edges[i].second == v)
 				{
-					/* 
+					/*
 					LOGE("Edge %d: %d->%d is antipodal to vertex %d, which is part of the same edge! This should be possible only if the input is degenerate planar!",
 						(int)i, edges[i].first, edges[i].second, v);
 					*/
@@ -2825,7 +2825,7 @@ bool OBB::Intersects(const Polyhedron &polyhedron) const
 std::string OBB::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"OBB(Pos:(%.2f, %.2f, %.2f) Halfsize:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))",
+    snprintf(str,sizeof(str),"OBB(Pos:(%.2f, %.2f, %.2f) Halfsize:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))",
 		pos.x, pos.y, pos.z, r.x, r.y, r.z, axis[0].x, axis[0].y, axis[0].z, axis[1].x, axis[1].y, axis[1].z, axis[2].x, axis[2].y, axis[2].z);
 	return str;
 }

@@ -496,13 +496,13 @@ int Sphere::IntersectLine(const vec &linePos, const vec &lineDir, const vec &sph
 	    || a + t * lineDir ||^2 == radSq.
 
 	  Since ||x||^2 == <x,x> (i.e. the square of a vector norm equals the dot product with itself), we get
-	
+
 	    <a + t * lineDir, a + t * lineDir> == radSq,
-	
+
 	  and using the identity <a+b, a+b> == <a,a> + 2*<a,b> + <b,b> (which holds for dot product when a and b are reals),
 	  we have
 
-	    <a,a> + 2 * <a, t * lineDir> + <t * lineDir, t * lineDir> == radSq, or		
+	    <a,a> + 2 * <a, t * lineDir> + <t * lineDir, t * lineDir> == radSq, or
 	    <a,a> - radSq + 2 * <a, lineDir> * t + <lineDir, lineDir> * t^2 == 0, or
 
 	    C + Bt + At^2 == 0, where
@@ -714,7 +714,7 @@ void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
 		s.Enclose(corners[i].pt);
 }
 
-// Optimize/reimplement the above function in the case when enclosing geometric objects where the number of 
+// Optimize/reimplement the above function in the case when enclosing geometric objects where the number of
 // points to enclose is fixed at compile-time. This avoids dynamic memory allocation.
 template<typename T, int n>
 void Sphere_Enclose(Sphere &s, const T &obj)
@@ -810,7 +810,7 @@ void Sphere::Enclose(const Capsule &capsule)
 	float db = pos.DistanceSq(capsule.l.b);
 
 	// Enclose the farther Sphere of the Capsule first, and the closer one second to retain the tightest fit.
-	if (da > db) 
+	if (da > db)
 	{
 		Enclose(capsule.SphereA());
 		Enclose(capsule.SphereB());
@@ -1054,7 +1054,7 @@ bool FitSphereThroughPoints(const vec &ab, const vec &ac, float &s, float &t)
 	   ( BC   C^2 )   (t)   (C^2 / 2)
 
 	   which equals
-	
+
 	   (s) = ( B^2  BC  )^-1  *  (B^2 / 2)
 	   (t)   ( BC   C^2 )        (C^2 / 2)
 
@@ -1135,7 +1135,7 @@ bool FitSphereThroughPoints(const vec &ab, const vec &ac, const vec &ad, float &
 	      ( BD   CD  D^2)   (u)   (D^2 / 2)
 
 	   which equals
-	
+
 	      (s)   ( B^2  BC  BD )^-1   (B^2 / 2)
 	      (t) = ( BC   C^2 CD )    * (C^2 / 2)
 	      (u)   ( BD   CD  D^2)      (D^2 / 2)
@@ -1391,7 +1391,7 @@ Sphere Sphere::FitThroughPoints(const vec &a, const vec &b, const vec &c, const 
 std::string Sphere::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)",
+    snprintf(str,sizeof(str),"Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)",
 		pos.x, pos.y, pos.z, r);
 	return str;
 }
@@ -1411,7 +1411,7 @@ std::string Sphere::SerializeToString() const
 std::string Sphere::SerializeToCodeString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"%.9g", r);
+    snprintf(str,sizeof(str),"%.9g", r);
 	return "Sphere(" + pos.SerializeToCodeString() + "," + str + ")";
 }
 

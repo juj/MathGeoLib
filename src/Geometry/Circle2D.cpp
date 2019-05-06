@@ -84,7 +84,7 @@ bool FitCircleThroughPoints(const float2 &ab, const float2 &ac, float &s, float 
 	   ( BC   C^2 )   (t)   (C^2 / 2)
 
 	   which equals
-	
+
 	   (s) = ( B^2  BC  )^-1  *  (B^2 / 2)
 	   (t)   ( BC   C^2 )        (C^2 / 2)
 
@@ -416,7 +416,7 @@ float2 Circle2D::RandomPointInside(LCG &lcg)
 std::string Circle2D::ToString() const
 {
 	char str[256];
-	sprintf_s(str, sizeof(str),"Circle2D(pos:(%.2f, %.2f) r:%.2f)",
+    snprintf(str, sizeof(str),"Circle2D(pos:(%.2f, %.2f) r:%.2f)",
 		pos.x, pos.y, r);
 	return str;
 }

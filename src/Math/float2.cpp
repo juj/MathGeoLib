@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+﻿/* Copyright Jukka Jylänki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -228,7 +228,7 @@ bool float2::BitEquals(const float2 &other) const
 /// at debug runs.
 bool IsNeutralCLocale()
 {
-	// Android NDK locale.h does not have struct lconv or localeconv() implemented, and only contains stub 
+	// Android NDK locale.h does not have struct lconv or localeconv() implemented, and only contains stub
 	// symbols with a comment 'MISSING FROM BIONIC - DEFINED TO MAKE libstdc++-v3 happy'
 #ifndef ANDROID
 	lconv *lc = localeconv();
@@ -242,7 +242,7 @@ bool IsNeutralCLocale()
 std::string float2::ToString() const
 {
 	char str[256];
-	sprintf_s(str,sizeof(str),"(%f, %f)", x, y);
+    snprintf(str,sizeof(str),"(%f, %f)", x, y);
 	return std::string(str);
 }
 
