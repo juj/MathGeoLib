@@ -513,6 +513,14 @@ float float3::DistanceSq(const float3 &rhs) const
 #endif
 }
 
+double float3::DistanceSqD(const float3 &rhs) const
+{
+	double dx = x - rhs.x;
+	double dy = y - rhs.y;
+	double dz = z - rhs.z;
+	return dx*dx + dy*dy + dz*dz;
+}
+
 float float3::Distance(const float3 &rhs) const
 {
 #ifdef MATH_AUTOMATIC_SIMD_FLOAT3

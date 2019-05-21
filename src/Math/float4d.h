@@ -47,6 +47,7 @@ public:
 	float4d(){}
 	float4d(double x, double y, double z, double w):x(x), y(y), z(z), w(w) {}
 	float4d(const float4 &rhs):x(rhs.x), y(rhs.y), z(rhs.z), w(rhs.w) {}
+	float4d(const float3 &rhs, float w):x(rhs.x), y(rhs.y), z(rhs.z), w(w) {}
 
 	double Dot(const float4d &rhs) const
 	{
@@ -93,6 +94,11 @@ public:
 									x * rhs.y - y * rhs.x,
 									0);
 #endif
+	}
+
+	double LengthSq() const
+	{
+		return x*x + y*y + z*z + w*w;
 	}
 
 	double Distance4Sq(const float4d &rhs) const
@@ -143,7 +149,7 @@ public:
 	}
 	double Normalize() { return Normalize4(); }
 
-		double Normalize3()
+	double Normalize3()
 	{
 		double len = sqrt(x*x + y*y + z*z);
 		double recipLen = 1.0 / len;
@@ -186,6 +192,18 @@ public:
 #endif
 	}
 
+	vec ToPointVec() const
+	{
+		assert1(EqualAbs(w, 1.0), w);
+		return POINT_VEC(x, y, z);
+	}
+
+	vec ToDirVec() const
+	{
+		assert1(EqualAbs(w, 0.0), w);
+		return DIR_VEC(x, y, z);
+	}
+
 	bool Equals(const float4d &other, float epsilon = 1e-3f) const
 	{
 		return MATH_NS::Abs(x - other.x) < epsilon &&
@@ -215,6 +233,10 @@ inline float4d operator *(double scalar, const float4d &vec)
 #else
 	return float4d(vec.x*scalar, vec.y*scalar, vec.z*scalar, vec.w*scalar);
 #endif
+}
+inline float4d operator *(const float4d &vec, double scalar)
+{
+	return scalar * vec;
 }
 
 struct double4_storage

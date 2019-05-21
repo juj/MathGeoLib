@@ -512,6 +512,7 @@ public:
 		(monotonous and non-decreasing) function.
 		@see Distance(), Length(), LengthSq(). */
 	float DistanceSq(const float3 &point) const;
+	double DistanceSqD(const float3 &point) const;
 
 	/// Computes the dot product of this and the given vector.
 	/** The dot product has a geometric interpretation of measuring how close two direction vectors are to pointing

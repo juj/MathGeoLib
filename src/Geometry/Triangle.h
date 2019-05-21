@@ -270,6 +270,7 @@ public:
 	float Distance(const Capsule &capsule) const;
 
 	float DistanceSq(const vec &point) const;
+	double DistanceSqD(const vec &point) const;
 
 	/// Tests whether this triangle and the given object intersect.	
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
@@ -323,6 +324,7 @@ public:
 		the region of intersection.
 		@see Contains(), Distance(), Intersects(), ClosestPointToTriangleEdge(). */
 	vec ClosestPoint(const vec &point) const;
+	vec ClosestPointD(const vec &point) const;
 	/** @param otherPt [out] If specified, receives the closest point on the other object to this triangle.
 		This pointer may be null. */
 	vec ClosestPoint(const LineSegment &lineSegment, vec *otherPt = 0) const;

@@ -91,6 +91,14 @@ inline std::string ObjToString<float>(const float &obj)
 }
 
 template<>
+inline std::string ObjToString<double>(const double &obj)
+{
+	std::stringstream ss;
+	ss << obj;
+	return ss.str();
+}
+
+template<>
 inline std::string ObjToString<int>(const int &obj)
 {
 	std::stringstream ss;

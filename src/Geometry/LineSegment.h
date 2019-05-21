@@ -150,6 +150,7 @@ public:
 		@see Contains(), Distance(), Intersects(). */
 	vec ClosestPoint(const vec &point) const { float d; return ClosestPoint(point, d); }
 	vec ClosestPoint(const vec &point, float &d) const;
+	vec ClosestPointD(const vec &point, double &d) const;
 	/** @param d2 [out] If specified, this parameter receives the (normalized, in case of line segment)
 			distance along the other line object which specifies the closest point on that line to
 			this line segment. */
@@ -189,6 +190,7 @@ public:
 
 	float DistanceSq(const vec &point) const;
 	float DistanceSq(const LineSegment &other) const;
+	double DistanceSqD(const vec &point) const;
 
 	/// Tests whether this line segment and the given object intersect.	
 	/** Both objects are treated as "solid", meaning that if one of the objects is fully contained inside
