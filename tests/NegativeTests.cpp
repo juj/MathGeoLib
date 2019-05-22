@@ -1740,3 +1740,35 @@ RANDOMIZED_TEST(RayKdTreeNoIntersect)
 	assert(!result.pos.IsFinite());
 	assert(!result.barycentricUV.IsFinite());
 }
+
+// https://github.com/juj/MathGeoLib/issues/55
+UNIQUE_TEST(AABB_Capsule_NoIntersect_Case)
+{
+	vec minPoint = POINT_VEC(438.420929f, 805.586670f, 493.709167f);
+	vec maxPoint = POINT_VEC(443.420929f, 810.586670f, 498.709167f);
+	AABB aabb(minPoint, maxPoint);
+	
+	vec a = POINT_VEC(479.665222f,  -30.f, 509.737244f);
+	vec b = POINT_VEC(479.665222f, 1530.f, 509.737244f);
+	
+	Capsule cylinder(a, b, 37.6882935f);
+	
+	assert(!cylinder.Intersects(aabb));
+}
+
+// https://github.com/juj/MathGeoLib/issues/55
+UNIQUE_TEST(AABB_Capsule_NoIntersect_Case_2)
+{
+	// Slightly simplified numbers from above
+	vec minPoint = POINT_VEC(438.f,        0.f, 493.f);
+	vec maxPoint = POINT_VEC(443.420929f, 10.f, 499.f);
+	AABB aabb(minPoint, maxPoint);
+	
+	vec a = POINT_VEC(479.665222f,  0.f, 509.737244f);
+	vec b = POINT_VEC(479.665222f, 10.f, 509.737244f);
+	
+	Capsule cylinder(a, b, 37.6882935f);
+	
+	assert(!cylinder.Intersects(aabb));
+}
+
