@@ -239,6 +239,11 @@ void Capsule::Translate(const vec &offset)
 	l.b += offset;
 }
 
+Capsule Capsule::Translated(const vec &offset) const
+{
+	return Capsule(l.a + offset, l.b + offset, r);
+}
+
 void Capsule::Scale(const vec &centerPoint, float scaleFactor)
 {
 	float3x4 tm = float3x4::Scale(DIR_VEC_SCALAR(scaleFactor), centerPoint);
@@ -401,7 +406,7 @@ bool Capsule::Intersects(const Plane &plane) const
 
 bool Capsule::Intersects(const AABB &aabb) const
 {
-	return GJKIntersect(*this, aabb);
+	return FloatingPointOffsetedGJKIntersect(*this, aabb);
 }
 
 bool Capsule::Intersects(const OBB &obb) const

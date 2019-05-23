@@ -28,4 +28,13 @@ const float4d float4d::unitW = float4d(0,0,0,1);
 const float4d float4d::nan = float4d(FLOAT_NAN, FLOAT_NAN, FLOAT_NAN, FLOAT_NAN);
 const float4d float4d::inf = float4d(FLOAT_INF, FLOAT_INF, FLOAT_INF, FLOAT_INF);
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+std::string float4d::ToString() const
+{
+	char str[256];
+	sprintf(str, "(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
+	return std::string(str);
+}
+#endif
+
 MATH_END_NAMESPACE

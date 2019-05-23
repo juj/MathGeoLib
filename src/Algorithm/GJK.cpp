@@ -16,6 +16,7 @@
 	@author Jukka Jylänki
 	@brief Implementation of the Gilbert-Johnson-Keerthi (GJK) convex polyhedron intersection test. */
 #include "GJK.h"
+#include "../Math/float4d.h"
 #include "../Geometry/LineSegment.h"
 #include "../Geometry/Triangle.h"
 #include "../Geometry/Plane.h"
@@ -245,8 +246,16 @@ vec UpdateSimplex(vec *s, int &n)
 		vec d03 = s[3] - s[0];
 		vec tri013Normal = Cross(d01, d03); // Normal of triangle 0->1->3 pointing outwards from the simplex.
 		vec tri023Normal = Cross(d03, d02); // Normal of triangle 0->2->3 pointing outwards from the simplex.
-		assert(Dot(tri013Normal, d02) <= 0.f);
-		assert(Dot(tri023Normal, d01) <= 0.f);
+
+#ifdef MATH_ASSERT_CORRECTNESS
+		float4d D01 = float4d(s[1], 1.f) - float4d(s[0], 1.f);
+		float4d D02 = float4d(s[2], 1.f) - float4d(s[0], 1.f);
+		float4d D03 = float4d(s[3], 1.f) - float4d(s[0], 1.f);
+		float4d tri013NormalD = D01.Cross(D03);
+		float4d tri023NormalD = D03.Cross(D02);
+		assert3(tri013NormalD.Dot(D02) <= 0.f, tri013NormalD, D02, tri013NormalD.Dot(D02));
+		assert3(tri023NormalD.Dot(D01) <= 0.f, tri023NormalD, D01, tri023NormalD.Dot(D01));
+#endif
 
 		vec e03_1 = Cross(tri013Normal, d03); // The normal of edge 0->3 on triangle 013.
 		vec e03_2 = Cross(d03, tri023Normal); // The normal of edge 0->3 on triangle 023.

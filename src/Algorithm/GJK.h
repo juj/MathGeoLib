@@ -19,6 +19,7 @@
 
 #include "../MathGeoLibFwd.h"
 #include "../Math/float3.h"
+#include "../Geometry/AABB.h"
 
 MATH_BEGIN_NAMESPACE
 
@@ -59,6 +60,18 @@ bool GJKIntersect(const A &a, const B &b)
 	}
 	assume2(false && "GJK intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
 	return false; // Report no intersection.
+}
+
+// This computes GJK intersection, but by first translating both objects to a coordinate frame that is as closely
+// centered around world origin as possible, to gain floating point precision.
+template<typename A, typename B>
+bool FloatingPointOffsetedGJKIntersect(const A &a, const B &b)
+{
+	AABB ab = a.MinimalEnclosingAABB();
+	AABB bb = b.MinimalEnclosingAABB();
+	vec offset = (Min(ab.minPoint, bb.minPoint) + Max(ab.maxPoint, bb.maxPoint)) * 0.5f;
+	const vec floatingPointPrecisionOffset = -offset;
+	return GJKIntersect(a.Translated(floatingPointPrecisionOffset), b.Translated(floatingPointPrecisionOffset));
 }
 
 MATH_END_NAMESPACE

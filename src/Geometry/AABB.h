@@ -254,6 +254,7 @@ public:
 		@param numPoints The number of elements in the pointArray list.
 		@see SetFrom(). */
 	static AABB MinimalEnclosingAABB(const vec *pointArray, int numPoints);
+	AABB MinimalEnclosingAABB() const { return *this; }
 
 	/// Finds the most extremal points along the three world axes simultaneously.
 	/** @param pointArray A pointer to an array of points to process.
@@ -324,6 +325,7 @@ public:
 	/** @param offset The amount of displacement to apply to this AABB, in world space coordinates.
 		@see Scale(), Transform(). */
 	void Translate(const vec &offset);
+	AABB Translated(const vec &offset) const;
 
 	/// Applies a uniform scale to this AABB.
 	/** This function scales this AABB structure in-place, using the given center point as the origin

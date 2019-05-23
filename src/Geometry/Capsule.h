@@ -205,6 +205,7 @@ public:
 		@param offset The world space offset to apply to the position of this capsule.
 		@see Transform(), Scale(). */
 	void Translate(const vec &offset);
+	Capsule Translated(const vec &offset) const;
 
 	/// Applies a uniform scale to this Capsule.
 	/** This function scales this capsule structure in-place, using the given center point as the origin

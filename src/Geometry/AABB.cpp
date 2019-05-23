@@ -453,6 +453,11 @@ void AABB::Translate(const vec &offset)
 	maxPoint += offset;
 }
 
+AABB AABB::Translated(const vec &offset) const
+{
+	return AABB(minPoint + offset, maxPoint + offset);
+}
+
 void AABB::Scale(const vec &centerPoint, float scaleFactor)
 {
 	minPoint = (minPoint - centerPoint) * scaleFactor + centerPoint;

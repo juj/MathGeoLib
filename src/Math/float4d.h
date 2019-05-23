@@ -212,6 +212,11 @@ public:
 					 MATH_NS::Abs(w - other.w) < epsilon;
 	}
 
+#ifdef MATH_ENABLE_STL_SUPPORT
+	/// Returns "(x, y, z, w)".
+	std::string ToString() const;
+#endif
+
 	static const float4d zero;
 	static const float4d one;
 	static const float4d unitX;
