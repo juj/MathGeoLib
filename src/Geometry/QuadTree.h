@@ -23,6 +23,7 @@
 #define MGL_PROFILE(x)
 #endif
 #include "../Math/float2.h"
+#include "../Math/float3.h"
 #include "AABB2D.h"
 #include "../Math/MathTypes.h"
 
@@ -116,7 +117,7 @@ public:
 
 	QuadTree()
 	:rootNodeIndex(-1),
-	boundingAABB(float2(0,0), float2(1,1))
+	boundingAABB(POINT_VEC2D(0,0), POINT_VEC2D(1,1))
 #ifdef QUADTREE_VERBOSE_LOGGING
 	,totalNumObjectsInTree(0)
 #endif

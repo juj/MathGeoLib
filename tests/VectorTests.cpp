@@ -6,6 +6,7 @@
 #include "TestRunner.h"
 #include "TestData.h"
 #include "../src/Math/float2.h"
+#include "../src/Math/float4d.h"
 #include "../src/Math/float4_sse.h"
 #include "../src/Math/float4_neon.h"
 
@@ -1044,6 +1045,62 @@ BENCHMARK(float4_PerpendicularBasis, "float4::PerpendicularBasis")
 	dummyResultVec += FLOAT4_TO_DIR(b + c);
 }
 BENCHMARK_END;
+
+// Pixar orthonormal basis code: https://graphics.pixar.com/library/OrthonormalB/paper.pdf
+void branchlessONB(const vec &n, vec &b1, vec &b2)
+{
+	float sign = copysignf(1.0f, n.z);
+	const float a = -1.0f / (sign + n.z);
+	const float b = n.x * n.y * a;
+	b1 = DIR_VEC(1.0f + sign * n.x * n.x * a, sign * b, -sign * n.x);
+	b2 = DIR_VEC(b, sign + n.y * n.y * a, -n.y);
+}
+
+BENCHMARK(float4_PerpendicularBasis_Pixar, "float4 Pixar orthonormal basis code")
+{
+	vec b, c;
+	branchlessONB(FLOAT4_TO_DIR(nv[i]), b, c);
+	dummyResultVec += b + c;
+}
+BENCHMARK_END;
+
+static double sqe(const vec &v)
+{
+	double d = Sqrt(FLOAT4D_DIR_VEC(v).LengthSq()) - 1.0;
+	return d*d;
+}
+
+static double sqe(const vec &v, const vec &w)
+{
+	double d = FLOAT4D_DIR_VEC(v).Dot(FLOAT4D_DIR_VEC(w));
+	return d*d;
+}
+
+UNIQUE_TEST(float4_PerpendicularBasis_precision)
+{
+	const int C = 2;
+	double maxRelError[C] = {};
+
+	for(int i = 0; i < 100000; ++i)
+	{
+		vec v = vec::RandomDir(rng, 1.f);
+		v.Normalize();
+
+		vec b, c;
+		v.PerpendicularBasis(b, c);
+		double error = (sqe(v) + sqe(b) + sqe(c) + sqe(v, b) + sqe(b, c) + sqe(c, v)) / 6.0;
+//		printf("error: %e %s %s %s\n", error, v.ToString().c_str(), b.ToString().c_str(), c.ToString().c_str());
+		maxRelError[0] = Max(error, maxRelError[0]);
+
+		branchlessONB(v, b, c);
+		error = (sqe(v) + sqe(b) + sqe(c) + sqe(v, b) + sqe(b, c) + sqe(c, v)) / 6.0;
+//		printf("error2: %e %s %s %s\n", error, v.ToString().c_str(), b.ToString().c_str(), c.ToString().c_str());
+		maxRelError[1] = Max(error, maxRelError[1]);
+	}
+
+	LOGI("Max relative error with float4::PerpendicularBasis: %e", maxRelError[0]);
+	LOGI("Max relative error with branchlessONB: %e", maxRelError[1]);
+}
 
 UNIQUE_TEST(float2_ConvexHull_Case)
 {

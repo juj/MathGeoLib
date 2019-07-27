@@ -197,10 +197,10 @@ vec UpdateSimplex(vec *s, int &n)
 		// Sanity-check that the above reasoning is valid by testing each voronoi region and assert()ing that the ones we assume never to
 		// happen never will.
 		double d[14];
-		d[0] = s[0].DistanceSqD(vec::zero);
-		d[1] = s[1].DistanceSqD(vec::zero);
-		d[2] = s[2].DistanceSqD(vec::zero);
-		d[3] = s[3].DistanceSqD(vec::zero);
+		d[0] = FLOAT4D_POINT_VEC(s[0]).Distance4Sq(FLOAT4D_POINT_VEC(vec::zero));
+		d[1] = FLOAT4D_POINT_VEC(s[1]).Distance4Sq(FLOAT4D_POINT_VEC(vec::zero));
+		d[2] = FLOAT4D_POINT_VEC(s[2]).Distance4Sq(FLOAT4D_POINT_VEC(vec::zero));
+		d[3] = FLOAT4D_POINT_VEC(s[3]).Distance4Sq(FLOAT4D_POINT_VEC(vec::zero));
 		d[4] = LineSegment(s[0], s[1]).DistanceSqD(vec::zero);
 		d[5] = LineSegment(s[0], s[2]).DistanceSqD(vec::zero);
 		d[6] = LineSegment(s[0], s[3]).DistanceSqD(vec::zero);
@@ -248,9 +248,9 @@ vec UpdateSimplex(vec *s, int &n)
 		vec tri023Normal = Cross(d03, d02); // Normal of triangle 0->2->3 pointing outwards from the simplex.
 
 #ifdef MATH_ASSERT_CORRECTNESS
-		float4d D01 = float4d(s[1], 1.f) - float4d(s[0], 1.f);
-		float4d D02 = float4d(s[2], 1.f) - float4d(s[0], 1.f);
-		float4d D03 = float4d(s[3], 1.f) - float4d(s[0], 1.f);
+		float4d D01 = FLOAT4D_POINT_VEC(s[1]) - FLOAT4D_POINT_VEC(s[0]);
+		float4d D02 = FLOAT4D_POINT_VEC(s[2]) - FLOAT4D_POINT_VEC(s[0]);
+		float4d D03 = FLOAT4D_POINT_VEC(s[3]) - FLOAT4D_POINT_VEC(s[0]);
 		float4d tri013NormalD = D01.Cross(D03);
 		float4d tri023NormalD = D03.Cross(D02);
 		assert3(tri013NormalD.Dot(D02) <= 0.f, tri013NormalD, D02, tri013NormalD.Dot(D02));

@@ -761,8 +761,17 @@ bool EqualAbs(float a, float b, float epsilon);
 #define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
 #define DIR_VEC(...) float4(__VA_ARGS__, 0.f)
 
+#define POINT_VEC2D(...) float4(__VA_ARGS__, 0.f, 1.f)
+#define DIR_VEC2D(...) float4(__VA_ARGS__, 0.f, 0.f)
+
 #define POINT_VEC_SCALAR(s) float4(pos_from_scalar_ps(s))
 #define DIR_VEC_SCALAR(s) float4(dir_from_scalar_ps(s))
+
+#define FLOAT4D_POINT_VEC(...) float4d(__VA_ARGS__)
+#define FLOAT4D_DIR_VEC(...) float4d(__VA_ARGS__)
+
+#define FLOAT4D_POINT_VEC_SCALAR(s) float4d(pos_from_scalar_ps(s))
+#define FLOAT4D_DIR_VEC_SCALAR(s) float4d(dir_from_scalar_ps(s))
 
 #define POINT_TO_FLOAT3(v) (v).xyz()
 #define DIR_TO_FLOAT3(v) (v).xyz()
@@ -788,6 +797,8 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 #else
 #define POINT_VEC(...) float3(__VA_ARGS__)
 #define DIR_VEC(...) float3(__VA_ARGS__)
+#define POINT_VEC2D(...) float2(__VA_ARGS__)
+#define DIR_VEC2D(...) float2(__VA_ARGS__)
 #define POINT_TO_FLOAT3(x) x
 #define DIR_TO_FLOAT3(x) x
 #define POINT_VEC_SCALAR(s) float3::FromScalar(s)
@@ -796,6 +807,12 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 #define DIR_TO_FLOAT4(v) float4(v, 0.f)
 #define FLOAT4_TO_POINT(v) (v).xyz()
 #define FLOAT4_TO_DIR(v) (v).xyz()
+
+#define FLOAT4D_POINT_VEC(...) float4d(__VA_ARGS__, 1.f)
+#define FLOAT4D_DIR_VEC(...) float4d(__VA_ARGS__, 0.f)
+
+#define FLOAT4D_POINT_VEC_SCALAR(s) float4d::FromScalar(s, 1.f)
+#define FLOAT4D_DIR_VEC_SCALAR(s) float4d::FromScalar(s, 0.f)
 
 #endif
 

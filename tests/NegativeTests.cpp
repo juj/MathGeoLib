@@ -1775,12 +1775,12 @@ UNIQUE_TEST(AABB_Capsule_NoIntersect_Case_2)
 // https://github.com/juj/MathGeoLib/issues/56
 UNIQUE_TEST(AABB_Capsule_NoIntersect_Case_3)
 {
-	vec minPoint = vec(1549.69849f, 639.203125f, 1115.08582f);
-	vec maxPoint = vec(1554.69849f, 644.203125f, 1120.08582f);
+	vec minPoint = POINT_VEC(1549.69849f, 639.203125f, 1115.08582f);
+	vec maxPoint = POINT_VEC(1554.69849f, 644.203125f, 1120.08582f);
 	AABB aabb(minPoint, maxPoint);
 
-	vec a(1072.35388f, 1130.68018f, -477.690887f);
-	vec b(1699.54614f, 490.913147f, 1637.29395f);
+	vec a = POINT_VEC(1072.35388f, 1130.68018f, -477.690887f);
+	vec b = POINT_VEC(1699.54614f, 490.913147f, 1637.29395f);
 
 	Capsule cylinder(a, b, 4.36077833f);
 
