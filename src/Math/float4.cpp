@@ -942,21 +942,10 @@ void float4::PerpendicularBasis(float4 &outB, float4 &outC) const
 	//   Best: 17.468 nsecs / 29.418 ticks, Avg: 17.703 nsecs, Worst: 19.275 nsecs
 	basis_ps(this->v, &outB.v, &outC.v);
 #else
-	// Benchmark 'float4_PerpendicularBasis': float4::PerpendicularBasis
-	//   Best: 33.731 nsecs / 57.715 ticks, Avg: 35.080 nsecs, Worst: 39.152 nsecs
-	float4 a = this->Abs();
-	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
-	float4 q;
-	if (a.x <= a.y)
-	{
-		if (a.x <= a.z) q = float4(1,0,0,0);
-		else q = float4(0,0,1,0);
-	}
-	else if (a.y <= a.z) q = float4(0,1,0,0);
-	else q = float4(0,0,1,0);
-
-	outB = this->Cross(q).Normalized();
-	outC = this->Cross(outB).Normalized();
+	float3 b, c;
+	Float3Part().PerpendicularBasis(b, c);
+	outB = float4(b, 0.f);
+	outC = float4(c, 0.f);
 #endif
 }
 

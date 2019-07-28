@@ -624,19 +624,12 @@ void float3::PerpendicularBasis(float3 &outB, float3 &outC) const
 	store_vec3(&outB.x, out1);
 	store_vec3(&outC.x, out2);
 #else
-	float3 a = this->Abs();
-	// Choose from (1,0,0), (0,1,0), and (0,0,1) the one that's most perpendicular to this vector.
-	float3 q;
-	if (a.x <= a.y)
-	{
-		if (a.x <= a.z) q = float3(1,0,0);
-		else q = float3(0,0,1);
-	}
-	else if (a.y <= a.z) q = float3(0,1,0);
-	else q = float3(0,0,1);
-
-	outB = this->Cross(q).Normalized();
-	outC = this->Cross(outB).Normalized();
+	// Pixar orthonormal basis code: https://graphics.pixar.com/library/OrthonormalB/paper.pdf
+	float sign = copysignf(1.0f, z);
+	const float a = -1.0f / (sign + z);
+	const float b = x * y * a;
+	outB = float3(1.0f + sign * x * x * a, sign * b,             -sign * x);
+	outC = float3(                      b, sign + y * y * a,            -y);
 #endif
 }
 
