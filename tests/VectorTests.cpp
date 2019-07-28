@@ -1081,7 +1081,7 @@ UNIQUE_TEST(float4_PerpendicularBasis_precision)
 	const int C = 2;
 	double maxRelError[C] = {};
 
-	for(int i = 0; i < 100000; ++i)
+	for(int i = 0; i < 1000000; ++i)
 	{
 		vec v = vec::RandomDir(rng, 1.f);
 		v.Normalize();
@@ -1089,12 +1089,10 @@ UNIQUE_TEST(float4_PerpendicularBasis_precision)
 		vec b, c;
 		v.PerpendicularBasis(b, c);
 		double error = (sqe(v) + sqe(b) + sqe(c) + sqe(v, b) + sqe(b, c) + sqe(c, v)) / 6.0;
-//		printf("error: %e %s %s %s\n", error, v.ToString().c_str(), b.ToString().c_str(), c.ToString().c_str());
 		maxRelError[0] = Max(error, maxRelError[0]);
 
 		branchlessONB(v, b, c);
 		error = (sqe(v) + sqe(b) + sqe(c) + sqe(v, b) + sqe(b, c) + sqe(c, v)) / 6.0;
-//		printf("error2: %e %s %s %s\n", error, v.ToString().c_str(), b.ToString().c_str(), c.ToString().c_str());
 		maxRelError[1] = Max(error, maxRelError[1]);
 	}
 
