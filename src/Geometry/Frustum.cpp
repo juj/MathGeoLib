@@ -337,6 +337,11 @@ float4x4 Frustum::ComputeProjectionMatrix() const
 	assume(handedness == FrustumLeftHanded || handedness == FrustumRightHanded);
 	if (type == PerspectiveFrustum)
 	{
+#ifdef __EMSCRIPTEN__
+		assert(projectiveSpace == FrustumSpaceGL && "TODO: D3D style 0..1 Z projection matrices are currently disabled in Emscripten builds due to code size issues");
+		assert(handedness == FrustumRightHanded && "TODO: D3D style left handed matrices are currently disabled in Emscripten builds due to code size issues");
+		return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
+#else
 		if (projectiveSpace == FrustumSpaceGL)
 		{
 			if (handedness == FrustumRightHanded)
@@ -351,9 +356,15 @@ float4x4 Frustum::ComputeProjectionMatrix() const
 			else if (handedness == FrustumLeftHanded)
 				return float4x4::D3DPerspProjLH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
 		}
+#endif
 	}
 	else if (type == OrthographicFrustum)
 	{
+#ifdef __EMSCRIPTEN__
+		assert(projectiveSpace == FrustumSpaceGL && "TODO: D3D style 0..1 Z projection matrices are currently disabled in Emscripten builds due to code size issues");
+		assert(handedness == FrustumRightHanded && "TODO: D3D style left handed matrices are currently disabled in Emscripten builds due to code size issues");
+		return float4x4::OpenGLOrthoProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
+#else
 		if (projectiveSpace == FrustumSpaceGL)
 		{
 			if (handedness == FrustumRightHanded)
@@ -368,6 +379,7 @@ float4x4 Frustum::ComputeProjectionMatrix() const
 			else if (handedness == FrustumLeftHanded)
 				return float4x4::D3DOrthoProjLH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
 		}
+#endif
 	}
 #ifndef OPTIMIZED_RELEASE
 	LOGE("Not all values of Frustum were initialized properly! Please initialize correctly before calling Frustum::ProjectionMatrix()!");
