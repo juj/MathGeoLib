@@ -87,24 +87,47 @@ float3x3 float3x3::RotateAxisAngle(const float3 &axisDirection, float angleRadia
 
 float3x3 float3x3::RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection)
 {
+	assume2(sourceDirection.IsNormalized(), sourceDirection, sourceDirection.Length());
+	assume2(targetDirection.IsNormalized(), targetDirection, targetDirection.Length());
+
 	// http://cs.brown.edu/research/pubs/pdfs/1999/Moller-1999-EBA.pdf
 	float3x3 r;
-	float3 v = sourceDirection.Cross(targetDirection);
-	float d = v.Dot(v);
-	if (d < 1e-3f)
+	float dot = sourceDirection.Dot(targetDirection);
+	if (Abs(dot) > 0.999f)
 	{
-		r.SetRotatePart(Quat::RotateFromTo(sourceDirection, targetDirection));
+		float3 s = sourceDirection.Abs();
+		float3 unit = s.x < s.y && s.x < s.z ? float3::unitX : (s.y < s.z ? float3::unitY : float3::unitZ);
+		float3 u = unit - sourceDirection;
+		float3 v = unit - targetDirection;
+		float uv = u.Dot(v);
+		float uu = u.Dot(u);
+		float vv = v.Dot(v);
+		float a = -2.f / uu;
+		float b = -2.f / vv;
+		float c = a * b * uv;
+
+		r[0][0] = 1.f + a*u.x*u.x + b*v.x*v.x + c*v.x*u.x;
+		r[0][1] =       a*u.x*u.y + b*v.x*v.y + c*v.x*u.y;
+		r[0][2] =       a*u.x*u.z + b*v.x*v.z + c*v.x*u.z;
+
+		r[1][0] =       a*u.y*u.x + b*v.y*v.x + c*v.y*u.x;
+		r[1][1] = 1.f + a*u.y*u.y + b*v.y*v.y + c*v.y*u.y;
+		r[1][2] =       a*u.y*u.z + b*v.y*v.z + c*v.y*u.z;
+
+		r[2][0] =       a*u.z*u.x + b*v.z*v.x + c*v.z*u.x;
+		r[2][1] =       a*u.z*u.y + b*v.z*v.y + c*v.z*u.y;
+		r[2][2] = 1.f + a*u.z*u.z + b*v.z*v.z + c*v.z*u.z;
 	}
 	else
 	{
-		float c = sourceDirection.Dot(targetDirection);
-		float h = (1.f - c) / d;
+		float3 v = sourceDirection.Cross(targetDirection);
+		float h = (1.f - dot) / v.Dot(v);
 		float hvx = h * v.x;
 		float hvy = h * v.y;
 		float hvz = h * v.z;
-		r[0][0] = hvx * v.x + c;   r[0][1] = hvy * v.x - v.z; r[0][2] = hvz * v.x + v.y;
-		r[1][0] = hvx * v.y + v.z; r[1][1] = hvy * v.y + c;   r[1][2] = hvz * v.y - v.x;
-		r[2][0] = hvx * v.z - v.y; r[2][1] = hvy * v.z + v.x; r[2][2] = hvz * v.z + c;
+		r[0][0] = hvx * v.x + dot; r[0][1] = hvy * v.x - v.z; r[0][2] = hvz * v.x + v.y;
+		r[1][0] = hvx * v.y + v.z; r[1][1] = hvy * v.y + dot; r[1][2] = hvz * v.y - v.x;
+		r[2][0] = hvx * v.z - v.y; r[2][1] = hvy * v.z + v.x; r[2][2] = hvz * v.z + dot;
 	}
 	return r;
 }
