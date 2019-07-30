@@ -1064,9 +1064,27 @@ BENCHMARK(float4_PerpendicularBasis_Pixar, "float4 Pixar orthonormal basis code"
 }
 BENCHMARK_END;
 
-static double sqe(const vec &v)
+BENCHMARK(float3x3_RotateFromTo, "float3x3::RotateFromTo")
 {
-	double d = Sqrt(FLOAT4D_DIR_VEC(v).LengthSq()) - 1.0;
+	uninitializedFloat3x3 = float3x3::RotateFromTo(nv[i].Float3Part(), nv[i+1].Float3Part());
+}
+BENCHMARK_END;
+
+BENCHMARK(float4x4_RotateFromTo, "float4x4::RotateFromTo")
+{
+	uninitializedFloat4x4 = float4x4::RotateFromTo(nv[i], nv[i+1]);
+}
+BENCHMARK_END;
+
+static double sqe(const float3 &v)
+{
+	double d = Sqrt(float4d(v, 0.f).LengthSq()) - 1.0;
+	return d*d;
+}
+
+static double sqe(const float4 &v)
+{
+	double d = Sqrt(float4d(v).LengthSq()) - 1.0;
 	return d*d;
 }
 
@@ -1074,6 +1092,16 @@ static double sqe(const vec &v, const vec &w)
 {
 	double d = FLOAT4D_DIR_VEC(v).Dot(FLOAT4D_DIR_VEC(w));
 	return d*d;
+}
+
+static double sqe(const float3x3 &m)
+{
+	return (sqe(m.Col(0)) + sqe(m.Col(1)) + sqe(m.Col(2)) + sqe(m.Col(0), m.Col(1)) + sqe(m.Col(1), m.Col(2)) + sqe(m.Col(0), m.Col(2))) / 6.0;
+}
+
+static double sqe(const float4x4 &m)
+{
+	return sqe(m.Float3x3Part());
 }
 
 UNIQUE_TEST(float4_PerpendicularBasis_precision)
@@ -1098,6 +1126,39 @@ UNIQUE_TEST(float4_PerpendicularBasis_precision)
 
 	LOGI("Max relative error with float4::PerpendicularBasis: %e", maxRelError[0]);
 	LOGI("Max relative error with branchlessONB: %e", maxRelError[1]);
+}
+
+UNIQUE_TEST(float4x4_RotateFromTo_precision)
+{
+	const int C = 3;
+	double maxRelError[C] = {};
+
+	for(int i = 0; i < 1000000; ++i)
+	{
+		vec v = vec::RandomDir(rng, 1.f);
+		v.Normalize();
+		vec v2 = vec::RandomDir(rng, 1.f);
+		v2.Normalize();
+
+		float3x3 r3 = float3x3::RotateFromTo(v.xyz(), v2.xyz());
+		float3 rotated3 = r3.MulDir(v.xyz());
+		double error = rotated3.DistanceSq(v2) + sqe(r3);
+		maxRelError[0] = Max(error, maxRelError[0]);
+
+		float4x4 r = float4x4::RotateFromTo(v, v2);
+		float4 rotated = r.Mul(DIR_TO_FLOAT4(v));
+		error = rotated.DistanceSq(DIR_TO_FLOAT4(v2)) + sqe(r);
+		maxRelError[1] = Max(error, maxRelError[1]);
+
+		Quat q = Quat::RotateFromTo(v, v2);
+		vec qv = q.Transform(v);
+		error = qv.DistanceSq(v2) + sqe(q.ToFloat3x3());
+		maxRelError[2] = Max(error, maxRelError[2]);
+	}
+
+	LOGI("Max relative error with float3x3::RotateFromTo: %e", maxRelError[0]);
+	LOGI("Max relative error with float4x4::RotateFromTo: %e", maxRelError[1]);
+	LOGI("Max relative error with Quat::RotateFromTo: %e", maxRelError[2]);
 }
 
 UNIQUE_TEST(float2_ConvexHull_Case)

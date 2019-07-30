@@ -210,6 +210,7 @@ public:
 		@return A new rotation matrix R for which R*sourceDirection == targetDirection. */
 	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection, const float3 &centerPoint);
 	static float4x4 RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection);
+	static float4x4 RotateFromTo(const float4 &sourceDirection, const float4 &targetDirection);
 
 	/// Returns a random 4x4 matrix with each entry randomized between the range [minElem, maxElem].
 	/** Warning: The matrices returned by this function do not represent well-formed 3D transformations.

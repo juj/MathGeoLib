@@ -87,8 +87,25 @@ float3x3 float3x3::RotateAxisAngle(const float3 &axisDirection, float angleRadia
 
 float3x3 float3x3::RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection)
 {
+	// http://cs.brown.edu/research/pubs/pdfs/1999/Moller-1999-EBA.pdf
 	float3x3 r;
-	r.SetRotatePart(Quat::RotateFromTo(sourceDirection, targetDirection));
+	float3 v = sourceDirection.Cross(targetDirection);
+	float d = v.Dot(v);
+	if (d < 1e-3f)
+	{
+		r.SetRotatePart(Quat::RotateFromTo(sourceDirection, targetDirection));
+	}
+	else
+	{
+		float c = sourceDirection.Dot(targetDirection);
+		float h = (1.f - c) / d;
+		float hvx = h * v.x;
+		float hvy = h * v.y;
+		float hvz = h * v.z;
+		r[0][0] = hvx * v.x + c;   r[0][1] = hvy * v.x - v.z; r[0][2] = hvz * v.x + v.y;
+		r[1][0] = hvx * v.y + v.z; r[1][1] = hvy * v.y + c;   r[1][2] = hvz * v.y - v.x;
+		r[2][0] = hvx * v.z - v.y; r[2][1] = hvy * v.z + v.x; r[2][2] = hvz * v.z + c;
+	}
 	return r;
 }
 

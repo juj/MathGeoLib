@@ -193,6 +193,12 @@ float4x4 float4x4::RotateFromTo(const float3 &sourceDirection, const float3 &tar
 	return Quat::RotateFromTo(sourceDirection, targetDirection).ToFloat4x4();
 }
 
+float4x4 float4x4::RotateFromTo(const float4 &sourceDirection, const float4 &targetDirection)
+{
+	return float4x4(float3x3::RotateFromTo(sourceDirection.Float3Part(), targetDirection.Float3Part()));
+	//return Quat::RotateFromTo(sourceDirection, targetDirection).ToFloat4x4();
+}
+
 float4x4 float4x4::RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection, const float3 &centerPoint)
 {
 	return float4x4::Translate(centerPoint) * RotateFromTo(sourceDirection, targetDirection) * float4x4::Translate(-centerPoint);
