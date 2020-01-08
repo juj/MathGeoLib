@@ -37,7 +37,7 @@ bool SATCollide2D(const float2 *a, int numA, const float2 *b, int numB)
 		normal = (b[i] - b[prev]).Perp();
 		ProjectionInterval2D(normal, a, numA, min1, max1);
 		ProjectionInterval2D(normal, b, numB, min2, max2);
-		if (max1 <= min2 || max1 <= min2) return false;
+		if (max1 <= min2 || max2 <= min1) return false;
 		prev = i;
 	}
 
