@@ -679,4 +679,7 @@ Q_DECLARE_METATYPE(float2*)
 template<typename T>
 int float2_ConvexHullInPlace(T *p, int n);
 
+template<typename T>
+bool float2_ConvexHullContains(T *hull, int n, const T &point);
+
 MATH_END_NAMESPACE

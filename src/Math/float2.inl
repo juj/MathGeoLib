@@ -142,4 +142,20 @@ int float2_ConvexHullInPlace(T *p, int n)
 	return h+1;
 }
 
+template<typename T>
+bool float2_ConvexHullContains(T *hull, int n, const T &point)
+{
+	assert(n >= 0);
+	if (n <= 2) return false; // todo: test vs point or vs line?
+
+	int prev = n-1;
+	for(int i = 0; i < n; ++i)
+	{
+		if (PerpDot2D(hull[prev], hull[i], point) < -1e-6f)
+			return false;
+		prev = i;
+	}
+	return true;
+}
+
 MATH_END_NAMESPACE
