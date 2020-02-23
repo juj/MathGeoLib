@@ -5,6 +5,8 @@
 
 MATH_BEGIN_NAMESPACE
 
+std::vector<float2> GenerateRandomPolygonContainingPt(LCG &rng, int numVertices, const float2 &pt, float boxRadius);
+
 namespace TestData
 {
 
@@ -312,6 +314,36 @@ float4 *VectorArrayWithW0Or1()
 	return arr;
 }
 
+std::vector<float2> *Poly2DsContainingZero()
+{
+	LCG lcg;
+	static std::vector<float2> *arr;
+	if (!arr)
+	{
+		arr = new std::vector<float2>[testrunner_numItersPerTest+UNROLL_LOOP_PADDING];
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
+		{
+			arr[i] = GenerateRandomPolygonContainingPt(lcg, lcg.Int(3, 10), float2::zero, 10.f);
+		}
+	}
+	return arr;
+}
+
+std::vector<float2> *Poly2DsAwayFromZero()
+{
+	LCG lcg;
+	static std::vector<float2> *arr;
+	if (!arr)
+	{
+		arr = new std::vector<float2>[testrunner_numItersPerTest+UNROLL_LOOP_PADDING];
+		for(int i = 0; i < testrunner_numItersPerTest+UNROLL_LOOP_PADDING; ++i)
+		{
+			arr[i] = GenerateRandomPolygonContainingPt(rng, rng.Int(3, 10), float2::RandomDir(rng) * 50.f, 10.f);
+		}
+	}
+	return arr;
+}
+
 float2 uninitializedFloat2;
 float3 uninitializedFloat3;
 float4 uninitializedFloat4;
@@ -347,6 +379,8 @@ OBB *obb = 0;
 Frustum *frustum = 0;
 const Circle2D *circle2d = 0;
 Circle2D *ucircle2d = 0;
+std::vector<float2> *poly2DsContainingZero;
+std::vector<float2> *poly2DsAwayFromZero;
 
 void InitTestData()
 {
@@ -372,8 +406,10 @@ void InitTestData()
 	aabb = AABBArray();
 	obb = OBBArray();
 	frustum = FrustumArray();
-    circle2d = Circle2DArray();
-    ucircle2d = Circle2DArray();
+	circle2d = Circle2DArray();
+	ucircle2d = Circle2DArray();
+	poly2DsContainingZero = Poly2DsContainingZero();
+	poly2DsAwayFromZero = Poly2DsAwayFromZero();
 }
 
 class FreeTestData

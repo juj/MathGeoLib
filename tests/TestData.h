@@ -70,6 +70,8 @@ extern float3x3 uninitializedFloat3x3;
 extern float3x4 uninitializedFloat3x4;
 extern float4x4 uninitializedFloat4x4;
 extern Quat uninitializedQuat;
+extern std::vector<float2> *poly2DsContainingZero;
+extern std::vector<float2> *poly2DsAwayFromZero;
 
 // An otherwise unused variable, but global so that writing results to this has the effect that compiler won't
 // optimize out benchmarks that time how long computations take.
