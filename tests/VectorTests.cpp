@@ -1088,9 +1088,15 @@ static double sqe(const float4 &v)
 	return d*d;
 }
 
-static double sqe(const vec &v, const vec &w)
+static double sqe(const float3 &v, const float3 &w)
 {
-	double d = FLOAT4D_DIR_VEC(v).Dot(FLOAT4D_DIR_VEC(w));
+	double d = float4d(v, 0.f).Dot(float4d(w, 0.f));
+	return d*d;
+}
+
+static double sqe(const float4 &v, const float4 &w)
+{
+	double d = float4d(v).Dot(float4d(w));
 	return d*d;
 }
 
@@ -1141,7 +1147,7 @@ UNIQUE_TEST(float4x4_RotateFromTo_precision)
 		v2.Normalize();
 
 		float3x3 r3 = float3x3::RotateFromTo(v.xyz(), v2.xyz());
-		float3 rotated3 = r3.MulDir(v.xyz());
+		vec rotated3 = DIR_VEC(r3.MulDir(v.xyz()));
 		double error = rotated3.DistanceSq(v2) + sqe(r3);
 		maxRelError[0] = Max(error, maxRelError[0]);
 

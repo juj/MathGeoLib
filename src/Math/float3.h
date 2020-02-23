@@ -758,17 +758,23 @@ MATH_BEGIN_NAMESPACE
 #ifdef MATH_AUTOMATIC_SSE
 bool EqualAbs(float a, float b, float epsilon);
 
+// Given a xyz triplet or a float3, constructs a vec object that represents a point vector.
 #define POINT_VEC(...) float4(__VA_ARGS__, 1.f)
+
+// Given a xyz triplet or a float3, constructs a vec object that represents a direction vector.
 #define DIR_VEC(...) float4(__VA_ARGS__, 0.f)
 
+// Given a xy pair or a float2d, constructs a vec object that represents a 2D point vector.
 #define POINT_VEC2D(...) float4(__VA_ARGS__, 0.f, 1.f)
+
+// Given a xy pair or a float2d, constructs a vec object that represents a 2D direction vector.
 #define DIR_VEC2D(...) float4(__VA_ARGS__, 0.f, 0.f)
 
 #define POINT_VEC_SCALAR(s) float4(pos_from_scalar_ps(s))
 #define DIR_VEC_SCALAR(s) float4(dir_from_scalar_ps(s))
 
-#define FLOAT4D_POINT_VEC(...) float4d(__VA_ARGS__)
-#define FLOAT4D_DIR_VEC(...) float4d(__VA_ARGS__)
+#define FLOAT4D_POINT_VEC(...) float4d(__VA_ARGS__, 1.0)
+#define FLOAT4D_DIR_VEC(...) float4d(__VA_ARGS__, 0.0)
 
 #define FLOAT4D_POINT_VEC_SCALAR(s) float4d(pos_from_scalar_ps(s))
 #define FLOAT4D_DIR_VEC_SCALAR(s) float4d(dir_from_scalar_ps(s))
@@ -779,8 +785,15 @@ bool EqualAbs(float a, float b, float epsilon);
 #define POINT_TO_FLOAT4(v) (v)
 #define DIR_TO_FLOAT4(v) (v)
 
+#define POINT_TO_FLOAT4D(v) float4d(v)
+#define DIR_TO_FLOAT4D(v) float4d(v)
+
 #define FLOAT4_TO_POINT(v) (v)
 #define FLOAT4_TO_DIR(v) (v)
+
+// TODO: SSE optimize double->float conversion
+#define FLOAT4D_TO_POINT(v) (float4((float)v.x, (float)v.y, (float)v.z, (float)v.w))
+#define FLOAT4D_TO_DIR(v) (float4((float)v.x, (float)v.y, (float)v.z, (float)v.w))
 
 /* /// TODO: Enable this:
 inline float3 POINT_TO_FLOAT3(const vec &v)
@@ -805,14 +818,18 @@ inline float3 DIR_TO_FLOAT3(const vec &v)
 #define DIR_VEC_SCALAR(s) float3::FromScalar(s)
 #define POINT_TO_FLOAT4(v) float4(v, 1.f)
 #define DIR_TO_FLOAT4(v) float4(v, 0.f)
+#define POINT_TO_FLOAT4D(v) float4d(v, 1.f)
+#define DIR_TO_FLOAT4D(v) float4d(v, 0.f)
 #define FLOAT4_TO_POINT(v) (v).xyz()
 #define FLOAT4_TO_DIR(v) (v).xyz()
+#define FLOAT4D_TO_POINT(v) (float3((float)v.x, (float)v.y, (float)v.z))
+#define FLOAT4D_TO_DIR(v) (float3((float)v.x, (float)v.y, (float)v.z))
 
-#define FLOAT4D_POINT_VEC(...) float4d(__VA_ARGS__, 1.f)
-#define FLOAT4D_DIR_VEC(...) float4d(__VA_ARGS__, 0.f)
+#define FLOAT4D_POINT_VEC(...) float4d(__VA_ARGS__)
+#define FLOAT4D_DIR_VEC(...) float4d(__VA_ARGS__)
 
-#define FLOAT4D_POINT_VEC_SCALAR(s) float4d::FromScalar(s, 1.f)
-#define FLOAT4D_DIR_VEC_SCALAR(s) float4d::FromScalar(s, 0.f)
+#define FLOAT4D_POINT_VEC_SCALAR(s) float4d::FromScalar(s)
+#define FLOAT4D_DIR_VEC_SCALAR(s) float4d::FromScalar(s)
 
 #endif
 

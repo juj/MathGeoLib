@@ -957,16 +957,16 @@ vec Triangle::ClosestPointD(const vec &p) const
 	/** The code for Triangle-float3 test is from Christer Ericson's Real-Time Collision Detection, pp. 141-142. */
 
 	// Check if P is in vertex region outside A.
-	float4d ab = FLOAT4D_POINT_VEC(b) - FLOAT4D_POINT_VEC(a);
-	float4d ac = FLOAT4D_POINT_VEC(c) - FLOAT4D_POINT_VEC(a);
-	float4d ap = FLOAT4D_POINT_VEC(p) - FLOAT4D_POINT_VEC(a);
+	float4d ab = POINT_TO_FLOAT4D(b) - POINT_TO_FLOAT4D(a);
+	float4d ac = POINT_TO_FLOAT4D(c) - POINT_TO_FLOAT4D(a);
+	float4d ap = POINT_TO_FLOAT4D(p) - POINT_TO_FLOAT4D(a);
 	double d1 = ab.Dot(ap);
 	double d2 = ac.Dot(ap);
 	if (d1 <= 0.0 && d2 <= 0.0)
 		return a; // Barycentric coordinates are (1,0,0).
 
 	// Check if P is in vertex region outside B.
-	float4d bp = FLOAT4D_POINT_VEC(p) - FLOAT4D_POINT_VEC(b);
+	float4d bp = POINT_TO_FLOAT4D(p) - POINT_TO_FLOAT4D(b);
 	double d3 = ab.Dot(bp);
 	double d4 = ac.Dot(bp);
 	if (d3 >= 0.0 && d4 <= d3)
@@ -977,11 +977,11 @@ vec Triangle::ClosestPointD(const vec &p) const
 	if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
 	{
 		double v = d1 / (d1 - d3);
-		return (FLOAT4D_POINT_VEC(a) + v * ab).ToPointVec(); // The barycentric coordinates are (1-v, v, 0).
+		return (POINT_TO_FLOAT4D(a) + v * ab).ToPointVec(); // The barycentric coordinates are (1-v, v, 0).
 	}
 
 	// Check if P is in vertex region outside C.
-	float4d cp = FLOAT4D_POINT_VEC(p) - FLOAT4D_POINT_VEC(c);
+	float4d cp = POINT_TO_FLOAT4D(p) - POINT_TO_FLOAT4D(c);
 	double d5 = ab.Dot(cp);
 	double d6 = ac.Dot(cp);
 	if (d6 >= 0.0 && d5 <= d6)
@@ -992,7 +992,7 @@ vec Triangle::ClosestPointD(const vec &p) const
 	if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0)
 	{
 		double w = d2 / (d2 - d6);
-		return (FLOAT4D_POINT_VEC(a) + w * ac).ToPointVec(); // The barycentric coordinates are (1-w, 0, w).
+		return (POINT_TO_FLOAT4D(a) + w * ac).ToPointVec(); // The barycentric coordinates are (1-w, 0, w).
 	}
 
 	// Check if P is in edge region of BC, and if so, return the projection of P onto BC.
@@ -1000,14 +1000,14 @@ vec Triangle::ClosestPointD(const vec &p) const
 	if (va <= 0.0 && d4 - d3 >= 0.0 && d5 - d6 >= 0.0)
 	{
 		double w = (d4 - d3) / (d4 - d3 + d5 - d6);
-		return (FLOAT4D_POINT_VEC(b) + w * (FLOAT4D_POINT_VEC(c) - FLOAT4D_POINT_VEC(b))).ToPointVec(); // The barycentric coordinates are (0, 1-w, w).
+		return (POINT_TO_FLOAT4D(b) + w * (POINT_TO_FLOAT4D(c) - POINT_TO_FLOAT4D(b))).ToPointVec(); // The barycentric coordinates are (0, 1-w, w).
 	}
 
 	// P must be inside the face region. Compute the closest point through its barycentric coordinates (u,v,w).
 	double denom = 1.f / (va + vb + vc);
 	double v = vb * denom;
 	double w = vc * denom;
-	return (FLOAT4D_POINT_VEC(a) + ab * v + ac * w).ToPointVec();
+	return (POINT_TO_FLOAT4D(a) + ab * v + ac * w).ToPointVec();
 }
 
 vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
