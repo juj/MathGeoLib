@@ -419,30 +419,6 @@ float3x4 float3x4::OrthographicProjectionXY()
 	return v;
 }
 
-MatrixProxy<float3x4::Cols> &float3x4::operator[](int rowIndex)
-{
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (rowIndex < 0 || rowIndex >= Rows)
-		rowIndex = 0; // Benign failure, just give the first row.
-#endif
-
-	return *(reinterpret_cast<MatrixProxy<Cols>*>(v[rowIndex]));
-}
-
-const MatrixProxy<float3x4::Cols> &float3x4::operator[](int rowIndex) const
-{
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (rowIndex < 0 || rowIndex >= Rows)
-		rowIndex = 0; // Benign failure, just give the first row.
-#endif
-
-	return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[rowIndex]));
-}
-
 float &float3x4::At(int rowIndex, int colIndex)
 {
 	assume(rowIndex >= 0);

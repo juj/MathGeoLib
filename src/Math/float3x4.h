@@ -306,8 +306,28 @@ public:
 		directly dereference it with the [] operator.
 		For example, m[0][3] Returns the last element on the first row, which is the amount
 		of translation in the x-direction. */
-	MatrixProxy<Cols> &operator[](int row);
-	const MatrixProxy<Cols> &operator[](int row) const;
+	FORCE_INLINE MatrixProxy<Cols> &operator[](int row)
+	{
+		assume(row >= 0);
+		assume(row < Rows);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (row < 0 || row >= Rows)
+			row = 0; // Benign failure, just give the first row.
+#endif
+		return *(reinterpret_cast<MatrixProxy<Cols>*>(v[row]));
+	}
+
+	FORCE_INLINE const MatrixProxy<Cols> &operator[](int row) const
+	{
+		assume(row >= 0);
+		assume(row < Rows);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (row < 0 || row >= Rows)
+			row = 0; // Benign failure, just give the first row.
+#endif
+		
+		return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[row]));
+	}
 
 	/// Returns the given element. [noscript]
 	/** This function returns the element of this matrix at (row, col)==(i, j)==(y, x).
