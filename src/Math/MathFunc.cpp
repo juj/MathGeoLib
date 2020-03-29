@@ -110,7 +110,13 @@ static inline void sincos_lookuptable(float n, float &sinOut, float &cosOut)
 	int i = (int)(n * (HALF_MAX_CIRCLE_ANGLE / PI));
 	i = (i >= 0) ? (i & MASK_MAX_CIRCLE_ANGLE) : (MAX_CIRCLE_ANGLE - ((-i) & MASK_MAX_CIRCLE_ANGLE));
 	sinOut = fast_cossin_table[i];
-	cosOut = fast_cossin_table[(MAX_CIRCLE_ANGLE + QUARTER_MAX_CIRCLE_ANGLE - i) & MASK_MAX_CIRCLE_ANGLE];
+	cosOut = fast_cossin_table[(QUARTER_MAX_CIRCLE_ANGLE + i) & MASK_MAX_CIRCLE_ANGLE];
+}
+
+static inline void sincos_lookuptable_u16ScaledRadians(u16 u16ScaledRadians, float &sinOut, float &cosOut)
+{
+	sinOut = fast_cossin_table[u16ScaledRadians];
+	cosOut = fast_cossin_table[(u16)(QUARTER_MAX_CIRCLE_ANGLE + u16ScaledRadians)];
 }
 
 #endif
@@ -159,6 +165,24 @@ void SinCos(float angleRadians, float &outSin, float &outCos)
 	outSin = s4f_x(sin);
 	outCos = s4f_x(cos);
 #else
+	outSin = Sin(angleRadians);
+	outCos = Cos(angleRadians);
+#endif
+}
+
+void __attribute__((noinline)) SinCosU16ScaledRadians(u16 u16ScaledRadians, float &outSin, float &outCos)
+{
+#ifdef MATH_USE_SINCOS_LOOKUPTABLE
+	return sincos_lookuptable_u16ScaledRadians(u16ScaledRadians, outSin, outCos);
+#elif defined(MATH_SSE2)
+	float angleRadians = u16ScaledRadians * PI / HALF_MAX_CIRCLE_ANGLE;
+	__m128 angle = modf_ps(setx_ps(angleRadians), pi2);
+	__m128 sin, cos;
+	sincos_ps(angle, &sin, &cos);
+	outSin = s4f_x(sin);
+	outCos = s4f_x(cos);
+#else
+	float angleRadians = u16ScaledRadians * PI / HALF_MAX_CIRCLE_ANGLE;
 	outSin = Sin(angleRadians);
 	outCos = Cos(angleRadians);
 #endif

@@ -65,6 +65,12 @@ void SinCos2(const float4 &angleRadians, float4 &outSin, float4 &outCos);
 void SinCos3(const float4 &angleRadians, float4 &outSin, float4 &outCos);
 /// Computes sin and cos of the four components of angleRadians, stored to the corresponding components of outSin and outCos.
 void SinCos4(const float4 &angleRadians, float4 &outSin, float4 &outCos);
+
+/// Simultaneously computes both sin(x) and cos(x), which yields a small performance increase over to
+/// computing them separately. This function uses a pre-scaled units for angles, where
+/// 0...65535 matches 0...2pi radians.
+void SinCosU16ScaledRadians(u16 u16ScaledRadians, float &outSin, float &outCos);
+
 /// Computes the function arcsin(x), in radians.
 /** @see Sin(), Cos(), Tan(), SinCos(), Acos(), Atan(), Atan2(), Sinh(), Cosh(), Tanh(). */
 float Asin(float x);
