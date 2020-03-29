@@ -443,10 +443,10 @@ float4x4 float4x4::ShearZ(float xFactor, float yFactor)
 
 float4x4 float4x4::Mirror(const Plane &p)
 {
-	float4x4 v;
-	SetMatrix3x4AffinePlaneMirror(v, p.normal.x, p.normal.y, p.normal.z, p.d);
-	v[3][0] = 0.f; v[3][1] = 0.f; v[3][2] = 0.f; v[3][3] = 1.f;
-	return v;
+	float4x4 m;
+	SetMatrix3x4AffinePlaneMirror(m, p.normal.x, p.normal.y, p.normal.z, p.d);
+	m[3][0] = 0.f; m[3][1] = 0.f; m[3][2] = 0.f; m[3][3] = 1.f;
+	return m;
 }
 
 float4x4 float4x4::D3DOrthoProjLH(float n, float f, float h, float v)
@@ -606,26 +606,36 @@ float4x4 float4x4::ComplementaryProjection() const
 	return float4x4::identity - *this;
 }
 
-MatrixProxy<float4x4::Cols> &float4x4::operator[](int rowIndex)
+MatrixProxy<float4x4::Rows, float4x4::Cols> &float4x4::operator[](int row)
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
+	assume(row >= 0);
+	assume(row < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (rowIndex < 0 || rowIndex >= Rows)
-		rowIndex = 0; // Benign failure, just give the first rowIndex.
+	if (row < 0 || row >= Rows)
+		row = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return *(reinterpret_cast<MatrixProxy<Cols>*>(v[rowIndex]));
+
+#ifdef MATH_COLMAJOR_MATRICES
+	return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+	return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
 }
 
-const MatrixProxy<float4x4::Cols> &float4x4::operator[](int rowIndex) const
+const MatrixProxy<float4x4::Rows, float4x4::Cols> &float4x4::operator[](int row) const
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
+	assume(row >= 0);
+	assume(row < Rows);
 #ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (rowIndex < 0 || rowIndex >= Rows)
-		rowIndex = 0; // Benign failure, just give the first rowIndex.
+	if (row < 0 || row >= Rows)
+		row = 0; // Benign failure, just give the first rowIndex.
 #endif
-	return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[rowIndex]));
+
+#ifdef MATH_COLMAJOR_MATRICES
+	return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+	return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
 }
 
 float &float4x4::At(int rowIndex, int colIndex)
@@ -638,7 +648,11 @@ float &float4x4::At(int rowIndex, int colIndex)
 	if (rowIndex < 0 || rowIndex >= Rows || colIndex < 0 || colIndex >= Cols)
 		return v[0][0]; // Benign failure, return the first element.
 #endif
+#ifdef MATH_COLMAJOR_MATRICES
+	return v[colIndex][rowIndex];
+#else
 	return v[rowIndex][colIndex];
+#endif
 }
 
 CONST_WIN32 float float4x4::At(int rowIndex, int colIndex) const
@@ -651,9 +665,85 @@ CONST_WIN32 float float4x4::At(int rowIndex, int colIndex) const
 	if (rowIndex < 0 || rowIndex >= Rows || colIndex < 0 || colIndex >= Cols)
 		return FLOAT_NAN;
 #endif
+#ifdef MATH_COLMAJOR_MATRICES
+	return v[colIndex][rowIndex];
+#else
 	return v[rowIndex][colIndex];
+#endif
 }
 
+#ifdef MATH_COLMAJOR_MATRICES
+float4 &float4x4::Col(int col)
+{
+	assume(col >= 0);
+	assume(col < Cols);
+	
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (col < 0 || col >= Cols)
+		col = 0; // Benign failure, just give the first column.
+#endif
+	
+	return reinterpret_cast<float4 &>(v[col]);
+}
+
+const float4 &float4x4::Col(int col) const
+{
+	assume(col >= 0);
+	assume(col < Cols);
+	
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (col < 0 || col >= Cols)
+		col = 0; // Benign failure, just give the first column.
+#endif
+	return reinterpret_cast<const float4 &>(v[col]);
+}
+
+float3 &float4x4::Col3(int col)
+{
+	assume(col >= 0);
+	assume(col < Cols);
+	
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (col < 0 || col >= Cols)
+		col = 0; // Benign failure, just give the first column.
+#endif
+	return reinterpret_cast<float3 &>(v[col]);
+}
+
+const float3 &float4x4::Col3(int col) const
+{
+	assume(col >= 0);
+	assume(col < Cols);
+	
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (col < 0 || col >= Cols)
+		col = 0; // Benign failure, just give the first column.
+#endif
+	return reinterpret_cast<const float3 &>(v[col]);
+}
+
+CONST_WIN32 float4 float4x4::Row(int row) const
+{
+	assume(row >= 0);
+	assume(row < Rows);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (row < 0 || row >= Rows)
+		return float4::nan;
+#endif
+	return float4(At(row, 0), At(row, 1), At(row, 2), At(row, 3));
+}
+
+CONST_WIN32 float3 float4x4::Row3(int row) const
+{
+	assume(row >= 0);
+	assume(row < Rows);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+	if (row < 0 || row >= Rows)
+		return float3::nan;
+#endif
+	return float3(At(row, 0), At(row, 1), At(row, 2));
+}
+#else
 float4 &float4x4::Row(int rowIndex)
 {
 	assume(rowIndex >= 0);
@@ -724,6 +814,7 @@ CONST_WIN32 float3 float4x4::Col3(int colIndex) const
 #endif
 	return float3(v[0][colIndex], v[1][colIndex], v[2][colIndex]);
 }
+#endif
 
 CONST_WIN32 float4 float4x4::Diagonal() const
 {
@@ -735,16 +826,21 @@ CONST_WIN32 float3 float4x4::Diagonal3() const
 	return float3(v[0][0], v[1][1], v[2][2]);
 }
 
-void float4x4::ScaleRow3(int rowIndex, float scalar)
+void float4x4::ScaleRow3(int r, float scalar)
 {
 	assume(MATH_NS::IsFinite(scalar));
-	Row3(rowIndex) *= scalar;
+	At(r, 0) *= scalar;
+	At(r, 1) *= scalar;
+	At(r, 2) *= scalar;
 }
 
-void float4x4::ScaleRow(int rowIndex, float scalar)
+void float4x4::ScaleRow(int r, float scalar)
 {
 	assume(MATH_NS::IsFinite(scalar));
-	Row(rowIndex) *= scalar;
+	At(r, 0) *= scalar;
+	At(r, 1) *= scalar;
+	At(r, 2) *= scalar;
+	At(r, 3) *= scalar;
 }
 
 void float4x4::ScaleCol3(int colIndex, float scalar)
@@ -756,9 +852,9 @@ void float4x4::ScaleCol3(int colIndex, float scalar)
 	if (colIndex < 0 || colIndex >= Cols)
 		return; // Benign failure
 #endif
-	v[0][colIndex] *= scalar;
-	v[1][colIndex] *= scalar;
-	v[2][colIndex] *= scalar;
+	At(0, colIndex) *= scalar;
+	At(1, colIndex) *= scalar;
+	At(2, colIndex) *= scalar;
 }
 
 void float4x4::ScaleCol(int colIndex, float scalar)
@@ -770,19 +866,27 @@ void float4x4::ScaleCol(int colIndex, float scalar)
 	if (colIndex < 0 || colIndex >= Cols)
 		return; // Benign failure
 #endif
-	v[0][colIndex] *= scalar;
-	v[1][colIndex] *= scalar;
-	v[2][colIndex] *= scalar;
-	v[3][colIndex] *= scalar;
+	At(0, colIndex) *= scalar;
+	At(1, colIndex) *= scalar;
+	At(2, colIndex) *= scalar;
+	At(3, colIndex) *= scalar;
 }
 
 CONST_WIN32 float3x3 float4x4::Float3x3Part() const
 {
-	return float3x3(v[0][0], v[0][1], v[0][2],
-	                v[1][0], v[1][1], v[1][2],
-	                v[2][0], v[2][1], v[2][2]);
+	return float3x3(At(0, 0), At(0, 1), At(0, 2),
+	                At(1, 0), At(1, 1), At(1, 2),
+	                At(2, 0), At(2, 1), At(2, 2));
 }
 
+#ifdef MATH_COLMAJOR_MATRICES
+CONST_WIN32 float3x4 float4x4::Float3x4Part() const
+{
+	return float3x4(At(0, 0), At(0, 1), At(0, 2), At(0, 3),
+					At(1, 0), At(1, 1), At(1, 2), At(1, 3),
+					At(2, 0), At(2, 1), At(2, 2), At(2, 3));
+}
+#else
 float3x4 &float4x4::Float3x4Part()
 {
 	return reinterpret_cast<float3x4 &>(*this);
@@ -792,6 +896,7 @@ const float3x4 &float4x4::Float3x4Part() const
 {
 	return reinterpret_cast<const float3x4 &>(*this);
 }
+#endif
 
 CONST_WIN32 float3 float4x4::TranslatePart() const
 {
@@ -844,9 +949,9 @@ void float4x4::SetRow3(int rowIndex, float m_r0, float m_r1, float m_r2)
 	if (rowIndex < 0 || rowIndex >= Rows)
 		return; // Benign failure
 #endif
-	v[rowIndex][0] = m_r0;
-	v[rowIndex][1] = m_r1;
-	v[rowIndex][2] = m_r2;
+	At(rowIndex, 0) = m_r0;
+	At(rowIndex, 1) = m_r1;
+	At(rowIndex, 2) = m_r2;
 }
 
 void float4x4::SetRow(int rowIndex, const float3 &rowVector, float m_r3)
@@ -887,10 +992,10 @@ void float4x4::SetRow(int rowIndex, float m_r0, float m_r1, float m_r2, float m_
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD) && (!defined(_MSC_VER) || _MSC_VER >= 1700)
 	this->row[rowIndex] = set_ps(m_r3, m_r2, m_r1, m_r0);
 #else
-	v[rowIndex][0] = m_r0;
-	v[rowIndex][1] = m_r1;
-	v[rowIndex][2] = m_r2;
-	v[rowIndex][3] = m_r3;
+	At(rowIndex, 0) = m_r0;
+	At(rowIndex, 1) = m_r1;
+	At(rowIndex, 2) = m_r2;
+	At(rowIndex, 3) = m_r3;
 #endif
 }
 
@@ -920,9 +1025,9 @@ void float4x4::SetCol3(int column, float m_0c, float m_1c, float m_2c)
 	if (column < 0 || column >= Cols)
 		return; // Benign failure
 #endif
-	v[0][column] = m_0c;
-	v[1][column] = m_1c;
-	v[2][column] = m_2c;
+	At(0, column) = m_0c;
+	At(1, column) = m_1c;
+	At(2, column) = m_2c;
 }
 
 void float4x4::SetCol(int column, const float3 &columnVector, float m_3c)
@@ -957,10 +1062,10 @@ void float4x4::SetCol(int column, float m_0c, float m_1c, float m_2c, float m_3c
 	if (column < 0 || column >= Cols)
 		return; // Benign failure
 #endif
-	v[0][column] = m_0c;
-	v[1][column] = m_1c;
-	v[2][column] = m_2c;
-	v[3][column] = m_3c;
+	At(0, column) = m_0c;
+	At(1, column) = m_1c;
+	At(2, column) = m_2c;
+	At(3, column) = m_3c;
 }
 
 void float4x4::Set(float _00, float _01, float _02, float _03,
@@ -974,10 +1079,10 @@ void float4x4::Set(float _00, float _01, float _02, float _03,
 	                _20, _21, _22, _23,
 	                _30, _31, _32, _33);
 #else
-	v[0][0] = _00; v[0][1] = _01; v[0][2] = _02; v[0][3] = _03;
-	v[1][0] = _10; v[1][1] = _11; v[1][2] = _12; v[1][3] = _13;
-	v[2][0] = _20; v[2][1] = _21; v[2][2] = _22; v[2][3] = _23;
-	v[3][0] = _30; v[3][1] = _31; v[3][2] = _32; v[3][3] = _33;
+	At(0, 0) = _00; At(0, 1) = _01; At(0, 2) = _02; At(0, 3) = _03;
+	At(1, 0) = _10; At(1, 1) = _11; At(1, 2) = _12; At(1, 3) = _13;
+	At(2, 0) = _20; At(2, 1) = _21; At(2, 2) = _22; At(2, 3) = _23;
+	At(3, 0) = _30; At(3, 1) = _31; At(3, 2) = _32; At(3, 3) = _33;
 #endif
 }
 
@@ -1019,7 +1124,7 @@ void float4x4::Set(int rowIndex, int colIndex, float value)
 	if (rowIndex < 0 || rowIndex >= Rows || colIndex < 0 || colIndex >= Cols)
 		return; // Benign failure
 #endif
-	v[rowIndex][colIndex] = value;
+	At(rowIndex, colIndex) = value;
 }
 
 void float4x4::SetIdentity()
@@ -1033,9 +1138,9 @@ void float4x4::SetIdentity()
 void float4x4::Set3x3Part(const float3x3 &r)
 {
 	assume(r.IsFinite());
-	v[0][0] = r[0][0]; v[0][1] = r[0][1]; v[0][2] = r[0][2];
-	v[1][0] = r[1][0]; v[1][1] = r[1][1]; v[1][2] = r[1][2];
-	v[2][0] = r[2][0]; v[2][1] = r[2][1]; v[2][2] = r[2][2];
+	At(0, 0) = r[0][0]; At(0, 1) = r[0][1]; At(0, 2) = r[0][2];
+	At(1, 0) = r[1][0]; At(1, 1) = r[1][1]; At(1, 2) = r[1][2];
+	At(2, 0) = r[2][0]; At(2, 1) = r[2][1]; At(2, 2) = r[2][2];
 }
 
 void float4x4::Set3x4Part(const float3x4 &r)
@@ -1047,9 +1152,9 @@ void float4x4::Set3x4Part(const float3x4 &r)
 	row[1] = r.row[1];
 	row[2] = r.row[2];
 #else
-	v[0][0] = r[0][0]; v[0][1] = r[0][1]; v[0][2] = r[0][2]; v[0][3] = r[0][3];
-	v[1][0] = r[1][0]; v[1][1] = r[1][1]; v[1][2] = r[1][2]; v[1][3] = r[1][3];
-	v[2][0] = r[2][0]; v[2][1] = r[2][1]; v[2][2] = r[2][2]; v[2][3] = r[2][3];
+	At(0, 0) = r[0][0]; At(0, 1) = r[0][1]; At(0, 2) = r[0][2]; At(0, 3) = r[0][3];
+	At(1, 0) = r[1][0]; At(1, 1) = r[1][1]; At(1, 2) = r[1][2]; At(1, 3) = r[1][3];
+	At(2, 0) = r[2][0]; At(2, 1) = r[2][1]; At(2, 2) = r[2][2]; At(2, 3) = r[2][3];
 #endif
 }
 
@@ -1063,10 +1168,10 @@ void float4x4::SwapColumns(int col1, int col2)
 	if (col1 < 0 || col1 >= Cols || col2 < 0 || col2 >= Cols)
 		return; // Benign failure
 #endif
-	Swap(v[0][col1], v[0][col2]);
-	Swap(v[1][col1], v[1][col2]);
-	Swap(v[2][col1], v[2][col2]);
-	Swap(v[3][col1], v[3][col2]);
+	Swap(At(0, col1), At(0, col2));
+	Swap(At(1, col1), At(1, col2));
+	Swap(At(2, col1), At(2, col2));
+	Swap(At(3, col1), At(3, col2));
 }
 
 void float4x4::SwapColumns3(int col1, int col2)
@@ -1079,9 +1184,9 @@ void float4x4::SwapColumns3(int col1, int col2)
 	if (col1 < 0 || col1 >= Cols || col2 < 0 || col2 >= Cols)
 		return; // Benign failure
 #endif
-	Swap(v[0][col1], v[0][col2]);
-	Swap(v[1][col1], v[1][col2]);
-	Swap(v[2][col1], v[2][col2]);
+	Swap(At(0, col1), At(0, col2));
+	Swap(At(1, col1), At(1, col2));
+	Swap(At(2, col1), At(2, col2));
 }
 
 void float4x4::SwapRows(int r1, int r2)
@@ -1098,10 +1203,10 @@ void float4x4::SwapRows(int r1, int r2)
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	Swap(row[r1], row[r2]);
 #else
-	Swap(v[r1][0], v[r2][0]);
-	Swap(v[r1][1], v[r2][1]);
-	Swap(v[r1][2], v[r2][2]);
-	Swap(v[r1][3], v[r2][3]);
+	Swap(At(r1, 0), At(r2, 0));
+	Swap(At(r1, 1), At(r2, 1));
+	Swap(At(r1, 2), At(r2, 2));
+	Swap(At(r1, 3), At(r2, 3));
 #endif
 }
 
@@ -1115,30 +1220,30 @@ void float4x4::SwapRows3(int r1, int r2)
 	if (r1 < 0 || r1 >= Rows || r2 < 0 || r2 >= Rows)
 		return; // Benign failure
 #endif
-	Swap(v[r1][0], v[r2][0]);
-	Swap(v[r1][1], v[r2][1]);
-	Swap(v[r1][2], v[r2][2]);
+	Swap(At(r1, 0), At(r2, 0));
+	Swap(At(r1, 1), At(r2, 1));
+	Swap(At(r1, 2), At(r2, 2));
 }
 
 void float4x4::SetTranslatePart(float translateX, float translateY, float translateZ)
 {
-	v[0][3] = translateX;
-	v[1][3] = translateY;
-	v[2][3] = translateZ;
+	At(0, 3) = translateX;
+	At(1, 3) = translateY;
+	At(2, 3) = translateZ;
 }
 
 void float4x4::SetTranslatePart(const float3 &offset)
 {
-	v[0][3] = offset.x;
-	v[1][3] = offset.y;
-	v[2][3] = offset.z;
+	At(0, 3) = offset.x;
+	At(1, 3) = offset.y;
+	At(2, 3) = offset.z;
 }
 
 void float4x4::SetTranslatePart(const float4 &offset)
 {
-	v[0][3] = offset.x;
-	v[1][3] = offset.y;
-	v[2][3] = offset.z;
+	At(0, 3) = offset.x;
+	At(1, 3) = offset.y;
+	At(2, 3) = offset.z;
 	assume(EqualAbs(offset.w, 1.f) || EqualAbs(offset.w, 0.f));
 }
 
@@ -1202,11 +1307,25 @@ float4x4 &float4x4::operator =(const float3x4 &rhs)
 	row[2] = rhs.row[2];
 	row[3] = set_ps(1.f, 0.f, 0.f, 0.f);
 #else
-	Float3x4Part() = rhs;
-	v[3][0] = 0.f;
-	v[3][1] = 0.f;
-	v[3][2] = 0.f;
-	v[3][3] = 1.f;
+	At(0, 0) = rhs[0][0];
+	At(0, 1) = rhs[0][1];
+	At(0, 2) = rhs[0][2];
+	At(0, 3) = rhs[0][3];
+
+	At(1, 0) = rhs[1][0];
+	At(1, 1) = rhs[1][1];
+	At(1, 2) = rhs[1][2];
+	At(1, 3) = rhs[1][3];
+
+	At(2, 0) = rhs[2][0];
+	At(2, 1) = rhs[2][1];
+	At(2, 2) = rhs[2][2];
+	At(2, 3) = rhs[2][3];
+
+	At(3, 0) = 0.f;
+	At(3, 1) = 0.f;
+	At(3, 2) = 0.f;
+	At(3, 3) = 1.f;
 #endif
 	return *this;
 }
@@ -1303,7 +1422,7 @@ float float4x4::Determinant4() const
 	return mat4x4_determinant(row);
 #else
 	assume(IsFinite());
-	return v[0][0] * Minor(0,0) - v[0][1] * Minor(0,1) + v[0][2] * Minor(0,2) - v[0][3] * Minor(0,3);
+	return At(0, 0) * Minor(0,0) - At(0, 1) * Minor(0,1) + At(0, 2) * Minor(0,2) - At(0, 3) * Minor(0,3);
 #endif
 }
 
@@ -1318,9 +1437,9 @@ float3x3 float4x4::SubMatrix(int i, int j) const
 	int c1 = SKIPNUM(1, j);
 	int c2 = SKIPNUM(2, j);
 
-	return float3x3(v[r0][c0], v[r0][c1], v[r0][c2],
-	                v[r1][c0], v[r1][c1], v[r1][c2],
-	                v[r2][c0], v[r2][c1], v[r2][c2]);
+	return float3x3(At(r0, c0), At(r0, c1), At(r0, c2),
+	                At(r1, c0), At(r1, c1), At(r1, c2),
+	                At(r2, c0), At(r2, c1), At(r2, c2));
 }
 
 float float4x4::Minor(int i, int j) const
@@ -1332,15 +1451,15 @@ float float4x4::Minor(int i, int j) const
 	int c1 = SKIPNUM(1, j);
 	int c2 = SKIPNUM(2, j);
 
-	float a = v[r0][c0];
-	float b = v[r0][c1];
-	float c = v[r0][c2];
-	float d = v[r1][c0];
-	float e = v[r1][c1];
-	float f = v[r1][c2];
-	float g = v[r2][c0];
-	float h = v[r2][c1];
-	float k = v[r2][c2];
+	float a = At(r0, c0);
+	float b = At(r0, c1);
+	float c = At(r0, c2);
+	float d = At(r1, c0);
+	float e = At(r1, c1);
+	float f = At(r1, c2);
+	float g = At(r2, c0);
+	float h = At(r2, c1);
+	float k = At(r2, c2);
 
 	return a*e*k + b*f*g + c*d*h - a*f*h - b*d*k - c*e*g;
 }
@@ -1399,7 +1518,23 @@ bool float4x4::InverseOrthogonalUniformScale()
 {
 	///\todo SSE
 	assume(!ContainsProjection());
-	return Float3x4Part().InverseOrthogonalUniformScale();
+	assume(IsColOrthogonal3(1e-3f));
+	assume(HasUniformScale());
+	Swap(At(0, 1), At(1, 0));
+	Swap(At(0, 2), At(2, 0));
+	Swap(At(1, 2), At(2, 1));
+	float scale = float3(At(0, 0), At(1, 0), At(2, 0)).LengthSq();
+	if (scale == 0.f)
+		return false;
+	scale = 1.f / scale;
+	
+	At(0, 0) *= scale; At(0, 1) *= scale; At(0, 2) *= scale;
+	At(1, 0) *= scale; At(1, 1) *= scale; At(1, 2) *= scale;
+	At(2, 0) *= scale; At(2, 1) *= scale; At(2, 2) *= scale;
+	
+	SetTranslatePart(TransformDir(-At(0, 3), -At(1, 3), -At(2, 3)));
+	
+	return true;
 }
 
 void float4x4::InverseOrthonormal()
@@ -1408,7 +1543,13 @@ void float4x4::InverseOrthonormal()
 #ifdef MATH_SSE
 	mat3x4_inverse_orthonormal(row, row);
 #else
-	return Float3x4Part().InverseOrthonormal();
+	// a) Transpose the top-left 3x3 part in-place to produce R^t.
+	Swap(v[0][1], v[1][0]);
+	Swap(v[0][2], v[2][0]);
+	Swap(v[1][2], v[2][1]);
+	
+	// b) Replace the top-right 3x1 part by computing R^t(-T).
+	SetTranslatePart(TransformDir(-At(0, 3), -At(1, 3), -At(2, 3)));
 #endif
 }
 
@@ -1524,19 +1665,19 @@ void float4x4::Pivot()
 
 		// find the rowIndex k with k >= 1 for which Mkj has the largest absolute value.
 		for(int i = rowIndex; i < Rows; ++i)
-			if (MATH_NS::Abs(v[i][col]) > MATH_NS::Abs(v[greatest][col]))
+			if (MATH_NS::Abs(At(i, col)) > MATH_NS::Abs(At(greatest, col)))
 				greatest = i;
 
-		if (!EqualAbs(v[greatest][col], 0))
+		if (!EqualAbs(At(greatest, col), 0))
 		{
 			if (rowIndex != greatest)
 				SwapRows(rowIndex, greatest); // the greatest now in rowIndex
 
-			ScaleRow(rowIndex, 1.f/v[rowIndex][col]);
+			ScaleRow(rowIndex, 1.f/At(rowIndex, col));
 
 			for(int r = 0; r < Rows; ++r)
 				if (r != rowIndex)
-					SetRow(r, Row(r) - Row(rowIndex) * v[r][col]);
+					SetRow(r, Row(r) - Row(rowIndex) * At(r, col));
 
 			++rowIndex;
 		}
@@ -1559,9 +1700,9 @@ float3 float4x4::TransformPos(float tx, float ty, float tz) const
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return mat3x4_mul_vec(row, set_ps(1.f, tz, ty, tx));
 #else
-	return float3(DOT4POS_xyz(Row(0), tx, ty, tz),
-	              DOT4POS_xyz(Row(1), tx, ty, tz),
-	              DOT4POS_xyz(Row(2), tx, ty, tz));
+	return float3(At(0, 0) * tx + At(0, 1) * ty + At(0, 2) * tz + At(0, 3),
+				  At(1, 0) * tx + At(1, 1) * ty + At(1, 2) * tz + At(1, 3),
+				  At(2, 0) * tx + At(2, 1) * ty + At(2, 2) * tz + At(2, 3));
 #endif
 }
 
@@ -1581,9 +1722,9 @@ float3 float4x4::TransformDir(float tx, float ty, float tz) const
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	return mat3x4_mul_vec(row, set_ps(0.f, tz, ty, tx));
 #else
-	return float3(DOT4DIR_xyz(Row(0), tx, ty, tz),
-	              DOT4DIR_xyz(Row(1), tx, ty, tz),
-	              DOT4DIR_xyz(Row(2), tx, ty, tz));
+	return float3(At(0, 0) * tx + At(0, 1) * ty + At(0, 2) * tz,
+				  At(1, 0) * tx + At(1, 1) * ty + At(1, 2) * tz,
+				  At(2, 0) * tx + At(2, 1) * ty + At(2, 2) * tz);
 #endif
 }
 
@@ -1592,10 +1733,10 @@ float4 float4x4::Transform(const float4 &vector) const
 #if defined(MATH_AUTOMATIC_SSE) && !defined(ANDROID) ///\bug Android GCC 4.6.6 gives internal compiler error!
 	return mat4x4_mul_vec4(row, vector.v);
 #else
-	return float4(DOT4(Row(0), vector),
-	              DOT4(Row(1), vector),
-	              DOT4(Row(2), vector),
-	              DOT4(Row(3), vector));
+	return float4(At(0, 0) * vector.x + At(0, 1) * vector.y + At(0, 2) * vector.z + At(0, 3) * vector.w,
+				  At(1, 0) * vector.x + At(1, 1) * vector.y + At(1, 2) * vector.z + At(1, 3) * vector.w,
+				  At(2, 0) * vector.x + At(2, 1) * vector.y + At(2, 2) * vector.z + At(2, 3) * vector.w,
+				  At(3, 0) * vector.x + At(3, 1) * vector.y + At(3, 2) * vector.z + At(3, 3) * vector.w);
 #endif
 }
 
@@ -1692,28 +1833,25 @@ float4x4 float4x4::operator *(const float3x3 &rhs) const
 #if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
 	mat4x4_mul_mat3x3_sse(r.row, this->row, rhs.ptr());
 #else
-	const float *c0 = rhs.ptr();
-	const float *c1 = rhs.ptr() + 1;
-	const float *c2 = rhs.ptr() + 2;
-	r[0][0] = DOT3STRIDED(v[0], c0, 3);
-	r[0][1] = DOT3STRIDED(v[0], c1, 3);
-	r[0][2] = DOT3STRIDED(v[0], c2, 3);
-	r[0][3] = v[0][3];
+	r[0][0] = At(0, 0) * rhs.At(0, 0) + At(0, 1) * rhs.At(1, 0) + At(0, 2) * rhs.At(2, 0);
+	r[0][1] = At(0, 0) * rhs.At(0, 1) + At(0, 1) * rhs.At(1, 1) + At(0, 2) * rhs.At(2, 1);
+	r[0][2] = At(0, 0) * rhs.At(0, 2) + At(0, 1) * rhs.At(1, 2) + At(0, 2) * rhs.At(2, 2);
+	r[0][3] = At(0, 3);
+	
+	r[1][0] = At(1, 0) * rhs.At(0, 0) + At(1, 1) * rhs.At(1, 0) + At(1, 2) * rhs.At(2, 0);
+	r[1][1] = At(1, 0) * rhs.At(0, 1) + At(1, 1) * rhs.At(1, 1) + At(1, 2) * rhs.At(2, 1);
+	r[1][2] = At(1, 0) * rhs.At(0, 2) + At(1, 1) * rhs.At(1, 2) + At(1, 2) * rhs.At(2, 2);
+	r[1][3] = At(1, 3);
+	
+	r[2][0] = At(2, 0) * rhs.At(0, 0) + At(2, 1) * rhs.At(1, 0) + At(2, 2) * rhs.At(2, 0);
+	r[2][1] = At(2, 0) * rhs.At(0, 1) + At(2, 1) * rhs.At(1, 1) + At(2, 2) * rhs.At(2, 1);
+	r[2][2] = At(2, 0) * rhs.At(0, 2) + At(2, 1) * rhs.At(1, 2) + At(2, 2) * rhs.At(2, 2);
+	r[2][3] = At(2, 3);
 
-	r[1][0] = DOT3STRIDED(v[1], c0, 3);
-	r[1][1] = DOT3STRIDED(v[1], c1, 3);
-	r[1][2] = DOT3STRIDED(v[1], c2, 3);
-	r[1][3] = v[1][3];
-
-	r[2][0] = DOT3STRIDED(v[2], c0, 3);
-	r[2][1] = DOT3STRIDED(v[2], c1, 3);
-	r[2][2] = DOT3STRIDED(v[2], c2, 3);
-	r[2][3] = v[2][3];
-
-	r[3][0] = DOT3STRIDED(v[3], c0, 3);
-	r[3][1] = DOT3STRIDED(v[3], c1, 3);
-	r[3][2] = DOT3STRIDED(v[3], c2, 3);
-	r[3][3] = v[3][3];
+	r[3][0] = At(3, 0) * rhs.At(0, 0) + At(3, 1) * rhs.At(1, 0) + At(3, 2) * rhs.At(2, 0);
+	r[3][1] = At(3, 0) * rhs.At(0, 1) + At(3, 1) * rhs.At(1, 1) + At(3, 2) * rhs.At(2, 1);
+	r[3][2] = At(3, 0) * rhs.At(0, 2) + At(3, 1) * rhs.At(1, 2) + At(3, 2) * rhs.At(2, 2);
+	r[3][3] = At(3, 3);
 #endif
 	return r;
 }
@@ -1724,29 +1862,25 @@ float4x4 float4x4::operator *(const float3x4 &rhs) const
 #if defined(MATH_SSE) && defined(MATH_AUTOMATIC_SSE)
 	mat4x4_mul_mat3x4_sse(r.row, this->row, rhs.row);
 #else
-	const float *c0 = rhs.ptr();
-	const float *c1 = rhs.ptr() + 1;
-	const float *c2 = rhs.ptr() + 2;
-	const float *c3 = rhs.ptr() + 3;
-	r[0][0] = DOT3STRIDED(v[0], c0, 4);
-	r[0][1] = DOT3STRIDED(v[0], c1, 4);
-	r[0][2] = DOT3STRIDED(v[0], c2, 4);
-	r[0][3] = DOT3STRIDED(v[0], c3, 4) + v[0][3];
-
-	r[1][0] = DOT3STRIDED(v[1], c0, 4);
-	r[1][1] = DOT3STRIDED(v[1], c1, 4);
-	r[1][2] = DOT3STRIDED(v[1], c2, 4);
-	r[1][3] = DOT3STRIDED(v[1], c3, 4) + v[1][3];
-
-	r[2][0] = DOT3STRIDED(v[2], c0, 4);
-	r[2][1] = DOT3STRIDED(v[2], c1, 4);
-	r[2][2] = DOT3STRIDED(v[2], c2, 4);
-	r[2][3] = DOT3STRIDED(v[2], c3, 4) + v[2][3];
-
-	r[3][0] = DOT3STRIDED(v[3], c0, 4);
-	r[3][1] = DOT3STRIDED(v[3], c1, 4);
-	r[3][2] = DOT3STRIDED(v[3], c2, 4);
-	r[3][3] = DOT3STRIDED(v[3], c3, 4) + v[3][3];
+	r[0][0] = At(0, 0) * rhs.At(0, 0) + At(0, 1) * rhs.At(1, 0) + At(0, 2) * rhs.At(2, 0);
+	r[0][1] = At(0, 0) * rhs.At(0, 1) + At(0, 1) * rhs.At(1, 1) + At(0, 2) * rhs.At(2, 1);
+	r[0][2] = At(0, 0) * rhs.At(0, 2) + At(0, 1) * rhs.At(1, 2) + At(0, 2) * rhs.At(2, 2);
+	r[0][3] = At(0, 0) * rhs.At(0, 3) + At(0, 1) * rhs.At(1, 3) + At(0, 2) * rhs.At(2, 3) + At(0, 3);
+	
+	r[1][0] = At(1, 0) * rhs.At(0, 0) + At(1, 1) * rhs.At(1, 0) + At(1, 2) * rhs.At(2, 0);
+	r[1][1] = At(1, 0) * rhs.At(0, 1) + At(1, 1) * rhs.At(1, 1) + At(1, 2) * rhs.At(2, 1);
+	r[1][2] = At(1, 0) * rhs.At(0, 2) + At(1, 1) * rhs.At(1, 2) + At(1, 2) * rhs.At(2, 2);
+	r[1][3] = At(1, 0) * rhs.At(0, 3) + At(1, 1) * rhs.At(1, 3) + At(1, 2) * rhs.At(2, 3) + At(1, 3);
+	
+	r[2][0] = At(2, 0) * rhs.At(0, 0) + At(2, 1) * rhs.At(1, 0) + At(2, 2) * rhs.At(2, 0);
+	r[2][1] = At(2, 0) * rhs.At(0, 1) + At(2, 1) * rhs.At(1, 1) + At(2, 2) * rhs.At(2, 1);
+	r[2][2] = At(2, 0) * rhs.At(0, 2) + At(2, 1) * rhs.At(1, 2) + At(2, 2) * rhs.At(2, 2);
+	r[2][3] = At(2, 0) * rhs.At(0, 3) + At(2, 1) * rhs.At(1, 3) + At(2, 2) * rhs.At(2, 3) + At(2, 3);
+	
+	r[3][0] = At(3, 0) * rhs.At(0, 0) + At(3, 1) * rhs.At(1, 0) + At(3, 2) * rhs.At(2, 0);
+	r[3][1] = At(3, 0) * rhs.At(0, 1) + At(3, 1) * rhs.At(1, 1) + At(3, 2) * rhs.At(2, 1);
+	r[3][2] = At(3, 0) * rhs.At(0, 2) + At(3, 1) * rhs.At(1, 2) + At(3, 2) * rhs.At(2, 2);
+	r[3][3] = At(3, 0) * rhs.At(0, 3) + At(3, 1) * rhs.At(1, 3) + At(3, 2) * rhs.At(2, 3) + At(3, 3);
 #endif
 	return r;
 }
@@ -1757,29 +1891,25 @@ float4x4 float4x4::operator *(const float4x4 &rhs) const
 #ifdef MATH_AUTOMATIC_SSE
 	mat4x4_mul_mat4x4(r.row, this->row, rhs.row);
 #else
-	const float *c0 = rhs.ptr();
-	const float *c1 = rhs.ptr() + 1;
-	const float *c2 = rhs.ptr() + 2;
-	const float *c3 = rhs.ptr() + 3;
-	r[0][0] = DOT4STRIDED(v[0], c0, 4);
-	r[0][1] = DOT4STRIDED(v[0], c1, 4);
-	r[0][2] = DOT4STRIDED(v[0], c2, 4);
-	r[0][3] = DOT4STRIDED(v[0], c3, 4);
-
-	r[1][0] = DOT4STRIDED(v[1], c0, 4);
-	r[1][1] = DOT4STRIDED(v[1], c1, 4);
-	r[1][2] = DOT4STRIDED(v[1], c2, 4);
-	r[1][3] = DOT4STRIDED(v[1], c3, 4);
-
-	r[2][0] = DOT4STRIDED(v[2], c0, 4);
-	r[2][1] = DOT4STRIDED(v[2], c1, 4);
-	r[2][2] = DOT4STRIDED(v[2], c2, 4);
-	r[2][3] = DOT4STRIDED(v[2], c3, 4);
-
-	r[3][0] = DOT4STRIDED(v[3], c0, 4);
-	r[3][1] = DOT4STRIDED(v[3], c1, 4);
-	r[3][2] = DOT4STRIDED(v[3], c2, 4);
-	r[3][3] = DOT4STRIDED(v[3], c3, 4);
+	r[0][0] = At(0, 0) * rhs.At(0, 0) + At(0, 1) * rhs.At(1, 0) + At(0, 2) * rhs.At(2, 0) + At(0, 3) * rhs.At(3, 0);
+	r[0][1] = At(0, 0) * rhs.At(0, 1) + At(0, 1) * rhs.At(1, 1) + At(0, 2) * rhs.At(2, 1) + At(0, 3) * rhs.At(3, 1);
+	r[0][2] = At(0, 0) * rhs.At(0, 2) + At(0, 1) * rhs.At(1, 2) + At(0, 2) * rhs.At(2, 2) + At(0, 3) * rhs.At(3, 2);
+	r[0][3] = At(0, 0) * rhs.At(0, 3) + At(0, 1) * rhs.At(1, 3) + At(0, 2) * rhs.At(2, 3) + At(0, 3) * rhs.At(3, 3);
+	
+	r[1][0] = At(1, 0) * rhs.At(0, 0) + At(1, 1) * rhs.At(1, 0) + At(1, 2) * rhs.At(2, 0) + At(1, 3) * rhs.At(3, 0);
+	r[1][1] = At(1, 0) * rhs.At(0, 1) + At(1, 1) * rhs.At(1, 1) + At(1, 2) * rhs.At(2, 1) + At(1, 3) * rhs.At(3, 1);
+	r[1][2] = At(1, 0) * rhs.At(0, 2) + At(1, 1) * rhs.At(1, 2) + At(1, 2) * rhs.At(2, 2) + At(1, 3) * rhs.At(3, 2);
+	r[1][3] = At(1, 0) * rhs.At(0, 3) + At(1, 1) * rhs.At(1, 3) + At(1, 2) * rhs.At(2, 3) + At(1, 3) * rhs.At(3, 3);
+	
+	r[2][0] = At(2, 0) * rhs.At(0, 0) + At(2, 1) * rhs.At(1, 0) + At(2, 2) * rhs.At(2, 0) + At(2, 3) * rhs.At(3, 0);
+	r[2][1] = At(2, 0) * rhs.At(0, 1) + At(2, 1) * rhs.At(1, 1) + At(2, 2) * rhs.At(2, 1) + At(2, 3) * rhs.At(3, 1);
+	r[2][2] = At(2, 0) * rhs.At(0, 2) + At(2, 1) * rhs.At(1, 2) + At(2, 2) * rhs.At(2, 2) + At(2, 3) * rhs.At(3, 2);
+	r[2][3] = At(2, 0) * rhs.At(0, 3) + At(2, 1) * rhs.At(1, 3) + At(2, 2) * rhs.At(2, 3) + At(2, 3) * rhs.At(3, 3);
+	
+	r[3][0] = At(3, 0) * rhs.At(0, 0) + At(3, 1) * rhs.At(1, 0) + At(3, 2) * rhs.At(2, 0) + At(3, 3) * rhs.At(3, 0);
+	r[3][1] = At(3, 0) * rhs.At(0, 1) + At(3, 1) * rhs.At(1, 1) + At(3, 2) * rhs.At(2, 1) + At(3, 3) * rhs.At(3, 1);
+	r[3][2] = At(3, 0) * rhs.At(0, 2) + At(3, 1) * rhs.At(1, 2) + At(3, 2) * rhs.At(2, 2) + At(3, 3) * rhs.At(3, 2);
+	r[3][3] = At(3, 0) * rhs.At(0, 3) + At(3, 1) * rhs.At(1, 3) + At(3, 2) * rhs.At(2, 3) + At(3, 3) * rhs.At(3, 3);
 #endif
 
 	return r;
@@ -1858,10 +1988,10 @@ float4x4 float4x4::operator -() const
 	mat4x4_negate(r.row, row);
 	return r;
 #else
-	return float4x4(-v[0][0], -v[0][1], -v[0][2], -v[0][3],
-	                -v[1][0], -v[1][1], -v[1][2], -v[1][3],
-	                -v[2][0], -v[2][1], -v[2][2], -v[2][3],
-	                -v[3][0], -v[3][1], -v[3][2], -v[3][3]);
+	return float4x4(-At(0, 0), -At(0, 1), -At(0, 2), -At(0, 3),
+	                -At(1, 0), -At(1, 1), -At(1, 2), -At(1, 3),
+	                -At(2, 0), -At(2, 1), -At(2, 2), -At(2, 3),
+	                -At(3, 0), -At(3, 1), -At(3, 2), -At(3, 3));
 #endif
 }
 
@@ -1931,22 +2061,22 @@ bool float4x4::IsIdentity(float epsilon) const
 
 bool float4x4::IsLowerTriangular(float epsilon) const
 {
-	return EqualAbs(v[0][1], 0.f, epsilon)
-	    && EqualAbs(v[0][2], 0.f, epsilon)
-	    && EqualAbs(v[0][3], 0.f, epsilon)
-	    && EqualAbs(v[1][2], 0.f, epsilon)
-	    && EqualAbs(v[1][3], 0.f, epsilon)
-	    && EqualAbs(v[2][3], 0.f, epsilon);
+	return EqualAbs(At(0, 1), 0.f, epsilon)
+	    && EqualAbs(At(0, 2), 0.f, epsilon)
+	    && EqualAbs(At(0, 3), 0.f, epsilon)
+	    && EqualAbs(At(1, 2), 0.f, epsilon)
+	    && EqualAbs(At(1, 3), 0.f, epsilon)
+	    && EqualAbs(At(2, 3), 0.f, epsilon);
 }
 
 bool float4x4::IsUpperTriangular(float epsilon) const
 {
-	return EqualAbs(v[1][0], 0.f, epsilon)
-	    && EqualAbs(v[2][0], 0.f, epsilon)
-	    && EqualAbs(v[3][0], 0.f, epsilon)
-	    && EqualAbs(v[2][1], 0.f, epsilon)
-	    && EqualAbs(v[3][1], 0.f, epsilon)
-	    && EqualAbs(v[3][2], 0.f, epsilon);
+	return EqualAbs(At(1, 0), 0.f, epsilon)
+	    && EqualAbs(At(2, 0), 0.f, epsilon)
+	    && EqualAbs(At(3, 0), 0.f, epsilon)
+	    && EqualAbs(At(2, 1), 0.f, epsilon)
+	    && EqualAbs(At(3, 1), 0.f, epsilon)
+	    && EqualAbs(At(3, 2), 0.f, epsilon);
 }
 
 bool float4x4::IsInvertible(float epsilon) const
@@ -2021,7 +2151,7 @@ bool float4x4::Equals(const float4x4 &other, float epsilon) const
 {
 	for(int iy = 0; iy < Rows; ++iy)
 		for(int ix = 0; ix < Cols; ++ix)
-			if (!EqualAbs(v[iy][ix], other[iy][ix], epsilon))
+			if (!EqualAbs(At(iy, ix), other[iy][ix], epsilon))
 				return false;
 	return true;
 }
@@ -2036,10 +2166,10 @@ std::string float4x4::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)",
-		v[0][0], v[0][1], v[0][2], v[0][3],
-		v[1][0], v[1][1], v[1][2], v[1][3],
-		v[2][0], v[2][1], v[2][2], v[2][3],
-		v[3][0], v[3][1], v[3][2], v[3][3]);
+		At(0, 0), At(0, 1), At(0, 2), At(0, 3),
+		At(1, 0), At(1, 1), At(1, 2), At(1, 3),
+		At(2, 0), At(2, 1), At(2, 2), At(2, 3),
+		At(3, 0), At(3, 1), At(3, 2), At(3, 3));
 
 	return std::string(str);
 }
@@ -2047,22 +2177,22 @@ std::string float4x4::ToString() const
 std::string float4x4::SerializeToString() const
 {
 	char str[512];
-	char *s = SerializeFloat(v[0][0], str); *s = ','; ++s;
-	s = SerializeFloat(v[0][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[0][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[0][3], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[1][3], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[2][3], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][0], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][1], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][2], s); *s = ','; ++s;
-	s = SerializeFloat(v[3][3], s);
+	char *s = SerializeFloat(At(0, 0), str); *s = ','; ++s;
+	s = SerializeFloat(At(0, 1), s); *s = ','; ++s;
+	s = SerializeFloat(At(0, 2), s); *s = ','; ++s;
+	s = SerializeFloat(At(0, 3), s); *s = ','; ++s;
+	s = SerializeFloat(At(1, 0), s); *s = ','; ++s;
+	s = SerializeFloat(At(1, 1), s); *s = ','; ++s;
+	s = SerializeFloat(At(1, 2), s); *s = ','; ++s;
+	s = SerializeFloat(At(1, 3), s); *s = ','; ++s;
+	s = SerializeFloat(At(2, 0), s); *s = ','; ++s;
+	s = SerializeFloat(At(2, 1), s); *s = ','; ++s;
+	s = SerializeFloat(At(2, 2), s); *s = ','; ++s;
+	s = SerializeFloat(At(2, 3), s); *s = ','; ++s;
+	s = SerializeFloat(At(3, 0), s); *s = ','; ++s;
+	s = SerializeFloat(At(3, 1), s); *s = ','; ++s;
+	s = SerializeFloat(At(3, 2), s); *s = ','; ++s;
+	s = SerializeFloat(At(3, 3), s);
 	assert(s+1 - str < 512);
 	MARK_UNUSED(s);
 	return str;
@@ -2072,10 +2202,10 @@ std::string float4x4::ToString2() const
 {
 	char str[256];
 	sprintf(str, "float4x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
-		v[0][0], v[1][0], v[2][0], v[3][0],
-		v[0][1], v[1][1], v[2][1], v[3][1],
-		v[0][2], v[1][2], v[2][2], v[3][2],
-		v[0][3], v[1][3], v[2][3], v[3][3]);
+		At(0, 0), At(1, 0), At(2, 0), At(3, 0),
+		At(0, 1), At(1, 1), At(2, 1), At(3, 1),
+		At(0, 2), At(1, 2), At(2, 2), At(3, 2),
+		At(0, 3), At(1, 3), At(2, 3), At(3, 3));
 
 	return std::string(str);
 }
@@ -2116,7 +2246,20 @@ void float4x4::Decompose(float3 &translate, float3x3 &rotate, float3 &scale) con
 	assume(this->IsColOrthogonal3());
 
 	assume(Row(3).Equals(0,0,0,1));
-	Float3x4Part().Decompose(translate, rotate, scale);
+
+	assume(this->IsColOrthogonal3());
+	
+	translate = Col3(3);
+	rotate = RotatePart();
+	scale.x = rotate.Col3(0).Length();
+	scale.y = rotate.Col3(1).Length();
+	scale.z = rotate.Col3(2).Length();
+	assume(!EqualAbs(scale.x, 0));
+	assume(!EqualAbs(scale.y, 0));
+	assume(!EqualAbs(scale.z, 0));
+	rotate.ScaleCol(0, 1.f / scale.x);
+	rotate.ScaleCol(1, 1.f / scale.y);
+	rotate.ScaleCol(2, 1.f / scale.z);
 
 	// Test that composing back yields the original float4x4.
 	assume(float4x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
@@ -2185,29 +2328,25 @@ float4x4 operator *(const float3x3 &lhs, const float4x4 &rhs)
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	mat3x3_mul_mat4x4_sse(r.row, lhs.ptr(), rhs.row);
 #else
-	const float *c0 = rhs.ptr();
-	const float *c1 = rhs.ptr() + 1;
-	const float *c2 = rhs.ptr() + 2;
-	const float *c3 = rhs.ptr() + 3;
-	r[0][0] = DOT3STRIDED(lhs[0], c0, 4);
-	r[0][1] = DOT3STRIDED(lhs[0], c1, 4);
-	r[0][2] = DOT3STRIDED(lhs[0], c2, 4);
-	r[0][3] = DOT3STRIDED(lhs[0], c3, 4);
-
-	r[1][0] = DOT3STRIDED(lhs[1], c0, 4);
-	r[1][1] = DOT3STRIDED(lhs[1], c1, 4);
-	r[1][2] = DOT3STRIDED(lhs[1], c2, 4);
-	r[1][3] = DOT3STRIDED(lhs[1], c3, 4);
-
-	r[2][0] = DOT3STRIDED(lhs[2], c0, 4);
-	r[2][1] = DOT3STRIDED(lhs[2], c1, 4);
-	r[2][2] = DOT3STRIDED(lhs[2], c2, 4);
-	r[2][3] = DOT3STRIDED(lhs[2], c3, 4);
-
-	r[3][0] = rhs[3][0];
-	r[3][1] = rhs[3][1];
-	r[3][2] = rhs[3][2];
-	r[3][3] = rhs[3][3];
+	r[0][0] = lhs.At(0, 0) * rhs.At(0, 0) + lhs.At(0, 1) * rhs.At(1, 0) + lhs.At(0, 2) * rhs.At(2, 0);
+	r[0][1] = lhs.At(0, 0) * rhs.At(0, 1) + lhs.At(0, 1) * rhs.At(1, 1) + lhs.At(0, 2) * rhs.At(2, 1);
+	r[0][2] = lhs.At(0, 0) * rhs.At(0, 2) + lhs.At(0, 1) * rhs.At(1, 2) + lhs.At(0, 2) * rhs.At(2, 2);
+	r[0][3] = lhs.At(0, 0) * rhs.At(0, 3) + lhs.At(0, 1) * rhs.At(1, 3) + lhs.At(0, 2) * rhs.At(2, 3);
+	
+	r[1][0] = lhs.At(1, 0) * rhs.At(0, 0) + lhs.At(1, 1) * rhs.At(1, 0) + lhs.At(1, 2) * rhs.At(2, 0);
+	r[1][1] = lhs.At(1, 0) * rhs.At(0, 1) + lhs.At(1, 1) * rhs.At(1, 1) + lhs.At(1, 2) * rhs.At(2, 1);
+	r[1][2] = lhs.At(1, 0) * rhs.At(0, 2) + lhs.At(1, 1) * rhs.At(1, 2) + lhs.At(1, 2) * rhs.At(2, 2);
+	r[1][3] = lhs.At(1, 0) * rhs.At(0, 3) + lhs.At(1, 1) * rhs.At(1, 3) + lhs.At(1, 2) * rhs.At(2, 3);
+	
+	r[2][0] = lhs.At(2, 0) * rhs.At(0, 0) + lhs.At(2, 1) * rhs.At(1, 0) + lhs.At(2, 2) * rhs.At(2, 0);
+	r[2][1] = lhs.At(2, 0) * rhs.At(0, 1) + lhs.At(2, 1) * rhs.At(1, 1) + lhs.At(2, 2) * rhs.At(2, 1);
+	r[2][2] = lhs.At(2, 0) * rhs.At(0, 2) + lhs.At(2, 1) * rhs.At(1, 2) + lhs.At(2, 2) * rhs.At(2, 2);
+	r[2][3] = lhs.At(2, 0) * rhs.At(0, 3) + lhs.At(2, 1) * rhs.At(1, 3) + lhs.At(2, 2) * rhs.At(2, 3);
+	
+	r[3][0] = rhs.At(3, 0);
+	r[3][1] = rhs.At(3, 1);
+	r[3][2] = rhs.At(3, 2);
+	r[3][3] = rhs.At(3, 3);
 #endif
 	return r;
 }
@@ -2218,29 +2357,25 @@ float4x4 operator *(const float3x4 &lhs, const float4x4 &rhs)
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	mat3x4_mul_mat4x4_sse(r.row, lhs.row, rhs.row);
 #else
-	const float *c0 = rhs.ptr();
-	const float *c1 = rhs.ptr() + 1;
-	const float *c2 = rhs.ptr() + 2;
-	const float *c3 = rhs.ptr() + 3;
-	r[0][0] = DOT4STRIDED(lhs[0], c0, 4);
-	r[0][1] = DOT4STRIDED(lhs[0], c1, 4);
-	r[0][2] = DOT4STRIDED(lhs[0], c2, 4);
-	r[0][3] = DOT4STRIDED(lhs[0], c3, 4);
-
-	r[1][0] = DOT4STRIDED(lhs[1], c0, 4);
-	r[1][1] = DOT4STRIDED(lhs[1], c1, 4);
-	r[1][2] = DOT4STRIDED(lhs[1], c2, 4);
-	r[1][3] = DOT4STRIDED(lhs[1], c3, 4);
-
-	r[2][0] = DOT4STRIDED(lhs[2], c0, 4);
-	r[2][1] = DOT4STRIDED(lhs[2], c1, 4);
-	r[2][2] = DOT4STRIDED(lhs[2], c2, 4);
-	r[2][3] = DOT4STRIDED(lhs[2], c3, 4);
-
-	r[3][0] = rhs[3][0];
-	r[3][1] = rhs[3][1];
-	r[3][2] = rhs[3][2];
-	r[3][3] = rhs[3][3];
+	r[0][0] = lhs.At(0, 0) * rhs.At(0, 0) + lhs.At(0, 1) * rhs.At(1, 0) + lhs.At(0, 2) * rhs.At(2, 0) + lhs.At(0, 3) * rhs.At(3, 0);
+	r[0][1] = lhs.At(0, 0) * rhs.At(0, 1) + lhs.At(0, 1) * rhs.At(1, 1) + lhs.At(0, 2) * rhs.At(2, 1) + lhs.At(0, 3) * rhs.At(3, 1);
+	r[0][2] = lhs.At(0, 0) * rhs.At(0, 2) + lhs.At(0, 1) * rhs.At(1, 2) + lhs.At(0, 2) * rhs.At(2, 2) + lhs.At(0, 3) * rhs.At(3, 2);
+	r[0][3] = lhs.At(0, 0) * rhs.At(0, 3) + lhs.At(0, 1) * rhs.At(1, 3) + lhs.At(0, 2) * rhs.At(2, 3) + lhs.At(0, 3) * rhs.At(3, 3);
+	
+	r[1][0] = lhs.At(1, 0) * rhs.At(0, 0) + lhs.At(1, 1) * rhs.At(1, 0) + lhs.At(1, 2) * rhs.At(2, 0) + lhs.At(1, 3) * rhs.At(3, 0);
+	r[1][1] = lhs.At(1, 0) * rhs.At(0, 1) + lhs.At(1, 1) * rhs.At(1, 1) + lhs.At(1, 2) * rhs.At(2, 1) + lhs.At(1, 3) * rhs.At(3, 1);
+	r[1][2] = lhs.At(1, 0) * rhs.At(0, 2) + lhs.At(1, 1) * rhs.At(1, 2) + lhs.At(1, 2) * rhs.At(2, 2) + lhs.At(1, 3) * rhs.At(3, 2);
+	r[1][3] = lhs.At(1, 0) * rhs.At(0, 3) + lhs.At(1, 1) * rhs.At(1, 3) + lhs.At(1, 2) * rhs.At(2, 3) + lhs.At(1, 3) * rhs.At(3, 3);
+	
+	r[2][0] = lhs.At(2, 0) * rhs.At(0, 0) + lhs.At(2, 1) * rhs.At(1, 0) + lhs.At(2, 2) * rhs.At(2, 0) + lhs.At(2, 3) * rhs.At(3, 0);
+	r[2][1] = lhs.At(2, 0) * rhs.At(0, 1) + lhs.At(2, 1) * rhs.At(1, 1) + lhs.At(2, 2) * rhs.At(2, 1) + lhs.At(2, 3) * rhs.At(3, 1);
+	r[2][2] = lhs.At(2, 0) * rhs.At(0, 2) + lhs.At(2, 1) * rhs.At(1, 2) + lhs.At(2, 2) * rhs.At(2, 2) + lhs.At(2, 3) * rhs.At(3, 2);
+	r[2][3] = lhs.At(2, 0) * rhs.At(0, 3) + lhs.At(2, 1) * rhs.At(1, 3) + lhs.At(2, 2) * rhs.At(2, 3) + lhs.At(2, 3) * rhs.At(3, 3);
+	
+	r[3][0] = rhs.At(3, 0);
+	r[3][1] = rhs.At(3, 1);
+	r[3][2] = rhs.At(3, 2);
+	r[3][3] = rhs.At(3, 3);
 #endif
 	return r;
 }
@@ -2250,10 +2385,10 @@ float4 operator *(const float4 &lhs, const float4x4 &rhs)
 #ifdef MATH_AUTOMATIC_SSE
 	return vec4_mul_mat4x4(lhs.v, rhs.row);
 #else
-	return float4(DOT4STRIDED(lhs, rhs.ptr(), 4),
-	              DOT4STRIDED(lhs, rhs.ptr()+1, 4),
-	              DOT4STRIDED(lhs, rhs.ptr()+2, 4),
-	              DOT4STRIDED(lhs, rhs.ptr()+3, 4));
+	return float4(lhs.x * rhs.At(0, 0) + lhs.y * rhs.At(1, 0) + lhs.z * rhs.At(2, 0) + lhs.w * rhs.At(3, 0),
+				  lhs.x * rhs.At(0, 1) + lhs.y * rhs.At(1, 1) + lhs.z * rhs.At(2, 1) + lhs.w * rhs.At(3, 1),
+				  lhs.x * rhs.At(0, 2) + lhs.y * rhs.At(1, 2) + lhs.z * rhs.At(2, 2) + lhs.w * rhs.At(3, 2),
+				  lhs.x * rhs.At(0, 3) + lhs.y * rhs.At(1, 3) + lhs.z * rhs.At(2, 3) + lhs.w * rhs.At(3, 3));
 #endif
 }
 

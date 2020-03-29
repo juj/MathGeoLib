@@ -63,8 +63,8 @@ MATH_BEGIN_NAMESPACE
 	The elements for a single row of the matrix hold successive memory addresses. This is the same memory layout as
 	 with C++ multidimensional arrays.
 
-	Contrast this with column-major storage, in which the elements are packed in the memory in
-	order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
+ 	If preprocessor #define MATH_COLMAJOR_MATRICES is set, column-major storage is used instead, in which the elements
+ 	are packed in the memory in order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
 	There the elements for a single column of the matrix hold successive memory addresses.
 	This is exactly opposite from the standard C++ multidimensional arrays, since if you have e.g.
 	int v[10][10], then v[0][9] comes in memory right before v[1][0]. ( [0][0], [0][1], [0][2], ... [1][0], [1][1], ...) */
@@ -81,6 +81,15 @@ public:
 	/** [noscript] */
 	union
 	{
+#ifdef MATH_COLMAJOR_MATRICES
+		float v[Cols][Rows];
+#ifdef MATH_AVX
+		__m256 col2[2];
+#endif
+#if defined(MATH_SIMD)
+		simd4f col[4];
+#endif
+#else
 		float v[Rows][Cols];
 #ifdef MATH_AVX
 		__m256 row2[2];
@@ -88,6 +97,8 @@ public:
 #if defined(MATH_SIMD)
 		simd4f row[4];
 #endif
+#endif
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4201) // warning C4201: nonstandard extension used: nameless struct/union
@@ -96,10 +107,17 @@ public:
 		// This gives human-readable names to the individual matrix elements:
 		struct
 		{
+#ifdef MATH_COLMAJOR_MATRICES
+			float  scaleX, shearYx, shearZx, shearWx;
+			float shearXy,  scaleY, shearZy, shearWy;
+			float shearXz, shearYz,  scaleZ, shearWz;
+			float       x,       y,       z,       w;
+#else
 			float  scaleX, shearXy, shearXz, x;
 			float shearYx,  scaleY, shearYz, y;
 			float shearZx, shearZy,  scaleZ, z;
 			float shearWx, shearWy, shearWz, w;
+#endif
 		};
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -356,9 +374,10 @@ public:
 		@note MatrixProxy is a temporary helper class. Do not store references to it, but always
 		directly dereference it with the [] operator.
 		For example, m[0][3] Returns the last element on the first row, which is the amount
-		of translation in the x-direction. */
-	MatrixProxy<Cols> &operator[](int row);
-	const MatrixProxy<Cols> &operator[](int row) const;
+	 	of translation in the x-direction. This is true independent of
+	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
+	MatrixProxy<Rows, Cols> &operator[](int row);
+	const MatrixProxy<Rows, Cols> &operator[](int row) const;
 
 	/// Returns the given element. [noscript]
 	/** This function returns the element of this matrix at (row, col)==(i, j)==(y, x).
@@ -367,6 +386,21 @@ public:
 	float &At(int row, int col);
 	CONST_WIN32 float At(int row, int col) const;
 
+#ifdef MATH_COLMAJOR_MATRICES
+	/// Returns the given column. [noscript]
+	/** @param col The zero-based index [0, 3] of the column to get. */
+	float4 &Col(int col);
+	const float4 &Col(int col) const;
+	/// Returns the three first entries of the given row. [similarOverload: Col] [hideIndex]
+	float3 &Col3(int col); ///< [noscript]
+	const float3 &Col3(int col) const;
+	
+	/// Returns the given row.
+	/** @param row The zero-based index [0, 3] of the row to get. */
+	CONST_WIN32 float4 Row(int row) const;
+	/// Returns the three first entries of the given row. [similarOverload: Row] [hideIndex]
+	CONST_WIN32 float3 Row3(int row) const;
+#else
 	/// Returns the given row. [noscript]
 	/** @param row The zero-based index [0, 3] of the row to get. */
 	float4 &Row(int row);
@@ -380,6 +414,7 @@ public:
 	CONST_WIN32 float4 Col(int col) const;
 	/// Returns the three first entries of the given column. [similarOverload: Column] [hideIndex]
 	CONST_WIN32 float3 Col3(int col) const;
+#endif
 
 	/// Returns the main diagonal.
 	/** The main diagonal consists of the elements at m[0][0], m[1][1], m[2][2] and m[3][3]. */
@@ -403,9 +438,13 @@ public:
 	CONST_WIN32 float3x3 Float3x3Part() const;
 
 	/// Returns the upper-left 3-by-4 part. [noscript]
-	/// @note The float3x4 and float4x4 are bit-compatible, so this function simply casts.
+	/// @note If not building with MATH_COLMAJOR_MATRICES, the float3x4 and float4x4 are bit-compatible, so this function simply casts.
+#ifdef MATH_COLMAJOR_MATRICES
+	CONST_WIN32 float3x4 Float3x4Part() const;
+#else
 	float3x4 &Float3x4Part();
 	const float3x4 &Float3x4Part() const;
+#endif
 
 	/// Returns the translation part.
 	/** The translation part is stored in the fourth column of this matrix.

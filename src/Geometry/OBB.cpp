@@ -110,7 +110,7 @@ void OBB::SetFrom(const AABB &aabb)
 template<typename Matrix>
 void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 {
-	assume(m.IsColOrthogonal()); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
+	assume1(m.IsColOrthogonal(), m); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
 	assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
 	obb.pos = m.MulPos(aabb.CenterPoint());
 	obb.r = aabb.HalfSize();
@@ -2652,7 +2652,7 @@ bool OBB::Intersects(const OBB &b, float epsilon) const
 	for(int i = 0; i < 3; ++i)
 	{
 		float ra = r[i];
-		float rb = DOT3(b.r, AbsR[i]);
+		float rb = b.r.x * AbsR[i][0] + b.r.y * AbsR[i][1] + b.r.z * AbsR[i][2];
 		if (Abs(t[i]) > ra + rb)
 			return false;
 	}

@@ -121,6 +121,12 @@
 //#define MATH_RIGHTHANDED_CAMERA
 #endif
 
+// If MATH_COLMAJOR_MATRICES is defined, matrices use a column-major memory layout. If undefined, matrices
+// use a row-major memory layout.
+#ifndef MATH_COLMAJOR_MATRICES
+// #define MATH_COLMAJOR_MATRICES
+#endif
+
 #if defined(MATH_USE_DIRECT3D) && defined(MATH_USE_OPENGL)
 #error Defines MATH_USE_DIRECT3D and MATH_USE_OPENGL are mutually exclusive!
 #endif

@@ -591,6 +591,30 @@ void Quat::Set(float x_, float y_, float z_, float w_)
 #endif
 }
 
+void Quat::Set(const Quat &q)
+{
+#ifdef MATH_AUTOMATIC_SSE
+	v = q.v;
+#else
+	x = q.x;
+	y = q.y;
+	z = q.z;
+	w = q.w;
+#endif
+}
+
+void Quat::Set(const float4 &vec)
+{
+#ifdef MATH_AUTOMATIC_SSE
+	v = vec.v;
+#else
+	x = vec.x;
+	y = vec.y;
+	z = vec.z;
+	w = vec.w;
+#endif
+}
+
 Quat MUST_USE_RESULT Quat::LookAt(const float3 &localForward, const float3 &targetDirection, const float3 &localUp, const float3 &worldUp)
 {
 	return float3x3::LookAt(localForward, targetDirection, localUp, worldUp).ToQuat();

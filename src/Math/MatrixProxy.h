@@ -23,7 +23,31 @@
 MATH_BEGIN_NAMESPACE
 
 /// A proxy class for double brackets [][] element access in matrices.
-template<int Cols>
+#ifdef MATH_COLMAJOR_MATRICES
+template<int Rows, int Cols>
+class MatrixProxy
+{
+private:
+	float v[Cols*Rows];
+
+public:
+	CONST_WIN32 FORCE_INLINE float operator[](int col) const
+	{
+		assert(col >= 0);
+		assert(col < Cols);
+		
+		return v[col*Rows];
+	}
+	FORCE_INLINE float &operator[](int col)
+	{
+		assert(col >= 0);
+		assert(col < Cols);
+		
+		return v[col*Rows];
+	}
+};
+#else
+template<int Rows, int Cols>
 class MatrixProxy
 {
 private:
@@ -45,5 +69,6 @@ public:
 		return v[col];
 	}
 };
+#endif
 
 MATH_END_NAMESPACE

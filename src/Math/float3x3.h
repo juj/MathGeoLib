@@ -62,8 +62,8 @@ MATH_BEGIN_NAMESPACE
 	The elements for a single row of the matrix hold successive memory addresses. This is the same memory layout as
 	 with C++ multidimensional arrays.
 
-	Contrast this with column-major storage, in which the elements are packed in the memory in
-	order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
+ 	If preprocessor #define MATH_COLMAJOR_MATRICES is set, column-major storage is used instead, in which the elements
+ 	are packed in the memory in order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
 	There the elements for a single column of the matrix hold successive memory addresses.
 	This is exactly opposite from the standard C++ multidimensional arrays, since if you have e.g.
 	int v[10][10], then v[0][9] comes in memory right before v[1][0]. ( [0][0], [0][1], [0][2], ... [1][0], [1][1], ...) */
@@ -79,7 +79,12 @@ public:
 	/// Stores the data in this matrix in row-major format. [noscript]
 	union
 	{
+#ifdef MATH_COLMAJOR_MATRICES
+		float v[Cols][Rows];
+#else
 		float v[Rows][Cols];
+#endif
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4201) // warning C4201: nonstandard extension used: nameless struct/union
@@ -88,9 +93,15 @@ public:
 		// This gives human-readable names to the individual matrix elements:
 		struct
 		{
+#ifdef MATH_COLMAJOR_MATRICES
+			float  scaleX, shearYx, shearZx;
+			float shearXy,  scaleY, shearZy;
+			float shearXz, shearYz,  scaleZ;
+#else
 			float  scaleX, shearXy, shearXz;
 			float shearYx,  scaleY, shearYz;
 			float shearZx, shearZy,  scaleZ;
+#endif
 		};
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -284,9 +295,10 @@ public:
 		@note You can use the index notation to set elements of the matrix, e.g. m[0][1] = 5.f;
 		@note MatrixProxy is a temporary helper class. Do not store references to it, but always
 		directly dereference it with the [] operator.
-		For example, m[0][2] Returns the last element on the first row. */
-	MatrixProxy<Cols> &operator[](int row);
-	const MatrixProxy<Cols> &operator[](int row) const;
+		For example, m[0][2] Returns the last element on the first row. This is true independent of
+	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
+	MatrixProxy<Rows, Cols> &operator[](int row);
+	const MatrixProxy<Rows, Cols> &operator[](int row) const;
 
 	/// Returns the given element. [noscript]
 	/** This function returns the element of this matrix at (row, col)==(i, j)==(y, x).
@@ -297,6 +309,18 @@ public:
 
 	/// Returns the given row. [noscript]
 	/** @param row The zero-based index [0, 2] of the row to get. */
+#ifdef MATH_COLMAJOR_MATRICES
+	CONST_WIN32 float3 Row(int row) const;
+	CONST_WIN32 float3 Row3(int row) const { return Row(row); }
+	
+	/// Returns the given column.
+	/** @param col The zero-based index [0, 2] of the column to get. */
+	float3 &Col(int col);
+	const float3 &Col(int col) const;
+
+	float3 &Col3(int col) { return Col(col); }
+	const float3 &Col3(int col) const { return Col(col); }
+#else
 	float3 &Row(int row);
 	const float3 &Row(int row) const;
 
@@ -307,7 +331,7 @@ public:
 	/** @param col The zero-based index [0, 2] of the column to get. */
 	CONST_WIN32 float3 Col(int col) const;
 	CONST_WIN32 float3 Col3(int col) const { return Col(col); }
-
+#endif
 	/// Returns the main diagonal.
 	/** The main diagonal consists of the elements at m[0][0], m[1][1], m[2][2]. */
 	CONST_WIN32 float3 Diagonal() const;

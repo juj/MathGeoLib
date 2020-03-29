@@ -1158,6 +1158,18 @@ void float4::Set(float x_, float y_, float z_, float w_)
 #endif
 }
 
+void float4::Set(const float4 &rhs)
+{
+#ifdef MATH_AUTOMATIC_SSE
+	v = rhs.v;
+#else
+	x = rhs.x;
+	y = rhs.y;
+	z = rhs.z;
+	w = rhs.w;
+#endif
+}
+
 void float4::SetFromScalar(float scalar, float w_)
 {
 #ifdef MATH_AUTOMATIC_SSE

@@ -482,7 +482,9 @@ void AABBTransformAsAABB(AABB &aabb, Matrix &m)
 	vec newCenter = m.MulPos(centerPoint);
 
 	// The following is equal to taking the absolute value of the whole matrix m.
-	vec newDir = DIR_VEC(ABSDOT3(m[0], halfSize), ABSDOT3(m[1], halfSize), ABSDOT3(m[2], halfSize));
+	vec newDir = DIR_VEC(Abs(m[0][0] * halfSize.x) + Abs(m[0][1] * halfSize.y) + Abs(m[0][2] * halfSize.z),
+						 Abs(m[1][0] * halfSize.x) + Abs(m[1][1] * halfSize.y) + Abs(m[1][2] * halfSize.z),
+						 Abs(m[2][0] * halfSize.x) + Abs(m[2][1] * halfSize.y) + Abs(m[2][2] * halfSize.z));
 	aabb.minPoint = newCenter - newDir;
 	aabb.maxPoint = newCenter + newDir;
 }

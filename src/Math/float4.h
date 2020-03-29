@@ -346,6 +346,7 @@ public:
 	/// Sets all elements of this vector.
 	/** @see x, y, z, w, At(). */
 	void Set(float x, float y, float z, float w);
+	void Set(const float4 &rhs);
 
 	/// Computes the squared length of the (x, y, z) part of this vector.
 	/** Calling this function is faster than calling Length3(), since this function avoids computing a square root.

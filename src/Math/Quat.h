@@ -230,6 +230,8 @@ public:
 	/// @note This sets the raw elements, which do *not* correspond directly to the axis and angle of the rotation. Use
 	///	   SetFromAxisAngle to define this Quat using a rotation axis and an angle.
 	void Set(float x, float y, float z, float w);
+	void Set(const Quat &q);
+	void Set(const float4 &v);
 
 	/// Creates a LookAt quaternion.
 	/** A LookAt quaternion is a quaternion that orients an object to face towards a specified target direction.

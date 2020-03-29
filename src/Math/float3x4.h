@@ -57,8 +57,8 @@ MATH_BEGIN_NAMESPACE
 	The elements for a single row of the matrix hold successive memory addresses. This is the same memory layout as
 	 with C++ multidimensional arrays.
 
-	Contrast this with column-major storage, in which the elements are packed in the memory in
-	order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
+ 	If preprocessor #define MATH_COLMAJOR_MATRICES is set, column-major storage is used instead, in which the elements
+ 	are packed in the memory in order m[0][0], m[1][0], m[2][0], m[3][0], m[0][1], m[1][1], ...
 	There the elements for a single column of the matrix hold successive memory addresses.
 	This is exactly opposite from the standard C++ multidimensional arrays, since if you have e.g.
 	int v[10][10], then v[0][9] comes in memory right before v[1][0]. ( [0][0], [0][1], [0][2], ... [1][0], [1][1], ...) */
@@ -75,9 +75,13 @@ public:
 	/** [noscript] */
 	union
 	{
+#ifdef MATH_COLMAJOR_MATRICES
+		float v[Cols][Rows];
+#else
 		float v[Rows][Cols];
 #if defined(MATH_SIMD)
 		simd4f row[3];
+#endif
 #endif
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -87,9 +91,16 @@ public:
 		// This gives human-readable names to the individual matrix elements:
 		struct
 		{
+#ifdef MATH_COLMAJOR_MATRICES
+			float scaleX, shearYx, shearZx;
+			float shearXy, scaleY, shearZy;
+			float shearXz, shearYz, scaleZ;
+			float x, y, z;
+#else
 			float  scaleX, shearXy, shearXz, x;
 			float shearYx,  scaleY, shearYz, y;
 			float shearZx, shearZy,  scaleZ, z;
+#endif
 		};
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -305,8 +316,9 @@ public:
 		@note MatrixProxy is a temporary helper class. Do not store references to it, but always
 		directly dereference it with the [] operator.
 		For example, m[0][3] Returns the last element on the first row, which is the amount
-		of translation in the x-direction. */
-	FORCE_INLINE MatrixProxy<Cols> &operator[](int row)
+	 	of translation in the x-direction. This is true independent of
+	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
+	FORCE_INLINE MatrixProxy<Rows, Cols> &operator[](int row)
 	{
 		assume(row >= 0);
 		assume(row < Rows);
@@ -314,10 +326,14 @@ public:
 		if (row < 0 || row >= Rows)
 			row = 0; // Benign failure, just give the first row.
 #endif
-		return *(reinterpret_cast<MatrixProxy<Cols>*>(v[row]));
+#ifdef MATH_COLMAJOR_MATRICES
+		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
 	}
 
-	FORCE_INLINE const MatrixProxy<Cols> &operator[](int row) const
+	FORCE_INLINE const MatrixProxy<Rows, Cols> &operator[](int row) const
 	{
 		assume(row >= 0);
 		assume(row < Rows);
@@ -326,7 +342,11 @@ public:
 			row = 0; // Benign failure, just give the first row.
 #endif
 		
-		return *(reinterpret_cast<const MatrixProxy<Cols>*>(v[row]));
+#ifdef MATH_COLMAJOR_MATRICES
+		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
 	}
 
 	/// Returns the given element. [noscript]
@@ -334,8 +354,24 @@ public:
 		If you have a non-const object, you can set values of this matrix through this
 		reference, using the notation m.At(row, col) = someValue; */
 	float &At(int row, int col);
-	CONST_WIN32 float At(int row, int col) const;
+	const float &At(int row, int col) const;
 
+#ifdef MATH_COLMAJOR_MATRICES
+	/// Returns the given column. [noscript]
+	/** @param col The zero-based index [0, 3] of the column to get. */
+	float3 &Col(int col);
+	const float3 &Col(int col) const;
+	
+	/// Returns the three first elements of the given column. [noscript]
+	/** @param col The zero-based index [0, 3] of the column to get. */
+	float3 &Col3(int col);
+	const float3 &Col3(int col) const;
+	
+	/// Returns the given row.
+	/** @param row The zero-based index [0, 2] of the row to get. */
+	CONST_WIN32 float4 Row(int row) const;
+	CONST_WIN32 float3 Row3(int row) const { return Row(row).xyz(); }
+#else
 	/// Returns the given row. [noscript]
 	/** @param row The zero-based index [0, 2] of the row to get. */
 	float4 &Row(int row);
@@ -350,6 +386,7 @@ public:
 	/** @param col The zero-based index [0, 3] of the column to get. */
 	CONST_WIN32 float3 Col(int col) const;
 	CONST_WIN32 float3 Col3(int col) const { return Col(col); }
+#endif
 
 	/// Returns the main diagonal.
 	/** The main diagonal consists of the elements at m[0][0], m[1][1], m[2][2]. */
