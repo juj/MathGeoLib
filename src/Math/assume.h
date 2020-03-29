@@ -214,9 +214,63 @@ MATH_END_NAMESPACE
 #ifdef assume
 #undef assume
 #endif
+#ifdef assume1
+#undef assume1
+#endif
+#ifdef assume2
+#undef assume2
+#endif
+#ifdef assume3
+#undef assume3
+#endif
+#ifdef assume4
+#undef assume4
+#endif
+#ifdef assert
+#undef assert
+#endif
+#ifdef assert1
+#undef assert1
+#endif
+#ifdef assert2
+#undef assert2
+#endif
+#ifdef assert3
+#undef assert3
+#endif
+#ifdef assert4
+#undef assert4
+#endif
 #ifdef mathassert
 #undef mathassert
 #endif
-#define assume(x) ((void)0)
-#define mathassert(x) ((void)0)
+#ifdef mathassert1
+#undef mathassert1
+#endif
+#ifdef mathassert2
+#undef mathassert2
+#endif
+#ifdef mathassert3
+#undef mathassert3
+#endif
+#ifdef mathassert4
+#undef mathassert4
+#endif
+
+#define assume(...) ((void)0)
+#define assume1(...) ((void)0)
+#define assume2(...) ((void)0)
+#define assume3(...) ((void)0)
+#define assume4(...) ((void)0)
+#define assert(...) ((void)0)
+#define assert1(...) ((void)0)
+#define assert2(...) ((void)0)
+#define assert3(...) ((void)0)
+#define assert4(...) ((void)0)
+#define mathassert(...) ((void)0)
+#define mathassert1(...) ((void)0)
+#define mathassert2(...) ((void)0)
+#define mathassert3(...) ((void)0)
+#define mathassert4(...) ((void)0)
+
 #endif
