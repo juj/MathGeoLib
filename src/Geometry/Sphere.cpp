@@ -612,7 +612,7 @@ int Sphere::Intersects(const LineSegment &l, vec *intersectionPoint, vec *inters
 	if (d2)
 		*d2 = t2 / lineLength;
 
-	return true;
+	return numIntersections;
 }
 
 bool Sphere::Intersects(const Plane &plane) const
