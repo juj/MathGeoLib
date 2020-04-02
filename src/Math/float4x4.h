@@ -446,6 +446,8 @@ public:
 	const float3x4 &Float3x4Part() const;
 #endif
 
+	void SetFloat3x4Part(const float3x4 &float3x4Part);
+
 	/// Returns the translation part.
 	/** The translation part is stored in the fourth column of this matrix.
 		This is equivalent to decomposing this matrix in the form M = T * M', i.e. this translation is applied last,

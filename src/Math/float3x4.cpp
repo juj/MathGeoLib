@@ -906,20 +906,20 @@ float3x4 &float3x4::operator =(const float3x4 &rhs)
 	row[1] = rhs.row[1];
 	row[2] = rhs.row[2];
 #else
-	v[0][0] = rhs.v[0][0];
-	v[0][1] = rhs.v[0][1];
-	v[0][2] = rhs.v[0][2];
-	v[0][3] = rhs.v[0][3];
+	At(0, 0) = rhs.At(0, 0);
+	At(0, 1) = rhs.At(0, 1);
+	At(0, 2) = rhs.At(0, 2);
+	At(0, 3) = rhs.At(0, 3);
 
-	v[1][0] = rhs.v[1][0];
-	v[1][1] = rhs.v[1][1];
-	v[1][2] = rhs.v[1][2];
-	v[1][3] = rhs.v[1][3];
+	At(1, 0) = rhs.At(1, 0);
+	At(1, 1) = rhs.At(1, 1);
+	At(1, 2) = rhs.At(1, 2);
+	At(1, 3) = rhs.At(1, 3);
 
-	v[2][0] = rhs.v[2][0];
-	v[2][1] = rhs.v[2][1];
-	v[2][2] = rhs.v[2][2];
-	v[2][3] = rhs.v[2][3];
+	At(2, 0) = rhs.At(2, 0);
+	At(2, 1) = rhs.At(2, 1);
+	At(2, 2) = rhs.At(2, 2);
+	At(2, 3) = rhs.At(2, 3);
 #endif
 
 	return *this;
@@ -1141,9 +1141,19 @@ void float3x4::Orthonormalize(int c0, int c1, int c2)
 void float3x4::RemoveScale()
 {
 	///\todo SSE.
+#ifdef MATH_COLMAJOR_MATRICES
+	float3 row0 = Row3(0);
+	float3 row1 = Row3(1);
+	float3 row2 = Row3(2);
+	float tx = row0.Normalize();
+	float ty = row1.Normalize();
+	float tz = row2.Normalize();
+#else
 	float tx = Row3(0).Normalize();
 	float ty = Row3(1).Normalize();
 	float tz = Row3(2).Normalize();
+#endif
+
 	assume(tx != 0 && ty != 0 && tz != 0 && "float3x4::RemoveScale failed!");
 	MARK_UNUSED(tx);
 	MARK_UNUSED(ty);

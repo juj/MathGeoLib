@@ -898,6 +898,13 @@ const float3x4 &float4x4::Float3x4Part() const
 }
 #endif
 
+void float4x4::SetFloat3x4Part(const float3x4 &float3x4Part)
+{
+	At(0, 0) = float3x4Part[0][0]; At(0, 1) = float3x4Part[0][1]; At(0, 2) = float3x4Part[0][2]; At(0, 3) = float3x4Part[0][3];
+	At(1, 0) = float3x4Part[1][0]; At(1, 1) = float3x4Part[1][1]; At(1, 2) = float3x4Part[1][2]; At(1, 3) = float3x4Part[1][3];
+	At(2, 0) = float3x4Part[2][0]; At(2, 1) = float3x4Part[2][1]; At(2, 2) = float3x4Part[2][2]; At(2, 3) = float3x4Part[2][3];
+}
+
 CONST_WIN32 float3 float4x4::TranslatePart() const
 {
 	return Col3(3);
@@ -1511,7 +1518,15 @@ bool float4x4::InverseColOrthogonal()
 {
 	///\todo SSE
 	assume(!ContainsProjection());
+#ifdef MATH_COLMAJOR_MATRICES
+	///\todo Optimize away redundant copies
+	float3x4 mat3x4 = Float3x4Part();
+	bool ret = mat3x4.InverseColOrthogonal();
+	SetFloat3x4Part(mat3x4);
+	return ret;
+#else
 	return Float3x4Part().InverseColOrthogonal();
+#endif
 }
 
 bool float4x4::InverseOrthogonalUniformScale()
@@ -1645,9 +1660,18 @@ void float4x4::Orthonormalize3(int c0, int c1, int c2)
 void float4x4::RemoveScale()
 {
 	///\todo SSE
+#ifdef MATH_COLMAJOR_MATRICES
+	float3 row0 = Row3(0);
+	float3 row1 = Row3(1);
+	float3 row2 = Row3(2);
+	float tx = row0.Normalize();
+	float ty = row1.Normalize();
+	float tz = row2.Normalize();
+#else
 	float tx = Row3(0).Normalize();
 	float ty = Row3(1).Normalize();
 	float tz = Row3(2).Normalize();
+#endif
 	assume(tx != 0 && ty != 0 && tz != 0 && "float4x4::RemoveScale failed!");
 	MARK_UNUSED(tx);
 	MARK_UNUSED(ty);
