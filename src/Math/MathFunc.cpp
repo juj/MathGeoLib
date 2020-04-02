@@ -170,7 +170,7 @@ void SinCos(float angleRadians, float &outSin, float &outCos)
 #endif
 }
 
-void __attribute__((noinline)) SinCosU16ScaledRadians(u16 u16ScaledRadians, float &outSin, float &outCos)
+void SinCosU16ScaledRadians(u16 u16ScaledRadians, float &outSin, float &outCos)
 {
 #ifdef MATH_USE_SINCOS_LOOKUPTABLE
 	return sincos_lookuptable_u16ScaledRadians(u16ScaledRadians, outSin, outCos);
