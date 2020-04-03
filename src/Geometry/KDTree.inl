@@ -462,6 +462,13 @@ inline void KdTree<T>::AABBQuery(const AABB &aabb, Func &leafCallback)
 	if (!aabb.Intersects(BoundingAABB()))
 		return;
 
+	// Process the degenerate case where the root node is a singular leaf node.
+	if (stack[0]->IsLeaf())
+	{
+		leafCallback(*this, *stack[0], aabb);
+		return;
+	}
+
 	while(stackSize > 0)
 	{
 		KdTreeNode *cur = stack[--stackSize];

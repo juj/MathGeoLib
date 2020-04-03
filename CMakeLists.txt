@@ -59,6 +59,8 @@ if (BUILD_FOR_GCOV OR MATH_TESTS_EXECUTABLE OR FAIL_USING_EXCEPTIONS) # TODO: Us
 endif()
 
 if (MATH_TESTS_EXECUTABLE)
+	# Tests use C++11 syntax. (at least for now the main library does not need to)
+	set (CMAKE_CXX_STANDARD 11)
 	add_executable(MathGeoLib ${sourceFiles} ${headerFiles})
 	if (EMSCRIPTEN)
 		set_target_properties(MathGeoLib PROPERTIES LINK_FLAGS "--js-library ${CMAKE_CURRENT_LIST_DIR}/src/emscripten/library_system.js -g")
