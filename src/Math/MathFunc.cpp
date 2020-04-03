@@ -69,14 +69,15 @@ bool AssumeFailed()
 #define MATH_USE_SINCOS_LOOKUPTABLE
 #endif
 
-#ifdef MATH_USE_SINCOS_LOOKUPTABLE
-
-// A lookup table implementation adapted from http://www.flipcode.com/archives/Fast_Trigonometry_Functions_Using_Lookup_Tables.shtml
 #define MAX_CIRCLE_ANGLE           65536
 #define HALF_MAX_CIRCLE_ANGLE     (MAX_CIRCLE_ANGLE/2)
 #define QUARTER_MAX_CIRCLE_ANGLE  (MAX_CIRCLE_ANGLE/4)
 #define MASK_MAX_CIRCLE_ANGLE     (MAX_CIRCLE_ANGLE - 1)
 #define PI                        3.14159265358979323846f
+
+#ifdef MATH_USE_SINCOS_LOOKUPTABLE
+
+// A lookup table implementation adapted from http://www.flipcode.com/archives/Fast_Trigonometry_Functions_Using_Lookup_Tables.shtml
 static float fast_cossin_table[MAX_CIRCLE_ANGLE];           // Declare table of fast cosinus and sinus
 
 class Init_fast_cossin_table
@@ -175,14 +176,14 @@ void SinCosU16ScaledRadians(u16 u16ScaledRadians, float &outSin, float &outCos)
 #ifdef MATH_USE_SINCOS_LOOKUPTABLE
 	return sincos_lookuptable_u16ScaledRadians(u16ScaledRadians, outSin, outCos);
 #elif defined(MATH_SSE2)
-	float angleRadians = u16ScaledRadians * PI / HALF_MAX_CIRCLE_ANGLE;
+	float angleRadians = u16ScaledRadians * (PI / HALF_MAX_CIRCLE_ANGLE);
 	__m128 angle = modf_ps(setx_ps(angleRadians), pi2);
 	__m128 sin, cos;
 	sincos_ps(angle, &sin, &cos);
 	outSin = s4f_x(sin);
 	outCos = s4f_x(cos);
 #else
-	float angleRadians = u16ScaledRadians * PI / HALF_MAX_CIRCLE_ANGLE;
+	float angleRadians = u16ScaledRadians * (PI / HALF_MAX_CIRCLE_ANGLE);
 	outSin = Sin(angleRadians);
 	outCos = Cos(angleRadians);
 #endif
