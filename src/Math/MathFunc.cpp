@@ -38,9 +38,18 @@
 #include "sse_mathfun.h"
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 MATH_BEGIN_NAMESPACE
 
-bool mathBreakOnAssume = false;
+bool mathBreakOnAssume =
+#ifdef MATH_STARTUP_BREAK_ON_ASSUME
+	true;
+#else
+	false;
+#endif
 
 void SetMathBreakOnAssume(bool isEnabled)
 {
@@ -55,12 +64,18 @@ bool MathBreakOnAssume()
 
 bool AssumeFailed()
 {
+#ifndef OPTIMIZED_RELEASE
 	if (mathBreakOnAssume)
 	{
 #if defined(WIN32) && !defined(WIN8RT) // Win8 metro apps don't have DebugBreak.
 		DebugBreak();
+#elif defined(__EMSCRIPTEN__)
+		emscripten_debugger();
+#elif __has_builtin(__builtin_debugtrap)
+		__builtin_debugtrap();
 #endif
 	}
+#endif
 	return mathBreakOnAssume;
 }
 

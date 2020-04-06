@@ -41,11 +41,22 @@
 #define ARRAY_LENGTH(x) (sizeof((x))/sizeof((x)[0]))
 #endif
 
+// MathGeoLib uses three types of runtime condition check macros:
+//  - assert(): the regular assert() check, that compiles out in release builds (when NDEBUG or OPTIMIZED_RELEASE is defined).
+//              Execution is aborted if an assert condition fails.
+//  - assume(): Performs a runtime condition check. If the check fails, prints out an error log entry. If MATH_ASSERT_ON_ASSUME
+//              is defined, behaves like assert(). (otherwise execution continues). If MathBreakOnAssume() is enabled, executes
+//              a statement on failure to invoke the system debugger. Unlike assert(), assume() macro checks are present in NDEBUG
+//              builds, but disabled in MATH_SILENT_ASSUME and OPTIMIZED_RELEASE modes.
+//  - mathassert(): Similar to assert(), but used internally by MathGeoLib to verify programming errors inside MathGeoLib implementation
+//              itself. MathAsserts are enabled if building with MATH_ASSERT_CORRECTNESS, otherwise disabled.
 // The assume() macro is used to check preconditions on the math-related functions, e.g. whether vectors are normalized, check that division by zero doesn't occur, orthonormal bases, and so on.
 
 // The assume() macro operates differently depending on which #defines are present:
 // #define FAIL_USING_EXCEPTIONS - the assume() macro throws an exception
 // #define MATH_ASSERT_ON_ASSUME - the assume() macro resolves to the assert() macro.
+// #define MATH_STARTUP_BREAK_ON_ASSUME - MathGeoLib execution will start with MathBreakOnAssume() behavior enabled, i.e. assume() failures
+//                                        will invoke the debugger. (this behavior can be controlled at runtime with SetMathBreakOnAssume(bool))
 // #define MATH_SILENT_ASSUME   - the assume() macro is silent, and disabled altogether. (no prints or breaks or anything, the checks by assume() are ignored)
 // If neither of the above is defined (default), then
 //  - WIN32: if MathBreakOnAssume() == true, the system will break to debugger using a call to DebugBreak().
