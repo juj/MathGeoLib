@@ -1,4 +1,4 @@
-/* Copyright Jukka Jyl‰nki
+/* Copyright Jukka Jyl√§nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file assume.h
-	@author Jukka Jyl‰nki
+       @author Jukka Jyl√§nki
 	@brief Global compilation defines. */
 #pragma once
 
@@ -44,8 +44,9 @@
 // The assume() macro is used to check preconditions on the math-related functions, e.g. whether vectors are normalized, check that division by zero doesn't occur, orthonormal bases, and so on.
 
 // The assume() macro operates differently depending on which #defines are present:
+// #define FAIL_USING_EXCEPTIONS - the assume() macro throws an exception
 // #define MATH_ASSERT_ON_ASSUME - the assume() macro resolves to the assert() macro.
-// #define MATH_DISABLE_ASSUME   - the assume() macro is silent, and disabled altogether. (no prints or breaks or anything, the checks by assume() are ignored)
+// #define MATH_SILENT_ASSUME   - the assume() macro is silent, and disabled altogether. (no prints or breaks or anything, the checks by assume() are ignored)
 // If neither of the above is defined (default), then
 //  - WIN32: if MathBreakOnAssume() == true, the system will break to debugger using a call to DebugBreak().
 //  - Other: if MathBreakOnAssume() == true, the assume() macro is equal to the assert() macro.
@@ -143,7 +144,10 @@ MATH_END_NAMESPACE
 #define assume(x) ((void)0)
 #define assume_failed(message) ((void)0)
 #else
-#define assume_failed(message) LOGE("Assumption \"%s\" failed! in file %s, line %d!", message, __FILE__, __LINE__)
+#define assume_failed(message) do { \
+		LOGE("Assumption \"%s\" failed! in file %s, line %d!", message, __FILE__, __LINE__); \
+		AssumeFailed(); \
+	} while (0)
 #endif
 
 #ifndef assume
