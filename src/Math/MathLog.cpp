@@ -117,20 +117,26 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 	if (channel == MathLogError || channel == MathLogErrorNoCallstack)
 	{
 		fprintf(stderr, "Error: %s\n", str);
+#ifndef __EMSCRIPTEN__
 		if (channel != MathLogErrorNoCallstack)
 		{
 			std::string callstack = GetCallstack("  ", "PrintToConsole");
 			fprintf(stderr, "%s", callstack.c_str());
 		}
+#endif
 	}
 	else if (channel == MathLogWarning || channel == MathLogWarningNoCallstack)
 	{
+#ifdef __EMSCRIPTEN__
+		fprintf(stderr, "Warning: %s\n", str);
+#else
 		printf("Warning: %s\n", str);
 		if (channel != MathLogWarningNoCallstack)
 		{
 			std::string callstack = GetCallstack("  ", "PrintToConsole");
 			printf("%s", callstack.c_str());
 		}
+#endif
 	}
 	else
 		printf("%s\n", str);
