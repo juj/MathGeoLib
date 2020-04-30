@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #include "Callstack.h"
+#include "MathFunc.h"
 
 #if defined(WIN32) || defined(WIN8PHONE)
 #include "../Math/InclWindows.h"
