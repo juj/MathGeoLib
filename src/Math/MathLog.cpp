@@ -133,6 +133,16 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 	}
 	else
 		printf("%s\n", str);
+
+#if defined(BREAK_ON_ERROR_PRINTS) || defined(BREAK_ON_WARNING_PRINTS)
+	if (channel == MathLogError)
+		AssumeFailed();
+#endif
+
+#ifdef BREAK_ON_WARNING_PRINTS
+	if (channel == MathLogWarning)
+		AssumeFailed();
+#endif
 }
 
 #endif

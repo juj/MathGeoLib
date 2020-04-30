@@ -76,6 +76,9 @@ bool AssumeFailed()
 #endif
 	}
 #endif
+	// If your debugger is breaking in this function, it means that an assume() failure has occurred,
+	// or a LOGE()/LOGW() failure has occurred, and building with trap-to-debugger enabled. Navigate
+	// up the callstack to find the offending code that raised the error.
 	return mathBreakOnAssume;
 }
 
