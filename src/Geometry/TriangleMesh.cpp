@@ -204,9 +204,9 @@ TriangleMesh &TriangleMesh::operator =(const TriangleMesh &rhs)
 	return *this;
 }
 
-void TriangleMesh::Set(const Polyhedron &polyhedron)
+void TriangleMesh::SetConvex(const Polyhedron &polyhedron)
 {
-	TriangleArray tris = polyhedron.Triangulate();
+	TriangleArray tris = polyhedron.TriangulateConvex();
 	if (!tris.empty())
 	{
 		int alignment = (simdCapability == SIMD_AVX) ? 8 : ((simdCapability == SIMD_SSE41 || simdCapability == SIMD_SSE2) ? 4 : 1);

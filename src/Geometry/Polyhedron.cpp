@@ -3150,7 +3150,7 @@ int Polyhedron::FindClosestVertex(const vec &pt, float &outDistanceSq) const
 	return closestI;
 }
 
-TriangleArray Polyhedron::Triangulate() const
+TriangleArray Polyhedron::TriangulateConvex() const
 {
 	TriangleArray outTriangleList;
 	for(int i = 0; i < NumFaces(); ++i)
@@ -3202,7 +3202,7 @@ void Polyhedron::DumpStructure() const
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-void Polyhedron::Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart, int faceEnd) const
+void Polyhedron::TriangulateConvex(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart, int faceEnd) const
 {
 	for(int i = faceStart; i < Min(NumFaces(), faceEnd); ++i)
 	{

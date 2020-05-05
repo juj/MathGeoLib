@@ -455,13 +455,13 @@ public:
 	///         Returns -1 if no such point is found. (no vertices in polyhedron, or all of them contained NaNs/Infs)
 	int FindClosestVertex(const vec &pt, float &outDistanceSq) const;
 
-	TriangleArray Triangulate() const;
+	TriangleArray TriangulateConvex() const;
 
 	std::string ToString() const;
 	void DumpStructure() const;
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP
-	void Triangulate(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart = 0, int faceEnd = 0x7FFFFFFF) const;
+	void TriangulateConvex(VertexBuffer &vb, bool ccwIsFrontFacing, int faceStart = 0, int faceEnd = 0x7FFFFFFF) const;
 	void ToLineList(VertexBuffer &vb) const;
 #endif
 };

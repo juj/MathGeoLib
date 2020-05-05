@@ -41,7 +41,7 @@ public:
 	void Set(const float3 *triangleMesh, int numTris) { Set(reinterpret_cast<const float *>(triangleMesh), numTris, sizeof(float3)); }
 	void Set(const Triangle *triangleMesh, int numTris) { Set(reinterpret_cast<const float *>(triangleMesh), numTris, sizeof(Triangle)/3); }
 
-	void Set(const Polyhedron &polyhedron);
+	void SetConvex(const Polyhedron &polyhedron);
 
 	float IntersectRay(const Ray &ray) const;
 	float IntersectRay_TriangleIndex(const Ray &ray, int &outTriangleIndex) const;
