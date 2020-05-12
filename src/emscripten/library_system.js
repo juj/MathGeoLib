@@ -1,9 +1,4 @@
 mergeInto(LibraryManager.library, {
-    is_ie_11_developer_preview: function() {
-      var ua = window.navigator.userAgent;
-      return ua.indexOf("Trident/7.0") >= 0 && ua.indexOf("rv:11.0") >= 0;
-    },
-
     browser_info: function () {
         var idstr = "";
         if (typeof navigator !== "undefined") {

@@ -103,19 +103,8 @@ bool IsSafariBrowser();
 extern "C"
 {
 	extern const char *browser_info(void);
-	extern bool is_ie_11_developer_preview(void);
-}
-
-inline bool IsIE11DeveloperPreview()
-{
-	static int isIE11DeveloperPreview = -1;
-	if (isIE11DeveloperPreview == -1) // Only do this check once, and cache the result for performance.
-		isIE11DeveloperPreview = is_ie_11_developer_preview() ? 1 : 0;
-	return isIE11DeveloperPreview != 0;
 }
 
 inline std::string GetOSDisplayString() { return browser_info(); }
 
-#else
-inline bool IsIE11DeveloperPreview() { return false; }
 #endif
