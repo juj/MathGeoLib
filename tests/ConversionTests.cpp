@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include "../src/Math/SSEMath.h"
+#include "../src/Math/BitFuncs.h"
 
 MATH_IGNORE_UNUSED_VARS_WARNING
 
@@ -135,15 +136,7 @@ int U32ToString_SSE(u32 i, char *str)
 	ones = _mm_or_si128(_mm_slli_si128(ones, 2), ones);
 	ones = _mm_or_si128(_mm_slli_si128(ones, 1), ones);
 	unsigned int onesBits = (unsigned int)_mm_movemask_epi8(ones);
-	unsigned long shift;
-#ifdef _MSC_VER
-	if (onesBits != 0)
-		_BitScanForward(&shift, onesBits);
-	else
-		shift = 0;
-#else
-	shift = (onesBits != 0) ? __builtin_ctz(onesBits) : 0;
-#endif
+	unsigned long shift = CountTrailingZeroes32(onesBits);
 	_mm_maskmoveu_si128(lo, ones, str-shift);
 	int len = 16-shift;
 	str[len] = '\0';
