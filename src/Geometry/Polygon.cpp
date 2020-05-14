@@ -295,7 +295,12 @@ Plane Polygon::PlaneCCW() const
 			}
 
 #ifndef MATH_SILENT_ASSUME
+#ifdef MATH_ENABLE_STL_SUPPORT
 		LOGW("Polygon contains %d points, but they are all collinear! Cannot form a plane for the Polygon using three points! %s", (int)p.size(), this->SerializeToString().c_str());
+#else
+		// TODO: enable above
+		LOGW("Polygon contains %d points, but they are all collinear! Cannot form a plane for the Polygon using three points!", (int)p.size());
+#endif
 #endif
 		// Polygon contains multiple points, but they are all collinear.
 		// Pick an arbitrary plane along the line as the polygon plane (as if the polygon had only two points)
@@ -992,7 +997,8 @@ bool IsAnEar(const std::vector<float2> &poly, int i, int j)
 	The running time of this function is O(n^2). */
 TriangleArray Polygon::Triangulate() const
 {
-	assume1(IsPlanar(), this->SerializeToString());
+	assume(IsPlanar());
+//	assume1(IsPlanar(), this->SerializeToString()); // TODO: enable
 
 	TriangleArray t;
 	// Handle degenerate cases.
@@ -1072,6 +1078,7 @@ AABB Polygon::MinimalEnclosingAABB() const
 	return aabb;
 }
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 std::string Polygon::ToString() const
 {
 	if (p.empty())
@@ -1098,6 +1105,7 @@ std::string Polygon::SerializeToString() const
 	ss << ")";
 	return ss.str();
 }
+#endif
 
 Polygon Polygon::FromString(const char *str, const char **outEndStr)
 {

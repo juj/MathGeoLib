@@ -61,28 +61,6 @@ float2::float2(const float *data)
 	y = data[1];
 }
 
-CONST_WIN32 float float2::At(int index) const
-{
-	assume(index >= 0);
-	assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (index < 0 || index >= Size)
-		return FLOAT_NAN;
-#endif
-	return ptr()[index];
-}
-
-float &float2::At(int index)
-{
-	assume(index >= 0);
-	assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (index < 0 || index >= Size)
-		return ptr()[0];
-#endif
-	return ptr()[index];
-}
-
 float2 float2::Swizzled(int i, int j) const
 {
 	return float2(At(i), At(j));
@@ -238,15 +216,15 @@ bool IsNeutralCLocale()
 	return true;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string float2::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT float2::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%f, %f)", x, y);
-	return std::string(str);
+	return str;
 }
 
-std::string float2::SerializeToString() const
+StringT float2::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(x, str); *s = ','; ++s;
@@ -256,7 +234,7 @@ std::string float2::SerializeToString() const
 	return str;
 }
 
-std::string float2::SerializeToCodeString() const
+StringT float2::SerializeToCodeString() const
 {
 	return "float2(" + SerializeToString() + ")";
 }
@@ -706,6 +684,14 @@ float2 float2::operator /(float scalar) const
 {
 	float invScalar = 1.f / scalar;
 	return float2(x * invScalar, y * invScalar);
+}
+
+float2 &float2::operator =(const float2 &rhs)
+{
+	x = rhs.x;
+	y = rhs.y;
+	
+	return *this;
 }
 
 float2 &float2::operator +=(const float2 &rhs)

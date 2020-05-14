@@ -70,12 +70,12 @@ vec TranslateOp::Offset() const
 	return offset;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string TranslateOp::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT TranslateOp::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.3f, %.3f, %.3f)", offset.x, offset.y, offset.z);
-	return std::string(str);
+	return str;
 }
 #endif
 
@@ -286,12 +286,12 @@ vec ScaleOp::Offset() const
 	return scale;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string ScaleOp::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT ScaleOp::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.3f, %.3f, %.3f)", scale.x, scale.y, scale.z);
-	return std::string(str);
+	return str;
 }
 #endif
 

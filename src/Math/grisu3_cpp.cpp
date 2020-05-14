@@ -6,6 +6,7 @@
 	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
 
 #include "grisu3.h"
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #include <assert.h>
 
@@ -18,3 +19,4 @@ std::string dtoa_grisu3_string(double v)
 	((void)len);
 	return str;
 }
+#endif

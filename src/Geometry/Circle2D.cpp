@@ -285,8 +285,8 @@ float2 Circle2D::RandomPointInside(LCG &lcg)
 	return pos;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Circle2D::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT Circle2D::ToString() const
 {
 	char str[256];
 	sprintf(str, "Circle2D(pos:(%.2f, %.2f) r:%.2f)",

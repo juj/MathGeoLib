@@ -356,15 +356,15 @@ Line operator *(const Quat &transform, const Line &l)
 	return Line(transform * l.pos, transform * l.dir);
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Line::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT Line::ToString() const
 {
 	char str[256];
 	sprintf(str, "Line(Pos:(%.2f, %.2f, %.2f) Dir:(%.3f, %.3f, %.3f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
 }
 
-std::string Line::SerializeToString() const
+StringT Line::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(pos.x, str); *s = ','; ++s;
@@ -378,10 +378,13 @@ std::string Line::SerializeToString() const
 	return str;
 }
 
-std::string Line::SerializeToCodeString() const
+StringT Line::SerializeToCodeString() const
 {
 	return "Line(" + pos.SerializeToCodeString() + "," + dir.SerializeToCodeString() + ")";
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const Line &line)
 {

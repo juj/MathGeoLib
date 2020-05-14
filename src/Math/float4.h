@@ -24,6 +24,7 @@
 #include <vector>
 #endif
 #include "../MathGeoLibFwd.h"
+#include "MathConstants.h"
 #include "float3.h"
 #include "SSEMath.h"
 #include "assume.h"
@@ -86,12 +87,8 @@ public:
 		@see x, y, z, w. */
 	float4() {}
 
-#ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float4 copy constructor.
-	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up
-		this function for script bindings. */
-	float4(const float4 &rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
-#endif
+	float4(const float4 &rhs) { Set(rhs); }
 
 	/// Constructs a new float4 with the value (x, y, z, w).
 	/** @note If you are constructing a float4 from an array of consecutive values, always prefer calling "float4(ptr);" instead of "float4(ptr[0], ptr[1], ptr[2], ptr[3]);"
@@ -134,15 +131,34 @@ public:
 	/** @param index The element to get. Pass in 0 for x, 1 for y, 2 for z and 3 for w.
 		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec[1] = 10.f; would set the y-component of this vector. */
-	float &operator [](int index) { return At(index); }
-	CONST_WIN32 float operator [](int index) const { return At(index); }
+	FORCE_INLINE float &operator [](int index) { return At(index); }
+	FORCE_INLINE CONST_WIN32 float operator [](int index) const { return At(index); }
 
 	/// Accesses an element of this vector.
 	/** @param index The element to get. Pass in 0 for x, 1 for y, 2 for z and 3 for w.
 		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec.At(1) = 10.f; would set the y-component of this vector. */
-	float &At(int index);
-	CONST_WIN32 float At(int index) const;
+	FORCE_INLINE CONST_WIN32 float At(int index) const
+	{
+		assume(index >= 0);
+		assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (index < 0 || index >= Size)
+			return FLOAT_NAN;
+#endif
+		return ptr()[index];
+	}
+	
+	FORCE_INLINE float &At(int index)
+	{
+		assume(index >= 0);
+		assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (index < 0 || index >= Size)
+			return ptr()[0];
+#endif
+		return ptr()[index];
+	}
 
 	/// Adds two vectors. [indexTitle: operators +,-,*,/]
 	/** This function is identical to the member function Add().
@@ -171,6 +187,10 @@ public:
 
 	/// Unary operator + allows this structure to be used in an expression '+x'.
 	float4 operator +() const { return *this; }
+
+	/// Assigns a vector to another.
+	/** @return A reference to this. */
+	float4 &operator =(const float4 &v);
 
 	/// Adds a vector to this vector, in-place. [indexTitle: operators +=,-=,*=,/=]
 	/** @return A reference to this. */
@@ -506,22 +526,20 @@ public:
 	static MUST_USE_RESULT bool AreOrthonormal(const float4 &a, const float4 &b, float epsilon = 1e-3f);
 	static MUST_USE_RESULT bool AreOrthonormal(const float4 &a, const float4 &b, const float4 &c, float epsilon = 1e-3f);
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns "(x, y, z, w)".
-	std::string ToString() const;
+	StringT ToString() const;
 
 	/// Returns "x,y,z,w". This is the preferred format for the float4 if it has to be serialized to a string for machine transfer.
-	std::string SerializeToString() const;
+	StringT SerializeToString() const;
 
 	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
-	std::string SerializeToCodeString() const;
+	StringT SerializeToCodeString() const;
+	static float4 FromString(const StringT &str) { return FromString(str.c_str()); }
 #endif
 
 	/// Parses a string that is of form "x,y,z,w" or "(x,y,z,w)" or "(x;y;z;w)" or "x y z w" to a new float4.
 	static float4 FromString(const char *str, const char **outEndStr = 0);
-#ifdef MATH_ENABLE_STL_SUPPORT
-	static float4 FromString(const std::string &str) { return FromString(str.c_str()); }
-#endif
 
 	/// @return x + y + z + w.
 	float SumOfElements() const;

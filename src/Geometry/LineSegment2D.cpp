@@ -505,8 +505,8 @@ LineSegment2D operator *(const Quat &transform, const LineSegment2D &l)
 }
 #endif
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string LineSegment2D::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT LineSegment2D::ToString() const
 {
 	char str[256];
 	sprintf(str, "LineSegment2D(a:(%.2f, %.2f) b:(%.2f, %.2f))",
@@ -514,7 +514,7 @@ std::string LineSegment2D::ToString() const
 	return str;
 }
 
-std::string LineSegment2D::SerializeToString() const
+StringT LineSegment2D::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
@@ -526,10 +526,13 @@ std::string LineSegment2D::SerializeToString() const
 	return str;
 }
 
-std::string LineSegment2D::SerializeToCodeString() const
+StringT LineSegment2D::SerializeToCodeString() const
 {
 	return "LineSegment2D(" + a.SerializeToCodeString() + "," + b.SerializeToCodeString() + ")";
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const LineSegment2D &lineSegment)
 {

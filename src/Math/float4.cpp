@@ -132,28 +132,6 @@ float4::float4(const float *data)
 #endif
 }
 
-CONST_WIN32 float float4::At(int index) const
-{
-	assume(index >= 0);
-	assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (index < 0 || index >= Size)
-		return FLOAT_NAN;
-#endif
-	return ptr()[index];
-}
-
-float &float4::At(int index)
-{
-	assume(index >= 0);
-	assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (index < 0 || index >= Size)
-		return ptr()[0];
-#endif
-	return ptr()[index];
-}
-
 float2 float4::xy() const
 {
 	return float2(x, y);
@@ -527,15 +505,15 @@ bool float4::IsPerpendicular(const float4 &other, float epsilonSq) const
 
 bool IsNeutralCLocale();
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string float4::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT float4::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.3f, %.3f, %.3f, %.3f)", x, y, z, w);
-	return std::string(str);
+	return str;
 }
 
-std::string float4::SerializeToString() const
+StringT float4::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(x, str); *s = ','; ++s;
@@ -547,7 +525,7 @@ std::string float4::SerializeToString() const
 	return str;
 }
 
-std::string float4::SerializeToCodeString() const
+StringT float4::SerializeToCodeString() const
 {
 	return "float4(" + SerializeToString() + ")";
 }
@@ -1352,6 +1330,20 @@ float4 float4::operator /(float scalar) const
 	float invScalar = 1.f / scalar;
 	return float4(x * invScalar, y * invScalar, z * invScalar, w * invScalar);
 #endif
+}
+
+float4 &float4::operator =(const float4 &rhs)
+{
+#ifdef MATH_AUTOMATIC_SSE
+	v = rhs.v;
+#else
+	x = rhs.x;
+	y = rhs.y;
+	z = rhs.z;
+	w = rhs.w;
+#endif
+	
+	return *this;
 }
 
 float4 &float4::operator +=(const float4 &rhs)

@@ -279,20 +279,19 @@ public:
 	bool Intersects(const Frustum &frustum) const;
 	bool Intersects(const Polyhedron &polyhedron) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a human-readable representation of this Capsule. Most useful for debugging purposes.
 	/** The returned string specifies the line segment and the radius of this Capsule. */
-	std::string ToString() const;
-	std::string SerializeToString() const;
+	StringT ToString() const;
+	StringT SerializeToString() const;
 
 	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
-	std::string SerializeToCodeString() const;
+	StringT SerializeToCodeString() const;
+
+	static Capsule FromString(const StringT &str) { return FromString(str.c_str()); }
 #endif
 
 	static Capsule FromString(const char *str, const char **outEndStr = 0);
-#ifdef MATH_ENABLE_STL_SUPPORT
-	static Capsule FromString(const std::string &str) { return FromString(str.c_str()); }
-#endif
 
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }

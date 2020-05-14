@@ -1387,8 +1387,8 @@ Sphere Sphere::FitThroughPoints(const vec &a, const vec &b, const vec &c, const 
 	return sphere;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Sphere::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT Sphere::ToString() const
 {
 	char str[256];
 	sprintf(str, "Sphere(pos:(%.2f, %.2f, %.2f) r:%.2f)",
@@ -1396,7 +1396,7 @@ std::string Sphere::ToString() const
 	return str;
 }
 
-std::string Sphere::SerializeToString() const
+StringT Sphere::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(pos.x, str); *s = ','; ++s;
@@ -1408,12 +1408,15 @@ std::string Sphere::SerializeToString() const
 	return str;
 }
 
-std::string Sphere::SerializeToCodeString() const
+StringT Sphere::SerializeToCodeString() const
 {
 	char str[256];
 	sprintf(str, "%.9g", r);
 	return "Sphere(" + pos.SerializeToCodeString() + "," + str + ")";
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
 {

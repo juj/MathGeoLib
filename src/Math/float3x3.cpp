@@ -356,40 +356,6 @@ float3x3 float3x3::OrthographicProjectionXY()
 	return v;
 }
 
-MatrixProxy<float3x3::Rows, float3x3::Cols> &float3x3::operator[](int row)
-{
-	assume(row >= 0);
-	assume(row < Rows);
-
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
-#endif
-
-#ifdef MATH_COLMAJOR_MATRICES
-	return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
-#else
-	return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(v[row]));
-#endif
-}
-
-const MatrixProxy<float3x3::Rows, float3x3::Cols> &float3x3::operator[](int row) const
-{
-	assume(row >= 0);
-	assume(row < Rows);
-
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first row.
-#endif
-
-#ifdef MATH_COLMAJOR_MATRICES
-	return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
-#else
-	return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(v[row]));
-#endif
-}
-
 float &float3x3::At(int row, int col)
 {
 	assume(row >= 0);
@@ -1518,8 +1484,8 @@ bool float3x3::Equals(const float3x3 &other, float epsilon) const
 	return true;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string float3x3::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT float3x3::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f) (%.2f, %.2f, %.2f)",
@@ -1527,10 +1493,10 @@ std::string float3x3::ToString() const
 		At(1, 0), At(1, 1), At(1, 2),
 		At(2, 0), At(2, 1), At(2, 2));
 
-	return std::string(str);
+	return str;
 }
 
-std::string float3x3::SerializeToString() const
+StringT float3x3::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(At(0, 0), str); *s = ','; ++s;
@@ -1547,7 +1513,7 @@ std::string float3x3::SerializeToString() const
 	return str;
 }
 
-std::string float3x3::ToString2() const
+StringT float3x3::ToString2() const
 {
 	char str[256];
 	sprintf(str, "float3x3(X:(%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f)",
@@ -1555,7 +1521,7 @@ std::string float3x3::ToString2() const
 		At(0, 1), At(1, 1), At(2, 1),
 		At(0, 2), At(1, 2), At(2, 2));
 
-	return std::string(str);
+	return str;
 }
 #endif
 

@@ -1,5 +1,3 @@
-#include <string>
-
 #include "SystemInfo.h"
 
 #if defined(LINUX) || defined(__APPLE__) || defined(ANDROID)
@@ -77,7 +75,9 @@ std::string FindLine(const std::string &inStr, const char *lineStart)
 #include <tchar.h>
 #include <stdio.h>
 
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <sstream>
+#endif
 #include <iostream>
 
 #ifdef _MSC_VER

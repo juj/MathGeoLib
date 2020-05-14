@@ -24,6 +24,8 @@
 #endif
 
 #include "../MathGeoLibFwd.h"
+#include "MathConstants.h"
+#include "assume.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector3D>
@@ -68,12 +70,8 @@ public:
 		@see x, y, z. */
 	float3() {}
 
-#ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float3 copy constructor.
-	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up
-		this function for script bindings. */
 	float3(const float3 &rhs) { x = rhs.x; y = rhs.y; z = rhs.z; }
-#endif
 
 	/// Constructs a new float3 with the value (x, y, z).
 	/** @see x, y, z. */
@@ -109,16 +107,35 @@ public:
 		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec[1] = 10.f; would set the y-component of this vector.
 		@see ptr(), At(). */
-	float &operator [](int index) { return At(index); }
-	CONST_WIN32 float operator [](int index) const { return At(index); }
+	FORCE_INLINE float &operator [](int index) { return At(index); }
+	FORCE_INLINE CONST_WIN32 float operator [](int index) const { return At(index); }
 
 	/// Accesses an element of this vector.
 	/** @param index The element to get. Pass in 0 for x, 1 for y, and 2 for z.
 		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec.At(1) = 10.f; would set the y-component of this vector.
 		@see ptr(), operator [](). */
-	float &At(int index);
-	CONST_WIN32 float At(int index) const;
+	FORCE_INLINE CONST_WIN32 float At(int index) const
+	{
+		assume(index >= 0);
+		assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (index < 0 || index >= Size)
+			return FLOAT_NAN;
+#endif
+		return ptr()[index];
+	}
+	
+	FORCE_INLINE float &At(int index)
+	{
+		assume(index >= 0);
+		assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (index < 0 || index >= Size)
+			return ptr()[0];
+#endif
+		return ptr()[index];
+	}
 
 	/// Adds two vectors. [indexTitle: operators +,-,*,/]
 	/** This function is identical to the member function Add().
@@ -143,6 +160,9 @@ public:
 	/// Unary operator + allows this structure to be used in an expression '+x'.
 	float3 operator +() const { return *this; }
 
+	/// Assigns a vector to another.
+	/** @return A reference to this. */
+	float3 &operator =(const float3 &v);
 	/// Adds a vector to this vector, in-place. [indexTitle: operators +=,-=,*=,/=]
 	/** @return A reference to this. */
 	float3 &operator +=(const float3 &v);
@@ -410,22 +430,20 @@ public:
 	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
 	bool BitEquals(const float3 &other) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns "(x, y, z)".
-	std::string ToString() const;
+	StringT ToString() const;
 
 	/// Returns "x,y,z". This is the preferred format for the float3 if it has to be serialized to a string for machine transfer.
-	std::string SerializeToString() const;
+	StringT SerializeToString() const;
 
 	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
-	std::string SerializeToCodeString() const;
+	StringT SerializeToCodeString() const;
+	static MUST_USE_RESULT float3 FromString(const StringT &str) { return FromString(str.c_str()); }
 #endif
 
 	/// Parses a string that is of form "x,y,z" or "(x,y,z)" or "(x;y;z)" or "x y z" to a new float3.
 	static MUST_USE_RESULT float3 FromString(const char *str, const char **outEndStr = 0);
-#ifdef MATH_ENABLE_STL_SUPPORT
-	static MUST_USE_RESULT float3 FromString(const std::string &str) { return FromString(str.c_str()); }
-#endif
 
 	/// @return x + y + z.
 	float SumOfElements() const;

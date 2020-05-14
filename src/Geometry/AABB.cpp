@@ -1209,14 +1209,14 @@ void AABB::ToEdgeList(vec *outPos) const
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
-std::string AABB::ToString() const
+StringT AABB::ToString() const
 {
 	char str[256];
 	sprintf(str, "AABB(Min:(%.2f, %.2f, %.2f) Max:(%.2f, %.2f, %.2f))", minPoint.x, minPoint.y, minPoint.z, maxPoint.x, maxPoint.y, maxPoint.z);
 	return str;
 }
 
-std::string AABB::SerializeToString() const
+StringT AABB::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(minPoint.x, str); *s = ','; ++s;
@@ -1230,7 +1230,7 @@ std::string AABB::SerializeToString() const
 	return str;
 }
 
-std::string AABB::SerializeToCodeString() const
+StringT AABB::SerializeToCodeString() const
 {
 	return "AABB(" + minPoint.SerializeToCodeString() + "," + maxPoint.SerializeToCodeString() + ")";
 }

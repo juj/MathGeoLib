@@ -180,7 +180,7 @@ public:
 	bool IntersectsDisc(const LineSegment &lineSegment) const;
 	bool IntersectsDisc(const Ray &ray) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Tests if this circle intersects the faces of the given OBB.
 	/** @param obb The bounding box to test against. This box is treated as "hollow", i.e. only the faces of the OBB are considered to be
 			a part of the OBB.
@@ -193,7 +193,7 @@ public:
 
 	/// Returns a human-readable representation of this circle. Most useful for debugging purposes.
 	/** The returned string specifies the center position, normal direction and the radius of this circle. */
-	std::string ToString() const;
+	StringT ToString() const;
 #endif
 
 #ifdef MATH_QT_INTEROP

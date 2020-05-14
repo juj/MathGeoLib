@@ -131,11 +131,7 @@ public:
 	/** [opaque-qtscript] */
 	float3x3() {}
 
-#ifdef MATH_EXPLICIT_COPYCTORS
-	/// The copy-ctor for float3x3 is the trivial copy-ctor, but it is explicitly written to be able to automatically
-	/// pick up this function for QtScript bindings.
 	float3x3(const float3x3 &rhs) { Set(rhs); }
-#endif
 
 	/// Constructs a new float3x3 by explicitly specifying all the matrix elements.
 	/// The elements are specified in row-major format, i.e. the first row first followed by the second and third row.
@@ -297,8 +293,39 @@ public:
 		directly dereference it with the [] operator.
 		For example, m[0][2] Returns the last element on the first row. This is true independent of
 	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
-	MatrixProxy<Rows, Cols> &operator[](int row);
-	const MatrixProxy<Rows, Cols> &operator[](int row) const;
+	FORCE_INLINE MatrixProxy<Rows, Cols> &operator[](int row)
+	{
+		assume(row >= 0);
+		assume(row < Rows);
+		
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (row < 0 || row >= Rows)
+			row = 0; // Benign failure, just give the first row.
+#endif
+		
+#ifdef MATH_COLMAJOR_MATRICES
+		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
+	}
+	
+	FORCE_INLINE const MatrixProxy<Rows, Cols> &operator[](int row) const
+	{
+		assume(row >= 0);
+		assume(row < Rows);
+		
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (row < 0 || row >= Rows)
+			row = 0; // Benign failure, just give the first row.
+#endif
+		
+#ifdef MATH_COLMAJOR_MATRICES
+		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
+	}
 
 	/// Returns the given element. [noscript]
 	/** This function returns the element of this matrix at (row, col)==(i, j)==(y, x).
@@ -657,12 +684,12 @@ public:
 	/// Returns true if this float3x3 is equal to the given float3x3, up to given per-element epsilon.
 	bool Equals(const float3x3 &other, float epsilon = 1e-3f) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns "(m00, m01, m02; m10, m11, m12; m20, m21, m22)".
-	std::string ToString() const;
-	std::string SerializeToString() const;
+	StringT ToString() const;
+	StringT SerializeToString() const;
 
-	std::string ToString2() const;
+	StringT ToString2() const;
 #endif
 
 	/// Extracts the rotation part of this matrix into Euler rotation angles (in radians). [indexTitle: ToEuler***]

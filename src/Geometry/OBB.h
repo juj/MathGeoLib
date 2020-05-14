@@ -501,20 +501,18 @@ public:
 		return 4*3*2;
 	}
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a human-readable representation of this OBB. Most useful for debugging purposes.
 	/** The returned string specifies the center point and the half-axes of this OBB. */
-	std::string ToString() const;
-	std::string SerializeToString() const;
+	StringT ToString() const;
+	StringT SerializeToString() const;
 
 	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
-	std::string SerializeToCodeString() const;
+	StringT SerializeToCodeString() const;
+	static OBB FromString(const StringT &str) { return FromString(str.c_str()); }
 #endif
 
 	static OBB FromString(const char *str, const char **outEndStr = 0);
-#ifdef MATH_ENABLE_STL_SUPPORT
-	static OBB FromString(const std::string &str) { return FromString(str.c_str()); }
-#endif
 
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }

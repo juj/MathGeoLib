@@ -2821,8 +2821,8 @@ bool OBB::Intersects(const Polyhedron &polyhedron) const
 	return polyhedron.Intersects(*this);
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string OBB::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT OBB::ToString() const
 {
 	char str[256];
 	sprintf(str, "OBB(Pos:(%.2f, %.2f, %.2f) Halfsize:(%.2f, %.2f, %.2f) X:(%.2f, %.2f, %.2f) Y:(%.2f, %.2f, %.2f) Z:(%.2f, %.2f, %.2f))",
@@ -2830,9 +2830,9 @@ std::string OBB::ToString() const
 	return str;
 }
 
-std::string OBB::SerializeToString() const
+StringT OBB::SerializeToString() const
 {
-	std::string s = pos.xyz().SerializeToString() + " "
+	StringT s = pos.xyz().SerializeToString() + " "
 	              + r.xyz().SerializeToString() + " "
 	              + axis[0].xyz().SerializeToString() + " "
 	              + axis[1].xyz().SerializeToString() + " "
@@ -2840,7 +2840,7 @@ std::string OBB::SerializeToString() const
 	return s;
 }
 
-std::string OBB::SerializeToCodeString() const
+StringT OBB::SerializeToCodeString() const
 {
 	return "OBB(" + pos.SerializeToCodeString() + ","
 	              + r.SerializeToCodeString() + ","
@@ -2848,6 +2848,9 @@ std::string OBB::SerializeToCodeString() const
 	              + axis[1].SerializeToCodeString() + ","
 	              + axis[2].SerializeToCodeString() + ")";
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const OBB &obb)
 {

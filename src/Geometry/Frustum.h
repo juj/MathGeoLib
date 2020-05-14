@@ -627,11 +627,11 @@ public:
 	void DeserializeFromXml(TiXmlElement *e);
 #endif
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.
-	std::string ToString() const;
+	StringT ToString() const;
 	 ///\todo Implement this properly.
-	std::string SerializeToString() const { return ToString(); }
+	StringT SerializeToString() const { return ToString(); }
 #endif
 #ifdef MATH_QT_INTEROP
 	operator QString() const { return toString(); }

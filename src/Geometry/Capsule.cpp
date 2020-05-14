@@ -450,15 +450,15 @@ bool Capsule::Intersects(const Polyhedron &polyhedron) const
 	return polyhedron.Intersects(*this);
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Capsule::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT Capsule::ToString() const
 {
 	char str[256];
 	sprintf(str, "Capsule(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f), r:%.2f)", l.a.x, l.a.y, l.a.z, l.b.x, l.b.y, l.b.z, r);
 	return str;
 }
 
-std::string Capsule::SerializeToString() const
+StringT Capsule::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(l.a.x, str); *s = ','; ++s;
@@ -473,18 +473,20 @@ std::string Capsule::SerializeToString() const
 	return str;
 }
 
-std::string Capsule::SerializeToCodeString() const
+StringT Capsule::SerializeToCodeString() const
 {
 	char str[256];
 	sprintf(str, "%.9g", r);
 	return "Capsule(" + l.SerializeToCodeString() + "," + str + ")";
 }
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 std::ostream &operator <<(std::ostream &o, const Capsule &capsule)
 {
 	o << capsule.ToString();
 	return o;
 }
+#endif
 
 #endif
 

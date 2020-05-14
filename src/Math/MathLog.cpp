@@ -86,7 +86,7 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_INTENSITY); // Dark gray
 		if (channel != MathLogErrorNoCallstack)
 		{
-			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			StringT callstack = GetCallstack("  ", "PrintToConsole");
 			fprintf(stderr, "%s", callstack.c_str());
 		}
 		SetConsoleTextAttribute(GetStdHandle(STD_ERROR_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Light gray/default
@@ -98,7 +98,7 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY); // Dark gray
 		if (channel != MathLogWarningNoCallstack)
 		{
-			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			StringT callstack = GetCallstack("  ", "PrintToConsole");
 			printf("%s", callstack.c_str());
 		}
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Light gray/default
@@ -120,7 +120,7 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 #ifndef __EMSCRIPTEN__
 		if (channel != MathLogErrorNoCallstack)
 		{
-			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			StringT callstack = GetCallstack("  ", "PrintToConsole");
 			fprintf(stderr, "%s", callstack.c_str());
 		}
 #endif
@@ -133,7 +133,7 @@ void PrintToConsole(MathLogChannel channel, const char *str)
 		printf("Warning: %s\n", str);
 		if (channel != MathLogWarningNoCallstack)
 		{
-			std::string callstack = GetCallstack("  ", "PrintToConsole");
+			StringT callstack = GetCallstack("  ", "PrintToConsole");
 			printf("%s", callstack.c_str());
 		}
 #endif

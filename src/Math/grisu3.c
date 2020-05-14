@@ -9,6 +9,11 @@
 #include <assert.h> // assert
 #include <math.h> // ceil
 #include <stdio.h> // sprintf
+#include <stddef.h> // ptrdiff_t
+#include <limits.h> // INT_MIN
+#include <string.h> // strcpy
+
+#include "grisu3.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4204) // nonstandard extension used : non-constant aggregate initializer
@@ -282,14 +287,10 @@ static int grisu3(double v, char *buffer, int *length, int *d_exp)
 	return success;
 }
 
-static int i_to_str(int val, char *str)
+int u32_to_string(uint32_t val, char *str)
 {
-	int len, i;
-	char *s;
-	char *begin = str;
-	if (val < 0) { *str++ = '-'; val = -val; }
-	s = str;
-
+	assert(str);
+	char *s = str;
 	for(;;)
 	{
 		int ni = val / 10;
@@ -300,15 +301,31 @@ static int i_to_str(int val, char *str)
 		val = ni;
 	}
 	*s = '\0';
-	len = (int)(s - str);
-	for(i = 0; i < len/2; ++i)
+	ptrdiff_t len = s - str;
+	for(int i = 0; i < len>>1; ++i)
 	{
 		char ch = str[i];
 		str[i] = str[len-1-i];
 		str[len-1-i] = ch;
 	}
 
-	return (int)(s - begin);
+	return (int)(s - str);
+}
+
+int i32_to_string(int i, char *str)
+{
+	assert(str);
+	if (i < 0)
+	{
+		*str++ = '-';
+		if (i == INT_MIN)
+		{
+			strcpy(str, "2147483648");
+			return 11; // == strlen("-2147483648")
+		}
+		return u32_to_string((uint32_t)-i, str) + 1;
+	}
+	return u32_to_string((uint32_t)i, str);
 }
 
 int dtoa_grisu3(double v, char *dst)
@@ -319,7 +336,18 @@ int dtoa_grisu3(double v, char *dst)
 	assert(dst);
 
 	// Prehandle NaNs
-	if ((u64 << 1) > 0xFFE0000000000000ULL) return sprintf(dst, "NaN(%08X%08X)", (uint32_t)(u64 >> 32), (uint32_t)u64);
+	if ((u64 << 1) > 0xFFE0000000000000ULL)
+	{
+#ifdef __EMSCRIPTEN__
+		*dst++ = 'N';
+		*dst++ = 'a';
+		*dst++ = 'N';
+		*dst = '\0';
+		return 3;
+#else
+		return sprintf(dst, "NaN(%08X%08X)", (uint32_t)(u64 >> 32), (uint32_t)u64);
+#endif
+	}
 	// Prehandle negative values.
 	if ((u64 & D64_SIGN) != 0) { *s2++ = '-'; v = -v; u64 ^= D64_SIGN; }
 	// Prehandle zero.
@@ -329,7 +357,14 @@ int dtoa_grisu3(double v, char *dst)
 
 	success = grisu3(v, s2, &len, &d_exp);
 	// If grisu3 was not able to convert the number to a string, then use old sprintf (suboptimal).
-	if (!success) return sprintf(s2, "%.17g", v) + (int)(s2 - dst);
+	if (!success)
+	{
+#ifdef __EMSCRIPTEN__
+		return js_double_to_string(v, dst);
+#else
+		return sprintf(s2, "%.17g", v) + (int)(s2 - dst);
+#endif
+	}
 
     // We now have an integer string of form "151324135" and a base-10 exponent for that number.
     // Next, decide the best presentation for that string by whether to use a decimal point, or the scientific exponent notation 'e'.
@@ -343,7 +378,7 @@ int dtoa_grisu3(double v, char *dst)
 		s2[len++ - decimals] = '.';
 		d_exp += decimals;
 		// Need scientific notation as well?
-		if (d_exp != 0) { s2[len++] = 'e'; len += i_to_str(d_exp, s2+len); }
+		if (d_exp != 0) { s2[len++] = 'e'; len += i32_to_string(d_exp, s2+len); }
 	}
 	else if (d_exp < 0 && d_exp >= -3) // Add decimal point for numbers of form 0.000x where it's shorter?
 	{
@@ -353,9 +388,14 @@ int dtoa_grisu3(double v, char *dst)
 		len += -d_exp;
 	}
 	// Add scientific notation?
-	else if (d_exp < 0 || d_exp > 2) { s2[len++] = 'e'; len += i_to_str(d_exp, s2+len); }
+	else if (d_exp < 0 || d_exp > 2) { s2[len++] = 'e'; len += i32_to_string(d_exp, s2+len); }
 	// Add zeroes instead of scientific notation?
 	else if (d_exp > 0) { while(d_exp-- > 0) s2[len++] = '0'; }
 	s2[len] = '\0'; // grisu3 doesn't null terminate, so ensure termination.
 	return (int)(s2+len-dst);
+}
+
+int f32_to_string(float v, char *dst)
+{
+	return dtoa_grisu3((double)v, dst);
 }

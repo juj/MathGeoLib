@@ -1,5 +1,7 @@
 #include "Callstack.h"
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
+#endif
 #include "assume.h"
 
 #if defined(WIN32) && defined(_MSC_VER) && !defined(WIN8RT)
@@ -13,7 +15,7 @@
 
 #pragma comment(lib, "dbghelp.lib")
 
-static std::string GetSymbolName(void *address, HANDLE hProcess)
+static StringT GetSymbolName(void *address, HANDLE hProcess)
 {
 	// http://msdn.microsoft.com/en-us/library/ms680578(v=vs.85).aspx
 	DWORD64 dwDisplacement = 0;
@@ -35,7 +37,7 @@ static std::string GetSymbolName(void *address, HANDLE hProcess)
 			// SymGetLineFromAddr64 returned success
 			char str[128];
 			sprintf(str, ":%u: ", line.LineNumber);
-			return std::string(line.FileName) + str + pSymbol->Name;
+			return StringT(line.FileName) + str + pSymbol->Name;
 		}
 		else
 		{
@@ -50,7 +52,7 @@ static std::string GetSymbolName(void *address, HANDLE hProcess)
 		// SymFromAddr failed
 //		DWORD error = GetLastError();
 //		printf("SymFromAddr returned error : %d\n", error);
-		return std::string();
+		return StringT();
 	}
 }
 
@@ -59,7 +61,7 @@ static std::string GetSymbolName(void *address, HANDLE hProcess)
 #pragma warning(disable : 4740) // warning C4740: flow in or out of inline asm code suppresses global optimization
 #endif
 
-std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
+StringT NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 {
 	static bool symInitialized = false;
 
@@ -107,14 +109,14 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 #endif
 	const PVOID contextRecord = &context;
 
-	std::string callstack;
+	StringT callstack;
 	for(int i = 0; i < 128; ++i)
 	{
 		BOOL result = StackWalk64(machineType, currentProcess, currentThread, &stack, contextRecord, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL);
 		if (!result)
 			break;
 
-		std::string symbolName = GetSymbolName((void*)stack.AddrPC.Offset, currentProcess);
+		StringT symbolName = GetSymbolName((void*)stack.AddrPC.Offset, currentProcess);
 		if (symbolName.find(" GetCallstack") == symbolName.length() - strlen(" GetCallstack"))
 			continue;
 		if (!ignoreFilter || symbolName.find(ignoreFilter) == symbolName.npos)
@@ -145,13 +147,13 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 #include <execinfo.h>
 #include <string.h>
 
-std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
+StringT NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 {
 	const int N = 128;
 	void *callstack[N];
 	int n = backtrace(callstack, N);
 	char **strs = backtrace_symbols(callstack, n);
-	std::string stack;
+	StringT stack;
 	for(int i = 0; i < n; ++i)
 	{
 		if (strstr(strs[i], "_Z12GetCallstackPK") != 0)
@@ -171,7 +173,7 @@ std::string NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 
 #include <emscripten.h>
 
-std::string GetCallstack(const char *indent, const char *ignoreFilter)
+StringT GetCallstack(const char *indent, const char *ignoreFilter)
 {
 	MARK_UNUSED(indent); // TODO Proper indentation
 	MARK_UNUSED(ignoreFilter); // TODO Support ignoreFilter
@@ -182,10 +184,10 @@ std::string GetCallstack(const char *indent, const char *ignoreFilter)
 
 #else
 
-std::string GetCallstack(const char *indent, const char *ignoreFilter)
+StringT GetCallstack(const char *indent, const char *ignoreFilter)
 {
 	// Not implemented on this platform.
-	return std::string();
+	return StringT();
 }
 
 #endif

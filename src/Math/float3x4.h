@@ -130,11 +130,7 @@ public:
 	/** [opaque-qtscript] */
 	float3x4() {}
 
-#ifdef MATH_EXPLICIT_COPYCTORS
-	/// The copy-ctor for float3x4 is the trivial copy-ctor, but it is explicitly written to be able to automatically
-	/// pick up this function for QtScript bindings.
-	float3x4(const float3x4 &rhs) { Set(rhs); }
-#endif
+	float3x4(const float3x4 &rhs) = default; // { Set(rhs); }
 
 	/// Constructs a new float3x4 by explicitly specifying all the matrix elements.
 	/// The elements are specified in row-major format, i.e. the first row first followed by the second and third row.
@@ -599,7 +595,7 @@ public:
 	float3x4 &operator =(const Quat &rhs);
 
 	/// Sets this float3x4 to represent the same transformation as the given float3x4.
-	float3x4 &operator =(const float3x4 &rhs);
+	//float3x4 &operator =(const float3x4 &rhs);
 
 
 	/// Computes the determinant of this matrix.
@@ -822,12 +818,12 @@ public:
 	/// Returns true if this float3x4 is equal to the given float3x4, up to given per-element epsilon.
 	bool Equals(const float3x4 &other, float epsilon = 1e-3f) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a string representation of form "(m00, m01, m02, m03; m10, m11, m12, m13; ... )".
-	std::string ToString() const;
-	std::string SerializeToString() const;
+	StringT ToString() const;
+	StringT SerializeToString() const;
 
-	std::string ToString2() const;
+	StringT ToString2() const;
 
 	static float3x4 FromString(const char *str, const char **outEndStr = 0);
 #endif

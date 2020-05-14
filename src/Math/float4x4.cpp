@@ -606,38 +606,6 @@ float4x4 float4x4::ComplementaryProjection() const
 	return float4x4::identity - *this;
 }
 
-MatrixProxy<float4x4::Rows, float4x4::Cols> &float4x4::operator[](int row)
-{
-	assume(row >= 0);
-	assume(row < Rows);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first rowIndex.
-#endif
-
-#ifdef MATH_COLMAJOR_MATRICES
-	return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
-#else
-	return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(v[row]));
-#endif
-}
-
-const MatrixProxy<float4x4::Rows, float4x4::Cols> &float4x4::operator[](int row) const
-{
-	assume(row >= 0);
-	assume(row < Rows);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (row < 0 || row >= Rows)
-		row = 0; // Benign failure, just give the first rowIndex.
-#endif
-
-#ifdef MATH_COLMAJOR_MATRICES
-	return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
-#else
-	return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(v[row]));
-#endif
-}
-
 float &float4x4::At(int rowIndex, int colIndex)
 {
 	assume(rowIndex >= 0);
@@ -1337,6 +1305,7 @@ float4x4 &float4x4::operator =(const float3x4 &rhs)
 	return *this;
 }
 
+#if 0
 float4x4 &float4x4::operator =(const float4x4 &rhs)
 {
 	// We deliberately don't want to assume rhs is finite, it is ok
@@ -1386,6 +1355,7 @@ float4x4 &float4x4::operator =(const float4x4 &rhs)
 #endif
 	return *this;
 }
+#endif
 
 float4x4 &float4x4::operator =(const Quat &rhs)
 {
@@ -2185,8 +2155,8 @@ bool float4x4::ContainsProjection(float epsilon) const
 	return Row(3).Equals(0.f, 0.f, 0.f, 1.f, epsilon) == false;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string float4x4::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT float4x4::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f) (%.2f, %.2f, %.2f, %.2f)",
@@ -2195,10 +2165,10 @@ std::string float4x4::ToString() const
 		At(2, 0), At(2, 1), At(2, 2), At(2, 3),
 		At(3, 0), At(3, 1), At(3, 2), At(3, 3));
 
-	return std::string(str);
+	return str;
 }
 
-std::string float4x4::SerializeToString() const
+StringT float4x4::SerializeToString() const
 {
 	char str[512];
 	char *s = SerializeFloat(At(0, 0), str); *s = ','; ++s;
@@ -2222,7 +2192,7 @@ std::string float4x4::SerializeToString() const
 	return str;
 }
 
-std::string float4x4::ToString2() const
+StringT float4x4::ToString2() const
 {
 	char str[256];
 	sprintf(str, "float4x4(X:(%.2f,%.2f,%.2f,%.2f) Y:(%.2f,%.2f,%.2f,%.2f) Z:(%.2f,%.2f,%.2f,%.2f), Pos:(%.2f,%.2f,%.2f,%.2f))",
@@ -2231,7 +2201,7 @@ std::string float4x4::ToString2() const
 		At(0, 2), At(1, 2), At(2, 2), At(3, 2),
 		At(0, 3), At(1, 3), At(2, 3), At(3, 3));
 
-	return std::string(str);
+	return str;
 }
 #endif
 

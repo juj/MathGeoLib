@@ -912,15 +912,16 @@ Plane operator *(const Quat &transform, const Plane &plane)
 	return p;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Plane::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+
+StringT Plane::ToString() const
 {
 	char str[256];
 	sprintf(str, "Plane(Normal:(%.2f, %.2f, %.2f) d:%.2f)", normal.x, normal.y, normal.z, d);
 	return str;
 }
 
-std::string Plane::SerializeToString() const
+StringT Plane::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(normal.x, str); *s = ','; ++s;
@@ -932,12 +933,13 @@ std::string Plane::SerializeToString() const
 	return str;
 }
 
-std::string Plane::SerializeToCodeString() const
+StringT Plane::SerializeToCodeString() const
 {
 	char str[256];
 	sprintf(str, "%.9g", d);
 	return "Plane(" + normal.SerializeToCodeString() + "," + str + ")";
 }
+#endif
 
 Plane Plane::FromString(const char *str, const char **outEndStr)
 {
@@ -954,6 +956,8 @@ Plane Plane::FromString(const char *str, const char **outEndStr)
 		*outEndStr = str;
 	return p;
 }
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const Plane &plane)
 {

@@ -149,11 +149,7 @@ public:
 	/** [opaque-qtscript] */
 	float4x4() {}
 
-#ifdef MATH_EXPLICIT_COPYCTORS
-	/// The copy-ctor for float4x4 is the trivial copy-ctor, but it is explicitly written to be able to automatically
-	/// pick up this function for QtScript bindings.
-	float4x4(const float4x4 &rhs) { Set(rhs); }
-#endif
+	float4x4(const float4x4 &rhs) = default;//{ Set(rhs); }
 
 	/// Constructs a new float4x4 by explicitly specifying all the matrix elements.
 	/// The elements are specified in row-major format, i.e. the first row first followed by the second and third row.
@@ -376,8 +372,37 @@ public:
 		For example, m[0][3] Returns the last element on the first row, which is the amount
 	 	of translation in the x-direction. This is true independent of
 	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
-	MatrixProxy<Rows, Cols> &operator[](int row);
-	const MatrixProxy<Rows, Cols> &operator[](int row) const;
+	FORCE_INLINE MatrixProxy<Rows, Cols> &operator[](int row)
+	{
+		assume(row >= 0);
+		assume(row < Rows);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (row < 0 || row >= Rows)
+			row = 0; // Benign failure, just give the first rowIndex.
+#endif
+		
+#ifdef MATH_COLMAJOR_MATRICES
+		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
+	}
+	
+	FORCE_INLINE const MatrixProxy<Rows, Cols> &operator[](int row) const
+	{
+		assume(row >= 0);
+		assume(row < Rows);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (row < 0 || row >= Rows)
+			row = 0; // Benign failure, just give the first rowIndex.
+#endif
+		
+#ifdef MATH_COLMAJOR_MATRICES
+		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
+#else
+		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(v[row]));
+#endif
+	}
 
 	/// Returns the given element. [noscript]
 	/** This function returns the element of this matrix at (row, col)==(i, j)==(y, x).
@@ -665,7 +690,7 @@ public:
 	/// @note The remaining entries of this matrix are set to identity.
 	float4x4 &operator =(const float3x4 &rhs);
 
-	float4x4 &operator =(const float4x4 &rhs);
+	// float4x4 &operator =(const float4x4 &rhs);
 
 	float4x4 &operator =(const TranslateOp &rhs);
 
@@ -935,12 +960,12 @@ public:
 	/// matrix differs from [0 0 0 1].
 	bool ContainsProjection(float epsilon = 1e-3f) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a string representation of form "(m00, m01, m02, m03; m10, m11, m12, m13; ... )".
-	std::string ToString() const;
-	std::string SerializeToString() const;
+	StringT ToString() const;
+	StringT SerializeToString() const;
 
-	std::string ToString2() const;
+	StringT ToString2() const;
 #endif
 
 	/// Extracts the rotation part of this matrix into Euler rotation angles (in radians). [indexTitle: ToEuler***]

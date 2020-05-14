@@ -212,9 +212,9 @@ public:
 					 MATH_NS::Abs(w - other.w) < epsilon;
 	}
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns "(x, y, z, w)".
-	std::string ToString() const;
+	StringT ToString() const;
 #endif
 
 	static const float4d zero;

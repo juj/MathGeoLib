@@ -58,7 +58,9 @@ bool GJKIntersect(const A &a, const B &b)
 		if (n == 0) // Was the origin contained in the current simplex? If so, then the convex shapes a and b do share a common point - intersection!
 			return true;
 	}
-	assume2(false && "GJK intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
+	assume(false && "GJK intersection test did not converge to a result!");
+	// TODO: enable
+	//assume2(false && "GJK intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
 	return false; // Report no intersection.
 }
 

@@ -1,3 +1,9 @@
+#pragma once
+
+#include "../src/MathBuildConfig.h"
+
+#ifdef MATH_ENABLE_STL_SUPPORT
+
 #include <list>
 #include <string>
 #include <algorithm>
@@ -341,3 +347,5 @@ private:
 };
 
 #undef LOG_WRITE
+
+#endif

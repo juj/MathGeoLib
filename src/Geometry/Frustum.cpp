@@ -1125,9 +1125,7 @@ void Frustum::DeserializeFromXml(TiXmlElement *e)
 
 #endif
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-
-std::string FrustumTypeToString(FrustumType t)
+const char *FrustumTypeToString(FrustumType t)
 {
 	if (t == InvalidFrustum) return "InvalidFrustum";
 	if (t == OrthographicFrustum) return "OrthographicFrustum";
@@ -1135,11 +1133,13 @@ std::string FrustumTypeToString(FrustumType t)
 	return "(invalid frustum type)";
 }
 
-std::string Frustum::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+
+StringT Frustum::ToString() const
 {
 	char str[256];
 	sprintf(str, "Frustum(%s pos:(%.2f, %.2f, %.2f) front:(%.2f, %.2f, %.2f), up:(%.2f, %.2f, %.2f), near: %.2f, far: %.2f, %s: %.2f, %s: %.2f)",
-		FrustumTypeToString(type).c_str(), pos.x, pos.y, pos.z, front.x, front.y, front.z,
+		FrustumTypeToString(type), pos.x, pos.y, pos.z, front.x, front.y, front.z,
 		up.x, up.y, up.z, nearPlaneDistance, farPlaneDistance,
 		type == OrthographicFrustum ? "ortho width:" : "hFov",
 		horizontalFov,
@@ -1147,6 +1147,9 @@ std::string Frustum::ToString() const
 		verticalFov);
 	return str;
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const Frustum &frustum)
 {

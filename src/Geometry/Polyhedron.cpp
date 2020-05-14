@@ -20,7 +20,9 @@
 #include <map>
 #include <utility>
 #include <list>
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <sstream>
+#endif
 #include <stdlib.h>
 #include "../Math/assume.h"
 #include "../Math/MathFunc.h"
@@ -87,6 +89,7 @@ void Polyhedron::Face::FlipWindingOrder()
 		Swap(v[i], v[v.size()-1-i]);
 }
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 std::string Polyhedron::Face::ToString() const
 {
 	std::stringstream ss;
@@ -94,6 +97,7 @@ std::string Polyhedron::Face::ToString() const
 		ss << v[i] << ((i!=v.size()-1) ? ", " : "");
 	return ss.str();
 }
+#endif
 
 Polyhedron::Face Polyhedron::Face::FromString(const char *str)
 {
@@ -623,7 +627,8 @@ bool Polyhedron::IsClosed() const
 	{
 		if (f[i].v.size() <= 1)
 			continue;
-		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString());
+		assume(FacePolygon(i).IsPlanar());
+//		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString()); // TODO: enable
 		assume(FacePolygon(i).IsSimple());
 		int x = f[i].v.back();
 		for(size_t j = 0; j < f[i].v.size(); ++j) // O(1)
@@ -633,7 +638,9 @@ bool Polyhedron::IsClosed() const
 			if (uniqueEdges.find(edge) != uniqueEdges.end()) // O(logE)
 			{
 				LOGW("The edge (%d,%d) is used twice. Polyhedron is not simple and closed!", x, y);
+#ifdef MATH_ENABLE_STL_SUPPORT
 				LOGW("Polyhedron: %s", this->ToString().c_str());
+#endif
 				return false; // This edge is being used twice! Cannot be simple and closed.
 			}
 			uniqueEdges.insert(edge); // O(logE)
@@ -2046,7 +2053,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				LOGE("Boundary:");
 				for(size_t b = 0; b < boundaryEdges.size(); ++b)
 					LOGE("%d->%d", (int)boundaryEdges[b].first, boundaryEdges[b].second);
+#ifdef MATH_ENABLE_STL_SUPPORT
 				LOGE("Polyhedron: %s", p.ToString().c_str());
+#endif
 				assert(false);
 				return Polyhedron();
 			}
@@ -3162,6 +3171,7 @@ TriangleArray Polyhedron::TriangulateConvex() const
 	return outTriangleList;
 }
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 std::string Polyhedron::ToString() const
 {
 	if (v.empty())
@@ -3190,6 +3200,7 @@ std::string Polyhedron::ToString() const
 	ss << ")";
 	return ss.str();
 }
+#endif
 
 void Polyhedron::DumpStructure() const
 {
@@ -3198,7 +3209,11 @@ void Polyhedron::DumpStructure() const
 		if (f[i].v.empty())
 			LOGI("Face %d: (no vertices)", (int)i);
 		else
+		{
+#ifdef MATH_ENABLE_STL_SUPPORT
 			LOGI("Face %d: %s (area: %f)", (int)i, f[i].ToString().c_str(), FacePolygon((int)i).Area());
+#endif
+		}
 }
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP

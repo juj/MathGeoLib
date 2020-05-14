@@ -20,10 +20,10 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/float3.h"
 
-//#ifdef MATH_ENABLE_STL_SUPPORT
 #include <vector>
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
-//#endif
+#endif
 
 MATH_BEGIN_NAMESPACE
 
@@ -46,7 +46,9 @@ public:
 		void FlipWindingOrder();
 
 		/// Returns a string of form "0,1,2,3,4" that refers to the indices of the vertices that this face uses.
+#if defined(MATH_ENABLE_STL_SUPPORT)
 		std::string ToString() const;
+#endif
 
 		static Face FromString(const char *str);
 	};
@@ -457,7 +459,10 @@ public:
 
 	TriangleArray TriangulateConvex() const;
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 	std::string ToString() const;
+#endif
+
 	void DumpStructure() const;
 
 #ifdef MATH_GRAPHICSENGINE_INTEROP

@@ -1,6 +1,10 @@
 #pragma once
 
+#include "../MathBuildConfig.h"
+
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <sstream>
+#endif
 #include "../Math/vec2d.h"
 #include "../Math/MathConstants.h"
 #include "../Math/myassert.h"
@@ -35,6 +39,7 @@ public:
 		return mostExtreme;
 	}
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 	std::string SerializeToString() const
 	{
 		std::stringstream ss;
@@ -44,5 +49,6 @@ public:
 		ss << ")";
 		return ss.str();
 	}
+#endif
 };
 

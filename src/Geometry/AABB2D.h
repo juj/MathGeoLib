@@ -128,8 +128,8 @@ public:
 		return a;
 	}
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-	std::string ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+	StringT ToString() const
 	{
 		char str[256];
 		sprintf(str, "AABB2D(Min:(%.2f, %.2f) Max:(%.2f, %.2f))", minPoint.x, minPoint.y, maxPoint.x, maxPoint.y);

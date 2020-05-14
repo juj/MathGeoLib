@@ -75,7 +75,9 @@
 
 // If MATH_ENABLE_STL_SUPPORT is defined, MathGeoLib utilizes STL data structures. Otherwise,
 // features requiring STL are disabled (but the library can still be built).
-#ifndef MATH_ENABLE_STL_SUPPORT
+// Due to large increase in code size, when building for HTML5 platform, do not automatically
+// enable STL support
+#if !defined(MATH_ENABLE_STL_SUPPORT) && !defined(__EMSCRIPTEN__)
 #define MATH_ENABLE_STL_SUPPORT
 #endif
 
@@ -124,7 +126,7 @@
 // If MATH_COLMAJOR_MATRICES is defined, matrices use a column-major memory layout. If undefined, matrices
 // use a row-major memory layout.
 #ifndef MATH_COLMAJOR_MATRICES
-// #define MATH_COLMAJOR_MATRICES
+#define MATH_COLMAJOR_MATRICES
 #endif
 
 #if defined(MATH_USE_DIRECT3D) && defined(MATH_USE_OPENGL)
@@ -223,6 +225,13 @@ typedef __m128 simd4f;
 // unaligned loads and stores and shuffling that is involved. You might want to
 // try benchmarking the effect of this being enabled vs disabled.
 #define MATH_AUTOMATIC_SIMD_FLOAT3
+#endif
+
+#ifdef MATH_CONTAINERLIB_SUPPORT
+class String;
+#define StringT String
+#else
+#define StringT std::string
 #endif
 
 #include "Math/MathTypes.h"

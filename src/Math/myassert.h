@@ -18,7 +18,9 @@
 #include "MathLog.h"
 #include "assume.h"
 
+#ifdef MATH_ENABLE_STL_SUPPORT
 #include <sstream>
+#endif
 
 #ifdef assert
 #undef assert
@@ -74,9 +76,8 @@
 	MULTI_LINE_MACRO_BEGIN \
 		if ((x) != (y)) \
 		{ \
-			std::stringstream std_stringstream_; \
-			std_stringstream_ << "Assertion '" #x "' == '" #y "' failed! (" << (x) << " != " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			RuntimeFailure(std_stringstream_.str().c_str()); \
+			StringT str = StringT("Assertion '" #x "' == '" #y "' failed! (") + ObjToString(x) + " != " + ObjToString(y) + ("!) in " __FILE__ ":" STRINGIZE(__LINE__)); \
+			RuntimeFailure(str.c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
 
@@ -84,9 +85,8 @@
 	MULTI_LINE_MACRO_BEGIN \
 		if (!((x) cmp (y))) \
 		{ \
-			std::stringstream std_stringstream_; \
-			std_stringstream_ << "Assertion '" #x "' " #cmp " '" #y "' failed! (" << (x) << " and " << (y) << "!) in " __FILE__ ":" STRINGIZE(__LINE__); \
-			RuntimeFailure(std_stringstream_.str().c_str()); \
+			StringT str = StringT("Assertion '" #x "' " #cmp " '" #y "' failed! (") + ObjToString(x) + " and " + ObjToString(y) + ("!) in " __FILE__ ":" STRINGIZE(__LINE__)); \
+			RuntimeFailure(str.c_str()); \
 		} \
 	MULTI_LINE_MACRO_END
 

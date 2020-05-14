@@ -1949,8 +1949,8 @@ Triangle operator *(const Quat &transform, const Triangle &triangle)
 	return t;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Triangle::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT Triangle::ToString() const
 {
 	char str[256];
 	sprintf(str, "Triangle(a:(%.2f, %.2f, %.2f) b:(%.2f, %.2f, %.2f) c:(%.2f, %.2f, %.2f))",
@@ -1958,7 +1958,7 @@ std::string Triangle::ToString() const
 	return str;
 }
 
-std::string Triangle::SerializeToString() const
+StringT Triangle::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
@@ -1975,10 +1975,13 @@ std::string Triangle::SerializeToString() const
 	return str;
 }
 
-std::string Triangle::SerializeToCodeString() const
+StringT Triangle::SerializeToCodeString() const
 {
 	return "Triangle(" + a.SerializeToCodeString() + "," + b.SerializeToCodeString() + "," + c.SerializeToCodeString() + ")";
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const Triangle &triangle)
 {

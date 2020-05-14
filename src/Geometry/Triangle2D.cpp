@@ -1692,8 +1692,8 @@ Triangle2D operator *(const float4x4 &transform, const Triangle2D &triangle)
 	return t;
 }
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string Triangle2D::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT Triangle2D::ToString() const
 {
 	char str[256];
 	sprintf(str, "Triangle2D(a:(%.2f, %.2f) b:(%.2f, %.2f) c:(%.2f, %.2f))",
@@ -1701,7 +1701,7 @@ std::string Triangle2D::ToString() const
 	return str;
 }
 
-std::string Triangle2D::SerializeToString() const
+StringT Triangle2D::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(a.x, str); *s = ','; ++s;
@@ -1715,10 +1715,13 @@ std::string Triangle2D::SerializeToString() const
 	return str;
 }
 
-std::string Triangle2D::SerializeToCodeString() const
+StringT Triangle2D::SerializeToCodeString() const
 {
 	return "Triangle2D(" + a.SerializeToCodeString() + "," + b.SerializeToCodeString() + "," + c.SerializeToCodeString() + ")";
 }
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 
 std::ostream &operator <<(std::ostream &o, const Triangle2D &triangle)
 {

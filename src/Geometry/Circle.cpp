@@ -251,7 +251,7 @@ VecArray Circle::IntersectsFaces(const OBB &obb) const
 	return intersectionPoints;
 }
 
-std::string Circle::ToString() const
+StringT Circle::ToString() const
 {
 	char str[256];
 	sprintf(str, "Circle(pos:(%.2f, %.2f, %.2f) normal:(%.2f, %.2f, %.2f), r:%.2f)",
@@ -259,11 +259,13 @@ std::string Circle::ToString() const
 	return str;
 }
 
+#if defined(MATH_ENABLE_STL_SUPPORT)
 std::ostream &operator <<(std::ostream &o, const Circle &circle)
 {
 	o << circle.ToString();
 	return o;
 }
+#endif
 
 #endif
 

@@ -25,6 +25,8 @@
 #endif
 
 #include "../MathGeoLibFwd.h"
+#include "MathConstants.h"
+#include "assume.h"
 
 #ifdef MATH_QT_INTEROP
 #include <QVector2D>
@@ -60,12 +62,8 @@ public:
 		@see x, y. */
 	float2() {}
 
-#ifdef MATH_EXPLICIT_COPYCTORS
 	/// The float2 copy constructor.
-	/** The copy constructor is a standard default copy-ctor, but it is explicitly written to be able to automatically pick up
-		this function for script bindings. */
 	float2(const float2 &rhs) { x = rhs.x; y = rhs.y; }
-#endif
 
 	/// Constructs a new float2 with the value (x, y).
 	/** @see x, y. */
@@ -98,16 +96,35 @@ public:
 		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec[1] = 10.f; would set the y-component of this vector.
 		@see ptr(), At(). */
-	float &operator [](int index) { return At(index); }
-	CONST_WIN32 float operator [](int index) const { return At(index); }
+	FORCE_INLINE float &operator [](int index) { return At(index); }
+	FORCE_INLINE CONST_WIN32 float operator [](int index) const { return At(index); }
 
 	/// Accesses an element of this vector.
 	/** @param index The element to get. Pass in 0 for x and 1 for y.
 		@note If you have a non-const instance of this class, you can use this notation to set the elements of
 			this vector as well, e.g. vec.At(1) = 10.f; would set the y-component of this vector.
 		@see ptr(), operator [](). */
-	float &At(int index);
-	CONST_WIN32 float At(int index) const;
+	FORCE_INLINE CONST_WIN32 float At(int index) const
+	{
+		assume(index >= 0);
+		assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (index < 0 || index >= Size)
+			return FLOAT_NAN;
+#endif
+		return ptr()[index];
+	}
+	
+	FORCE_INLINE float &At(int index)
+	{
+		assume(index >= 0);
+		assume(index < Size);
+#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
+		if (index < 0 || index >= Size)
+			return ptr()[0];
+#endif
+		return ptr()[index];
+	}
 
 	/// Adds two vectors. [indexTitle: operators +,-,*,/]
 	/** This function is identical to the member function Add().
@@ -132,6 +149,9 @@ public:
 	/// Unary operator + allows this structure to be used in an expression '+x'.
 	float2 operator +() const { return *this; }
 
+	/// Assigns a vector to another.
+	/** @return A reference to this. */
+	float2 &operator =(const float2 &v);
 	/// Adds a vector to this vector, in-place. [indexTitle: operators +=,-=,*=,/=]
 	/** @return A reference to this. */
 	float2 &operator +=(const float2 &v);
@@ -347,22 +367,20 @@ public:
 	/** @note Prefer using this over e.g. memcmp, since there can be SSE-related padding in the structures. */
 	bool BitEquals(const float2 &other) const;
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns "(x, y)".
-	std::string ToString() const;
+	StringT ToString() const;
 
 	/// Returns "x,y". This is the preferred format for the float2 if it has to be serialized to a string for machine transfer.
-	std::string SerializeToString() const;
+	StringT SerializeToString() const;
 
 	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
-	std::string SerializeToCodeString() const;
+	StringT SerializeToCodeString() const;
+	static float2 FromString(const StringT &str) { return FromString(str.c_str()); }
 #endif
 
 	/// Parses a string that is of form "x,y" or "(x,y)" or "(x;y)" or "x y" to a new float2.
 	static float2 FromString(const char *str, const char **outEndStr = 0);
-#ifdef MATH_ENABLE_STL_SUPPORT
-	static float2 FromString(const std::string &str) { return FromString(str.c_str()); }
-#endif
 
 	/// @return x + y.
 	float SumOfElements() const;
@@ -551,6 +569,7 @@ public:
 	/// Computes the 2D convex hull of the given point set.
 	/* @see ConvexHullInPlace */
 	static void ConvexHull(const float2 *pointArray, int numPoints, std::vector<float2> &outConvexHull);
+#endif
 
 	/// Computes the 2D convex hull of the given point set, in-place.
 	/** This version of the algorithm works in-place, meaning that when the algorithm finishes,
@@ -570,7 +589,6 @@ public:
 		@param numPointsInConvexHull The number of elements in the array convexHull.
 		@param point The target point to test. */
 	static bool ConvexHullContains(const float2 *convexHull, int numPointsInConvexHull, const float2 &point);
-#endif
 
 	/// Computes the minimum-area rectangle that bounds the given point set. [noscript]
 	/** Implementation adapted from Christer Ericson's Real-time Collision Detection, p.111.

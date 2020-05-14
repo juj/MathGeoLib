@@ -17,12 +17,18 @@
 	@brief Global compilation defines. */
 #pragma once
 
-#include <sstream>
 #include "../MathBuildConfig.h"
+#ifdef MATH_ENABLE_STL_SUPPORT
+#include <sstream>
+#endif
 #include "MathNamespace.h"
 #include <stdio.h>
 #include "myassert.h"
 #include "MathLog.h"
+
+#ifdef MATH_CONTAINERLIB_SUPPORT
+#include "Container/UString.h"
+#endif
 
 #ifndef MARK_UNUSED
 /// If a variable is labelled with this directive, the compiler should not emit a warning even if it is unused in the code.
@@ -80,7 +86,7 @@ bool MathBreakOnAssume();
 bool AssumeFailed();
 
 template<typename T>
-inline std::string ObjToString(const T &obj)
+inline StringT ObjToString(const T &obj)
 {
 	return obj.ToString();
 }
@@ -92,49 +98,63 @@ inline std::string ObjToString<const char*>(const char * const & obj)
 }
 */
 template<>
-inline std::string ObjToString<std::string>(const std::string &obj)
+inline StringT ObjToString<StringT>(const StringT &obj)
 {
 	return obj;
 }
 
 template<>
-inline std::string ObjToString<float>(const float &obj)
+inline StringT ObjToString<float>(const float &obj)
 {
+#if defined(MATH_CONTAINERLIB_SUPPORT)
+	return String::FromFloat(obj);
+#else
 	std::stringstream ss;
 	ss << obj;
 	return ss.str();
+#endif
 }
 
 template<>
-inline std::string ObjToString<double>(const double &obj)
+inline StringT ObjToString<double>(const double &obj)
 {
+#if defined(MATH_CONTAINERLIB_SUPPORT)
+	return String::FromDouble(obj);
+#else
 	std::stringstream ss;
 	ss << obj;
 	return ss.str();
+#endif
 }
 
 template<>
-inline std::string ObjToString<int>(const int &obj)
+inline StringT ObjToString<int>(const int &obj)
 {
+#if defined(MATH_CONTAINERLIB_SUPPORT)
+	return String::FromInt(obj);
+#else
 	std::stringstream ss;
 	ss << obj;
 	return ss.str();
+#endif
 }
 
 template<>
-inline std::string ObjToString<bool>(const bool &obj)
+inline StringT ObjToString<bool>(const bool &obj)
 {
-	std::stringstream ss;
-	ss << obj;
-	return ss.str();
+	return obj ? "true" : "false";
 }
 
 template<>
-inline std::string ObjToString<u32>(const u32 &obj)
+inline StringT ObjToString<u32>(const u32 &obj)
 {
+#if defined(MATH_CONTAINERLIB_SUPPORT)
+	return String::FromUInt(obj);
+#else
 	std::stringstream ss;
 	ss << obj;
 	return ss.str();
+#endif
 }
 
 MATH_END_NAMESPACE

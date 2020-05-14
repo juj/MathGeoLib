@@ -74,28 +74,6 @@ float3::float3(const float *data)
 	z = data[2];
 }
 
-CONST_WIN32 float float3::At(int index) const
-{
-	assume(index >= 0);
-	assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (index < 0 || index >= Size)
-		return FLOAT_NAN;
-#endif
-	return ptr()[index];
-}
-
-float &float3::At(int index)
-{
-	assume(index >= 0);
-	assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (index < 0 || index >= Size)
-		return ptr()[0];
-#endif
-	return ptr()[index];
-}
-
 float2 float3::xx() const { return float2(x,x); }
 float2 float3::xy() const { return float2(x,y); }
 float2 float3::xz() const { return float2(x,z); }
@@ -235,15 +213,15 @@ bool MUST_USE_RESULT float3::AreCollinear(const float3 &p1, const float3 &p2, co
 
 bool IsNeutralCLocale();
 
-#ifdef MATH_ENABLE_STL_SUPPORT
-std::string float3::ToString() const
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT float3::ToString() const
 {
 	char str[256];
 	sprintf(str, "(%.3f, %.3f, %.3f)", x, y, z);
-	return std::string(str);
+	return str;
 }
 
-std::string float3::SerializeToString() const
+StringT float3::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(x, str); *s = ','; ++s;
@@ -254,7 +232,7 @@ std::string float3::SerializeToString() const
 	return str;
 }
 
-std::string float3::SerializeToCodeString() const
+StringT float3::SerializeToCodeString() const
 {
 	return "float3(" + SerializeToString() + ")";
 }
@@ -984,6 +962,18 @@ float3 float3::operator /(float scalar) const
 #else
 	return float3(x * invScalar, y * invScalar, z * invScalar);
 #endif
+}
+
+float3 &float3::operator =(const float3 &rhs)
+{
+#ifdef MATH_AUTOMATIC_SIMD_FLOAT3
+	store_vec3(ptr(), load_vec3(rhs.ptr(), 0.f));
+#else
+	x = rhs.x;
+	y = rhs.y;
+	z = rhs.z;
+#endif
+	return *this;
 }
 
 float3 &float3::operator +=(const float3 &rhs)
