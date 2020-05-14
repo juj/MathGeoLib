@@ -53,10 +53,6 @@ float2::float2(float scalar)
 float2::float2(const float *data)
 {
 	assume(data);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!data)
-		return;
-#endif
 	x = data[0];
 	y = data[1];
 }

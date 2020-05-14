@@ -783,10 +783,6 @@ void Frustum::Transform(const Quat &transform)
 void Frustum::GetPlanes(Plane *outArray) const
 {
 	assume(outArray);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outArray)
-		return;
-#endif
 	for(int i = 0; i < 6; ++i)
 		outArray[i] = GetPlane(i);
 }
@@ -799,10 +795,6 @@ vec Frustum::CenterPoint() const
 void Frustum::GetCornerPoints(vec *outPointArray) const
 {
 	assume(outPointArray);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outPointArray)
-		return;
-#endif
 
 	if (type == PerspectiveFrustum)
 	{

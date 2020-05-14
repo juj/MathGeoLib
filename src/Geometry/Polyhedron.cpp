@@ -128,10 +128,6 @@ vec Polyhedron::Vertex(int vertexIndex) const
 {
 	assume(vertexIndex >= 0);
 	assume(vertexIndex < (int)v.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (vertexIndex < 0 || vertexIndex >= (int)v.size())
-		return vec::nan;
-#endif
 	
 	return v[vertexIndex];
 }
@@ -141,10 +137,6 @@ LineSegment Polyhedron::Edge(int edgeIndex) const
 	assume(edgeIndex >= 0);
 	LineSegmentArray edges = Edges();
 	assume(edgeIndex < (int)edges.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (edgeIndex < 0 || edgeIndex >= (int)edges.size())
-		return LineSegment(vec::nan, vec::nan);
-#endif
 	return edges[edgeIndex];
 }
 
@@ -195,10 +187,6 @@ Polygon Polyhedron::FacePolygon(int faceIndex) const
 	Polygon p;
 	assume(faceIndex >= 0);
 	assume(faceIndex < (int)f.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (faceIndex < 0 || faceIndex >= (int)f.size())
-		return Polygon();
-#endif
 
 	p.p.reserve(f[faceIndex].v.size());
 	for(size_t i = 0; i < f[faceIndex].v.size(); ++i)

@@ -59,10 +59,6 @@ vec Polygon::Vertex(int vertexIndex) const
 {
 	assume(vertexIndex >= 0);
 	assume(vertexIndex < (int)p.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (vertexIndex < 0 || vertexIndex >= (int)p.size())
-		return vec::nan;
-#endif
 	return p[vertexIndex];
 }
 
@@ -91,10 +87,6 @@ bool Polygon::DiagonalExists(int i, int j) const
 	assume(j >= 0);
 	assume(i < (int)p.size());
 	assume(j < (int)p.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (p.size() < 3 || i < 0 || j < 0 || i >= (int)p.size() || j >= (int)p.size())
-		return false;
-#endif
 	assume(IsPlanar());
 	assume(i != j);
 	if (i == j) // Degenerate if i == j.
@@ -139,10 +131,6 @@ LineSegment Polygon::Diagonal(int i, int j) const
 	assume(j >= 0);
 	assume(i < (int)p.size());
 	assume(j < (int)p.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (i < 0 || j < 0 || i >= (int)p.size() || j >= (int)p.size())
-		return LineSegment(vec::nan, vec::nan);
-#endif
 	return LineSegment(p[i], p[j]);
 }
 
@@ -175,20 +163,12 @@ float2 Polygon::MapTo2D(int i) const
 {
 	assume(i >= 0);
 	assume(i < (int)p.size());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (i < 0 || i >= (int)p.size())
-		return float2::nan;
-#endif
 	return MapTo2D(p[i]);
 }
 
 float2 Polygon::MapTo2D(const vec &point) const
 {
 	assume(!p.empty());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (p.empty())
-		return float2::nan;
-#endif
 	vec basisU = BasisU();
 	vec basisV = BasisV();
 	vec pt = point - p[0];
@@ -198,10 +178,6 @@ float2 Polygon::MapTo2D(const vec &point) const
 vec Polygon::MapFrom2D(const float2 &point) const
 {
 	assume(!p.empty());
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (p.empty())
-		return vec::nan;
-#endif
 	return (vec)p[0] + point.x * BasisU() + point.y * BasisV();
 }
 

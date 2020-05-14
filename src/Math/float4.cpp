@@ -118,10 +118,6 @@ float4::float4(const float2 &xy, const float2 &zw)
 float4::float4(const float *data)
 {
 	assume(data);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!data)
-		return;
-#endif
 #if defined(MATH_AUTOMATIC_SSE)
 	v = loadu_ps(data);
 #else

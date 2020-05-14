@@ -43,10 +43,6 @@ MATH_BEGIN_NAMESPACE
 Quat::Quat(const float *data)
 {
 	assume(data);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!data)
-		return;
-#endif
 #if defined(MATH_AUTOMATIC_SSE)
 	q = loadu_ps(data);
 #else

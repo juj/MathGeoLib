@@ -264,10 +264,6 @@ Sphere Sphere::FastEnclosingSphere(const vec *pts, int numPoints)
 		return s;
 	}
 	assume(pts || numPoints == 0);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!pts)
-		return Sphere();
-#endif
 
 	// First pass: Pick the cardinal axis (X,Y or Z) which has the two most distant points.
 	int minx, maxx, miny, maxy, minz, maxz;
@@ -774,10 +770,6 @@ void Sphere::Enclose(const LineSegment &lineSegment)
 void Sphere::Enclose(const vec *pointArray, int numPoints)
 {
 	assume(pointArray || numPoints == 0);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!pointArray)
-		return;
-#endif
 	Sphere_Enclose_pts(*this, pointArray, numPoints);
 }
 
@@ -840,10 +832,6 @@ int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVerti
 	assume(numVertices >= 24 && "At minimum, sphere triangulation will contain at least 8 triangles, which is 24 vertices, but fewer were specified!");
 	assume(numVertices % 3 == 0 && "Warning:: The size of output should be divisible by 3 (each triangle takes up 3 vertices!)");
 
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outPos)
-		return 0;
-#endif
 	assume(this->r > 0.f);
 
 	if (numVertices < 24)

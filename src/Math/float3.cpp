@@ -65,10 +65,6 @@ float3::float3(const float2 &xy, float z_)
 float3::float3(const float *data)
 {
 	assume(data);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!data)
-		return;
-#endif
 	x = data[0];
 	y = data[1];
 	z = data[2];

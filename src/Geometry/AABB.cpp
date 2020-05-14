@@ -348,10 +348,6 @@ Plane AABB::FacePlane(int faceIndex) const
 void AABB::GetCornerPoints(vec *outPointArray) const
 {
 	assume(outPointArray);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outPointArray)
-		return;
-#endif
 	for(int i = 0; i < 8; ++i)
 		outPointArray[i] = CornerPoint(i);
 }
@@ -359,10 +355,6 @@ void AABB::GetCornerPoints(vec *outPointArray) const
 void AABB::GetFacePlanes(Plane *outPlaneArray) const
 {
 	assume(outPlaneArray);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outPlaneArray)
-		return;
-#endif
 	for(int i = 0; i < 6; ++i)
 		outPlaneArray[i] = FacePlane(i);
 }

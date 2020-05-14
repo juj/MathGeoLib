@@ -366,11 +366,7 @@ public:
 	{
 		assume(row >= 0);
 		assume(row < Rows);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-		if (row < 0 || row >= Rows)
-			row = 0; // Benign failure, just give the first rowIndex.
-#endif
-		
+
 #ifdef MATH_COLMAJOR_MATRICES
 		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
 #else
@@ -382,11 +378,7 @@ public:
 	{
 		assume(row >= 0);
 		assume(row < Rows);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-		if (row < 0 || row >= Rows)
-			row = 0; // Benign failure, just give the first rowIndex.
-#endif
-		
+
 #ifdef MATH_COLMAJOR_MATRICES
 		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
 #else

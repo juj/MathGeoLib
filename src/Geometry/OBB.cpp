@@ -447,10 +447,6 @@ Plane OBB::FacePlane(int faceIndex) const
 void OBB::GetCornerPoints(vec *outPointArray) const
 {
 	assume(outPointArray);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outPointArray)
-		return;
-#endif
 	for(int i = 0; i < 8; ++i)
 		outPointArray[i] = CornerPoint(i);
 }
@@ -458,10 +454,6 @@ void OBB::GetCornerPoints(vec *outPointArray) const
 void OBB::GetFacePlanes(Plane *outPlaneArray) const
 {
 	assume(outPlaneArray);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!outPlaneArray)
-		return;
-#endif
 	for(int i = 0; i < 6; ++i)
 		outPlaneArray[i] = FacePlane(i);
 }
@@ -472,11 +464,6 @@ void OBB::ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int
 	assume(pointArray || numPoints == 0);
 
 	idxSmallest = idxLargest = 0;
-
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-	if (!pointArray)
-		return;
-#endif
 
 	smallestD = FLOAT_INF;
 	largestD = -FLOAT_INF;

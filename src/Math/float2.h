@@ -98,10 +98,6 @@ public:
 	{
 		assume(index >= 0);
 		assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-		if (index < 0 || index >= Size)
-			return FLOAT_NAN;
-#endif
 		return ptr()[index];
 	}
 	
@@ -109,10 +105,6 @@ public:
 	{
 		assume(index >= 0);
 		assume(index < Size);
-#ifndef MATH_ENABLE_INSECURE_OPTIMIZATIONS
-		if (index < 0 || index >= Size)
-			return ptr()[0];
-#endif
 		return ptr()[index];
 	}
 

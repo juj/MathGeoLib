@@ -172,12 +172,6 @@ inline StringT ObjToString<u64>(const u64 &obj)
 
 MATH_END_NAMESPACE
 
-// If MATH_ENABLE_INSECURE_OPTIMIZATIONS is defined, all input data is assumed to be correct and will
-// not be checked against at runtime.
-// If this flag is undefined (the default), all input is sanity checked so that user cannot crash the system
-// e.g. with out-of-bounds accesses.
-//#define MATH_ENABLE_INSECURE_OPTIMIZATIONS
-
 #ifdef FAIL_USING_EXCEPTIONS
 #include <stdexcept>
 #define assume_failed(message) throw std::runtime_error((message))
