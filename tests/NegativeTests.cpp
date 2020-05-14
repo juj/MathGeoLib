@@ -1714,7 +1714,7 @@ RANDOMIZED_TEST(RayTriangleMeshNoIntersect)
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	TriangleMesh tm;
-	tm.Set(a);
+	tm.SetConvex(a);
 	p.ReverseNormal();
 	Ray b = RandomRayInHalfspace(p);
 	float d = tm.IntersectRay(b);
@@ -1727,7 +1727,7 @@ RANDOMIZED_TEST(RayKdTreeNoIntersect)
 	Plane p(vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE)), vec::RandomDir(rng));
 	Polyhedron a = RandomPolyhedronInHalfspace(p);
 	KdTree<Triangle> t;
-	TriangleArray tris = a.Triangulate();
+	TriangleArray tris = a.TriangulateConvex();
 	if (!tris.empty())
 		t.AddObjects((Triangle*)&tris[0], (int)tris.size());
 	t.Build();
