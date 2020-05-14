@@ -27,7 +27,7 @@
 // If we have C99, take the types from there.
 #if (__STDC_VERSION__ >= 199901L) || (_MSC_VER >= 1600)
 
-#include <cstdint>
+#include <stdint.h>
 
 typedef uint8_t u8; ///< a single byte: 0-255.
 typedef uint16_t u16; ///< 2 bytes: 0 - 65535.

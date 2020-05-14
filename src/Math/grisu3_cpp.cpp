@@ -7,11 +7,13 @@
 
 #include "grisu3.h"
 #include "../MathBuildConfig.h"
-#ifdef MATH_ENABLE_STL_SUPPORT
-#include <string>
+#if defined(MATH_CONTAINERLIB_SUPPORT)
+#include "Container/UString.h"
+#endif
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 #include <assert.h>
 
-std::string dtoa_grisu3_string(double v)
+StringT dtoa_grisu3_string(double v)
 {
 	char str[32];
 	int len = dtoa_grisu3(v, str);

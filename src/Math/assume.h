@@ -92,13 +92,11 @@ inline StringT ObjToString(const T &obj)
 	return obj.ToString();
 }
 
-#if defined(MATH_ENABLE_STL_SUPPORT)
 template<>
-inline std::string ObjToString<const char*>(const char * const & obj)
+inline StringT ObjToString<const char * const>(const char * const & obj)
 {
-	return obj;
+	return StringT(obj);
 }
-#endif
 
 template<>
 inline StringT ObjToString<StringT>(const StringT &obj)
@@ -153,6 +151,18 @@ inline StringT ObjToString<u32>(const u32 &obj)
 {
 #if defined(MATH_CONTAINERLIB_SUPPORT)
 	return String::FromUInt(obj);
+#else
+	std::stringstream ss;
+	ss << obj;
+	return ss.str();
+#endif
+}
+
+template<>
+inline StringT ObjToString<u64>(const u64 &obj)
+{
+#if defined(MATH_CONTAINERLIB_SUPPORT)
+	return String::FromUInt64(obj);
 #else
 	std::stringstream ss;
 	ss << obj;

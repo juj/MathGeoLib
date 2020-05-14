@@ -227,11 +227,15 @@ typedef __m128 simd4f;
 #define MATH_AUTOMATIC_SIMD_FLOAT3
 #endif
 
+#ifdef __cplusplus
+
 #ifdef MATH_CONTAINERLIB_SUPPORT
 class String;
 #define StringT String
 #else
 #define StringT std::string
+#endif
+
 #endif
 
 #include "Math/MathTypes.h"
