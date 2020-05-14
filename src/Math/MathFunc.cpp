@@ -71,8 +71,9 @@ bool AssumeFailed()
 		DebugBreak();
 #elif defined(__EMSCRIPTEN__)
 		emscripten_debugger();
-#elif defined(__clang__) && __has_builtin(__builtin_debugtrap)
-		__builtin_debugtrap();
+// TODO: Test locally on Linux GCC and enable
+//#elif defined(__clang__) && __has_builtin(__builtin_debugtrap)
+//		__builtin_debugtrap();
 #endif
 	}
 #endif
