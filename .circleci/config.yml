@@ -35,3 +35,9 @@ jobs:
       - run:
           name: Test
           command: './build/MathGeoLib 10 10'
+workflows:
+  version: 2.1
+  builds:
+    jobs:
+      - linux_test_scalar
+      - linux_test_avx
