@@ -212,9 +212,6 @@ public:
 #ifdef WIN8
 		LOG_WRITE( "\t\t\"WIN8\": true,\n");
 #endif
-#ifdef MATH_ENABLE_WINXP_SUPPORT
-		LOG_WRITE("\t\t\"MATH_ENABLE_WINXP_SUPPORT\": true,\n");
-#endif
 #ifdef _DEBUG
 		LOG_WRITE("\t\t\"_DEBUG\": true,\n");
 #endif
