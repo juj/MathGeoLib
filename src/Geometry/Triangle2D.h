@@ -347,7 +347,7 @@ public:
 
 	/// Returns a string of C++ code that can be used to construct this object. Useful for generating test cases from badly behaving objects.
 	StringT SerializeToCodeString() const;
-	static Triangle2D FromString(const String &str) { return FromString(str.c_str()); }
+	static Triangle2D FromString(const StringT &str) { return FromString(str.c_str()); }
 #endif
 
 	static Triangle2D FromString(const char *str, const char **outEndStr = 0);
