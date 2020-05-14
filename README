@@ -9,3 +9,5 @@ A C++ library for linear algebra and geometry manipulation for computer graphics
 * Bug Tracker: https://github.com/juj/MathGeoLib/issues
 
 This repository contains an implementation of my 2015 paper "An Exact Algorithm for Finding Minimum Oriented Bounding Boxes". See http://clb.confined.space/minobb/minobb.html for the full text, and http://clb.confined.space/minobb/test/ModelView.html for a live test build.
+
+https://circleci.com/gh/juj/MathGeoLib.svg?style=shield
