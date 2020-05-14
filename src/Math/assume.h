@@ -20,6 +20,7 @@
 #include "../MathBuildConfig.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <sstream>
+#include <string>
 #endif
 #include "MathNamespace.h"
 #include <stdio.h>
@@ -90,13 +91,15 @@ inline StringT ObjToString(const T &obj)
 {
 	return obj.ToString();
 }
-/*
+
+#if defined(MATH_ENABLE_STL_SUPPORT)
 template<>
 inline std::string ObjToString<const char*>(const char * const & obj)
 {
 	return obj;
 }
-*/
+#endif
+
 template<>
 inline StringT ObjToString<StringT>(const StringT &obj)
 {
