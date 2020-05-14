@@ -1730,7 +1730,7 @@ RANDOMIZED_TEST(RayTriangleMeshIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	TriangleMesh tm;
-	tm.Set(a);
+	tm.SetConvex(a);
 	Ray b = RandomRayContainingPoint(pt);
 	float d = tm.IntersectRay(b);
 	MARK_UNUSED(d);
@@ -1743,7 +1743,7 @@ RANDOMIZED_TEST(RayKdTreeIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	KdTree<Triangle> t;
-	TriangleArray tris = a.Triangulate();
+	TriangleArray tris = a.TriangulateConvex();
 	if (!tris.empty())
 		t.AddObjects((Triangle*)&tris[0], (int)tris.size());
 	t.Build();
