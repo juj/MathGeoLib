@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
 
 #include "../src/MathBuildConfig.h"
 #include "../src/MathGeoLib.h"

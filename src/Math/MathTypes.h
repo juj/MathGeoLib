@@ -54,7 +54,6 @@ typedef signed long long s64; ///< 8 bytes signed. 9,223,372,036,854,775,807 ~ 9
 
 #endif
 
-
 #ifdef _MSC_VER
 #define STATIC_ASSERT static_assert
 #else
