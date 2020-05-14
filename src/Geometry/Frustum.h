@@ -619,7 +619,7 @@ public:
 	bool Intersects(const Frustum &frustum) const;
 	bool Intersects(const Polyhedron &polyhedron) const;
 
-#if defined(MATH_CONTAINERLIB_SUPPORT)
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.
 	StringT ToString() const;
 	 ///\todo Implement this properly.
