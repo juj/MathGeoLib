@@ -514,7 +514,6 @@ void float2::ConvexHull(const float2 *pointArray, int numPoints, std::vector<flo
 }
 #endif
 
-#ifdef MATH_ENABLE_STL_SUPPORT
 /** This function implements the Graham's Scan algorithm for finding the convex hull of
 	a 2D point set. The running time is O(nlogn). For details, see
 	"Introduction to Algorithms, 2nd ed.", by Cormen, Leiserson, Rivest, p.824, or
@@ -536,8 +535,6 @@ bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexH
 	}
 	return true;
 }
-
-#endif // ~MATH_ENABLE_STL_SUPPORT
 
 #define NEXT_P(ptr) ((ptr)+1 < (pEnd) ? (ptr)+1 : (p))
 

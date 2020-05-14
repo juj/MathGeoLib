@@ -362,14 +362,14 @@ void Ray::ProjectToAxis(const vec &direction, float &outMin, float &outMax) cons
 }
 
 #if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
-String Ray::ToString() const
+StringT Ray::ToString() const
 {
 	char str[256];
 	sprintf(str, "Ray(Pos:(%.2f, %.2f, %.2f) Dir:(%.3f, %.3f, %.3f))", pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
 	return str;
 }
 
-String Ray::SerializeToString() const
+StringT Ray::SerializeToString() const
 {
 	char str[256];
 	char *s = SerializeFloat(pos.x, str); *s = ','; ++s;
@@ -383,7 +383,7 @@ String Ray::SerializeToString() const
 	return str;
 }
 
-String Ray::SerializeToCodeString() const
+StringT Ray::SerializeToCodeString() const
 {
 	return "Ray(" + pos.SerializeToCodeString() + "," + dir.SerializeToCodeString() + ")";
 }

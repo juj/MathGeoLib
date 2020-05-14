@@ -6,6 +6,8 @@
 	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
 #pragma once
 
+#include "../MathBuildConfig.h"
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -60,9 +62,12 @@ int i32_to_string(int i, char *dst);
 
 #ifdef __cplusplus
 
-#ifdef MATH_ENABLE_STL_SUPPORT
+#if defined(MATH_ENABLE_STL_SUPPORT)
 #include <string>
-std::string dtoa_grisu3_string(double v);
+#endif
+
+#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+StringT dtoa_grisu3_string(double v);
 #endif
 
 #endif

@@ -11,16 +11,16 @@ UNIQUE_TEST(KdTree_SingleTriangle_AABBQuery)
 	// Build the tree
 	KdTree<Triangle> tree;
 
-	Triangle triangle(float3::zero, float3::unitX, float3::unitY);
+	Triangle triangle(POINT_VEC_SCALAR(0.f), POINT_VEC(1.f, 0.f, 0.f), POINT_VEC(0.f, 1.f, 0.f));
 
 	tree.AddObjects(&triangle, 1);
 	tree.Build();
 
 	// Query
-	AABB bbox(float3::one * -10, float3::one * 10);
+	AABB bbox(POINT_VEC_SCALAR(-10.f), POINT_VEC_SCALAR(10.f));
 
 	bool intersected = false;
-	auto callback = [&](const KdTree<Triangle>& tree, const KdTreeNode& leaf, const AABB& aabb)
+	auto callback = [&](const KdTree<Triangle>& tree, const KdTreeNode& leaf, const AABB& /*aabb*/)
 	{
 		auto bucket = tree.Bucket(leaf.bucketIndex);
 		auto triangle = tree.Object(*bucket);
