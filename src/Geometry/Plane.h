@@ -20,13 +20,6 @@
 #include "../MathGeoLibFwd.h"
 #include "../Math/float3.h"
 
-#ifdef MATH_OGRE_INTEROP
-#include <OgrePlane.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Plane.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// Specifies a plane in 3D space. This plane is an affine 2D subspace of the 3D space, meaning
@@ -398,21 +391,9 @@ public:
 
 	static Plane FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_OGRE_INTEROP
-	Plane(const Ogre::Plane &other):normal(other.normal), d(other.d) {}
-	operator Ogre::Plane() const { return Ogre::Plane(normal, d); }
-#endif
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, float uWidth, float vHeight, const vec &centerPoint, int numFacesU, int numFacesV, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb, float uWidth, float vHeight, const vec &centerPoint, int numLinesU, int numLinesV) const;
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	Plane(const Urho3D::Plane &other) : normal(other.normal_), d(other.d_) {}
-	operator Urho3D::Plane() const { return Urho3D::Plane(float4(normal, d)); }
 #endif
 };
 
@@ -435,11 +416,6 @@ Plane operator *(const float3x3 &transform, const Plane &plane);
 Plane operator *(const float3x4 &transform, const Plane &plane);
 Plane operator *(const float4x4 &transform, const Plane &plane);
 Plane operator *(const Quat &transform, const Plane &plane);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Plane)
-Q_DECLARE_METATYPE(Plane*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Plane &plane);

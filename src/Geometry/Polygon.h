@@ -426,11 +426,6 @@ Polygon operator *(const float3x4 &transform, const Polygon &polygon);
 Polygon operator *(const float4x4 &transform, const Polygon &polygon);
 Polygon operator *(const Quat &transform, const Polygon &polygon);
 
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Polygon)
-Q_DECLARE_METATYPE(Polygon*)
-#endif
-
 // @todo Add this.
 //#ifdef MATH_ENABLE_STL_SUPPORT
 //std::ostream &operator <<(std::ostream &o, const Polygon &polygon);

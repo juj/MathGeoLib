@@ -386,11 +386,6 @@ public:
 
 	static Triangle FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
-
 	bool Equals(const Triangle &rhs, float epsilon = 1e-3f) const { return a.Equals(rhs.a, epsilon) && b.Equals(rhs.b, epsilon) && c.Equals(rhs.c, epsilon); }
 
 	/// Compares whether this Triangle and the given Triangle are identical bit-by-bit in the underlying representation.
@@ -413,11 +408,6 @@ struct Triangle_storage
 	operator Triangle() const { return *reinterpret_cast<const Triangle*>(this); }
 };
 #define TRIANGLE(x) (*(Triangle*)&x)
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Triangle)
-Q_DECLARE_METATYPE(Triangle*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Triangle &triangle);

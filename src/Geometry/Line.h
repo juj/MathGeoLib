@@ -230,22 +230,12 @@ public:
 #endif
 
 	static Line FromString(const char *str, const char **outEndStr = 0);
-
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
 };
 
 Line operator *(const float3x3 &transform, const Line &line);
 Line operator *(const float3x4 &transform, const Line &line);
 Line operator *(const float4x4 &transform, const Line &line);
 Line operator *(const Quat &transform, const Line &line);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Line)
-Q_DECLARE_METATYPE(Line*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Line &line);

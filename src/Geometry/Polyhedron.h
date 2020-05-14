@@ -476,10 +476,6 @@ Polyhedron operator *(const float3x4 &transform, const Polyhedron &polyhedron);
 Polyhedron operator *(const float4x4 &transform, const Polyhedron &polyhedron);
 Polyhedron operator *(const Quat &transform, const Polyhedron &polyhedron);
 
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Polyhedron)
-Q_DECLARE_METATYPE(Polyhedron*)
-#endif
 /*
 Polyhedron operator *(const float3x3 &m, const Polyhedron &s);
 Polyhedron operator *(const float3x4 &m, const Polyhedron &s);

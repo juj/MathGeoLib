@@ -512,11 +512,6 @@ public:
 
 	static OBB FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
-
 	// Finds the set intersection of this and the given OBB.
 	/* @return This function returns the Polyhedron that is contained in both this and the given OBB. */
 //	Polyhedron Intersection(const AABB &aabb) const;
@@ -548,11 +543,6 @@ OBB operator *(const float3x3 &transform, const OBB &obb);
 OBB operator *(const float3x4 &transform, const OBB &obb);
 OBB operator *(const float4x4 &transform, const OBB &obb);
 OBB operator *(const Quat &transform, const OBB &obb);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(OBB)
-Q_DECLARE_METATYPE(OBB*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const OBB &obb);

@@ -24,10 +24,6 @@
 #include "../Math/float4x4.h"
 #include "Ray.h"
 
-#ifdef MATH_TINYXML_INTEROP
-#include "Config/tinyxml/tinyxml.h"
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A Frustum can be set to one of the two common different forms.
@@ -623,19 +619,11 @@ public:
 	bool Intersects(const Frustum &frustum) const;
 	bool Intersects(const Polyhedron &polyhedron) const;
 
-#if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
-	void DeserializeFromXml(TiXmlElement *e);
-#endif
-
-#if defined(MATH_ENABLE_STL_SUPPORT) || defined(MATH_CONTAINERLIB_SUPPORT)
+#if defined(MATH_CONTAINERLIB_SUPPORT)
 	/// Returns a human-readable representation of this Frustum. Most useful for debugging purposes.
 	StringT ToString() const;
 	 ///\todo Implement this properly.
 	StringT SerializeToString() const { return ToString(); }
-#endif
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
 #endif
 };
 
@@ -643,11 +631,6 @@ Frustum operator *(const float3x3 &transform, const Frustum &frustum);
 Frustum operator *(const float3x4 &transform, const Frustum &frustum);
 Frustum operator *(const float4x4 &transform, const Frustum &frustum);
 Frustum operator *(const Quat &transform, const Frustum &frustum);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Frustum)
-Q_DECLARE_METATYPE(Frustum*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Frustum &frustum);

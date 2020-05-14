@@ -28,16 +28,6 @@
 #include "MathConstants.h"
 #include "assume.h"
 
-#ifdef MATH_QT_INTEROP
-#include <QVector2D>
-#endif
-#ifdef MATH_OGRE_INTEROP
-#include <OgreVector2.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Vector2.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A vector of form (x,y).
@@ -640,24 +630,6 @@ public:
 	/** @note Due to static data initialization order being undefined in C++, do NOT use this
 			member to initialize other static data in other compilation units! */
 	static const float2 inf;
-
-#ifdef MATH_OGRE_INTEROP
-	float2(const Ogre::Vector2 &other):x(other.x), y(other.y) {}
-	operator Ogre::Vector2() const { return Ogre::Vector2(x, y); }
-#endif
-#ifdef MATH_QT_INTEROP
-	float2(const QVector2D &other):x(other.x()), y(other.y()) {}
-	operator QVector2D() const { return QVector2D(x, y); }
-	operator QString() const { return "float2(" + QString::number(x) + "," + QString::number(y) + ")"; }
-	QString toString() const { return (QString)*this; }
-	QVector2D ToQVector2D() const { return QVector2D(x, y); }
-	static float2 FromQVector2D(const QVector2D &v) { return (float2)v; }
-	static float2 FromString(const QString &str) { return FromString(str.toStdString()); }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	float2(const Urho3D::Vector2 &other) : x(other.x_), y(other.y_) {}
-	operator Urho3D::Vector2() const { return Urho3D::Vector2(x, y); }
-#endif
 };
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -688,11 +660,6 @@ float2 MulPos2D(const float3x4 &transform, const float2 &v);
 float2 MulDir2D(const float3x4 &transform, const float2 &v);
 float2 MulPos2D(const float4x4 &transform, const float2 &v);
 float2 MulDir2D(const float4x4 &transform, const float2 &v);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(float2)
-Q_DECLARE_METATYPE(float2*)
-#endif
 
 template<typename T>
 int float2_ConvexHullInPlace(T *p, int n);

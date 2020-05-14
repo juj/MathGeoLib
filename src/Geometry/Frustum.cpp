@@ -43,7 +43,7 @@
 #include <iostream>
 #endif
 
-#if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
+#if defined(MATH_CONTAINERLIB_SUPPORT)
 #include "Container/UString.h"
 #endif
 
@@ -1108,22 +1108,6 @@ bool Frustum::Intersects(const Polyhedron &polyhedron) const
 {
 	return this->ToPolyhedron().Intersects(polyhedron);
 }
-
-#if defined(MATH_TINYXML_INTEROP) && defined(MATH_CONTAINERLIB_SUPPORT)
-
-void Frustum::DeserializeFromXml(TiXmlElement *e)
-{
-	type = StrCaseEq(e->Attribute("orthographic"), "true") ? OrthographicFrustum : PerspectiveFrustum;
-	pos = POINT_VEC(float3::FromString(e->Attribute("pos")));
-	front = DIR_VEC(float3::FromString(e->Attribute("front")));
-	up = DIR_VEC(float3::FromString(e->Attribute("up")));
-	e->QueryFloatAttribute("nearPlaneDistance", &nearPlaneDistance);
-	e->QueryFloatAttribute("farPlaneDistance", &farPlaneDistance);
-	e->QueryFloatAttribute("horizontalFov", &horizontalFov);
-	e->QueryFloatAttribute("verticalFov", &verticalFov);
-}
-
-#endif
 
 const char *FrustumTypeToString(FrustumType t)
 {

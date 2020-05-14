@@ -352,11 +352,6 @@ public:
 
 	static Triangle2D FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
-
 	bool Equals(const Triangle2D &rhs, float epsilon = 1e-3f) const { return a.Equals(rhs.a, epsilon) && b.Equals(rhs.b, epsilon) && c.Equals(rhs.c, epsilon); }
 
 	/// Compares whether this Triangle2D and the given Triangle2D are identical bit-by-bit in the underlying representation.
@@ -378,11 +373,6 @@ struct Triangle2D_storage
 	operator Triangle2D() const { return *reinterpret_cast<const Triangle2D*>(this); }
 };
 #define TRIANGLE(x) (*(Triangle2D*)&x)
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Triangle2D)
-Q_DECLARE_METATYPE(Triangle2D*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Triangle2D &triangle);

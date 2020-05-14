@@ -195,22 +195,12 @@ public:
 	/** The returned string specifies the center position, normal direction and the radius of this circle. */
 	StringT ToString() const;
 #endif
-
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
 };
 
 Circle operator *(const float3x3 &transform, const Circle &circle);
 Circle operator *(const float3x4 &transform, const Circle &circle);
 Circle operator *(const float4x4 &transform, const Circle &circle);
 Circle operator *(const Quat &transform, const Circle &circle);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Circle)
-Q_DECLARE_METATYPE(Circle*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Circle &circle);

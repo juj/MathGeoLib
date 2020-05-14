@@ -258,11 +258,6 @@ public:
 
 	static LineSegment2D FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
-
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void ToLineList(VertexBuffer &vb) const;
 #endif
@@ -283,11 +278,6 @@ LineSegment2D operator *(const float3x3 &transform, const LineSegment2D &line);
 LineSegment2D operator *(const float3x4 &transform, const LineSegment2D &line);
 LineSegment2D operator *(const float4x4 &transform, const LineSegment2D &line);
 LineSegment2D operator *(const Quat &transform, const LineSegment2D &line);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(LineSegment2D)
-Q_DECLARE_METATYPE(LineSegment2D*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const LineSegment2D &lineSegment);

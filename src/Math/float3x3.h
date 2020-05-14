@@ -26,16 +26,6 @@
 #include "MatrixProxy.h"
 #include "../Math/float3.h"
 
-#ifdef MATH_OGRE_INTEROP
-#include <OgreMatrix3.h>
-#endif
-#ifdef MATH_BULLET_INTEROP
-#include <LinearMath/btMatrix3x3.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Matrix3.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A 3-by-3 matrix for linear transformations of 3D geometry.
@@ -753,23 +743,6 @@ public:
 		assume(EqualAbs(rhs.w, 0.f));
 		return Mul(rhs);
 	}
-
-#ifdef MATH_OGRE_INTEROP
-	float3x3(const Ogre::Matrix3 &m) { Set(&m[0][0]); }
-	operator Ogre::Matrix3() { return Ogre::Matrix3(v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]); }
-#endif
-#ifdef MATH_BULLET_INTEROP
-	float3x3(const btMatrix3x3 &m) { Set(m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1], m[2][2]); }
-	operator btMatrix3x3() { return btMatrix3x3(v[0][0], v[0][1], v[0][2], v[1][0], v[1][1], v[1][2], v[2][0], v[2][1], v[2][2]); }
-#endif
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return ToString2().c_str(); }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	float3x3(const Urho3D::Matrix3 &m) { Set(m.m00_, m.m01_, m.m02_, m.m10_, m.m11_, m.m12_, m.m20_, m.m21_, m.m22_); }
-	operator Urho3D::Matrix3() { return Urho3D::Matrix3(ptr()); }
-#endif
 };
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -790,10 +763,5 @@ float3 operator *(const float3 &lhs, const float3x3 &rhs);
 /// (Remember that M * v != v * M in general).
 /// This function ignores the w component of the given input vector. This component is assumed to be either 0 or 1.
 float4 operator *(const float4 &lhs, const float3x3 &rhs);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(float3x3)
-Q_DECLARE_METATYPE(float3x3*)
-#endif
 
 MATH_END_NAMESPACE

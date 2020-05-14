@@ -27,22 +27,6 @@
 #include "MathConstants.h"
 #include "assume.h"
 
-#ifdef MATH_QT_INTEROP
-#include <QVector3D>
-#endif
-#ifdef MATH_OGRE_INTEROP
-#include <OgreVector3.h>
-#endif
-#ifdef MATH_BULLET_INTEROP
-#include <LinearMath/btVector3.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Vector3.h>
-#endif
-#ifdef MATH_IRRKLANG_INTEROP
-#include <ik_vec3d.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A vector of form (x,y,z).
@@ -710,32 +694,6 @@ public:
 	/** @note Due to static data initialization order being undefined in C++, do NOT use this
 			member to initialize other static data in other compilation units! */
 	static const float3 inf;
-
-#ifdef MATH_OGRE_INTEROP
-	float3(const Ogre::Vector3 &other):x(other.x), y(other.y), z(other.z) {}
-	operator Ogre::Vector3() const { return Ogre::Vector3(x, y, z); }
-#endif
-#ifdef MATH_QT_INTEROP
-	float3(const QVector3D &other):x(other.x()), y(other.y()), z(other.z()) {}
-	operator QVector3D() const { return QVector3D(x, y, z); }
-	operator QString() const { return "float3(" + QString::number(x) + "," + QString::number(y) + "," + QString::number(z) + ")"; }
-	QString toString() const { return (QString)*this; }
-	QVector3D ToQVector3D() const { return QVector3D(x, y, z); }
-	static float3 FromQVector3D(const QVector3D &v) { return (float3)v; }
-	static float3 FromString(const QString &str) { return FromString(str.toStdString()); }
-#endif
-#ifdef MATH_BULLET_INTEROP
-	float3(const btVector3 &other):x(other.x()), y(other.y()), z(other.z()) {}
-	operator btVector3() const { return btVector3(x, y, z); }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	float3(const Urho3D::Vector3 &other) : x(other.x_), y(other.y_), z(other.z_) {}
-	operator Urho3D::Vector3() const { return Urho3D::Vector3(x, y, z); }
-#endif
-#ifdef MATH_IRRKLANG_INTEROP
-    float3(const irrklang::vec3df &other) : x(other.X), y(other.Y), z(other.Z) {}
-    operator irrklang::vec3df() const { return irrklang::vec3df(x, y, z); }
-#endif
 };
 
 /// Prints this float3 to the given stream.
@@ -760,11 +718,6 @@ inline float3 Clamp(const float3 &a, float floor, float ceil) { return a.Clamp(f
 inline float3 Clamp(const float3 &a, const float3 &floor, const float3 &ceil) { return a.Clamp(floor, ceil); }
 inline float3 Clamp01(const float3 &a) { return a.Clamp01(); }
 inline float3 Lerp(const float3 &a, const float3 &b, float t) { return a.Lerp(b, t); }
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(float3)
-Q_DECLARE_METATYPE(float3*)
-#endif
 
 MATH_END_NAMESPACE
 

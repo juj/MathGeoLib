@@ -27,10 +27,6 @@
 #include "float3.h"
 #include "SSEMath.h"
 
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Matrix3x4.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A 3-by-4 matrix for affine transformations of 3D geometry.
@@ -882,15 +878,6 @@ public:
 	float3 MulDir(const float3 &directionVector) const;
 	float4 MulDir(const float4 &directionVector) const;
 	float4 Mul(const float4 &vector) const;
-
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return ToString2().c_str(); }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	float3x4(const Urho3D::Matrix3x4 &m) { Set(m.m00_, m.m01_, m.m02_, m.m03_, m.m10_, m.m11_, m.m12_, m.m13_, m.m20_, m.m21_, m.m22_, m.m23_); }
-	operator Urho3D::Matrix3x4() { return Urho3D::Matrix3x4(ptr()); }
-#endif
 };
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -907,10 +894,5 @@ float3x4 operator *(const float3x3 &lhs, const float3x4 &rhs);
 /// of multiplication is against the convention of this math system. Please use the M * v notation instead.
 /// (Remember that M * v != v * M in general).
 float4 operator *(const float4 &lhs, const float3x4 &rhs);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(float3x4)
-Q_DECLARE_METATYPE(float3x4*)
-#endif
 
 MATH_END_NAMESPACE

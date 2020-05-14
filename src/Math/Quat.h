@@ -26,19 +26,6 @@
 #endif
 #include "../MathGeoLibFwd.h"
 
-#ifdef MATH_QT_INTEROP
-#include <QQuaternion>
-#endif
-#ifdef MATH_OGRE_INTEROP
-#include <OgreQuaternion.h>
-#endif
-#ifdef MATH_BULLET_INTEROP
-#include <LinearMath/btQuaternion.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Quaternion.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// Represents a rotation or an orientation of a 3D object.
@@ -382,28 +369,6 @@ public:
 	/// Unary operator + allows this structure to be used in an expression '+x'.
 	Quat operator +() const { return *this; }
 
-#ifdef MATH_OGRE_INTEROP
-	Quat(const Ogre::Quaternion &other):x(other.x), y(other.y), z(other.z), w(other.w) {}
-	operator Ogre::Quaternion() const { return Ogre::Quaternion(w, x, y, z); }
-#endif
-#ifdef MATH_QT_INTEROP
-	Quat(const QQuaternion &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
-	operator QQuaternion() const { return QQuaternion(w, x, y, z); }
-	operator QString() const { return toString(); }
-	QString toString() const { return ToString2().c_str(); }
-	QQuaternion ToQQuaternion() const { return (QQuaternion)*this; }
-	static MUST_USE_RESULT Quat FromQQuaternion(const QQuaternion &q) { return (Quat)q; }
-	static MUST_USE_RESULT Quat FromString(const QString &str) { return FromString(str.toStdString()); }
-#endif
-#ifdef MATH_BULLET_INTEROP
-	Quat(const btQuaternion &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
-	operator btQuaternion() const { return btQuaternion(x, y, z, w); }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	Quat(const Urho3D::Quaternion &other) : x(other.x_), y(other.y_), z(other.z_), w(other.w_) {}
-	operator Urho3D::Quaternion() const { return Urho3D::Quaternion(w, x, y, z); }
-#endif
-
 	/// Multiplies two quaternions in the order 'this * rhs'.
 	/// This corresponds to the concatenation of the two operations ('this * rhs * vector' applies the rotation 'rhs' first, followed by the rotation 'this'.
 	Quat MUST_USE_RESULT Mul(const Quat &rhs) const;
@@ -449,10 +414,5 @@ std::ostream &operator <<(std::ostream &out, const Quat &rhs);
 
 FORCE_INLINE Quat Lerp(const Quat &a, const Quat &b, float t) { return a.Lerp(b, t); }
 FORCE_INLINE Quat Slerp(const Quat &a, const Quat &b, float t) { return a.Slerp(b, t); }
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Quat)
-Q_DECLARE_METATYPE(Quat*)
-#endif
 
 MATH_END_NAMESPACE

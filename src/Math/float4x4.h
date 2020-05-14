@@ -27,16 +27,6 @@
 #include "../MathGeoLibFwd.h"
 #include "MatrixProxy.h"
 
-#ifdef MATH_OGRE_INTEROP
-#include <OgreMatrix4.h>
-#endif
-#ifdef MATH_QT_INTEROP
-#include <QMatrix4x4>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Matrix4.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A 4-by-4 matrix for affine transformations and perspective projections of 3D geometry.
@@ -1015,23 +1005,6 @@ public:
 	/// Computes a new matrix with each element of this matrix replaced with their absolute value.
 	float4x4 Abs() const;
 
-#ifdef MATH_OGRE_INTEROP
-	float4x4(const Ogre::Matrix4 &m) { Set(&m[0][0]); }
-	operator Ogre::Matrix4() { return Ogre::Matrix4(v[0][0], v[0][1], v[0][2], v[0][3], v[1][0], v[1][1], v[1][2], v[1][3], v[2][0], v[2][1], v[2][2], v[2][3], v[3][0], v[3][1], v[3][2], v[3][3]); }
-#endif
-#ifdef MATH_QT_INTEROP
-	float4x4(const QMatrix4x4 &m) { Set(m(0,0), m(0,1), m(0,2), m(0,3), m(1,0), m(1,1), m(1,2), m(1,3), m(2,0), m(2,1), m(2,2), m(2,3), m(3,0), m(3,1), m(3,2), m(3,3)); }
-	operator QMatrix4x4() const { return QMatrix4x4(v[0][0], v[0][1], v[0][2], v[0][3], v[1][0], v[1][1], v[1][2], v[1][3], v[2][0], v[2][1], v[2][2], v[2][3], v[3][0], v[3][1], v[3][2], v[3][3]); }
-	operator QString() const { return toString(); }
-	QString toString() const { return ToString2().c_str(); }
-	QMatrix4x4 ToQMatrix4x4() const { return (QMatrix4x4)*this; }
-	static float4x4 FromQMatrix4x4(const QMatrix4x4 &m) { return (float4x4)m; }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	float4x4(const Urho3D::Matrix4 &m) { Set(m.m00_, m.m01_, m.m02_, m.m03_, m.m10_, m.m11_, m.m12_, m.m13_, m.m20_, m.m21_, m.m22_, m.m23_, m.m30_, m.m31_, m.m32_, m.m33_); }
-	operator Urho3D::Matrix4() { return Urho3D::Matrix4(ptr()); }
-#endif
-
 	float4x4 Mul(const float3x3 &rhs) const;
 	float4x4 Mul(const float3x4 &rhs) const;
 	float4x4 Mul(const float4x4 &rhs) const;
@@ -1057,11 +1030,6 @@ float4x4 operator *(const float3x3 &lhs, const float4x4 &rhs);
 /// of multiplication is against the convention of this math system. Please use the M * v notation instead.
 /// (Remember that M * v != v * M in general).
 float4 operator *(const float4 &lhs, const float4x4 &rhs);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(float4x4)
-Q_DECLARE_METATYPE(float4x4*)
-#endif
 
 #ifdef MATH_SIMD
 template<>

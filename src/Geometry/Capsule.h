@@ -293,11 +293,6 @@ public:
 
 	static Capsule FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
-
 	bool Equals(const Capsule &rhs, float epsilon = 1e-3f) const { return l.Equals(rhs.l, epsilon) && EqualAbs(r, rhs.r, epsilon); }
 
 	/// Compares whether this Capsule and the given Capsule are identical bit-by-bit in the underlying representation.
@@ -309,11 +304,6 @@ Capsule operator *(const float3x3 &transform, const Capsule &capsule);
 Capsule operator *(const float3x4 &transform, const Capsule &capsule);
 Capsule operator *(const float4x4 &transform, const Capsule &capsule);
 Capsule operator *(const Quat &transform, const Capsule &capsule);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(Capsule)
-Q_DECLARE_METATYPE(Capsule*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const Capsule &capsule);

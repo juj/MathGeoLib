@@ -15,7 +15,7 @@ set PATH=%PATH%;C:\Program Files (x86)\Cppcheck
 call cppcheck --version
 IF ERRORLEVEL 1 GOTO NO_CPPCHECK
 
-call cppcheck --template "{file}({line}): ({severity}) ({id}): {message}" -UMATH_QT_INTEROP -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=noConstructor --suppress=uninitMemberVar --suppress=ConfigurationNotChecked --suppress=incorrectStringBooleanError --error-exitcode=1 --force --suppressions suppressions.txt ../src
+call cppcheck --template "{file}({line}): ({severity}) ({id}): {message}" -I../src -rp=../src --enable=all --suppress=unusedFunction --suppress=noConstructor --suppress=uninitMemberVar --suppress=ConfigurationNotChecked --suppress=incorrectStringBooleanError --error-exitcode=1 --force --suppressions suppressions.txt ../src
 GOTO END
 
 :NO_CPPCHECK

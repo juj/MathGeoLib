@@ -76,12 +76,6 @@
 #define MATH_ENABLE_STL_SUPPORT
 #endif
 
-// If MATH_TINYXML_INTEROP is defined, MathGeoLib integrates with TinyXML to provide
-// serialization and deserialization to XML for the data structures.
-#ifndef MATH_TINYXML_INTEROP
-//#define MATH_TINYXML_INTEROP
-#endif
-
 // If MATH_CONTAINERLIB_SUPPORT is defined, MathGeoLib integrates with a certain
 // STL replacement container library. Do not enable, only for internal use.
 #ifndef MATH_CONTAINERLIB_SUPPORT

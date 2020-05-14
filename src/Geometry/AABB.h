@@ -25,13 +25,6 @@
 #include "../Math/float4.h"
 #endif
 
-#ifdef MATH_OGRE_INTEROP
-#include <OgreAxisAlignedBox.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/BoundingBox.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 /// A 3D axis-aligned bounding box.
 /** This data structure can be used to represent coarse bounds of objects, in situations where detailed triangle-level
@@ -512,11 +505,6 @@ public:
 
 	static AABB FromString(const char *str, const char **outEndStr = 0);
 
-#ifdef MATH_QT_INTEROP
-	operator QString() const { return toString(); }
-	QString toString() const { return QString::fromStdString(ToString()); }
-#endif
-
 	/// Finds the set intersection of this and the given AABB.
 	/** @return This function returns the AABB that is contained in both this and the given AABB.
 		@todo Add Intersection(OBB/Polyhedron). */
@@ -556,17 +544,9 @@ public:
 	bool IntersectLineAABB_SSE(const float4 &linePos, const float4 &lineDir, float tNear, float tFar) const;
 #endif
 
-#ifdef MATH_OGRE_INTEROP
-	AABB(const Ogre::AxisAlignedBox &other):minPoint(other.getMinimum()), maxPoint(other.getMaximum()) {}
-	operator Ogre::AxisAlignedBox() const { return Ogre::AxisAlignedBox(minPoint, maxPoint); }
-#endif
 #ifdef MATH_GRAPHICSENGINE_INTEROP
 	void Triangulate(VertexBuffer &vb, int numFacesX, int numFacesY, int numFacesZ, bool ccwIsFrontFacing) const;
 	void ToLineList(VertexBuffer &vb) const;
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	AABB(const Urho3D::BoundingBox&other) : minPoint(other.min_), maxPoint(other.max_) {}
-	operator Urho3D::BoundingBox() const { return Urho3D::BoundingBox(minPoint, maxPoint); }
 #endif
 
 	bool Equals(const AABB &rhs, float epsilon = 1e-3f) const { return minPoint.Equals(rhs.minPoint, epsilon) && maxPoint.Equals(rhs.maxPoint, epsilon); }
@@ -580,11 +560,6 @@ OBB operator *(const float3x3 &transform, const AABB &aabb);
 OBB operator *(const float3x4 &transform, const AABB &aabb);
 OBB operator *(const float4x4 &transform, const AABB &aabb);
 OBB operator *(const Quat &transform, const AABB &aabb);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(AABB)
-Q_DECLARE_METATYPE(AABB*)
-#endif
 
 #ifdef MATH_ENABLE_STL_SUPPORT
 std::ostream &operator <<(std::ostream &o, const AABB &aabb);

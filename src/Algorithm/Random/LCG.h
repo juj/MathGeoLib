@@ -124,9 +124,4 @@ public:
 	u32 lastNumber;
 };
 
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(LCG)
-Q_DECLARE_METATYPE(LCG*)
-#endif
-
 MATH_END_NAMESPACE

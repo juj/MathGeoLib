@@ -29,16 +29,6 @@
 #include "SSEMath.h"
 #include "assume.h"
 
-#ifdef MATH_QT_INTEROP
-#include <QVector4D>
-#endif
-#ifdef MATH_OGRE_INTEROP
-#include <OgreVector4.h>
-#endif
-#ifdef MATH_URHO3D_INTEROP
-#include <Urho3D/Math/Vector4.h>
-#endif
-
 MATH_BEGIN_NAMESPACE
 
 /// A 3D vector of form (x,y,z,w) in a 4D homogeneous coordinate space.
@@ -829,30 +819,6 @@ public:
 			member to initialize other static data in other compilation units! */
 	static const float4 inf;
 
-#ifdef MATH_OGRE_INTEROP
-	float4(const Ogre::Vector4 &other): x(other.x), y(other.y), z(other.z), w(other.w) {}
-	float4 &operator =(const Ogre::Vector4 &other) { x = other.x; y = other.y; z = other.z; w = other.w; return *this; }
-	operator Ogre::Vector4() const { return Ogre::Vector4(x, y, z, w); }
-#endif
-#ifdef MATH_QT_INTEROP
-	float4(const QVector4D &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
-	operator QVector4D() const { return QVector4D(x, y, z, w); }
-	operator QString() const { return "float4(" + QString::number(x) + "," + QString::number(y) + "," + QString::number(z) + "," + QString::number(w) + ")"; }
-	QString toString() const { return (QString)*this; }
-	QVector4D ToQVector4D() const { return QVector4D(x, y, z, w); }
-	static float4 FromQVector4D(const QVector4D &v) { return (float4)v; }
-	static float4 FromString(const QString &str) { return FromString(str.toStdString()); }
-#endif
-#ifdef MATH_BULLET_INTEROP
-	// Bullet uses the same btVector3 class for both 3- and 4 -tuples (due to SSE).
-	float4(const btVector3 &other):x(other.x()), y(other.y()), z(other.z()), w(other.w()) {}
-	operator btVector3() const { btVector3 v(x, y, z); v.setW(w); return v; }
-#endif
-#ifdef MATH_URHO3D_INTEROP
-	float4(const Urho3D::Vector4 &other) : x(other.x_), y(other.y_), z(other.z_), w(other.w_) {}
-	operator Urho3D::Vector4() const { return Urho3D::Vector4(x, y, z, w); }
-#endif
-
 #ifdef MATH_SIMD
 	float4(simd4f vec):v(vec) {}
 
@@ -929,10 +895,5 @@ float4 MulPos2D(const float3x4 &transform, const float4 &v);
 float4 MulPos2D(const float4x4 &transform, const float4 &v);
 float4 MulDir2D(const float3x4 &transform, const float4 &v);
 float4 MulDir2D(const float4x4 &transform, const float4 &v);
-
-#ifdef MATH_QT_INTEROP
-Q_DECLARE_METATYPE(float4)
-Q_DECLARE_METATYPE(float4*)
-#endif
 
 MATH_END_NAMESPACE
