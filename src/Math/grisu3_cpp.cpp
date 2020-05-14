@@ -6,6 +6,7 @@
 	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
 
 #include "grisu3.h"
+#include "../MathBuildConfig.h"
 #ifdef MATH_ENABLE_STL_SUPPORT
 #include <string>
 #include <assert.h>

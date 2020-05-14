@@ -77,7 +77,7 @@
 // features requiring STL are disabled (but the library can still be built).
 // Due to large increase in code size, when building for HTML5 platform, do not automatically
 // enable STL support
-#if !defined(MATH_ENABLE_STL_SUPPORT) && !defined(__EMSCRIPTEN__)
+#if !defined(MATH_ENABLE_STL_SUPPORT) && !defined(MATH_DISABLE_STL_SUPPORT)
 #define MATH_ENABLE_STL_SUPPORT
 #endif
 
@@ -126,7 +126,7 @@
 // If MATH_COLMAJOR_MATRICES is defined, matrices use a column-major memory layout. If undefined, matrices
 // use a row-major memory layout.
 #ifndef MATH_COLMAJOR_MATRICES
-#define MATH_COLMAJOR_MATRICES
+// #define MATH_COLMAJOR_MATRICES
 #endif
 
 #if defined(MATH_USE_DIRECT3D) && defined(MATH_USE_OPENGL)

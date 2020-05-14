@@ -594,7 +594,7 @@ void Quat::Set(float x_, float y_, float z_, float w_)
 void Quat::Set(const Quat &q)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = q.v;
+	this->q = q.q;
 #else
 	x = q.x;
 	y = q.y;
@@ -606,7 +606,7 @@ void Quat::Set(const Quat &q)
 void Quat::Set(const float4 &vec)
 {
 #ifdef MATH_AUTOMATIC_SSE
-	v = vec.v;
+	q = vec.v;
 #else
 	x = vec.x;
 	y = vec.y;
