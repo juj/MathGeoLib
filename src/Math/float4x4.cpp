@@ -872,16 +872,7 @@ void float4x4::SetRow(int rowIndex, float m_r0, float m_r1, float m_r2, float m_
 	assume(MATH_NS::IsFinite(m_r2));
 	assume(MATH_NS::IsFinite(m_r3));
 
-// Require VS2012 for the following line - VS2010 fails at internal compiler error, see
-// http://clb.demon.fi:8113/builders/vs2010-MathGeoLib-32bit-SSE4.1/builds/379/steps/Compile%20MathGeoLib-32bit-Release/logs/stdio
-#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD) && (!defined(_MSC_VER) || _MSC_VER >= 1700)
 	this->row[rowIndex] = set_ps(m_r3, m_r2, m_r1, m_r0);
-#else
-	At(rowIndex, 0) = m_r0;
-	At(rowIndex, 1) = m_r1;
-	At(rowIndex, 2) = m_r2;
-	At(rowIndex, 3) = m_r3;
-#endif
 }
 
 void float4x4::SetCol3(int column, const float3 &columnVector)
