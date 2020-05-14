@@ -94,12 +94,6 @@
 //#define MATH_GRAPHICSENGINE_INTEROP
 #endif
 
-// If KNET_LOGGING_SUPPORT_ENABLED is defined, MathGeoLib utilizes logging functions
-// from the kNet library.
-#ifndef KNET_LOGGING_SUPPORT_ENABLED
-//#define KNET_LOGGING_SUPPORT_ENABLED
-#endif
-
 // If MATH_USE_DIRECT3D is defined, the Frustum class defaults to creating Frustums with projectiveSpace = FrustumSpaceD3D.
 #ifndef MATH_USE_DIRECT3D
 //#define MATH_USE_DIRECT3D
