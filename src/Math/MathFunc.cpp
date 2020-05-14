@@ -71,7 +71,7 @@ bool AssumeFailed()
 		DebugBreak();
 #elif defined(__EMSCRIPTEN__)
 		emscripten_debugger();
-#elif __has_builtin(__builtin_debugtrap)
+#elif defined(__clang__) && __has_builtin(__builtin_debugtrap)
 		__builtin_debugtrap();
 #endif
 	}
