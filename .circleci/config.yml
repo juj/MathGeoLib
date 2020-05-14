@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  build:
+  linux_test_scalar:
     docker:
       - image: "debian:stretch"
     steps:
@@ -12,6 +12,23 @@ jobs:
       - run:
           name: CMake
           command: 'cmake -H. -Bbuild -DMATH_TESTS_EXECUTABLE=1 -DFAIL_USING_EXCEPTIONS=1 -DMATH_ENABLE_UNCOMMON_OPERATIONS=1'
+      - run:
+          name: Build
+          command: 'cmake --build build'
+      - run:
+          name: Test
+          command: './build/MathGeoLib 10 10'
+  linux_test_avx:
+    docker:
+      - image: "debian:stretch"
+    steps:
+      - checkout
+      - run:
+          name: Installing via apt-get
+          command: 'apt-get update && apt-get install -y sudo gcc g++ cmake && rm -rf /var/lib/apt/lists/*'
+      - run:
+          name: CMake
+          command: 'cmake -H. -Bbuild -DMATH_AVX=1 -DMATH_TESTS_EXECUTABLE=1 -DFAIL_USING_EXCEPTIONS=1 -DMATH_ENABLE_UNCOMMON_OPERATIONS=1'
       - run:
           name: Build
           command: 'cmake --build build'
