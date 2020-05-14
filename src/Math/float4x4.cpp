@@ -872,7 +872,14 @@ void float4x4::SetRow(int rowIndex, float m_r0, float m_r1, float m_r2, float m_
 	assume(MATH_NS::IsFinite(m_r2));
 	assume(MATH_NS::IsFinite(m_r3));
 
+#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	this->row[rowIndex] = set_ps(m_r3, m_r2, m_r1, m_r0);
+#else
+	At(rowIndex, 0) = m_r0;
+	At(rowIndex, 1) = m_r1;
+	At(rowIndex, 2) = m_r2;
+	At(rowIndex, 3) = m_r3;
+#endif
 }
 
 void float4x4::SetCol3(int column, const float3 &columnVector)
