@@ -40,6 +40,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/math.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
@@ -106,7 +107,11 @@ public:
 	{
 		// Build cossin table
 		for(int i = 0; i < MAX_CIRCLE_ANGLE; i++)
+#ifdef __EMSCRIPTEN__
+			fast_cossin_table[i] = (float)emscripten_math_sin((double)i * PI / HALF_MAX_CIRCLE_ANGLE);
+#else
 			fast_cossin_table[i] = (float)sin((double)i * PI / HALF_MAX_CIRCLE_ANGLE);
+#endif
 	}
 };
 Init_fast_cossin_table static_initializer;
@@ -171,7 +176,12 @@ float Cos(float angleRadians)
 
 float Tan(float angleRadians)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.tan() for minimal code size
+	return emscripten_math_tan(angleRadians);
+#else
 	return tanf(angleRadians);
+#endif
 }
 
 void SinCos(float angleRadians, float &outSin, float &outCos)
@@ -246,37 +256,72 @@ void SinCos4(const float4 &angleRadians, float4 &outSin, float4 &outCos)
 
 float Asin(float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.asin() for minimal code size
+	return emscripten_math_asin(x);
+#else
 	return asinf(x);
+#endif
 }
 
 float Acos(float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.acos() for minimal code size
+	return emscripten_math_acos(x);
+#else
 	return acosf(x);
+#endif
 }
 
 float Atan(float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.atan() for minimal code size
+	return emscripten_math_atan(x);
+#else
 	return atanf(x);
+#endif
 }
 
 float Atan2(float y, float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.atan2() for minimal code size
+	return emscripten_math_atan2(y, x);
+#else
 	return atan2f(y, x);
+#endif
 }
 
 float Sinh(float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.sinh() for minimal code size
+	return emscripten_math_sinh(x);
+#else
 	return sinhf(x);
+#endif
 }
 
 float Cosh(float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.atan() for minimal code size
+	return emscripten_math_cosh(x);
+#else
 	return coshf(x);
+#endif
 }
 
 float Tanh(float x)
 {
+#ifdef __EMSCRIPTEN__
+	// Use Math.tanh() for minimal code size
+	return emscripten_math_tanh(x);
+#else
 	return tanhf(x);
+#endif
 }
 
 bool IsPow2(u32 number)
