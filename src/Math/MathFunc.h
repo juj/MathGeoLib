@@ -189,7 +189,7 @@ float InvLerp(float a, float b, float x);
 float Step(float y, float x);
 /// See http://msdn.microsoft.com/en-us/library/bb509658(v=vs.85).aspx
 /** @see Lerp(), LerpMod(), InvLerp(), Step(), PingPongMod(), Mod(), ModPos(), Frac(). */
-float SmoothStep(float min, float max, float x);
+float Ramp(float min, float max, float x);
 /// Limits x to the range [0, mod], but instead of wrapping around from mod to 0, the result will move back
 /// from mod to 0 as x goes from mod to 2*mod.
 /** @see Lerp(), LerpMod(), InvLerp(), Step(), SmoothStep(), Mod(), ModPos(), Frac(). */

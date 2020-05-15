@@ -499,7 +499,7 @@ float Step(float y, float x)
 	return (x >= y) ? 1.f : 0.f;
 }
 
-float SmoothStep(float min, float max, float x)
+float Ramp(float min, float max, float x)
 {
 	return x <= min ? 0.f : (x >= max ? 1.f : (x - min) / (max - min));
 }
