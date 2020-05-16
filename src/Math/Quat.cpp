@@ -303,7 +303,7 @@ Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	simd4f angle = dot4_ps(q, q2.q); // <q, q2.q>
 	simd4f neg = cmplt_ps(angle, zero_ps()); // angle < 0?
-	neg = and_ps(neg, set1_ps_hex(0x80000000)); // Convert 0/0xFFFFFFFF mask to a 0x/0x80000000 mask.
+	neg = and_ps(neg, set1_ps(-0.0f)); // Convert 0/0xFFFFFFFF mask to a 0x/0x80000000 mask.
 //	neg = s4i_to_s4f(_mm_slli_epi32(s4f_to_s4i(neg), 31)); // A SSE2-esque way to achieve the above would be this, but this seems to clock slower (12.04 clocks vs 11.97 clocks)
 	angle = xor_ps(angle, neg); // if angle was negative, make it positive.
 	simd4f one = set1_ps(1.f);

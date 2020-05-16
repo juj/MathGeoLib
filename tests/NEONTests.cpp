@@ -18,26 +18,16 @@ BENCHMARK(float4_op_add, "float4 + float4")
 }
 BENCHMARK_END;
 
-#ifdef MATH_NEON
-
-BENCHMARK(rsqrtq, "neon")
+UNIQUE_TEST(set_ps_neg_zero)
 {
-	float32x4_t r = v[i];
-	float32x4_t rcp = vrsqrteq_f32(r);
-	float32x4_t ret = vmulq_f32(vrsqrtsq_f32(vmulq_f32(rcp, rcp), r), rcp);
-	v3[i] = ret;
+	simd4f constant = set1_ps(-0.f);
+	u32 arr[4];
+	memcpy(arr, &constant, sizeof(arr));
+	asserteq(arr[0], 0x80000000u);
+	asserteq(arr[1], 0x80000000u);
+	asserteq(arr[2], 0x80000000u);
+	asserteq(arr[3], 0x80000000u);
 }
-BENCHMARK_END
-
-BENCHMARK(rsqrt, "neon")
-{
-	float32x4_t r = v[i];
-	float32x2_t rcp = vrsqrte_f32(vget_low_f32(r));
-	float32x2_t hi = vget_high_f32(r);
-	float32x2_t ret = vmul_f32(vrsqrts_f32(vmul_f32(rcp, rcp), vget_low_f32(r)), rcp);
-	v3[i] = vcombine_f32(ret, hi);
-}
-BENCHMARK_END
 
 UNIQUE_TEST(set_ps_const)
 {
@@ -60,6 +50,27 @@ UNIQUE_TEST(set_ps_const_hex)
 	asserteq(arr[2], 1.0f);
 	asserteq(arr[3], -0.0f);
 }
+
+#ifdef MATH_NEON
+
+BENCHMARK(rsqrtq, "neon")
+{
+	float32x4_t r = v[i];
+	float32x4_t rcp = vrsqrteq_f32(r);
+	float32x4_t ret = vmulq_f32(vrsqrtsq_f32(vmulq_f32(rcp, rcp), r), rcp);
+	v3[i] = ret;
+}
+BENCHMARK_END
+
+BENCHMARK(rsqrt, "neon")
+{
+	float32x4_t r = v[i];
+	float32x2_t rcp = vrsqrte_f32(vget_low_f32(r));
+	float32x2_t hi = vget_high_f32(r);
+	float32x2_t ret = vmul_f32(vrsqrts_f32(vmul_f32(rcp, rcp), vget_low_f32(r)), rcp);
+	v3[i] = vcombine_f32(ret, hi);
+}
+BENCHMARK_END
 
 #ifdef ANDROID
 
