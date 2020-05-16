@@ -7,6 +7,7 @@
 #include "TestRunner.h"
 #include "TestData.h"
 #include "../src/Math/SSEMath.h"
+#include "../src/Math/simd.h"
 #include "../src/Math/float4x4_sse.h"
 #include "../src/Math/float4_neon.h"
 
@@ -29,7 +30,7 @@ UNIQUE_TEST(set_ps_neg_zero)
 	asserteq(arr[3], 0x80000000u);
 }
 
-UNIQUE_TEST(set_ps_const)
+UNIQUE_TEST(set_ps_const_vec)
 {
 	simd4f constant = set_ps_const(4.f, 3.f, 2.f, 1.f);
 	float arr[4];
