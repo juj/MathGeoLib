@@ -87,7 +87,7 @@ public:
 		representing it as an oriented bounding box. The basis of this matrix is assumed to be orthogonal, which
 		means no projection or shear is allowed. Additionally, the matrix must contain only uniform scaling. */
 	void SetFrom(const AABB2D &aabb, float angle);
-	void SetFrom(const AABB2D &aabb, const float2x2 &transform);
+//	void SetFrom(const AABB2D &aabb, const float2x2 &transform);
 
 	/// Sets this OBB2D to enclose the given circle.
 	/** This function computes the tightest possible OBB2D (in terms of area) that contains the given circle, and stores the result in this structure.
