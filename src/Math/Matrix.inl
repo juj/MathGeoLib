@@ -159,7 +159,7 @@ void ExtractEulerXZY(Matrix &m, float &x, float &z, float &y)
 		{
 			// Not a unique solution: y - x = atan2(-m[2][0], m[2][2]);
 			z = pi/2.f;
-			x = atan2(-m[2][0], m[2][2]);
+			x = -atan2(-m[2][0], m[2][2]);
 			y = 0;
 		}
 	}
@@ -185,7 +185,7 @@ void Set3x3PartRotateEulerYXZ(Matrix &m, float &y, float &x, float &z)
 	SinCos(y, sy, cy);
 	SinCos(z, sz, cz);
 
-	m[0][0] =  cy*cz + sx*sy*sz; m[0][1] = cx*sx*sy - cy*sz; m[0][2] = cx*sy;
+	m[0][0] =  cy*cz + sx*sy*sz; m[0][1] = cz*sx*sy - cy*sz; m[0][2] = cx*sy;
 	m[1][0] =             cx*sz; m[1][1] = cx*cz;            m[1][2] =   -sx;
 	m[2][0] = -cz*sy + cy*sx*sz; m[2][1] = cy*cz*sx + sy*sz; m[2][2] = cx*cy;
 }
@@ -238,7 +238,7 @@ void Set3x3PartRotateEulerYZX(Matrix &m, float &y, float &z, float &x)
 
 	m[0][0] =  cy*cz; m[0][1] = sx*sy - cx*cy*sz; m[0][2] = cx*sy + cy*sx*sz;
 	m[1][0] =     sz; m[1][1] =            cx*cz; m[1][2] =           -cz*sx;
-	m[2][0] = -cx*sy; m[2][1] = cy*sx + cx*sy*sz; m[2][2] = cx*cy - sx*sy*sz;
+	m[2][0] = -cz*sy; m[2][1] = cy*sx + cx*sy*sz; m[2][2] = cx*cy - sx*sy*sz;
 }
 
 /** Decomposes the matrix M to form M = R_y * R_z * R_x (R_d being the cardinal rotation
@@ -254,8 +254,8 @@ void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 		if (m[1][0] > -1.f)
 		{
 			z = asin(m[1][0]);
-			y = atan2(m[2][0], m[0][0]);
-			x = atan2(m[1][2], m[1][1]);
+			y = atan2(-m[2][0], m[0][0]);
+			x = atan2(-m[1][2], m[1][1]);
 		}
 		else
 		{
@@ -269,7 +269,7 @@ void ExtractEulerYZX(Matrix &m, float &y, float &z, float &x)
 	{
 		// Not a unique solution.
 		z = pi/2.f;
-		y = atan2(-m[2][1], m[2][2]);
+		y = atan2(m[2][1], m[2][2]);
 		x = 0;
 	}
 }
@@ -312,7 +312,7 @@ void ExtractEulerZXY(const Matrix &m, float &z, float &x, float &y)
 		{
 			// Not a unique solution.
 			x = -pi/2.f;
-			z = -atan2(-m[0][2], m[0][0]);
+			z = -atan2(m[0][2], m[0][0]);
 			y = 0;
 		}
 	}
@@ -465,7 +465,7 @@ void ExtractEulerXZX(Matrix &m, float &x2, float &z, float &x1)
 		{
 			// Not a unique solution.
 			z = pi;
-			x2 = -atan2(-m[2][1], m[2][2]);
+			x2 = -atan2(m[2][1], m[2][2]);
 			x1 = 0;
 		}
 	}
@@ -524,7 +524,7 @@ void ExtractEulerYXY(Matrix &m, float &y2, float &x, float &y1)
 	{
 		// Not a unique solution.
 		x = 0;
-		y2 = atan2(m[2][0], m[0][0]);
+		y2 = atan2(m[0][2], m[0][0]);
 		y1 = 0;
 	}
 }
@@ -645,7 +645,7 @@ void Set3x3PartRotateEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 	SinCos(z1, sz1, cz1);
 
 	m[0][0] = cy*cz2*cz1 - sz2*sz1; m[0][1] = -cz1*sz2 - cy*cz2*sz1; m[0][2] = sy*cz2;
-	m[1][0] =           cy*cz1*sz2; m[1][1] =  cz2*cz1 - cy*sz2*sz1; m[1][2] = sy*sz2;
+	m[1][0] = cy*cz1*sz2 + cz2*sz1; m[1][1] =  cz2*cz1 - cy*sz2*sz1; m[1][2] = sy*sz2;
 	m[2][0] =              -sy*cz1; m[2][1] =                sy*sz1; m[2][2] =     cy;
 }
 
@@ -669,7 +669,7 @@ void ExtractEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 		{
 			// Not a unique solution.
 			y = pi;
-			z2 = -atan2(-m[1][0], m[1][1]);
+			z2 = -atan2(m[1][0], m[1][1]);
 			z1 = 0;
 		}
 	}

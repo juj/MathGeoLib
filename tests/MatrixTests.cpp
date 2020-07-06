@@ -733,6 +733,85 @@ RANDOMIZED_TEST(Float4x4MulFloat3x4)
 	assert(test.Equals(correct));
 }
 
+#define EULER_TEST(from, to, cmp) \
+	float3 v = float3::RandomBox(rng, -20.f, 20.f); \
+	float3x3 m = float3x3::from(v.x, v.y, v.z); \
+	float3x3 m2 = cmp; \
+	assert2(m.Equals(m2), m, m2); \
+	float3 w = m.to(); \
+	float3x3 m3 = float3x3::from(w.x, w.y, w.z); \
+	assert2(m.Equals(m3), m, m3);
+
+RANDOMIZED_TEST(Float3x3EulerXYX)
+{
+	EULER_TEST(FromEulerXYX, ToEulerXYX, float3x3::RotateX(v.x) * float3x3::RotateY(v.y) * float3x3::RotateX(v.z));
+	/*
+	float3 v = float3::RandomBox(rng, -20.f, 20.f);
+	float3x3 m = float3x3::FromEulerXYX(v.x, v.y, v.z);
+	float3x3 m2 = float3x3::RotateX(v.x) * float3x3::RotateY(v.y) * float3x3::RotateX(v.z);
+	assert2(m.Equals(m2), m, m2);
+
+	float3 w = m.ToEulerXYX();
+	float3x3 m3 = float3x3::FromEulerXYX(w.x, w.y, w.z);
+	assert2(m.Equals(m3), m, m3);
+	 */
+}
+
+RANDOMIZED_TEST(Float3x3EulerXZX)
+{
+	EULER_TEST(FromEulerXZX, ToEulerXZX, float3x3::RotateX(v.x) * float3x3::RotateZ(v.y) * float3x3::RotateX(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerYXY)
+{
+	EULER_TEST(FromEulerYXY, ToEulerYXY, float3x3::RotateY(v.x) * float3x3::RotateX(v.y) * float3x3::RotateY(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerYZY)
+{
+	EULER_TEST(FromEulerYZY, ToEulerYZY, float3x3::RotateY(v.x) * float3x3::RotateZ(v.y) * float3x3::RotateY(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerZXZ)
+{
+	EULER_TEST(FromEulerZXZ, ToEulerZXZ, float3x3::RotateZ(v.x) * float3x3::RotateX(v.y) * float3x3::RotateZ(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerZYZ)
+{
+	EULER_TEST(FromEulerZYZ, ToEulerZYZ, float3x3::RotateZ(v.x) * float3x3::RotateY(v.y) * float3x3::RotateZ(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerXYZ)
+{
+	EULER_TEST(FromEulerXYZ, ToEulerXYZ, float3x3::RotateX(v.x) * float3x3::RotateY(v.y) * float3x3::RotateZ(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerXZY)
+{
+	EULER_TEST(FromEulerXZY, ToEulerXZY, float3x3::RotateX(v.x) * float3x3::RotateZ(v.y) * float3x3::RotateY(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerYXZ)
+{
+	EULER_TEST(FromEulerYXZ, ToEulerYXZ, float3x3::RotateY(v.x) * float3x3::RotateX(v.y) * float3x3::RotateZ(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerYZX)
+{
+	EULER_TEST(FromEulerYZX, ToEulerYZX, float3x3::RotateY(v.x) * float3x3::RotateZ(v.y) * float3x3::RotateX(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerZXY)
+{
+	EULER_TEST(FromEulerZXY, ToEulerZXY, float3x3::RotateZ(v.x) * float3x3::RotateX(v.y) * float3x3::RotateY(v.z));
+}
+
+RANDOMIZED_TEST(Float3x3EulerZYX)
+{
+	EULER_TEST(FromEulerZYX, ToEulerZYX, float3x3::RotateZ(v.x) * float3x3::RotateY(v.y) * float3x3::RotateX(v.z));
+}
+
 #ifdef MATH_SSE
 BENCHMARK(mat4x4_determinant, "test against float4x4_Determinant4")
 {
