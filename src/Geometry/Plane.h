@@ -152,8 +152,7 @@ public:
 			of this plane. See the SignedDistance() function to produce a distance value that differentiates between the
 			front and back sides of this plane.
 		@see SignedDistance(), Intersects(), Contains(). */
-	float Distance(const float3 &point) const;
-	float Distance(const float4 &point) const;
+	float Distance(const vec &point) const;
 	float Distance(const LineSegment &lineSegment) const;
 	float Distance(const Sphere &sphere) const;
 	float Distance(const Capsule &capsule) const;
