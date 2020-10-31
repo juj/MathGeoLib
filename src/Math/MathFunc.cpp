@@ -40,7 +40,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#include <emscripten/math.h>
+#include <emscripten/em_math.h>
 #endif
 
 MATH_BEGIN_NAMESPACE
