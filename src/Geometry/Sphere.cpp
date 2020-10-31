@@ -692,6 +692,13 @@ private:
 	void operator=(const AutoArrayPtr&);
 };
 
+static int PointWithDistanceCmp(const void *e1, const void *e2)
+{
+    const PointWithDistance &f = *((PointWithDistance*)e1);
+    const PointWithDistance &s = *((PointWithDistance*)e2);
+    return (s < f) ? 1 : ((f < s) ? -1 : 0);
+}
+
 // Encloses n points into the Sphere s, in the order of farthest first, in order to
 // generate the tightest resulting enclosure.
 void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
@@ -704,7 +711,11 @@ void Sphere_Enclose_pts(Sphere &s, const vec *pts, int n)
 		corners[i].pt = pts[i];
 		corners[i].d = s.pos.DistanceSq(corners[i].pt);
 	}
+#ifdef MATH_ENABLE_STL_SUPPORT
 	std::sort(corners, corners+n);
+#else
+	qsort(corners, n, sizeof(PointWithDistance), PointWithDistanceCmp);
+#endif
 
 	for(int i = n-1; i >= 0; --i)
 		s.Enclose(corners[i].pt);
@@ -721,7 +732,11 @@ void Sphere_Enclose(Sphere &s, const T &obj)
 		corners[i].pt = obj.CornerPoint(i);
 		corners[i].d = s.pos.DistanceSq(corners[i].pt);
 	}
+#ifdef MATH_ENABLE_STL_SUPPORT
 	std::sort(corners, corners+n);
+#else
+	qsort(corners, n, sizeof(PointWithDistance), PointWithDistanceCmp);
+#endif
 
 	for(int i = n-1; i >= 0; --i)
 		s.Enclose(corners[i].pt);
