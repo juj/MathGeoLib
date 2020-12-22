@@ -69,10 +69,62 @@ bool GJKIntersect2D(const A &a, const B &b)
 	return false; // Report no intersection.
 }
 
+
 inline bool GJKIntersect2D(const vec2d *a, int numA, const vec2d *b, int numB)
 {
 	Polygon2DRef p1 = { a, numA };
 	Polygon2DRef p2 = { b, numB };
+	return GJKIntersect2D(p1, p2);
+}
+
+// A helper adapter class to allow passing a vec2d into GJKIntersect2D() function.
+struct GJKVec2DProxy
+{
+	vec2d v;
+	GJKVec2DProxy(const vec2d &v):v(v) {}
+	vec2d AnyPointFast() const { return v; }
+	vec2d ExtremePoint(const vec2d &) const { return v; }
+	vec2d ExtremePoint(const vec2d &direction, float &projectionDistance) const
+	{
+		vec2d extremePoint = ExtremePoint(direction);
+		projectionDistance = extremePoint.Dot(direction);
+		return extremePoint;
+	}
+};
+
+inline bool GJKContainsPt2D(const vec2d *a, int numA, const vec2d &b)
+{
+	Polygon2DRef p1 = { a, numA };
+	GJKVec2DProxy p2 = b;
+	return GJKIntersect2D(p1, p2);
+}
+
+// A helper adapter class to allow passing a vec2d into GJKIntersect2D() function.
+struct GJKOBB2DProxy
+{
+	vec2d center, axis0, axis1;
+	GJKOBB2DProxy(const vec2d &center, const vec2d &axis0, const vec2d &axis1):center(center), axis0(axis0), axis1(axis1) {}
+	vec2d AnyPointFast() const { return center; }
+	vec2d ExtremePoint(const vec2d &direction) const
+	{
+		vec2d pt = center;
+		pt += axis0 * (Dot(direction, axis0) >= 0.f ? 1.0f : -1.0f);
+		pt += axis1 * (Dot(direction, axis1) >= 0.f ? 1.0f : -1.0f);
+		return pt;
+	}
+
+	vec2d ExtremePoint(const vec2d &direction, float &projectionDistance) const
+	{
+		vec2d extremePoint = ExtremePoint(direction);
+		projectionDistance = extremePoint.Dot(direction);
+		return extremePoint;
+	}
+};
+
+inline bool GJKIntersectOBB2D(const vec2d *a, int numA, const vec2d &center, const vec2d &axis0, const vec2d &axis1)
+{
+	Polygon2DRef p1 = { a, numA };
+	GJKOBB2DProxy p2(center, axis0, axis1);
 	return GJKIntersect2D(p1, p2);
 }
 
@@ -83,6 +135,21 @@ inline bool GJKIntersect2D(const Array<vec2d> &a, const Array<vec2d> &b)
 	Polygon2DRef p2 = { b.ptr(), (int)b.size() };
 	return GJKIntersect2D(p1, p2);
 }
+
+inline bool GJKContainsPt2D(const Array<vec2d> &a, const vec2d &b)
+{
+	Polygon2DRef p1 = { a.ptr(), (int)a.size() };
+	GJKVec2DProxy p2 = b;
+	return GJKIntersect2D(p1, p2);
+}
+
+inline bool GJKIntersectOBB2D(const Array<vec2d> &a, const vec2d &center, const vec2d &axis0, const vec2d &axis1)
+{
+	Polygon2DRef p1 = { a.ptr(), (int)a.size() };
+	GJKOBB2DProxy p2(center, axis0, axis1);
+	return GJKIntersect2D(p1, p2);
+}
+
 #endif
 
 MATH_END_NAMESPACE

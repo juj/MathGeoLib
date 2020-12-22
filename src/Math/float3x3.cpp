@@ -1102,6 +1102,11 @@ void float3x3::RemoveScale()
 	MARK_UNUSED(z);
 }
 
+float2 float3x3::Transform(const float2 &vector) const
+{
+	return Transform(vector.x, vector.y);
+}
+
 float3 float3x3::Transform(const float3 &vector) const
 {
 	return Transform(vector.x, vector.y, vector.z);
@@ -1112,6 +1117,12 @@ float3 float3x3::TransformLeft(const float3 &vector) const
 	return float3(vector[0] * At(0, 0) + vector[1] * At(1, 0) + vector[2] * At(2, 0),
 				  vector[0] * At(0, 1) + vector[1] * At(1, 1) + vector[2] * At(2, 1),
 				  vector[0] * At(0, 2) + vector[1] * At(1, 2) + vector[2] * At(2, 2));
+}
+
+float2 float3x3::Transform(float x, float y) const
+{
+	return float2(At(0, 0) * x + At(0, 1) * y,
+	              At(1, 0) * x + At(1, 1) * y);
 }
 
 float3 float3x3::Transform(float x, float y, float z) const
@@ -1492,6 +1503,7 @@ float3x3 float3x3::Mul(const float3x3 &rhs) const { return *this * rhs; }
 float3x4 float3x3::Mul(const float3x4 &rhs) const { return *this * rhs; }
 float4x4 float3x3::Mul(const float4x4 &rhs) const { return *this * rhs; }
 float3x3 float3x3::Mul(const Quat &rhs) const { return *this * rhs; }
+float2 float3x3::Mul(const float2 &rhs) const { return Transform(rhs.x, rhs.y); }
 float3 float3x3::Mul(const float3 &rhs) const { return *this * rhs; }
 
 float3x3 operator *(const Quat &lhs, const float3x3 &rhs)
