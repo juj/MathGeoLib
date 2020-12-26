@@ -213,6 +213,10 @@ public:
 	/// This function assumes that the matrix is orthonormal (no shear or scaling) and does not perform any mirroring (determinant > 0).
 	Quat ToQuat() const;
 
+	/// Attempts to convert this matrix to a quaternion. Returns false if the conversion cannot succeed (this matrix was not a rotation
+	/// matrix, and there is scaling, shearing or mirroring in this matrix)
+	bool TryConvertToQuat(Quat &q) const;
+
 	/// Creates a new float3x3 as a combination of rotation and scale.
 	/** This function creates a new float3x3 M of the form M = R * S, where R is a
 		rotation matrix and S a scale matrix. Transforming a vector v using this matrix computes the vector

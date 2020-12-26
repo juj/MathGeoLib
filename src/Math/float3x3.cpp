@@ -160,6 +160,16 @@ Quat float3x3::ToQuat() const
 	return Quat(*this);
 }
 
+bool float3x3::TryConvertToQuat(Quat &q) const
+{
+	if (IsColOrthogonal() && HasUnitaryScale() && !HasNegativeScale())
+	{
+		q = ToQuat();
+		return true;
+	}
+	return false;
+}
+
 float3x3 float3x3::FromRS(const Quat &rotate, const float3 &scale)
 {
 	return float3x3(rotate) * float3x3::Scale(scale);

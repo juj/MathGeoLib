@@ -205,6 +205,15 @@ float3x4 float3x4::FromTRS(const float3 &translate, const float3x4 &rotate, cons
 	return float3x4::Translate(translate) * float3x4(rotate) * float3x4::Scale(scale);
 }
 
+void float3x4::DecomposeToTRS(float3 &translate, float3x3 &rotate, float3 &scale) const
+{
+	translate = float3(At(0, 3), At(1, 3), At(2, 3));
+	scale = float3(Col(0).Length(), Col(1).Length(), Col(2).Length());
+	rotate.SetCol(0, Col(0) / scale.x);
+	rotate.SetCol(1, Col(1) / scale.y);
+	rotate.SetCol(2, Col(2) / scale.z);
+}
+
 float3x4 float3x4::FromEulerXYX(float x2, float y, float x)
 {
 	float3x4 r;

@@ -238,6 +238,11 @@ public:
 	static float3x4 FromTRS(const float3 &translate, const float3x3 &rotate, const float3 &scale);
 	static float3x4 FromTRS(const float3 &translate, const float3x4 &rotate, const float3 &scale);
 
+	/// Attempts to decompose this matrix to a combination of translation, rotation and scale. The components
+	/// are written out to the input parameters if true is returned. If false is returned, decomposing did not
+	/// succeed.
+	void DecomposeToTRS(float3 &translate, float3x3 &rotate, float3 &scale) const;
+
 	/// Creates a new float3x4 from the given sequence of Euler rotation angles (in radians).
 	/** The FromEulerABC function returns a matrix M = A(ea) * B(eb) * C(ec). Rotation
 		C is applied first, followed by B and then A. [indexTitle: FromEuler***] */
