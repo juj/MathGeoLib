@@ -69,6 +69,11 @@ bool SATIntersect(const A &a, const B &b)
 
 bool SATCollide2D(const float2 *a, int numA, const float2 *b, int numB);
 
+// Returns the penetration distance between the two objects. If > 0, the objects are not colliding.
+// If < 0, then the objects penetrate that deep along outCollisionNormal vector.
+float SATCollide2D_CollisionPoint(const float2 *a, int numA, const float2 *b, int numB,
+                                 float2 &outCollisionPoint, float2 &outCollisionNormal);
+
 #ifdef MATH_CONTAINERLIB_SUPPORT
 inline bool SATCollide2D(const Array<float2> &a, const Array<float2> &b)
 {
