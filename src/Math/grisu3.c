@@ -287,6 +287,48 @@ static int grisu3(double v, char *buffer, int *length, int *d_exp)
 	return success;
 }
 
+int u32_to_hex_string(uint32_t val, char *str)
+{
+	assert(str);
+	char *s = str;
+	const char hex[] = "0123456789ABCDEF";
+	for(;;)
+	{
+		*s++ = hex[val & 0xF];
+		val >>= 4;
+		if (val == 0)
+			break;
+	}
+	*s = '\0';
+
+	// TODO: Can avoid reversing in this loop if using builtin_clz to detect the string width beforehand.
+	ptrdiff_t len = s - str;
+	for(int i = 0; i < len>>1; ++i)
+	{
+		char ch = str[i];
+		str[i] = str[len-1-i];
+		str[len-1-i] = ch;
+	}
+
+	return (int)(s - str);
+}
+
+int i32_to_hex_string(int i, char *str)
+{
+	assert(str);
+	if (i < 0)
+	{
+		*str++ = '-';
+		if (i == INT_MIN)
+		{
+			strcpy(str, "80000000");
+			return 9; // == strlen("-80000000")
+		}
+		return u32_to_string((uint32_t)-i, str) + 1;
+	}
+	return u32_to_string((uint32_t)i, str);
+}
+
 int u32_to_string(uint32_t val, char *str)
 {
 	assert(str);

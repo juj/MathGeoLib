@@ -45,6 +45,9 @@ int f32_to_string(float v, char *dst);
 		is always written) is returned here. */
 int u32_to_string(uint32_t val, char *dst);
 
+/// Similar to u32_to_string(), but prints the number in hexadecimal, inluding leading "0x".
+int u32_to_hex_string(uint32_t val, char *str);
+
 /// Converts an signed 32-bit integer to a string. Longest 32-bit signed integer is
 /// -2147483648, which is 11 bytes (12 if including \0)
 /** @param val The number to convert.
@@ -55,6 +58,9 @@ int u32_to_string(uint32_t val, char *dst);
 	@return the number of characters written to dst, excluding the null terminator (which
 		is always written) is returned here. */
 int i32_to_string(int i, char *dst);
+
+/// Similar to i32_to_string(), but prints the number in signed hexadecimal, inluding leading "0x".
+int i32_to_hex_string(int i, char *str);
 
 #ifdef __cplusplus
 }
