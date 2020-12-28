@@ -29,27 +29,8 @@ MATH_BEGIN_NAMESPACE
 
 class AABB2D;
 
-/// See Christer Ericson's Real-time Collision Detection, p. 87, or
-/// James Arvo's "Transforming Axis-aligned Bounding Boxes" in Graphics Gems 1, pp. 548-550.
-/// http://www.graphicsgems.org/
 template<typename Matrix>
-void AABB2DTransformAsAABB2D(AABB2D &aabb, Matrix &m)
-{
-	float ax = m[0][0] * aabb.minPoint.x;
-	float bx = m[0][0] * aabb.maxPoint.x;
-	float ay = m[0][1] * aabb.minPoint.y;
-	float by = m[0][1] * aabb.maxPoint.y;
-
-	float ax2 = m[1][0] * aabb.minPoint.x;
-	float bx2 = m[1][0] * aabb.maxPoint.x;
-	float ay2 = m[1][1] * aabb.minPoint.y;
-	float by2 = m[1][1] * aabb.maxPoint.y;
-
-	aabb.minPoint.x = Min(ax, bx) + Min(ay, by) + m[0][3];
-	aabb.maxPoint.x = Max(ax, bx) + Max(ay, by) + m[0][3];
-	aabb.minPoint.y = Min(ax2, bx2) + Min(ay2, by2) + m[1][3];
-	aabb.maxPoint.y = Max(ax2, bx2) + Max(ay2, by2) + m[1][3];
-}
+void AABB2DTransformAsAABB2D(AABB2D &aabb, Matrix &m);
 
 class AABB2D
 {
@@ -219,6 +200,28 @@ inline bool Contains(const AABB2D &aabb, const float3 &pt)
 	       aabb.minPoint.y <= pt.y &&
 	       pt.x <= aabb.maxPoint.x &&
 	       pt.y <= aabb.maxPoint.y;
+}
+
+/// See Christer Ericson's Real-time Collision Detection, p. 87, or
+/// James Arvo's "Transforming Axis-aligned Bounding Boxes" in Graphics Gems 1, pp. 548-550.
+/// http://www.graphicsgems.org/
+template<typename Matrix>
+void AABB2DTransformAsAABB2D(AABB2D &aabb, Matrix &m)
+{
+	float ax = m[0][0] * aabb.minPoint.x;
+	float bx = m[0][0] * aabb.maxPoint.x;
+	float ay = m[0][1] * aabb.minPoint.y;
+	float by = m[0][1] * aabb.maxPoint.y;
+
+	float ax2 = m[1][0] * aabb.minPoint.x;
+	float bx2 = m[1][0] * aabb.maxPoint.x;
+	float ay2 = m[1][1] * aabb.minPoint.y;
+	float by2 = m[1][1] * aabb.maxPoint.y;
+
+	aabb.minPoint.x = Min(ax, bx) + Min(ay, by) + m[0][3];
+	aabb.maxPoint.x = Max(ax, bx) + Max(ay, by) + m[0][3];
+	aabb.minPoint.y = Min(ax2, bx2) + Min(ay2, by2) + m[1][3];
+	aabb.maxPoint.y = Max(ax2, bx2) + Max(ay2, by2) + m[1][3];
 }
 
 MATH_END_NAMESPACE
