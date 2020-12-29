@@ -78,7 +78,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 	if (n <= 1) return n > 0 ? n : 0;
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
-    sort::CocktailSort(p, n, LexSortPred<T>);
+    sort::CocktailSort(p, n, TriCmpPred<T>);
 #elif defined(MATH_ENABLE_STL_SUPPORT)
 	std::sort(p, p + n, LexSortPred<T>);
 #else

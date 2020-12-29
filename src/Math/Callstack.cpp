@@ -119,7 +119,7 @@ StringT NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 		StringT symbolName = GetSymbolName((void*)stack.AddrPC.Offset, currentProcess);
 		if (symbolName.find(" GetCallstack") == symbolName.length() - strlen(" GetCallstack"))
 			continue;
-		if (!ignoreFilter || symbolName.find(ignoreFilter) == symbolName.npos)
+		if (!ignoreFilter || symbolName.find(ignoreFilter) == StringT::npos)
 		{
 			if (!symbolName.empty())
 			{
