@@ -672,7 +672,7 @@ public:
 	/// @note The remaining entries of this matrix are set to identity.
 	float4x4 &operator =(const float3x4 &rhs);
 
-	// float4x4 &operator =(const float4x4 &rhs);
+	float4x4 &operator =(const float4x4 &rhs) = default;
 
 	float4x4 &operator =(const TranslateOp &rhs);
 

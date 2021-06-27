@@ -587,8 +587,7 @@ public:
 	float3x4 &operator =(const Quat &rhs);
 
 	/// Sets this float3x4 to represent the same transformation as the given float3x4.
-	//float3x4 &operator =(const float3x4 &rhs);
-
+	float3x4 &operator =(const float3x4 &rhs) = default;
 
 	/// Computes the determinant of this matrix.
 	/** If the determinant is nonzero, this matrix is invertible.

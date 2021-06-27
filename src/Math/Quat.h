@@ -385,6 +385,8 @@ public:
 	/// @note Negating a quaternion will not produce the inverse rotation. Call Quat::Inverse() to generate the inverse rotation.
 	Quat Neg() const { return -*this; }
 
+	Quat &operator=(const Quat &rhs) = default;
+
 private: // Hide the unsafe operations from the user, so that he doesn't accidentally invoke an unintended operation.
 
 	/// Multiplies a quaternion by a scalar.
