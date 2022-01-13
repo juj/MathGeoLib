@@ -470,7 +470,7 @@ StringT LineSegment::SerializeToString() const
 	s = SerializeFloat(b.x, s); *s = ','; ++s;
 	s = SerializeFloat(b.y, s); *s = ','; ++s;
 	s = SerializeFloat(b.z, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -493,7 +493,7 @@ std::ostream &operator <<(std::ostream &o, const LineSegment &lineSegment)
 
 LineSegment LineSegment::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return LineSegment(vec::nan, vec::nan);
 	LineSegment l;

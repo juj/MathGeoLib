@@ -17,10 +17,10 @@ RANDOMIZED_TEST(PolyhedronConvexCentroid)
 	Polyhedron p = RandomPolyhedronContainingPoint(pt);
 
 	vec convexCentroid = p.ConvexCentroid();
-	assert2(p.Contains(convexCentroid), p, convexCentroid);
+	mgl_assert2(p.Contains(convexCentroid), p, convexCentroid);
 
 	vec approximateConvexCentroid = p.ApproximateConvexCentroid();
-	assert2(p.Contains(approximateConvexCentroid), p, approximateConvexCentroid);
+	mgl_assert2(p.Contains(approximateConvexCentroid), p, approximateConvexCentroid);
 }
 
 // Skipped due to numerical stability reasons.
@@ -41,9 +41,9 @@ UNIQUE_TEST(PolyhedronConvexCentroidCase)
 	PBVolume<12> intersection = Source.ToPBVolume().SetIntersection(Target.ToPBVolume());
 	Polyhedron Volume = intersection.ToPolyhedron();
 	vec c = Volume.ConvexCentroid();
-	assert(Volume.Contains(c));
-	assert(Source.Contains(c));
-	assert(Target.Contains(c));
+	mgl_assert(Volume.Contains(c));
+	mgl_assert(Source.Contains(c));
+	mgl_assert(Target.Contains(c));
 }
 */
 
@@ -55,7 +55,7 @@ RANDOMIZED_TEST(Polyhedron_intersects_itself)
 	else
 		pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron p = RandomPolyhedronContainingPoint(pt);
-	assert(p.Intersects(p));
+	mgl_assert(p.Intersects(p));
 }
 
 UNIQUE_TEST(Platonic_solids_contain_zero)
@@ -72,7 +72,7 @@ UNIQUE_TEST(Platonic_solids_contain_zero)
 		case 3: p = Polyhedron::Icosahedron(pt, SCALE); break;
 		default: p = Polyhedron::Dodecahedron(pt, SCALE); break;
 		}
-		assert(p.Contains(pt));
+		mgl_assert(p.Contains(pt));
 	}
 }
 
@@ -87,7 +87,7 @@ UNIQUE_TEST(PolyhedronContainsPointCase)
 	p.v.push_back(POINT_VEC(-16.392548f, -65.362495f, -39.771103f));
 	p.v.push_back(POINT_VEC(-16.392548f, -18.697929f, -102.40900f));
 	p.v.push_back(POINT_VEC(-16.392548f, -18.697929f, -39.771103f));
-	
+
 	int i0[4] = {0,1,3,2};
 	int i1[4] = {4,6,7,5};
 	int i2[4] = {0,4,5,1};
@@ -104,7 +104,7 @@ UNIQUE_TEST(PolyhedronContainsPointCase)
 	AABB a(POINT_VEC(-115.40511f, -65.362495f, -102.40900f),
 		POINT_VEC(-16.392548f,-18.697929f, -39.771103f));
 
-	assert(p.Contains(a.CenterPoint()));
+	mgl_assert(p.Contains(a.CenterPoint()));
 }
 
 RANDOMIZED_TEST(Polyhedron_ConvexHull)
@@ -117,7 +117,7 @@ RANDOMIZED_TEST(Polyhedron_ConvexHull)
 	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+		mgl_assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
 }
 
 UNIQUE_TEST(Polyhedron_ConvexHull_case)
@@ -133,7 +133,7 @@ UNIQUE_TEST(Polyhedron_ConvexHull_case)
 	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+		mgl_assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
 }
 
 UNIQUE_TEST(Polyhedron_ConvexHull_case2)
@@ -150,7 +150,7 @@ UNIQUE_TEST(Polyhedron_ConvexHull_case2)
 	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+		mgl_assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
 }
 
 UNIQUE_TEST(Polyhedron_ConvexHull_case3)
@@ -167,5 +167,5 @@ UNIQUE_TEST(Polyhedron_ConvexHull_case3)
 	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
+		mgl_assert1(convexHull.ContainsConvex(points[i]), convexHull.Distance(points[i]));
 }

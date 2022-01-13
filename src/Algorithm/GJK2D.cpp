@@ -33,7 +33,7 @@ MATH_BEGIN_NAMESPACE
 	@return The new search direction vector. */
 vec2d UpdateSimplex2D(vec2d *s, int &n)
 {
-	assert1(n == 2 || n == 3, n);
+	mgl_assert1(n == 2 || n == 3, n);
 
 	if (n == 2)
 	{
@@ -50,12 +50,12 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 		float d0 = s[0].DistanceSq(vec2d::zero);
 		float d1 = s[1].DistanceSq(vec2d::zero);
 		float d2 = LineSegment2D(s[0], s[1]).DistanceSq(vec2d::zero);
-		assert2(d2 <= d0, d2, d0);
-		assert2(d2 <= d1, d2, d1);
+		mgl_assert2(d2 <= d0, d2, d0);
+		mgl_assert2(d2 <= d1, d2, d1);
 		// Cannot be in case 0: the step 0 -> 1 must have been toward the zero direction:
-		assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
+		mgl_assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
 		// Cannot be in case 1: the zero direction cannot be in the voronoi region of vertex s[1].
-		assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
+		mgl_assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
 #endif
 
 		vec2d d01 = s[1] - s[0];
@@ -73,7 +73,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 	}
 	else
 	{
-		assert(n == 3);
+		mgl_assert(n == 3);
 		// Seven voronoi regions:
 		// 0) closest to vertex s[0].
 		// 1) closest to vertex s[1].
@@ -109,10 +109,10 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 				minDistIndex = i;
 			}
 
-		assert4(isContainedInTriangle || dist <= d[0] + 1e-4f, d[0], dist, isContainedInTriangle, minDistIndex);
-		assert4(isContainedInTriangle || dist <= d[1] + 1e-4f, d[1], dist, isContainedInTriangle, minDistIndex);
-		assert4(isContainedInTriangle || dist <= d[2] + 1e-4f, d[2], dist, isContainedInTriangle, minDistIndex);
-		assert4(isContainedInTriangle || dist <= d[3] + 1e-4f, d[3], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[0] + 1e-4f, d[0], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[1] + 1e-4f, d[1], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[2] + 1e-4f, d[2], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[3] + 1e-4f, d[3], dist, isContainedInTriangle, minDistIndex);
 #endif
 		vec2d d12 = s[2]-s[1];
 		vec2d d02 = s[2]-s[0];
@@ -124,7 +124,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 		{
 			// Case 4: Edge 1->2 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist), d[4], dist, isContainedInTriangle, minDistIndex);
+			mgl_assert4(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist), d[4], dist, isContainedInTriangle, minDistIndex);
 #endif
 			vec2d newDir = e12;
 			s[0] = s[1];
@@ -139,7 +139,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 		{
 			// Case 5: Edge 0->2 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist), d[5], dist, isContainedInTriangle, minDistIndex);
+			mgl_assert4(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist), d[5], dist, isContainedInTriangle, minDistIndex);
 #endif
 			vec2d newDir = e02;
 			s[1] = s[2];
@@ -148,7 +148,7 @@ vec2d UpdateSimplex2D(vec2d *s, int &n)
 		}
 		// Case 6) The origin lies directly inside the triangle. For robustness, terminate the search here immediately with success.
 #ifdef MATH_ASSERT_CORRECTNESS
-		assert4(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, isContainedInTriangle, minDistIndex);
 #endif
 		n = 0;
 		return vec2d::zero;

@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file float2.inl
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief */
 #include "float2.h"
 #include "float3.h"
@@ -74,7 +74,7 @@ float DistSq2D(const T &a, const T &b)
 template<typename T>
 int float2_ConvexHullInPlace(T *p, int n)
 {
-	assert(n >= 0);
+	mgl_assert(n >= 0);
 	if (n <= 1) return n > 0 ? n : 0;
 
 #ifdef MATH_CONTAINERLIB_SUPPORT
@@ -102,7 +102,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 		while (k >= 2 && PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0)
 			--k;
 
-		assert(k < 2*n);
+		mgl_assert(k < 2*n);
 		hull[k++] = p[i];
 	}
 
@@ -114,7 +114,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 		while (k > start && PerpDot2D(hull[k-2], hull[k-1], p[i]) <= 0)
 			--k;
 
-		assert(k < 2*n);
+		mgl_assert(k < 2*n);
 		hull[k++] = p[i];
 	}
 
@@ -132,7 +132,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 	{
 		if (DistSq2D(hull[i], p[h]) > eps)
 		{
-			assert(h+1 < n);
+			mgl_assert(h+1 < n);
 			p[++h] = hull[i];
 		}
 	}
@@ -145,7 +145,7 @@ int float2_ConvexHullInPlace(T *p, int n)
 template<typename T>
 bool float2_ConvexHullContains(T *hull, int n, const T &point)
 {
-	assert(n >= 0);
+	mgl_assert(n >= 0);
 	if (n <= 2) return false; // todo: test vs point or vs line?
 
 	int prev = n-1;

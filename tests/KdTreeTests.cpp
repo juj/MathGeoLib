@@ -24,11 +24,11 @@ UNIQUE_TEST(KdTree_SingleTriangle_AABBQuery)
 	{
 		auto bucket = tree.Bucket(leaf.bucketIndex);
 		auto triangle = tree.Object(*bucket);
-		
+
 		// ... do stuff with triangle ...
 		intersected = true;
 		return false;
 	};
 	tree.AABBQuery(bbox, callback);
-	assert(intersected);
+	mgl_assert(intersected);
 }

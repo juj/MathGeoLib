@@ -87,8 +87,8 @@ void Circle::Translate(const vec &offset)
 
 void Circle::Transform(const float3x3 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal());
 	pos = transform.Mul(pos);
 	normal = transform.Mul(normal).Normalized();
 	r *= transform.Col(0).Length(); // Scale the radius of the circle.
@@ -96,8 +96,8 @@ void Circle::Transform(const float3x3 &transform)
 
 void Circle::Transform(const float3x4 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal());
 	pos = transform.MulPos(pos);
 	normal = transform.MulDir(normal).Normalized();
 	r *= transform.Col(0).Length(); // Scale the radius of the circle.
@@ -105,8 +105,8 @@ void Circle::Transform(const float3x4 &transform)
 
 void Circle::Transform(const float4x4 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal3());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal3());
 	pos = transform.MulPos(pos);
 	normal = transform.MulDir(normal).Normalized();
 	r *= transform.Col3(0).Length(); // Scale the radius of the circle.

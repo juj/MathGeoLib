@@ -25,7 +25,7 @@ UNIQUE_TEST(Triangle_Intersects_AABB_Case)
 		POINT_VEC(-2.0f, -2.0f, -2.0f),
 		POINT_VEC(2.0f, 2.0f, 2.0f));
 
-	assert(triangle.Intersects(aabb));
+	mgl_assert(triangle.Intersects(aabb));
 }
 
 UNIQUE_TEST(Triangle_Intersects_AABB_Case2)
@@ -41,7 +41,7 @@ UNIQUE_TEST(Triangle_Intersects_AABB_Case2)
 		POINT_VEC(-1.0f, -1.0f, -1.0f),
 		POINT_VEC(0.0f, 0.0f, 0.0f));
 
-	assert(!triangle.Intersects(aabb));
+	mgl_assert(!triangle.Intersects(aabb));
 }
 
 UNIQUE_TEST(Triangle_Intersects_AABB_Case3)
@@ -57,5 +57,5 @@ UNIQUE_TEST(Triangle_Intersects_AABB_Case3)
 		POINT_VEC(-10.0f, -10.0f, -1.0f),
 		POINT_VEC(10.0f, 10.0f, 0.0f));
 
-	assert(!triangle.Intersects(aabb));
+	mgl_assert(!triangle.Intersects(aabb));
 }

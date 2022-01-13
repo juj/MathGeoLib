@@ -52,7 +52,7 @@ struct KdTreeNode
 	};
 
 	/// If true, this leaf does not contain any objects.
-	bool IsEmptyLeaf() const { assert(IsLeaf()); return bucketIndex == 0; }
+	bool IsEmptyLeaf() const { mgl_assert(IsLeaf()); return bucketIndex == 0; }
 	bool IsLeaf() const { return splitAxis == AxisNone; }
 	int LeftChildIndex() const { return (int)childIndex; }
 	int RightChildIndex() const { return (int)childIndex+1; }
@@ -222,7 +222,7 @@ struct TriangleKdTreeRayQueryNearestHitVisitor
 	bool operator()(KdTree<Triangle> &tree, const KdTreeNode &leaf, const Ray &ray, float tNear, float tFar)
 	{
 		u32 *bucket = tree.Bucket(leaf.bucketIndex);
-		assert(bucket);
+		mgl_assert(bucket);
 		while(*bucket != KdTree<Triangle>::BUCKET_SENTINEL)
 		{
 			const Triangle &tri = tree.Object(*bucket);

@@ -126,17 +126,17 @@ int Polyhedron::NumEdges() const
 
 vec Polyhedron::Vertex(int vertexIndex) const
 {
-	assume(vertexIndex >= 0);
-	assume(vertexIndex < (int)v.size());
+	mgl_assume(vertexIndex >= 0);
+	mgl_assume(vertexIndex < (int)v.size());
 	
 	return v[vertexIndex];
 }
 
 LineSegment Polyhedron::Edge(int edgeIndex) const
 {
-	assume(edgeIndex >= 0);
+	mgl_assume(edgeIndex >= 0);
 	LineSegmentArray edges = Edges();
-	assume(edgeIndex < (int)edges.size());
+	mgl_assume(edgeIndex < (int)edges.size());
 	return edges[edgeIndex];
 }
 
@@ -156,7 +156,7 @@ std::vector<std::pair<int, int> > Polyhedron::EdgeIndices() const
 	std::set<std::pair<int, int> > uniqueEdges;
 	for(int i = 0; i < NumFaces(); ++i)
 	{
-		assume(f[i].v.size() >= 3);
+		mgl_assume(f[i].v.size() >= 3);
 		if (f[i].v.size() < 3)
 			continue; // Degenerate face with less than three vertices, skip!
 		int x = f[i].v.back();
@@ -185,8 +185,8 @@ std::vector<Polygon> Polyhedron::Faces() const
 Polygon Polyhedron::FacePolygon(int faceIndex) const
 {
 	Polygon p;
-	assume(faceIndex >= 0);
-	assume(faceIndex < (int)f.size());
+	mgl_assume(faceIndex >= 0);
+	mgl_assume(faceIndex < (int)f.size());
 
 	p.p.reserve(f[faceIndex].v.size());
 	for(size_t i = 0; i < f[faceIndex].v.size(); ++i)
@@ -254,7 +254,7 @@ cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 			a = b;
 			b = c;
 		}
-		assert(bestLen != -FLOAT_INF);
+		mgl_assert(bestLen != -FLOAT_INF);
 		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
 #endif
 
@@ -296,7 +296,7 @@ cv PolyFaceNormal(const Polyhedron &poly, int faceIndex)
 				bestNormal = normal;
 			}
 		}
-		assert(bestLen != -FLOAT_INF);
+		mgl_assert(bestLen != -FLOAT_INF);
 		return DIR_VEC((float)bestNormal.x, (float)bestNormal.y, (float)bestNormal.z);
 #endif
 	}
@@ -615,9 +615,9 @@ bool Polyhedron::IsClosed() const
 	{
 		if (f[i].v.size() <= 1)
 			continue;
-		assume(FacePolygon(i).IsPlanar());
-//		assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString()); // TODO: enable
-		assume(FacePolygon(i).IsSimple());
+		mgl_assume(FacePolygon(i).IsPlanar());
+//		mgl_assume1(FacePolygon(i).IsPlanar(), FacePolygon(i).SerializeToString()); // TODO: enable
+		mgl_assume(FacePolygon(i).IsSimple());
 		int x = f[i].v.back();
 		for(size_t j = 0; j < f[i].v.size(); ++j) // O(1)
 		{
@@ -757,11 +757,11 @@ float Polyhedron::FaceContainmentDistance2D(int faceIndex, const vec &worldSpace
 	vec basisU = (vec)v[vertices[1]] - (vec)v[vertices[0]];
 	basisU.Normalize();
 	vec basisV = Cross(p.normal, basisU).Normalized();
-	mathassert(basisU.IsNormalized());
-	mathassert(basisV.IsNormalized());
-	mathassert(basisU.IsPerpendicular(basisV));
-	mathassert(basisU.IsPerpendicular(p.normal));
-	mathassert(basisV.IsPerpendicular(p.normal));
+	mgl_mathassert(basisU.IsNormalized());
+	mgl_mathassert(basisV.IsNormalized());
+	mgl_mathassert(basisU.IsPerpendicular(basisV));
+	mgl_mathassert(basisU.IsPerpendicular(p.normal));
+	mgl_mathassert(basisV.IsPerpendicular(p.normal));
 
 	// Tracks a pseudo-distance of the point to the ~nearest edge of the polygon. If the point is very close to the polygon
 	// edge, this is very small, and it's possible that due to numerical imprecision we cannot rely on the result in higher-level
@@ -949,7 +949,7 @@ bool Polyhedron::Contains(const Frustum &frustum) const
 
 bool Polyhedron::Contains(const Polyhedron &polyhedron) const
 {
-	assume(polyhedron.IsClosed());
+	mgl_assume(polyhedron.IsClosed());
 	for(int i = 0; i < polyhedron.NumVertices(); ++i)
 		if (!Contains(polyhedron.Vertex(i)))
 			return false;
@@ -959,7 +959,7 @@ bool Polyhedron::Contains(const Polyhedron &polyhedron) const
 
 bool Polyhedron::ContainsConvex(const vec &point, float epsilon) const
 {
-	assume(IsConvex());
+	mgl_assume(IsConvex());
 	for(int i = 0; i < NumFaces(); ++i)
 		if (FacePlane(i).SignedDistance(point) > epsilon)
 			return false;
@@ -979,7 +979,7 @@ bool Polyhedron::ContainsConvex(const Triangle &triangle) const
 
 vec Polyhedron::ClosestPointConvex(const vec &point) const
 {
-	assume(IsConvex());
+	mgl_assume(IsConvex());
 	if (ContainsConvex(point))
 		return point;
 	vec closestPoint = vec::nan;
@@ -1064,7 +1064,7 @@ float Polyhedron::Distance(const vec &point) const
 bool Polyhedron::ClipLineSegmentToConvexPolyhedron(const vec &ptA, const vec &dir,
                                                    float &tFirst, float &tLast) const
 {
-	assume(IsConvex());
+	mgl_assume(IsConvex());
 
 	// Intersect line segment against each plane.
 	for(int i = 0; i < NumFaces(); ++i)
@@ -1167,7 +1167,7 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	// Test for each edge of this polyhedron whether the other polyhedron intersects it.
 	for(size_t i = 0; i < f.size(); ++i)
 	{
-		assert(!f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
+		mgl_assert(!f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
 		int v0 = f[i].v.back();
 		vec l0 = v[v0];
 		for(size_t j = 0; j < f[i].v.size(); ++j)
@@ -1184,7 +1184,7 @@ bool Polyhedron::Intersects(const Polyhedron &polyhedron) const
 	// Test for each edge of the other polyhedron whether this polyhedron intersects it.
 	for(size_t i = 0; i < polyhedron.f.size(); ++i)
 	{
-		assert(!polyhedron.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
+		mgl_assert(!polyhedron.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
 		int v0 = polyhedron.f[i].v.back();
 		vec l0 = polyhedron.v[v0];
 		for(size_t j = 0; j < polyhedron.f[i].v.size(); ++j)
@@ -1217,7 +1217,7 @@ bool PolyhedronIntersectsAABB_OBB(const Polyhedron &p, const T &obj)
 	// Test for each edge of this polyhedron whether the AABB/OBB intersects it.
 	for(size_t i = 0; i < p.f.size(); ++i)
 	{
-		assert(!p.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
+		mgl_assert(!p.f[i].v.empty()); // Cannot have degenerate faces here, and for performance reasons, don't start checking for this condition in release mode!
 		int v0 = p.f[i].v.back();
 		vec l0 = p.v[v0];
 		for(size_t j = 0; j < p.f[i].v.size(); ++j)
@@ -1398,7 +1398,7 @@ void Polyhedron::MergeConvex(const vec &point)
 			//vec newTriangleNormal = (v[v.size()-1]-v[iter->second]).Cross(v[iter->first]-v[iter->second]).Normalized();
 
 			std::map<std::pair<int, int>, int>::iterator existing = remainingEdges.find(opposite);
-			assert(existing != remainingEdges.end());
+			mgl_assert(existing != remainingEdges.end());
 			MARK_UNUSED(existing);
 
 #if 0			
@@ -1430,8 +1430,8 @@ void Polyhedron::MergeConvex(const vec &point)
 
 						break;
 					}
-				assert(added);
-				assume(added);
+				mgl_assert(added);
+				mgl_assume(added);
 			}
 			else
 #endif
@@ -1447,14 +1447,14 @@ void Polyhedron::MergeConvex(const vec &point)
 		}
 	}
 
-#define mathasserteq(lhs, op, rhs) do { if (!((lhs) op (rhs))) { LOGE("Condition %s %s %s (%g %s %g) failed!", #lhs, #op, #rhs, (double)(lhs), #op, (double)(rhs)); assert(false); } } while(0)
+#define mgl_mathasserteq(lhs, op, rhs) do { if (!((lhs) op (rhs))) { LOGE("Condition %s %s %s (%g %s %g) failed!", #lhs, #op, #rhs, (double)(lhs), #op, (double)(rhs)); mgl_assert(false); } } while(0)
 
 //	mathasserteq(NumVertices() + NumFaces(), ==, 2 + NumEdges());
-	assert(FaceIndicesValid());
-//	assert(EulerFormulaHolds());
-//	assert(IsClosed());
-//	assert(FacesAreNondegeneratePlanar());
-//	assert(IsConvex());
+	mgl_assert(FaceIndicesValid());
+//	mgl_assert(EulerFormulaHolds());
+//	mgl_assert(IsClosed());
+//	mgl_assert(FacesAreNondegeneratePlanar());
+//	mgl_assert(IsConvex());
 
 //	if (hadDisconnectedHorizon)
 //		MergeConvex(point);
@@ -1463,8 +1463,8 @@ void Polyhedron::MergeConvex(const vec &point)
 
 void Polyhedron::MergeConvex(const vec &point)
 {
-//	assert(IsClosed());
-//	assert(IsConvex());
+//	mgl_assert(IsClosed());
+//	mgl_assert(IsConvex());
 
 	std::set<std::pair<int, int> > deletedEdges;
 
@@ -1513,11 +1513,11 @@ void Polyhedron::MergeConvex(const vec &point)
 		f.push_back(tri);
 	}
 
-//	assert(FaceIndicesValid());
-//	assert(EulerFormulaHolds());
-//	assert(IsClosed());
-//	assert(FacesAreNondegeneratePlanar());
-//	assert(IsConvex());
+//	mgl_assert(FaceIndicesValid());
+//	mgl_assert(EulerFormulaHolds());
+//	mgl_assert(IsClosed());
+//	mgl_assert(FacesAreNondegeneratePlanar());
+//	mgl_assert(IsConvex());
 }
 
 void Polyhedron::Translate(const vec &offset)
@@ -1663,7 +1663,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		extremes.insert(extremeI);
 	}
 
-//	assume(extremes.size() >= 3);
+//	mgl_assume(extremes.size() >= 3);
 	if (extremes.size() < 3)
 		return p; // This might happen if there's NaNs in the vertex data, or duplicates.
 
@@ -1710,7 +1710,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		int v1 = *iter; ++iter;
 		int v2 = *iter; ++iter;
 		int v3 = *iter;
-		assert(v0 < v1 && v1 < v2 && v2 < v3);
+		mgl_assert(v0 < v1 && v1 < v2 && v2 < v3);
 		Swap(p.v[0], p.v[v0]);
 		Swap(p.v[1], p.v[v1]);
 		Swap(p.v[2], p.v[v2]);
@@ -1749,9 +1749,9 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		p.f[3].FlipWindingOrder();
 	}
 
-	assert(p.IsClosed());
-	assert(p.FaceIndicesValid());
-	assert(p.FacesAreNondegeneratePlanar());
+	mgl_assert(p.IsClosed());
+	mgl_assert(p.FaceIndicesValid());
+	mgl_assert(p.FacesAreNondegeneratePlanar());
 
 #ifdef CONVEXHULL_VERBOSE
 	p.DumpStructure();
@@ -1944,8 +1944,8 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				C_LOG("Traversing edge %d->%d which belongs to face %d, and edge %d->%d belongs to face %d",
 					v0, v1, edgesToFaces[std::make_pair(v0, v1)],
 					v1, v0, edgesToFaces[std::make_pair(v1, v0)]);
-				assert(edgesToFaces[std::make_pair(v0, v1)] == fi);
-				assert(adjFace != fi);
+				mgl_assert(edgesToFaces[std::make_pair(v0, v1)] == fi);
+				mgl_assert(adjFace != fi);
 
 				bool adjFaceIsInConflict = (conflictingFaces.find(adjFace) != conflictingFaces.end());
 
@@ -2004,7 +2004,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				for(std::set<int>::iterator fi = conflictingFaces.begin(); fi != conflictingFaces.end(); ++fi)
 				{
 					std::set<int>::iterator iter = conflictListVertices[v].find(*fi);
-					//assert(iter3 != conflictListVertices[*iter].end());
+					//mgl_assert(iter3 != conflictListVertices[*iter].end());
 					if (iter != conflictListVertices[v].end())
 					{
 						C_LOG("Vertex %d no longer with face %d, because the face was removed.", 
@@ -2044,7 +2044,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 #ifdef MATH_ENABLE_STL_SUPPORT
 				LOGE("Polyhedron: %s", p.ToString().c_str());
 #endif
-				assert(false);
+				mgl_assert(false);
 				return Polyhedron();
 			}
 			prev = boundaryEdges[i];
@@ -2058,7 +2058,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 		// Create new faces to close the boundary.
 		for(size_t i = 0; i < boundaryEdges.size(); ++i)
 		{
-			assert(face.v.size() == 3);
+			mgl_assert(face.v.size() == 3);
 			face.v[0] = boundaryEdges[i].first; face.v[1] = boundaryEdges[i].second; face.v[2] = extremeI; p.f.push_back(face);
 
 #if 0
@@ -2086,14 +2086,14 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 				degenerateTris.push_back(t);
 			}
 #endif
-			assert(!faceNormal.IsZero() && faceNormal.IsFinite());
+			mgl_assert(!faceNormal.IsZero() && faceNormal.IsFinite());
 			faceNormals.push_back(faceNormal);
-			assert(extremeI >= (int)hullVertices.size() || !hullVertices[extremeI]);
-			assert(edgesToFaces.find(std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second))
+			mgl_assert(extremeI >= (int)hullVertices.size() || !hullVertices[extremeI]);
+			mgl_assert(edgesToFaces.find(std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second))
 				== edgesToFaces.end() || edgesToFaces[std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second)] == -1);
-			assert(edgesToFaces.find(std::make_pair(boundaryEdges[i].second, extremeI))
+			mgl_assert(edgesToFaces.find(std::make_pair(boundaryEdges[i].second, extremeI))
 				== edgesToFaces.end() || edgesToFaces[std::make_pair(boundaryEdges[i].second, extremeI)] == -1);
-			assert(edgesToFaces.find(std::make_pair(extremeI, boundaryEdges[i].first))
+			mgl_assert(edgesToFaces.find(std::make_pair(extremeI, boundaryEdges[i].first))
 				== edgesToFaces.end() || edgesToFaces[std::make_pair(extremeI, boundaryEdges[i].first)] == -1);
 
 			if (!(edgesToFaces.find(std::make_pair(boundaryEdges[i].first, boundaryEdges[i].second))
@@ -2168,7 +2168,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 #endif
 		// Add new faces that still have conflicting vertices to the work stack for later processing.
 		// The algorithm will terminate once all faces are clear of conflicts.
-		assert(conflictList.size() == p.f.size());
+		mgl_assert(conflictList.size() == p.f.size());
 		for(size_t j = oldNumFaces; j < p.f.size(); ++j)
 			if (!conflictList.at(j).empty())
 //				if (!conflictList[j].empty())
@@ -2184,7 +2184,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 					if (p.f[j].v.empty()) continue;
 					vec pointOnFace = p.v[p.f[j].v[0]];
 					float d = Dot((vec)p.v[i] - pointOnFace, faceNormals[j]);
-					assert(d <= 1e-1f);
+					mgl_assert(d <= 1e-1f);
 				}
 			}
 #endif
@@ -2194,7 +2194,7 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 
 #ifndef NDEBUG
 	for(size_t i = 0; i < conflictList.size(); ++i)
-		assert(conflictList[i].empty());
+		mgl_assert(conflictList[i].empty());
 #endif
 
 #ifdef CONVEXHULL_VERBOSE
@@ -2217,19 +2217,19 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	p.RemoveRedundantVertices();
 //	p.DumpStructure();
 
-	assume(p.IsClosed());
-	assume(p.FaceIndicesValid());
-	assume(p.EulerFormulaHolds());
-	assume(p.FacesAreNondegeneratePlanar());
-	assume(p.IsConvex());
+	mgl_assume(p.IsClosed());
+	mgl_assume(p.FaceIndicesValid());
+	mgl_assume(p.EulerFormulaHolds());
+	mgl_assume(p.FacesAreNondegeneratePlanar());
+	mgl_assume(p.IsConvex());
 
 #ifndef NDEBUG
 //	for(int i = 0; i < numPoints; ++i)
-//		assume1(p.ContainsConvex(pointArray[i]), p.Distance(pointArray[i]));
+//		mgl_assume1(p.ContainsConvex(pointArray[i]), p.Distance(pointArray[i]));
 
 #ifdef MATH_VEC_IS_FLOAT4
 	for(size_t i = 0; i < p.v.size(); ++i)
-		assume1(p.v[i].w == 1.f && vec(p.v[i]).IsFinite(), vec(p.v[i]));
+		mgl_assume1(p.v[i].w == 1.f && vec(p.v[i]).IsFinite(), vec(p.v[i]));
 #endif
 #endif
 
@@ -2246,10 +2246,10 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 	{
 		p.MergeConvex(pointArray[*iter]);
 
-//		assert(p.FaceIndicesValid());
-//		assert(p.IsClosed());
-//		assert(p.FacesAreNondegeneratePlanar());
-//		assert(p.IsConvex());
+//		mgl_assert(p.FaceIndicesValid());
+//		mgl_assert(p.IsClosed());
+//		mgl_assert(p.FacesAreNondegeneratePlanar());
+//		mgl_assert(p.IsConvex());
 	}
 
 	// Merge all the rest of the points.
@@ -2259,18 +2259,18 @@ Polyhedron Polyhedron::ConvexHull(const vec *pointArray, int numPoints, LCG &rng
 			continue; // The extreme points have already been merged.
 		p.MergeConvex(pointArray[j]);
 
-//		assert(p.FaceIndicesValid());
-//		assert(p.IsClosed());
+//		mgl_assert(p.FaceIndicesValid());
+//		mgl_assert(p.IsClosed());
 //		mathassert(p.FacesAreNondegeneratePlanar());
-//		assert(p.IsConvex());
+//		mgl_assert(p.IsConvex());
 
 //		if (p.f.size() > 5000)
 //			break;
 	}
 
-//	assert(p.FaceIndicesValid());
-//	assert(p.IsClosed());
-//	assert(p.IsConvex());
+//	mgl_assert(p.FaceIndicesValid());
+//	mgl_assert(p.IsClosed());
+//	mgl_assert(p.IsConvex());
 	p.RemoveRedundantVertices();
 	return p;
 #endif
@@ -2302,12 +2302,12 @@ Polyhedron Polyhedron::Tetrahedron(const vec &centerPos, float scale, bool ccwIs
 		p.f.push_back(f);
 	}
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -2347,12 +2347,12 @@ Polyhedron Polyhedron::Octahedron(const vec &centerPos, float scale, bool ccwIsF
 		p.f.push_back(f);
 	}
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -2365,12 +2365,12 @@ Polyhedron Polyhedron::Hexahedron(const vec &centerPos, float scale, bool ccwIsF
 	aabb.Translate(centerPos);
 	Polyhedron p = aabb.ToPolyhedron();
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	if (ccwIsFrontFacing)
 		p.FlipWindingOrder();
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -2428,12 +2428,12 @@ Polyhedron Polyhedron::Icosahedron(const vec &centerPos, float scale, bool ccwIs
 		p.f.push_back(f);
 	}
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -2493,12 +2493,12 @@ Polyhedron Polyhedron::Dodecahedron(const vec &centerPos, float scale, bool ccwI
 		p.f.push_back(f);
 	}
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	if (!ccwIsFrontFacing)
 		p.FlipWindingOrder();
 
-	assume(p.Contains(centerPos));
+	mgl_assume(p.Contains(centerPos));
 
 	return p;
 }
@@ -2683,7 +2683,7 @@ void Polyhedron::RemoveRedundantVertices()
 		{
 			int oldIndex = f[i].v[j];
 			int newIndex = ArrayBinarySearch(&usedVerticesArray[0], (int)usedVerticesArray.size(), oldIndex, IntTriCmp);
-			assert(newIndex != -1);
+			mgl_assert(newIndex != -1);
 			f[i].v[j] = newIndex;
 		}
 
@@ -2692,7 +2692,7 @@ void Polyhedron::RemoveRedundantVertices()
 		v[i] = v[usedVerticesArray[i]];
 	v.resize(usedVerticesArray.size());
 	
-	assert(FaceIndicesValid());
+	mgl_assert(FaceIndicesValid());
 }
 
 void PolyExtremeVertexOnFace(const Polyhedron &poly, int face, const cv &dir, cs &outMin, cs &outMax)
@@ -2946,7 +2946,7 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 						{
 							std::vector<int> v2 = nghb.v;
 							std::sort(v2.begin(), v2.end());
-							assert(std::unique(v2.begin(), v2.end()) == v2.end());
+							mgl_assert(std::unique(v2.begin(), v2.end()) == v2.end());
 						}
 #endif
 */
@@ -2962,7 +2962,7 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 						verticesToFaces.erase(std::make_pair(v0, v1));
 
 						f[i].v.clear();
-//						assert(IsClosed());
+//						mgl_assert(IsClosed());
 						break;
 					}
 				}
@@ -2973,8 +2973,8 @@ int Polyhedron::MergeAdjacentPlanarFaces(bool snapVerticesToMergedPlanes, bool c
 #endif
 	RemoveDegenerateFaces();
 	RemoveRedundantVertices();
-	assume(IsClosed());
-	assume(IsConvex());
+	mgl_assume(IsClosed());
+	mgl_assume(IsConvex());
 
 #if 0
 	for(size_t i = 0; i < f.size(); ++i)

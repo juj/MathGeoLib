@@ -690,8 +690,8 @@ void ExtractEulerZYZ(Matrix &m, float &z2, float &y, float &z1)
 template<typename Matrix, typename Vector>
 void SetRotationAxis3x3(Matrix &m, const Vector &a, float angle)
 {
-	assume(a.IsNormalized());
-	assume(MATH_NS::IsFinite(angle));
+	mgl_assume(a.IsNormalized());
+	mgl_assume(MATH_NS::IsFinite(angle));
 
 	float s, c;
 	SinCos(angle, s, c);
@@ -794,7 +794,7 @@ bool InverseMatrix(Matrix &mat, float epsilon)
 		}
 		
 		// multiply rows
-		assume(!EqualAbs(mat[column][column], 0.f, epsilon));
+		mgl_assume(!EqualAbs(mat[column][column], 0.f, epsilon));
 		float scale = 1.f / mat[column][column];
 		inversed.ScaleRow(column, scale);
 		mat.ScaleRow(column, scale);
@@ -880,7 +880,7 @@ void SetMatrixRotatePart(Matrix &m, const Quat &q)
 {
 	// See e.g. http://www.geometrictools.com/Documentation/LinearAlgebraicQuaternions.pdf .
 
-	assume2(q.IsNormalized(1e-3f), q.ToString(), q.LengthSq());
+	mgl_assume2(q.IsNormalized(1e-3f), q.ToString(), q.LengthSq());
 	const float x = q.x; const float y = q.y; const float z = q.z; const float w = q.w;
 	m[0][0] = 1 - 2*(y*y + z*z); m[0][1] =     2*(x*y - z*w); m[0][2] =     2*(x*z + y*w);
 	m[1][0] =     2*(x*y + z*w); m[1][1] = 1 - 2*(x*x + z*z); m[1][2] =     2*(y*z - x*w);
@@ -891,7 +891,7 @@ void SetMatrixRotatePart(Matrix &m, const Quat &q)
 template<typename Matrix>
 void SetMatrix3x3LinearPlaneMirror(Matrix &m, float x, float y, float z)
 {
-	assume(float3(x,y,z).IsNormalized());
+	mgl_assume(float3(x,y,z).IsNormalized());
 	m[0][0] = 1.f - 2.f*x*x; m[0][1] =      -2.f*y*x; m[0][2] =      -2.f*z*x;
 	m[1][0] =      -2.f*x*y; m[1][1] = 1.f - 2.f*y*y; m[1][2] =      -2.f*y*z;
 	m[2][0] =      -2.f*x*z; m[2][1] =      -2.f*y*z; m[2][2] = 1.f - 2.f*z*z;
@@ -909,7 +909,7 @@ void SetMatrix3x4AffinePlaneMirror(Matrix &m, float x, float y, float z, float d
 template<typename Matrix>
 void SetMatrix3x3LinearPlaneProject(Matrix &m, float x, float y, float z)
 {
-	assume(float3(x,y,z).IsNormalized());
+	mgl_assume(float3(x,y,z).IsNormalized());
 	m[0][0] = 1.f - x*x; m[0][1] =      -y*x; m[0][2] =      -z*x;
 	m[1][0] =      -x*y; m[1][1] = 1.f - y*y; m[1][2] =      -y*z;
 	m[2][0] =      -x*z; m[2][1] =      -y*z; m[2][2] = 1.f - z*z;

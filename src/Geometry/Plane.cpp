@@ -49,7 +49,7 @@ MATH_BEGIN_NAMESPACE
 Plane::Plane(const vec &normal_, float d_)
 :normal(normal_), d(d_)
 {
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 }
 
 Plane::Plane(const vec &v1, const vec &v2, const vec &v3)
@@ -89,21 +89,21 @@ void Plane::Set(const vec &v1, const vec &v2, const vec &v3)
 {
 	normal = (v2-v1).Cross(v3-v1);
 	float len = normal.Length();
-	assume1(len > 1e-10f, len);
+	mgl_assume1(len > 1e-10f, len);
 	normal /= len;
-	assume2(normal.IsNormalized(), normal, normal.LengthSq());
+	mgl_assume2(normal.IsNormalized(), normal, normal.LengthSq());
 	d = normal.Dot(v1);
 }
 
 void Plane::Set(const vec &point, const vec &normal_)
 {
 	normal = normal_;
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	d = point.Dot(normal);
 
 #ifdef MATH_ASSERT_CORRECTNESS
-	assert1(EqualAbs(SignedDistance(point), 0.f, 0.01f), SignedDistance(point));
-	assert1(EqualAbs(SignedDistance(point + normal_), 1.f, 0.01f), SignedDistance(point + normal_));
+	mgl_assert1(EqualAbs(SignedDistance(point), 0.f, 0.01f), SignedDistance(point));
+	mgl_assert1(EqualAbs(SignedDistance(point + normal_), 1.f, 0.01f), SignedDistance(point + normal_));
 #endif
 }
 
@@ -153,7 +153,7 @@ void Plane::Transform(const float3x4 &transform)
 	///@todo Could optimize this function by switching to plane convention ax+by+cz+d=0 instead of ax+by+cz=d.
 	float3x3 r = transform.Float3x3Part();
 	bool success = r.Inverse(); ///@todo Can optimize the inverse here by assuming orthogonality or orthonormality.
-	assume(success);
+	mgl_assume(success);
 	MARK_UNUSED(success);
 	d = d + normal.Dot(DIR_VEC(r * transform.TranslatePart()));
 	normal = normal * r;
@@ -161,7 +161,7 @@ void Plane::Transform(const float3x4 &transform)
 
 void Plane::Transform(const float4x4 &transform)
 {
-	assume(transform.Row(3).Equals(float4(0,0,0,1)));
+	mgl_assume(transform.Row(3).Equals(float4(0,0,0,1)));
 	Transform(transform.Float3x4Part());
 }
 
@@ -221,9 +221,9 @@ float Plane::Distance(const Capsule &capsule) const
 
 float Plane::SignedDistance(const vec &point) const
 {
-	assume2(normal.IsNormalized(), normal, normal.Length());
+	mgl_assume2(normal.IsNormalized(), normal, normal.Length());
 #ifdef MATH_VEC_IS_FLOAT4
-	assert1(normal.w == 0.f, normal.w);
+	mgl_assert1(normal.w == 0.f, normal.w);
 #endif
 	return normal.Dot(point) - d;
 }
@@ -232,7 +232,7 @@ template<typename T>
 float Plane_SignedDistance(const Plane &plane, const T &object)
 {
 	float pMin, pMax;
-	assume(plane.normal.IsNormalized());
+	mgl_assume(plane.normal.IsNormalized());
 	object.ProjectToAxis(plane.normal, pMin, pMax);
 	pMin -= plane.d;
 	pMax -= plane.d;
@@ -268,7 +268,7 @@ float3x4 Plane::ObliqueProjection(const vec & /*obliqueProjectionDir*/) const
 #else
 #warning Plane::ObliqueProjection not implemented!
 #endif
-	assume(false && "Plane::ObliqueProjection not implemented!"); /// @todo Implement.
+	mgl_assume(false && "Plane::ObliqueProjection not implemented!"); /// @todo Implement.
 	return float3x4();
 }
 #endif
@@ -283,10 +283,10 @@ vec Plane::Mirror(const vec &point) const
 #ifdef MATH_ASSERT_CORRECTNESS
 	float signedDistance = SignedDistance(point);
 #endif
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	vec reflected = point - 2.f * (point.Dot(normal) - d) * normal;
-	mathassert(EqualAbs(signedDistance, -SignedDistance(reflected), 1e-2f));
-	mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));
+	mgl_mathassert(EqualAbs(signedDistance, -SignedDistance(reflected), 1e-2f));
+	mgl_mathassert(reflected.Equals(MirrorMatrix().MulPos(point)));
 	return reflected;
 }
 
@@ -358,8 +358,8 @@ Polygon Plane::Project(const Polygon &polygon) const
 
 vec Plane::ClosestPoint(const Ray &ray) const
 {
-	assume(ray.IsFinite());
-	assume(!IsDegenerate());
+	mgl_assume(ray.IsFinite());
+	mgl_assume(!IsDegenerate());
 
 	// The plane and a ray have three configurations:
 	// 1) the ray and the plane don't intersect: the closest point is the ray origin point.
@@ -389,8 +389,8 @@ vec Plane::ClosestPoint(const LineSegment &lineSegment) const
 			return Project(lineSegment.b);
 	*/
 
-	assume(lineSegment.IsFinite());
-	assume(!IsDegenerate());
+	mgl_assume(lineSegment.IsFinite());
+	mgl_assume(!IsDegenerate());
 
 	float aDist = Dot(normal, lineSegment.a);
 	float bDist = Dot(normal, lineSegment.b);
@@ -419,7 +419,7 @@ vec Plane::ObliqueProject(const vec & /*point*/, const vec & /*obliqueProjection
 #else
 #warning Plane::ObliqueProject not implemented!
 #endif
-	assume(false && "Plane::ObliqueProject not implemented!"); /// @todo Implement.
+	mgl_assume(false && "Plane::ObliqueProject not implemented!"); /// @todo Implement.
 	return vec();
 }
 #endif
@@ -458,7 +458,7 @@ bool Plane::Contains(const Polygon &polygon, float epsilon) const
 {
 	switch(polygon.NumVertices())
 	{
-	case 0: assume(false && "Plane::Contains(Polygon) called with a degenerate polygon of 0 vertices!"); return false;
+	case 0: mgl_assume(false && "Plane::Contains(Polygon) called with a degenerate polygon of 0 vertices!"); return false;
 	case 1: return Contains(polygon.Vertex(0), epsilon);
 	case 2: return Contains(polygon.Vertex(0), epsilon) && Contains(polygon.Vertex(1), epsilon);
 	default:
@@ -928,7 +928,7 @@ StringT Plane::SerializeToString() const
 	s = SerializeFloat(normal.y, s); *s = ','; ++s;
 	s = SerializeFloat(normal.z, s); *s = ','; ++s;
 	s = SerializeFloat(d, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -943,7 +943,7 @@ StringT Plane::SerializeToCodeString() const
 
 Plane Plane::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return Plane(vec::nan, FLOAT_NAN);
 	Plane p;

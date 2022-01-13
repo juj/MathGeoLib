@@ -93,7 +93,7 @@ void AABB::SetFrom(const Sphere &s)
 
 void AABB::SetFrom(const vec *pointArray, int numPoints)
 {
-	assume(pointArray || numPoints == 0);
+	mgl_assume(pointArray || numPoints == 0);
 	SetNegativeInfinity();
 	if (!pointArray)
 		return;
@@ -138,12 +138,12 @@ Polyhedron AABB::ToPolyhedron() const
 		p.f.push_back(face);
 	}
 	
-	assume(p.IsClosed());
-	assume(p.IsConvex());
-	assume(p.EulerFormulaHolds());
-	assume(p.FaceIndicesValid());
-	assume(p.FacesAreNondegeneratePlanar());
-	assume(p.Contains(this->CenterPoint()));
+	mgl_assume(p.IsClosed());
+	mgl_assume(p.IsConvex());
+	mgl_assume(p.EulerFormulaHolds());
+	mgl_assume(p.FaceIndicesValid());
+	mgl_assume(p.FacesAreNondegeneratePlanar());
+	mgl_assume(p.Contains(this->CenterPoint()));
 	return p;
 }
 
@@ -187,9 +187,9 @@ vec AABB::CenterPoint() const
 
 vec AABB::PointInside(float x, float y, float z) const
 {
-	assume(0.f <= x && x <= 1.f);
-	assume(0.f <= y && y <= 1.f);
-	assume(0.f <= z && z <= 1.f);
+	mgl_assume(0.f <= x && x <= 1.f);
+	mgl_assume(0.f <= y && y <= 1.f);
+	mgl_assume(0.f <= z && z <= 1.f);
 
 	vec d = maxPoint - minPoint;
 	return minPoint + d.Mul(POINT_VEC(x, y, z));
@@ -197,7 +197,7 @@ vec AABB::PointInside(float x, float y, float z) const
 
 LineSegment AABB::Edge(int edgeIndex) const
 {
-	assume(0 <= edgeIndex && edgeIndex <= 11);
+	mgl_assume(0 <= edgeIndex && edgeIndex <= 11);
 	switch(edgeIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -233,7 +233,7 @@ LineSegment AABB::Edge(int edgeIndex) const
 
 vec AABB::CornerPoint(int cornerIndex) const
 {
-	assume(0 <= cornerIndex && cornerIndex <= 7);
+	mgl_assume(0 <= cornerIndex && cornerIndex <= 7);
 	switch(cornerIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -264,8 +264,8 @@ vec AABB::ExtremePoint(const vec &direction, float &projectionDistance) const
 
 vec AABB::PointOnEdge(int edgeIndex, float u) const
 {
-	assume(0 <= edgeIndex && edgeIndex <= 11);
-	assume(0 <= u && u <= 1.f);
+	mgl_assume(0 <= edgeIndex && edgeIndex <= 11);
+	mgl_assume(0 <= u && u <= 1.f);
 
 	vec d = maxPoint - minPoint;
 	switch(edgeIndex)
@@ -290,7 +290,7 @@ vec AABB::PointOnEdge(int edgeIndex, float u) const
 
 vec AABB::FaceCenterPoint(int faceIndex) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
 
 	vec center = (minPoint + maxPoint) * 0.5f;
 	switch(faceIndex)
@@ -307,9 +307,9 @@ vec AABB::FaceCenterPoint(int faceIndex) const
 
 vec AABB::FacePoint(int faceIndex, float u, float v) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
-	assume(0 <= u && u <= 1.f);
-	assume(0 <= v && v <= 1.f);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= u && u <= 1.f);
+	mgl_assume(0 <= v && v <= 1.f);
 
 	vec d = maxPoint - minPoint;
 	switch(faceIndex)
@@ -326,7 +326,7 @@ vec AABB::FacePoint(int faceIndex, float u, float v) const
 
 vec AABB::FaceNormal(int faceIndex) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -341,20 +341,20 @@ vec AABB::FaceNormal(int faceIndex) const
 
 Plane AABB::FacePlane(int faceIndex) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
 	return Plane(FaceCenterPoint(faceIndex), FaceNormal(faceIndex));
 }
 
 void AABB::GetCornerPoints(vec *outPointArray) const
 {
-	assume(outPointArray);
+	mgl_assume(outPointArray);
 	for(int i = 0; i < 8; ++i)
 		outPointArray[i] = CornerPoint(i);
 }
 
 void AABB::GetFacePlanes(Plane *outPlaneArray) const
 {
-	assume(outPlaneArray);
+	mgl_assume(outPlaneArray);
 	for(int i = 0; i < 6; ++i)
 		outPlaneArray[i] = FacePlane(i);
 }
@@ -368,7 +368,7 @@ AABB AABB::MinimalEnclosingAABB(const vec *pointArray, int numPoints)
 
 void AABB::ExtremePointsAlongAABB(const vec *pts, int numPoints, int &minx, int &maxx, int &miny, int &maxy, int &minz, int &maxz)
 {
-	assume(pts || numPoints == 0);
+	mgl_assume(pts || numPoints == 0);
 	if (!pts)
 		return;
 	minx = maxx = miny = maxy = minz = maxz = 0;
@@ -502,25 +502,25 @@ void AABBTransformAsAABB_SIMD(AABB &aabb, const float4x4 &m)
 
 void AABB::TransformAsAABB(const float3x3 &transform)
 {
-	assume(transform.IsColOrthogonal());
-	assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal());
+	mgl_assume(transform.HasUniformScale());
 
 	AABBTransformAsAABB(*this, transform);
 }
 
 void AABB::TransformAsAABB(const float3x4 &transform)
 {
-	assume(transform.IsColOrthogonal());
-	assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal());
+	mgl_assume(transform.HasUniformScale());
 
 	AABBTransformAsAABB(*this, transform);
 }
 
 void AABB::TransformAsAABB(const float4x4 &transform)
 {
-	assume(transform.IsColOrthogonal3());
-	assume(transform.HasUniformScale());
-	assume(transform.Row(3).Equals(0,0,0,1));
+	mgl_assume(transform.IsColOrthogonal3());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.Row(3).Equals(0,0,0,1));
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	AABBTransformAsAABB_SIMD(*this, transform);
@@ -568,9 +568,9 @@ OBB AABB::Transform(const Quat &transform) const
 vec AABB::ClosestPoint(const vec &targetPoint) const
 {
 #ifdef MATH_VEC_IS_FLOAT4
-	assume(EqualAbs(minPoint.w, 1.f));
-	assume(EqualAbs(maxPoint.w, 1.f));
-	assume(EqualAbs(targetPoint.w, 1.f));
+	mgl_assume(EqualAbs(minPoint.w, 1.f));
+	mgl_assume(EqualAbs(maxPoint.w, 1.f));
+	mgl_assume(EqualAbs(targetPoint.w, 1.f));
 #endif
 	return targetPoint.Clamp(minPoint, maxPoint);
 }
@@ -724,8 +724,8 @@ bool AABB::Intersects(const LineSegment &lineSegment) const
 
 bool AABB::IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &tNear, float &tFar) const
 {
-	assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
-	assume2(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!", tNear, tFar);
+	mgl_assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
+	mgl_assume2(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!", tNear, tFar);
 	// The user should have inputted values for tNear and tFar to specify the desired subrange [tNear, tFar] of the line
 	// for this intersection test.
 	// For a Line-AABB test, pass in
@@ -795,8 +795,8 @@ bool AABB::IntersectLineAABB_CPP(const vec &linePos, const vec &lineDir, float &
 #ifdef MATH_SIMD
 bool AABB::IntersectLineAABB_SSE(const float4 &rayPos, const float4 &rayDir, float tNear, float tFar) const
 {
-	assume(rayDir.IsNormalized4());
-	assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
+	mgl_assume(rayDir.IsNormalized4());
+	mgl_assume(tNear <= tFar && "AABB::IntersectLineAABB: User gave a degenerate line as input for the intersection test!");
 	/* For reference, this is the C++ form of the vectorized SSE code below.
 
 	float4 recipDir = rayDir.RecipFast4();
@@ -1105,7 +1105,7 @@ void AABB::Enclose(const Polyhedron &polyhedron)
 
 void AABB::Enclose(const vec *pointArray, int numPoints)
 {
-	assume(pointArray || numPoints == 0);
+	mgl_assume(pointArray || numPoints == 0);
 	if (!pointArray)
 		return;
 	for(int i = 0; i < numPoints; ++i)
@@ -1116,11 +1116,11 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
                        vec *outPos, vec *outNormal, float2 *outUV,
                        bool ccwIsFrontFacing) const
 {
-	assume(numFacesX >= 1);
-	assume(numFacesY >= 1);
-	assume(numFacesZ >= 1);
+	mgl_assume(numFacesX >= 1);
+	mgl_assume(numFacesY >= 1);
+	mgl_assume(numFacesZ >= 1);
 
-	assume(outPos);
+	mgl_assume(outPos);
 	if (!outPos)
 		return;
 
@@ -1184,12 +1184,12 @@ void AABB::Triangulate(int numFacesX, int numFacesY, int numFacesZ,
 				i += 6;
 			}
 	}
-	assert(i == NumVerticesInTriangulation(numFacesX, numFacesY, numFacesZ));
+	mgl_assert(i == NumVerticesInTriangulation(numFacesX, numFacesY, numFacesZ));
 }
 
 void AABB::ToEdgeList(vec *outPos) const
 {
-	assume(outPos);
+	mgl_assume(outPos);
 	if (!outPos)
 		return;
 	for(int i = 0; i < 12; ++i)
@@ -1217,7 +1217,7 @@ StringT AABB::SerializeToString() const
 	s = SerializeFloat(maxPoint.x, s); *s = ','; ++s;
 	s = SerializeFloat(maxPoint.y, s); *s = ','; ++s;
 	s = SerializeFloat(maxPoint.z, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -1229,7 +1229,7 @@ StringT AABB::SerializeToCodeString() const
 
 AABB AABB::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return AABB(vec::nan, vec::nan);
 	AABB a;

@@ -194,13 +194,13 @@ public:
 
 	vec ToPointVec() const
 	{
-		assert1(EqualAbs((float)w, 1.0), w);
+		mgl_assert1(EqualAbs((float)w, 1.0), w);
 		return POINT_VEC((float)x, (float)y, (float)z);
 	}
 
 	vec ToDirVec() const
 	{
-		assert1(EqualAbs((float)w, 0.0), w);
+		mgl_assert1(EqualAbs((float)w, 0.0), w);
 		return DIR_VEC((float)x, (float)y, (float)z);
 	}
 

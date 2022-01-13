@@ -45,7 +45,7 @@ UNIQUE_TEST(assertWorks)
 	EXPECT_FAIL("Testing exception throwing");
 
 	if (TrueCondition())
-		assert(false && "Testing that assert() macro fails as expected!");
+		mgl_assert(false && "Testing that assert() macro fails as expected!");
 }
 
 UNIQUE_TEST(assume1Works)
@@ -57,13 +57,13 @@ UNIQUE_TEST(assume1Works)
 		assume1(false && "Testing that assume() macro fails as expected!", val);
 }
 
-UNIQUE_TEST(assert1Works)
+UNIQUE_TEST(mgl_assert1Works)
 {
 	EXPECT_FAIL("Testing exception throwing");
 
 	int val = 5;
 	if (TrueCondition())
-		assert1(false && "Testing that assert() macro fails as expected!", val);
+		mgl_assert1(false && "Testing that assert() macro fails as expected!", val);
 }
 
 UNIQUE_TEST(assume4Works)
@@ -81,7 +81,7 @@ UNIQUE_TEST(assert4Works)
 
 	int val = 5;
 	if (TrueCondition())
-		assert4(false && "Testing that assert() macro fails as expected!", val, val, val, val);
+		mgl_assert4(false && "Testing that assert() macro fails as expected!", val, val, val, val);
 }
 
 UNIQUE_TEST(ExceptionGoesThrough)
@@ -111,7 +111,7 @@ UNIQUE_TEST(ExceptionCatchingWorks)
 	{
 		LOGE("Exception catching does not work!");
 	}
-	assert(gotException);
+	mgl_assert(gotException);
 }
 
 UNIQUE_TEST(BaseDerivedExceptionCatchingWorks)
@@ -132,7 +132,7 @@ UNIQUE_TEST(BaseDerivedExceptionCatchingWorks)
 	{
 		LOGE("Exception catching does not work!");
 	}
-	assert(gotException);
+	mgl_assert(gotException);
 }
 #endif
 
@@ -141,18 +141,18 @@ TEST(CXX11StdFinite)
 {
 	// When using MathGeoLib, users should still be able to invoke C++11 std::isfinite function.
 	// http://en.cppreference.com/w/cpp/numeric/math/isfinite
-	assert(std::isfinite(5.f));
-	assert(std::isfinite(5.0));
+	mgl_assert(std::isfinite(5.f));
+	mgl_assert(std::isfinite(5.0));
 
 	using namespace std;
 
-	assert(isfinite(5.f));
-	assert(isfinite(5.0));
+	mgl_assert(isfinite(5.f));
+	mgl_assert(isfinite(5.0));
 
 
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(std::isfinite(5.0L));
-	assert(isfinite(5.0L));
+	mgl_assert(std::isfinite(5.0L));
+	mgl_assert(isfinite(5.0L));
 #endif
 
 }
@@ -172,8 +172,8 @@ struct U80
 		for(int i = 0; i < 16; ++i)
 			data[i] = 0;
 		ld = d;
-		assert(sizeof(long double) <= 16);
-		assert(sizeof(d) <= 16);
+		mgl_assert(sizeof(long double) <= 16);
+		mgl_assert(sizeof(d) <= 16);
 	}
 
 	std::string ToString() const
@@ -217,94 +217,94 @@ UNIQUE_TEST(FloatRepresentation)
 
 TEST(IsFinite)
 {
-	assert(IsFinite(5));
-	assert(IsFinite(5.f));
-	assert(IsFinite(5.0));
+	mgl_assert(IsFinite(5));
+	mgl_assert(IsFinite(5.f));
+	mgl_assert(IsFinite(5.0));
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(IsFinite(5.0L));
+	mgl_assert(IsFinite(5.0L));
 #endif
 
-	assert(!IsFinite(FLOAT_NAN));
-	assert(!IsFinite(FLOAT_INF));
-	assert(IsFinite(FLT_MAX));
+	mgl_assert(!IsFinite(FLOAT_NAN));
+	mgl_assert(!IsFinite(FLOAT_INF));
+	mgl_assert(IsFinite(FLT_MAX));
 
-	assert(!IsFinite((double)FLOAT_NAN));
-	assert(!IsFinite((double)FLOAT_INF));
-	assert(IsFinite((double)FLT_MAX));
+	mgl_assert(!IsFinite((double)FLOAT_NAN));
+	mgl_assert(!IsFinite((double)FLOAT_INF));
+	mgl_assert(IsFinite((double)FLT_MAX));
 
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(!IsFinite((long double)FLOAT_NAN));
-	assert(!IsFinite((long double)FLOAT_INF));
-	assert(IsFinite((long double)FLT_MAX));
+	mgl_assert(!IsFinite((long double)FLOAT_NAN));
+	mgl_assert(!IsFinite((long double)FLOAT_INF));
+	mgl_assert(IsFinite((long double)FLT_MAX));
 #endif
 }
 
 TEST(IsNan)
 {
-	assert(!IsNan(5.f));
-	assert(!IsNan(5.0));
+	mgl_assert(!IsNan(5.f));
+	mgl_assert(!IsNan(5.0));
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(!IsNan(5.0L));
+	mgl_assert(!IsNan(5.0L));
 #endif
 
-	assert(IsNan(FLOAT_NAN));
-	assert(!IsNan(FLOAT_INF));
-	assert(!IsNan(FLT_MAX));
+	mgl_assert(IsNan(FLOAT_NAN));
+	mgl_assert(!IsNan(FLOAT_INF));
+	mgl_assert(!IsNan(FLT_MAX));
 
-	assert(IsNan((double)FLOAT_NAN));
-	assert(!IsNan((double)FLOAT_INF));
-	assert(!IsNan((double)FLT_MAX));
+	mgl_assert(IsNan((double)FLOAT_NAN));
+	mgl_assert(!IsNan((double)FLOAT_INF));
+	mgl_assert(!IsNan((double)FLT_MAX));
 
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(IsNan((long double)FLOAT_NAN));
-	assert(!IsNan((long double)FLOAT_INF));
-	assert(!IsNan((long double)FLT_MAX));
+	mgl_assert(IsNan((long double)FLOAT_NAN));
+	mgl_assert(!IsNan((long double)FLOAT_INF));
+	mgl_assert(!IsNan((long double)FLT_MAX));
 #endif
 }
 
 TEST(IsInf)
 {
-	assert(!IsInf(5.f));
-	assert(!IsInf(5.0));
+	mgl_assert(!IsInf(5.f));
+	mgl_assert(!IsInf(5.0));
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(!IsInf(5.0L));
+	mgl_assert(!IsInf(5.0L));
 #endif
 
-	assert(!IsInf(FLOAT_NAN));
-	assert(IsInf(FLOAT_INF));
-	assert(IsInf(-FLOAT_INF));
-	assert(!IsInf(FLT_MAX));
+	mgl_assert(!IsInf(FLOAT_NAN));
+	mgl_assert(IsInf(FLOAT_INF));
+	mgl_assert(IsInf(-FLOAT_INF));
+	mgl_assert(!IsInf(FLT_MAX));
 
-	assert(!IsInf((double)FLOAT_NAN));
-	assert(IsInf((double)FLOAT_INF));
-	assert(IsInf(-(double)FLOAT_INF));
-	assert(!IsInf((double)FLT_MAX));
+	mgl_assert(!IsInf((double)FLOAT_NAN));
+	mgl_assert(IsInf((double)FLOAT_INF));
+	mgl_assert(IsInf(-(double)FLOAT_INF));
+	mgl_assert(!IsInf((double)FLT_MAX));
 
 #ifndef __EMSCRIPTEN__ // long double is not supported.
-	assert(!IsInf((long double)FLOAT_NAN));
-	assert(IsInf((long double)FLOAT_INF));
-	assert(IsInf(-(long double)FLOAT_INF));
-	assert(!IsInf((long double)FLT_MAX));
+	mgl_assert(!IsInf((long double)FLOAT_NAN));
+	mgl_assert(IsInf((long double)FLOAT_INF));
+	mgl_assert(IsInf(-(long double)FLOAT_INF));
+	mgl_assert(!IsInf((long double)FLT_MAX));
 #endif
 }
 
 TEST(ReinterpretAsU32)
 {
-	assert(ReinterpretAsU32(0.0f) == 0x00000000);
-	assert(ReinterpretAsU32(1.0f) == 0x3F800000);
-	assert(ReinterpretAsU32(2.0f) == 0x40000000);
-	assert(ReinterpretAsU32(-1.0f) == 0xBF800000);
-	assert(ReinterpretAsU32(FLOAT_INF) == 0x7F800000);
+	mgl_assert(ReinterpretAsU32(0.0f) == 0x00000000);
+	mgl_assert(ReinterpretAsU32(1.0f) == 0x3F800000);
+	mgl_assert(ReinterpretAsU32(2.0f) == 0x40000000);
+	mgl_assert(ReinterpretAsU32(-1.0f) == 0xBF800000);
+	mgl_assert(ReinterpretAsU32(FLOAT_INF) == 0x7F800000);
 }
 
 TEST(ReinterpretAsFloat)
 {
-	assert(ReinterpretAsFloat(0x00000000) == 0.0f);
-	assert(ReinterpretAsFloat(0x3F800000) == 1.0f);
-	assert(ReinterpretAsFloat(0x40000000) == 2.0f);
-	assert(ReinterpretAsFloat(0xBF800000) == -1.0f);
-	assert(ReinterpretAsFloat(0x7F800000) == FLOAT_INF);
-	assert(IsNan(ReinterpretAsFloat(0x7F800001)));
+	mgl_assert(ReinterpretAsFloat(0x00000000) == 0.0f);
+	mgl_assert(ReinterpretAsFloat(0x3F800000) == 1.0f);
+	mgl_assert(ReinterpretAsFloat(0x40000000) == 2.0f);
+	mgl_assert(ReinterpretAsFloat(0xBF800000) == -1.0f);
+	mgl_assert(ReinterpretAsFloat(0x7F800000) == FLOAT_INF);
+	mgl_assert(IsNan(ReinterpretAsFloat(0x7F800001)));
 }
 
 // Idea: Since approx Sqrt is so fast, run through that and do one manual Newton-Rhapson iteration to improve.
@@ -382,9 +382,9 @@ float AnotherHackSqrt(float f)
 
 UNIQUE_TEST(SqrtVals)
 {
-	assert(Sqrt(-0.f) == 0.f);
-	assert(Sqrt(0.f) == 0.f);
-	assert(Sqrt(1.f) == 1.f);
+	mgl_assert(Sqrt(-0.f) == 0.f);
+	mgl_assert(Sqrt(0.f) == 0.f);
+	mgl_assert(Sqrt(1.f) == 1.f);
 }
 
 UNIQUE_TEST(sqrt_precision)
@@ -425,27 +425,27 @@ UNIQUE_TEST(sqrt_precision)
 		}
 
 		LOGI("Max relative error with Sqrt: %e", maxRelError[0]);
-		assert(maxRelError[0] < 1e-6f);
+		mgl_assert(maxRelError[0] < 1e-6f);
 		LOGI("Max relative error with SqrtFast: %e", maxRelError[1]);
-		assert(maxRelError[1] < 1e-3f);
+		mgl_assert(maxRelError[1] < 1e-3f);
 		LOGI("Max relative error with NewtonRhapsonSqrt: %e", maxRelError[2]);
-		assert(maxRelError[2] < 1e-6f);
+		mgl_assert(maxRelError[2] < 1e-6f);
 #ifdef MATH_SSE
 		LOGI("Max relative error with NewtonRhapsonSSESqrt: %e", maxRelError[3]);
-		assert(maxRelError[3] < 1e-6f);
+		mgl_assert(maxRelError[3] < 1e-6f);
 
 		LOGI("Max relative error with NewtonRhapsonSSESqrt2: %e", maxRelError[4]);
-		assert(maxRelError[4] < 1e-6f);
+		mgl_assert(maxRelError[4] < 1e-6f);
 
 		LOGI("Max relative error with NewtonRhapsonSSESqrt3: %e", maxRelError[5]);
-		assert(maxRelError[5] < 1e-6f);
+		mgl_assert(maxRelError[5] < 1e-6f);
 
 		LOGI("Max relative error with Sqrt_Via_Rcp_RSqrt: %e", maxRelError[6]);
-		assert(maxRelError[6] < 1e-3f);
+		mgl_assert(maxRelError[6] < 1e-3f);
 #endif
 #ifdef MATH_SIMD
 		LOGI("Max relative error with sqrt_ps: %e", maxRelError[7]);
-		assert(maxRelError[7] < 1e-6f);
+		mgl_assert(maxRelError[7] < 1e-6f);
 #endif
 
 		LOGI("Max relative error with sqrtf: %e", maxRelError[8]);
@@ -549,18 +549,18 @@ UNIQUE_TEST(sqrt_rsqrt_precision)
 			maxRelError[j] = Max(RelativeError(x, X[j]), maxRelError[j]);
 	}
 	LOGI("Max relative error with RSqrt: %e", maxRelError[0]);
-	assert(maxRelError[0] < 1e-6f);
+	mgl_assert(maxRelError[0] < 1e-6f);
 	LOGI("Max relative error with 1.f/sqrtf: %e", maxRelError[1]);
-	assert(maxRelError[1] < 1e-6f);
+	mgl_assert(maxRelError[1] < 1e-6f);
 	LOGI("Max relative error with sqrtf(1.f/x): %e", maxRelError[2]);
-	assert(maxRelError[2] < 1e-6f);
+	mgl_assert(maxRelError[2] < 1e-6f);
 	LOGI("Max relative error with Quake InvSqrt: %e", maxRelError[3]);
-	assert(maxRelError[3] < 1e-2f);
+	mgl_assert(maxRelError[3] < 1e-2f);
 	LOGI("Max relative error with RSqrtFast: %e", maxRelError[4]);
-	assert(maxRelError[4] < 5e-3f);
+	mgl_assert(maxRelError[4] < 5e-3f);
 #ifdef MATH_SIMD
 	LOGI("Max relative error with rsqrt_ps: %e", maxRelError[5]);
-	assert(maxRelError[5] < 1e-6f);
+	mgl_assert(maxRelError[5] < 1e-6f);
 #endif
 }
 
@@ -614,7 +614,7 @@ float NewtonRhapsonRecip(float x)
 
 	// Do one iteration of Newton-Rhapson:
 	simd4f e2 = _mm_mul_ss(e,e);
-	
+
 	return s4f_x(_mm_sub_ss(_mm_add_ss(e, e), _mm_mul_ss(X, e2)));
 }
 
@@ -684,24 +684,24 @@ UNIQUE_TEST(sqrt_recip_precision)
 	}
 
 	LOGI("Max relative error with Recip: %e", maxRelError[0]);
-	assert(maxRelError[0] < 1e-5f);
+	mgl_assert(maxRelError[0] < 1e-5f);
 	LOGI("Max relative error with RecipFast: %e", maxRelError[1]);
-	assert(maxRelError[1] < 5e-3f);
+	mgl_assert(maxRelError[1] < 5e-3f);
 #ifdef MATH_SSE
 	LOGI("Max relative error with NewtonRhapsonRecip: %e", maxRelError[2]);
-	assert(maxRelError[2] < 1e-5f);
+	mgl_assert(maxRelError[2] < 1e-5f);
 	LOGI("Max relative error with NewtonRhapsonRecip2: %e", maxRelError[3]);
-	assert(maxRelError[3] < 1e-5f);
+	mgl_assert(maxRelError[3] < 1e-5f);
 #endif
 	LOGI("Max relative error with 1.f/x: %e", maxRelError[4]);
-	assert(maxRelError[4] < 1e-6f);
+	mgl_assert(maxRelError[4] < 1e-6f);
 #ifdef MATH_SIMD
 	LOGI("Max relative error with rcp_ps: %e", maxRelError[5]);
-	assert(maxRelError[5] < 1e-5f);
+	mgl_assert(maxRelError[5] < 1e-5f);
 #endif
 #ifdef MATH_SSE2
 	LOGI("Max relative error with rcp_double: %e", maxRelError[6]);
-	assert(maxRelError[6] < 1e-5f);
+	mgl_assert(maxRelError[6] < 1e-5f);
 #endif
 }
 
@@ -1007,7 +1007,7 @@ RANDOMIZED_TEST(Min)
 	if (rng.Int(0,10) == 0) b = FLOAT_INF;
 	float correctMin = std::min(a,b);
 	float mglMin = Min(a, b);
-	assert(correctMin == mglMin);
+	mgl_assert(correctMin == mglMin);
 	MARK_UNUSED(correctMin);
 	MARK_UNUSED(mglMin);
 }
@@ -1026,7 +1026,7 @@ RANDOMIZED_TEST(Max)
 	if (rng.Int(0,10) == 0) b = FLOAT_INF;
 	float correctMax = std::max(a,b);
 	float mglMax = Max(a, b);
-	assert(correctMax == mglMax);
+	mgl_assert(correctMax == mglMax);
 	MARK_UNUSED(correctMax);
 	MARK_UNUSED(mglMax);
 }
@@ -1139,159 +1139,159 @@ BENCHMARK_END;
 
 UNIQUE_TEST(IsPow2)
 {
-	assert(IsPow2(0));
-	assert(IsPow2(1));
-	assert(IsPow2(2));
-	assert(!IsPow2(3));
-	assert(IsPow2(4));
-	assert(!IsPow2(6));
-	assert(IsPow2(8));
-	assert(IsPow2(65536));
-	assert(!IsPow2(3423626));
-	assert(!IsPow2((u32)-1));
-	assert(!IsPow2((u32)0xFFFFFFFFU));
-	assert(IsPow2((u32)0x40000000U));
-	assert(IsPow2((u32)0x80000000U));
+	mgl_assert(IsPow2(0));
+	mgl_assert(IsPow2(1));
+	mgl_assert(IsPow2(2));
+	mgl_assert(!IsPow2(3));
+	mgl_assert(IsPow2(4));
+	mgl_assert(!IsPow2(6));
+	mgl_assert(IsPow2(8));
+	mgl_assert(IsPow2(65536));
+	mgl_assert(!IsPow2(3423626));
+	mgl_assert(!IsPow2((u32)-1));
+	mgl_assert(!IsPow2((u32)0xFFFFFFFFU));
+	mgl_assert(IsPow2((u32)0x40000000U));
+	mgl_assert(IsPow2((u32)0x80000000U));
 }
 
 UNIQUE_TEST(IsPow2_u64)
 {
-	assert(IsPow2(0ULL));
-	assert(IsPow2(1ULL));
-	assert(IsPow2(2ULL));
-	assert(!IsPow2(3ULL));
-	assert(IsPow2(4ULL));
-	assert(!IsPow2(6ULL));
-	assert(IsPow2(8ULL));
-	assert(IsPow2(65536ULL));
-	assert(!IsPow2(3423626ULL));
-	assert(!IsPow2((u64)-1));
-	assert(!IsPow2(0xFFFFFFFFULL));
-	assert(!IsPow2(0xFFFFFFFFFFFFFFFFULL));
-	assert(IsPow2(0x40000000ULL));
-	assert(IsPow2(0x80000000ULL));
-	assert(IsPow2(0x100000000ULL));
-	assert(IsPow2(0x4000000000000000ULL));
-	assert(IsPow2(0x8000000000000000ULL));
+	mgl_assert(IsPow2(0ULL));
+	mgl_assert(IsPow2(1ULL));
+	mgl_assert(IsPow2(2ULL));
+	mgl_assert(!IsPow2(3ULL));
+	mgl_assert(IsPow2(4ULL));
+	mgl_assert(!IsPow2(6ULL));
+	mgl_assert(IsPow2(8ULL));
+	mgl_assert(IsPow2(65536ULL));
+	mgl_assert(!IsPow2(3423626ULL));
+	mgl_assert(!IsPow2((u64)-1));
+	mgl_assert(!IsPow2(0xFFFFFFFFULL));
+	mgl_assert(!IsPow2(0xFFFFFFFFFFFFFFFFULL));
+	mgl_assert(IsPow2(0x40000000ULL));
+	mgl_assert(IsPow2(0x80000000ULL));
+	mgl_assert(IsPow2(0x100000000ULL));
+	mgl_assert(IsPow2(0x4000000000000000ULL));
+	mgl_assert(IsPow2(0x8000000000000000ULL));
 }
 
 UNIQUE_TEST(RoundUpPow2)
 {
-	asserteq(RoundUpPow2(0), 0);
-	asserteq(RoundUpPow2(1), 1);
-	asserteq(RoundUpPow2(2), 2);
-	asserteq(RoundUpPow2(3), 4);
-	asserteq(RoundUpPow2(4), 4);
-	asserteq(RoundUpPow2(5), 8);
-	asserteq(RoundUpPow2(64241), 65536);
-	asserteq(RoundUpPow2((u32)0x7FFFFFFFU), 0x80000000U);
-	asserteq(RoundUpPow2((u32)0x80000000U), 0x80000000U);
-	asserteq(RoundUpPow2((u32)0x80000001U), 0);
-	asserteq(RoundUpPow2((u32)0xFE873210U), 0);
-	asserteq(RoundUpPow2((u32)0xFFFFFFFFU), 0);
+	mgl_asserteq(RoundUpPow2(0), 0);
+	mgl_asserteq(RoundUpPow2(1), 1);
+	mgl_asserteq(RoundUpPow2(2), 2);
+	mgl_asserteq(RoundUpPow2(3), 4);
+	mgl_asserteq(RoundUpPow2(4), 4);
+	mgl_asserteq(RoundUpPow2(5), 8);
+	mgl_asserteq(RoundUpPow2(64241), 65536);
+	mgl_asserteq(RoundUpPow2((u32)0x7FFFFFFFU), 0x80000000U);
+	mgl_asserteq(RoundUpPow2((u32)0x80000000U), 0x80000000U);
+	mgl_asserteq(RoundUpPow2((u32)0x80000001U), 0);
+	mgl_asserteq(RoundUpPow2((u32)0xFE873210U), 0);
+	mgl_asserteq(RoundUpPow2((u32)0xFFFFFFFFU), 0);
 }
 
 UNIQUE_TEST(RoundUpPow2_u64)
 {
-	asserteq(RoundUpPow2(0ULL), 0);
-	asserteq(RoundUpPow2(1ULL), 1);
-	asserteq(RoundUpPow2(2ULL), 2);
-	asserteq(RoundUpPow2(3ULL), 4);
-	asserteq(RoundUpPow2(4ULL), 4);
-	asserteq(RoundUpPow2(5ULL), 8);
-	asserteq(RoundUpPow2(64241ULL), 65536);
-	asserteq(RoundUpPow2(0x7FFFFFFFULL), 0x80000000U);
-	asserteq(RoundUpPow2(0x80000000ULL), 0x80000000U);
-	asserteq(RoundUpPow2(0x80000001ULL), 0x100000000ULL);
-	asserteq(RoundUpPow2(0xFE873210ULL), 0x100000000ULL);
-	asserteq(RoundUpPow2(0xFFFFFFFFULL), 0x100000000ULL);
-	asserteq(RoundUpPow2(0x7FFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
-	asserteq(RoundUpPow2(0x8000000000000000ULL), 0x8000000000000000ULL);
-	asserteq(RoundUpPow2(0x8000000000000001ULL), 0);
-	asserteq(RoundUpPow2(0xFE87321084208274ULL), 0);
-	asserteq(RoundUpPow2(0xFFFFFFFFFFFFFFFFULL), 0);
+	mgl_asserteq(RoundUpPow2(0ULL), 0);
+	mgl_asserteq(RoundUpPow2(1ULL), 1);
+	mgl_asserteq(RoundUpPow2(2ULL), 2);
+	mgl_asserteq(RoundUpPow2(3ULL), 4);
+	mgl_asserteq(RoundUpPow2(4ULL), 4);
+	mgl_asserteq(RoundUpPow2(5ULL), 8);
+	mgl_asserteq(RoundUpPow2(64241ULL), 65536);
+	mgl_asserteq(RoundUpPow2(0x7FFFFFFFULL), 0x80000000U);
+	mgl_asserteq(RoundUpPow2(0x80000000ULL), 0x80000000U);
+	mgl_asserteq(RoundUpPow2(0x80000001ULL), 0x100000000ULL);
+	mgl_asserteq(RoundUpPow2(0xFE873210ULL), 0x100000000ULL);
+	mgl_asserteq(RoundUpPow2(0xFFFFFFFFULL), 0x100000000ULL);
+	mgl_asserteq(RoundUpPow2(0x7FFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
+	mgl_asserteq(RoundUpPow2(0x8000000000000000ULL), 0x8000000000000000ULL);
+	mgl_asserteq(RoundUpPow2(0x8000000000000001ULL), 0);
+	mgl_asserteq(RoundUpPow2(0xFE87321084208274ULL), 0);
+	mgl_asserteq(RoundUpPow2(0xFFFFFFFFFFFFFFFFULL), 0);
 }
 
 UNIQUE_TEST(RoundDownPow2)
 {
-	asserteq(RoundDownPow2(0), 0);
-	asserteq(RoundDownPow2(1), 1);
-	asserteq(RoundDownPow2(2), 2);
-	asserteq(RoundDownPow2(3), 2);
-	asserteq(RoundDownPow2(4), 4);
-	asserteq(RoundDownPow2(5), 4);
-	asserteq(RoundDownPow2(64241), 32768);
-	asserteq(RoundDownPow2((u32)0x7FFFFFFFU), 0x40000000U);
-	asserteq(RoundDownPow2((u32)0x80000000U), 0x80000000U);
-	asserteq(RoundDownPow2((u32)0x80000001U), 0x80000000U);
-	asserteq(RoundDownPow2((u32)0xFE873210U), 0x80000000U);
-	asserteq(RoundDownPow2((u32)0xFFFFFFFFU), 0x80000000U);
+	mgl_asserteq(RoundDownPow2(0), 0);
+	mgl_asserteq(RoundDownPow2(1), 1);
+	mgl_asserteq(RoundDownPow2(2), 2);
+	mgl_asserteq(RoundDownPow2(3), 2);
+	mgl_asserteq(RoundDownPow2(4), 4);
+	mgl_asserteq(RoundDownPow2(5), 4);
+	mgl_asserteq(RoundDownPow2(64241), 32768);
+	mgl_asserteq(RoundDownPow2((u32)0x7FFFFFFFU), 0x40000000U);
+	mgl_asserteq(RoundDownPow2((u32)0x80000000U), 0x80000000U);
+	mgl_asserteq(RoundDownPow2((u32)0x80000001U), 0x80000000U);
+	mgl_asserteq(RoundDownPow2((u32)0xFE873210U), 0x80000000U);
+	mgl_asserteq(RoundDownPow2((u32)0xFFFFFFFFU), 0x80000000U);
 }
 
 UNIQUE_TEST(RoundDownPow2_u64)
 {
-	asserteq(RoundDownPow2(0ULL), 0);
-	asserteq(RoundDownPow2(1ULL), 1);
-	asserteq(RoundDownPow2(2ULL), 2);
-	asserteq(RoundDownPow2(3ULL), 2);
-	asserteq(RoundDownPow2(4ULL), 4);
-	asserteq(RoundDownPow2(5ULL), 4);
-	asserteq(RoundDownPow2(64241ULL), 32768);
-	asserteq(RoundDownPow2(0x7FFFFFFFULL), 0x40000000U);
-	asserteq(RoundDownPow2(0x80000000ULL), 0x80000000U);
-	asserteq(RoundDownPow2(0x80000001ULL), 0x80000000ULL);
-	asserteq(RoundDownPow2(0xFE873210ULL), 0x80000000ULL);
-	asserteq(RoundDownPow2(0xFFFFFFFFULL), 0x80000000ULL);
-	asserteq(RoundDownPow2(0x7FFFFFFFFFFFFFFFULL), 0x4000000000000000ULL);
-	asserteq(RoundDownPow2(0x8000000000000000ULL), 0x8000000000000000ULL);
-	asserteq(RoundDownPow2(0x8000000000000001ULL), 0x8000000000000000ULL);
-	asserteq(RoundDownPow2(0xFE87321084208274ULL), 0x8000000000000000ULL);
-	asserteq(RoundDownPow2(0xFFFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
+	mgl_asserteq(RoundDownPow2(0ULL), 0);
+	mgl_asserteq(RoundDownPow2(1ULL), 1);
+	mgl_asserteq(RoundDownPow2(2ULL), 2);
+	mgl_asserteq(RoundDownPow2(3ULL), 2);
+	mgl_asserteq(RoundDownPow2(4ULL), 4);
+	mgl_asserteq(RoundDownPow2(5ULL), 4);
+	mgl_asserteq(RoundDownPow2(64241ULL), 32768);
+	mgl_asserteq(RoundDownPow2(0x7FFFFFFFULL), 0x40000000U);
+	mgl_asserteq(RoundDownPow2(0x80000000ULL), 0x80000000U);
+	mgl_asserteq(RoundDownPow2(0x80000001ULL), 0x80000000ULL);
+	mgl_asserteq(RoundDownPow2(0xFE873210ULL), 0x80000000ULL);
+	mgl_asserteq(RoundDownPow2(0xFFFFFFFFULL), 0x80000000ULL);
+	mgl_asserteq(RoundDownPow2(0x7FFFFFFFFFFFFFFFULL), 0x4000000000000000ULL);
+	mgl_asserteq(RoundDownPow2(0x8000000000000000ULL), 0x8000000000000000ULL);
+	mgl_asserteq(RoundDownPow2(0x8000000000000001ULL), 0x8000000000000000ULL);
+	mgl_asserteq(RoundDownPow2(0xFE87321084208274ULL), 0x8000000000000000ULL);
+	mgl_asserteq(RoundDownPow2(0xFFFFFFFFFFFFFFFFULL), 0x8000000000000000ULL);
 }
 
 UNIQUE_TEST(LSB_U32)
 {
-	asserteq(LSB((u32)0), 0);
-	asserteq(LSB((u32)1), 1);
-	asserteq(LSB((u32)2), 3);
-	asserteq(LSB((u32)3), 7);
-	asserteq(LSB((u32)16), 0xFFFFU);
-	asserteq(LSB((u32)31), 0x7FFFFFFFU);
-	asserteq(LSB((u32)32), 0xFFFFFFFFU);
+	mgl_asserteq(LSB((u32)0), 0);
+	mgl_asserteq(LSB((u32)1), 1);
+	mgl_asserteq(LSB((u32)2), 3);
+	mgl_asserteq(LSB((u32)3), 7);
+	mgl_asserteq(LSB((u32)16), 0xFFFFU);
+	mgl_asserteq(LSB((u32)31), 0x7FFFFFFFU);
+	mgl_asserteq(LSB((u32)32), 0xFFFFFFFFU);
 }
 
 UNIQUE_TEST(LSB_U64)
 {
-	asserteq(LSB64((u64)0), 0);
-	asserteq(LSB64((u64)1), 1);
-	asserteq(LSB64((u64)2), 3);
-	asserteq(LSB64((u64)3), 7);
-	asserteq(LSB64((u64)16), 0xFFFFULL);
-	asserteq(LSB64((u64)31), 0x7FFFFFFFULL);
-	asserteq(LSB64((u64)32), 0xFFFFFFFFULL);
-	asserteq(LSB64((u64)33), 0x1FFFFFFFFULL);
-	asserteq(LSB64((u64)63), 0x7FFFFFFFFFFFFFFFULL);
-	asserteq(LSB64((u64)64), 0xFFFFFFFFFFFFFFFFULL);
+	mgl_asserteq(LSB64((u64)0), 0);
+	mgl_asserteq(LSB64((u64)1), 1);
+	mgl_asserteq(LSB64((u64)2), 3);
+	mgl_asserteq(LSB64((u64)3), 7);
+	mgl_asserteq(LSB64((u64)16), 0xFFFFULL);
+	mgl_asserteq(LSB64((u64)31), 0x7FFFFFFFULL);
+	mgl_asserteq(LSB64((u64)32), 0xFFFFFFFFULL);
+	mgl_asserteq(LSB64((u64)33), 0x1FFFFFFFFULL);
+	mgl_asserteq(LSB64((u64)63), 0x7FFFFFFFFFFFFFFFULL);
+	mgl_asserteq(LSB64((u64)64), 0xFFFFFFFFFFFFFFFFULL);
 }
 
 UNIQUE_TEST(Sin_lookuptable)
 {
-	asserteq(Sin(0.f), 0.f);
-	assert1(EqualAbs(Sin(pi), 0.f, 1e-7f), Sin(pi));
-	assert1(EqualAbs(Sin(-pi), 0.f, 1e-7f), Sin(-pi));
-	assert1(EqualAbs(Sin(-37.6991577f), 0.f, 1e-4f), Sin(-37.6991577f));
-	assert1(EqualAbs(Sin(pi/2.f), 1.f, 1e-7f), Sin(pi/2.f));
-	assert1(EqualAbs(Sin(-pi/2.f), -1.f, 1e-4f), Sin(-pi/2.f));
-	assert1(EqualAbs(Sin(pi/4.f), 1.f/Sqrt(2.f), 1e-4f), Sin(pi/4.f));
+	mgl_asserteq(Sin(0.f), 0.f);
+	mgl_assert1(EqualAbs(Sin(pi), 0.f, 1e-7f), Sin(pi));
+	mgl_assert1(EqualAbs(Sin(-pi), 0.f, 1e-7f), Sin(-pi));
+	mgl_assert1(EqualAbs(Sin(-37.6991577f), 0.f, 1e-4f), Sin(-37.6991577f));
+	mgl_assert1(EqualAbs(Sin(pi/2.f), 1.f, 1e-7f), Sin(pi/2.f));
+	mgl_assert1(EqualAbs(Sin(-pi/2.f), -1.f, 1e-4f), Sin(-pi/2.f));
+	mgl_assert1(EqualAbs(Sin(pi/4.f), 1.f/Sqrt(2.f), 1e-4f), Sin(pi/4.f));
 }
 
 UNIQUE_TEST(Cos_lookuptable)
 {
-	asserteq(Cos(0.f), 1.f);
-	assert1(EqualAbs(Cos(pi), -1.f, 1e-7f), Cos(pi));
-	assert1(EqualAbs(Cos(-pi), -1.f, 1e-7f), Cos(-pi));
-	assert1(EqualAbs(Cos(-37.6991577f), 1.f, 1e-4f), Cos(-37.6991577f));
-	assert1(EqualAbs(Cos(pi / 2.f), 0.f, 1e-7f), Cos(pi / 2.f));
-	assert1(EqualAbs(Cos(-pi / 2.f), -0.f, 1e-4f), Cos(-pi / 2.f));
-	assert1(EqualAbs(Cos(pi / 4.f), 1.f/Sqrt(2.f), 1e-4f), Cos(pi / 4.f));
+	mgl_asserteq(Cos(0.f), 1.f);
+	mgl_assert1(EqualAbs(Cos(pi), -1.f, 1e-7f), Cos(pi));
+	mgl_assert1(EqualAbs(Cos(-pi), -1.f, 1e-7f), Cos(-pi));
+	mgl_assert1(EqualAbs(Cos(-37.6991577f), 1.f, 1e-4f), Cos(-37.6991577f));
+	mgl_assert1(EqualAbs(Cos(pi / 2.f), 0.f, 1e-7f), Cos(pi / 2.f));
+	mgl_assert1(EqualAbs(Cos(-pi / 2.f), -0.f, 1e-4f), Cos(-pi / 2.f));
+	mgl_assert1(EqualAbs(Cos(pi / 4.f), 1.f/Sqrt(2.f), 1e-4f), Cos(pi / 4.f));
 }

@@ -74,7 +74,7 @@ void Clock::InitClockData()
 	mach_timebase_info_data_t timeBaseInfo;
 	mach_timebase_info(&timeBaseInfo);
 	ticksPerSecond = 1000000000ULL * (uint64_t)timeBaseInfo.denom / (uint64_t)timeBaseInfo.numer;
-	assert(ticksPerSecond > (uint64_t)timeBaseInfo.denom/timeBaseInfo.numer); // Guard against overflow if OSX numer/denom change or similar.
+	mgl_assert(ticksPerSecond > (uint64_t)timeBaseInfo.denom/timeBaseInfo.numer); // Guard against overflow if OSX numer/denom change or similar.
 #endif
 }
 
@@ -217,7 +217,7 @@ tick_t Clock::Tick()
 #elif defined(WIN32)
 	LARGE_INTEGER ddwTimer;
 	BOOL success = QueryPerformanceCounter(&ddwTimer);
-	assume(success != 0);
+	mgl_assume(success != 0);
 	MARK_UNUSED(success);
 	return ddwTimer.QuadPart;
 #elif defined(__APPLE__)
@@ -240,7 +240,7 @@ unsigned long Clock::TickU32()
 #ifdef WIN32
 	LARGE_INTEGER ddwTimer;
 	BOOL success = QueryPerformanceCounter(&ddwTimer);
-	assume(success != 0);
+	mgl_assume(success != 0);
 	MARK_UNUSED(success);
 	return ddwTimer.LowPart;
 #else

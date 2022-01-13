@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file MathFunc.h
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief Common mathematical functions. */
 #pragma once
 
@@ -98,22 +98,22 @@ float Tanh(float x);
 	@see RoundUpPow2(), RoundDownPow2(). */
 bool IsPow2(u32 number);
 bool IsPow2(u64 number);
-FORCE_INLINE bool IsPow2(s32 number) { assert(number >= 0); return IsPow2((u32)number); }
-FORCE_INLINE bool IsPow2(s64 number) { assert(number >= 0); return IsPow2((u64)number); }
+FORCE_INLINE bool IsPow2(s32 number) { mgl_assert(number >= 0); return IsPow2((u32)number); }
+FORCE_INLINE bool IsPow2(s64 number) { mgl_assert(number >= 0); return IsPow2((u64)number); }
 /// Returns the smallest power-of-2 number (1,2,4,8,16,32,...) greater or equal than the given number.
 /** @note RoundUpPow2(0) == 0. Also, note that RoundUpPow2(x) == 0 if x >= 0x80000001 for the u32 version, or if x >= 0x8000000000000001 for the u64 version.
 	@see IsPow2(), RoundDownPow2(). */
 u32 RoundUpPow2(u32 number);
 u64 RoundUpPow2(u64 number);
-FORCE_INLINE s32 RoundUpPow2(s32 number) { assert(number >= 0); return (int /*s32*/)RoundUpPow2((u32)number); }
-FORCE_INLINE s64 RoundUpPow2(s64 number) { assert(number >= 0); return (s64)RoundUpPow2((u64)number); }
+FORCE_INLINE s32 RoundUpPow2(s32 number) { mgl_assert(number >= 0); return (int /*s32*/)RoundUpPow2((u32)number); }
+FORCE_INLINE s64 RoundUpPow2(s64 number) { mgl_assert(number >= 0); return (s64)RoundUpPow2((u64)number); }
 /// Returns the largest power-of-2 number (1,2,4,8,16,32,...) smaller or equal than the given number.
 /** @note RoundDownPow2(0) == 0.
 	@see IsPow2(), RoundUpPow2(). */
 u32 RoundDownPow2(u32 number);
 u64 RoundDownPow2(u64 number);
-FORCE_INLINE s32 RoundDownPow2(s32 number) { assert(number >= 0); return (int /*s32*/)RoundDownPow2((u32)number); }
-FORCE_INLINE s64 RoundDownPow2(s64 number) { assert(number >= 0); return (s64)RoundDownPow2((u64)number); }
+FORCE_INLINE s32 RoundDownPow2(s32 number) { mgl_assert(number >= 0); return (int /*s32*/)RoundDownPow2((u32)number); }
+FORCE_INLINE s64 RoundDownPow2(s64 number) { mgl_assert(number >= 0); return (s64)RoundDownPow2((u64)number); }
 
 /// Returns the given number rounded up to the next multiple of n.
 /** @param x The number to round up.
@@ -256,7 +256,7 @@ FORCE_INLINE float RSqrt(float x)
 	// e_n = e + 0.5 * (e - x * e^3)
 	simd4f e3 = _mm_mul_ss(_mm_mul_ss(e,e), e);
 	simd4f half = _mm_set_ss(0.5f);
-	
+
 	return s4f_x(_mm_add_ss(e, _mm_mul_ss(half, _mm_sub_ss(e, _mm_mul_ss(X, e3)))));
 #else
 	return 1.f / sqrtf(x);
@@ -328,7 +328,7 @@ int CombinatorialTab(int n, int k);
 template<typename T>
 FORCE_INLINE T Clamp(const T &val, const T &floor, const T &ceil)
 {
-	assume(floor <= ceil);
+	mgl_assume(floor <= ceil);
 	return val <= ceil ? (val >= floor ? val : floor) : ceil;
 }
 
@@ -484,9 +484,9 @@ template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return _
 FORCE_INLINE bool IsInf(long double value) { return IsInf((double)value); }
 FORCE_INLINE bool IsNan(long double value) { return IsNan((double)value); }
 #elif !defined(__EMSCRIPTEN__) // long double is not supported.
-//template<> FORCE_INLINE bool IsFinite<long double>(long double value) { asserteq(sizeof(long double), 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) != 0x7FFF || val[0] < 0x8000000000000000ULL; }
-//FORCE_INLINE bool IsInf(long double value) { asserteq(sizeof(long double), 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] == 0x8000000000000000ULL; }
-//FORCE_INLINE bool IsNan(long double value) { asserteq(sizeof(long double), 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] >  0x8000000000000000ULL; }
+//template<> FORCE_INLINE bool IsFinite<long double>(long double value) { mgl_asserteq(sizeof(long double), 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) != 0x7FFF || val[0] < 0x8000000000000000ULL; }
+//FORCE_INLINE bool IsInf(long double value) { mgl_asserteq(sizeof(long double), 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] == 0x8000000000000000ULL; }
+//FORCE_INLINE bool IsNan(long double value) { mgl_asserteq(sizeof(long double), 16); u64 val[2]; memcpy(val, &value, sizeof(u64)*2); return (val[1] & 0x7FFF) == 0x7FFF && val[0] >  0x8000000000000000ULL; }
 template<> FORCE_INLINE bool IsFinite<long double>(long double value) { return IsFinite<double>((double)value); }
 FORCE_INLINE bool IsInf(long double value) { return IsInf((double)value); }
 FORCE_INLINE bool IsNan(long double value) { return IsNan((double)value); }

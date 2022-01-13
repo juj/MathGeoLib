@@ -9,47 +9,47 @@ TEST(AABB_Degenerate)
 {
 	AABB a;
 	a.SetNegativeInfinity();
-	assert(a.IsDegenerate());
+	mgl_assert(a.IsDegenerate());
 
 	a = AABB(POINT_VEC_SCALAR(0.f), POINT_VEC_SCALAR(1.f));
-	assert(!a.IsDegenerate());
+	mgl_assert(!a.IsDegenerate());
 }
 
 TEST(OBB_Degenerate)
 {
 	OBB o;
 	o.SetNegativeInfinity();
-	assert(o.IsDegenerate());
+	mgl_assert(o.IsDegenerate());
 
 	o = OBB(AABB(POINT_VEC_SCALAR(0.f), POINT_VEC_SCALAR(1.f)));
-	assert1(!o.IsDegenerate(), o);
+	mgl_assert1(!o.IsDegenerate(), o);
 }
 
 TEST(Capsule_Degenerate)
 {
 	Capsule c;
 	c.SetDegenerate();
-	assert(c.IsDegenerate());
+	mgl_assert(c.IsDegenerate());
 
 	c = Capsule(POINT_VEC_SCALAR(0.f), POINT_VEC_SCALAR(1.f), 1.f);
-	assert(!c.IsDegenerate());
+	mgl_assert(!c.IsDegenerate());
 }
 /* ///\todo Implement.
 TEST(Circle_Degenerate)
 {
 	Circle c;
 	c.SetDegenerate();
-	assert(c.IsDegenerate());
+	mgl_assert(c.IsDegenerate());
 
 	c = Circle(float3::zero, float3::unitX, 1.f);
-	assert(!c.IsDegenerate());
+	mgl_assert(!c.IsDegenerate());
 }
 
 TEST(Frustum_Degenerate)
 {
 	Frustum f;
 	f.SetDegenerate();
-	assert(f.IsDegenerate());
+	mgl_assert(f.IsDegenerate());
 
 	f.type = OrthographicFrustum;
 	f.pos = float3::zero;
@@ -59,87 +59,87 @@ TEST(Frustum_Degenerate)
 	f.farPlaneDistance = 1.f;
 	f.orthographicWidth = 1.f;
 	f.orthographicHeight = 1.f;
-	assert(!f.IsDegenerate());
+	mgl_assert(!f.IsDegenerate());
 }
 
 TEST(Line_Degenerate)
 {
 	Line l;
 	l.SetDegenerate();
-	assert(l.IsDegenerate());
+	mgl_assert(l.IsDegenerate());
 
 	l = Line(float3::zero, float3::unitX);
-	assert(!l.IsDegenerate());
+	mgl_assert(!l.IsDegenerate());
 }
 
 TEST(LineSegment_Degenerate)
 {
 	LineSegment l;
 	l.SetDegenerate();
-	assert(l.IsDegenerate());
+	mgl_assert(l.IsDegenerate());
 
 	l = LineSegment(float3::zero, float3::unitX);
-	assert(!l.IsDegenerate());
+	mgl_assert(!l.IsDegenerate());
 }
 
 TEST(Plane_Degenerate)
 {
 	Plane p;
 	p.SetDegenerate();
-	assert(p.IsDegenerate());
+	mgl_assert(p.IsDegenerate());
 
 	p = Plane(float3::unitX, 1.f);
-	assert(!p.IsDegenerate());
+	mgl_assert(!p.IsDegenerate());
 }
 
 TEST(Polygon_Degenerate)
 {
 	Polygon p;
 	p.SetDegenerate();
-	assert(p.IsDegenerate());
+	mgl_assert(p.IsDegenerate());
 
 	p = Triangle(float3::unitX, float3::unitY, float3::unitZ).ToPolygon();
-	assert(!p.IsDegenerate());
+	mgl_assert(!p.IsDegenerate());
 }
 
 TEST(Polyhedron_Degenerate)
 {
 	Polyhedron p;
 	p.SetDegenerate();
-	assert(p.IsDegenerate());
+	mgl_assert(p.IsDegenerate());
 
 	p = Polyhedron::Tetrahedron();
-	assert(!p.IsDegenerate());
+	mgl_assert(!p.IsDegenerate());
 }
 
 TEST(Ray_Degenerate)
 {
 	Ray r;
 	r.SetDegenerate();
-	assert(r.IsDegenerate());
+	mgl_assert(r.IsDegenerate());
 
 	r = Ray(float3::zero, float3::unitX);
-	assert(!r.IsDegenerate());
+	mgl_assert(!r.IsDegenerate());
 }
 */
 TEST(Sphere_Degenerate)
 {
 	Sphere s;
 	s.SetDegenerate();
-	assert(s.IsDegenerate());
+	mgl_assert(s.IsDegenerate());
 
 	s = Sphere(POINT_VEC_SCALAR(0.f), POINT_VEC(float3::unitX));
-	assert(!s.IsDegenerate());
+	mgl_assert(!s.IsDegenerate());
 }
 /* ///\todo Implement.
 TEST(Triangle_Degenerate)
 {
 	Triangle t;
 	t.SetDegenerate();
-	assert(t.IsDegenerate());
+	mgl_assert(t.IsDegenerate());
 
 	t = Triangle(float3::unitX, float3::unitY, float3::unitZ);
-	assert(!t.IsDegenerate());
+	mgl_assert(!t.IsDegenerate());
 }
 */
 

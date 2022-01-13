@@ -42,7 +42,7 @@ MATH_BEGIN_NAMESPACE
 
 Quat::Quat(const float *data)
 {
-	assume(data);
+	mgl_assume(data);
 #if defined(MATH_AUTOMATIC_SSE)
 	q = loadu_ps(data);
 #else
@@ -92,10 +92,10 @@ vec Quat::WorldZ() const
 
 vec Quat::Axis() const
 {
-	assume2(this->IsNormalized(), *this, this->Length());
+	mgl_assume2(this->IsNormalized(), *this, this->Length());
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Best: 6.145 nsecs / 16.88 ticks, Avg: 6.367 nsecs, Worst: 6.529 nsecs
-	assume2(this->IsNormalized(), *this, this->Length());
+	mgl_assume2(this->IsNormalized(), *this, this->Length());
 	simd4f cosAngle = wwww_ps(q);
 	simd4f rcpSinAngle = rsqrt_ps(sub_ps(set1_ps(1.f), mul_ps(cosAngle, cosAngle)));
 	simd4f a = mul_ps(q, rcpSinAngle);
@@ -176,7 +176,7 @@ Quat Quat::Normalized() const
 #else
 	Quat copy = *this;
 	float success = copy.Normalize();
-	assume(success > 0 && "Quat::Normalized failed!");
+	mgl_assume(success > 0 && "Quat::Normalized failed!");
 	MARK_UNUSED(success);
 	return copy;
 #endif
@@ -212,15 +212,15 @@ bool Quat::BitEquals(const Quat &other) const
 
 void Quat::Inverse()
 {
-	assume(IsNormalized());
-	assume(IsInvertible());
+	mgl_assume(IsNormalized());
+	mgl_assume(IsInvertible());
 	Conjugate();
 }
 
 Quat MUST_USE_RESULT Quat::Inverted() const
 {
-	assume(IsNormalized());
-	assume(IsInvertible());
+	mgl_assume(IsNormalized());
+	mgl_assume(IsInvertible());
 	return Conjugated();
 }
 
@@ -252,7 +252,7 @@ Quat MUST_USE_RESULT Quat::Conjugated() const
 
 float3 MUST_USE_RESULT Quat::Transform(const float3 &vec) const
 {
-	assume2(this->IsNormalized(), *this, this->LengthSq());
+	mgl_assume2(this->IsNormalized(), *this, this->LengthSq());
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return float4(quat_transform_vec4(q, load_vec3(vec.ptr(), 0.f))).xyz();
 #else
@@ -273,7 +273,7 @@ float3 MUST_USE_RESULT Quat::Transform(float X, float Y, float Z) const
 
 float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 {
-	assume(vec.IsWZeroOrOne());
+	mgl_assume(vec.IsWZeroOrOne());
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return quat_transform_vec4(q, vec);
@@ -284,7 +284,7 @@ float4 MUST_USE_RESULT Quat::Transform(const float4 &vec) const
 
 Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 {
-	assume(0.f <= t && t <= 1.f);
+	mgl_assume(0.f <= t && t <= 1.f);
 
 	// TODO: SSE
 	float angle = this->Dot(b);
@@ -296,9 +296,9 @@ Quat MUST_USE_RESULT Quat::Lerp(const Quat &b, float t) const
 
 Quat MUST_USE_RESULT Quat::Slerp(const Quat &q2, float t) const
 {
-	assume(0.f <= t && t <= 1.f);
-	assume(IsNormalized());
-	assume(q2.IsNormalized());
+	mgl_assume(0.f <= t && t <= 1.f);
+	mgl_assume(IsNormalized());
+	mgl_assume(q2.IsNormalized());
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	simd4f angle = dot4_ps(q, q2.q); // <q, q2.q>
@@ -401,7 +401,7 @@ float3 MUST_USE_RESULT Quat::SlerpVectorAbs(const float3 &from, const float3 &to
 
 float MUST_USE_RESULT Quat::AngleBetween(const Quat &target) const
 {
-	assume(this->IsInvertible());
+	mgl_assume(this->IsInvertible());
 	Quat delta = target / *this;
 	delta.Normalize();
 	return delta.Angle();
@@ -409,7 +409,7 @@ float MUST_USE_RESULT Quat::AngleBetween(const Quat &target) const
 
 vec MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 {
-	assume(this->IsInvertible());
+	mgl_assume(this->IsInvertible());
 	Quat delta = target / *this;
 	delta.Normalize();
 	return delta.Axis();
@@ -418,7 +418,7 @@ vec MUST_USE_RESULT Quat::AxisFromTo(const Quat &target) const
 void Quat::ToAxisAngle(float3 &axis, float &angle) const
 {
 	// Best: 36.868 nsecs / 98.752 ticks, Avg: 37.095 nsecs, Worst: 37.636 nsecs
-	assume2(this->IsNormalized(), *this, this->Length());
+	mgl_assume2(this->IsNormalized(), *this, this->Length());
 	float halfAngle = Acos(w);
 	angle = halfAngle * 2.f;
 	// Convert cos to sin via the identity sin^2 + cos^2 = 1, and fuse reciprocal and square root to the same instruction,
@@ -433,7 +433,7 @@ void Quat::ToAxisAngle(float4 &axis, float &angle) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// Best: 35.332 nsecs / 94.328 ticks, Avg: 35.870 nsecs, Worst: 57.607 nsecs
-	assume2(this->IsNormalized(), *this, this->Length());
+	mgl_assume2(this->IsNormalized(), *this, this->Length());
 	simd4f cosAngle = wwww_ps(q);
 	simd4f rcpSinAngle = rsqrt_ps(sub_ps(set1_ps(1.f), mul_ps(cosAngle, cosAngle)));
 	angle = Acos(s4f_x(cosAngle)) * 2.f;
@@ -454,8 +454,8 @@ void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
 	SetFromAxisAngle(load_vec3(axis.ptr(), 0.f), angle);
 #else
-	assume1(axis.IsNormalized(), axis);
-	assume1(MATH_NS::IsFinite(angle), angle);
+	mgl_assume1(axis.IsNormalized(), axis);
+	mgl_assume1(MATH_NS::IsFinite(angle), angle);
 	float sinz, cosz;
 	SinCos(angle*0.5f, sinz, cosz);
 	x = axis.x * sinz;
@@ -467,9 +467,9 @@ void Quat::SetFromAxisAngle(const float3 &axis, float angle)
 
 void Quat::SetFromAxisAngle(const float4 &axis, float angle)
 {
-	assume1(EqualAbs(axis.w, 0.f), axis);
-	assume2(axis.IsNormalized(1e-4f), axis, axis.Length4());
-	assume1(MATH_NS::IsFinite(angle), angle);
+	mgl_assume1(EqualAbs(axis.w, 0.f), axis);
+	mgl_assume2(axis.IsNormalized(1e-4f), axis, axis.Length4());
+	mgl_assume1(MATH_NS::IsFinite(angle), angle);
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE2)
 	// Best: 26.499 nsecs / 71.024 ticks, Avg: 26.856 nsecs, Worst: 27.651 nsecs
@@ -531,47 +531,47 @@ void SetQuatFrom(Quat &q, const M &m)
 		q.w = (m[1][0] - m[0][1]) * z4;
 	}
 	float oldLength = q.Normalize();
-	assume(oldLength > 0.f);
+	mgl_assume(oldLength > 0.f);
 	MARK_UNUSED(oldLength);
 }
 
 void Quat::Set(const float3x3 &m)
 {
-	assume(m.IsColOrthogonal());
-	assume(m.HasUnitaryScale());
-	assume(!m.HasNegativeScale());
+	mgl_assume(m.IsColOrthogonal());
+	mgl_assume(m.HasUnitaryScale());
+	mgl_assume(!m.HasNegativeScale());
 	SetQuatFrom(*this, m);
 
 #ifdef MATH_ASSERT_CORRECTNESS
 	// Test that the conversion float3x3->Quat->float3x3 is correct.
-	mathassert(this->ToFloat3x3().Equals(m, 0.01f));
+	mgl_mathassert(this->ToFloat3x3().Equals(m, 0.01f));
 #endif
 }
 
 void Quat::Set(const float3x4 &m)
 {
-	assume(m.IsColOrthogonal());
-	assume(m.HasUnitaryScale());
-	assume(!m.HasNegativeScale());
+	mgl_assume(m.IsColOrthogonal());
+	mgl_assume(m.HasUnitaryScale());
+	mgl_assume(!m.HasNegativeScale());
 	SetQuatFrom(*this, m);
 
 #ifdef MATH_ASSERT_CORRECTNESS
 	// Test that the conversion float3x3->Quat->float3x3 is correct.
-	mathassert(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
+	mgl_mathassert(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
 #endif
 }
 
 void Quat::Set(const float4x4 &m)
 {
-	assume(m.IsColOrthogonal3());
-	assume(m.HasUnitaryScale());
-	assume(!m.HasNegativeScale());
-	assume(m.Row(3).Equals(0,0,0,1));
+	mgl_assume(m.IsColOrthogonal3());
+	mgl_assume(m.HasUnitaryScale());
+	mgl_assume(!m.HasNegativeScale());
+	mgl_assume(m.Row(3).Equals(0,0,0,1));
 	SetQuatFrom(*this, m);
 
 #ifdef MATH_ASSERT_CORRECTNESS
 	// Test that the conversion float3x3->Quat->float3x3 is correct.
-	mathassert(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
+	mgl_mathassert(this->ToFloat3x3().Equals(m.Float3x3Part(), 0.01f));
 #endif
 }
 
@@ -638,8 +638,8 @@ Quat MUST_USE_RESULT Quat::RotateAxisAngle(const float3 &axis, float angle)
 
 Quat MUST_USE_RESULT Quat::RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection)
 {
-	assume(sourceDirection.IsNormalized());
-	assume(targetDirection.IsNormalized());
+	mgl_assume(sourceDirection.IsNormalized());
+	mgl_assume(targetDirection.IsNormalized());
 	// If sourceDirection == targetDirection, the cross product comes out zero, and normalization would fail. In that case, pick an arbitrary axis.
 	float3 axis = sourceDirection.Cross(targetDirection);
 	float oldLength = axis.Normalize();
@@ -677,8 +677,8 @@ Quat MUST_USE_RESULT Quat::RotateFromTo(const float4 &sourceDirection, const flo
 	return q;
 #else
 	// Best: 19.970 nsecs / 53.632 ticks, Avg: 20.197 nsecs, Worst: 21.122 nsecs
-	assume(EqualAbs(sourceDirection.w, 0.f));
-	assume(EqualAbs(targetDirection.w, 0.f));
+	mgl_assume(EqualAbs(sourceDirection.w, 0.f));
+	mgl_assume(EqualAbs(targetDirection.w, 0.f));
 	return Quat::RotateFromTo(sourceDirection.xyz(), targetDirection.xyz());
 #endif
 }
@@ -715,7 +715,7 @@ Quat MUST_USE_RESULT Quat::RandomRotation(LCG &lcg)
 		if (lenSq >= 1e-6f && lenSq <= 1.f)
 			return Quat(x, y, z, w) / Sqrt(lenSq);
 	}
-	assume(false && "Quat::RandomRotation failed!");
+	mgl_assume(false && "Quat::RandomRotation failed!");
 	return Quat::identity;
 }
 
@@ -752,7 +752,7 @@ float3x4 MUST_USE_RESULT Quat::ToFloat3x4() const
 
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4() const
 {
-	assume(IsNormalized());
+	mgl_assume(IsNormalized());
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	float4x4 m;
 	quat_to_mat4x4(q, _mm_set_ps(1,0,0,0), m.row);
@@ -773,7 +773,7 @@ float4x4 MUST_USE_RESULT Quat::ToFloat4x4(const float3 &translation) const
 
 float4x4 MUST_USE_RESULT Quat::ToFloat4x4(const float4 &translation) const
 {
-	assume(IsNormalized());
+	mgl_assume(IsNormalized());
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	float4x4 m;
 	quat_to_mat4x4(q, translation.v, m.row);
@@ -810,7 +810,7 @@ StringT MUST_USE_RESULT Quat::SerializeToString() const
 	s = SerializeFloat(y, s); *s = ','; ++s;
 	s = SerializeFloat(z, s); *s = ','; ++s;
 	s = SerializeFloat(w, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -823,8 +823,8 @@ StringT Quat::SerializeToCodeString() const
 
 Quat MUST_USE_RESULT Quat::FromString(const char *str, const char **outEndStr)
 {
-	assert(IsNeutralCLocale());
-	assume(str);
+	mgl_assert(IsNeutralCLocale());
+	mgl_assume(str);
 	if (!str)
 		return Quat::nan;
 	MATH_SKIP_WORD(str, "Quat");
@@ -899,7 +899,7 @@ float4 Quat::operator *(const float4 &rhs) const
 
 Quat Quat::operator /(float scalar) const
 {
-	assume(!EqualAbs(scalar, 0.f));
+	mgl_assume(!EqualAbs(scalar, 0.f));
 
 #ifdef MATH_AUTOMATIC_SSE
 	return div_ps(q, set1_ps(scalar));

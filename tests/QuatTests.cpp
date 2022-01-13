@@ -164,7 +164,7 @@ RANDOMIZED_TEST(Quat_SetFromAxisAngle)
 	Quat q, q2;
 	q.SetFromAxisAngle(axis, f);
 	q2.SetFromAxisAngle(axis4, f);
-	assert2(q.Equals(q2), q, q2);
+	mgl_assert2(q.Equals(q2), q, q2);
 }
 
 RANDOMIZED_TEST(Quat_Transform)
@@ -175,34 +175,34 @@ RANDOMIZED_TEST(Quat_Transform)
 	float3 mv = m*v;
 	float3 qv = q*v;
 	float3 qv2 = q.Transform(v);
-	assert(mv.Equals(qv));
-	assert(qv.Equals(qv2));
+	mgl_assert(mv.Equals(qv));
+	mgl_assert(qv.Equals(qv2));
 
 	float4 V(v, (float)rng.Int(0, 1));
 	float4x4 M = float4x4(q);
 	float4 MV = M*V;
 	float4 qV = q*V;
 	float4 qV2 = q.Transform(V);
-	assert(MV.Equals(qV));
-	assert(MV.Equals(qV2));
+	mgl_assert(MV.Equals(qV));
+	mgl_assert(MV.Equals(qV2));
 }
 
 RANDOMIZED_TEST(Quat_float4x4_conv)
 {
 	Quat q = Quat::RandomRotation(rng);
 	float4x4 m = q.ToFloat4x4();
-	assert(m.TranslatePart().Equals(0,0,0));
-	assert(!m.ContainsProjection());
+	mgl_assert(m.TranslatePart().Equals(0,0,0));
+	mgl_assert(!m.ContainsProjection());
 	Quat q2 = m.Float3x3Part().ToQuat();
-	assert(q.Equals(q2) || q.Equals(q2.Neg()));
+	mgl_assert(q.Equals(q2) || q.Equals(q2.Neg()));
 
 	float4 v = float4::RandomGeneral(rng, -1000.f, 1000.f);
 	v.w = (float)rng.Int(0,1);
 	m = q.ToFloat4x4(v);
-	assert(m.TranslatePart().Equals(v.xyz()));
-	assert(!m.ContainsProjection());
+	mgl_assert(m.TranslatePart().Equals(v.xyz()));
+	mgl_assert(!m.ContainsProjection());
 	q2 = m.Float3x3Part().ToQuat();
-	assert(q.Equals(q2) || q.Equals(q2.Neg()));
+	mgl_assert(q.Equals(q2) || q.Equals(q2.Neg()));
 }
 
 BENCHMARK(Quat_op_mul_Quat, "Quat * Quat")
@@ -255,8 +255,8 @@ RANDOMIZED_TEST(Quat_Mul_Quat)
 	float3x3 m = q.ToFloat3x3();
 	float3x3 m2 = q2.ToFloat3x3();
 	float4 v4 = m2*m*v;
-	assert(v2.Equals(v3));
-	assert(v2.Equals(v4));
+	mgl_assert(v2.Equals(v3));
+	mgl_assert(v2.Equals(v4));
 }
 
 RANDOMIZED_TEST(quat_mul_quat)
@@ -265,7 +265,7 @@ RANDOMIZED_TEST(quat_mul_quat)
 	Quat q2 = Quat::RandomRotation(rng);
 	Quat correct = Quat(q.ToFloat3x3() * q2.ToFloat3x3());
 	Quat q3 = quat_mul_quat(q.q, q2.q);
-	assert(q3.Equals(correct) || q3.Equals(correct.Neg()));
+	mgl_assert(q3.Equals(correct) || q3.Equals(correct.Neg()));
 }
 
 RANDOMIZED_TEST(Quat_ToAxisAngle_float3)
@@ -276,7 +276,7 @@ RANDOMIZED_TEST(Quat_ToAxisAngle_float3)
 	q.ToAxisAngle(axis, angle);
 	Quat q2;
 	q2.SetFromAxisAngle(axis, angle);
-	assert(q.Equals(q2));
+	mgl_assert(q.Equals(q2));
 }
 
 RANDOMIZED_TEST(Quat_ToAxisAngle_float4)
@@ -287,10 +287,10 @@ RANDOMIZED_TEST(Quat_ToAxisAngle_float4)
 	q.ToAxisAngle(axis, angle);
 
 	vec axis2 = q.Axis();
-	assert(axis2.xyz().Equals(axis.xyz()));
+	mgl_assert(axis2.xyz().Equals(axis.xyz()));
 	Quat q2;
 	q2.SetFromAxisAngle(axis, angle);
-	assert(q.Equals(q2));
+	mgl_assert(q.Equals(q2));
 }
 
 RANDOMIZED_TEST(Quat_RotateFromTo_float3)
@@ -299,7 +299,7 @@ RANDOMIZED_TEST(Quat_RotateFromTo_float3)
 	float3 v2 = float3::RandomDir(rng);
 	Quat rot = Quat::RotateFromTo(v, v2);
 	float3 v2_ = rot * v;
-	assert2(v2.Equals(v2_), v2, v2_);
+	mgl_assert2(v2.Equals(v2_), v2, v2_);
 }
 
 RANDOMIZED_TEST(Quat_RotateFromTo_float4)
@@ -308,7 +308,7 @@ RANDOMIZED_TEST(Quat_RotateFromTo_float4)
 	float4 v2 = float4::RandomDir(rng);
 	Quat rot = Quat::RotateFromTo(v, v2);
 	float4 v2_ = rot * v;
-	assert2(v2.Equals(v2_), v2, v2_);
+	mgl_assert2(v2.Equals(v2_), v2, v2_);
 }
 
 TEST(QuatNormalize)
@@ -316,30 +316,30 @@ TEST(QuatNormalize)
 	Quat q(-1.f, 2.f, 3.f, 4.f);
 	float oldLength = q.Normalize();
 	MARK_UNUSED(oldLength);
-	assertcmp(oldLength, >, 0);
-	assert(EqualAbs(q.x, -1.f / Sqrt(30.f)));
-	assert(EqualAbs(q.y, 2.f / Sqrt(30.f)));
-	assert(EqualAbs(q.z, 3.f / Sqrt(30.f)));
-	assert(EqualAbs(q.w, 4.f / Sqrt(30.f)));
+	mgl_assertcmp(oldLength, >, 0);
+	mgl_assert(EqualAbs(q.x, -1.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q.y, 2.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q.z, 3.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q.w, 4.f / Sqrt(30.f)));
 
 	Quat q2(0,0,0, 0.f);
 	oldLength = q2.Normalize();
 	MARK_UNUSED(oldLength);
-	assert(oldLength == 0.f);
-	assert(q2.x == 1.f);
-	assert(q2.y == 0.f);
-	assert(q2.z == 0.f);
-	assert(q2.w == 0.f);
+	mgl_assert(oldLength == 0.f);
+	mgl_assert(q2.x == 1.f);
+	mgl_assert(q2.y == 0.f);
+	mgl_assert(q2.z == 0.f);
+	mgl_assert(q2.w == 0.f);
 }
 
 TEST(QuatNormalized)
 {
 	Quat q(-1.f, 2.f, 3.f, -4.f);
 	Quat q2 = q.Normalized();
-	assert(EqualAbs(q2.x, -1.f / Sqrt(30.f)));
-	assert(EqualAbs(q2.y, 2.f / Sqrt(30.f)));
-	assert(EqualAbs(q2.z, 3.f / Sqrt(30.f)));
-	assert(EqualAbs(q2.w, -4.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q2.x, -1.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q2.y, 2.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q2.z, 3.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(q2.w, -4.f / Sqrt(30.f)));
 }
 
 #ifdef ANDROID
@@ -350,7 +350,7 @@ RANDOMIZED_TEST(quat_mul_quat_asm)
 	Quat correct = q * q2;
 	Quat q3;
 	quat_mul_quat_asm(q.ptr(), q2.ptr(), q3.ptr());
-	assert(q3.Equals(correct));
+	mgl_assert(q3.Equals(correct));
 }
 #endif
 
@@ -367,7 +367,7 @@ RANDOMIZED_TEST(quat_div_quat)
 	Quat q2 = Quat::RandomRotation(rng);
 	Quat correct = q / q2;
 	Quat q3 = quat_div_quat(q.q, q2.q);
-	assert(q3.Equals(correct));
+	mgl_assert(q3.Equals(correct));
 }
 #endif
 BENCHMARK(quat_lerp_simd, "test against Quat_Lerp")
@@ -384,7 +384,7 @@ RANDOMIZED_TEST(quat_lerp)
 	float t = rng.Float();
 	Quat correct = q.Lerp(q2, t);
 	Quat q3 = vec4_lerp(q.q, q2.q, t);
-	assert2(q3.Equals(correct), q3, correct);
+	mgl_assert2(q3.Equals(correct), q3, correct);
 }
 */
 
