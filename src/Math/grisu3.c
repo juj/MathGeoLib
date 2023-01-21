@@ -409,7 +409,7 @@ int dtoa_grisu3(double v, char *dst)
 	}
 
     // We now have an integer string of form "151324135" and a base-10 exponent for that number.
-    // Next, decide the best presentation for that string by whether to use a decimal point, or the scientific exponent notation 'e'.
+    // Next, decide the best presentation for that string by whether to use a decimal point, or the scientific exponent notation 'e'.
     // We don't pick the absolute shortest representation, but pick a balance between readability and shortness, e.g.
     // 1.545056189557677e-308 could be represented in a shorter form
     // 1545056189557677e-323 but that would be somewhat unreadable.
