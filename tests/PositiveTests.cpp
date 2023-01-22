@@ -20,12 +20,12 @@ AABB RandomAABBContainingPoint(const vec &pt, float maxSideLength)
 	h = rng.Float(1e-3f, h-1e-3f);
 	d = rng.Float(1e-3f, d-1e-3f);
 	a.Translate(pt - POINT_VEC(w, h, d));
-	assert(!a.IsDegenerate());
-	assert(a.IsFinite());
-	assert(a.Contains(pt));
+	mgl_assert(!a.IsDegenerate());
+	mgl_assert(a.IsFinite());
+	mgl_assert(a.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(a.minPoint.w, 1.f);
-	asserteq(a.maxPoint.w, 1.f);
+	mgl_asserteq(a.minPoint.w, 1.f);
+	mgl_asserteq(a.maxPoint.w, 1.f);
 #endif
 	return a;
 }
@@ -41,25 +41,25 @@ OBB RandomOBBContainingPoint(const vec &pt, float maxSideLength)
 	o.axis[0] = DIR_VEC(rot.Col(0));
 	o.axis[1] = DIR_VEC(rot.Col(1));
 	o.axis[2] = DIR_VEC(rot.Col(2));
-	assume2(o.axis[0].IsNormalized(), o.axis[0], o.axis[0].LengthSq());
-	assume2(o.axis[1].IsNormalized(), o.axis[1], o.axis[1].LengthSq());
-	assume2(o.axis[2].IsNormalized(), o.axis[2], o.axis[2].LengthSq());
-	assume(vec::AreOrthogonal(o.axis[0], o.axis[1], o.axis[2]));
+	mgl_assume2(o.axis[0].IsNormalized(), o.axis[0], o.axis[0].LengthSq());
+	mgl_assume2(o.axis[1].IsNormalized(), o.axis[1], o.axis[1].LengthSq());
+	mgl_assume2(o.axis[2].IsNormalized(), o.axis[2], o.axis[2].LengthSq());
+	mgl_assume(vec::AreOrthogonal(o.axis[0], o.axis[1], o.axis[2]));
 //	assume(vec::AreOrthonormal(o.axis[0], o.axis[1], o.axis[2]));
 	o.r = DIR_VEC(w, h, d);
 	const float epsilon = 1e-4f;
 	o.pos += rng.Float(-w+epsilon, w-epsilon) * o.axis[0];
 	o.pos += rng.Float(-h+epsilon, h-epsilon) * o.axis[1];
 	o.pos += rng.Float(-d+epsilon, d-epsilon) * o.axis[2];
-	assert1(!o.IsDegenerate(), o);
-	assert(o.IsFinite());
-	assert(o.Contains(pt));
+	mgl_assert1(!o.IsDegenerate(), o);
+	mgl_assert(o.IsFinite());
+	mgl_assert(o.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(o.pos.w, 1.f);
-	asserteq(o.r.w, 0.f);
-	asserteq(o.axis[0].w, 0.f);
-	asserteq(o.axis[1].w, 0.f);
-	asserteq(o.axis[2].w, 0.f);
+	mgl_asserteq(o.pos.w, 1.f);
+	mgl_asserteq(o.r.w, 0.f);
+	mgl_asserteq(o.axis[0].w, 0.f);
+	mgl_asserteq(o.axis[1].w, 0.f);
+	mgl_asserteq(o.axis[2].w, 0.f);
 #endif
 	return o;
 }
@@ -68,11 +68,11 @@ Sphere RandomSphereContainingPoint(const vec &pt, float maxRadius)
 {
 	Sphere s(pt, rng.Float(1.f, maxRadius));
 	s.pos += vec::RandomDir(rng, Max(0.f, s.r - 1e-2f));
-	assert(s.IsFinite());
-	assert(!s.IsDegenerate());
-	assert(s.Contains(pt));
+	mgl_assert(s.IsFinite());
+	mgl_assert(!s.IsDegenerate());
+	mgl_assert(s.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(s.pos.w, 1.f);
+	mgl_asserteq(s.pos.w, 1.f);
 #endif
 	return s;
 }
@@ -88,9 +88,9 @@ Circle2D RandomCircle2DContainingPoint(LCG &lcg, const float2 &pt, float maxRadi
     if (!c.Contains(pt))
         return RandomCircle2DContainingPoint(pt, maxRadius);
 #endif
-	assert(c.IsFinite());
-	assert(!c.IsDegenerate());
-	assert(c.Contains(pt));
+	mgl_assert(c.IsFinite());
+	mgl_assert(!c.IsDegenerate());
+	mgl_assert(c.Contains(pt));
 	return c;
 }
 
@@ -120,13 +120,13 @@ Frustum RandomFrustumContainingPoint(LCG &lcg, const vec &pt)
 	vec pt2 = f.UniformRandomPointInside(lcg);
 	f.SetPos(f.Pos() + pt - pt2);
 
-	assert(f.IsFinite());
-//	assert(!f.IsDegenerate());
-	assert(f.Contains(pt));
+	mgl_assert(f.IsFinite());
+//	mgl_assert(!f.IsDegenerate());
+	mgl_assert(f.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(f.Pos().w, 1.f);
-	asserteq(f.Front().w, 0.f);
-	asserteq(f.Up().w, 0.f);
+	mgl_asserteq(f.Pos().w, 1.f);
+	mgl_asserteq(f.Front().w, 0.f);
+	mgl_asserteq(f.Up().w, 0.f);
 #endif
 	return f;
 }
@@ -136,11 +136,11 @@ Line RandomLineContainingPoint(const vec &pt)
 	vec dir = vec::RandomDir(rng);
 	Line l(pt, dir);
 	l.pos = l.GetPoint(rng.Float(-SCALE, SCALE));
-	assert(l.IsFinite());
-	assert(l.Contains(pt));
+	mgl_assert(l.IsFinite());
+	mgl_assert(l.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(l.pos.w, 1.f);
-	asserteq(l.dir.w, 0.f);
+	mgl_asserteq(l.pos.w, 1.f);
+	mgl_asserteq(l.dir.w, 0.f);
 #endif
 	return l;
 }
@@ -150,11 +150,11 @@ Ray RandomRayContainingPoint(const vec &pt)
 	vec dir = vec::RandomDir(rng);
 	Ray l(pt, dir);
 	l.pos = l.GetPoint(rng.Float(-SCALE, 0));
-	assert(l.IsFinite());
-	assert(l.Contains(pt));
+	mgl_assert(l.IsFinite());
+	mgl_assert(l.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(l.pos.w, 1.f);
-	asserteq(l.dir.w, 0.f);
+	mgl_asserteq(l.pos.w, 1.f);
+	mgl_asserteq(l.dir.w, 0.f);
 #endif
 	return l;
 }
@@ -165,11 +165,11 @@ LineSegment RandomLineSegmentContainingPoint(const vec &pt)
 	float a = rng.Float(0, SCALE);
 	float b = rng.Float(0, SCALE);
 	LineSegment l(pt + a*dir, pt - b*dir);
-	assert(l.IsFinite());
-	assert(l.Contains(pt));
+	mgl_assert(l.IsFinite());
+	mgl_assert(l.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(l.a.w, 1.f);
-	asserteq(l.b.w, 1.f);
+	mgl_asserteq(l.a.w, 1.f);
+	mgl_asserteq(l.b.w, 1.f);
 #endif
 	return l;
 }
@@ -184,11 +184,11 @@ Capsule RandomCapsuleContainingPoint(const vec &pt)
 	vec d = vec::RandomSphere(rng, vec::zero, c.r);
 	c.l.a += d;
 	c.l.b += d;
-	assert(c.IsFinite());
-	assert(c.Contains(pt));
+	mgl_assert(c.IsFinite());
+	mgl_assert(c.Contains(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(c.l.a.w, 1.f);
-	asserteq(c.l.b.w, 1.f);
+	mgl_asserteq(c.l.a.w, 1.f);
+	mgl_asserteq(c.l.b.w, 1.f);
 #endif
 
 	return c;
@@ -197,11 +197,11 @@ Capsule RandomCapsuleContainingPoint(const vec &pt)
 Plane RandomPlaneContainingPoint(const vec &pt)
 {
 	vec dir = vec::RandomDir(rng);
-	assume2(dir.IsNormalized(), dir.SerializeToCodeString(), dir.Length());
+	mgl_assume2(dir.IsNormalized(), dir.SerializeToCodeString(), dir.Length());
 	Plane p(pt, dir);
-	assert(!p.IsDegenerate());
+	mgl_assert(!p.IsDegenerate());
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(p.normal.w, 0.f);
+	mgl_asserteq(p.normal.w, 0.f);
 #endif
 	return p;
 }
@@ -220,13 +220,13 @@ Triangle RandomTriangleContainingPoint(const vec &pt)
 	t.b += pt;
 	t.c += pt;
 
-	assert1(t.IsFinite(), t);
-	assert1(!t.IsDegenerate(), t);
-	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
+	mgl_assert1(t.IsFinite(), t);
+	mgl_assert1(!t.IsDegenerate(), t);
+	mgl_assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
 #ifdef MATH_AUTOMATIC_SSE
-	asserteq(t.a.w, 1.f);
-	asserteq(t.b.w, 1.f);
-	asserteq(t.c.w, 1.f);
+	mgl_asserteq(t.a.w, 1.f);
+	mgl_asserteq(t.b.w, 1.f);
+	mgl_asserteq(t.c.w, 1.f);
 #endif
 	return t;
 }
@@ -247,12 +247,12 @@ Polyhedron RandomPolyhedronContainingPoint(const vec &pt)
 	}
 #ifdef MATH_AUTOMATIC_SSE
 	for (int i = 0; i < p.NumVertices(); ++i)
-		asserteq(p.Vertex(i).w, 1.f);
+		mgl_asserteq(p.Vertex(i).w, 1.f);
 #endif
 	return p;
-//	assert1(t.IsFinite(), t);
-//	assert1(!t.IsDegenerate(), t);
-//	assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
+//	mgl_assert1(t.IsFinite(), t);
+//	mgl_assert1(!t.IsDegenerate(), t);
+//	mgl_assert3(t.Contains(pt), t.SerializeToCodeString(), pt.SerializeToCodeString(), t.Distance(pt));
 }
 
 UNIQUE_TEST(Polygon_Contains_PointCase)
@@ -265,7 +265,7 @@ UNIQUE_TEST(Polygon_Contains_PointCase)
 	p.p.push_back(POINT_VEC(0.f, 0.f, 1.f));
 	vec pt = POINT_VEC(0.5f, 0.f, 0.0007f);
 
-	assert(p.Contains(pt));
+	mgl_assert(p.Contains(pt));
 }
 
 Polygon RandomPolygonContainingPoint(const vec &pt)
@@ -274,17 +274,17 @@ Polygon RandomPolygonContainingPoint(const vec &pt)
 	Polygon poly = p.FacePolygon(rng.Int(0, p.NumFaces()-1));
 
 	vec pt2 = poly.FastRandomPointInside(rng);
-	assert3(poly.Contains(pt2), poly.SerializeToString(), pt2.SerializeToString(), poly.Distance(pt2));
+	mgl_assert3(poly.Contains(pt2), poly.SerializeToString(), pt2.SerializeToString(), poly.Distance(pt2));
 	poly.Translate(pt - pt2);
 
-	assert1(!poly.IsDegenerate(), poly);
-	assert1(!poly.IsNull(), poly);
-	assert1(poly.IsPlanar(), poly);
-	assert1(poly.IsFinite(), poly);
-	assert3(poly.Contains(pt), poly, pt, poly.Distance(pt));
+	mgl_assert1(!poly.IsDegenerate(), poly);
+	mgl_assert1(!poly.IsNull(), poly);
+	mgl_assert1(poly.IsPlanar(), poly);
+	mgl_assert1(poly.IsFinite(), poly);
+	mgl_assert3(poly.Contains(pt), poly, pt, poly.Distance(pt));
 #ifdef MATH_AUTOMATIC_SSE
 	for (int i = 0; i < poly.NumVertices(); ++i)
-		asserteq(poly.Vertex(i).w, 1.f);
+		mgl_asserteq(poly.Vertex(i).w, 1.f);
 #endif
 
 	return poly;
@@ -295,18 +295,18 @@ RANDOMIZED_TEST(AABBAABBIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	AABB b = RandomAABBContainingPoint(pt, 10.f);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBOBBIntersect)
@@ -314,18 +314,18 @@ RANDOMIZED_TEST(AABBOBBIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBLineIntersect)
@@ -333,14 +333,14 @@ RANDOMIZED_TEST(AABBLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
-	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	mgl_assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBRayIntersect)
@@ -348,14 +348,14 @@ RANDOMIZED_TEST(AABBRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(TrickyAABBLineSegmentIntersectGJK)
@@ -366,8 +366,8 @@ UNIQUE_TEST(TrickyAABBLineSegmentIntersectGJK)
 	LineSegment b;
 	b.a = POINT_VEC(-61.331539f, 16.955204f, -18.561975f);
 	b.b = POINT_VEC(-53.097103f, 40.628937f, 30.422394f);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
 }
@@ -377,16 +377,16 @@ RANDOMIZED_TEST(AABBLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBPlaneIntersect)
@@ -394,14 +394,14 @@ RANDOMIZED_TEST(AABBPlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBSphereIntersect)
@@ -409,16 +409,16 @@ RANDOMIZED_TEST(AABBSphereIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
 
 
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBCapsuleIntersect)
@@ -426,14 +426,14 @@ RANDOMIZED_TEST(AABBCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBTriangleIntersect)
@@ -441,18 +441,18 @@ RANDOMIZED_TEST(AABBTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBFrustumIntersect)
@@ -460,18 +460,18 @@ RANDOMIZED_TEST(AABBFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(AABBPolyhedronIntersect)
@@ -479,14 +479,14 @@ RANDOMIZED_TEST(AABBPolyhedronIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(AABBPolygonIntersectCase)
@@ -498,7 +498,7 @@ UNIQUE_TEST(AABBPolygonIntersectCase)
 	b.p.push_back(POINT_VEC(56.3732452f,-19.4667053f,-35.8499298f));
 	b.p.push_back(POINT_VEC(56.3732452f,-119.466698f,-35.8499298f));
 	b.p.push_back(POINT_VEC(-43.6267548f,-119.466698f,-35.8499298f));
-	assert(a.Intersects(b));
+	mgl_assert(a.Intersects(b));
 }
 
 UNIQUE_TEST(AABBPolygonIntersectCase2)
@@ -509,7 +509,7 @@ UNIQUE_TEST(AABBPolygonIntersectCase2)
 	b.p.push_back(POINT_VEC(74.7439194f,-20.989212f,181.39743f));
 	b.p.push_back(POINT_VEC(-25.2560806f,-20.989212f,81.3974304f));
 	b.p.push_back(POINT_VEC(74.7439194f,-120.989212f,81.3974304f));
-	assert(a.Intersects(b));
+	mgl_assert(a.Intersects(b));
 }
 
 RANDOMIZED_TEST(AABBPolygonIntersect)
@@ -517,14 +517,14 @@ RANDOMIZED_TEST(AABBPolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToString());
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToString());
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -535,18 +535,18 @@ RANDOMIZED_TEST(OBBOBBIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 int xxxxx = 0;
@@ -610,14 +610,14 @@ RANDOMIZED_TEST(OBBLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBRayIntersect)
@@ -625,14 +625,14 @@ RANDOMIZED_TEST(OBBRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBLineSegmentIntersect)
@@ -640,16 +640,16 @@ RANDOMIZED_TEST(OBBLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBPlaneIntersect)
@@ -657,14 +657,14 @@ RANDOMIZED_TEST(OBBPlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBSphereIntersect)
@@ -672,16 +672,16 @@ RANDOMIZED_TEST(OBBSphereIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-////	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+////	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBCapsuleIntersect)
@@ -689,16 +689,16 @@ RANDOMIZED_TEST(OBBCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBTriangleIntersect)
@@ -706,18 +706,18 @@ RANDOMIZED_TEST(OBBTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBFrustumIntersect)
@@ -725,18 +725,18 @@ RANDOMIZED_TEST(OBBFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBPolyhedronIntersect)
@@ -744,14 +744,14 @@ RANDOMIZED_TEST(OBBPolyhedronIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(OBBPolygonIntersect)
@@ -759,14 +759,14 @@ RANDOMIZED_TEST(OBBPolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-///	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+///	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -778,16 +778,16 @@ RANDOMIZED_TEST(SphereSphereIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, 10.f);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SphereLineIntersect)
@@ -795,14 +795,14 @@ RANDOMIZED_TEST(SphereLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SphereRayIntersect)
@@ -810,14 +810,14 @@ RANDOMIZED_TEST(SphereRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SphereLineSegmentIntersect)
@@ -825,16 +825,16 @@ RANDOMIZED_TEST(SphereLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SpherePlaneIntersect)
@@ -842,14 +842,14 @@ RANDOMIZED_TEST(SpherePlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SphereCapsuleIntersect)
@@ -857,16 +857,16 @@ RANDOMIZED_TEST(SphereCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SphereTriangleIntersect)
@@ -874,16 +874,16 @@ RANDOMIZED_TEST(SphereTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SphereFrustumIntersect)
@@ -891,16 +891,16 @@ RANDOMIZED_TEST(SphereFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SpherePolyhedronIntersect)
@@ -908,14 +908,14 @@ RANDOMIZED_TEST(SpherePolyhedronIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(SpherePolygonIntersect)
@@ -923,14 +923,14 @@ RANDOMIZED_TEST(SpherePolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -941,14 +941,14 @@ RANDOMIZED_TEST(FrustumLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumRayIntersect)
@@ -956,14 +956,14 @@ RANDOMIZED_TEST(FrustumRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumLineSegmentIntersect)
@@ -971,16 +971,16 @@ RANDOMIZED_TEST(FrustumLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumPlaneIntersect)
@@ -988,14 +988,14 @@ RANDOMIZED_TEST(FrustumPlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumCapsuleIntersect)
@@ -1003,16 +1003,16 @@ RANDOMIZED_TEST(FrustumCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumTriangleIntersect)
@@ -1020,18 +1020,18 @@ RANDOMIZED_TEST(FrustumTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumFrustumIntersect)
@@ -1039,18 +1039,18 @@ RANDOMIZED_TEST(FrustumFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 BENCHMARK(BM_FrustumFrustumIntersect, "Frustum-Frustum Intersects")
@@ -1112,14 +1112,14 @@ RANDOMIZED_TEST(FrustumPolyhedronIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(FrustumPolygonIntersect)
@@ -1127,14 +1127,14 @@ RANDOMIZED_TEST(FrustumPolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -1145,14 +1145,14 @@ RANDOMIZED_TEST(CapsuleLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsuleRayIntersect)
@@ -1160,14 +1160,14 @@ RANDOMIZED_TEST(CapsuleRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsuleLineSegmentIntersect)
@@ -1175,16 +1175,16 @@ RANDOMIZED_TEST(CapsuleLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsulePlaneIntersect)
@@ -1192,14 +1192,14 @@ RANDOMIZED_TEST(CapsulePlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsuleCapsuleIntersect)
@@ -1207,16 +1207,16 @@ RANDOMIZED_TEST(CapsuleCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsuleTriangleIntersect)
@@ -1224,16 +1224,16 @@ RANDOMIZED_TEST(CapsuleTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-///	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+///	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsulePolyhedronIntersect)
@@ -1241,14 +1241,14 @@ RANDOMIZED_TEST(CapsulePolyhedronIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-///	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+///	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(CapsulePolygonIntersect)
@@ -1256,14 +1256,14 @@ RANDOMIZED_TEST(CapsulePolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -1275,14 +1275,14 @@ RANDOMIZED_TEST(PolyhedronLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolyhedronRayIntersect)
@@ -1290,14 +1290,14 @@ RANDOMIZED_TEST(PolyhedronRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolyhedronLineSegmentIntersect)
@@ -1305,17 +1305,17 @@ RANDOMIZED_TEST(PolyhedronLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-	assert4(a.Distance(a.ClosestPoint(b)) < 1e-3f, a, b, a.ClosestPoint(b), a.Distance(a.ClosestPoint(b)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert4(a.Distance(a.ClosestPoint(b)) < 1e-3f, a, b, a.ClosestPoint(b), a.Distance(a.ClosestPoint(b)));
 //	TODO: The following is problematic due to numerical
 //	stability issues at the surface of the Polyhedron.
-//	assert(a.Contains(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolyhedronPlaneIntersect)
@@ -1323,14 +1323,14 @@ RANDOMIZED_TEST(PolyhedronPlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolyhedronTriangleIntersect)
@@ -1338,14 +1338,14 @@ RANDOMIZED_TEST(PolyhedronTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolyhedronPolyhedronIntersect)
@@ -1353,14 +1353,14 @@ RANDOMIZED_TEST(PolyhedronPolyhedronIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Polyhedron b = RandomPolyhedronContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolyhedronPolygonIntersect)
@@ -1368,14 +1368,14 @@ RANDOMIZED_TEST(PolyhedronPolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polyhedron a = RandomPolyhedronContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(PolygonLineIntersectCase)
@@ -1389,7 +1389,7 @@ UNIQUE_TEST(PolygonLineIntersectCase)
 
 	Line l(POINT_VEC(-51.2448387f,66.6799698f,-31.887619f),DIR_VEC(-0.494226635f,-0.341286302f,-0.799539685f));
 
-	assert(p.Intersects(l));
+	mgl_assert(p.Intersects(l));
 }
 
 RANDOMIZED_TEST(PolygonLineIntersect)
@@ -1397,14 +1397,14 @@ RANDOMIZED_TEST(PolygonLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToString(), b.SerializeToCodeString());
-	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToString());
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToString(), b.SerializeToCodeString());
+	mgl_assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToString());
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolygonRayIntersect)
@@ -1412,14 +1412,14 @@ RANDOMIZED_TEST(PolygonRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolygonLineSegmentIntersect)
@@ -1427,14 +1427,14 @@ RANDOMIZED_TEST(PolygonLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-	assert4(a.Contains(a.ClosestPoint(b)), a, b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
-	assert3(b.Contains(a.ClosestPoint(b)), b.SerializeToCodeString(), a.SerializeToString(), b.Distance(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert4(a.Contains(a.ClosestPoint(b)), a, b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
+	mgl_assert3(b.Contains(a.ClosestPoint(b)), b.SerializeToCodeString(), a.SerializeToString(), b.Distance(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolygonPlaneIntersect)
@@ -1442,14 +1442,14 @@ RANDOMIZED_TEST(PolygonPlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PolygonTriangleIntersect)
@@ -1457,14 +1457,14 @@ RANDOMIZED_TEST(PolygonTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(PolygonPolygonIntersectCase)
@@ -1493,15 +1493,15 @@ UNIQUE_TEST(PolygonPolygonIntersectCase)
 			break;
 		}
 
-		assert(t1.Intersects(t1));
-		assert(t2.Intersects(t2));
-		assert(t1.Intersects(t2));
+		mgl_assert(t1.Intersects(t1));
+		mgl_assert(t2.Intersects(t2));
+		mgl_assert(t1.Intersects(t2));
 
 		Polygon a = t1.ToPolygon();
-		assert(a.Intersects(a));
+		mgl_assert(a.Intersects(a));
 		Polygon b = t2.ToPolygon();
 
-		assert(a.Intersects(b));
+		mgl_assert(a.Intersects(b));
 	}
 }
 
@@ -1519,7 +1519,7 @@ UNIQUE_TEST(PolygonPolygonIntersectCase2)
 	b.p.push_back(POINT_VEC(-29.0814209f,53.0219727f, 0.f));
 	b.p.push_back(POINT_VEC(-29.0814209f,-46.9780273f, 0.f));
 
-	assert(a.Intersects(b));
+	mgl_assert(a.Intersects(b));
 }
 
 UNIQUE_TEST(PolygonContainsPointCase)
@@ -1529,9 +1529,9 @@ UNIQUE_TEST(PolygonContainsPointCase)
 	a.p.push_back(POINT_VEC(15.0997639f,-67.2276688f,12.971736f));
 	a.p.push_back(POINT_VEC(15.062994f,-67.2823105f,12.9826784f));
 	a.p.push_back(POINT_VEC(-27.6450062f,-17.8819065f,116.161354f));
-	
+
 	vec pt = POINT_VEC(12.1201611f,-63.8624725f,20.105011f);
-	assert(a.Contains(pt, 1e-2f));
+	mgl_assert(a.Contains(pt, 1e-2f));
 }
 
 RANDOMIZED_TEST(PolygonPolygonIntersect)
@@ -1539,14 +1539,14 @@ RANDOMIZED_TEST(PolygonPolygonIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Polygon a = RandomPolygonContainingPoint(pt);
 	Polygon b = RandomPolygonContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToString(), b.SerializeToString());
-	assert2(b.Intersects(a), b.SerializeToString(), a.SerializeToString());
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-///	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToString(), b.SerializeToString());
+	mgl_assert2(b.Intersects(a), b.SerializeToString(), a.SerializeToString());
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+///	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -1556,14 +1556,14 @@ RANDOMIZED_TEST(TriangleLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
-//	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
-	assert(a.Contains(b.ClosestPoint(a)));
-	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+//	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
+	mgl_assert(b.Contains(a.ClosestPoint(b)));
+	mgl_assert(a.Contains(b.ClosestPoint(a)));
+	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(TriangleRayIntersect)
@@ -1571,14 +1571,14 @@ RANDOMIZED_TEST(TriangleRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(TriangleLineSegmentIntersectCase)
@@ -1586,10 +1586,10 @@ UNIQUE_TEST(TriangleLineSegmentIntersectCase)
 	Triangle a(POINT_VEC(-45.7166939f,-104.675713f,17.1150723f),POINT_VEC(-20.9888325f,-89.1524963f,-31.5042286f),POINT_VEC(-1.45244789f,-76.914505f,-69.9231262f));
 	LineSegment b(POINT_VEC(-19.0950012f,-134.222748f,-33.7456589f),POINT_VEC(-52.5003471f,-49.3652039f,28.5405655f));
 
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
 	vec cp = a.ClosestPoint(b);
-	assert(a.Contains(cp));
-//	assert(b.Contains(cp));
+	mgl_assert(a.Contains(cp));
+//	mgl_assert(b.Contains(cp));
 }
 
 RANDOMIZED_TEST(TriangleLineSegmentIntersect)
@@ -1597,16 +1597,16 @@ RANDOMIZED_TEST(TriangleLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(a.Intersects(b));
-//	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+//	mgl_assert(b.Intersects(a));
 
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
+	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(TrianglePlaneIntersect)
@@ -1614,14 +1614,14 @@ RANDOMIZED_TEST(TrianglePlaneIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Plane b = RandomPlaneContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(TriangleTriangleIntersect)
@@ -1629,18 +1629,18 @@ RANDOMIZED_TEST(TriangleTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 
 
-	assert(SATIntersect(a, b));
+	mgl_assert(SATIntersect(a, b));
 
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
-	assert(a.Contains(b.ClosestPoint(a)));
-	assert(b.Contains(b.ClosestPoint(a)));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
+	mgl_assert(b.Contains(a.ClosestPoint(b)));
+	mgl_assert(a.Contains(b.ClosestPoint(a)));
+	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 
@@ -1651,21 +1651,21 @@ RANDOMIZED_TEST(PlaneLineIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	Line b = RandomLineContainingPoint(pt);
-	assert(a.Intersects(b));
-///	assert(b.Intersects(a));
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert(a.Intersects(b));
+///	mgl_assert(b.Intersects(a));
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(PlaneRayIntersectCase)
 {
 	Plane p(DIR_VEC(-0.25385046f,-0.518036366f,-0.816822112f),91.5489655f);
 	Ray r(POINT_VEC(-70.5785141f,-19.6609783f,-77.6785507f),DIR_VEC(0.916250288f,0.141897082f,-0.374634057f));
-	assert(p.Intersects(r));
+	mgl_assert(p.Intersects(r));
 }
 
 RANDOMIZED_TEST(PlaneRayIntersect)
@@ -1673,14 +1673,14 @@ RANDOMIZED_TEST(PlaneRayIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	Ray b = RandomRayContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
-	assert2(b.Intersects(a), a.SerializeToCodeString(), b.SerializeToCodeString());
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-	assert2(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
-	assert2(b.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	mgl_assert2(b.Intersects(a), a.SerializeToCodeString(), b.SerializeToCodeString());
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert2(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
+	mgl_assert2(b.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString());
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(PlaneLineSegmentIntersect)
@@ -1688,22 +1688,22 @@ RANDOMIZED_TEST(PlaneLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Plane a = RandomPlaneContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
-	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
-	assert(a.Distance(b) == 0.f);
-	assert(b.Distance(a) == 0.f);
-	assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
-	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	mgl_assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
+	mgl_assert(a.Distance(b) == 0.f);
+	mgl_assert(b.Distance(a) == 0.f);
+	mgl_assert4(a.Contains(a.ClosestPoint(b)), a.SerializeToCodeString(), b.SerializeToCodeString(), a.ClosestPoint(b).SerializeToCodeString(), a.Distance(a.ClosestPoint(b)));
+	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 UNIQUE_TEST(PlanePlaneIntersectCase)
 {
 	Plane a(DIR_VEC(-9.31284958e-005f,0.896122217f,-0.44380734f).Normalized(),-63.5531387f);
 	Plane b(DIR_VEC(0.0797545761f,-0.9964259f,0.0185146127f).Normalized(),45.0416794f);
-	assert(a.Intersects(b));
-	assert(b.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(b.Intersects(a));
 }
 
 RANDOMIZED_TEST(PlanePlaneIntersect)
@@ -1715,14 +1715,14 @@ RANDOMIZED_TEST(PlanePlaneIntersect)
 		a.d = b.d; // Avoid floating-point imprecision issues in the test: if plane normals are equal, make sure the planes are parallel.
 	if (a.normal.Equals(-b.normal))
 		a.d = -b.d;
-	assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
-	assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
-//	assert(a.Distance(b) == 0.f);
-//	assert(b.Distance(a) == 0.f);
-//	assert(a.Contains(a.ClosestPoint(b)));
-//	assert(b.Contains(a.ClosestPoint(b)));
-//	assert(a.Contains(b.ClosestPoint(a)));
-//	assert(b.Contains(b.ClosestPoint(a)));
+	mgl_assert2(a.Intersects(b), a.SerializeToCodeString(), b.SerializeToCodeString());
+	mgl_assert2(b.Intersects(a), b.SerializeToCodeString(), a.SerializeToCodeString());
+//	mgl_assert(a.Distance(b) == 0.f);
+//	mgl_assert(b.Distance(a) == 0.f);
+//	mgl_assert(a.Contains(a.ClosestPoint(b)));
+//	mgl_assert(b.Contains(a.ClosestPoint(b)));
+//	mgl_assert(a.Contains(b.ClosestPoint(a)));
+//	mgl_assert(b.Contains(b.ClosestPoint(a)));
 }
 
 RANDOMIZED_TEST(RayTriangleMeshIntersect)
@@ -1734,8 +1734,8 @@ RANDOMIZED_TEST(RayTriangleMeshIntersect)
 	Ray b = RandomRayContainingPoint(pt);
 	float d = tm.IntersectRay(b);
 	MARK_UNUSED(d);
-	assert(d >= 0.f);
-	assert(IsFinite(d));
+	mgl_assert(d >= 0.f);
+	mgl_assert(IsFinite(d));
 }
 
 RANDOMIZED_TEST(RayKdTreeIntersect)
@@ -1750,11 +1750,11 @@ RANDOMIZED_TEST(RayKdTreeIntersect)
 	Ray b = RandomRayContainingPoint(pt);
 	TriangleKdTreeRayQueryNearestHitVisitor result;
 	t.RayQuery(b, result);
-	assert(result.rayT >= 0.f);
-	assert(result.rayT < FLOAT_INF);
-	assert(result.triangleIndex != KdTree<Triangle_storage>::BUCKET_SENTINEL);
-	assert(result.pos.IsFinite());
-	assert(result.barycentricUV.IsFinite());
+	mgl_assert(result.rayT >= 0.f);
+	mgl_assert(result.rayT < FLOAT_INF);
+	mgl_assert(result.triangleIndex != KdTree<Triangle_storage>::BUCKET_SENTINEL);
+	mgl_assert(result.pos.IsFinite());
+	mgl_assert(result.barycentricUV.IsFinite());
 }
 
 TEST(PolygonContains2D)
@@ -1768,7 +1768,7 @@ TEST(PolygonContains2D)
 	pol.p.push_back(POINT_VEC(xmax, ymax, z));
 	pol.p.push_back(POINT_VEC(xmin, ymax, z));
 
-	assert(pol.Contains(point));
+	mgl_assert(pol.Contains(point));
 }
 
 #if 0
@@ -1782,6 +1782,6 @@ UNIQUE_TEST(PolygonContainsPointCase2)
 
 	vec pt = POINT_VEC(1.f,0.0645294f,0);
 
-	assert(p.Contains(pt));
+	mgl_assert(p.Contains(pt));
 }
 #endif

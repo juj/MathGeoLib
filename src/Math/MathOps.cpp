@@ -52,9 +52,9 @@ inline int ReinterpretFloatAsInt(float a)
 
 bool EqualUlps(float a, float b, int maxUlps)
 {
-	assert(sizeof(float) == sizeof(int));
-	assert(maxUlps >= 0);
-	assert(maxUlps < 4 * 1024 * 1024);
+	mgl_assert(sizeof(float) == sizeof(int));
+	mgl_assert(maxUlps >= 0);
+	mgl_assert(maxUlps < 4 * 1024 * 1024);
 
 	int intA = ReinterpretFloatAsInt(a);
 	if (intA < 0) intA = 0x80000000 - intA;

@@ -62,7 +62,7 @@ static Circle2D SmallestCircleSqEnclosing4Points(const float2 &a, const float2 &
 {
 	// Find the smallest circle that encloses each of a, b, c and d.
 	// As prerequisite, we know that a is not contained by smallest circle that encloses b, c and d, enforce that precondition.
-	assert1(!Circle2D::OptimalEnclosingCircle(b, c, d).Contains(a, -1e-1f), Circle2D::OptimalEnclosingCircle(b, c, d).SignedDistance(a));
+	mgl_assert1(!Circle2D::OptimalEnclosingCircle(b, c, d).Contains(a, -1e-1f), Circle2D::OptimalEnclosingCircle(b, c, d).SignedDistance(a));
 
 	// Therefore, the smallest circle that encloses each of a, b, c and d must pass through a. Test
 	// the three possible candidate circles (a,b,c), (a,b,d) and (a,c,d), one of those must enclose
@@ -198,7 +198,7 @@ float Circle2D::SignedDistance(const float2 &point) const
 
 Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoints)
 {
-	assert(pointArray || numPoints == 0);
+	mgl_assert(pointArray || numPoints == 0);
 
 	// Special case handling for 0-3 points.
 	switch(numPoints)
@@ -257,9 +257,9 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
 		// Start again from scratch: pts[0]-pts[2] now has the new candidate.
 		i = 2;
 
-		mathassert1(minCircle.Contains(pts[0], 1e-3f), minCircle.SignedDistance(pts[0]));
-		mathassert1(minCircle.Contains(pts[1], 1e-3f), minCircle.SignedDistance(pts[1]));
-		mathassert1(minCircle.Contains(pts[2], 1e-3f), minCircle.SignedDistance(pts[2]));
+		mgl_mathassert1(minCircle.Contains(pts[0], 1e-3f), minCircle.SignedDistance(pts[0]));
+		mgl_mathassert1(minCircle.Contains(pts[1], 1e-3f), minCircle.SignedDistance(pts[1]));
+		mgl_mathassert1(minCircle.Contains(pts[2], 1e-3f), minCircle.SignedDistance(pts[2]));
 	}
 	delete[] pts;
 	return minCircle;
@@ -267,7 +267,7 @@ Circle2D Circle2D::OptimalEnclosingCircle(const float2 *pointArray, int numPoint
 
 float2 Circle2D::RandomPointInside(LCG &lcg)
 {
-	assume(r > 1e-3f);
+	mgl_assume(r > 1e-3f);
 	float2 v = float2::zero;
 	// Rejection sampling analysis: The unit circle fills ~78.54% of the area of its enclosing rectangle, so this
 	// loop is expected to take only very few iterations before succeeding.
@@ -279,7 +279,7 @@ float2 Circle2D::RandomPointInside(LCG &lcg)
 		if (v.LengthSq() <= r * r)
 			return pos + v;
 	}
-	assume(false && "Circle2D::RandomPointInside failed!");
+	mgl_assume(false && "Circle2D::RandomPointInside failed!");
 
 	// Failed to generate a point inside this circle. Return the circle center as fallback.
 	return pos;

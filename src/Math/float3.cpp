@@ -64,7 +64,7 @@ float3::float3(const float2 &xy, float z_)
 
 float3::float3(const float *data)
 {
-	assume(data);
+	mgl_assume(data);
 	x = data[0];
 	y = data[1];
 	z = data[2];
@@ -123,7 +123,7 @@ float float3::Normalize()
 	store_vec3(ptr(), normalized);
 	return s4f_x(origLength);
 #else
-	assume(IsFinite());
+	mgl_assume(IsFinite());
 	float length = Length();
 	if (length > 1e-6f)
 	{
@@ -149,7 +149,7 @@ float3 float3::Normalized() const
 #else
 	float3 copy = *this;
 	float oldLength = copy.Normalize();
-	assume(oldLength > 0.f && "float3::Normalized() failed!");
+	mgl_assume(oldLength > 0.f && "float3::Normalized() failed!");
 	MARK_UNUSED(oldLength);
 	return copy;
 #endif
@@ -174,7 +174,7 @@ float float3::ScaleToLength(float newLength)
 
 float3 float3::ScaledToLength(float newLength) const
 {
-	assume(!IsZero());
+	mgl_assume(!IsZero());
 
 	float3 v = *this;
 	v.ScaleToLength(newLength);
@@ -223,7 +223,7 @@ StringT float3::SerializeToString() const
 	char *s = SerializeFloat(x, str); *s = ','; ++s;
 	s = SerializeFloat(y, s); *s = ','; ++s;
 	s = SerializeFloat(z, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -236,8 +236,8 @@ StringT float3::SerializeToCodeString() const
 
 float3 MUST_USE_RESULT float3::FromString(const char *str, const char **outEndStr)
 {
-	assert(IsNeutralCLocale());
-	assume(str);
+	mgl_assert(IsNeutralCLocale());
+	mgl_assume(str);
 	if (!str)
 		return float3::nan;
 	MATH_SKIP_WORD(str, "float3");
@@ -291,7 +291,7 @@ vec PointVecFromString(const char *str, const char **outEndStr)
 	{
 		const char *end = FindNext(str, ')');
 		int numFields = CountCommas(str, end) + 1;
-		assume1(numFields == 3 || numFields == 4, numFields);
+		mgl_assume1(numFields == 3 || numFields == 4, numFields);
 		if (numFields == 4)
 			return FLOAT4_TO_POINT(float4::FromString(str, outEndStr));
 	}
@@ -313,7 +313,7 @@ vec DirVecFromString(const char *str, const char **outEndStr)
 	{
 		const char *end = FindNext(str, ')');
 		int numFields = CountCommas(str, end) + 1;
-		assume1(numFields == 3 || numFields == 4, numFields);
+		mgl_assume1(numFields == 3 || numFields == 4, numFields);
 		if (numFields == 4)
 			return FLOAT4_TO_DIR(float4::FromString(str, outEndStr));
 	}
@@ -568,9 +568,9 @@ float3x3 float3::OuterProduct(const float3 &rhs) const
 
 float3 float3::Perpendicular(const float3 &hint, const float3 &hint2) const
 {
-	assume(!this->IsZero());
-	assume(hint.IsNormalized());
-	assume(hint2.IsNormalized());
+	mgl_assume(!this->IsZero());
+	mgl_assume(hint.IsNormalized());
+	mgl_assume(hint2.IsNormalized());
 	float3 v = this->Cross(hint);
 	float len = v.Normalize();
 	if (len == 0)
@@ -581,9 +581,9 @@ float3 float3::Perpendicular(const float3 &hint, const float3 &hint2) const
 
 float3 float3::AnotherPerpendicular(const float3 &hint, const float3 &hint2) const
 {
-	assume(!this->IsZero());
-	assume(hint.IsNormalized());
-	assume(hint2.IsNormalized());
+	mgl_assume(!this->IsZero());
+	mgl_assume(hint.IsNormalized());
+	mgl_assume(hint2.IsNormalized());
 	float3 firstPerpendicular = Perpendicular(hint, hint2);
 	float3 v = this->Cross(firstPerpendicular);
 	return v.Normalized();
@@ -619,7 +619,7 @@ float MUST_USE_RESULT float3::ScalarTripleProduct(const float3 &u, const float3 
 
 float3 float3::Reflect(const float3 &normal) const
 {
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	return 2.f * this->ProjectToNorm(normal) - *this;
 }
 
@@ -637,13 +637,13 @@ float3 float3::Refract(const float3 &normal, float negativeSideRefractionIndex, 
 
 float3 float3::ProjectTo(const float3 &direction) const
 {
-	assume(!direction.IsZero());
+	mgl_assume(!direction.IsZero());
 	return direction * this->Dot(direction) / direction.LengthSq();
 }
 
 float3 float3::ProjectToNorm(const float3 &direction) const
 {
-	assume(direction.IsNormalized());
+	mgl_assume(direction.IsNormalized());
 	return direction * this->Dot(direction);
 }
 
@@ -660,8 +660,8 @@ float float3::AngleBetween(const float3 &other) const
 
 float float3::AngleBetweenNorm(const float3 &other) const
 {
-	assume(this->IsNormalized());
-	assume(other.IsNormalized());
+	mgl_assume(this->IsNormalized());
+	mgl_assume(other.IsNormalized());
 	float cosa = Dot(other);
 	if (cosa >= 1.f)
 		return 0.f;
@@ -673,14 +673,14 @@ float float3::AngleBetweenNorm(const float3 &other) const
 
 void float3::Decompose(const float3 &direction, float3 &outParallel, float3 &outPerpendicular) const
 {
-	assume(direction.IsNormalized());
+	mgl_assume(direction.IsNormalized());
 	outParallel = this->ProjectToNorm(direction);
 	outPerpendicular = *this - outParallel;
 }
 
 float3 float3::Lerp(const float3 &b, float t) const
 {
-	assume(0.f <= t && t <= 1.f);
+	mgl_assume(0.f <= t && t <= 1.f);
 	return (1.f - t) * *this + t * b;
 }
 
@@ -720,8 +720,8 @@ bool MUST_USE_RESULT float3::AreOrthogonal(const float3 &a, const float3 &b, con
 
 void float3::Orthonormalize(float3 &a, float3 &b)
 {
-	assume(!a.IsZero());
-	assume(!b.IsZero());
+	mgl_assume(!a.IsZero());
+	mgl_assume(!b.IsZero());
 	a.Normalize();
 	b -= b.ProjectToNorm(a);
 	b.Normalize();
@@ -729,14 +729,14 @@ void float3::Orthonormalize(float3 &a, float3 &b)
 
 void float3::Orthonormalize(float3 &a, float3 &b, float3 &c)
 {
-	assume(!a.IsZero());
+	mgl_assume(!a.IsZero());
 	a.Normalize();
 	b -= b.ProjectToNorm(a);
-	assume(!b.IsZero());
+	mgl_assume(!b.IsZero());
 	b.Normalize();
 	c -= c.ProjectToNorm(a);
 	c -= c.ProjectToNorm(b);
-	assume(!c.IsZero());
+	mgl_assume(!c.IsZero());
 	c.Normalize();
 }
 
@@ -831,7 +831,7 @@ float3 float3::ToSphericalCoordinates() const
 
 float2 float3::ToSphericalCoordinatesNormalized() const
 {
-	assume(IsNormalized());
+	mgl_assume(IsNormalized());
 	float azimuth = atan2(x, z);
 	float inclination = asin(-y);
 	return float2(azimuth, inclination);

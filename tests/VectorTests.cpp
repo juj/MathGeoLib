@@ -19,7 +19,7 @@ TEST(Float4Swizzled)
 	float4 f(float2(1,2),3,4);
 	float4 f2 = f.Swizzled(2,0,1,3);
 	float f3[4] = { 3, 1, 2, 4 };
-	assert(f2.Equals(float4(f3)));
+	mgl_assert(f2.Equals(float4(f3)));
 	MARK_UNUSED(f3);
 }
 
@@ -29,7 +29,7 @@ TEST(vec4_permute)
 	float4 f(float2(1,2),3,4);
 	float4 f2 = vec4_permute(f, 2, 0, 1, 3);
 	float f3[4] = { 3, 1, 2, 4 };
-	assert(f2.Equals(float4(f3)));
+	mgl_assert(f2.Equals(float4(f3)));
 	MARK_UNUSED(f3);
 }
 
@@ -50,57 +50,57 @@ BENCHMARK_END
 TEST(Float4LengthSq3)
 {
 	float4 f(-1.f,2.f,3.f,1000000.f);
-	assert(EqualAbs(f.LengthSq3(), 14.f));
+	mgl_assert(EqualAbs(f.LengthSq3(), 14.f));
 }
 
 TEST(Float4Length3)
 {
 	float4 f(-1.f,2.f,3.f,1000000.f);
-	assert(EqualAbs(f.Length3(), Sqrt(14.f)));
+	mgl_assert(EqualAbs(f.Length3(), Sqrt(14.f)));
 }
 
 TEST(Float4LengthSq4)
 {
 	float4 f(-1.f,2.f,3.f,-4.f);
-	assert(EqualAbs(f.LengthSq4(), 30.f));
+	mgl_assert(EqualAbs(f.LengthSq4(), 30.f));
 }
 
 TEST(Float4Length4)
 {
 	float4 f(-1.f,2.f,3.f,-4.f);
-	assert(EqualAbs(f.Length4(), Sqrt(30.f)));
+	mgl_assert(EqualAbs(f.Length4(), Sqrt(30.f)));
 }
 
 TEST(Float4Normalize3)
 {
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float oldLength = f.Normalize3();
-	assert(oldLength > 0.f);
+	mgl_assert(oldLength > 0.f);
 	MARK_UNUSED(oldLength);
-	assert(EqualAbs(f.x, -1.f / Sqrt(14.f)));
-	assert(EqualAbs(f.y, 2.f / Sqrt(14.f)));
-	assert(EqualAbs(f.z, 3.f / Sqrt(14.f)));
-	assert(EqualAbs(f.w, 1000.f));
+	mgl_assert(EqualAbs(f.x, -1.f / Sqrt(14.f)));
+	mgl_assert(EqualAbs(f.y, 2.f / Sqrt(14.f)));
+	mgl_assert(EqualAbs(f.z, 3.f / Sqrt(14.f)));
+	mgl_assert(EqualAbs(f.w, 1000.f));
 
 	float4 f2(0,0,0, 1000.f);
 	oldLength = f2.Normalize3();
 	MARK_UNUSED(oldLength);
-	assert(oldLength == 0.f);
-	assert(f2.x == 1.f);
-	assert(f2.y == 0.f);
-	assert(f2.z == 0.f);
-	assert(f2.w == 1000.f);
+	mgl_assert(oldLength == 0.f);
+	mgl_assert(f2.x == 1.f);
+	mgl_assert(f2.y == 0.f);
+	mgl_assert(f2.z == 0.f);
+	mgl_assert(f2.w == 1000.f);
 }
 
 TEST(Float4Normalized3)
 {
 	float4 f(-1.f, 2.f, 3.f, 1000.f);
 	float4 f2 = f.Normalized3();
-	assert4(EqualAbs(f2.x, -1.f / Sqrt(14.f)), f, f2, -1.f / Sqrt(14.f), f2.LengthSq3());
-	assert(EqualAbs(f2.y, 2.f / Sqrt(14.f)));
-	assert(EqualAbs(f2.z, 3.f / Sqrt(14.f)));
-	assert(EqualAbs(f2.w, 1000.f));
-	assert1(EqualAbs(f2.LengthSq3(), 1.f), f2.LengthSq3());
+	mgl_assert4(EqualAbs(f2.x, -1.f / Sqrt(14.f)), f, f2, -1.f / Sqrt(14.f), f2.LengthSq3());
+	mgl_assert(EqualAbs(f2.y, 2.f / Sqrt(14.f)));
+	mgl_assert(EqualAbs(f2.z, 3.f / Sqrt(14.f)));
+	mgl_assert(EqualAbs(f2.w, 1000.f));
+	mgl_assert1(EqualAbs(f2.LengthSq3(), 1.f), f2.LengthSq3());
 }
 
 TEST(Float4Normalize4)
@@ -108,44 +108,44 @@ TEST(Float4Normalize4)
 	float4 f(-1.f, 2.f, 3.f, 4.f);
 	float oldLength = f.Normalize4();
 	MARK_UNUSED(oldLength);
-	assertcmp(oldLength, >, 0);
-	assert(EqualAbs(f.x, -1.f / Sqrt(30.f)));
-	assert(EqualAbs(f.y, 2.f / Sqrt(30.f)));
-	assert(EqualAbs(f.z, 3.f / Sqrt(30.f)));
-	assert(EqualAbs(f.w, 4.f / Sqrt(30.f)));
+	mgl_assertcmp(oldLength, >, 0);
+	mgl_assert(EqualAbs(f.x, -1.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f.y, 2.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f.z, 3.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f.w, 4.f / Sqrt(30.f)));
 
 	float4 f2(0,0,0, 0.f);
 	oldLength = f2.Normalize4();
 	MARK_UNUSED(oldLength);
-	assert(oldLength == 0.f);
-	assert(f2.x == 1.f);
-	assert(f2.y == 0.f);
-	assert(f2.z == 0.f);
-	assert(f2.w == 0.f);
+	mgl_assert(oldLength == 0.f);
+	mgl_assert(f2.x == 1.f);
+	mgl_assert(f2.y == 0.f);
+	mgl_assert(f2.z == 0.f);
+	mgl_assert(f2.w == 0.f);
 }
 
 TEST(Float4Normalized4)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2 = f.Normalized4();
-	assert(EqualAbs(f2.x, -1.f / Sqrt(30.f)));
-	assert(EqualAbs(f2.y, 2.f / Sqrt(30.f)));
-	assert(EqualAbs(f2.z, 3.f / Sqrt(30.f)));
-	assert(EqualAbs(f2.w, -4.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f2.x, -1.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f2.y, 2.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f2.z, 3.f / Sqrt(30.f)));
+	mgl_assert(EqualAbs(f2.w, -4.f / Sqrt(30.f)));
 }
 
 TEST(Float4NormalizeW)
 {
 	float4 f(-2.f, -4.f, 8.f, 2.f);
 	f.NormalizeW();
-	assert(f.Equals(float4(-1.f, -2.f, 4.f, 1.f)));
+	mgl_assert(f.Equals(float4(-1.f, -2.f, 4.f, 1.f)));
 }
 
 TEST(Float4Scale3)
 {
 	float4 f(-2.f, -4.f, 8.f, 1000.f);
 	f.Scale3(100.f);
-	assert(f.Equals(float4(-200.f, -400.f, 800.f, 1000.f)));
+	mgl_assert(f.Equals(float4(-200.f, -400.f, 800.f, 1000.f)));
 }
 
 TEST(Float4ScaleToLength3)
@@ -154,121 +154,121 @@ TEST(Float4ScaleToLength3)
 	float4 f2 = f.ScaledToLength3(10.f);
 	float oldLength = f.ScaleToLength3(10.f);
 	MARK_UNUSED(oldLength);
-	assert(f.Equals(f2));
-	assert(EqualAbs(oldLength, Sqrt(14.f)));
-	assert(EqualAbs(f.x, -1.f * 10.f / oldLength));
-	assert(EqualAbs(f.y, 2.f * 10.f / oldLength));
-	assert(EqualAbs(f.z, 3.f * 10.f / oldLength));
-	assert(EqualAbs(f.w, 1000.f));
+	mgl_assert(f.Equals(f2));
+	mgl_assert(EqualAbs(oldLength, Sqrt(14.f)));
+	mgl_assert(EqualAbs(f.x, -1.f * 10.f / oldLength));
+	mgl_assert(EqualAbs(f.y, 2.f * 10.f / oldLength));
+	mgl_assert(EqualAbs(f.z, 3.f * 10.f / oldLength));
+	mgl_assert(EqualAbs(f.w, 1000.f));
 }
 
 TEST(Float4SumOfElements)
 {
 	float4 f(-1.f, 4.f, 20.f, -100.f);
-	assert(EqualAbs(f.SumOfElements(), -77.f));
+	mgl_assert(EqualAbs(f.SumOfElements(), -77.f));
 }
 
 TEST(Float4ProductOfElements)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(EqualAbs(f.ProductOfElements(), 64.f));
+	mgl_assert(EqualAbs(f.ProductOfElements(), 64.f));
 }
 
 TEST(Float4AverageOfElements)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
-	assert(EqualAbs(f.AverageOfElements(), -1.f));
+	mgl_assert(EqualAbs(f.AverageOfElements(), -1.f));
 }
 
 TEST(Float4Abs)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
-	assert(f.Abs().Equals(float4(2.f, 2.f, 4.f, 8.f)));
+	mgl_assert(f.Abs().Equals(float4(2.f, 2.f, 4.f, 8.f)));
 }
 
 TEST(Float4Neg3)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
-	assert(f.Neg3().Equals(float4(2.f, -2.f, -4.f, -8.f)));
+	mgl_assert(f.Neg3().Equals(float4(2.f, -2.f, -4.f, -8.f)));
 }
 
 TEST(Float4Neg4)
 {
 	float4 f(-2.f, 2.f, 4.f, -8.f);
-	assert(f.Neg4().Equals(float4(2.f, -2.f, -4.f, 8.f)));
+	mgl_assert(f.Neg4().Equals(float4(2.f, -2.f, -4.f, 8.f)));
 }
 
 TEST(Float4Recip3)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(f.Recip3().Equals(float4(-1.f, 0.5f, 0.25f, -8.f)));
+	mgl_assert(f.Recip3().Equals(float4(-1.f, 0.5f, 0.25f, -8.f)));
 }
 
 TEST(Float4Recip4)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(f.Recip4().Equals(float4(-1.f, 0.5f, 0.25f, -0.125f)));
+	mgl_assert(f.Recip4().Equals(float4(-1.f, 0.5f, 0.25f, -0.125f)));
 }
 
 TEST(Float4RecipFast4)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(f.RecipFast4().Equals(float4(-1.f, 0.5f, 0.25f, -0.125f)));
+	mgl_assert(f.RecipFast4().Equals(float4(-1.f, 0.5f, 0.25f, -0.125f)));
 }
 
 TEST(Float4Min)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(f.Min(-4.f).Equals(float4(-4.f, -4.f, -4.f, -8.f)));
-	assert(f.Min(float4(-3.f, 20.f, -2.f, 9.f)).Equals(-3.f, 2.f, -2.f, -8.f));
+	mgl_assert(f.Min(-4.f).Equals(float4(-4.f, -4.f, -4.f, -8.f)));
+	mgl_assert(f.Min(float4(-3.f, 20.f, -2.f, 9.f)).Equals(-3.f, 2.f, -2.f, -8.f));
 }
 
 TEST(Float4Max)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(f.Max(-4.f).Equals(float4(-1.f, 2.f, 4.f, -4.f)));
-	assert(f.Max(float4(-3.f, 20.f, -2.f, 9.f)).Equals(-1.f, 20.f, 4.f, 9.f));
+	mgl_assert(f.Max(-4.f).Equals(float4(-1.f, 2.f, 4.f, -4.f)));
+	mgl_assert(f.Max(float4(-3.f, 20.f, -2.f, 9.f)).Equals(-1.f, 20.f, 4.f, 9.f));
 }
 
 TEST(Float4Clamp)
 {
 	float4 f(-1.f, 2.f, 4.f, -8.f);
-	assert(f.Clamp(-2.f, 2.f).Equals(float4(-1.f, 2.f, 2.f, -2.f)));
-	assert(f.Clamp(float4(0.f, -1.f, -10.f, -8.f), float4(10.f, 0.f, 10.f, -8.f)).Equals(float4(0.f, 0.f, 4.f, -8.f)));
+	mgl_assert(f.Clamp(-2.f, 2.f).Equals(float4(-1.f, 2.f, 2.f, -2.f)));
+	mgl_assert(f.Clamp(float4(0.f, -1.f, -10.f, -8.f), float4(10.f, 0.f, 10.f, -8.f)).Equals(float4(0.f, 0.f, 4.f, -8.f)));
 }
 
 TEST(Float4Clamp01)
 {
 	float4 f(-1.f, 0.f, 0.5f, 2.f);
-	assert(f.Clamp01().Equals(float4(0.f, 0.f, 0.5f, 1.f)));
+	mgl_assert(f.Clamp01().Equals(float4(0.f, 0.f, 0.5f, 1.f)));
 }
 
 TEST(Float4DistanceSq3)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
-	assert(EqualAbs(f.Distance3Sq(f2), 56.f));
+	mgl_assert(EqualAbs(f.Distance3Sq(f2), 56.f));
 }
 
 TEST(Float4Distance3)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
-	assert(EqualAbs(f.Distance3(f2), Sqrt(56.f)));
+	mgl_assert(EqualAbs(f.Distance3(f2), Sqrt(56.f)));
 }
 
 TEST(Float4DistanceSq4)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
-	assert(EqualAbs(f.Distance4Sq(f2), 120.f));
+	mgl_assert(EqualAbs(f.Distance4Sq(f2), 120.f));
 }
 
 TEST(Float4Distance4)
 {
 	float4 f(1.f, 2.f, 3.f, 4.f);
 	float4 f2(-1.f, -2.f, -3.f, -4.f);
-	assert(EqualAbs(f.Distance4(f2), Sqrt(120.f)));
+	mgl_assert(EqualAbs(f.Distance4(f2), Sqrt(120.f)));
 }
 
 TEST(Float4Dot3)
@@ -276,51 +276,51 @@ TEST(Float4Dot3)
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float3 f2(2.f, -1.f, -3.f);
 	float4 f3(2.f, -1.f, 0.f, 4.f);
-	assert(EqualAbs(f.Dot3(f2), -13.f));
-	assert(EqualAbs(f.Dot3(f3), -4.f));
+	mgl_assert(EqualAbs(f.Dot3(f2), -13.f));
+	mgl_assert(EqualAbs(f.Dot3(f3), -4.f));
 }
 
 TEST(Float4Dot4)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2(2.f, -1.f, 0.f, 4.f);
-	assert(EqualAbs(f.Dot4(f2), -20.f));
+	mgl_assert(EqualAbs(f.Dot4(f2), -20.f));
 }
 
 TEST(Float4Cross3)
 {
 	float4 f(-1.f, 2.f, 3.f, -4.f);
 	float4 f2(2.f, -1.f, 0.f, 4.f);
-	assert(f.Cross3(f2).Equals(f.Cross3(f2.xyz())));
+	mgl_assert(f.Cross3(f2).Equals(f.Cross3(f2.xyz())));
 
 	float4 f3 = f.Cross3(f2);
-	assert(f3.Equals(float4(3.f, 6.f, -3.f, 0.f)));
+	mgl_assert(f3.Equals(float4(3.f, 6.f, -3.f, 0.f)));
 
 	float4 z = float4::unitX.Cross3(float4::unitY);
 	float4 y = float4::unitZ.Cross3(float4::unitX);
 	float4 x = float4::unitY.Cross3(float4::unitZ);
-	assert(x.Equals(float4(1,0,0,0)));
-	assert(y.Equals(float4(0,1,0,0)));
-	assert(z.Equals(float4(0,0,1,0)));
+	mgl_assert(x.Equals(float4(1,0,0,0)));
+	mgl_assert(y.Equals(float4(0,1,0,0)));
+	mgl_assert(z.Equals(float4(0,0,1,0)));
 }
 
 TEST(Float4FromScalar)
 {
 	float4 f = float4::FromScalar(1.f);
-	assert(f.Equals(float4(1,1,1,1)));
+	mgl_assert(f.Equals(float4(1,1,1,1)));
 	f.SetFromScalar(-1.f);
-	assert(f.Equals(float4(-1,-1,-1,-1)));
+	mgl_assert(f.Equals(float4(-1,-1,-1,-1)));
 
 	float4 f2(3.f, 3.f, 3.f, -9.f);
 	f.SetFromScalar(3.f, -9.f);
-	assert(f.Equals(f2));
+	mgl_assert(f.Equals(f2));
 }
 
 TEST(Float4Set)
 {
 	float4 f = float4(1,2,3,4);
 	f.Set(5,6,7,8);
-	assert(f.Equals(float4(5,6,7,8)));
+	mgl_assert(f.Equals(float4(5,6,7,8)));
 }
 
 TEST(Float4OpAdd)
@@ -328,28 +328,28 @@ TEST(Float4OpAdd)
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
 	float4 f3 = f + f2;
-	assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
+	mgl_assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
 }
 
 TEST(Float2OpAddUnary)
 {
 	float2 f(1,2);
 	float2 g = +f;
-	assert(f.Equals(g));
+	mgl_assert(f.Equals(g));
 }
 
 TEST(Float3OpAddUnary)
 {
 	float3 f(1,2,3);
 	float3 g = +f;
-	assert(f.Equals(g));
+	mgl_assert(f.Equals(g));
 }
 
 TEST(Float4OpAddUnary)
 {
 	float4 f(1,2,3,4);
 	float4 g = +f;
-	assert(f.Equals(g));
+	mgl_assert(f.Equals(g));
 }
 
 TEST(Float4OpSub)
@@ -357,35 +357,35 @@ TEST(Float4OpSub)
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
 	float4 f3 = f - f2;
-	assert(f3.Equals(float4(6.f, 8.f, 10.f, 12.f)));
+	mgl_assert(f3.Equals(float4(6.f, 8.f, 10.f, 12.f)));
 }
 
 TEST(Float4OpNeg)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f3 = -f;
-	assert(f3.Equals(float4(-1.f, -2.f, -3.f, -4.f)));
+	mgl_assert(f3.Equals(float4(-1.f, -2.f, -3.f, -4.f)));
 }
 
 TEST(Float4OpMul)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = -2.f;
-	
+
 	float4 f2 = f * scalar;
 	float4 f3 = scalar * f;
-	assert(f2.Equals(f3));
+	mgl_assert(f2.Equals(f3));
 
-	assert(f2.Equals(float4(-2.f, -4.f, -6.f, -8.f)));
+	mgl_assert(f2.Equals(float4(-2.f, -4.f, -6.f, -8.f)));
 }
 
 TEST(Float4OpDiv)
 {
 	float4 f = float4(1,2,4,8);
 	float scalar = -2.f;
-	
+
 	float4 f2 = f / scalar;
-	assert(f2.Equals(float4(-0.5f, -1.f, -2.f, -4.f)));
+	mgl_assert(f2.Equals(float4(-0.5f, -1.f, -2.f, -4.f)));
 }
 
 TEST(Float4OpAddAssign)
@@ -394,7 +394,7 @@ TEST(Float4OpAddAssign)
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
 	float4 f3 = f;
 	f3 += f2;
-	assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
+	mgl_assert(f3.Equals(float4(-4.f, -4.f, -4.f, -4.f)));
 }
 
 TEST(Float4OpSubAssign)
@@ -403,27 +403,27 @@ TEST(Float4OpSubAssign)
 	float4 f2 = float4(-5.f, -6.f, -7.f, -8.f);
 	float4 f3 = f;
 	f3 -= f2;
-	assert(f3.Equals(float4(6.f, 8.f, 10.f, 12.f)));
+	mgl_assert(f3.Equals(float4(6.f, 8.f, 10.f, 12.f)));
 }
 
 TEST(Float4OpMulAssign)
 {
 	float4 f = float4(1,2,3,4);
 	float scalar = -2.f;
-	
+
 	float4 f2 = f;
 	f2 *= scalar;
-	assert(f2.Equals(float4(-2.f, -4.f, -6.f, -8.f)));
+	mgl_assert(f2.Equals(float4(-2.f, -4.f, -6.f, -8.f)));
 }
 
 TEST(Float4OpDivAssign)
 {
 	float4 f = float4(1,2,4,8);
 	float scalar = -2.f;
-	
+
 	float4 f2 = f;
 	f2 /= scalar;
-	assert(f2.Equals(float4(-0.5f, -1.f, -2.f, -4.f)));
+	mgl_assert(f2.Equals(float4(-0.5f, -1.f, -2.f, -4.f)));
 }
 
 TEST(Float4Add)
@@ -431,7 +431,7 @@ TEST(Float4Add)
 	float4 f = float4(1,2,3,4);
 	float scalar = 5.f;
 	float4 f2 = f.Add(scalar);
-	assert(f2.Equals(float4(6.f, 7.f, 8.f, 9.f)));
+	mgl_assert(f2.Equals(float4(6.f, 7.f, 8.f, 9.f)));
 }
 
 TEST(Float4Sub)
@@ -439,7 +439,7 @@ TEST(Float4Sub)
 	float4 f = float4(1,2,3,4);
 	float scalar = 5.f;
 	float4 f2 = f.Sub(scalar);
-	assert(f2.Equals(float4(-4.f, -3.f, -2.f, -1.f)));
+	mgl_assert(f2.Equals(float4(-4.f, -3.f, -2.f, -1.f)));
 }
 
 TEST(Float4SubLeft)
@@ -447,7 +447,7 @@ TEST(Float4SubLeft)
 	float4 f = float4(1,2,3,4);
 	float scalar = 5.f;
 	float4 f2 = f.SubLeft(scalar);
-	assert(f2.Equals(float4(4.f, 3.f, 2.f, 1.f)));
+	mgl_assert(f2.Equals(float4(4.f, 3.f, 2.f, 1.f)));
 }
 
 TEST(Float4DivLeft)
@@ -455,28 +455,28 @@ TEST(Float4DivLeft)
 	float4 f = float4(-1,2,4,8);
 	float scalar = -8.f;
 	float4 f2 = f.DivLeft(scalar);
-	assert(f2.Equals(float4(8.f, -4.f, -2.f, -1.f)));
+	mgl_assert(f2.Equals(float4(8.f, -4.f, -2.f, -1.f)));
 }
 
 TEST(Float4Mul)
 {
 	float4 f = float4(1,2,3,4);
 	float4 f2 = float4(-2.f, -4.f, 2.f, 1.f);
-	assert(f.Mul(f2).Equals(float4(-2.f, -8.f, 6.f, 4.f)));
+	mgl_assert(f.Mul(f2).Equals(float4(-2.f, -8.f, 6.f, 4.f)));
 }
 
 TEST(Float4Div)
 {
 	float4 f = float4(1,1,4,8);
 	float4 f2 = float4(-2.f, -4.f, 2.f, 1.f);
-	assert(f.Div(f2).Equals(float4(-0.5f, -0.25f, 2.f, 8.f)));
+	mgl_assert(f.Div(f2).Equals(float4(-0.5f, -0.25f, 2.f, 8.f)));
 }
 
 #ifdef MATH_SSE
 
 // Testing various strategies for loading a single 'float' scalar to a __m128.
 
-/* 	VS2010 with AVX generates, BAD! 
+/* 	VS2010 with AVX generates, BAD!
 	vmovss	xmm1, DWORD PTR [edx+eax*4]
 	vxorps	xmm0, xmm0, xmm0
 	vmovss	xmm0, xmm0, xmm1
@@ -893,7 +893,7 @@ RANDOMIZED_TEST(vec4_lerp)
 	float t = rng.Float();
 	float4 correct = f.Lerp(f2, t);
 	float4 f3 = vec4_lerp(f, f2, t);
-	assert(f3.Equals(correct));
+	mgl_assert(f3.Equals(correct));
 }
 
 #endif
@@ -902,9 +902,9 @@ TEST(float4_Lerp)
 {
 	float4 a(2,2,2,1);
 	float4 b(10,10,10,1);
-	assert(a.Lerp(b, 0.f).Equals(2,2,2,1));
-	assert(a.Lerp(b, 1.f).Equals(10,10,10,1));
-	assert(a.Lerp(b, 0.5f).Equals(6,6,6,1));
+	mgl_assert(a.Lerp(b, 0.f).Equals(2,2,2,1));
+	mgl_assert(a.Lerp(b, 1.f).Equals(10,10,10,1));
+	mgl_assert(a.Lerp(b, 0.5f).Equals(6,6,6,1));
 }
 
 // Test that copying uninitialized memory around is ok in the sense that it doesn't crash or assert:
@@ -1026,15 +1026,15 @@ RANDOMIZED_TEST(vec_PerpendicularBasis)
 		vec b, c;
 
 		a.PerpendicularBasis(b, c);
-		assert2(a.IsPerpendicular(b), a, b);
-		assert2(a.IsPerpendicular(c), a, c);
+		mgl_assert2(a.IsPerpendicular(b), a, b);
+		mgl_assert2(a.IsPerpendicular(c), a, c);
 
 		a.Normalize();
 		a.PerpendicularBasis(b, c);
-		assert2(a.IsPerpendicular(b), a, b);
-		assert2(a.IsPerpendicular(c), a, c);
-		assert1(b.IsNormalized(), b.Length());
-		assert1(c.IsNormalized(), c.Length());
+		mgl_assert2(a.IsPerpendicular(b), a, b);
+		mgl_assert2(a.IsPerpendicular(c), a, c);
+		mgl_assert1(b.IsNormalized(), b.Length());
+		mgl_assert1(c.IsNormalized(), c.Length());
 	}
 }
 
@@ -1172,13 +1172,13 @@ UNIQUE_TEST(float2_ConvexHull_Case)
 	float2 p[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
 	float2 h[4] = { float2(-1, 0), float2(1,0), float2(0,1), float2(0,-1) };
 	int numPointsInConvexHull = float2::ConvexHullInPlace(h, 4);
-	assert(numPointsInConvexHull == 4);
+	mgl_assert(numPointsInConvexHull == 4);
 	MARK_UNUSED(numPointsInConvexHull);
 
 	for(int i = 0; i < numPointsInConvexHull; ++i)
-		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
+		mgl_assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
 	MARK_UNUSED(p);
-	assert(float2::ConvexHullContains(h, numPointsInConvexHull, float2(0,0)));
+	mgl_assert(float2::ConvexHullContains(h, numPointsInConvexHull, float2(0,0)));
 }
 
 UNIQUE_TEST(float2_ConvexHull_Case2)
@@ -1189,11 +1189,11 @@ UNIQUE_TEST(float2_ConvexHull_Case2)
 	pts.push_back(float2(-44.626469, 113.405243));
 	pts.push_back(float2(-72.140152, 192.883652));
 	int numPointsInConvexHull = float2::ConvexHullInPlace(&pts[0], pts.size());
-	assert(numPointsInConvexHull == 4);
+	mgl_assert(numPointsInConvexHull == 4);
 	MARK_UNUSED(numPointsInConvexHull);
 
 	for(int i = 0; i < numPointsInConvexHull; ++i)
-		assert(float2::ConvexHullContains(&pts[0], numPointsInConvexHull, pts[i]));
+		mgl_assert(float2::ConvexHullContains(&pts[0], numPointsInConvexHull, pts[i]));
 }
 
 UNIQUE_TEST(float2_ConvexHull_Case3)
@@ -1204,11 +1204,11 @@ UNIQUE_TEST(float2_ConvexHull_Case3)
 	pts.push_back(float2(60.997635, -17.011709));
 	pts.push_back(float2(61.076935, -16.866882));
 	int numPointsInConvexHull = float2::ConvexHullInPlace(&pts[0], pts.size());
-	assert(numPointsInConvexHull == 3);
+	mgl_assert(numPointsInConvexHull == 3);
 	MARK_UNUSED(numPointsInConvexHull);
 
 	for(int i = 0; i < numPointsInConvexHull; ++i)
-		assert(float2::ConvexHullContains(&pts[0], numPointsInConvexHull, pts[i]));
+		mgl_assert(float2::ConvexHullContains(&pts[0], numPointsInConvexHull, pts[i]));
 }
 
 RANDOMIZED_TEST(float2_ConvexHull)
@@ -1220,11 +1220,11 @@ RANDOMIZED_TEST(float2_ConvexHull)
 		h[i] = p[i] = float2::RandomBox(rng, -100.f, 100.f);
 
 	int numPointsInConvexHull = float2::ConvexHullInPlace(h, n);
-	assert(numPointsInConvexHull >= 3);
+	mgl_assert(numPointsInConvexHull >= 3);
 	MARK_UNUSED(numPointsInConvexHull);
 
 	for(int i = 0; i < n; ++i)
-		assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
+		mgl_assert(float2::ConvexHullContains(h, numPointsInConvexHull, p[i]));
 }
 
 BENCHMARK(float2_ConvexHull, "float2_ConvexHull")
@@ -1254,16 +1254,16 @@ UNIQUE_TEST(float2_MinAreaRect_Case)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
 UNIQUE_TEST(float2_MinAreaRect_Case_2)
@@ -1282,16 +1282,16 @@ UNIQUE_TEST(float2_MinAreaRect_Case_2)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
 UNIQUE_TEST(float2_MinAreaRect_Case_3)
@@ -1311,16 +1311,16 @@ UNIQUE_TEST(float2_MinAreaRect_Case_3)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
 UNIQUE_TEST(float2_MinAreaRect_Case_4)
@@ -1343,7 +1343,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case_4)
 	int numPointsInConvexHull = float2::ConvexHullInPlace(c, n);
 
 	for(int i = 0; i < n; ++i)
-		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+		mgl_assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
 	MARK_UNUSED(numPointsInConvexHull);
 
 	float2 center, uDir, vDir;
@@ -1358,16 +1358,16 @@ UNIQUE_TEST(float2_MinAreaRect_Case_4)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
 
@@ -1399,7 +1399,7 @@ UNIQUE_TEST(float2_MinAreaRect_Case_5)
 	int numPointsInConvexHull = float2::ConvexHullInPlace(c, n);
 
 	for(int i = 0; i < n; ++i)
-		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+		mgl_assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
 	MARK_UNUSED(numPointsInConvexHull);
 
 	float2 center, uDir, vDir;
@@ -1414,16 +1414,16 @@ UNIQUE_TEST(float2_MinAreaRect_Case_5)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
 
@@ -1478,7 +1478,7 @@ p[13] = float2(-4.599999904632568,-2.510286331176758);
 	int numPointsInConvexHull = float2::ConvexHullInPlace(c, n);
 
 	for(int i = 0; i < n; ++i)
-		assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
+		mgl_assert(float2::ConvexHullContains(c, numPointsInConvexHull, p[i]));
 	MARK_UNUSED(numPointsInConvexHull);
 
 	float2 center, uDir, vDir;
@@ -1493,16 +1493,16 @@ p[13] = float2(-4.599999904632568,-2.510286331176758);
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 RANDOMIZED_TEST(float2_MinAreaRect)
 {
@@ -1525,16 +1525,16 @@ RANDOMIZED_TEST(float2_MinAreaRect)
 		float x = d.Dot(uDir);
 		diffUMin = MATH_NS::Min(diffUMin, x - minU);
 		diffUMax = MATH_NS::Min(diffUMax, maxU - x);
-		assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
+		mgl_assert3(x >= minU-epsilon && x <= maxU+epsilon, x, minU, maxU);
 		float y = d.Dot(vDir);
 		diffVMin = MATH_NS::Min(diffVMin, y - minV);
 		diffVMax = MATH_NS::Min(diffVMax, maxV - y);
-		assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
+		mgl_assert3(y >= minV-epsilon && y <= maxV+epsilon, y, minV, maxV);
 	}
-	assert1(diffUMin <= 1e-5f, diffUMin);
-	assert1(diffUMax <= 1e-5f, diffUMax);
-	assert1(diffVMin <= 1e-5f, diffVMin);
-	assert1(diffVMax <= 1e-5f, diffVMax);
+	mgl_assert1(diffUMin <= 1e-5f, diffUMin);
+	mgl_assert1(diffUMax <= 1e-5f, diffUMax);
+	mgl_assert1(diffVMin <= 1e-5f, diffVMin);
+	mgl_assert1(diffVMax <= 1e-5f, diffVMax);
 }
 
 BENCHMARK(float2_MinAreaRect, "float2::MinAreaRect")
@@ -1557,12 +1557,12 @@ UNIQUE_TEST(MatrixTranspose)
 	simd4f b = set_ps(5.f,6.f,7.f,8.f);
 	simd4f c = set_ps(9.f,10.f,11.f,12.f);
 	simd4f d = set_ps(13.f,14.f,15.f,16.f);
-	
+
 	_MM_TRANSPOSE4_PS(a, b, c, d);
-	assert(float4(a).Equals(float4(4.f, 8.f, 12.f, 16.f)));
-	assert(float4(b).Equals(float4(3.f, 7.f, 11.f, 15.f)));
-	assert(float4(c).Equals(float4(2.f, 6.f, 10.f, 14.f)));
-	assert(float4(d).Equals(float4(1.f, 5.f, 9.f, 13.f)));
+	mgl_assert(float4(a).Equals(float4(4.f, 8.f, 12.f, 16.f)));
+	mgl_assert(float4(b).Equals(float4(3.f, 7.f, 11.f, 15.f)));
+	mgl_assert(float4(c).Equals(float4(2.f, 6.f, 10.f, 14.f)));
+	mgl_assert(float4(d).Equals(float4(1.f, 5.f, 9.f, 13.f)));
 }
 #endif
 
@@ -1576,11 +1576,11 @@ UNIQUE_TEST(float2_pointwise)
 	c *= b;
 	float2 d = a;
 	d /= b;
-	assert((a*b).Equals(float2(36.f, 32.f)));
-	assert((a/b).Equals(float2(4.f, 2.f)));
-	assert(c.Equals(float2(36.f, 32.f)));
-	assert(d.Equals(float2(4.f, 2.f)));
-	assert((12.f / b).Equals(float2(4.f, 3.f)));
+	mgl_assert((a*b).Equals(float2(36.f, 32.f)));
+	mgl_assert((a/b).Equals(float2(4.f, 2.f)));
+	mgl_assert(c.Equals(float2(36.f, 32.f)));
+	mgl_assert(d.Equals(float2(4.f, 2.f)));
+	mgl_assert((12.f / b).Equals(float2(4.f, 3.f)));
 }
 
 UNIQUE_TEST(float3_pointwise)
@@ -1591,11 +1591,11 @@ UNIQUE_TEST(float3_pointwise)
 	c *= b;
 	float3 d = a;
 	d /= b;
-	assert((a*b).Equals(float3(36.f, 32.f, 2700.f)));
-	assert((a/b).Equals(float3(4.f, 2.f, 3.f)));
-	assert(c.Equals(float3(36.f, 32.f, 2700.f)));
-	assert(d.Equals(float3(4.f, 2.f, 3.f)));
-	assert((360.f / b).Equals(float3(120.f, 90.f, 12.f)));
+	mgl_assert((a*b).Equals(float3(36.f, 32.f, 2700.f)));
+	mgl_assert((a/b).Equals(float3(4.f, 2.f, 3.f)));
+	mgl_assert(c.Equals(float3(36.f, 32.f, 2700.f)));
+	mgl_assert(d.Equals(float3(4.f, 2.f, 3.f)));
+	mgl_assert((360.f / b).Equals(float3(120.f, 90.f, 12.f)));
 }
 
 UNIQUE_TEST(float4_pointwise)
@@ -1606,11 +1606,11 @@ UNIQUE_TEST(float4_pointwise)
 	c *= b;
 	float4 d = a;
 	d /= b;
-	assert((a*b).Equals(float4(36.f, 32.f, 2700.f, -200.f)));
-	assert((a/b).Equals(float4(4.f, 2.f, 3.f, -2.f)));
-	assert(c.Equals(float4(36.f, 32.f, 2700.f, -200.f)));
-	assert(d.Equals(float4(4.f, 2.f, 3.f, -2.f)));
-	assert((3600.f / b).Equals(float4(1200.f, 900.f, 120.f, 360.f)));
+	mgl_assert((a*b).Equals(float4(36.f, 32.f, 2700.f, -200.f)));
+	mgl_assert((a/b).Equals(float4(4.f, 2.f, 3.f, -2.f)));
+	mgl_assert(c.Equals(float4(36.f, 32.f, 2700.f, -200.f)));
+	mgl_assert(d.Equals(float4(4.f, 2.f, 3.f, -2.f)));
+	mgl_assert((3600.f / b).Equals(float4(1200.f, 900.f, 120.f, 360.f)));
 }
 
 #endif

@@ -18,23 +18,23 @@ UNIQUE_TEST(TrickyAABBCapsuleNoIntersect)
 	LOGI("D: %f", b.Distance(a.Centroid()));
 	LOGI("D: %f", b.Distance(a.SphereA()));
 	LOGI("D: %f", b.Distance(a.SphereB()));
-	assert(!a.Intersects(b));
+	mgl_assert(!a.Intersects(b));
 }
 
 UNIQUE_TEST(TrickyGJKSphereSphereIntersect)
 {
 	Sphere a = Sphere(POINT_VEC(-14.740263f, 8.2647991f, 64.282227f), 7.6029987f);
 	Sphere b = Sphere(POINT_VEC(-23.840866f, 9.4233770f, 66.399742f), 1.9519407f);
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
+	mgl_assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(b, a));
 }
 
 UNIQUE_TEST(TrickyGJKSphereSphereIntersect2)
 {
 	Sphere a = Sphere(POINT_VEC(57.166256f, 99.426201f, 75.735786f), 2.3808355f);
 	Sphere b = Sphere(POINT_VEC(54.087727f, 94.719139f, 75.188812f), 3.3114955f);
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
+	mgl_assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(b, a));
 }
 /*
 UNIQUE_TEST(TrickyGJKCapsuleTriangleNoIntersect)
@@ -47,8 +47,8 @@ UNIQUE_TEST(TrickyGJKCapsuleTriangleNoIntersect)
 	t.a = POINT_VEC(-104.49078f, 26.969154f, 132.72052f);
 	t.b = POINT_VEC(-80.549988f, 9.9734116f, 7.7765503f);
 	t.c = POINT_VEC(65.374435f, 15.144905f, 149.00766f);
-	assert(!GJKIntersect(c, t));
-	assert(!GJKIntersect(t, c));
+	mgl_assert(!GJKIntersect(c, t));
+	mgl_assert(!GJKIntersect(t, c));
 }
 */
 
@@ -56,22 +56,22 @@ UNIQUE_TEST(TrickyGJKAABBAABBIntersect)
 {
 	AABB a(POINT_VEC_SCALAR(-10.f), POINT_VEC_SCALAR(10.f));
 	AABB b(POINT_VEC_SCALAR(8.f), POINT_VEC_SCALAR(20.f));
-	assert(GJKIntersect(a, b));
-	assert(GJKIntersect(b, a));
+	mgl_assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(b, a));
 }
 
 UNIQUE_TEST(GJKAABBSphereIntersectCase)
 {
 	AABB a(POINT_VEC(37.1478767f,-71.9611969f,-51.1293259f),POINT_VEC(42.8975906f,-67.3180618f,-44.9161682f));
 	Sphere b(POINT_VEC(41.9271927f,-71.1957016f,-56.7100677f),7.20756626f);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 UNIQUE_TEST(GJKAABBSphereIntersectCase2)
 {
 	AABB a(POINT_VEC(-6.17850494f,-1.09283221f,-85.2101898f),POINT_VEC(-3.21846271f,-0.564386666f,-84.2947693f));
 	Sphere b(POINT_VEC(-2.29130507f,-1.87549007f,-83.2377472f),2.09292078f);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBShereNoIntersect)
@@ -81,8 +81,8 @@ RANDOMIZED_TEST(GJKAABBShereNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
-	assert(!GJKIntersect(b, a));
+	mgl_assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(b, a));
 }
 
 RANDOMIZED_TEST(GJKAABBAABBIntersect)
@@ -90,7 +90,7 @@ RANDOMIZED_TEST(GJKAABBAABBIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	AABB b = RandomAABBContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBOBBIntersect)
@@ -98,7 +98,7 @@ RANDOMIZED_TEST(GJKAABBOBBIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBLineSegmentIntersect)
@@ -108,7 +108,7 @@ RANDOMIZED_TEST(GJKAABBLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	try
 	{
-		assert(GJKIntersect(a, b));
+		mgl_assert(GJKIntersect(a, b));
 	} catch(...)
 	{
 		LOGI("a: %s", a.SerializeToCodeString().c_str());
@@ -122,7 +122,7 @@ RANDOMIZED_TEST(GJKAABBSphereIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBCapsuleIntersect)
@@ -130,7 +130,7 @@ RANDOMIZED_TEST(GJKAABBCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBTriangleIntersect)
@@ -138,7 +138,7 @@ RANDOMIZED_TEST(GJKAABBTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBFrustumIntersect)
@@ -146,7 +146,7 @@ RANDOMIZED_TEST(GJKAABBFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	AABB a = RandomAABBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBOBBIntersect)
@@ -154,7 +154,7 @@ RANDOMIZED_TEST(GJKOBBOBBIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	OBB b = RandomOBBContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBLineSegmentIntersect)
@@ -162,7 +162,7 @@ RANDOMIZED_TEST(GJKOBBLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBSphereIntersect)
@@ -170,7 +170,7 @@ RANDOMIZED_TEST(GJKOBBSphereIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, SCALE);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBCapsuleIntersect)
@@ -178,7 +178,7 @@ RANDOMIZED_TEST(GJKOBBCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBTriangleIntersect)
@@ -186,7 +186,7 @@ RANDOMIZED_TEST(GJKOBBTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBFrustumIntersect)
@@ -194,7 +194,7 @@ RANDOMIZED_TEST(GJKOBBFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	OBB a = RandomOBBContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereSphereIntersect)
@@ -202,7 +202,7 @@ RANDOMIZED_TEST(GJKSphereSphereIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Sphere b = RandomSphereContainingPoint(pt, 10.f);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 /*
@@ -210,7 +210,7 @@ UNIQUE_TEST(GJKSphereLineSegmentIntersectCase)
 {
 	Sphere a(POINT_VEC(52.4970627f,45.4888649f,-7.32828188f),9.61045837f);
 	LineSegment b(POINT_VEC(90.447998f,30.0441036f,-46.333149f),POINT_VEC(35.6951218f,38.615181f,4.10816383f));
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 */
 
@@ -221,7 +221,7 @@ RANDOMIZED_TEST(GJKSphereLineSegmentIntersect)
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
 	try
 	{
-		assert(GJKIntersect(a, b));
+		mgl_assert(GJKIntersect(a, b));
 	} catch(...)
 	{
 		LOGI("%s", a.SerializeToCodeString().c_str());
@@ -235,7 +235,7 @@ RANDOMIZED_TEST(GJKSphereCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereTriangleIntersect)
@@ -243,7 +243,7 @@ RANDOMIZED_TEST(GJKSphereTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereFrustumIntersect)
@@ -251,7 +251,7 @@ RANDOMIZED_TEST(GJKSphereFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Sphere a = RandomSphereContainingPoint(pt, 10.f);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumLineSegmentIntersect)
@@ -259,7 +259,7 @@ RANDOMIZED_TEST(GJKFrustumLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumCapsuleIntersect)
@@ -267,7 +267,7 @@ RANDOMIZED_TEST(GJKFrustumCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumTriangleIntersect)
@@ -275,7 +275,7 @@ RANDOMIZED_TEST(GJKFrustumTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumFrustumIntersect)
@@ -283,7 +283,7 @@ RANDOMIZED_TEST(GJKFrustumFrustumIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Frustum a = RandomFrustumContainingPoint(rng, pt);
 	Frustum b = RandomFrustumContainingPoint(rng, pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKCapsuleLineSegmentIntersect)
@@ -291,7 +291,7 @@ RANDOMIZED_TEST(GJKCapsuleLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKCapsuleCapsuleIntersect)
@@ -299,7 +299,7 @@ RANDOMIZED_TEST(GJKCapsuleCapsuleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Capsule b = RandomCapsuleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKCapsuleTriangleIntersect)
@@ -307,7 +307,7 @@ RANDOMIZED_TEST(GJKCapsuleTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Capsule a = RandomCapsuleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKTriangleLineSegmentIntersect)
@@ -315,7 +315,7 @@ RANDOMIZED_TEST(GJKTriangleLineSegmentIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	LineSegment b = RandomLineSegmentContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKTriangleTriangleIntersect)
@@ -323,7 +323,7 @@ RANDOMIZED_TEST(GJKTriangleTriangleIntersect)
 	vec pt = vec::RandomBox(rng, POINT_VEC_SCALAR(-SCALE), POINT_VEC_SCALAR(SCALE));
 	Triangle a = RandomTriangleContainingPoint(pt);
 	Triangle b = RandomTriangleContainingPoint(pt);
-	assert(GJKIntersect(a, b));
+	mgl_assert(GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBAABBNoIntersect)
@@ -333,7 +333,7 @@ RANDOMIZED_TEST(GJKAABBAABBNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	AABB b = RandomAABBInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBOBBNoIntersect)
@@ -342,7 +342,7 @@ RANDOMIZED_TEST(GJKAABBOBBNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBLineSegmentNoIntersect)
@@ -351,7 +351,7 @@ RANDOMIZED_TEST(GJKAABBLineSegmentNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBSphereNoIntersect)
@@ -360,7 +360,7 @@ RANDOMIZED_TEST(GJKAABBSphereNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, SCALE);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBCapsuleNoIntersect)
@@ -369,7 +369,7 @@ RANDOMIZED_TEST(GJKAABBCapsuleNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBTriangleNoIntersect)
@@ -378,7 +378,7 @@ RANDOMIZED_TEST(GJKAABBTriangleNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKAABBFrustumNoIntersect)
@@ -387,7 +387,7 @@ RANDOMIZED_TEST(GJKAABBFrustumNoIntersect)
 	AABB a = RandomAABBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBOBBNoIntersect)
@@ -396,7 +396,7 @@ RANDOMIZED_TEST(GJKOBBOBBNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	OBB b = RandomOBBInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBLineSegmentNoIntersect)
@@ -405,7 +405,7 @@ RANDOMIZED_TEST(GJKOBBLineSegmentNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBSphereNoIntersect)
@@ -414,7 +414,7 @@ RANDOMIZED_TEST(GJKOBBSphereNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, SCALE);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBCapsuleNoIntersect)
@@ -423,7 +423,7 @@ RANDOMIZED_TEST(GJKOBBCapsuleNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBTriangleNoIntersect)
@@ -432,7 +432,7 @@ RANDOMIZED_TEST(GJKOBBTriangleNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKOBBFrustumNoIntersect)
@@ -441,7 +441,7 @@ RANDOMIZED_TEST(GJKOBBFrustumNoIntersect)
 	OBB a = RandomOBBInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereSphereNoIntersect)
@@ -450,7 +450,7 @@ RANDOMIZED_TEST(GJKSphereSphereNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Sphere b = RandomSphereInHalfspace(p, 10.f);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereLineSegmentNoIntersect)
@@ -459,7 +459,7 @@ RANDOMIZED_TEST(GJKSphereLineSegmentNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereCapsuleNoIntersect)
@@ -468,7 +468,7 @@ RANDOMIZED_TEST(GJKSphereCapsuleNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereTriangleNoIntersect)
@@ -477,7 +477,7 @@ RANDOMIZED_TEST(GJKSphereTriangleNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKSphereFrustumNoIntersect)
@@ -486,7 +486,7 @@ RANDOMIZED_TEST(GJKSphereFrustumNoIntersect)
 	Sphere a = RandomSphereInHalfspace(p, 10.f);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumLineSegmentNoIntersect)
@@ -495,7 +495,7 @@ RANDOMIZED_TEST(GJKFrustumLineSegmentNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumCapsuleNoIntersect)
@@ -504,7 +504,7 @@ RANDOMIZED_TEST(GJKFrustumCapsuleNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumTriangleNoIntersect)
@@ -513,7 +513,7 @@ RANDOMIZED_TEST(GJKFrustumTriangleNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKFrustumFrustumNoIntersect)
@@ -522,7 +522,7 @@ RANDOMIZED_TEST(GJKFrustumFrustumNoIntersect)
 	Frustum a = RandomFrustumInHalfspace(p);
 	p.ReverseNormal();
 	Frustum b = RandomFrustumInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKCapsuleLineSegmentNoIntersect)
@@ -531,7 +531,7 @@ RANDOMIZED_TEST(GJKCapsuleLineSegmentNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKCapsuleCapsuleNoIntersect)
@@ -540,7 +540,7 @@ RANDOMIZED_TEST(GJKCapsuleCapsuleNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Capsule b = RandomCapsuleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKCapsuleTriangleNoIntersect)
@@ -549,7 +549,7 @@ RANDOMIZED_TEST(GJKCapsuleTriangleNoIntersect)
 	Capsule a = RandomCapsuleInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKTriangleLineSegmentNoIntersect)
@@ -558,7 +558,7 @@ RANDOMIZED_TEST(GJKTriangleLineSegmentNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	LineSegment b = RandomLineSegmentInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }
 
 RANDOMIZED_TEST(GJKTriangleTriangleNoIntersect)
@@ -567,5 +567,5 @@ RANDOMIZED_TEST(GJKTriangleTriangleNoIntersect)
 	Triangle a = RandomTriangleInHalfspace(p);
 	p.ReverseNormal();
 	Triangle b = RandomTriangleInHalfspace(p);
-	assert(!GJKIntersect(a, b));
+	mgl_assert(!GJKIntersect(a, b));
 }

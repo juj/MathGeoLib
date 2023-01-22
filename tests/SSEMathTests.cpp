@@ -386,7 +386,7 @@ RANDOMIZED_TEST(mat4x4_mul_avx)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = mat4x4_mul_avx((__m256*)&m, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_avx_2, "test against float4x4_mul_float4")
@@ -401,7 +401,7 @@ RANDOMIZED_TEST(mat4x4_mul_avx_2)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = mat4x4_mul_avx_2((__m256*)&m, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #endif // ~AVX
@@ -434,7 +434,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse41)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = mat4x4_mul_sse41(m.row, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #endif
@@ -453,7 +453,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse3)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = mat4x4_mul_sse3(m.row, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #endif
@@ -472,7 +472,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse1)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = mat4x4_mul_sse1(m.row, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 BENCHMARK(colmajor_mat4x4_mul_sse1, "test against float4x4_mul_float4")
@@ -488,7 +488,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_sse1)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = colmajor_mat4x4_mul_sse1(tpm.row, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #ifdef MATH_AVX
@@ -506,7 +506,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_avx)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = colmajor_mat4x4_mul_avx(tpm.row2, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 BENCHMARK(colmajor_mat4x4_mul_avx_2, "test against float4x4_mul_float4")
@@ -522,7 +522,7 @@ RANDOMIZED_TEST(colmajor_mat4x4_mul_avx_2)
 	float4 v = float4::RandomGeneral(rng, -10.f, 10.f);
 	float4 res = colmajor_mat4x4_mul_avx_2(tpm.row2, v);
 	float4 res2 = m*v;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #endif
@@ -540,7 +540,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps)
 	float4x4 res;
 	mat4x4_mul_dpps(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_dpps_2, "test against float4x4_op_mul")
@@ -556,7 +556,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_2)
 	float4x4 res;
 	mat4x4_mul_dpps_2(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 BENCHMARK(mat4x4_mul_dpps_3, "test against float4x4_op_mul")
@@ -572,7 +572,7 @@ RANDOMIZED_TEST(mat4x4_mul_dpps_3)
 	float4x4 res;
 	mat4x4_mul_dpps_3(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #ifdef MATH_FMA
@@ -631,7 +631,7 @@ RANDOMIZED_TEST(mat4x4_mul_fma)
 	float4x4 res;
 	mat4x4_mul_fma(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 #endif
 
@@ -648,7 +648,7 @@ RANDOMIZED_TEST(mat4x4_mul_sse)
 	float4x4 res;
 	mat4x4_mul_sse(res.row, m.row, m2.row);
 	float4x4 res2 = m*m2;
-	assert(res.Equals(res2));
+	mgl_assert(res.Equals(res2));
 }
 
 #endif

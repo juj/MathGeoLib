@@ -23,7 +23,7 @@ RANDOMIZED_TEST(ParallelLineLineClosestPoint)
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointB = b.GetPoint(d2);
 	vec perpDistance = displacement - displacement.ProjectTo(a.dir);
-	assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
+	mgl_assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
 }
 
 RANDOMIZED_TEST(ParallelLineRayClosestPoint)
@@ -39,7 +39,7 @@ RANDOMIZED_TEST(ParallelLineRayClosestPoint)
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointB = b.GetPoint(d2);
 	vec perpDistance = displacement - displacement.ProjectTo(a.dir);
-	assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
+	mgl_assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
 }
 
 RANDOMIZED_TEST(ParallelLineLineSegmentClosestPoint)
@@ -56,7 +56,7 @@ RANDOMIZED_TEST(ParallelLineLineSegmentClosestPoint)
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointB = b.GetPoint(d2);
 	vec perpDistance = displacement - displacement.ProjectTo(a.dir);
-	assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
+	mgl_assert2(EqualAbs(closestPointA.Distance(closestPointB), perpDistance.Length()), closestPointA.Distance(closestPointB), perpDistance.Length());
 }
 
 RANDOMIZED_TEST(ParallelRayRayClosestPoint)
@@ -71,11 +71,11 @@ RANDOMIZED_TEST(ParallelRayRayClosestPoint)
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointB = b.GetPoint(d2);
 	float cpd = closestPointA.Distance(closestPointB);
-	assert(cpd <= displacement.Length()+1e-4f);
+	mgl_assert(cpd <= displacement.Length()+1e-4f);
 	MARK_UNUSED(cpd);
 
 	float t = a.pos.Distance(b.pos);
-	assert(cpd <= t+1e-4f);
+	mgl_assert(cpd <= t+1e-4f);
 	MARK_UNUSED(t);
 }
 
@@ -94,13 +94,13 @@ RANDOMIZED_TEST(ParallelRayLineSegmentClosestPoint)
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointB = b.GetPoint(d2);
 	float cpd = closestPointA.Distance(closestPointB);
-	assert(cpd <= displacement.Length()+1e-4f);
+	mgl_assert(cpd <= displacement.Length()+1e-4f);
 	MARK_UNUSED(cpd);
 
 	float t1 = a.pos.Distance(b.a);
 	float t2 = a.pos.Distance(b.b);
-	assert(cpd <= t1+1e-4f);
-	assert(cpd <= t2+1e-4f);
+	mgl_assert(cpd <= t1+1e-4f);
+	mgl_assert(cpd <= t2+1e-4f);
 	MARK_UNUSED(t1);
 	MARK_UNUSED(t2);
 }
@@ -129,17 +129,17 @@ RANDOMIZED_TEST(ParallelLineSegmentLineSegmentClosestPoint)
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointB = b.GetPoint(d2);
 	float cpd = closestPointA.Distance(closestPointB);
-	assert(cpd <= displacement.Length()+1e-4f);
+	mgl_assert(cpd <= displacement.Length()+1e-4f);
 	MARK_UNUSED(cpd);
 
 	float t1 = a.a.Distance(b.a);
 	float t2 = a.a.Distance(b.b);
 	float t3 = a.b.Distance(b.a);
 	float t4 = a.b.Distance(b.b);
-	assert(cpd <= t1+1e-4f);
-	assert(cpd <= t2+1e-4f);
-	assert(cpd <= t3+1e-4f);
-	assert(cpd <= t4+1e-4f);
+	mgl_assert(cpd <= t1+1e-4f);
+	mgl_assert(cpd <= t2+1e-4f);
+	mgl_assert(cpd <= t3+1e-4f);
+	mgl_assert(cpd <= t4+1e-4f);
 	MARK_UNUSED(t1);
 	MARK_UNUSED(t2);
 	MARK_UNUSED(t3);
@@ -155,19 +155,19 @@ RANDOMIZED_TEST(LineLineClosestPoint)
 
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
-	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
+	mgl_assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
-	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
-	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
+	mgl_assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
+	mgl_assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
+	mgl_assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
-	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
+	mgl_assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
-	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
+	mgl_assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 }
 
 RANDOMIZED_TEST(LineRayClosestPoint)
@@ -180,22 +180,22 @@ RANDOMIZED_TEST(LineRayClosestPoint)
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointAd = a.GetPoint(d);
-	assert3(closestPointA.Equals(closestPointAd, 1e-1f), closestPointA, closestPointAd, closestPointA.Distance(closestPointAd));
+	mgl_assert3(closestPointA.Equals(closestPointAd, 1e-1f), closestPointA, closestPointAd, closestPointA.Distance(closestPointAd));
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-//	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
-//	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
-	assert(closestPointB.Equals(closestPointB2, 1e-1f));
+//	mgl_assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
+//	mgl_assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
+	mgl_assert(closestPointB.Equals(closestPointB2, 1e-1f));
 	vec closestPointA2 = a.GetPoint(D2);
-	assert(closestPointA.Equals(closestPointA2, 1e-1f));
+	mgl_assert(closestPointA.Equals(closestPointA2, 1e-1f));
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-2f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-1f));
-	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-1f));
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-2f);
+	mgl_assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-1f));
+	mgl_assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-1f));
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.pos) + 1e-2f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-2f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.pos) + 1e-2f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-2f);
 }
 
 RANDOMIZED_TEST(LineLineSegmentClosestPoint)
@@ -207,24 +207,24 @@ RANDOMIZED_TEST(LineLineSegmentClosestPoint)
 
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
-	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
+	mgl_assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-//	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
-//	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
-	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
+//	mgl_assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
+//	mgl_assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
+	mgl_assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
-	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
+	mgl_assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
-	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
+	mgl_assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
 }
 
 RANDOMIZED_TEST(RayRayClosestPoint)
@@ -237,25 +237,25 @@ RANDOMIZED_TEST(RayRayClosestPoint)
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
 	vec closestPointA2 = a.GetPoint(d);
-	assert3(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA, closestPointA2, closestPointA.Distance(closestPointA2));
+	mgl_assert3(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA, closestPointA2, closestPointA.Distance(closestPointA2));
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-//	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
-//	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
-	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
+//	mgl_assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
+//	mgl_assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
+	mgl_assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	closestPointA2 = a.GetPoint(D2);
-	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
+	mgl_assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
-	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
+	mgl_assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.pos) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.pos) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.pos) + 1e-3f);
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.pos) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.pos) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-3f);
 }
 
 RANDOMIZED_TEST(RayLineSegmentClosestPoint)
@@ -267,27 +267,27 @@ RANDOMIZED_TEST(RayLineSegmentClosestPoint)
 
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
-	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
+	mgl_assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-//	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
-//	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
-	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
+//	mgl_assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
+//	mgl_assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
+	mgl_assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
-	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
+	mgl_assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
-	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
+	mgl_assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.pos) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.pos) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.pos) + 1e-3f);
 }
 
 RANDOMIZED_TEST(LineSegmentLineSegmentClosestPoint)
@@ -299,27 +299,27 @@ RANDOMIZED_TEST(LineSegmentLineSegmentClosestPoint)
 
 	float d, d2;
 	vec closestPointA = a.ClosestPoint(b, d, d2);
-	assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
+	mgl_assert3(closestPointA.Equals(a.GetPoint(d), 1e-2f), closestPointA, a.GetPoint(d), closestPointA.Distance(a.GetPoint(d)));
 	vec closestPointB = b.GetPoint(d2);
 	float D, D2;
 	vec closestPointB2 = b.ClosestPoint(a, D, D2);
-//	assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
-//	assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
-	assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
+//	mgl_assert2(EqualAbs(d, D2, 1e-2f) || EqualRel(d, D2, 1e-2f), d, D2);
+//	mgl_assert2(EqualAbs(D, d2, 1e-2f) || EqualRel(D, d2, 1e-2f), D, d2);
+	mgl_assert2(closestPointB.Equals(closestPointB2, 1e-2f), closestPointB.SerializeToCodeString(), closestPointB2.SerializeToCodeString());
 	vec closestPointA2 = a.GetPoint(D2);
-	assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
+	mgl_assert2(closestPointA.Equals(closestPointA2, 1e-2f), closestPointA.SerializeToCodeString(), closestPointA2.SerializeToCodeString());
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
-	assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
-	assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, pt.Distance(pt2) + 1e-3f);
+	mgl_assert(EqualAbs(a.Distance(b), closestPointA.Distance(closestPointB), 1e-2f));
+	mgl_assert(EqualAbs(b.Distance(a), closestPointA.Distance(closestPointB), 1e-2f));
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointA.Distance(b.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, a.Distance(b.b) + 1e-3f);
 
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.b) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.a) + 1e-3f);
-	assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, closestPointB.Distance(a.b) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.a) + 1e-3f);
+	mgl_assertcmp(closestPointA.Distance(closestPointB), <=, b.Distance(a.b) + 1e-3f);
 }

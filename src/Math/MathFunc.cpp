@@ -336,7 +336,7 @@ bool IsPow2(u64 number)
 
 u32 RoundUpPow2(u32 x)
 {
-	assert(sizeof(u32) == 4);
+	mgl_assert(sizeof(u32) == 4);
 	--x;
 	x |= x >> 1;
 	x |= x >> 2;
@@ -350,7 +350,7 @@ u32 RoundUpPow2(u32 x)
 
 u64 RoundUpPow2(u64 x)
 {
-	assert(sizeof(u64) == 8);
+	mgl_assert(sizeof(u64) == 8);
 	--x;
 	x |= x >> 1;
 	x |= x >> 2;
@@ -365,7 +365,7 @@ u64 RoundUpPow2(u64 x)
 
 u32 RoundDownPow2(u32 x)
 {
-	assert(sizeof(u32) == 4);
+	mgl_assert(sizeof(u32) == 4);
 	x |= x >> 1;
 	x |= x >> 2;
 	x |= x >> 4;
@@ -376,7 +376,7 @@ u32 RoundDownPow2(u32 x)
 
 u64 RoundDownPow2(u64 x)
 {
-	assert(sizeof(u64) == 8);
+	mgl_assert(sizeof(u64) == 8);
 	x |= x >> 1;
 	x |= x >> 2;
 	x |= x >> 4;
@@ -388,13 +388,13 @@ u64 RoundDownPow2(u64 x)
 
 int RoundIntUpToMultipleOfPow2(int x, int n)
 {
-	assert(IsPow2(n));
+	mgl_assert(IsPow2(n));
 	return (x + n-1) & ~(n-1);
 }
 
 s64 RoundIntUpToMultipleOfPow2(s64 x, s64 n)
 {
-	assert(IsPow2(n));
+	mgl_assert(IsPow2(n));
 	return (x + n-1) & ~(n-1);
 }
 
@@ -490,7 +490,7 @@ float LerpMod(float a, float b, float mod, float t)
 
 float InvLerp(float a, float b, float x)
 {
-	assume(Abs(b-a) > 1e-5f);
+	mgl_assume(Abs(b-a) > 1e-5f);
 	return (x - a) / (b - a);
 }
 
@@ -688,7 +688,7 @@ float DeserializeFloat(const char *str, const char **outEndStr)
 
 int hexstr_to_u64(const char *str, uint64_t *u)
 {
-	assert(u);
+	mgl_assert(u);
 	*u = 0;
 	const char *s = str;
 	for(int i = 0; i <= 16; ++i)

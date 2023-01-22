@@ -21,7 +21,7 @@ void *AlignedMalloc(size_t size, size_t alignment)
 	ptr += incr;
 	((u8*)ptr)[-1] = (u8)(incr+1);
 #endif
-	assert(ptr % alignment == 0);
+	mgl_assert(ptr % alignment == 0);
 	return (void*)ptr;
 }
 

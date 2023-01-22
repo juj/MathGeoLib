@@ -199,8 +199,8 @@ float Triangle::Perimeter() const
 
 LineSegment Triangle::Edge(int i) const
 {
-	assume(0 <= i);
-	assume(i <= 2);
+	mgl_assume(0 <= i);
+	mgl_assume(i <= 2);
 	if (i == 0)
 		return LineSegment(a, b);
 	else if (i == 1)
@@ -213,8 +213,8 @@ LineSegment Triangle::Edge(int i) const
 
 vec Triangle::Vertex(int i) const
 {
-	assume(0 <= i);
-	assume(i <= 2);
+	mgl_assume(0 <= i);
+	mgl_assume(i <= 2);
 	if (i == 0)
 		return a;
 	else if (i == 1)
@@ -564,7 +564,7 @@ bool Triangle::Intersects(const Triangle &t2, LineSegment *outLine) const
 		// Find the intersection line of the two planes.
 		Line l;
 		bool success = p1.Intersects(p2, &l);
-		assume(success); // We already determined the two triangles have intersecting planes, so this should always succeed.
+		mgl_assume(success); // We already determined the two triangles have intersecting planes, so this should always succeed.
 		if (!success)
 			return false;
 
@@ -1018,7 +1018,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 	bool intersects = (t >= 0.0f && t <= 1.0f);
 	if (intersects)
 	{
-//		assume3(lineSegment.GetPoint(t).Equals(this->Point(u, v)), lineSegment.GetPoint(t).SerializeToCodeString(), this->Point(u, v).SerializeToCodeString(), lineSegment.GetPoint(t).Distance(this->Point(u, v)));
+//		mgl_assume3(lineSegment.GetPoint(t).Equals(this->Point(u, v)), lineSegment.GetPoint(t).SerializeToCodeString(), this->Point(u, v).SerializeToCodeString(), lineSegment.GetPoint(t).Distance(this->Point(u, v)));
 		if (otherPt)
 			*otherPt = lineSegment.GetPoint(t);
 		return this->Point(u, v);
@@ -1150,7 +1150,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 		{
 			// Clamp to t == 0 and solve for v.
 			v = B[1] / m[1][1];
-//			mathassert(EqualAbs(v, Clamp01(v)));
+//			mgl_mathassert(EqualAbs(v, Clamp01(v)));
 			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
 			// The solution is (u,v,t)=(0,v,0).
 			if (otherPt)
@@ -1161,7 +1161,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 		{
 			// Clamp to t == 1 and solve for v.
 			v = (B[1] - m[1][2]) / m[1][1];
-//			mathassert(EqualAbs(v, Clamp01(v)));
+//			mgl_mathassert(EqualAbs(v, Clamp01(v)));
 			v = Clamp01(v); // The solution for v must also be in the range [0,1]. TODO: Is this guaranteed by the above?
 			// The solution is (u,v,t)=(0,v,1).
 			if (otherPt)
@@ -1213,7 +1213,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 		{
 			// Clamp to t == 0 and solve for u.
 			u = B[0] / m[0][0];
-//			mathassert(EqualAbs(u, Clamp01(u)));
+//			mgl_mathassert(EqualAbs(u, Clamp01(u)));
 			u = Clamp01(u); // The solution for u must also be in the range [0,1].
 			if (otherPt)
 				*otherPt = lineSegment.a;
@@ -1223,7 +1223,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 		{
 			// Clamp to t == 1 and solve for u.
 			u = (B[0] - m[0][2]) / m[0][0];
-//			mathassert(EqualAbs(u, Clamp01(u)));
+//			mgl_mathassert(EqualAbs(u, Clamp01(u)));
 			u = Clamp01(u); // The solution for u must also be in the range [0,1].
 			if (otherPt)
 				*otherPt = lineSegment.b;
@@ -1269,7 +1269,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 		{
 			// Set v = 1-u and solve again.
 //			u = (B[0] - m[0][0]) / (m[0][0] - m[0][1]);
-//			mathassert(EqualAbs(u, Clamp01(u)));
+//			mgl_mathassert(EqualAbs(u, Clamp01(u)));
 //			u = Clamp01(u); // The solution for u must also be in the range [0,1].
 //			return a + u*e0;
 
@@ -1343,7 +1343,7 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 			u = (B[0] - m[0][1] - m[0][2]) / (m[0][0] - m[0][1]);
 //			u = Dot(a + e1 + lineSegment.b, e1 - e0) / Dot(e0-e1, e0-e1);
 
-//			mathassert(EqualAbs(u, Clamp01(u)));
+//			mgl_mathassert(EqualAbs(u, Clamp01(u)));
 			u = Clamp01(u);
 			return a + u*e0 + (1-u)*e1;
 		}
@@ -1382,8 +1382,8 @@ vec Triangle::ClosestPoint(const LineSegment &lineSegment, vec *otherPt) const
 			// The solution is (u,v,t)=(1,0,t)
 			return b;
 		}
-		mathassert(t >= 0.f);
-		mathassert(t <= 1.f);
+		mgl_mathassert(t >= 0.f);
+		mgl_mathassert(t <= 1.f);
 		return a + u*e0 + (1.f-u)*e1;
 	}
 	else // All parameters are within range, so the triangle and the line segment intersect, and the intersection point is the closest point.
@@ -1888,14 +1888,14 @@ vec Triangle::RandomPointInside(LCG &rng) const
 #ifdef MATH_ASSERT_CORRECTNESS
 	vec pt = Point(s, t);
 	float2 uv = BarycentricUV(pt);
-	assert1(uv.x >= 0.f, uv.x);
-	assert1(uv.y >= 0.f, uv.y);
-	assert3(uv.x + uv.y <= 1.f, uv.x, uv.y, uv.x + uv.y);
+	mgl_assert1(uv.x >= 0.f, uv.x);
+	mgl_assert1(uv.y >= 0.f, uv.y);
+	mgl_assert3(uv.x + uv.y <= 1.f, uv.x, uv.y, uv.x + uv.y);
 	float3 uvw = BarycentricUVW(pt);
-	assert1(uvw.x >= 0.f, uvw.x);
-	assert1(uvw.y >= 0.f, uvw.y);
-	assert1(uvw.z >= 0.f, uvw.z);
-	assert4(EqualAbs(uvw.x + uvw.y + uvw.z, 1.f), uvw.x, uvw.y, uvw.z, uvw.x + uvw.y + uvw.z);
+	mgl_assert1(uvw.x >= 0.f, uvw.x);
+	mgl_assert1(uvw.y >= 0.f, uvw.y);
+	mgl_assert1(uvw.z >= 0.f, uvw.z);
+	mgl_assert4(EqualAbs(uvw.x + uvw.y + uvw.z, 1.f), uvw.x, uvw.y, uvw.z, uvw.x + uvw.y + uvw.z);
 #endif
 	return Point(s, t);
 }
@@ -1907,7 +1907,7 @@ vec Triangle::RandomVertex(LCG &rng) const
 
 vec Triangle::RandomPointOnEdge(LCG &rng) const
 {
-	assume(!IsDegenerate());
+	mgl_assume(!IsDegenerate());
 	float ab = a.Distance(b);
 	float bc = b.Distance(c);
 	float ca = c.Distance(a);
@@ -1970,7 +1970,7 @@ StringT Triangle::SerializeToString() const
 	s = SerializeFloat(c.x, s); *s = ','; ++s;
 	s = SerializeFloat(c.y, s); *s = ','; ++s;
 	s = SerializeFloat(c.z, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -1993,7 +1993,7 @@ std::ostream &operator <<(std::ostream &o, const Triangle &triangle)
 
 Triangle Triangle::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return Triangle(vec::nan, vec::nan, vec::nan);
 	Triangle t;

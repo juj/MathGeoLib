@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file QuadTree.inl
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief Implementation for the QuadTree object. */
 #pragma once
 
@@ -29,10 +29,10 @@ void QuadTree<T>::Clear(const float2 &minXY, const float2 &maxXY)
 	boundingAABB.minPoint = minXY;
 	boundingAABB.maxPoint = maxXY;
 
-	assert(!boundingAABB.IsDegenerate());
+	mgl_assert(!boundingAABB.IsDegenerate());
 
 	rootNodeIndex = AllocateNodeGroup(0);
-	assert(Root());
+	mgl_assert(Root());
 	Node *root = Root();
 	root->center = (minXY + maxXY) * 0.5f;
 	root->radius = maxXY - root->center;
@@ -47,14 +47,14 @@ void QuadTree<T>::Add(const T &object)
 {
 	MGL_PROFILE(QuadTree_Add);
 	Node *n = Root();
-	assert(n && "Error: QuadTree has not been initialized with a root node! Call QuadTree::Clear() to initialize the root node.");
+	mgl_assert(n && "Error: QuadTree has not been initialized with a root node! Call QuadTree::Clear() to initialize the root node.");
 
-	assert(boundingAABB.IsFinite());
-	assert(!boundingAABB.IsDegenerate());
+	mgl_assert(boundingAABB.IsFinite());
+	mgl_assert(!boundingAABB.IsDegenerate());
 
 	AABB2D objectAABB = GetAABB2D(object);
-	assert(objectAABB.IsFinite());
-	assert(!objectAABB.HasNegativeVolume());
+	mgl_assert(objectAABB.IsFinite());
+	mgl_assert(!objectAABB.HasNegativeVolume());
 
 #ifdef QUADTREE_VERBOSE_LOGGING
 	++totalNumObjectsInTree;
@@ -131,10 +131,10 @@ void QuadTree<T>::Add(const T &object, Node *n)
 	for(;;)
 	{
 		// Traverse the QuadTree to decide which quad to place this object into.
-		assert(MinX(object) <= MaxX(object));
+		mgl_assert(MinX(object) <= MaxX(object));
 		float left = n->center.x - MinX(object); // If left > 0.f, then the object overlaps with the left quadrant.
 		float right = MaxX(object) - n->center.x; // If right > 0.f, then the object overlaps with the right quadrant.
-		assert(MinY(object) <= MaxY(object));
+		mgl_assert(MinY(object) <= MaxY(object));
 		float top = n->center.y - MinY(object); // If top > 0.f, then the object overlaps with the top quadrant.
 		float bottom = MaxY(object) - n->center.y; // If bottom > 0.f, then the object overlaps with the bottom quadrant.
 		float leftAndRight = Min(left, right); // If > 0.f, then the object straddles left-right halves.
@@ -165,12 +165,12 @@ void QuadTree<T>::Add(const T &object, Node *n)
 		{
 			if (top > 0.f)
 			{
-				assert(nodes[n->TopLeftChildIndex()].parent == n);
+				mgl_assert(nodes[n->TopLeftChildIndex()].parent == n);
 				n = &nodes[n->TopLeftChildIndex()];
 			}
 			else
 			{
-				assert(nodes[n->BottomLeftChildIndex()].parent == n);
+				mgl_assert(nodes[n->BottomLeftChildIndex()].parent == n);
 				n = &nodes[n->BottomLeftChildIndex()];
 			}
 		}
@@ -178,12 +178,12 @@ void QuadTree<T>::Add(const T &object, Node *n)
 		{
 			if (top > 0.f)
 			{
-				assert(nodes[n->TopRightChildIndex()].parent == n);
+				mgl_assert(nodes[n->TopRightChildIndex()].parent == n);
 				n = &nodes[n->TopRightChildIndex()];
 			}
 			else
 			{
-				assert(nodes[n->BottomRightChildIndex()].parent == n);
+				mgl_assert(nodes[n->BottomRightChildIndex()].parent == n);
 				n = &nodes[n->BottomRightChildIndex()];
 			}
 		}
@@ -232,7 +232,7 @@ int QuadTree<T>::AllocateNodeGroup(Node *parent)
 		n.center.x = parent->center.x + n.radius.x;
 	nodes.push_back(n);
 #ifdef _DEBUG
-	assert(nodes.capacity() == oldCap); // Limitation: Cannot resize the nodes vector!
+	mgl_assert(nodes.capacity() == oldCap); // Limitation: Cannot resize the nodes vector!
 #endif
 	return index;
 }
@@ -240,8 +240,8 @@ int QuadTree<T>::AllocateNodeGroup(Node *parent)
 template<typename T>
 void QuadTree<T>::SplitLeaf(Node *leaf)
 {
-	assert(leaf->IsLeaf());
-	assert(leaf->childIndex == 0xFFFFFFFF);
+	mgl_assert(leaf->IsLeaf());
+	mgl_assert(leaf->childIndex == 0xFFFFFFFF);
 
 	leaf->childIndex = AllocateNodeGroup(leaf);
 
@@ -251,10 +251,10 @@ void QuadTree<T>::SplitLeaf(Node *leaf)
 		const T &object = leaf->objects[i];
 
 		// Traverse the QuadTree to decide which quad to place this object into.
-		assert(MinX(object) <= MaxX(object));
+		mgl_assert(MinX(object) <= MaxX(object));
 		float left = leaf->center.x - MinX(object); // If left > 0.f, then the object overlaps with the left quadrant.
 		float right = MaxX(object) - leaf->center.x; // If right > 0.f, then the object overlaps with the right quadrant.
-		assert(MinY(object) <= MaxY(object));
+		mgl_assert(MinY(object) <= MaxY(object));
 		float top = leaf->center.y - MinY(object); // If top > 0.f, then the object overlaps with the top quadrant.
 		float bottom = MaxY(object) - leaf->center.y; // If bottom > 0.f, then the object overlaps with the bottom quadrant.
 		float leftAndRight = Min(left, right); // If > 0.f, then the object straddles left-right halves.
@@ -385,7 +385,7 @@ public:
 					if (aabbI.Intersects(aabbJ))
 						(*collisionCallback)(node.objects[i], n->objects[j]);
 				}
-				assert(n != n->parent);
+				mgl_assert(n != n->parent);
 				n = n->parent;
 			}
 		}
@@ -759,15 +759,15 @@ template<typename T>
 void QuadTree<T>::DebugSanityCheckNode(Node *n)
 {
 #ifdef _DEBUG
-	assert(n);
-	assert(n->parent || n == Root()); // If no parent, must be root.
-	assert(n != Root() || !n->parent); // If not root, must have a parent.
+	mgl_assert(n);
+	mgl_assert(n->parent || n == Root()); // If no parent, must be root.
+	mgl_assert(n != Root() || !n->parent); // If not root, must have a parent.
 
 	// Must have a good AABB.
 	AABB2D aabb = n->ComputeAABB();
-	assert(aabb.IsFinite());
-	assert(aabb.minPoint.x <= aabb.maxPoint.x);
-	assert(aabb.minPoint.y <= aabb.maxPoint.y);
+	mgl_assert(aabb.IsFinite());
+	mgl_assert(aabb.minPoint.x <= aabb.maxPoint.x);
+	mgl_assert(aabb.minPoint.y <= aabb.maxPoint.y);
 
 	LOGI("Node AABB: %s.", aabb.ToString().c_str());
 	// Each object in this node must be contained in this node.
@@ -775,7 +775,7 @@ void QuadTree<T>::DebugSanityCheckNode(Node *n)
 	{
 		LOGI("Object AABB: %s.", GetAABB2D(n->objects[i]).ToString().c_str());
 
-		assert(aabb.Contains(GetAABB2D(n->objects[i])));
+		mgl_assert(aabb.Contains(GetAABB2D(n->objects[i])));
 	}
 
 	// Parent <-> child links must be valid.
@@ -784,11 +784,11 @@ void QuadTree<T>::DebugSanityCheckNode(Node *n)
 		for(int i = 0; i < 4; ++i)
 		{
 			Node *child = &nodes[n->TopLeftChildIndex()+i];
-			assert(child->parent == n);
+			mgl_assert(child->parent == n);
 
 			// Must contain all its child nodes.
-			assert(aabb.Contains(child->center));
-			assert(aabb.Contains(child->ComputeAABB()));
+			mgl_assert(aabb.Contains(child->center));
+			mgl_assert(aabb.Contains(child->ComputeAABB()));
 
 			DebugSanityCheckNode(child);
 		}

@@ -66,7 +66,7 @@ public:
 	FixedPoint(const BaseT &whole, const BaseT &nomin, const BaseT &denom)
 	:value((whole << FracBits) + (nomin << FracBits) / denom)
 	{
-		assert(denom != 0);
+		mgl_assert(denom != 0);
 	}
 
 	operator double() const

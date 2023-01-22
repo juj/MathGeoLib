@@ -33,15 +33,15 @@ private:
 public:
 	CONST_WIN32 FORCE_INLINE float operator[](int col) const
 	{
-		assert(col >= 0);
-		assert(col < Cols);
+		mgl_assert(col >= 0);
+		mgl_assert(col < Cols);
 		
 		return v[col*Rows];
 	}
 	FORCE_INLINE float &operator[](int col)
 	{
-		assert(col >= 0);
-		assert(col < Cols);
+		mgl_assert(col >= 0);
+		mgl_assert(col < Cols);
 		
 		return v[col*Rows];
 	}
@@ -56,15 +56,15 @@ private:
 public:
 	CONST_WIN32 FORCE_INLINE float operator[](int col) const
 	{
-		assert(col >= 0);
-		assert(col < Cols);
+		mgl_assert(col >= 0);
+		mgl_assert(col < Cols);
 
 		return v[col];
 	}
 	FORCE_INLINE float &operator[](int col)
 	{
-		assert(col >= 0);
-		assert(col < Cols);
+		mgl_assert(col >= 0);
+		mgl_assert(col < Cols);
 
 		return v[col];
 	}

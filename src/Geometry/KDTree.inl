@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file KDTree.inl
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief Implementation for the KDTree object. */
 #pragma once
 
@@ -48,7 +48,7 @@ void KdTree<T>::FreeBuckets()
 template<typename T>
 AABB KdTree<T>::BoundingAABB(const u32 *bucket) const
 {
-	assert(bucket);
+	mgl_assert(bucket);
 
 	AABB a;
 	a.SetNegativeInfinity();
@@ -66,10 +66,10 @@ void KdTree<T>::SplitLeaf(int nodeIndex, const AABB &nodeAABB, int numObjectsInB
 		return; // Exceeded max depth - disallow splitting.
 
 	KdTreeNode *node = &nodes[nodeIndex];
-	assert(node->IsLeaf());
+	mgl_assert(node->IsLeaf());
 	// Choose the longest axis for the split and convert the node from a leaf to an inner node.
 	int curBucketIndex = node->bucketIndex; // The existing objects.
-	assert(curBucketIndex != 0); // The leaf must contain some objects, otherwise this function should never be called!
+	mgl_assert(curBucketIndex != 0); // The leaf must contain some objects, otherwise this function should never be called!
 	CardinalAxis splitAxis = (CardinalAxis)nodeAABB.Size().MaxElementIndex();
 	float splitPos = nodeAABB.CenterPoint()[splitAxis];
 
@@ -142,7 +142,7 @@ void KdTree<T>::SplitLeaf(int nodeIndex, const AABB &nodeAABB, int numObjectsInB
 	rightChild->bucketIndex = (u32)buckets.size();
 	buckets.push_back(rightBucket);
 
-	assert(numObjectsLeft < numObjectsInBucket && numObjectsRight < numObjectsInBucket);
+	mgl_assert(numObjectsLeft < numObjectsInBucket && numObjectsRight < numObjectsInBucket);
 
 	// Recursively split children.
 	if (numObjectsLeft > 16)
@@ -313,8 +313,8 @@ bool KdTree<T>::IsPartOfThisTree(const KdTreeNode *node) const
 template<typename T>
 bool KdTree<T>::IsPartOfThisTree(const KdTreeNode *root, const KdTreeNode *node) const
 {
-	assert(root);
-	assert(node);
+	mgl_assert(root);
+	mgl_assert(node);
 	if (root == node)
 		return true;
 	if (root->IsLeaf())
@@ -329,10 +329,10 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 {
 	float tNear = 0.f, tFar = FLOAT_INF;
 
-	assume(rootAABB.IsFinite());
-	assume(!rootAABB.IsDegenerate());
+	mgl_assume(rootAABB.IsFinite());
+	mgl_assume(!rootAABB.IsDegenerate());
 #ifdef _DEBUG
-	assume(!needsBuilding);
+	mgl_assume(!needsBuilding);
 #endif
 
 	if (!rootAABB.IntersectLineAABB(r.pos, r.dir, tNear, tFar))
@@ -418,7 +418,7 @@ inline void KdTree<T>::RayQuery(const Ray &r, Func &nodeProcessFunc)
 			StackPtr tempPtr = exitPoint++;
 			if (exitPoint == entryPoint) // avoid overwriting data on the stack.
 				++exitPoint;
-			assert(exitPoint < cMaxStackItems);
+			mgl_assert(exitPoint < cMaxStackItems);
 
 			stack[exitPoint].prev = tempPtr;
 			stack[exitPoint].t = t;
@@ -472,7 +472,7 @@ inline void KdTree<T>::AABBQuery(const AABB &aabb, Func &leafCallback)
 	while(stackSize > 0)
 	{
 		KdTreeNode *cur = stack[--stackSize];
-		assert(!cur->IsLeaf());
+		mgl_assert(!cur->IsLeaf());
 
 		// We know that aabb intersects with the AABB of the current node, which allows
 		// most of the AABB-AABB intersection tests to be ignored.
@@ -531,7 +531,7 @@ inline void KdTree<T>::KdTreeQuery(KdTree<T> &tree2, const float3x4 &thisWorldTr
 	stack[0].thisNode = Root();
 	stack[0].thisAABB = BoundingAABB();
 	stack[0].tree2Node = tree2.Root();
-	stack[0].tree2AABB = tree2.BoundingAABB();	
+	stack[0].tree2AABB = tree2.BoundingAABB();
 	OBB tree2OBB = stack[0].tree2AABB.Transform(tree2Transform);
 	stack[0].tree2OBB = tree2OBB;
 
@@ -540,7 +540,7 @@ inline void KdTree<T>::KdTreeQuery(KdTree<T> &tree2, const float3x4 &thisWorldTr
 
 	while(stackSize > 0)
 	{
-		assert(stackSize < cMaxStackItems*100);
+		mgl_assert(stackSize < cMaxStackItems*100);
 		--stackSize;
 		KdTreeNode *thisNode = stack[stackSize].thisNode;
 		KdTreeNode *tree2Node = stack[stackSize].tree2Node;

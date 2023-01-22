@@ -48,24 +48,24 @@ bool GJKIntersect2D(const A &a, const B &b)
 		float maxS, minS;
 		vec2d newSupport = SUPPORT2D(d, minS, maxS);
 #ifdef MATH_VEC_IS_FLOAT4
-		assume(newSupport.z == 0.f);
-		assume(newSupport.w == 0.f);
+		mgl_assume(newSupport.z == 0.f);
+		mgl_assume(newSupport.w == 0.f);
 #endif
 		// If the most extreme point in that search direction did not walk past the origin, then the origin cannot be contained in the Minkowski
 		// convex shape, and the two convex objects a and b do not share a common point - no intersection!
 		if (minS + maxS < 0.f)
 			return false;
 		// Add the newly evaluated point to the search simplex.
-		assert(n < 3);
+		mgl_assert(n < 3);
 		support[n++] = newSupport;
 		// Examine the current simplex, prune a redundant part of it, and produce the next search direction.
 		d = UpdateSimplex2D(support, n);
 		if (n == 0) // Was the origin contained in the current simplex? If so, then the convex shapes a and b do share a common point - intersection!
 			return true;
 	}
-	assume(false && "GJK2D intersection test did not converge to a result!");
+	mgl_assume(false && "GJK2D intersection test did not converge to a result!");
 	// TODO: enable this on Polygon2DRef
-//	assume2(false && "GJK2D intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
+//	mgl_assume2(false && "GJK2D intersection test did not converge to a result!", a.SerializeToString(), b.SerializeToString());
 	return false; // Report no intersection.
 }
 

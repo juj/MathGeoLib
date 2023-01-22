@@ -57,8 +57,8 @@ int Polygon::NumEdges() const
 
 vec Polygon::Vertex(int vertexIndex) const
 {
-	assume(vertexIndex >= 0);
-	assume(vertexIndex < (int)p.size());
+	mgl_assume(vertexIndex >= 0);
+	mgl_assume(vertexIndex < (int)p.size());
 	return p[vertexIndex];
 }
 
@@ -82,18 +82,18 @@ LineSegment Polygon::Edge2D(int i) const
 
 bool Polygon::DiagonalExists(int i, int j) const
 {
-	assume(p.size() >= 3);
-	assume(i >= 0);
-	assume(j >= 0);
-	assume(i < (int)p.size());
-	assume(j < (int)p.size());
-	assume(IsPlanar());
-	assume(i != j);
+	mgl_assume(p.size() >= 3);
+	mgl_assume(i >= 0);
+	mgl_assume(j >= 0);
+	mgl_assume(i < (int)p.size());
+	mgl_assume(j < (int)p.size());
+	mgl_assume(IsPlanar());
+	mgl_assume(i != j);
 	if (i == j) // Degenerate if i == j.
 		return false;
 	if (i > j)
 		Swap(i, j);
-	assume(i+1 != j);
+	mgl_assume(i+1 != j);
 	if (i+1 == j) // Is this LineSegment an edge of this polygon?
 		return false;
 
@@ -127,16 +127,16 @@ vec Polygon::BasisV() const
 
 LineSegment Polygon::Diagonal(int i, int j) const
 {
-	assume(i >= 0);
-	assume(j >= 0);
-	assume(i < (int)p.size());
-	assume(j < (int)p.size());
+	mgl_assume(i >= 0);
+	mgl_assume(j >= 0);
+	mgl_assume(i < (int)p.size());
+	mgl_assume(j < (int)p.size());
 	return LineSegment(p[i], p[j]);
 }
 
 bool Polygon::IsConvex() const
 {
-	assume(IsPlanar());
+	mgl_assume(IsPlanar());
 	if (p.empty())
 		return false;
 	if (p.size() <= 3)
@@ -161,14 +161,14 @@ bool Polygon::IsConvex() const
 
 float2 Polygon::MapTo2D(int i) const
 {
-	assume(i >= 0);
-	assume(i < (int)p.size());
+	mgl_assume(i >= 0);
+	mgl_assume(i < (int)p.size());
 	return MapTo2D(p[i]);
 }
 
 float2 Polygon::MapTo2D(const vec &point) const
 {
-	assume(!p.empty());
+	mgl_assume(!p.empty());
 	vec basisU = BasisU();
 	vec basisV = BasisV();
 	vec pt = point - p[0];
@@ -177,7 +177,7 @@ float2 Polygon::MapTo2D(const vec &point) const
 
 vec Polygon::MapFrom2D(const float2 &point) const
 {
-	assume(!p.empty());
+	mgl_assume(!p.empty());
 	return (vec)p[0] + point.x * BasisU() + point.y * BasisV();
 }
 
@@ -200,7 +200,7 @@ bool Polygon::IsPlanar(float epsilonSq) const
 
 bool Polygon::IsSimple() const
 {
-	assume(IsPlanar());
+	mgl_assume(IsPlanar());
 	Plane plane = PlaneCCW();
 	for(int i = 0; i < (int)p.size(); ++i)
 	{
@@ -349,11 +349,11 @@ bool Polygon::Contains(const vec &worldSpacePoint, float polygonThicknessSq) con
 
 	vec basisU = BasisU();
 	vec basisV = BasisV();
-	assert1(basisU.IsNormalized(), basisU);
-	assert1(basisV.IsNormalized(), basisV);
-	assert2(basisU.IsPerpendicular(basisV), basisU, basisV);
-	assert3(basisU.IsPerpendicular(PlaneCCW().normal), basisU, PlaneCCW().normal, basisU.Dot(PlaneCCW().normal));
-	assert3(basisV.IsPerpendicular(PlaneCCW().normal), basisV, PlaneCCW().normal, basisV.Dot(PlaneCCW().normal));
+	mgl_assert1(basisU.IsNormalized(), basisU);
+	mgl_assert1(basisV.IsNormalized(), basisV);
+	mgl_assert2(basisU.IsPerpendicular(basisV), basisU, basisV);
+	mgl_assert3(basisU.IsPerpendicular(PlaneCCW().normal), basisU, PlaneCCW().normal, basisU.Dot(PlaneCCW().normal));
+	mgl_assert3(basisV.IsPerpendicular(PlaneCCW().normal), basisV, PlaneCCW().normal, basisV.Dot(PlaneCCW().normal));
 
 	vec normal = basisU.Cross(basisV);
 //	float lenSq = normal.LengthSq(); ///\todo Could we treat basisU and basisV unnormalized here?
@@ -727,7 +727,7 @@ bool Polygon::Intersects(const Capsule &capsule) const
 
 vec Polygon::ClosestPoint(const vec &point) const
 {
-	assume(IsPlanar());
+	mgl_assume(IsPlanar());
 
 	TriangleArray tris = Triangulate();
 	vec closestPt = vec::nan;
@@ -838,7 +838,7 @@ bool Contains(const vec &point, const vec &viewDirection) const;
 /** Implementation based on Graphics Gems 2, p. 170: "IV.1. Area of Planar Polygons and Volume of Polyhedra." */
 float Polygon::Area() const
 {
-	assume(IsPlanar());
+	mgl_assume(IsPlanar());
 	vec area = vec::zero;
 	if (p.size() <= 2)
 		return 0.f;
@@ -884,12 +884,12 @@ vec Polygon::PointOnEdge(float normalizedDistance) const
 	{
 		LineSegment edge = Edge(i);
 		float len = edge.Length();
-		assume(len != 0.f && "Degenerate Polygon detected!");
+		mgl_assume(len != 0.f && "Degenerate Polygon detected!");
 		if (d <= len)
 			return edge.GetPoint(d / len);
 		d -= len;
 	}
-	mathassert(false && "Polygon::PointOnEdge reached end of loop which shouldn't!");
+	mgl_mathassert(false && "Polygon::PointOnEdge reached end of loop which shouldn't!");
 	return p[0];
 }
 
@@ -973,8 +973,8 @@ bool IsAnEar(const std::vector<float2> &poly, int i, int j)
 	The running time of this function is O(n^2). */
 TriangleArray Polygon::Triangulate() const
 {
-	assume(IsPlanar());
-//	assume1(IsPlanar(), this->SerializeToString()); // TODO: enable
+	mgl_assume(IsPlanar());
+//	mgl_assume1(IsPlanar(), this->SerializeToString()); // TODO: enable
 
 	TriangleArray t;
 	// Handle degenerate cases.
@@ -1026,7 +1026,7 @@ TriangleArray Polygon::Triangulate() const
 		}
 	}
 
-	assume3(p2d.size() == 3, (int)p2d.size(), (int)polyIndices.size(), (int)NumVertices());
+	mgl_assume3(p2d.size() == 3, (int)p2d.size(), (int)polyIndices.size(), (int)NumVertices());
 	if (p2d.size() > 3) // If this occurs, then the polygon is NOT counter-clockwise oriented.
 		return t;
 /*

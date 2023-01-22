@@ -97,11 +97,11 @@ uint16_t Float32ToFloat16(float float32)
 
 uint32_t Float32ToMiniFloat(bool signBit, int exponentBits, int mantissaBits, int exponentBias, float value)
 {
-	assert(sizeof(float) == 4);
-	assert(exponentBits > 0);
-	assert(exponentBits <= 8);
-	assert(mantissaBits > 0);
-	assert(mantissaBits <= 23);
+	mgl_assert(sizeof(float) == 4);
+	mgl_assert(exponentBits > 0);
+	mgl_assert(exponentBits <= 8);
+	mgl_assert(mantissaBits > 0);
+	mgl_assert(mantissaBits <= 23);
 	uint32_t v = ReinterpretAsU32(value);
 	uint32_t biasedExponent = (v & 0x7F800000) >> 23;
 	uint32_t mantissa = v & 0x7FFFFF;
@@ -152,11 +152,11 @@ uint32_t Float32ToMiniFloat(bool signBit, int exponentBits, int mantissaBits, in
 
 float MiniFloatToFloat32(bool signBit, int exponentBits, int mantissaBits, int exponentBias, uint32_t miniFloat)
 {
-	assert(sizeof(float) == 4);
-	assert(exponentBits > 0);
-	assert(exponentBits <= 8);
-	assert(mantissaBits > 0);
-	assert(mantissaBits <= 23);
+	mgl_assert(sizeof(float) == 4);
+	mgl_assert(exponentBits > 0);
+	mgl_assert(exponentBits <= 8);
+	mgl_assert(mantissaBits > 0);
+	mgl_assert(mantissaBits <= 23);
 
 	uint32_t sign = signBit ? (miniFloat & (1U << (exponentBits + mantissaBits))) : 0;
 	uint32_t exponent = (miniFloat >> mantissaBits) & ((1U << exponentBits) - 1);

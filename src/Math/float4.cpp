@@ -117,7 +117,7 @@ float4::float4(const float2 &xy, const float2 &zw)
 
 float4::float4(const float *data)
 {
-	assume(data);
+	mgl_assume(data);
 #if defined(MATH_AUTOMATIC_SSE)
 	v = loadu_ps(data);
 #else
@@ -323,7 +323,7 @@ float float4::Normalize3()
 	v = vec4_safe_normalize3(v, origLength);
 	return s4f_x(origLength);
 #else
-	assume(IsFinite());
+	mgl_assume(IsFinite());
 	float lengthSq = LengthSq3();
 	if (lengthSq > 1e-6f)
 	{
@@ -350,7 +350,7 @@ float4 float4::Normalized3() const
 #else
 	float4 copy = *this;
 	float length = copy.Normalize3();
-	assume(length > 0);
+	mgl_assume(length > 0);
 	MARK_UNUSED(length);
 	return copy;
 #endif
@@ -362,7 +362,7 @@ float float4::Normalize4()
 	simd4f len = Normalize4_SSE();
 	return s4f_x(len);
 #else
-	assume(IsFinite());
+	mgl_assume(IsFinite());
 	float lengthSq = LengthSq4();
 	if (lengthSq > 1e-6f)
 	{
@@ -382,7 +382,7 @@ float4 float4::Normalized4() const
 {
 	float4 copy = *this;
 	float length = copy.Normalize4();
-	assume(length > 0);
+	mgl_assume(length > 0);
 	MARK_UNUSED(length);
 	return copy;
 }
@@ -460,7 +460,7 @@ float float4::ScaleToLength3(float newLength)
 
 float4 float4::ScaledToLength3(float newLength) const
 {
-	assume(!IsZero3());
+	mgl_assume(!IsZero3());
 
 	float4 vtx = *this;
 	vtx.ScaleToLength3(newLength);
@@ -516,7 +516,7 @@ StringT float4::SerializeToString() const
 	s = SerializeFloat(y, s); *s = ','; ++s;
 	s = SerializeFloat(z, s); *s = ','; ++s;
 	s = SerializeFloat(w, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -529,8 +529,8 @@ StringT float4::SerializeToCodeString() const
 
 float4 float4::FromString(const char *str, const char **outEndStr)
 {
-	assert(IsNeutralCLocale());
-	assume(str);
+	mgl_assert(IsNeutralCLocale());
+	mgl_assume(str);
 	if (!str)
 		return float4::nan;
 	MATH_SKIP_WORD(str, "float4");
@@ -849,8 +849,8 @@ float4 float4::Cross3(const float3 &rhs) const
 float4 float4::Cross3(const float4 &rhs) const
 {
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
-	assert((((uintptr_t)&rhs) & 15) == 0); // For SSE ops we must be 16-byte aligned.
-	assert((((uintptr_t)this) & 15) == 0);
+	mgl_assert((((uintptr_t)&rhs) & 15) == 0); // For SSE ops we must be 16-byte aligned.
+	mgl_assert((((uintptr_t)this) & 15) == 0);
 	return float4(cross_ps(v, rhs.v));
 #else
 	return Cross3(rhs.xyz());
@@ -869,10 +869,10 @@ float4x4 float4::OuterProduct(const float4 &rhs) const
 
 float4 float4::Perpendicular3(const float3 &hint, const float3 &hint2) const
 {
-	assume(!this->IsZero3());
-	assume(EqualAbs(w, 0));
-	assume(hint.IsNormalized());
-	assume(hint2.IsNormalized());
+	mgl_assume(!this->IsZero3());
+	mgl_assume(EqualAbs(w, 0));
+	mgl_assume(hint.IsNormalized());
+	mgl_assume(hint2.IsNormalized());
 	float3 perp = this->Cross3(hint).xyz();
 	float len = perp.Normalize();
 	if (len == 0)
@@ -883,10 +883,10 @@ float4 float4::Perpendicular3(const float3 &hint, const float3 &hint2) const
 
 float4 float4::Perpendicular(const float4 &hint, const float4 &hint2) const
 {
-	assume(!this->IsZero3());
-	assume(EqualAbs(w, 0));
-	assume(hint.IsNormalized());
-	assume(hint2.IsNormalized());
+	mgl_assume(!this->IsZero3());
+	mgl_assume(EqualAbs(w, 0));
+	mgl_assume(hint.IsNormalized());
+	mgl_assume(hint2.IsNormalized());
 	float4 perp = this->Cross(hint);
 	float len = perp.Normalize();
 	if (len == 0)
@@ -930,15 +930,15 @@ float4 float4::RandomPerpendicular(LCG &rng) const
 
 float4 float4::Reflect3(const float3 &normal) const
 {
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
-	assume(EqualAbs(w, 0));
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume(EqualAbs(w, 0));
 	return 2.f * this->ProjectToNorm3(normal) - *this;
 }
 
 float4 float4::Reflect(const float4 &normal) const
 {
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
-	assume(EqualAbs(w, 0));
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume(EqualAbs(w, 0));
 	return 2.f * this->ProjectToNorm(normal) - *this;
 }
 
@@ -967,8 +967,8 @@ float float4::AngleBetween3(const float4 &other) const
 
 float float4::AngleBetweenNorm3(const float4 &other) const
 {
-	assume(this->IsNormalized3());
-	assume(other.IsNormalized3());
+	mgl_assume(this->IsNormalized3());
+	mgl_assume(other.IsNormalized3());
 	return acos(Dot3(other));
 }
 
@@ -985,36 +985,36 @@ float float4::AngleBetween4(const float4 &other) const
 
 float float4::AngleBetweenNorm4(const float4 &other) const
 {
-	assume(this->IsNormalized4());
-	assume(other.IsNormalized4());
+	mgl_assume(this->IsNormalized4());
+	mgl_assume(other.IsNormalized4());
 	return acos(Dot4(other));
 }
 
 float4 float4::ProjectTo3(const float3 &target) const
 {
-	assume(!target.IsZero());
-	assume(this->IsWZeroOrOne());
+	mgl_assume(!target.IsZero());
+	mgl_assume(this->IsWZeroOrOne());
 	return float4(target * MATH_NS::Dot(xyz(), target) / target.LengthSq(), w);
 }
 
 float4 float4::ProjectTo(const float4 &target) const
 {
-	assume(!target.IsZero());
-	assume(this->IsWZeroOrOne());
+	mgl_assume(!target.IsZero());
+	mgl_assume(this->IsWZeroOrOne());
 	return target * (this->Dot(target) / target.LengthSq());
 }
 
 float4 float4::ProjectToNorm3(const float3 &target) const
 {
-	assume(target.IsNormalized());
-	assume(this->IsWZeroOrOne());
+	mgl_assume(target.IsNormalized());
+	mgl_assume(this->IsWZeroOrOne());
 	return float4(target * MATH_NS::Dot(xyz(), target), w);
 }
 
 float4 float4::ProjectToNorm(const float4 &target) const
 {
-	assume(target.IsNormalized());
-	assume(this->IsWZeroOrOne());
+	mgl_assume(target.IsNormalized());
+	mgl_assume(this->IsWZeroOrOne());
 	return target * this->Dot(target);
 }
 
@@ -1025,8 +1025,8 @@ bool MUST_USE_RESULT float4::AreCollinear(const float4 &p1, const float4 &p2, co
 
 float4 float4::Lerp(const float4 &b, float t) const
 {
-	assume(EqualAbs(this->w, b.w));
-	assume(0.f <= t && t <= 1.f);
+	mgl_assume(EqualAbs(this->w, b.w));
+	mgl_assume(0.f <= t && t <= 1.f);
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
 	return vec4_lerp(v, b.v, t);
 #else
@@ -1053,8 +1053,8 @@ bool MUST_USE_RESULT float4::AreOrthogonal(const float4 &a, const float4 &b, con
 
 void float4::Orthonormalize(float4 &a, float4 &b)
 {
-	assume(!a.IsZero());
-	assume(!b.IsZero());
+	mgl_assume(!a.IsZero());
+	mgl_assume(!b.IsZero());
 	a.Normalize();
 	b -= b.ProjectToNorm(a);
 	b.Normalize();
@@ -1062,14 +1062,14 @@ void float4::Orthonormalize(float4 &a, float4 &b)
 
 void float4::Orthonormalize(float4 &a, float4 &b, float4 &c)
 {
-	assume(!a.IsZero());
+	mgl_assume(!a.IsZero());
 	a.Normalize();
 	b -= b.ProjectToNorm(a);
-	assume(!b.IsZero());
+	mgl_assume(!b.IsZero());
 	b.Normalize();
 	c -= c.ProjectToNorm(a);
 	c -= c.ProjectToNorm(b);
-	assume(!c.IsZero());
+	mgl_assume(!c.IsZero());
 	c.Normalize();
 }
 
@@ -1213,7 +1213,7 @@ float3 float4::ToSphericalCoordinates() const
 
 float2 float4::ToSphericalCoordinatesNormalized() const
 {
-	assume(IsNormalized());
+	mgl_assume(IsNormalized());
 	float azimuth = atan2(x, z);
 	float inclination = asin(-y);
 	return float2(azimuth, inclination);
