@@ -7,6 +7,7 @@
 #include "TestRunner.h"
 #include "TestData.h"
 #include "../src/Math/SSEMath.h"
+#include "../src/Math/simd.h"
 #include "../src/Math/float4x4_sse.h"
 #include "../src/Math/float4_neon.h"
 
@@ -17,6 +18,39 @@ BENCHMARK(float4_op_add, "float4 + float4")
 	v3[i] = v[i] + v2[i];
 }
 BENCHMARK_END;
+
+UNIQUE_TEST(set_ps_neg_zero)
+{
+	simd4f constant = set1_ps(-0.f);
+	u32 arr[4];
+	memcpy(arr, &constant, sizeof(arr));
+	asserteq(arr[0], 0x80000000u);
+	asserteq(arr[1], 0x80000000u);
+	asserteq(arr[2], 0x80000000u);
+	asserteq(arr[3], 0x80000000u);
+}
+
+UNIQUE_TEST(set_ps_const_vec)
+{
+	simd4f constant = set_ps_const(4.f, 3.f, 2.f, 1.f);
+	float arr[4];
+	memcpy(arr, &constant, sizeof(arr));
+	asserteq(arr[0], 1.f);
+	asserteq(arr[1], 2.f);
+	asserteq(arr[2], 3.f);
+	asserteq(arr[3], 4.f);
+}
+
+UNIQUE_TEST(set_ps_const_hex)
+{
+	simd4f constant = set_ps_hex_const(0x80000000u, 0x3F800000u /*1.0f*/, 0x42C80000u /*100.0f*/, 0);
+	float arr[4];
+	memcpy(arr, &constant, sizeof(arr));
+	asserteq(arr[0], 0.f);
+	asserteq(arr[1], 100.f);
+	asserteq(arr[2], 1.0f);
+	asserteq(arr[3], -0.0f);
+}
 
 #ifdef MATH_NEON
 
@@ -38,28 +72,6 @@ BENCHMARK(rsqrt, "neon")
 	v3[i] = vcombine_f32(ret, hi);
 }
 BENCHMARK_END
-
-UNIQUE_TEST(set_ps_const)
-{
-	simd4f constant = set_ps_const(4.f, 3.f, 2.f, 1.f);
-	float arr[4];
-	memcpy(arr, &constant, sizeof(arr));
-	asserteq(arr[0], 1.f);
-	asserteq(arr[1], 2.f);
-	asserteq(arr[2], 3.f);
-	asserteq(arr[3], 4.f);
-}
-
-UNIQUE_TEST(set_ps_const_hex)
-{
-	simd4f constant = set_ps_hex_const(0x80000000u, 0x3F800000u /*1.0f*/, 0x42C80000u /*100.0f*/, 0);
-	float arr[4];
-	memcpy(arr, &constant, sizeof(arr));
-	asserteq(arr[0], 0.f);
-	asserteq(arr[1], 100.f);
-	asserteq(arr[2], 1.0f);
-	asserteq(arr[3], -0.0f);
-}
 
 #ifdef ANDROID
 
