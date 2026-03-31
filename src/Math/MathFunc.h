@@ -213,9 +213,13 @@ float Frac(float x);
 FORCE_INLINE float Sqrt(float x)
 {
 #ifdef MATH_NEON
-	float result;
-	asm("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
-	return result;
+	#if defined(_M_ARM64) || defined(_M_ARM64EC)
+		return vget_lane_f32(vsqrt_f32(vdup_n_f32(x)), 0);
+	#else
+		float result;
+		asm("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
+		return result;
+	#endif
 #elif defined(MATH_SSE)
 	return s4f_x(_mm_sqrt_ss(setx_ps(x)));
 #else
@@ -227,9 +231,13 @@ FORCE_INLINE float Sqrt(float x)
 FORCE_INLINE float SqrtFast(float x)
 {
 #ifdef MATH_NEON
-	float result;
-	asm("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
-	return result;
+	#if defined(_M_ARM64) || defined(_M_ARM64EC)
+		return vget_lane_f32(vsqrt_f32(vdup_n_f32(x)), 0);
+	#else
+		float result;
+		asm("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
+		return result;
+	#endif
 #elif defined(MATH_SSE)
 	simd4f X = setx_ps(x);
 	return s4f_x(_mm_mul_ss(X, _mm_rsqrt_ss(X)));
