@@ -110,8 +110,8 @@ void OBB::SetFrom(const AABB &aabb)
 template<typename Matrix>
 void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 {
-	assume1(m.IsColOrthogonal(), m); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
-	assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
+	mgl_assume1(m.IsColOrthogonal(), m); // We cannot convert transform an AABB to OBB if it gets sheared in the process.
+	mgl_assume(m.HasUniformScale()); // Nonuniform scale will produce shear as well.
 	obb.pos = m.MulPos(aabb.CenterPoint());
 	obb.r = aabb.HalfSize();
 	obb.axis[0] = DIR_VEC(m.Col(0));
@@ -127,15 +127,15 @@ void OBBSetFrom(OBB &obb, const AABB &aabb, const Matrix &m)
 	obb.axis[1] *= matrixScale;
 	obb.axis[2] *= matrixScale;
 
-//	mathassert(vec::AreOrthogonal(obb.axis[0], obb.axis[1], obb.axis[2]));
-//	mathassert(vec::AreOrthonormal(obb.axis[0], obb.axis[1], obb.axis[2]));
+//	mgl_mathassert(vec::AreOrthogonal(obb.axis[0], obb.axis[1], obb.axis[2]));
+//	mgl_mathassert(vec::AreOrthonormal(obb.axis[0], obb.axis[1], obb.axis[2]));
 	///@todo Would like to simply do the above, but instead numerical stability requires to do the following:
 	vec::Orthonormalize(obb.axis[0], obb.axis[1], obb.axis[2]);
 }
 
 void OBB::SetFrom(const AABB &aabb, const float3x3 &transform)
 {
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.IsColOrthogonal());
 	OBBSetFrom(*this, aabb, transform);
 }
 
@@ -146,7 +146,7 @@ void OBB::SetFrom(const AABB &aabb, const float3x4 &transform)
 
 void OBB::SetFrom(const AABB &aabb, const float4x4 &transform)
 {
-	assume(transform.Row(3).Equals(0,0,0,1));
+	mgl_assume(transform.Row(3).Equals(0,0,0,1));
 	OBBSetFrom(*this, aabb, transform.Float3x4Part());
 }
 
@@ -237,7 +237,7 @@ AABB OBB::MaximalContainedAABB() const
 #else
 #warning OBB::MaximalContainedAABB not implemented!
 #endif
-	assume(false && "OBB::MaximalContainedAABB not implemented!"); /// @todo Implement.
+	mgl_assume(false && "OBB::MaximalContainedAABB not implemented!"); /// @todo Implement.
 	return AABB();
 }
 #endif
@@ -275,9 +275,9 @@ vec OBB::CenterPoint() const
 
 vec OBB::PointInside(float x, float y, float z) const
 {
-	assume(0.f <= x && x <= 1.f);
-	assume(0.f <= y && y <= 1.f);
-	assume(0.f <= z && z <= 1.f);
+	mgl_assume(0.f <= x && x <= 1.f);
+	mgl_assume(0.f <= y && y <= 1.f);
+	mgl_assume(0.f <= z && z <= 1.f);
 
 	return pos + axis[0] * (2.f * r.x * x - r.x)
 			   + axis[1] * (2.f * r.y * y - r.y)
@@ -286,7 +286,7 @@ vec OBB::PointInside(float x, float y, float z) const
 
 LineSegment OBB::Edge(int edgeIndex) const
 {
-	assume(0 <= edgeIndex && edgeIndex <= 11);
+	mgl_assume(0 <= edgeIndex && edgeIndex <= 11);
 	switch(edgeIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -307,7 +307,7 @@ LineSegment OBB::Edge(int edgeIndex) const
 
 vec OBB::CornerPoint(int cornerIndex) const
 {	
-	assume(0 <= cornerIndex && cornerIndex <= 7);
+	mgl_assume(0 <= cornerIndex && cornerIndex <= 7);
 	switch(cornerIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -366,8 +366,8 @@ int OBB::UniqueEdgeDirections(vec *out) const
 
 vec OBB::PointOnEdge(int edgeIndex, float u) const
 {
-	assume(0 <= edgeIndex && edgeIndex <= 11);
-	assume(0 <= u && u <= 1.f);
+	mgl_assume(0 <= edgeIndex && edgeIndex <= 11);
+	mgl_assume(0 <= u && u <= 1.f);
 
 	edgeIndex = Clamp(edgeIndex, 0, 11);
 	vec d = axis[edgeIndex/4] * (2.f * u - 1.f) * r[edgeIndex/4];
@@ -393,7 +393,7 @@ vec OBB::PointOnEdge(int edgeIndex, float u) const
 
 vec OBB::FaceCenterPoint(int faceIndex) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
 
 	switch(faceIndex)
 	{
@@ -409,9 +409,9 @@ vec OBB::FaceCenterPoint(int faceIndex) const
 
 vec OBB::FacePoint(int faceIndex, float u, float v) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
-	assume(0 <= u && u <= 1.f);
-	assume(0 <= v && v <= 1.f);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= u && u <= 1.f);
+	mgl_assume(0 <= v && v <= 1.f);
 
 	int uIdx = faceIndex/2;
 	int vIdx = (faceIndex/2 + 1) % 3;
@@ -431,7 +431,7 @@ vec OBB::FacePoint(int faceIndex, float u, float v) const
 
 Plane OBB::FacePlane(int faceIndex) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
 	switch(faceIndex)
 	{
 	default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -446,14 +446,14 @@ Plane OBB::FacePlane(int faceIndex) const
 
 void OBB::GetCornerPoints(vec *outPointArray) const
 {
-	assume(outPointArray);
+	mgl_assume(outPointArray);
 	for(int i = 0; i < 8; ++i)
 		outPointArray[i] = CornerPoint(i);
 }
 
 void OBB::GetFacePlanes(Plane *outPlaneArray) const
 {
-	assume(outPlaneArray);
+	mgl_assume(outPlaneArray);
 	for(int i = 0; i < 6; ++i)
 		outPlaneArray[i] = FacePlane(i);
 }
@@ -461,7 +461,7 @@ void OBB::GetFacePlanes(Plane *outPlaneArray) const
 /// See Christer Ericson's book Real-Time Collision Detection, page 83.
 void OBB::ExtremePointsAlongDirection(const vec &dir, const vec *pointArray, int numPoints, int &idxSmallest, int &idxLargest, float &smallestD, float &largestD)
 {
-	assume(pointArray || numPoints == 0);
+	mgl_assume(pointArray || numPoints == 0);
 
 	idxSmallest = idxLargest = 0;
 
@@ -500,14 +500,14 @@ OBB SmallestOBBVolumeOneEdgeFixed(const vec &edge, const vec *pointArray, int nu
 	float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
 	vec basisU = uDir.x * u + uDir.y * v;
 	vec basisV = vDir.x * u + vDir.y * v;
-	assume2(basisU.IsPerpendicular(basisV), basisU, basisV);
+	mgl_assume2(basisU.IsPerpendicular(basisV), basisU, basisV);
 	return OBB::FixedOrientationEnclosingOBB(pointArray, numPoints, basisU, basisV);
 }
 
 float SmallestOBBVolumeJiggle(const vec &edge_, const vec *pointArray, int numPoints, std::vector<float2> &pts,
 	vec &outEdgeA, vec &outEdgeB)
 {
-	assume(numPoints >= 3);
+	mgl_assume(numPoints >= 3);
 	vec edge = edge_;
 	int numTimesNotImproved = 0;
 	float bestVolume = FLOAT_INF;
@@ -531,9 +531,9 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const vec *pointArray, int numPo
 		float minU, maxU, minV, maxV;
 
 		float2::MinAreaRectInPlace(&pts[0], (int)pts.size(), rectCenter, uDir, vDir, minU, maxU, minV, maxV);
-		assume(uDir.IsNormalized());
-		assume(vDir.IsNormalized());
-		assume(uDir.IsPerpendicular(vDir));
+		mgl_assume(uDir.IsNormalized());
+		mgl_assume(vDir.IsNormalized());
+		mgl_assume(uDir.IsPerpendicular(vDir));
 		float2 c10 = (maxV - minV) * vDir;
 		float2 c20 = (maxU - minU) * uDir;
 
@@ -546,16 +546,16 @@ float SmallestOBBVolumeJiggle(const vec &edge_, const vec *pointArray, int numPo
 		{
 			bestVolume = volume;
 			edgeFirstChoice = (uDir.x*u + uDir.y*v);
-			assume(edgeFirstChoice.IsPerpendicular(edge));
+			mgl_assume(edgeFirstChoice.IsPerpendicular(edge));
 			float len = edgeFirstChoice.Normalize();
-			assert(len > 0.f);
+			mgl_assert(len > 0.f);
 
 			edgeSecondChoice = (vDir.x*u + vDir.y*v);
 			len = edgeSecondChoice.Normalize();
-			assert(len > 0.f);
+			mgl_assert(len > 0.f);
 
-			assume3(edgeSecondChoice.IsPerpendicular(edge), edgeSecondChoice, edge, edgeSecondChoice.Dot(edge));
-			assume3(edgeSecondChoice.IsPerpendicular(edgeFirstChoice), edgeSecondChoice, edgeFirstChoice, edgeSecondChoice.Dot(edgeFirstChoice));
+			mgl_assume3(edgeSecondChoice.IsPerpendicular(edge), edgeSecondChoice, edge, edgeSecondChoice.Dot(edge));
+			mgl_assume3(edgeSecondChoice.IsPerpendicular(edgeFirstChoice), edgeSecondChoice, edgeFirstChoice, edgeSecondChoice.Dot(edgeFirstChoice));
 			outEdgeA = edge;
 			outEdgeB = edge = edgeFirstChoice;
 			numTimesNotImproved = 0;
@@ -834,8 +834,8 @@ bool AreCompatibleOpposingEdges(const vec &f1a, const vec &f1b, const vec &f2a, 
 
 OBB OBB::OptimalEnclosingOBB(const vec *pointArray, int numPoints)
 {
-	assert(pointArray);
-	assert(numPoints >= 0);
+	mgl_assert(pointArray);
+	mgl_assert(numPoints >= 0);
 
 	// Precomputation: Generate the convex hull of the input point set. This is because
 	// we need vertex-edge-face connectivity information about the convex hull shape, and
@@ -975,10 +975,10 @@ void FORCE_INLINE TestThreeAdjacentFaces(const vec &n1, const vec &n2, const vec
 		minOBB->r[1] = (maxN2 - minN2) * 0.5f;
 		minOBB->r[2] = (maxN3 - minN3) * 0.5f;
 		minOBB->pos = (minN1 + minOBB->r[0])*n1 + (minN2 + minOBB->r[1])*n2 + (minN3 + minOBB->r[2])*n3;
-		assert(volume > 0.f);
+		mgl_assert(volume > 0.f);
 #ifdef OBB_ASSERT_VALIDITY
 		OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB->axis[0], minOBB->axis[1]);
-		assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+		mgl_assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
 #endif
 		*minVolume = volume;
 	}
@@ -1802,7 +1802,7 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 						minOBB.r[2] = (maxN3 - minN3) * 0.5f;
 #ifdef OBB_ASSERT_VALIDITY
 						OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
-						assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+						mgl_assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
 #endif
 						minVolume = volume;
 					}
@@ -1939,10 +1939,10 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 					minOBB.r[0] = (maxN1 - minN1) * 0.5f;
 					minOBB.r[1] = (maxN2 - minN2) * 0.5f;
 					minOBB.r[2] = (maxN3 - minN3) * 0.5f;
-					assert(volume > 0.f);
+					mgl_assert(volume > 0.f);
 #ifdef OBB_ASSERT_VALIDITY
 					OBB o = OBB::FixedOrientationEnclosingOBB((const vec*)&convexHull.v[0], convexHull.v.size(), minOBB.axis[0], minOBB.axis[1]);
-					assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
+					mgl_assert2(EqualRel(o.Volume(), volume), o.Volume(), volume);
 #endif
 					minVolume = volume;
 				}
@@ -1969,9 +1969,9 @@ OBB OBB::OptimalEnclosingOBB(const Polyhedron &convexHull)
 
 OBB OBB::FixedOrientationEnclosingOBB(const vec *pointArray, int numPoints, const vec &dir0, const vec &dir1)
 {
-	assume(dir0.IsNormalized());
-	assume(dir1.IsNormalized());
-	assume(dir0.IsPerpendicular(dir1));
+	mgl_assume(dir0.IsNormalized());
+	mgl_assume(dir1.IsNormalized());
+	mgl_assume(dir0.IsPerpendicular(dir1));
 
 	int d0, d1;
 	float mind0, maxd0, mind1, maxd1, mind2, maxd2;
@@ -2042,7 +2042,7 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 			float fz = Sqrt(1.0f - lenSq);
 
 			vec edge = DIR_VEC(fx, fy, fz);
-			assert(edge.IsNormalized());
+			mgl_assert(edge.IsNormalized());
 
 			vec edgeA, edgeB;
 			float volume = SmallestOBBVolumeJiggle(edge, (const vec*)&convexPolyhedron.v[0], (int)convexPolyhedron.v.size(), pts, /*adjacencyData, floodFillVisited, floodFillVisitColor,*/
@@ -2050,7 +2050,7 @@ OBB OBB::BruteEnclosingOBB(const Polyhedron &convexPolyhedron)
 
 			if (volume < minVolume)
 			{
-				assert3(edgeA.IsPerpendicular(edgeB), edgeA, edgeB, edgeA.Dot(edgeB));
+				mgl_assert3(edgeA.IsPerpendicular(edgeB), edgeA, edgeB, edgeA.Dot(edgeB));
 				minVolumeEdgeA = edgeA;
 				minVolumeEdgeB = edgeB;
 				minVolume = volume;
@@ -2243,21 +2243,21 @@ float3x4 OBB::LocalToWorld() const
 	return m;
 	*/
 
-	assume2(axis[0].IsNormalized(), axis[0], axis[0].LengthSq());
-	assume2(axis[1].IsNormalized(), axis[1], axis[1].LengthSq());
-	assume2(axis[2].IsNormalized(), axis[2], axis[2].LengthSq());
+	mgl_assume2(axis[0].IsNormalized(), axis[0], axis[0].LengthSq());
+	mgl_assume2(axis[1].IsNormalized(), axis[1], axis[1].LengthSq());
+	mgl_assume2(axis[2].IsNormalized(), axis[2], axis[2].LengthSq());
 	float3x4 m; ///\todo sse-matrix
 	m.SetCol(0, axis[0].ptr());
 	m.SetCol(1, axis[1].ptr());
 	m.SetCol(2, axis[2].ptr());
 	vec p = pos - axis[0] * r.x - axis[1] * r.y - axis[2] * r.z;
 	m.SetCol(3, p.ptr());
-	assume1(m.Row3(0).IsNormalized(), m.Row3(0));
-	assume1(m.Row3(1).IsNormalized(), m.Row3(1));
-	assume1(m.Row3(2).IsNormalized(), m.Row3(2));
-	assume3(m.Col(0).IsPerpendicular(m.Col(1)), m.Col(0), m.Col(1), m.Col(0).Dot(m.Col(1)));
-	assume3(m.Col(0).IsPerpendicular(m.Col(2)), m.Col(0), m.Col(2), m.Col(0).Dot(m.Col(2)));
-	assume3(m.Col(1).IsPerpendicular(m.Col(2)), m.Col(1), m.Col(2), m.Col(1).Dot(m.Col(2)));
+	mgl_assume1(m.Row3(0).IsNormalized(), m.Row3(0));
+	mgl_assume1(m.Row3(1).IsNormalized(), m.Row3(1));
+	mgl_assume1(m.Row3(2).IsNormalized(), m.Row3(2));
+	mgl_assume3(m.Col(0).IsPerpendicular(m.Col(1)), m.Col(0), m.Col(1), m.Col(0).Dot(m.Col(1)));
+	mgl_assume3(m.Col(0).IsPerpendicular(m.Col(2)), m.Col(0), m.Col(2), m.Col(0).Dot(m.Col(2)));
+	mgl_assume3(m.Col(1).IsPerpendicular(m.Col(2)), m.Col(1), m.Col(2), m.Col(1).Dot(m.Col(2)));
 	return m;
 }
 
@@ -2357,19 +2357,19 @@ void OBBTransform(OBB &o, const Matrix &transform)
 
 void OBB::Transform(const float3x3 &transform)
 {
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.IsColOrthogonal());
 	OBBTransform(*this, transform);
 }
 
 void OBB::Transform(const float3x4 &transform)
 {
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.IsColOrthogonal());
 	OBBTransform(*this, transform);
 }
 
 void OBB::Transform(const float4x4 &transform)
 {
-	assume(transform.IsColOrthogonal3());
+	mgl_assume(transform.IsColOrthogonal3());
 	OBBTransform(*this, transform);
 }
 
@@ -2467,7 +2467,7 @@ bool OBB::Contains(const Frustum &frustum) const
 
 bool OBB::Contains(const Polyhedron &polyhedron) const
 {
-	assume(polyhedron.IsClosed());
+	mgl_assume(polyhedron.IsClosed());
 	for(int i = 0; i < polyhedron.NumVertices(); ++i)
 		if (!Contains(polyhedron.Vertex(i)))
 			return false;
@@ -2485,7 +2485,7 @@ void OBB::Enclose(const vec &point)
 	vec p = point - pos;
 	for(int i = 0; i < 3; ++i)
 	{
-		assume2(EqualAbs(axis[i].Length(), 1.f), axis[i], axis[i].Length());
+		mgl_assume2(EqualAbs(axis[i].Length(), 1.f), axis[i], axis[i].Length());
 		float dist = p.Dot(axis[i]);
 		float distanceFromOBB = Abs(dist) - r[i];
 		if (distanceFromOBB > 0.f)
@@ -2498,11 +2498,11 @@ void OBB::Enclose(const vec &point)
 
 			p = point-pos; ///\todo Can we omit this? (redundant since axis[i] are orthonormal?)
 
-			mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i], 1e-1f));
+			mgl_mathassert(EqualAbs(Abs(p.Dot(axis[i])), r[i], 1e-1f));
 		}
 	}
 	// Should now contain the point.
-	assume2(Distance(point) <= 1e-3f, point, Distance(point));
+	mgl_assume2(Distance(point) <= 1e-3f, point, Distance(point));
 }
 
 void OBB::Triangulate(int x, int y, int z, vec *outPos, vec *outNormal, float2 *outUV, bool ccwIsFrontFacing) const
@@ -2510,14 +2510,14 @@ void OBB::Triangulate(int x, int y, int z, vec *outPos, vec *outNormal, float2 *
 	AABB aabb(POINT_VEC_SCALAR(0), r*2.f);
 	aabb.Triangulate(x, y, z, outPos, outNormal, outUV, ccwIsFrontFacing);
 	float3x4 localToWorld = LocalToWorld();
-	assume(localToWorld.HasUnitaryScale()); // Transforming of normals will fail otherwise.
+	mgl_assume(localToWorld.HasUnitaryScale()); // Transforming of normals will fail otherwise.
 	localToWorld.BatchTransformPos(outPos, NumVerticesInTriangulation(x,y,z), sizeof(vec));
 	localToWorld.BatchTransformDir(outNormal, NumVerticesInTriangulation(x,y,z), sizeof(vec));
 }
 
 void OBB::ToEdgeList(vec *outPos) const
 {
-	assume(outPos);
+	mgl_assume(outPos);
 	if (!outPos)
 		return;
 	for(int i = 0; i < 12; ++i)
@@ -2530,10 +2530,10 @@ void OBB::ToEdgeList(vec *outPos) const
 
 bool OBB::Intersects(const OBB &b, float epsilon) const
 {
-	assume(pos.IsFinite());
-	assume(b.pos.IsFinite());
-	assume(vec::AreOrthogonal(axis[0], axis[1], axis[2]));
-	assume(vec::AreOrthogonal(b.axis[0], b.axis[1], b.axis[2]));
+	mgl_assume(pos.IsFinite());
+	mgl_assume(b.pos.IsFinite());
+	mgl_assume(vec::AreOrthogonal(axis[0], axis[1], axis[2]));
+	mgl_assume(vec::AreOrthogonal(b.axis[0], b.axis[1], b.axis[2]));
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// SSE4.1:
@@ -2844,7 +2844,7 @@ std::ostream &operator <<(std::ostream &o, const OBB &obb)
 
 OBB OBB::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return OBB(vec::nan, vec::nan, vec::nan, vec::nan, vec::nan);
 	OBB o;

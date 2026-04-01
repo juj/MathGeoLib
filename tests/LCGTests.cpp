@@ -14,7 +14,7 @@ RANDOMIZED_TEST(LCG_IntFast)
 	for(int i = 0; i < 1000; ++i)
 	{
 		u32 next = lcg.IntFast();
-		assert(next != prev);
+		mgl_assert(next != prev);
 		MARK_UNUSED(prev);
 		MARK_UNUSED(next);
 		prev = next;
@@ -24,18 +24,18 @@ RANDOMIZED_TEST(LCG_IntFast)
 RANDOMIZED_TEST(LCG_Int)
 {
 	LCG lcg;
-	assert4((lcg.lastNumber != 0 || lcg.increment != 0) && "Default-seeded LCG should be functional!", lcg.lastNumber, lcg.increment, lcg.multiplier, lcg.modulus);
+	mgl_assert4((lcg.lastNumber != 0 || lcg.increment != 0) && "Default-seeded LCG should be functional!", lcg.lastNumber, lcg.increment, lcg.multiplier, lcg.modulus);
 	bool allEqual = true;
 	for(int i = 0; i < 1000; ++i)
 	{
 		int prev = lcg.Int();
 		int next = lcg.Int();
-		assert4(prev != 0 || next != 0, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
+		mgl_assert4(prev != 0 || next != 0, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		MARK_UNUSED(allEqual);
 		if (prev != next)
 			allEqual = false;
 	}
-	assert(!allEqual);
+	mgl_assert(!allEqual);
 }
 
 RANDOMIZED_TEST(LCG_Int_A_B)
@@ -48,8 +48,8 @@ RANDOMIZED_TEST(LCG_Int_A_B)
 		if (b < a)
 			Swap(a, b);
 		int val = lcg.Int(a, b);
-		assert(a <= val);
-		assert(val <= b);
+		mgl_assert(a <= val);
+		mgl_assert(val <= b);
 		MARK_UNUSED(a);
 		MARK_UNUSED(b);
 		MARK_UNUSED(val);
@@ -64,15 +64,15 @@ RANDOMIZED_TEST(LCG_Float)
 	{
 		float f = lcg.Float();
 		float f2 = lcg.Float();
-		assert1(f < 1.f, f);
-		assert1(f >= 0.f, f);
-		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
+		mgl_assert1(f < 1.f, f);
+		mgl_assert1(f >= 0.f, f);
+		mgl_assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		MARK_UNUSED(f);
 		MARK_UNUSED(f2);
 		if (f != f2)
 			allEqual = false;
 	}
-	assert(!allEqual);
+	mgl_assert(!allEqual);
 	MARK_UNUSED(allEqual);
 }
 
@@ -84,13 +84,13 @@ RANDOMIZED_TEST(LCG_Float01Incl)
 	{
 		float f = lcg.Float01Incl();
 		float f2 = lcg.Float01Incl();
-		assert(f <= 1.f);
-		assert(f >= 0.f);
-		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
+		mgl_assert(f <= 1.f);
+		mgl_assert(f >= 0.f);
+		mgl_assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		if (f != f2)
 			allEqual = false;
 	}
-	assert(!allEqual);
+	mgl_assert(!allEqual);
 	MARK_UNUSED(allEqual);
 }
 
@@ -102,13 +102,13 @@ RANDOMIZED_TEST(LCG_FloatNeg1_1)
 	{
 		float f = lcg.FloatNeg1_1();
 		float f2 = lcg.FloatNeg1_1();
-		assert1(f < 1.f, f);
-		assert1(f > -1.f, f);
-		assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
+		mgl_assert1(f < 1.f, f);
+		mgl_assert1(f > -1.f, f);
+		mgl_assert4(f != 0.f || f2 != 0.f, lcg.multiplier, lcg.increment, lcg.modulus, lcg.lastNumber);
 		if (f != f2)
 			allEqual = false;
 	}
-	assert(!allEqual);
+	mgl_assert(!allEqual);
 	MARK_UNUSED(allEqual);
 }
 
@@ -125,8 +125,8 @@ RANDOMIZED_TEST(LCG_Float_A_B)
 			Swap(a, b);
 
 		float f = lcg.Float(a, b);
-		assert2(a <= f, a, b);
-		assert2(f < b, f, b);
+		mgl_assert2(a <= f, a, b);
+		mgl_assert2(f < b, f, b);
 	}
 }
 
@@ -141,8 +141,8 @@ RANDOMIZED_TEST(LCG_Float_A_B_Incl)
 			Swap(a, b);
 
 		float f = lcg.FloatIncl(a, b);
-		assert2(a <= f, a, b);
-		assert2(f <= b, f, b);
+		mgl_assert2(a <= f, a, b);
+		mgl_assert2(f <= b, f, b);
 	}
 }
 

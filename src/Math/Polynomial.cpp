@@ -48,7 +48,7 @@ int Polynomial::SolveCubic(float /*a*/, float /*b*/, float /*c*/, float /*d*/, f
 #else
 #warning Polynomial::SolveCubic not implemented!
 #endif
-	assume(false && "Polynomial::SolveCubic not implemented!"); /// @todo Implement.
+	mgl_assume(false && "Polynomial::SolveCubic not implemented!"); /// @todo Implement.
 	return 0;
 }
 
@@ -59,7 +59,7 @@ int Polynomial::SolveQuartic(float /*a*/, float /*b*/, float /*c*/, float /*d*/,
 #else
 #warning Polynomial::SolveQuartic not implemented!
 #endif
-	assume(false && "Polynomial::SolveQuartic not implemented!"); /// @todo Implement.
+	mgl_assume(false && "Polynomial::SolveQuartic not implemented!"); /// @todo Implement.
 	return 0;
 }
 #endif

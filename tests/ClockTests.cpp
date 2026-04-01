@@ -13,12 +13,12 @@ TEST(MonotonousClock)
 	{
 		tick_t now = Clock::Tick();
 		tick_t diff = Clock::TicksInBetween(now, prev);
-		assert(diff < Clock::TicksPerSec());
+		mgl_assert(diff < Clock::TicksPerSec());
 		prev = now;
 		maxDiff = Max(diff, maxDiff);
 	}
 
-	assert(maxDiff > 0); // The clock must proceed at least some amount.
+	mgl_assert(maxDiff > 0); // The clock must proceed at least some amount.
 }
 
 UNIQUE_TEST(ClockPrecision)
@@ -50,7 +50,7 @@ UNIQUE_TEST(SubMillisecondPrecision)
 	tick_t ticksPerMillisecond = Clock::TicksPerMillisecond();
 	MARK_UNUSED(ticksPerMillisecond);
 #ifndef MATH_TICK_IS_FLOAT
-	assert1(ticksPerMillisecond > 1, (u32)ticksPerMillisecond);
+	mgl_assert1(ticksPerMillisecond > 1, (u32)ticksPerMillisecond);
 #endif
 
 	tick_t minDiff = Clock::TicksPerSec();
@@ -69,10 +69,10 @@ UNIQUE_TEST(SubMillisecondPrecision)
 		prev = now;
 	}
 
-	LOGI("Smallest observed non-zero delta in Clock::Tick() is %d ticks. A zero delta was observed %d times (out of %d tests)", 
+	LOGI("Smallest observed non-zero delta in Clock::Tick() is %d ticks. A zero delta was observed %d times (out of %d tests)",
 		(int)minDiff, numTimesZeroDiff, numIters);
-	assert(minDiff > 0);
-	assert(minDiff < ticksPerMillisecond/2); // Smallest met quantity must be less than half a millisecond.
+	mgl_assert(minDiff > 0);
+	mgl_assert(minDiff < ticksPerMillisecond/2); // Smallest met quantity must be less than half a millisecond.
 }
 
 volatile tick_t dummyGlobalTicks = 0;

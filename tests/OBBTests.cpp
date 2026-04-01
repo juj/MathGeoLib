@@ -18,10 +18,10 @@ UNIQUE_TEST(OBB_ClosestPoint_Point)
 {
 	vec pt = POINT_VEC_SCALAR(0.f);
 	OBB o(pt, DIR_VEC(1.f, 1.f, 1.f), vec::unitX, vec::unitY, vec::unitZ);
-	assert(o.ClosestPoint(pt).Equals(pt));
-	assert(o.ClosestPoint(POINT_VEC(5.f, 0.f, 0.f)).Equals(POINT_VEC(1.f, 0.f, 0.f)));
-	assert(o.ClosestPoint(POINT_VEC(5.f, 5.f, 5.f)).Equals(POINT_VEC(1.f, 1.f, 1.f)));
-	assert(o.ClosestPoint(POINT_VEC(-5.f, -5.f, -5.f)).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
+	mgl_assert(o.ClosestPoint(pt).Equals(pt));
+	mgl_assert(o.ClosestPoint(POINT_VEC(5.f, 0.f, 0.f)).Equals(POINT_VEC(1.f, 0.f, 0.f)));
+	mgl_assert(o.ClosestPoint(POINT_VEC(5.f, 5.f, 5.f)).Equals(POINT_VEC(1.f, 1.f, 1.f)));
+	mgl_assert(o.ClosestPoint(POINT_VEC(-5.f, -5.f, -5.f)).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
 }
 
 // Programmatically found test case of two OBBs which by construction should be disjoint.
@@ -42,7 +42,7 @@ UNIQUE_TEST(OBB_NoIntersect_OBB_Case1)
 	b.axis[1] = DIR_VEC(0.44f, -0.23f, -0.87f);
 	b.axis[2] = DIR_VEC(-0.80f, -0.54f, -0.26f);
 
-	assert(!a.Intersects(b));
+	mgl_assert(!a.Intersects(b));
 }
 
 BENCHMARK(OBBIntersectsOBB_Random, "OBB::Intersects(OBB) Random")
@@ -113,16 +113,16 @@ RANDOMIZED_TEST(OBB_OptimalEnclosingOBB)
 	OBB o = OBB::OptimalEnclosingOBB(points, n);
 
 #ifdef MATH_VEC_IS_FLOAT4
-	assert(EqualAbs(o.pos.w, 1.f));
-	assert(EqualAbs(o.axis[0].w, 0.f));
-	assert(EqualAbs(o.axis[1].w, 0.f));
-	assert(EqualAbs(o.axis[2].w, 0.f));
-	assert(EqualAbs(o.r.w, 0.f));
+	mgl_assert(EqualAbs(o.pos.w, 1.f));
+	mgl_assert(EqualAbs(o.axis[0].w, 0.f));
+	mgl_assert(EqualAbs(o.axis[1].w, 0.f));
+	mgl_assert(EqualAbs(o.axis[2].w, 0.f));
+	mgl_assert(EqualAbs(o.r.w, 0.f));
 #endif
 	// Test that it does actually enclose the given points.
 	for(int i = 0; i < n; ++i)
-		assert1(o.Distance(points[i]) < 1e-3f, o.Distance(points[i]));
-		//assert2(o.Contains(points[i]), points[i], o.Distance(points[i]));
+		mgl_assert1(o.Distance(points[i]) < 1e-3f, o.Distance(points[i]));
+		//mgl_assert2(o.Contains(points[i]), points[i], o.Distance(points[i]));
 }
 
 // Tests that OBB::OptimalEnclosingOBB() works even if all points in the input set lie in a plane (degenerating into a 2D convex hull computation)
@@ -149,40 +149,40 @@ RANDOMIZED_TEST(OBB_OptimalEnclosingOBB_Degenerate2D)
 
 	// Compute the minimal OBB that encloses those points.
 	OBB optimalObb = OBB::OptimalEnclosingOBB(points, n);
-	assert(!optimalObb.IsDegenerate());
-	assert(optimalObb.LocalToWorld().IsOrthonormal());
+	mgl_assert(!optimalObb.IsDegenerate());
+	mgl_assert(optimalObb.LocalToWorld().IsOrthonormal());
 
 #ifdef MATH_VEC_IS_FLOAT4
-	assert(EqualAbs(optimalObb.pos.w, 1.f));
-	assert(EqualAbs(optimalObb.axis[0].w, 0.f));
-	assert(EqualAbs(optimalObb.axis[1].w, 0.f));
-	assert(EqualAbs(optimalObb.axis[2].w, 0.f));
-	assert(EqualAbs(optimalObb.r.w, 0.f));
+	mgl_assert(EqualAbs(optimalObb.pos.w, 1.f));
+	mgl_assert(EqualAbs(optimalObb.axis[0].w, 0.f));
+	mgl_assert(EqualAbs(optimalObb.axis[1].w, 0.f));
+	mgl_assert(EqualAbs(optimalObb.axis[2].w, 0.f));
+	mgl_assert(EqualAbs(optimalObb.r.w, 0.f));
 #endif
 
 	// Brute force compute a bounding box
 	OBB bruteObb = OBB::BruteEnclosingOBB(points, n);
-	assert(!bruteObb.IsDegenerate());
-	assert(bruteObb.LocalToWorld().IsOrthonormal());
+	mgl_assert(!bruteObb.IsDegenerate());
+	mgl_assert(bruteObb.LocalToWorld().IsOrthonormal());
 
 	// Test that both boxes actually enclose the given points.
 	for(int i = 0; i < n; ++i)
 	{
-		assert1(optimalObb.Distance(points[i]) < 1e-3f, optimalObb.Distance(points[i]));
-		assert1(bruteObb.Distance(points[i]) < 1e-3f, bruteObb.Distance(points[i]));
+		mgl_assert1(optimalObb.Distance(points[i]) < 1e-3f, optimalObb.Distance(points[i]));
+		mgl_assert1(bruteObb.Distance(points[i]) < 1e-3f, bruteObb.Distance(points[i]));
 	}
-		//assert2(o.Contains(points[i]), points[i], o.Distance(points[i]));
+		//mgl_assert2(o.Contains(points[i]), points[i], o.Distance(points[i]));
 
 	// Would like to assert that optimal OBB has smaller volume than brute-force computed OBB volume, but since
 	// the point sets are planar, the generated OBB should be practically flat, and volume should be zero. Therefore
 	// instead of asserting volume, assert that the surface area of the optimal box is smaller than that of the brute
 	// force OBB.
-//	assert4(optimalObb.Volume() <= bruteObb.Volume(), optimalObb, bruteObb, optimalObb.Volume(), bruteObb.Volume());
+//	mgl_assert4(optimalObb.Volume() <= bruteObb.Volume(), optimalObb, bruteObb, optimalObb.Volume(), bruteObb.Volume());
 
 #define MAX_SURFACE_AREA(v) Max(v.x*v.y, v.x*v.z, v.y*v.z)
 	float optimalSurfaceArea = MAX_SURFACE_AREA(optimalObb.r);
 	float bruteSurfaceArea = MAX_SURFACE_AREA(bruteObb.r);
-	assert4(optimalSurfaceArea <= bruteSurfaceArea + 1e-5f, optimalObb, bruteObb, optimalSurfaceArea, bruteSurfaceArea);
+	mgl_assert4(optimalSurfaceArea <= bruteSurfaceArea + 1e-5f, optimalObb, bruteObb, optimalSurfaceArea, bruteSurfaceArea);
 }
 
 UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case)
@@ -212,7 +212,7 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case)
 	OBB fastOBB = OBB::BruteEnclosingOBB(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(knownTightOBB.Distance(points[i]) < 1e-5f, knownTightOBB.Distance(points[i]));
+		mgl_assert1(knownTightOBB.Distance(points[i]) < 1e-5f, knownTightOBB.Distance(points[i]));
 	LOGI("Tight OBB Volume: %.9g", knownTightOBB.Volume());
 	for(int i = 0; i < 6; i += 2)
 		LOGI("Tight OBB normal: %s", knownTightOBB.FacePlane(i).normal.ToString().c_str());
@@ -224,9 +224,9 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case)
 	LOGI("Difference in angle: %.9g (%.9g degrees)", q.AngleBetween(q2), RadToDeg(q.AngleBetween(q2)));
 //	LOGI("%s", fastOBB.SerializeToCodeString().c_str());
 
-	assert(minOBB.Volume() <= knownTightOBB.Volume());
-	assert(fastOBB.Volume() <= knownTightOBB.Volume()*1.005 /* fastOBB is only an approximation, so allow small 0.5% wiggle room. */);
-	assert(minOBB.Volume() <= fastOBB.Volume());
+	mgl_assert(minOBB.Volume() <= knownTightOBB.Volume());
+	mgl_assert(fastOBB.Volume() <= knownTightOBB.Volume()*1.005 /* fastOBB is only an approximation, so allow small 0.5% wiggle room. */);
+	mgl_assert(minOBB.Volume() <= fastOBB.Volume());
 }
 
 UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case2)
@@ -250,7 +250,7 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case2)
 	OBB fastOBB = OBB::BruteEnclosingOBB(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(knownTightOBB.Distance(points[i]) < 1e-4f, knownTightOBB.Distance(points[i]));
+		mgl_assert1(knownTightOBB.Distance(points[i]) < 1e-4f, knownTightOBB.Distance(points[i]));
 	LOGI("Tight OBB Volume: %.9g", knownTightOBB.Volume());
 	for(int i = 0; i < 6; i += 2)
 		LOGI("Tight OBB normal: %s", knownTightOBB.FacePlane(i).normal.ToString().c_str());
@@ -262,8 +262,8 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case2)
 	LOGI("Difference in angle: %.9g (%.9g degrees)", q.AngleBetween(q2), RadToDeg(q.AngleBetween(q2)));
 //	LOGI("%s", fastOBB.SerializeToCodeString().c_str());
 
-	assert(minOBB.Volume() <= knownTightOBB.Volume());
-	assert(minOBB.Volume() <= fastOBB.Volume());
+	mgl_assert(minOBB.Volume() <= knownTightOBB.Volume());
+	mgl_assert(minOBB.Volume() <= fastOBB.Volume());
 }
 
 UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case3)
@@ -287,7 +287,7 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case3)
 	OBB fastOBB = OBB::BruteEnclosingOBB(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert1(knownTightOBB.Distance(points[i]) < 1e-4f, knownTightOBB.Distance(points[i]));
+		mgl_assert1(knownTightOBB.Distance(points[i]) < 1e-4f, knownTightOBB.Distance(points[i]));
 	LOGI("Tight OBB Volume: %.9g", knownTightOBB.Volume());
 	for(int i = 0; i < 6; i += 2)
 		LOGI("Tight OBB normal: %s", knownTightOBB.FacePlane(i).normal.ToString().c_str());
@@ -299,8 +299,8 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case3)
 	LOGI("Difference in angle: %.9g (%.9g degrees)", q.AngleBetween(q2), RadToDeg(q.AngleBetween(q2)));
 //	LOGI("%s", fastOBB.SerializeToCodeString().c_str());
 
-	assert(minOBB.Volume() <= knownTightOBB.Volume());
-//	assert(minOBB.Volume() <= fastOBB.Volume()); // TODO: Due to numerical imprecision, brute-forcing seems to jiggle itself to a tiny fraction better result than the minimally computed one
+	mgl_assert(minOBB.Volume() <= knownTightOBB.Volume());
+//	mgl_assert(minOBB.Volume() <= fastOBB.Volume()); // TODO: Due to numerical imprecision, brute-forcing seems to jiggle itself to a tiny fraction better result than the minimally computed one
 }
 
 UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case4)
@@ -316,18 +316,18 @@ UNIQUE_TEST(OBB_OptimalEnclosingOBB_Case4)
 
 	Polyhedron convexHull = Polyhedron::ConvexHull(points, n);
 	for(int i = 0; i < n; ++i)
-		assert3(convexHull.ContainsConvex(points[i]) || convexHull.Distance(points[i]) < 1e-4f, convexHull, points[i], convexHull.Distance(points[i]));
+		mgl_assert3(convexHull.ContainsConvex(points[i]) || convexHull.Distance(points[i]) < 1e-4f, convexHull, points[i], convexHull.Distance(points[i]));
 
 	OBB minOBB = OBB::OptimalEnclosingOBB(points, n);
 	OBB fastOBB = OBB::BruteEnclosingOBB(points, n);
 
 	for(int i = 0; i < n; ++i)
-		assert2(fastOBB.Distance(points[i]) < 1e-4f, i, fastOBB.Distance(points[i]));
+		mgl_assert2(fastOBB.Distance(points[i]) < 1e-4f, i, fastOBB.Distance(points[i]));
 
 	LOGI("Min OBB volume: %.9g", minOBB.Volume());
 	LOGI("fast OBB volume: %.9g", fastOBB.Volume());
 
-//	assert(minOBB.Volume() <= fastOBB.Volume()); // TODO: Due to numerical imprecision, brute-forcing seems to jiggle itself to a tiny fraction better result than the minimally computed one
+//	mgl_assert(minOBB.Volume() <= fastOBB.Volume()); // TODO: Due to numerical imprecision, brute-forcing seems to jiggle itself to a tiny fraction better result than the minimally computed one
 }
 
 

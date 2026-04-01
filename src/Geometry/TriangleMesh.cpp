@@ -316,10 +316,10 @@ void TriangleMesh::SetSoA4(const float *vertexData, int numTris, int vtxSizeByte
 	vertexDataLayout = 1; // SoA4
 #endif
 
-	assert(vtxSizeBytes % 4 == 0);
+	mgl_assert(vtxSizeBytes % 4 == 0);
 	int vertexSizeFloats = vtxSizeBytes / 4;
 	int triangleSizeFloats = vertexSizeFloats * 3;
-	assert(numTris % 4 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
+	mgl_assert(numTris % 4 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
 	// To xxxx yyyy zzzz xxxx yyyy zzzz xxxx yyyy zzzz
@@ -363,10 +363,10 @@ void TriangleMesh::SetSoA8(const float *vertexData, int numTris, int vtxSizeByte
 	vertexDataLayout = 2; // SoA8
 #endif
 
-	assert(vtxSizeBytes % 4 == 0);
+	mgl_assert(vtxSizeBytes % 4 == 0);
 	int vertexSizeFloats = vtxSizeBytes / 4;
 	int triangleSizeFloats = vertexSizeFloats * 3;
-	assert(numTris % 8 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
+	mgl_assert(numTris % 8 == 0); // We must have an evenly divisible amount of triangles, so that the SoA swizzling succeeds.
 
 	// From (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz) (xyz xyz xyz)
 	// To xxxxxxxx yyyyyyyy zzzzzzzz xxxxxxxx yyyyyyyy zzzzzzzz xxxxxxxx yyyyyyyy zzzzzzzz
@@ -409,10 +409,10 @@ void TriangleMesh::SetSoA8(const float *vertexData, int numTris, int vtxSizeByte
 
 float TriangleMesh::IntersectRay_TriangleIndex_UV_CPP(const Ray &ray, int &outTriangleIndex, float &outU, float &outV) const
 {
-	assert(sizeof(float3) == 3*sizeof(float));
-	assert(sizeof(Triangle) == 3*sizeof(vec));
+	mgl_assert(sizeof(float3) == 3*sizeof(float));
+	mgl_assert(sizeof(Triangle) == 3*sizeof(vec));
 #ifdef _DEBUG
-	assert(vertexDataLayout == 0); // Must be AoS structured!
+	mgl_assert(vertexDataLayout == 0); // Must be AoS structured!
 #endif
 
 	float nearestD = FLOAT_INF;

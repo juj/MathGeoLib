@@ -47,54 +47,54 @@ BENCHMARK_END
 UNIQUE_TEST(AABBContains)
 {
 	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
-	assert(a.Contains(POINT_VEC(0,0,0)));
-	assert(a.Contains(POINT_VEC(10,10,10)));
-	assert(a.Contains(POINT_VEC(1,2,3)));
-	assert(!a.Contains(POINT_VEC(-1,2,3)));
-	assert(!a.Contains(POINT_VEC(1,-2,3)));
-	assert(!a.Contains(POINT_VEC(1,2,-3)));
-	assert(!a.Contains(POINT_VEC(11,2,3)));
-	assert(!a.Contains(POINT_VEC(1,12,3)));
-	assert(!a.Contains(POINT_VEC(1,2,13)));
-	assert(!a.Contains(POINT_VEC(-1,-2,-3)));
-	assert(!a.Contains(POINT_VEC(11,12,13)));
+	mgl_assert(a.Contains(POINT_VEC(0,0,0)));
+	mgl_assert(a.Contains(POINT_VEC(10,10,10)));
+	mgl_assert(a.Contains(POINT_VEC(1,2,3)));
+	mgl_assert(!a.Contains(POINT_VEC(-1,2,3)));
+	mgl_assert(!a.Contains(POINT_VEC(1,-2,3)));
+	mgl_assert(!a.Contains(POINT_VEC(1,2,-3)));
+	mgl_assert(!a.Contains(POINT_VEC(11,2,3)));
+	mgl_assert(!a.Contains(POINT_VEC(1,12,3)));
+	mgl_assert(!a.Contains(POINT_VEC(1,2,13)));
+	mgl_assert(!a.Contains(POINT_VEC(-1,-2,-3)));
+	mgl_assert(!a.Contains(POINT_VEC(11,12,13)));
 }
 
 UNIQUE_TEST(AABBContainsAABB)
 {
 	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
-	assert(a.Contains(a));
-	assert(a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(6,6,6))));
-	assert(a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(10,6,6))));
-	assert(!a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(15,15,15))));
-	assert(!a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(5,15,5))));
-	assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(5,5,5))));
-	assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
+	mgl_assert(a.Contains(a));
+	mgl_assert(a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(6,6,6))));
+	mgl_assert(a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(10,6,6))));
+	mgl_assert(!a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(15,15,15))));
+	mgl_assert(!a.Contains(AABB(POINT_VEC(5,5,5), POINT_VEC(5,15,5))));
+	mgl_assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(5,5,5))));
+	mgl_assert(!a.Contains(AABB(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
 }
 
 UNIQUE_TEST(AABBContainsLineSegment)
 {
 	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
-	assert(a.Contains(LineSegment(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10))));
-	assert(a.Contains(LineSegment(POINT_VEC(10,10,10), POINT_VEC(0, 0, 0))));
-	assert(a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(6,6,6))));
-	assert(a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(10,6,6))));
-	assert(!a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(15,15,15))));
-	assert(!a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(5,15,5))));
-	assert(!a.Contains(LineSegment(POINT_VEC(-5,-5,-5), POINT_VEC(5,5,5))));
-	assert(!a.Contains(LineSegment(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
-	assert(!a.Contains(LineSegment(POINT_VEC(15,15,15), POINT_VEC(-15,-15,-15))));
+	mgl_assert(a.Contains(LineSegment(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10))));
+	mgl_assert(a.Contains(LineSegment(POINT_VEC(10,10,10), POINT_VEC(0, 0, 0))));
+	mgl_assert(a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(6,6,6))));
+	mgl_assert(a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(10,6,6))));
+	mgl_assert(!a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(15,15,15))));
+	mgl_assert(!a.Contains(LineSegment(POINT_VEC(5,5,5), POINT_VEC(5,15,5))));
+	mgl_assert(!a.Contains(LineSegment(POINT_VEC(-5,-5,-5), POINT_VEC(5,5,5))));
+	mgl_assert(!a.Contains(LineSegment(POINT_VEC(-5,-5,-5), POINT_VEC(0,0,0))));
+	mgl_assert(!a.Contains(LineSegment(POINT_VEC(15,15,15), POINT_VEC(-15,-15,-15))));
 }
 
 UNIQUE_TEST(AABBContainsSphere)
 {
 	AABB a(POINT_VEC(0,0,0), POINT_VEC(10, 10, 10));
-	assert(a.Contains(Sphere(POINT_VEC(0,0,0), 0.f)));
-	assert(a.Contains(Sphere(POINT_VEC(5,5,5), 1.f)));
-	assert(!a.Contains(Sphere(POINT_VEC(5,5,5), 15.f)));
-	assert(!a.Contains(Sphere(POINT_VEC(9,5,5), 2.f)));
-	assert(!a.Contains(Sphere(POINT_VEC(1,5,5), 2.f)));
-	assert(!a.Contains(Sphere(POINT_VEC(-10,-10,-10), 1000.f)));
+	mgl_assert(a.Contains(Sphere(POINT_VEC(0,0,0), 0.f)));
+	mgl_assert(a.Contains(Sphere(POINT_VEC(5,5,5), 1.f)));
+	mgl_assert(!a.Contains(Sphere(POINT_VEC(5,5,5), 15.f)));
+	mgl_assert(!a.Contains(Sphere(POINT_VEC(9,5,5), 2.f)));
+	mgl_assert(!a.Contains(Sphere(POINT_VEC(1,5,5), 2.f)));
+	mgl_assert(!a.Contains(Sphere(POINT_VEC(-10,-10,-10), 1000.f)));
 }
 
 UNIQUE_TEST(AABBIntersectsAABB)
@@ -104,11 +104,11 @@ UNIQUE_TEST(AABBIntersectsAABB)
 	AABB c(POINT_VEC(-5,-5,-5), POINT_VEC(0, 10, 0));
 	AABB d(POINT_VEC(20,20,20), POINT_VEC(30, 30, 30));
 	AABB e(POINT_VEC(1,1,1), POINT_VEC(9,9,9));
-	assert(a.Intersects(a));
-	assert(a.Intersects(b));
-	assert(!a.Intersects(c));
-	assert(!a.Intersects(d));
-	assert(a.Intersects(e));
+	mgl_assert(a.Intersects(a));
+	mgl_assert(a.Intersects(b));
+	mgl_assert(!a.Intersects(c));
+	mgl_assert(!a.Intersects(d));
+	mgl_assert(a.Intersects(e));
 }
 
 BENCHMARK(AABBIntersectsAABB_positive, "AABB::Intersects(AABB) positive")
@@ -135,7 +135,7 @@ RANDOMIZED_TEST(AABBTransformAsAABB)
 	AABB x = a;
 	x.TransformAsAABB(m);
 	AABB y = o.MinimalEnclosingAABB();
-	assert(x.Equals(y));
+	mgl_assert(x.Equals(y));
 }
 
 BENCHMARK(AABBTransformOBBToAABB_BM, "AABB::Transform to OBB and convert back to AABB")
@@ -163,7 +163,7 @@ RANDOMIZED_TEST(AABBTransformAsAABB_SIMD)
 	AABB x = a;
 	AABBTransformAsAABB_SIMD(x, m);
 	AABB y = o.MinimalEnclosingAABB();
-	assert2(x.Equals(y, 1e-2f), x.SerializeToCodeString(), y.SerializeToCodeString());
+	mgl_assert2(x.Equals(y, 1e-2f), x.SerializeToCodeString(), y.SerializeToCodeString());
 }
 
 BENCHMARK(AABBTransformAsAABB_SIMD_BM, "AABB::TransformAsAABB SIMD")
@@ -176,93 +176,93 @@ BENCHMARK_END
 UNIQUE_TEST(AABBIsDegenerate)
 {
 	AABB a(vec::nan, vec::nan);
-	assert(a.IsDegenerate());
-	assert(!a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(!a.IsFinite());
 
 	a = AABB(vec::zero, vec::nan);
-	assert(a.IsDegenerate());
-	assert(!a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(!a.IsFinite());
 
 	a = AABB(vec::zero, vec::one);
-	assert(!a.IsDegenerate());
-	assert(a.IsFinite());
+	mgl_assert(!a.IsDegenerate());
+	mgl_assert(a.IsFinite());
 
 	a = AABB(vec::zero, vec::inf);
-	assert(!a.IsDegenerate());
-	assert(!a.IsFinite());
+	mgl_assert(!a.IsDegenerate());
+	mgl_assert(!a.IsFinite());
 
 	a = AABB(vec::zero, vec::zero);
-	assert(a.IsDegenerate());
-	assert(a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(a.IsFinite());
 
 	a = AABB(vec::zero, -vec::zero);
-	assert(a.IsDegenerate());
-	assert(a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(a.IsFinite());
 
 	a = AABB(vec::zero, -vec::one);
-	assert(a.IsDegenerate());
-	assert(a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(a.IsFinite());
 
 	a = AABB(vec::zero, -vec::inf);
-	assert(a.IsDegenerate());
-	assert(!a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(!a.IsFinite());
 
 	a = AABB(vec::inf, -vec::inf);
-	assert(a.IsDegenerate());
-	assert(!a.IsFinite());
+	mgl_assert(a.IsDegenerate());
+	mgl_assert(!a.IsFinite());
 
 	a = AABB(-vec::inf, vec::inf);
-	assert(!a.IsDegenerate());
-	assert(!a.IsFinite());
+	mgl_assert(!a.IsDegenerate());
+	mgl_assert(!a.IsFinite());
 }
 
 UNIQUE_TEST(OBBIsDegenerate)
 {
 	OBB o = AABB(vec::nan, vec::nan);
-	assert(o.IsDegenerate());
-	assert(!o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(!o.IsFinite());
 
 	o = OBB(AABB(vec::zero, vec::nan));
-	assert(o.IsDegenerate());
-	assert(!o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(!o.IsFinite());
 
 	o = OBB(AABB(vec::zero, vec::one));
-	assert(!o.IsDegenerate());
-	assert(o.IsFinite());
+	mgl_assert(!o.IsDegenerate());
+	mgl_assert(o.IsFinite());
 
 	o = OBB(AABB(vec::zero, vec::inf));
-	assert(!o.IsDegenerate());
-	assert(!o.IsFinite());
+	mgl_assert(!o.IsDegenerate());
+	mgl_assert(!o.IsFinite());
 
 	o = OBB(AABB(vec::zero, vec::zero));
-	assert(o.IsDegenerate());
-	assert(o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(o.IsFinite());
 
 	o = OBB(AABB(vec::zero, -vec::zero));
-	assert(o.IsDegenerate());
-	assert(o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(o.IsFinite());
 
 	o = OBB(AABB(vec::zero, -vec::one));
-	assert(o.IsDegenerate());
-	assert(o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(o.IsFinite());
 
 	o = OBB(AABB(vec::zero, -vec::inf));
-	assert(o.IsDegenerate());
-	assert(!o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(!o.IsFinite());
 
 	o = OBB(AABB(vec::inf, -vec::inf));
-	assert(o.IsDegenerate());
-	assert(!o.IsFinite());
+	mgl_assert(o.IsDegenerate());
+	mgl_assert(!o.IsFinite());
 
 	o = OBB(AABB(-vec::inf, vec::inf));
-	assert(!o.IsDegenerate());
-	assert(!o.IsFinite());
+	mgl_assert(!o.IsDegenerate());
+	mgl_assert(!o.IsFinite());
 }
 
 UNIQUE_TEST(AABB_Volume)
 {
 	AABB a(POINT_VEC_SCALAR(-1.f), POINT_VEC_SCALAR(1.f));
-	assert(a.Volume() == 8.f);
+	mgl_assert(a.Volume() == 8.f);
 }
 
 MATH_END_NAMESPACE

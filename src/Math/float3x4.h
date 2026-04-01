@@ -317,8 +317,8 @@ public:
 	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
 	FORCE_INLINE MatrixProxy<Rows, Cols> &operator[](int row)
 	{
-		assume(row >= 0);
-		assume(row < Rows);
+		mgl_assume(row >= 0);
+		mgl_assume(row < Rows);
 #ifdef MATH_COLMAJOR_MATRICES
 		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
 #else
@@ -328,8 +328,8 @@ public:
 
 	FORCE_INLINE const MatrixProxy<Rows, Cols> &operator[](int row) const
 	{
-		assume(row >= 0);
-		assume(row < Rows);		
+		mgl_assume(row >= 0);
+		mgl_assume(row < Rows);		
 #ifdef MATH_COLMAJOR_MATRICES
 		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
 #else

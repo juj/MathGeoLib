@@ -272,13 +272,13 @@ vec2d LineSegment2D::ClosestPoint(const Line2D &other, float &d, float &d2) cons
 	@see ClosestPoint(), Distance(). */
 void Line2DClosestPointLineLine(const vec2d &v0, const vec2d &v10, const vec2d &v2, const vec2d &v32, float &d, float &d2) // TODO: Move to Line2D when that exists
 {
-	assume(!v10.IsZero());
-	assume(!v32.IsZero());
+	mgl_assume(!v10.IsZero());
+	mgl_assume(!v32.IsZero());
 	vec2d v02 = v0 - v2;
 	float d0232 = v02.Dot(v32);
 	float d3210 = v32.Dot(v10);
 	float d3232 = v32.Dot(v32);
-	assume(d3232 != 0.f); // Don't call with a zero direction vector.
+	mgl_assume(d3232 != 0.f); // Don't call with a zero direction vector.
 	float d0210 = v02.Dot(v10);
 	float d1010 = v10.Dot(v10);
 	float denom = d1010*d3232 - d3210*d3210;
@@ -521,7 +521,7 @@ StringT LineSegment2D::SerializeToString() const
 	s = SerializeFloat(a.y, s); *s = ','; ++s;
 	s = SerializeFloat(b.x, s); *s = ','; ++s;
 	s = SerializeFloat(b.y, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -544,7 +544,7 @@ std::ostream &operator <<(std::ostream &o, const LineSegment2D &lineSegment)
 
 LineSegment2D LineSegment2D::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return LineSegment2D(vec2d::nan, vec2d::nan);
 	LineSegment2D l;

@@ -37,7 +37,7 @@ RANDOMIZED_TEST(Poly2D_Poly2D_Intersect)
 {
 	std::vector<float2> p1 = GenerateRandomPolygonContainingPt(rng, rng.Int(3, 10), float2::zero, 10.f);
 	std::vector<float2> p2 = GenerateRandomPolygonContainingPt(rng, rng.Int(3, 10), float2::zero, 10.f);
-	assert(SATCollide2D(&p1[0], (int)p1.size(), &p2[0], (int)p2.size()));
+	mgl_assert(SATCollide2D(&p1[0], (int)p1.size(), &p2[0], (int)p2.size()));
 }
 
 BENCHMARK(Poly2D_Poly2D_Intersect, "Poly2D-Poly2D SAT positive collision")
@@ -51,7 +51,7 @@ RANDOMIZED_TEST(Poly2D_Poly2D_NoIntersect)
 {
 	std::vector<float2> p1 = GenerateRandomPolygonContainingPt(rng, rng.Int(3, 10), float2::zero, 10.f);
 	std::vector<float2> p2 = GenerateRandomPolygonContainingPt(rng, rng.Int(3, 10), float2::RandomDir(rng) * 50.f, 10.f);
-	assert(!SATCollide2D(&p1[0], (int)p1.size(), &p2[0], (int)p2.size()));
+	mgl_assert(!SATCollide2D(&p1[0], (int)p1.size(), &p2[0], (int)p2.size()));
 }
 
 BENCHMARK(Poly2D_Poly2D_NoIntersect, "Poly2D-Poly2D SAT no collision")

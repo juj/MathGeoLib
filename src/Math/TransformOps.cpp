@@ -85,7 +85,7 @@ float3x4 operator *(const TranslateOp &lhs, const float3x4 &rhs)
 	r.SetTranslatePart(r.TranslatePart() + DIR_TO_FLOAT3(lhs.Offset()));
 
 	// Our optimized form of multiplication must be the same as this.
-	mathassert(r.Equals((float3x4)lhs * rhs));
+	mgl_mathassert(r.Equals((float3x4)lhs * rhs));
 	return r;
 }
 
@@ -95,7 +95,7 @@ float3x4 operator *(const float3x4 &lhs, const TranslateOp &rhs)
 	r.SetTranslatePart(lhs.TransformPos(DIR_TO_FLOAT3(rhs.Offset())));
 
 	// Our optimized form of multiplication must be the same as this.
-	assume4(r.Equals(lhs * (float3x4)rhs), lhs, rhs, r, lhs * (float3x4)rhs);
+	mgl_assume4(r.Equals(lhs * (float3x4)rhs), lhs, rhs, r, lhs * (float3x4)rhs);
 	return r;
 }
 
@@ -103,7 +103,7 @@ float4x4 operator *(const TranslateOp &lhs, const float4x4 &rhs)
 {
 	// This function is based on the optimized assumption that the last row of rhs is [0,0,0,1].
 	// If this does not hold and you are hitting the check below, explicitly cast TranslateOp lhs to float4x4 before multiplication!
-	assume(rhs.Row(3).Equals(0.f, 0.f, 0.f, 1.f));
+	mgl_assume(rhs.Row(3).Equals(0.f, 0.f, 0.f, 1.f));
 
 	float4x4 r = rhs;
 	r.SetTranslatePart(r.TranslatePart() + DIR_TO_FLOAT3(lhs.Offset()));
@@ -188,7 +188,7 @@ float3x3 operator *(const ScaleOp &lhs, const float3x3 &rhs)
 	ret.ScaleRow(2, lhs.scale.z);
 
 	// Our optimized form of multiplication must be the same as this.
-	mathassert(ret.Equals((float3x3)lhs * rhs));
+	mgl_mathassert(ret.Equals((float3x3)lhs * rhs));
 	return ret;
 }
 
@@ -200,7 +200,7 @@ float3x3 operator *(const float3x3 &lhs, const ScaleOp &rhs)
 	ret.ScaleCol(2, rhs.scale.z);
 
 	// Our optimized form of multiplication must be the same as this.
-	mathassert(ret.Equals(lhs * (float3x3)rhs));
+	mgl_mathassert(ret.Equals(lhs * (float3x3)rhs));
 	return ret;
 }
 
@@ -211,7 +211,7 @@ float3x4 operator *(const ScaleOp &lhs, const float3x4 &rhs)
 	ret[1][0] = rhs[1][0] * lhs.scale.y; ret[1][1] = rhs[1][1] * lhs.scale.y; ret[1][2] = rhs[1][2] * lhs.scale.y; ret[1][3] = rhs[1][3] * lhs.scale.y;
 	ret[2][0] = rhs[2][0] * lhs.scale.z; ret[2][1] = rhs[2][1] * lhs.scale.z; ret[2][2] = rhs[2][2] * lhs.scale.z; ret[2][3] = rhs[2][3] * lhs.scale.z;
 
-	mathassert(ret.Equals(lhs.ToFloat3x4() * rhs));
+	mgl_mathassert(ret.Equals(lhs.ToFloat3x4() * rhs));
 	return ret;
 }
 
@@ -222,7 +222,7 @@ float3x4 operator *(const float3x4 &lhs, const ScaleOp &rhs)
 	ret[1][0] = lhs[1][0] * rhs.scale.x; ret[1][1] = lhs[1][1] * rhs.scale.y; ret[1][2] = lhs[1][2] * rhs.scale.z; ret[1][3] = lhs[1][3];
 	ret[2][0] = lhs[2][0] * rhs.scale.x; ret[2][1] = lhs[2][1] * rhs.scale.y; ret[2][2] = lhs[2][2] * rhs.scale.z; ret[2][3] = lhs[2][3];
 
-	mathassert(ret.Equals(lhs * rhs.ToFloat3x4()));
+	mgl_mathassert(ret.Equals(lhs * rhs.ToFloat3x4()));
 	return ret;
 }
 
@@ -243,7 +243,7 @@ float4x4 operator *(const ScaleOp &lhs, const float4x4 &rhs)
 	ret[2][0] = rhs[2][0] * lhs.scale.z; ret[2][1] = rhs[2][1] * lhs.scale.z; ret[2][2] = rhs[2][2] * lhs.scale.z; ret[2][3] = rhs[2][3] * lhs.scale.z;
 	ret[3][0] = rhs[3][0];         ret[3][1] = rhs[3][1];         ret[3][2] = rhs[3][2];         ret[3][3] = rhs[3][3];
 #endif
-	mathassert(ret.Equals(lhs.ToFloat4x4() * rhs));
+	mgl_mathassert(ret.Equals(lhs.ToFloat4x4() * rhs));
 	return ret;
 }
 
@@ -255,7 +255,7 @@ float4x4 operator *(const float4x4 &lhs, const ScaleOp &rhs)
 	ret[2][0] = lhs[2][0] * rhs.scale.x; ret[2][1] = lhs[2][1] * rhs.scale.y; ret[2][2] = lhs[2][2] * rhs.scale.z; ret[2][3] = lhs[2][3];
 	ret[3][0] = lhs[3][0] * rhs.scale.x; ret[3][1] = lhs[3][1] * rhs.scale.y; ret[3][2] = lhs[3][2] * rhs.scale.z; ret[3][3] = lhs[3][3];
 
-	mathassert4(ret.Equals(lhs * rhs.ToFloat4x4()), lhs, rhs.ToFloat4x4(), ret, lhs * rhs.ToFloat4x4());
+	mgl_mathassert4(ret.Equals(lhs * rhs.ToFloat4x4()), lhs, rhs.ToFloat4x4(), ret, lhs * rhs.ToFloat4x4());
 	return ret;
 }
 
@@ -266,7 +266,7 @@ float3x4 operator *(const ScaleOp &lhs, const TranslateOp &rhs)
 	ret[1][0] =	          0; ret[1][1] = lhs.scale.y; ret[1][2] =       	0; ret[1][3] = lhs.scale.y * rhs.offset.y;
 	ret[2][0] =	          0; ret[2][1] =	       0; ret[2][2] = lhs.scale.z; ret[2][3] = lhs.scale.z * rhs.offset.z;
 
-	mathassert(ret.Equals(lhs.ToFloat3x4() * rhs));
+	mgl_mathassert(ret.Equals(lhs.ToFloat3x4() * rhs));
 	return ret;
 }
 
@@ -277,7 +277,7 @@ float3x4 operator *(const TranslateOp &lhs, const ScaleOp &rhs)
 	ret[1][0] =	 0; ret[1][1] = rhs.scale.y; ret[1][2] =	 0; ret[1][3] = lhs.offset.y;
 	ret[2][0] =	 0; ret[2][1] =	 0; ret[2][2] = rhs.scale.z; ret[2][3] = lhs.offset.z;
 
-	mathassert(ret.Equals(lhs.ToFloat3x4() * rhs));
+	mgl_mathassert(ret.Equals(lhs.ToFloat3x4() * rhs));
 	return ret;
 }
 

@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file TriangleMesh_IntersectRay_AVX.inl
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief AVX implementation of ray-mesh intersection routines. */
 
 #include "../Math/SSEMath.h"
@@ -31,10 +31,10 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 //	std::cout << numTris << " tris: ";
 //	TRACESTART(RayTriMeshIntersectAVX);
 
-	assert(sizeof(float3) == 3*sizeof(float));
-	assert(sizeof(Triangle) == 3*sizeof(vec));
+	mgl_assert(sizeof(float3) == 3*sizeof(float));
+	mgl_assert(sizeof(Triangle) == 3*sizeof(vec));
 #ifdef _DEBUG
-	assert(vertexDataLayout == 2); // Must be SoA8 structured!
+	mgl_assert(vertexDataLayout == 2); // Must be SoA8 structured!
 #endif
 
 //	hitTriangleIndex = -1;
@@ -60,7 +60,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_AVX(const Ray &ray, int &outTr
 	const __m256 zero = _mm256_setzero_ps();
 	const __m256 one = _mm256_set1_ps(1.f);
 
-	assert(((uintptr_t)data & 0x1F) == 0);
+	mgl_assert(((uintptr_t)data & 0x1F) == 0);
 
 	const float *tris = reinterpret_cast<const float*>(data);
 

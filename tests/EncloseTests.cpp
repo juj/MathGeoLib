@@ -71,17 +71,17 @@ RANDOMIZED_TEST(AABB_Enclose_point)
 	vec pt = RandomPointNearOrigin(DISTSCALE);
 	aabb.Enclose(pt);
 
-	assert(aabb.Contains(pt));
+	mgl_assert(aabb.Contains(pt));
 }
 
-/** @bug Improve numerical stability of the test with epsilon and enable this test. 
+/** @bug Improve numerical stability of the test with epsilon and enable this test.
 RANDOMIZED_TEST(OBB_Enclose_point)
 {
 	OBB obb = RandomOBBNearOrigin(DISTSCALE, SIZESCALE);
 	vec pt = RandomPointNearOrigin(DISTSCALE);
 	obb.Enclose(pt);
 
-	assert(obb.Contains(pt));
+	mgl_assert(obb.Contains(pt));
 } */
 
 RANDOMIZED_TEST(AABB_Enclose_LineSegment)
@@ -90,7 +90,7 @@ RANDOMIZED_TEST(AABB_Enclose_LineSegment)
 	LineSegment ls = RandomLineSegmentNearOrigin(DISTSCALE);
 	aabb.Enclose(ls);
 
-	assert(aabb.Contains(ls));
+	mgl_assert(aabb.Contains(ls));
 }
 
 RANDOMIZED_TEST(AABB_Enclose_AABB)
@@ -99,17 +99,17 @@ RANDOMIZED_TEST(AABB_Enclose_AABB)
 	AABB aabb2 = RandomAABBNearOrigin(DISTSCALE, SIZESCALE);
 	aabb.Enclose(aabb2);
 
-	assert(aabb.Contains(aabb2));
+	mgl_assert(aabb.Contains(aabb2));
 }
 
-/** @bug Improve numerical stability of the test with epsilon and enable this test. 
+/** @bug Improve numerical stability of the test with epsilon and enable this test.
 RANDOMIZED_TEST(AABB_Enclose_OBB)
 {
 	AABB aabb = RandomAABBNearOrigin(DISTSCALE, SIZESCALE);
 	OBB obb = RandomOBBNearOrigin(DISTSCALE, SIZESCALE);
 	aabb.Enclose(obb);
 
-	assert(aabb.Contains(obb));
+	mgl_assert(aabb.Contains(obb));
 } */
 
 RANDOMIZED_TEST(AABB_Enclose_Sphere)
@@ -118,7 +118,7 @@ RANDOMIZED_TEST(AABB_Enclose_Sphere)
 	Sphere s = RandomSphereNearOrigin(DISTSCALE, SIZESCALE);
 	aabb.Enclose(s);
 
-	assert(aabb.Contains(s));
+	mgl_assert(aabb.Contains(s));
 }
 
 RANDOMIZED_TEST(AABB_Enclose_Triangle)
@@ -127,7 +127,7 @@ RANDOMIZED_TEST(AABB_Enclose_Triangle)
 	Triangle t = RandomTriangleNearOrigin(DISTSCALE);
 	aabb.Enclose(t);
 
-	assert(aabb.Contains(t));
+	mgl_assert(aabb.Contains(t));
 }
 
 RANDOMIZED_TEST(AABB_Enclose_Capsule)
@@ -136,7 +136,7 @@ RANDOMIZED_TEST(AABB_Enclose_Capsule)
 	Capsule c = RandomCapsuleNearOrigin(DISTSCALE);
 	aabb.Enclose(c);
 
-	assert(aabb.Contains(c));
+	mgl_assert(aabb.Contains(c));
 }
 
 RANDOMIZED_TEST(AABB_Enclose_Frustum)
@@ -145,7 +145,7 @@ RANDOMIZED_TEST(AABB_Enclose_Frustum)
 	Frustum f = RandomFrustumNearOrigin(DISTSCALE);
 	aabb.Enclose(f);
 
-	assert(aabb.Contains(f));
+	mgl_assert(aabb.Contains(f));
 }
 
 RANDOMIZED_TEST(AABB_Enclose_Polygon)
@@ -154,7 +154,7 @@ RANDOMIZED_TEST(AABB_Enclose_Polygon)
 	Polygon p = RandomPolygonNearOrigin(DISTSCALE);
 	aabb.Enclose(p);
 
-	assert2(aabb.Contains(p), aabb, p);
+	mgl_assert2(aabb.Contains(p), aabb, p);
 }
 
 RANDOMIZED_TEST(AABB_Enclose_Polyhedron)
@@ -163,7 +163,7 @@ RANDOMIZED_TEST(AABB_Enclose_Polyhedron)
 	Polyhedron p = RandomPolyhedronNearOrigin(DISTSCALE);
 	aabb.Enclose(p);
 
-	assert2(aabb.Contains(p), aabb, p);
+	mgl_assert2(aabb.Contains(p), aabb, p);
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_point)
@@ -172,7 +172,7 @@ RANDOMIZED_TEST(Sphere_Enclose_point)
 	vec pt = RandomPointNearOrigin(DISTSCALE);
 	s.Enclose(pt);
 
-	assert3(s.Contains(pt), s, pt, s.Distance(pt));
+	mgl_assert3(s.Contains(pt), s, pt, s.Distance(pt));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_LineSegment)
@@ -181,7 +181,7 @@ RANDOMIZED_TEST(Sphere_Enclose_LineSegment)
 	LineSegment ls = RandomLineSegmentNearOrigin(DISTSCALE);
 	s.Enclose(ls);
 
-	assert(s.Contains(ls));
+	mgl_assert(s.Contains(ls));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_AABB)
@@ -190,7 +190,7 @@ RANDOMIZED_TEST(Sphere_Enclose_AABB)
 	Sphere aabb = RandomSphereNearOrigin(DISTSCALE, SIZESCALE);
 	s.Enclose(aabb);
 
-	assert(s.Contains(aabb));
+	mgl_assert(s.Contains(aabb));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_OBB)
@@ -199,7 +199,7 @@ RANDOMIZED_TEST(Sphere_Enclose_OBB)
 	OBB obb = RandomOBBNearOrigin(DISTSCALE, SIZESCALE);
 	s.Enclose(obb);
 
-	assert(s.Contains(obb));
+	mgl_assert(s.Contains(obb));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Sphere)
@@ -208,7 +208,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Sphere)
 	Sphere s2 = RandomSphereNearOrigin(DISTSCALE, SIZESCALE);
 	s.Enclose(s2);
 
-	assert(s.Contains(s2));
+	mgl_assert(s.Contains(s2));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Triangle)
@@ -217,7 +217,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Triangle)
 	Triangle t = RandomTriangleNearOrigin(DISTSCALE);
 	s.Enclose(t);
 
-	assert(s.Contains(t));
+	mgl_assert(s.Contains(t));
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Capsule)
@@ -226,7 +226,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Capsule)
 	Capsule c = RandomCapsuleNearOrigin(DISTSCALE);
 	s.Enclose(c);
 
-	assert2(s.Contains(c), s.SerializeToCodeString(), c.SerializeToCodeString());
+	mgl_assert2(s.Contains(c), s.SerializeToCodeString(), c.SerializeToCodeString());
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Frustum)
@@ -235,7 +235,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Frustum)
 	Frustum f = RandomFrustumNearOrigin(DISTSCALE);
 	s.Enclose(f);
 
-	assert2(s.Contains(f), s, f);
+	mgl_assert2(s.Contains(f), s, f);
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Polygon)
@@ -244,7 +244,7 @@ RANDOMIZED_TEST(Sphere_Enclose_Polygon)
 	Polygon p = RandomPolygonNearOrigin(DISTSCALE);
 	s.Enclose(p);
 
-	assert2(s.Contains(p), s, p);
+	mgl_assert2(s.Contains(p), s, p);
 }
 
 RANDOMIZED_TEST(Sphere_Enclose_Polyhedron)
@@ -253,5 +253,5 @@ RANDOMIZED_TEST(Sphere_Enclose_Polyhedron)
 	Polyhedron p = RandomPolyhedronNearOrigin(DISTSCALE);
 	s.Enclose(p);
 
-	assert2(s.Contains(p), s, p);
+	mgl_assert2(s.Contains(p), s, p);
 }

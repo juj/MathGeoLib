@@ -22,8 +22,8 @@
 #include <sstream>
 #endif
 
-#ifdef assert
-#undef assert
+#ifdef mgl_assert
+#undef mgl_assert
 #endif
 
 #ifdef FAIL_USING_EXCEPTIONS
@@ -41,9 +41,9 @@
 
 #ifdef RUNTIME_FAILURE_DISABLED
 
-#define assert(x) ((void)0)
-#define asserteq(x,y) ((void)0)
-#define assertcmp(x, cmp, y) ((void)0)
+#define mgl_assert(x) ((void)0)
+#define mgl_asserteq(x,y) ((void)0)
+#define mgl_assertcmp(x, cmp, y) ((void)0)
 
 // If defined in a compilation unit, MATH_IGNORE_UNUSED_VARS_WARNING will kill all subsequent warnings about variables going unused.
 // This occurs commonly in unit tests that are also doubled as benchmarks - killing the use of assert() macro will leave variables
@@ -62,7 +62,7 @@
 
 #define MATH_IGNORE_UNUSED_VARS_WARNING
 
-#define assert(x) \
+#define mgl_assert(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
 		{ \
@@ -72,7 +72,7 @@
 		} \
 	MULTI_LINE_MACRO_END
 
-#define asserteq(x,y) \
+#define mgl_asserteq(x,y) \
 	MULTI_LINE_MACRO_BEGIN \
 		if ((x) != (y)) \
 		{ \
@@ -81,7 +81,7 @@
 		} \
 	MULTI_LINE_MACRO_END
 
-#define assertcmp(x, cmp, y) \
+#define mgl_assertcmp(x, cmp, y) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!((x) cmp (y))) \
 		{ \

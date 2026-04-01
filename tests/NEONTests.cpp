@@ -44,10 +44,10 @@ UNIQUE_TEST(set_ps_const)
 	simd4f constant = set_ps_const(4.f, 3.f, 2.f, 1.f);
 	float arr[4];
 	memcpy(arr, &constant, sizeof(arr));
-	asserteq(arr[0], 1.f);
-	asserteq(arr[1], 2.f);
-	asserteq(arr[2], 3.f);
-	asserteq(arr[3], 4.f);
+	mgl_asserteq(arr[0], 1.f);
+	mgl_asserteq(arr[1], 2.f);
+	mgl_asserteq(arr[2], 3.f);
+	mgl_asserteq(arr[3], 4.f);
 }
 
 UNIQUE_TEST(set_ps_const_hex)
@@ -55,10 +55,10 @@ UNIQUE_TEST(set_ps_const_hex)
 	simd4f constant = set_ps_hex_const(0x80000000u, 0x3F800000u /*1.0f*/, 0x42C80000u /*100.0f*/, 0);
 	float arr[4];
 	memcpy(arr, &constant, sizeof(arr));
-	asserteq(arr[0], 0.f);
-	asserteq(arr[1], 100.f);
-	asserteq(arr[2], 1.0f);
-	asserteq(arr[3], -0.0f);
+	mgl_asserteq(arr[0], 0.f);
+	mgl_asserteq(arr[1], 100.f);
+	mgl_asserteq(arr[2], 1.0f);
+	mgl_asserteq(arr[3], -0.0f);
 }
 
 #ifdef ANDROID
@@ -89,7 +89,7 @@ UNIQUE_TEST(inline_asm_add)
 	float4 v3;
 	inline_asm_add(v.ptr(), v2.ptr(), v3.ptr());
 	float4 correct = v + v2;
-	assert(v3.Equals(correct));
+	mgl_assert(v3.Equals(correct));
 }
 
 simd4f inline_asm_add_2(simd4f v1, simd4f v2)
@@ -109,7 +109,7 @@ UNIQUE_TEST(inline_asm_add_2)
 	float4 v3;
 	v3 = inline_asm_add_2(v, v2);
 	float4 correct = v + v2;
-	assert(v3.Equals(correct));
+	mgl_assert(v3.Equals(correct));
 }
 
 simd4f inline_asm_add_3(simd4f v1, simd4f v2)
@@ -133,7 +133,7 @@ UNIQUE_TEST(inline_asm_add_3)
 	float4 v3;
 	v3 = inline_asm_add_3(v, v2);
 	float4 correct = v + v2;
-	assert(v3.Equals(correct));
+	mgl_assert(v3.Equals(correct));
 }
 
 BENCHMARK(float4_add_neon_intrinsics_once, "test against float4_op_add")
@@ -246,7 +246,7 @@ UNIQUE_TEST(vec4_length_sq_float_asm)
 {
 	float4 f(1,2,3,4);
 	float len = vec4_length_sq_float_asm(&f.v);
-	asserteq(len, 30.f);
+	mgl_asserteq(len, 30.f);
 }
 
 BENCHMARK(vec4_length_sq_float_asm, "neon")
@@ -261,10 +261,10 @@ UNIQUE_TEST(vec4_length_sq_ps_asm)
 	float4 lensq;
 	vec4_length_sq_ps_asm(&f.v, &lensq.v);
 	LOGI("%s", lensq.ToString().c_str());
-	asserteq(lensq.x, 30.f);
-	asserteq(lensq.y, 30.f);
-	asserteq(lensq.z, 30.f);
-	asserteq(lensq.w, 30.f);
+	mgl_asserteq(lensq.x, 30.f);
+	mgl_asserteq(lensq.y, 30.f);
+	mgl_asserteq(lensq.z, 30.f);
+	mgl_asserteq(lensq.w, 30.f);
 }
 
 BENCHMARK(vec4_length_sq_ps_asm, "neon")

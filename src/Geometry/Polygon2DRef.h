@@ -18,8 +18,8 @@ public:
 
 	FORCE_INLINE vec2d AnyPointFast() const
 	{
-		assert(points);
-		assert(numPoints > 0);
+		mgl_assert(points);
+		mgl_assert(numPoints > 0);
 		return points[0];
 	}
 

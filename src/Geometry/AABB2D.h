@@ -126,7 +126,7 @@ public:
 		@see PointInside(), Edge(), PointOnEdge(), FaceCenterPoint(), FacePoint(), GetCornerPoints(). */
 	vec2d CornerPoint(int cornerIndex) const
 	{
-		assume(0 <= cornerIndex && cornerIndex <= 3);
+		mgl_assume(0 <= cornerIndex && cornerIndex <= 3);
 		switch(cornerIndex)
 		{
 			default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.

@@ -52,7 +52,7 @@ float2::float2(float scalar)
 
 float2::float2(const float *data)
 {
-	assume(data);
+	mgl_assume(data);
 	x = data[0];
 	y = data[1];
 }
@@ -108,13 +108,13 @@ float2 float2::ToPolarCoordinates() const
 
 float float2::AimedAngle() const
 {
-	assume(!IsZero());
+	mgl_assume(!IsZero());
 	return atan2(y, x);
 }
 
 float float2::Normalize()
 {
-	assume(IsFinite());
+	mgl_assume(IsFinite());
 	float lengthSq = LengthSq();
 	if (lengthSq > 1e-6f)
 	{
@@ -133,7 +133,7 @@ float2 float2::Normalized() const
 {
 	float2 copy = *this;
 	float oldLength = copy.Normalize();
-	assume(oldLength > 0.f && "float2::Normalized() failed!");
+	mgl_assume(oldLength > 0.f && "float2::Normalized() failed!");
 	MARK_UNUSED(oldLength);
 	return copy;
 }
@@ -153,7 +153,7 @@ float float2::ScaleToLength(float newLength)
 
 float2 float2::ScaledToLength(float newLength) const
 {
-	assume(!IsZero());
+	mgl_assume(!IsZero());
 
 	float2 v = *this;
 	v.ScaleToLength(newLength);
@@ -225,7 +225,7 @@ StringT float2::SerializeToString() const
 	char str[256];
 	char *s = SerializeFloat(x, str); *s = ','; ++s;
 	s = SerializeFloat(y, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -238,8 +238,8 @@ StringT float2::SerializeToCodeString() const
 
 float2 float2::FromString(const char *str, const char **outEndStr)
 {
-	assert(IsNeutralCLocale());
-	assume(str);
+	mgl_assert(IsNeutralCLocale());
+	mgl_assume(str);
 	if (!str)
 		return float2::nan;
 	MATH_SKIP_WORD(str, "float2");
@@ -370,7 +370,7 @@ float float2::PerpDot(const float2 &rhs) const
 
 float2 float2::Reflect(const float2 &normal) const
 {
-	assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
+	mgl_assume2(normal.IsNormalized(), normal.SerializeToCodeString(), normal.Length());
 	return 2.f * this->ProjectToNorm(normal) - *this;
 }
 
@@ -388,13 +388,13 @@ float2 float2::Refract(const float2 &normal, float negativeSideRefractionIndex, 
 
 float2 float2::ProjectTo(const float2 &direction) const
 {
-	assume(!direction.IsZero());
+	mgl_assume(!direction.IsZero());
 	return direction * this->Dot(direction) / direction.LengthSq();
 }
 
 float2 float2::ProjectToNorm(const float2 &direction) const
 {
-	assume(direction.IsNormalized());
+	mgl_assume(direction.IsNormalized());
 	return direction * this->Dot(direction);
 }
 
@@ -405,14 +405,14 @@ float float2::AngleBetween(const float2 &other) const
 
 float float2::AngleBetweenNorm(const float2 &other) const
 {
-	assume(this->IsNormalized());
-	assume(other.IsNormalized());
+	mgl_assume(this->IsNormalized());
+	mgl_assume(other.IsNormalized());
 	return acos(Dot(other));
 }
 
 float2 float2::Lerp(const float2 &b, float t) const
 {
-	assume(0.f <= t && t <= 1.f);
+	mgl_assume(0.f <= t && t <= 1.f);
 	return (1.f - t) * *this + t * b;
 }
 
@@ -423,14 +423,14 @@ float2 float2::Lerp(const float2 &a, const float2 &b, float t)
 
 void float2::Decompose(const float2 &direction, float2 &outParallel, float2 &outPerpendicular) const
 {
-	assume(direction.IsNormalized());
+	mgl_assume(direction.IsNormalized());
 	outParallel = this->Dot(direction) * direction;
 	outPerpendicular = *this - outParallel;
 }
 
 void float2::Orthogonalize(const float2 &a, float2 &b)
 {
-	assume(!a.IsZero());
+	mgl_assume(!a.IsZero());
 	b -= a.Dot(b) / a.Length() * a;
 }
 
@@ -442,7 +442,7 @@ bool float2::AreOrthogonal(const float2 &a, const float2 &b, float epsilon)
 
 void float2::Orthonormalize(float2 &a, float2 &b)
 {
-	assume(!a.IsZero());
+	mgl_assume(!a.IsZero());
 	a.Normalize();
 	b -= a.Dot(b) * a;
 }
@@ -536,7 +536,7 @@ bool float2::ConvexHullContains(const float2 *convexHull, int numPointsInConvexH
 
 float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir, float2 &vDir, float &minU, float &maxU, float &minV, float &maxV)
 {
-	assume(p || n == 0);
+	mgl_assume(p || n == 0);
 	if (!p || n <= 0)
 	{
 		center = uDir = vDir = float2::nan;
@@ -547,7 +547,7 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 	// As a preparation, need to compute the convex hull so that points are CCW-oriented,
 	// and this also greatly reduces the number of points for performance.
 	n = float2::ConvexHullInPlace(p, n);
-	assert(n > 0);
+	mgl_assert(n > 0);
 	if (n == 1)
 	{
 		center = p[0];
@@ -628,7 +628,7 @@ float float2::MinAreaRectInPlace(float2 *p, int n, float2 &center, float2 &uDir,
 
 float2 float2::RandomDir(LCG &lcg, float r)
 {
-	assume(r > 1e-3f);
+	mgl_assume(r > 1e-3f);
 	for(int i = 0; i < 1000; ++i)
 	{
 		float x = lcg.Float(-r, r);
@@ -637,7 +637,7 @@ float2 float2::RandomDir(LCG &lcg, float r)
 		if (lenSq >= 1e-6f && lenSq <= r*r)
 			return r / Sqrt(lenSq) * float2(x,y);
 	}
-	assume(false && "Failed to generate a random float2 direction vector!");
+	mgl_assume(false && "Failed to generate a random float2 direction vector!");
 	return float2(r, 0);
 }
 

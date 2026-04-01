@@ -66,12 +66,12 @@ inline void quat_mul_quat_asm(const void *q1, const void *q2, void *out)
 	            x*r.y - y*r.x + z*r.w + w*r.z,
 	           -x*r.x - y*r.y - z*r.z + w*r.w); */
 #ifdef _DEBUG
-	assert(IS16ALIGNED(out));
-	assert(IS16ALIGNED(q1));
-	assert(IS16ALIGNED(q2));
-	assert(IS16ALIGNED(sx));
-	assert(IS16ALIGNED(sy));
-	assert(IS16ALIGNED(sz));
+	mgl_assert(IS16ALIGNED(out));
+	mgl_assert(IS16ALIGNED(q1));
+	mgl_assert(IS16ALIGNED(q2));
+	mgl_assert(IS16ALIGNED(sx));
+	mgl_assert(IS16ALIGNED(sy));
+	mgl_assert(IS16ALIGNED(sz));
 #endif
 	///\todo 128-bit aligned loads: [%1,:128]
 	asm(

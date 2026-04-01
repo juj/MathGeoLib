@@ -101,15 +101,15 @@ public:
 		@see ptr(), operator [](). */
 	FORCE_INLINE CONST_WIN32 float At(int index) const
 	{
-		assume(index >= 0);
-		assume(index < Size);
+		mgl_assume(index >= 0);
+		mgl_assume(index < Size);
 		return ptr()[index];
 	}
 	
 	FORCE_INLINE float &At(int index)
 	{
-		assume(index >= 0);
-		assume(index < Size);
+		mgl_assume(index >= 0);
+		mgl_assume(index < Size);
 		return ptr()[index];
 	}
 
@@ -761,12 +761,12 @@ bool EqualAbs(float a, float b, float epsilon);
 /* /// TODO: Enable this:
 inline float3 POINT_TO_FLOAT3(const vec &v)
 {
-	assume(EqualAbs(v.w, 1.f, 1e-4f));
+	mgl_assume(EqualAbs(v.w, 1.f, 1e-4f));
 	return v.xyz();
 }
 inline float3 DIR_TO_FLOAT3(const vec &v)
 {
-	assume(EqualAbs(v.w, 0.f, 1e-4f));
+	mgl_assume(EqualAbs(v.w, 0.f, 1e-4f));
 	return v.xyz();
 }
 */

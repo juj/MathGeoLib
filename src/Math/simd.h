@@ -199,7 +199,7 @@ int FORCE_INLINE allzero_ps(simd4f x)
 	x = or_ps(x, y);
 #ifdef _DEBUG
 	// In this construction in SSE1, we can't detect NaNs, so test that those don't occur.
-	assume(ReinterpretAsU32(_mm_cvtss_f32(x)) == 0xFFFFFFFF || !IsNan(ReinterpretAsU32(_mm_cvtss_f32(x))));
+	mgl_assume(ReinterpretAsU32(_mm_cvtss_f32(x)) == 0xFFFFFFFF || !IsNan(ReinterpretAsU32(_mm_cvtss_f32(x))));
 #endif
 	return _mm_ucomige_ss(x, x);
 #endif
@@ -215,7 +215,7 @@ int FORCE_INLINE allone_ps(simd4f x)
 	x = and_ps(x, y);
 #ifdef _DEBUG
 	// In this construction in SSE1, we can't detect NaNs, so test that those don't occur.
-	assume(ReinterpretAsU32(_mm_cvtss_f32(x)) == 0xFFFFFFFF || !IsNan(ReinterpretAsU32(_mm_cvtss_f32(x))));
+	mgl_assume(ReinterpretAsU32(_mm_cvtss_f32(x)) == 0xFFFFFFFF || !IsNan(ReinterpretAsU32(_mm_cvtss_f32(x))));
 #endif
 	return !_mm_ucomige_ss(x, x);
 #endif

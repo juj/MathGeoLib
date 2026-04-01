@@ -40,12 +40,12 @@ Frustum GenIdFrustum(FrustumType t, FrustumHandedness h, FrustumProjectiveSpace 
 		case 6: f = GenIdFrustum(OrthographicFrustum, FrustumLeftHanded, FrustumSpaceD3D); break; \
 		case 7: f = GenIdFrustum(OrthographicFrustum, FrustumRightHanded, FrustumSpaceD3D); break; \
 		} \
-		
+
 UNIQUE_TEST(Frustum_AspectRatio)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
-		assert(EqualAbs(f.AspectRatio(), 1.f));
+		mgl_assert(EqualAbs(f.AspectRatio(), 1.f));
 	}
 }
 
@@ -54,9 +54,9 @@ UNIQUE_TEST(Frustum_WorldRight)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		if (f.Handedness() == FrustumRightHanded)
-			assert(f.WorldRight().Equals(DIR_VEC(1, 0, 0)));
+			mgl_assert(f.WorldRight().Equals(DIR_VEC(1, 0, 0)));
 		else // In the test func, all cameras look down to -Z, so left-handed cameras need to point their right towards -X then.
-			assert(f.WorldRight().Equals(DIR_VEC(-1, 0, 0)));
+			mgl_assert(f.WorldRight().Equals(DIR_VEC(-1, 0, 0)));
 	}
 }
 
@@ -64,12 +64,12 @@ UNIQUE_TEST(Frustum_Chirality)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
-		assert(f.WorldMatrix().Determinant() > 0.f);
-		assert(f.ViewMatrix().Determinant() > 0.f);
+		mgl_assert(f.WorldMatrix().Determinant() > 0.f);
+		mgl_assert(f.ViewMatrix().Determinant() > 0.f);
 		if (f.Handedness() == FrustumLeftHanded)
-			assert(f.ProjectionMatrix().Determinant4() > 0.f); // left-handed view -> projection space transform does not change handedness.
+			mgl_assert(f.ProjectionMatrix().Determinant4() > 0.f); // left-handed view -> projection space transform does not change handedness.
 		else
-			assert(f.ProjectionMatrix().Determinant4() < 0.f); // but right-handed transform should.
+			mgl_assert(f.ProjectionMatrix().Determinant4() < 0.f); // but right-handed transform should.
 	}
 }
 
@@ -77,11 +77,11 @@ UNIQUE_TEST(Frustum_Planes)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
-		assert(f.NearPlane().normal.Equals(DIR_VEC(0, 0, 1)));
-		assert(EqualAbs(f.NearPlane().d, -1.f));
+		mgl_assert(f.NearPlane().normal.Equals(DIR_VEC(0, 0, 1)));
+		mgl_assert(EqualAbs(f.NearPlane().d, -1.f));
 
-		assert(f.FarPlane().normal.Equals(DIR_VEC(0, 0, -1)));
-		assert(EqualAbs(f.FarPlane().d, 100.f));
+		mgl_assert(f.FarPlane().normal.Equals(DIR_VEC(0, 0, -1)));
+		mgl_assert(EqualAbs(f.FarPlane().d, 100.f));
 
 		for(int i = 0; i < 9; ++i)
 		{
@@ -90,13 +90,13 @@ UNIQUE_TEST(Frustum_Planes)
 				pt = f.CenterPoint();
 			else
 				pt = f.CornerPoint(i);
-			assert(f.NearPlane().SignedDistance(pt) < 1e-3f);
-			assert(f.FarPlane().SignedDistance(pt) < 1e-3f);
-			assert(f.LeftPlane().SignedDistance(pt) < 1e-3f);
-			assert(f.RightPlane().SignedDistance(pt) < 1e-3f);
-			assert(f.TopPlane().SignedDistance(pt) < 1e-3f);
-			assert(f.BottomPlane().SignedDistance(pt) < 1e-3f);
-			assert(f.Contains(pt));
+			mgl_assert(f.NearPlane().SignedDistance(pt) < 1e-3f);
+			mgl_assert(f.FarPlane().SignedDistance(pt) < 1e-3f);
+			mgl_assert(f.LeftPlane().SignedDistance(pt) < 1e-3f);
+			mgl_assert(f.RightPlane().SignedDistance(pt) < 1e-3f);
+			mgl_assert(f.TopPlane().SignedDistance(pt) < 1e-3f);
+			mgl_assert(f.BottomPlane().SignedDistance(pt) < 1e-3f);
+			mgl_assert(f.Contains(pt));
 		}
 	}
 }
@@ -109,47 +109,47 @@ UNIQUE_TEST(Frustum_Corners)
 		// Corner points are returned in XYZ order: 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++
 		if (f.Type() == PerspectiveFrustum && f.Handedness() == FrustumLeftHanded)
 		{
-			assert(f.CornerPoint(0).Equals(POINT_VEC(1.f, -1.f, -1.f)));
-			assert(f.CornerPoint(1).Equals(POINT_VEC(100.f, -100.f, -100.f)));
-			assert(f.CornerPoint(2).Equals(POINT_VEC(1.f, 1, -1.f)));
-			assert(f.CornerPoint(3).Equals(POINT_VEC(100.f, 100.f, -100.f)));
-			assert(f.CornerPoint(4).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
-			assert(f.CornerPoint(5).Equals(POINT_VEC(-100.f, -100.f, -100.f)));
-			assert(f.CornerPoint(6).Equals(POINT_VEC(-1.f, 1.f, -1.f)));
-			assert(f.CornerPoint(7).Equals(POINT_VEC(-100.f, 100.f, -100.f)));
+			mgl_assert(f.CornerPoint(0).Equals(POINT_VEC(1.f, -1.f, -1.f)));
+			mgl_assert(f.CornerPoint(1).Equals(POINT_VEC(100.f, -100.f, -100.f)));
+			mgl_assert(f.CornerPoint(2).Equals(POINT_VEC(1.f, 1, -1.f)));
+			mgl_assert(f.CornerPoint(3).Equals(POINT_VEC(100.f, 100.f, -100.f)));
+			mgl_assert(f.CornerPoint(4).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
+			mgl_assert(f.CornerPoint(5).Equals(POINT_VEC(-100.f, -100.f, -100.f)));
+			mgl_assert(f.CornerPoint(6).Equals(POINT_VEC(-1.f, 1.f, -1.f)));
+			mgl_assert(f.CornerPoint(7).Equals(POINT_VEC(-100.f, 100.f, -100.f)));
 		}
 		else if (f.Type() == PerspectiveFrustum && f.Handedness() == FrustumRightHanded)
 		{
-			assert(f.CornerPoint(0).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
-			assert(f.CornerPoint(1).Equals(POINT_VEC(-100.f, -100.f, -100.f)));
-			assert(f.CornerPoint(2).Equals(POINT_VEC(-1.f, 1, -1.f)));
-			assert(f.CornerPoint(3).Equals(POINT_VEC(-100.f, 100.f, -100.f)));
-			assert(f.CornerPoint(4).Equals(POINT_VEC(1.f, -1.f, -1.f)));
-			assert(f.CornerPoint(5).Equals(POINT_VEC(100.f, -100.f, -100.f)));
-			assert(f.CornerPoint(6).Equals(POINT_VEC(1.f, 1.f, -1.f)));
-			assert(f.CornerPoint(7).Equals(POINT_VEC(100.f, 100.f, -100.f)));
+			mgl_assert(f.CornerPoint(0).Equals(POINT_VEC(-1.f, -1.f, -1.f)));
+			mgl_assert(f.CornerPoint(1).Equals(POINT_VEC(-100.f, -100.f, -100.f)));
+			mgl_assert(f.CornerPoint(2).Equals(POINT_VEC(-1.f, 1, -1.f)));
+			mgl_assert(f.CornerPoint(3).Equals(POINT_VEC(-100.f, 100.f, -100.f)));
+			mgl_assert(f.CornerPoint(4).Equals(POINT_VEC(1.f, -1.f, -1.f)));
+			mgl_assert(f.CornerPoint(5).Equals(POINT_VEC(100.f, -100.f, -100.f)));
+			mgl_assert(f.CornerPoint(6).Equals(POINT_VEC(1.f, 1.f, -1.f)));
+			mgl_assert(f.CornerPoint(7).Equals(POINT_VEC(100.f, 100.f, -100.f)));
 		}
 		else if (f.Type() == OrthographicFrustum && f.Handedness() == FrustumLeftHanded)
 		{
-			assert(f.CornerPoint(0).Equals(POINT_VEC(50.f, -50.f, -1.f)));
-			assert(f.CornerPoint(1).Equals(POINT_VEC(50.f, -50.f, -100.f)));
-			assert(f.CornerPoint(2).Equals(POINT_VEC(50.f, 50.f, -1.f)));
-			assert(f.CornerPoint(3).Equals(POINT_VEC(50.f, 50.f, -100.f)));
-			assert(f.CornerPoint(4).Equals(POINT_VEC(-50.f, -50.f, -1.f)));
-			assert(f.CornerPoint(5).Equals(POINT_VEC(-50.f, -50.f, -100.f)));
-			assert(f.CornerPoint(6).Equals(POINT_VEC(-50.f, 50.f, -1.f)));
-			assert(f.CornerPoint(7).Equals(POINT_VEC(-50.f, 50.f, -100.f)));
+			mgl_assert(f.CornerPoint(0).Equals(POINT_VEC(50.f, -50.f, -1.f)));
+			mgl_assert(f.CornerPoint(1).Equals(POINT_VEC(50.f, -50.f, -100.f)));
+			mgl_assert(f.CornerPoint(2).Equals(POINT_VEC(50.f, 50.f, -1.f)));
+			mgl_assert(f.CornerPoint(3).Equals(POINT_VEC(50.f, 50.f, -100.f)));
+			mgl_assert(f.CornerPoint(4).Equals(POINT_VEC(-50.f, -50.f, -1.f)));
+			mgl_assert(f.CornerPoint(5).Equals(POINT_VEC(-50.f, -50.f, -100.f)));
+			mgl_assert(f.CornerPoint(6).Equals(POINT_VEC(-50.f, 50.f, -1.f)));
+			mgl_assert(f.CornerPoint(7).Equals(POINT_VEC(-50.f, 50.f, -100.f)));
 		}
 		else if (f.Type() == OrthographicFrustum && f.Handedness() == FrustumRightHanded)
 		{
-			assert(f.CornerPoint(0).Equals(POINT_VEC(-50.f, -50.f, -1.f)));
-			assert(f.CornerPoint(1).Equals(POINT_VEC(-50.f, -50.f, -100.f)));
-			assert(f.CornerPoint(2).Equals(POINT_VEC(-50.f, 50.f, -1.f)));
-			assert(f.CornerPoint(3).Equals(POINT_VEC(-50.f, 50.f, -100.f)));
-			assert(f.CornerPoint(4).Equals(POINT_VEC(50.f, -50.f, -1.f)));
-			assert(f.CornerPoint(5).Equals(POINT_VEC(50.f, -50.f, -100.f)));
-			assert(f.CornerPoint(6).Equals(POINT_VEC(50.f, 50.f, -1.f)));
-			assert(f.CornerPoint(7).Equals(POINT_VEC(50.f, 50.f, -100.f)));
+			mgl_assert(f.CornerPoint(0).Equals(POINT_VEC(-50.f, -50.f, -1.f)));
+			mgl_assert(f.CornerPoint(1).Equals(POINT_VEC(-50.f, -50.f, -100.f)));
+			mgl_assert(f.CornerPoint(2).Equals(POINT_VEC(-50.f, 50.f, -1.f)));
+			mgl_assert(f.CornerPoint(3).Equals(POINT_VEC(-50.f, 50.f, -100.f)));
+			mgl_assert(f.CornerPoint(4).Equals(POINT_VEC(50.f, -50.f, -1.f)));
+			mgl_assert(f.CornerPoint(5).Equals(POINT_VEC(50.f, -50.f, -100.f)));
+			mgl_assert(f.CornerPoint(6).Equals(POINT_VEC(50.f, 50.f, -1.f)));
+			mgl_assert(f.CornerPoint(7).Equals(POINT_VEC(50.f, 50.f, -100.f)));
 		}
 	}
 }
@@ -172,15 +172,15 @@ UNIQUE_TEST(Frustum_Project_Unproject_Symmetry)
 				float2 pt = float2::RandomBox(rng, -1.f, 1.f);
 				vec pos = f.NearPlanePos(pt);
 				vec pt2 = f.Project(pos);
-				assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
+				mgl_assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
 
 				pos = f.FarPlanePos(pt);
 				pt2 = f.Project(pos);
-				assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
+				mgl_assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
 
 				pos = f.PointInside(pt.x, pt.y, rng.Float());
 				pt2 = f.Project(pos);
-				assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
+				mgl_assert2(pt.Equals(pt2.xy()), pt, pt2.xy());
 			}
 		}
 	}
@@ -196,10 +196,10 @@ UNIQUE_TEST(Frustum_Plane_Normals_Are_Correct)
 		f.GetCornerPoints(corners);
 		f.GetPlanes(planes);
 		for(int i = 0; i < 8; ++i)
-			assert(pb.Contains(corners[i]));
+			mgl_assert(pb.Contains(corners[i]));
 		for(int i = 0; i < 6; ++i)
 			for(int j = 0; j < 8; ++j)
-				assert(planes[i].SignedDistance(corners[j]) <= 0.f);
+				mgl_assert(planes[i].SignedDistance(corners[j]) <= 0.f);
 	}
 }
 
@@ -213,12 +213,12 @@ UNIQUE_TEST(Frustum_IsConvex)
 		{
 			Plane p1 = f.GetPlane(i);
 			Plane p2 = p.FacePlane(i);
-			assert3(p1.Equals(p2), i, p1, p2);
+			mgl_assert3(p1.Equals(p2), i, p1, p2);
 		}
-		assert(p.EulerFormulaHolds());
-		assert(p.IsClosed());
-		assert(p.IsConvex());
-		assert(!p.IsNull());
+		mgl_assert(p.EulerFormulaHolds());
+		mgl_assert(p.IsClosed());
+		mgl_assert(p.IsConvex());
+		mgl_assert(!p.IsNull());
 	}
 }
 
@@ -228,11 +228,11 @@ UNIQUE_TEST(Plane_ProjectToNegativeHalf)
 
 	vec neg = POINT_VEC(0,-100.f, 0);
 	vec pos = POINT_VEC(0, 100.f, 0);
-	assert(neg.Equals(p.ProjectToNegativeHalf(neg)));
-	assert(!neg.Equals(p.ProjectToPositiveHalf(neg)));
+	mgl_assert(neg.Equals(p.ProjectToNegativeHalf(neg)));
+	mgl_assert(!neg.Equals(p.ProjectToPositiveHalf(neg)));
 
-	assert(pos.Equals(p.ProjectToPositiveHalf(pos)));
-	assert(!pos.Equals(p.ProjectToNegativeHalf(pos)));
+	mgl_assert(pos.Equals(p.ProjectToPositiveHalf(pos)));
+	mgl_assert(!pos.Equals(p.ProjectToNegativeHalf(pos)));
 }
 
 UNIQUE_TEST(Frustum_Contains)
@@ -246,11 +246,11 @@ UNIQUE_TEST(Frustum_Contains)
 			float distance = f.Distance(corner);
 			if (!f.Contains(corner) || distance > 1e-4f)
 				LOGE("Closest point to %s: %s", corner.ToString().c_str(), closestPoint.ToString().c_str());
-			assert4(f.Contains(corner), i, corner, f, distance);
-			assert1(distance < 10.f, distance);
+			mgl_assert4(f.Contains(corner), i, corner, f, distance);
+			mgl_assert1(distance < 10.f, distance);
 		}
 
-		assert3(f.Contains(f.CenterPoint()), f, f.CenterPoint(), f.Distance(f.CenterPoint()));
+		mgl_assert3(f.Contains(f.CenterPoint()), f, f.CenterPoint(), f.Distance(f.CenterPoint()));
 	}
 }
 
@@ -263,13 +263,13 @@ RANDOMIZED_TEST(Frustum_Contains_Corners)
 	{
 		vec point = (i == 8) ? b.CenterPoint() : b.CornerPoint(i);
 
-		assert(b.NearPlane().SignedDistance(point) < 1e-3f);
-		assert(b.FarPlane().SignedDistance(point) < 1e-3f);
-		assert(b.LeftPlane().SignedDistance(point) < 1e-3f);
-		assert(b.RightPlane().SignedDistance(point) < 1e-3f);
-		assert(b.TopPlane().SignedDistance(point) < 1e-3f);
-		assert(b.BottomPlane().SignedDistance(point) < 1e-3f);
-		assert1(b.Contains(point), b.Distance(point));
+		mgl_assert(b.NearPlane().SignedDistance(point) < 1e-3f);
+		mgl_assert(b.FarPlane().SignedDistance(point) < 1e-3f);
+		mgl_assert(b.LeftPlane().SignedDistance(point) < 1e-3f);
+		mgl_assert(b.RightPlane().SignedDistance(point) < 1e-3f);
+		mgl_assert(b.TopPlane().SignedDistance(point) < 1e-3f);
+		mgl_assert(b.BottomPlane().SignedDistance(point) < 1e-3f);
+		mgl_assert1(b.Contains(point), b.Distance(point));
 	}
 }
 
@@ -280,18 +280,18 @@ UNIQUE_TEST(Frustum_Matrices)
 		if (f.Handedness() == FrustumRightHanded)
 		{
 			float3x4 wm = f.WorldMatrix();
-			assert(wm.IsIdentity());
+			mgl_assert(wm.IsIdentity());
 
 			float3x4 vm = f.ViewMatrix();
-			assert(vm.IsIdentity());
+			mgl_assert(vm.IsIdentity());
 		}
 		else
 		{
 			float3x4 wm = f.WorldMatrix() * float3x4::RotateY(pi);
-			assert(wm.IsIdentity());
+			mgl_assert(wm.IsIdentity());
 
 			float3x4 vm = f.ViewMatrix() * float3x4::RotateY(pi);
-			assert(vm.IsIdentity());
+			mgl_assert(vm.IsIdentity());
 		}
 	}
 }
@@ -303,14 +303,14 @@ UNIQUE_TEST(Frustum_Projection)
 		const float nearD = (f.ProjectiveSpace() == FrustumSpaceD3D) ? 0.f : -1.f;
 
 		// Corner points are returned in XYZ order: 0: ---, 1: --+, 2: -+-, 3: -++, 4: +--, 5: +-+, 6: ++-, 7: +++
-		assert(f.Project(f.CornerPoint(0)).Equals(POINT_VEC(-1, -1, nearD)));
-		assert(f.Project(f.CornerPoint(1)).Equals(POINT_VEC(-1, -1, 1)));
-		assert(f.Project(f.CornerPoint(2)).Equals(POINT_VEC(-1, 1, nearD)));
-		assert(f.Project(f.CornerPoint(3)).Equals(POINT_VEC(-1, 1, 1)));
-		assert(f.Project(f.CornerPoint(4)).Equals(POINT_VEC(1, -1, nearD)));
-		assert(f.Project(f.CornerPoint(5)).Equals(POINT_VEC(1, -1, 1)));
-		assert(f.Project(f.CornerPoint(6)).Equals(POINT_VEC(1, 1, nearD)));
-		assert(f.Project(f.CornerPoint(7)).Equals(POINT_VEC(1, 1, 1)));
+		mgl_assert(f.Project(f.CornerPoint(0)).Equals(POINT_VEC(-1, -1, nearD)));
+		mgl_assert(f.Project(f.CornerPoint(1)).Equals(POINT_VEC(-1, -1, 1)));
+		mgl_assert(f.Project(f.CornerPoint(2)).Equals(POINT_VEC(-1, 1, nearD)));
+		mgl_assert(f.Project(f.CornerPoint(3)).Equals(POINT_VEC(-1, 1, 1)));
+		mgl_assert(f.Project(f.CornerPoint(4)).Equals(POINT_VEC(1, -1, nearD)));
+		mgl_assert(f.Project(f.CornerPoint(5)).Equals(POINT_VEC(1, -1, 1)));
+		mgl_assert(f.Project(f.CornerPoint(6)).Equals(POINT_VEC(1, 1, nearD)));
+		mgl_assert(f.Project(f.CornerPoint(7)).Equals(POINT_VEC(1, 1, 1)));
 		MARK_UNUSED(nearD);
 	}
 }
@@ -322,19 +322,19 @@ UNIQUE_TEST(Frustum_UnProject)
 		if (f.Type() == PerspectiveFrustum)
 		{
 			Ray r = f.UnProject(0, 0);
-			assert(r.pos.Equals(f.Pos()));
-			assert(r.pos.Equals(POINT_VEC(0, 0, 0)));
-			assert(r.dir.Equals(DIR_VEC(0,0,-1)));
+			mgl_assert(r.pos.Equals(f.Pos()));
+			mgl_assert(r.pos.Equals(POINT_VEC(0, 0, 0)));
+			mgl_assert(r.dir.Equals(DIR_VEC(0,0,-1)));
 
 			r = f.UnProject(-1, -1);
-			assert(r.pos.Equals(f.Pos()));
-			assert(r.pos.Equals(POINT_VEC(0, 0, 0)));
-			assert(r.dir.Equals((f.CornerPoint(1)-f.CornerPoint(0)).Normalized()));
+			mgl_assert(r.pos.Equals(f.Pos()));
+			mgl_assert(r.pos.Equals(POINT_VEC(0, 0, 0)));
+			mgl_assert(r.dir.Equals((f.CornerPoint(1)-f.CornerPoint(0)).Normalized()));
 
 			r = f.UnProject(1, 1);
-			assert(r.pos.Equals(f.Pos()));
-			assert(r.pos.Equals(POINT_VEC(0, 0, 0)));
-			assert(r.dir.Equals((f.CornerPoint(7)-f.CornerPoint(6)).Normalized()));
+			mgl_assert(r.pos.Equals(f.Pos()));
+			mgl_assert(r.pos.Equals(POINT_VEC(0, 0, 0)));
+			mgl_assert(r.dir.Equals((f.CornerPoint(7)-f.CornerPoint(6)).Normalized()));
 		}
 	}
 }
@@ -344,16 +344,16 @@ UNIQUE_TEST(Frustum_UnProjectFromNearPlane)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		Ray r = f.UnProjectFromNearPlane(0, 0);
-		assert(r.pos.Equals(POINT_VEC(0,0,-1)));
-		assert(r.dir.Equals(DIR_VEC(0,0,-1)));
+		mgl_assert(r.pos.Equals(POINT_VEC(0,0,-1)));
+		mgl_assert(r.dir.Equals(DIR_VEC(0,0,-1)));
 
 		r = f.UnProjectFromNearPlane(-1, -1);
-		assert(r.pos.Equals(f.CornerPoint(0)));
-		assert(r.dir.Equals((f.CornerPoint(1)-f.CornerPoint(0)).Normalized()));
+		mgl_assert(r.pos.Equals(f.CornerPoint(0)));
+		mgl_assert(r.dir.Equals((f.CornerPoint(1)-f.CornerPoint(0)).Normalized()));
 
 		r = f.UnProjectFromNearPlane(1, 1);
-		assert(r.pos.Equals(f.CornerPoint(6)));
-		assert(r.dir.Equals((f.CornerPoint(7)-f.CornerPoint(6)).Normalized()));
+		mgl_assert(r.pos.Equals(f.CornerPoint(6)));
+		mgl_assert(r.dir.Equals((f.CornerPoint(7)-f.CornerPoint(6)).Normalized()));
 	}
 }
 
@@ -362,16 +362,16 @@ UNIQUE_TEST(Frustum_UnProjectLineSegment)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		LineSegment ls = f.UnProjectLineSegment(0, 0);
-		assert(ls.a.Equals(POINT_VEC(0,0,-1)));
-		assert(ls.b.Equals(POINT_VEC(0,0,-100)));
+		mgl_assert(ls.a.Equals(POINT_VEC(0,0,-1)));
+		mgl_assert(ls.b.Equals(POINT_VEC(0,0,-100)));
 
 		ls = f.UnProjectLineSegment(-1, -1);
-		assert(ls.a.Equals(f.CornerPoint(0)));
-		assert(ls.b.Equals(f.CornerPoint(1)));
+		mgl_assert(ls.a.Equals(f.CornerPoint(0)));
+		mgl_assert(ls.b.Equals(f.CornerPoint(1)));
 
 		ls = f.UnProjectLineSegment(1, 1);
-		assert(ls.a.Equals(f.CornerPoint(6)));
-		assert(ls.b.Equals(f.CornerPoint(7)));
+		mgl_assert(ls.a.Equals(f.CornerPoint(6)));
+		mgl_assert(ls.b.Equals(f.CornerPoint(7)));
 	}
 }
 
@@ -383,15 +383,15 @@ UNIQUE_TEST(Frustum_NearPlanePos)
 		{
 			if (f.Handedness() == FrustumLeftHanded)
 			{
-				assert(f.NearPlanePos(1,-1).Equals(POINT_VEC(-1,-1,-1)));
-				assert(f.NearPlanePos(-1,1).Equals(POINT_VEC(1,1,-1)));
+				mgl_assert(f.NearPlanePos(1,-1).Equals(POINT_VEC(-1,-1,-1)));
+				mgl_assert(f.NearPlanePos(-1,1).Equals(POINT_VEC(1,1,-1)));
 			}
 			else
 			{
-				assert(f.NearPlanePos(-1,-1).Equals(POINT_VEC(-1,-1,-1)));
-				assert(f.NearPlanePos(1,1).Equals(POINT_VEC(1,1,-1)));
+				mgl_assert(f.NearPlanePos(-1,-1).Equals(POINT_VEC(-1,-1,-1)));
+				mgl_assert(f.NearPlanePos(1,1).Equals(POINT_VEC(1,1,-1)));
 			}
-			assert(f.NearPlanePos(0,0).Equals(POINT_VEC(0,0,-1)));
+			mgl_assert(f.NearPlanePos(0,0).Equals(POINT_VEC(0,0,-1)));
 		}
 	}
 }
@@ -404,15 +404,15 @@ UNIQUE_TEST(Frustum_FarPlanePos)
 		{
 			if (f.Handedness() == FrustumLeftHanded)
 			{
-				assert(f.FarPlanePos(1,-1).Equals(POINT_VEC(-100,-100,-100)));
-				assert(f.FarPlanePos(-1,1).Equals(POINT_VEC(100,100,-100)));
+				mgl_assert(f.FarPlanePos(1,-1).Equals(POINT_VEC(-100,-100,-100)));
+				mgl_assert(f.FarPlanePos(-1,1).Equals(POINT_VEC(100,100,-100)));
 			}
 			else
 			{
-				assert(f.FarPlanePos(-1,-1).Equals(POINT_VEC(-100,-100,-100)));
-				assert(f.FarPlanePos(1,1).Equals(POINT_VEC(100,100,-100)));
+				mgl_assert(f.FarPlanePos(-1,-1).Equals(POINT_VEC(-100,-100,-100)));
+				mgl_assert(f.FarPlanePos(1,1).Equals(POINT_VEC(100,100,-100)));
 			}
-			assert(f.FarPlanePos(0,0).Equals(POINT_VEC(0,0,-100)));
+			mgl_assert(f.FarPlanePos(0,0).Equals(POINT_VEC(0,0,-100)));
 		}
 	}
 }
@@ -421,7 +421,7 @@ UNIQUE_TEST(Frustum_Finite)
 {
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
-		assert(f.IsFinite());
+		mgl_assert(f.IsFinite());
 	}
 }
 
@@ -430,7 +430,7 @@ UNIQUE_TEST(Frustum_MinimalEnclosingAABB)
 	Frustum f;
 	FOR_EACH_FRUSTUM_CONVENTION(f)
 		AABB a = f.MinimalEnclosingAABB();
-		assert(a.Contains(f));
+		mgl_assert(a.Contains(f));
 	}
 }
 
@@ -444,7 +444,7 @@ UNIQUE_TEST(Frustum_MinimalEnclosingOBB)
 			LOGE("OBB: %s", o.ToString().c_str());
 			LOGE("Frustum: %s", f.ToString().c_str());
 		}
-		assert(o.Contains(f));
+		mgl_assert(o.Contains(f));
 	}
 }
 
@@ -456,11 +456,11 @@ UNIQUE_TEST(Frustum_AspectRatio_NearPlanePos)
 	f.SetFrame(POINT_VEC_SCALAR(0.f), DIR_VEC(0, 0, -1), DIR_VEC(0, 1, 0));
 	f.SetViewPlaneDistances(0.5f, 10.f);
 
-	assert(EqualAbs(f.NearPlaneWidth(), 0.5f*Tan(DegToRad(140.f)/2.f)*2.f));
-	assert(EqualAbs(f.NearPlaneHeight(), 0.5f*Tan(DegToRad(30.f)/2.f)*2.f));
+	mgl_assert(EqualAbs(f.NearPlaneWidth(), 0.5f*Tan(DegToRad(140.f)/2.f)*2.f));
+	mgl_assert(EqualAbs(f.NearPlaneHeight(), 0.5f*Tan(DegToRad(30.f)/2.f)*2.f));
 
 	float aspect = f.NearPlaneWidth() / f.NearPlaneHeight();
-	assert(EqualAbs(aspect, f.AspectRatio()));
+	mgl_assert(EqualAbs(aspect, f.AspectRatio()));
 	MARK_UNUSED(aspect);
 }
 
@@ -471,27 +471,27 @@ RANDOMIZED_TEST(Frustum_ToPbVolume_And_Back)
 	PBVolume<6> pbvol = f.ToPBVolume();
 
 	Polyhedron ph2 = f.ToPolyhedron();
-	assert(ph2.EulerFormulaHolds());
+	mgl_assert(ph2.EulerFormulaHolds());
 	///\todo Due to numeric instability, this condition does not always hold, but would be nice to have it.
-//	assert(ph2.IsConvex());
-	assert(ph2.IsClosed());
+//	mgl_assert(ph2.IsConvex());
+	mgl_assert(ph2.IsClosed());
 	Polyhedron ph = pbvol.ToPolyhedron();
-	assert(ph.EulerFormulaHolds());
-	assert(ph.SetEquals(ph2));
-	assert(ph.IsClosed());
-//	assert(ph.IsConvex());
-	assert(!ph.IsNull());
+	mgl_assert(ph.EulerFormulaHolds());
+	mgl_assert(ph.SetEquals(ph2));
+	mgl_assert(ph.IsClosed());
+//	mgl_assert(ph.IsConvex());
+	mgl_assert(!ph.IsNull());
 
-	assert(ph.SetEquals(ph2));
+	mgl_assert(ph.SetEquals(ph2));
 
-	// .SetEquals() canonicalizes the Polyhedrons, so run the assert()s again to ensure it didn't change anything for real.
-	assert(ph2.EulerFormulaHolds());
-	assert(ph.EulerFormulaHolds());
-//	assert(ph2.IsConvex());
-	assert(ph2.IsClosed());
-	assert(ph.IsClosed());
-//	assert(ph.IsConvex());
-	assert(!ph.IsNull());
+	// .SetEquals() canonicalizes the Polyhedrons, so run the mgl_assert()s again to ensure it didn't change anything for real.
+	mgl_assert(ph2.EulerFormulaHolds());
+	mgl_assert(ph.EulerFormulaHolds());
+//	mgl_assert(ph2.IsConvex());
+	mgl_assert(ph2.IsClosed());
+	mgl_assert(ph.IsClosed());
+//	mgl_assert(ph.IsConvex());
+	mgl_assert(!ph.IsNull());
 }
 
 // This tests the ability to compute the set intersection of two convex objects (Frustums) represented as PBVolumes.
@@ -514,66 +514,66 @@ RANDOMIZED_TEST(Intersect_Two_Frustums)
 	Polyhedron ph = intersection.ToPolyhedron();
 
 	// ph is the set intersection of a and b, so must be contained in both a and b.
-	assert(a.Contains(ph));
-	assert(b.Contains(ph));
+	mgl_assert(a.Contains(ph));
+	mgl_assert(b.Contains(ph));
 
 	// ph must be valid in itself.
-	assert(!ph.IsNull());
-	assert(ph.IsClosed());
-	assert(ph.Contains(pt));
+	mgl_assert(!ph.IsNull());
+	mgl_assert(ph.IsClosed());
+	mgl_assert(ph.Contains(pt));
 }
 
 RANDOMIZED_TEST(Frustum_Contains_LineSegment)
 {
 	vec pt = POINT_VEC_SCALAR(0.f);
 	Frustum f = RandomFrustumContainingPoint(rng, pt);
-	assert(f.Contains(LineSegment(pt, pt)));
+	mgl_assert(f.Contains(LineSegment(pt, pt)));
 	vec pt2 = POINT_VEC_SCALAR(1e9f);
-	assert(!f.Contains(LineSegment(pt2, pt2)));
+	mgl_assert(!f.Contains(LineSegment(pt2, pt2)));
 
 	// Must contain the line segment passing from the center of near plane to the far plane.
 	vec n = f.NearPlanePos(0.f, 0.f);
 	vec d = f.FarPlanePos(0.f, 0.f);
 	LineSegment l(n, d);
-	assert(f.Contains(l));
+	mgl_assert(f.Contains(l));
 
 	// Must not contain the eye position (unless an orthographic frustum with zero near plane distance)
 	vec p = f.Pos();
 	vec front = f.Front();
-	assert(!f.Contains(LineSegment(p, p)) || (f.NearPlaneDistance() <= 0.f && f.Type() == OrthographicFrustum));
+	mgl_assert(!f.Contains(LineSegment(p, p)) || (f.NearPlaneDistance() <= 0.f && f.Type() == OrthographicFrustum));
 
 	// Must not contain line segment between eye and behind it.
 	vec out = (p + n)*0.5f;
-	assert(!f.Contains(LineSegment(out, out - front)));
+	mgl_assert(!f.Contains(LineSegment(out, out - front)));
 
 	// Must not contain line segment past the far plane.
-	assert(!f.Contains(LineSegment(d + front, d + 2.f*front)));
+	mgl_assert(!f.Contains(LineSegment(d + front, d + 2.f*front)));
 
 	// Must not contain a line segment that straddles the Frustum.
-	assert(!f.Contains(LineSegment(p, d + 2.f * front)));
+	mgl_assert(!f.Contains(LineSegment(p, d + 2.f * front)));
 }
 
 RANDOMIZED_TEST(Frustum_Contains_Triangle)
 {
 	vec pt = POINT_VEC_SCALAR(0.f);
 	Frustum f = RandomFrustumContainingPoint(rng, pt);
-	assert(f.Contains(LineSegment(pt, pt)));
+	mgl_assert(f.Contains(LineSegment(pt, pt)));
 	vec pt2 = POINT_VEC_SCALAR(1e9f);
-	assert(!f.Contains(LineSegment(pt2, pt2)));
+	mgl_assert(!f.Contains(LineSegment(pt2, pt2)));
 
 	// Test containment inside the Frustum.
 	vec n = f.NearPlanePos(-1.f, 0.f);
 	vec n2 = f.NearPlanePos(1.f, 0.f);
 	vec d = f.FarPlanePos(0.f, 0.f);
-	assert(f.Contains(Triangle(n, n2, d)));
+	mgl_assert(f.Contains(Triangle(n, n2, d)));
 
 	// Must not contain the eye position (unless an orthographic frustum with zero near plane distance) or a Triangle that straddles the Frustum.
 	vec p = f.Pos();
-	assert(!f.Contains(Triangle(p, n, d)));
+	mgl_assert(!f.Contains(Triangle(p, n, d)));
 
 	// Must not contain a Triangle that's completely outside the Frustum.
 	vec front = f.Front();
-	assert(!f.Contains(Triangle(p - front, p - front, p - front)));
+	mgl_assert(!f.Contains(Triangle(p - front, p - front, p - front)));
 }
 
 BENCHMARK(Frustum_Contains_Point, "Frustum::Contains(point)")
@@ -601,26 +601,26 @@ RANDOMIZED_TEST(Frustum_ClosestPoint_Point)
 {
 	vec pt = POINT_VEC_SCALAR(0.f);
 	Frustum f = RandomFrustumContainingPoint(rng, pt);
-	assert(f.ClosestPoint(pt).Equals(pt));
+	mgl_assert(f.ClosestPoint(pt).Equals(pt));
 
 	vec n = f.NearPlanePos(0.f, 0.f);
-	assert(f.ClosestPoint(n).Equals(n));
+	mgl_assert(f.ClosestPoint(n).Equals(n));
 	vec p = f.Pos();
 	vec cp = f.ClosestPoint(p);
 #ifdef MATH_VEC_IS_FLOAT4
-	assert(EqualAbs(cp.w, 1.f));
+	mgl_assert(EqualAbs(cp.w, 1.f));
 #endif
-	assert3(cp.Equals(n), p, cp, n);
+	mgl_assert3(cp.Equals(n), p, cp, n);
 
 	vec d = f.FarPlanePos(0.f, 0.f);
 	vec front = f.Front();
-	assert(f.ClosestPoint(d + front).Equals(d));
+	mgl_assert(f.ClosestPoint(d + front).Equals(d));
 
 	vec pt2 = vec::RandomSphere(rng, pt, 1000.f);
 	cp = f.ClosestPoint(pt2);
 
 	vec cp2 = f.ToPolyhedron().ClosestPoint(pt2); // This is known to be correct.
-	assert2(cp.Equals(cp2), cp, cp2);
+	mgl_assert2(cp.Equals(cp2), cp, cp2);
 }
 
 BENCHMARK(Frustum_ClosestPoint_Point, "Frustum::ClosestPoint(point)")

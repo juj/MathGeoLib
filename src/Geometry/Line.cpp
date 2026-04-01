@@ -55,13 +55,13 @@ MATH_BEGIN_NAMESPACE
 	@see ClosestPoint(), Distance(). */
 void Line::ClosestPointLineLine(const vec &v0, const vec &v10, const vec &v2, const vec &v32, float &d, float &d2)
 {
-	assume(!v10.IsZero());
-	assume(!v32.IsZero());
+	mgl_assume(!v10.IsZero());
+	mgl_assume(!v32.IsZero());
 	vec v02 = v0 - v2;
 	float d0232 = v02.Dot(v32);
 	float d3210 = v32.Dot(v10);
 	float d3232 = v32.Dot(v32);
-	assume(d3232 != 0.f); // Don't call with a zero direction vector.
+	mgl_assume(d3232 != 0.f); // Don't call with a zero direction vector.
 	float d0210 = v02.Dot(v10);
 	float d1010 = v10.Dot(v10);
 	float denom = d1010*d3232 - d3210*d3210;
@@ -75,13 +75,13 @@ void Line::ClosestPointLineLine(const vec &v0, const vec &v10, const vec &v2, co
 Line::Line(const vec &pos_, const vec &dir_)
 :pos(pos_), dir(dir_)
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Line::Line(const Ray &ray)
 :pos(ray.pos), dir(ray.dir)
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Line::Line(const LineSegment &lineSegment)
@@ -96,7 +96,7 @@ bool Line::IsFinite() const
 
 vec Line::GetPoint(float d) const
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
 	return pos + d * dir;
 }
 
@@ -146,8 +146,8 @@ bool Line::Contains(const LineSegment &lineSegment, float epsilon) const
 
 bool Line::Equals(const Line &line, float epsilon) const
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
-	assume2(line.dir.IsNormalized(), line.dir, line.dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(line.dir.IsNormalized(), line.dir, line.dir.LengthSq());
 	// If the point of the other line is on this line, and the two lines point to the same, or exactly reverse directions,
 	// they must be equal.
 	return Contains(line.pos, epsilon) && EqualAbs(Abs(dir.Dot(line.dir)), 1.f, epsilon);
@@ -173,8 +173,8 @@ float Line::Distance(const Line &other, float &d, float &d2) const
 float Line::Distance(const LineSegment &other, float &d, float &d2) const
 {
 	vec c = ClosestPoint(other, d, d2);
-	mathassert(d2 >= 0.f);
-	mathassert(d2 <= 1.f);
+	mgl_mathassert(d2 >= 0.f);
+	mgl_mathassert(d2 <= 1.f);
 	return c.Distance(other.GetPoint(d2));
 }
 
@@ -373,7 +373,7 @@ StringT Line::SerializeToString() const
 	s = SerializeFloat(dir.x, s); *s = ','; ++s;
 	s = SerializeFloat(dir.y, s); *s = ','; ++s;
 	s = SerializeFloat(dir.z, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -396,7 +396,7 @@ std::ostream &operator <<(std::ostream &o, const Line &line)
 
 Line Line::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return Line(vec::nan, vec::nan);
 	Line l;

@@ -96,15 +96,15 @@ public:
 		@see ptr(), operator [](). */
 	FORCE_INLINE CONST_WIN32 float At(int index) const
 	{
-		assume(index >= 0);
-		assume(index < Size);
+		mgl_assume(index >= 0);
+		mgl_assume(index < Size);
 		return ptr()[index];
 	}
 	
 	FORCE_INLINE float &At(int index)
 	{
-		assume(index >= 0);
-		assume(index < Size);
+		mgl_assume(index >= 0);
+		mgl_assume(index < Size);
 		return ptr()[index];
 	}
 

@@ -94,7 +94,7 @@ vec Capsule::Center() const
 vec Capsule::ExtremePoint(const vec &direction) const
 {
 	float len = direction.Length();
-	assume(len > 0.f);
+	mgl_assume(len > 0.f);
 	return (Dot(direction, l.b - l.a) >= 0.f ? l.b : l.a) + direction * (r / len);
 }
 
@@ -114,7 +114,7 @@ void Capsule::ProjectToAxis(const vec &direction, float &outMin, float &outMax) 
 
 	// The following requires that direction is normalized, otherwise we would have to sub/add 'r * direction.Length()', but
 	// don't want to do that for performance reasons.
-	assume(direction.IsNormalized());
+	mgl_assume(direction.IsNormalized());
 	outMin -= r;
 	outMax += r;
 }
@@ -148,8 +148,8 @@ float Capsule::SurfaceArea() const
 
 Circle Capsule::CrossSection(float yPos) const
 {
-	assume(yPos >= 0.f);
-	assume(yPos <= 1.f);
+	mgl_assume(yPos >= 0.f);
+	mgl_assume(yPos <= 1.f);
 	yPos *= Height();
 	vec up = UpDirection();
 	vec centerPos = Bottom() + up * yPos;
@@ -213,7 +213,7 @@ OBB Capsule::MinimalEnclosingOBB() const
 
 vec Capsule::RandomPointInside(LCG &rng) const
 {
-	assume(IsFinite());
+	mgl_assume(IsFinite());
 
 	OBB obb = MinimalEnclosingOBB();
 	for(int i = 0; i < 1000; ++i)
@@ -222,7 +222,7 @@ vec Capsule::RandomPointInside(LCG &rng) const
 		if (Contains(pt))
 			return pt;
 	}
-	assume(false && "Warning: Capsule::RandomPointInside ran out of iterations to perform!");
+	mgl_assume(false && "Warning: Capsule::RandomPointInside ran out of iterations to perform!");
 	return Center(); // Just return some point that is known to be inside.
 }
 
@@ -253,24 +253,24 @@ void Capsule::Scale(const vec &centerPoint, float scaleFactor)
 
 void Capsule::Transform(const float3x3 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal());
 	l.Transform(transform);
 	r *= transform.Col(0).Length(); // Scale the radius.
 }
 
 void Capsule::Transform(const float3x4 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal());
 	l.Transform(transform);
 	r *= transform.Col(0).Length(); // Scale the radius.
 }
 
 void Capsule::Transform(const float4x4 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(transform.IsColOrthogonal3());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(transform.IsColOrthogonal3());
 	l.Transform(transform);
 	r *= transform.Col3(0).Length(); // Scale the radius.
 }
@@ -376,7 +376,7 @@ bool Capsule::Contains(const Frustum &frustum) const
 
 bool Capsule::Contains(const Polyhedron &polyhedron) const
 {
-	assume(polyhedron.IsClosed());
+	mgl_assume(polyhedron.IsClosed());
 	for(int i = 0; i < polyhedron.NumVertices(); ++i)
 		if (!Contains(polyhedron.Vertex(i)))
 			return false;
@@ -468,7 +468,7 @@ StringT Capsule::SerializeToString() const
 	s = SerializeFloat(l.b.y, s); *s = ','; ++s;
 	s = SerializeFloat(l.b.z, s); *s = ','; ++s;
 	s = SerializeFloat(r, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -492,7 +492,7 @@ std::ostream &operator <<(std::ostream &o, const Capsule &capsule)
 
 Capsule Capsule::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return Capsule(vec::nan, vec::nan, FLOAT_NAN);
 	Capsule c;

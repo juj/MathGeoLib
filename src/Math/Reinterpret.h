@@ -41,7 +41,7 @@ FORCE_INLINE float ReinterpretAsFloat(u32 i)
 	FloatIntReinterpret fi;
 	fi.i = i;
 #ifdef __EMSCRIPTEN__
-	assert(ReinterpretAsU32(fi.f) == i);
+	mgl_assert(ReinterpretAsU32(fi.f) == i);
 #endif
 	return fi.f;
 }
@@ -51,7 +51,7 @@ FORCE_INLINE double ReinterpretAsDouble(u64 i)
 	DoubleU64Reinterpret di;
 	di.i = i;
 #ifdef __EMSCRIPTEN__
-	assert(ReinterpretAsU64(di.d) == i);
+	mgl_assert(ReinterpretAsU64(di.d) == i);
 #endif
 	return di.d;
 }

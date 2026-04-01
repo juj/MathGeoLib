@@ -28,27 +28,27 @@ MATH_BEGIN_NAMESPACE
 // Sometimes also referred to as EaseIn or EaseInQuad.
 inline float SmoothStart(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   return t*t;
 }
 
 // Like SmoothStart, but even smoother start (and sharper stop)
 inline float SmoothStart3(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   return t*t*t;
 }
 
 inline float SmoothStart4(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   float tt = t*t;
   return tt*tt;
 }
 
 inline float SmoothStart5(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   float tt = t*t;
   return tt*tt*t;
 }
@@ -56,21 +56,21 @@ inline float SmoothStart5(float t)
 // Starts sharply at (0,0), but stops smoothly to (1,1). I.e. reverse of SmoothStart2.
 inline float SmoothStop(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   float oneT = 1.f - t;
   return 1.f - oneT*oneT;
 }
 
 inline float SmoothStop3(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   float oneT = 1.f - t;
   return 1.f - oneT*oneT*oneT;
 }
 
 inline float SmoothStop4(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   float oneT = 1.f - t;
   oneT *= oneT;
   return 1.f - oneT*oneT;
@@ -78,7 +78,7 @@ inline float SmoothStop4(float t)
 
 inline float SmoothStop5(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   float oneT = 1.f - t;
   float oneT2 = oneT * oneT;
   return 1.f - oneT2*oneT2*oneT;
@@ -87,7 +87,7 @@ inline float SmoothStop5(float t)
 // Starts out as SmoothStop, and linearly blends to SmoothStart
 inline float SharpStep(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   //   t * t^2 + (1-t)*(1 - (1-t)^2)
   // = 2t^3 - 3t^2 + 2t
   // = t(2t^2 + 2 - 3t)
@@ -99,7 +99,7 @@ inline float SharpStep(float t)
 // Also called "cubic Hermite interpolation"
 inline float SmoothStep(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   //   (1-t) * SmoothStart(t) + t * SmoothStop(t)
   // = (1-t) * t^2 + t*(1 - (1-t)^2)
   // = 3t^2 - 2t^3
@@ -124,7 +124,7 @@ inline float SmoothStep(float t)
 
 inline float SmoothStep5(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   // 6t^5 -15t^4 + 10t^3
   float tt = t*t;
   return tt*t*(6.f*tt - 15.f*t + 10.f);
@@ -132,7 +132,7 @@ inline float SmoothStep5(float t)
 
 inline float SmoothStep7(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   // -20t^7 + 70t^6 - 84t^5 + 35t^4
   float tt = t*t;
   float tttt = tt*tt;
@@ -141,7 +141,7 @@ inline float SmoothStep7(float t)
 
 inline float CosineStep01(float t)
 {
-  assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
+  mgl_assume1(t >= 0.f && t <= 1.f, t); // Input should be pre-clamped for performance (combine with Clamp01() from MathFunc.h)
   return 0.5f - Cos(t*pi) * 0.5f;
 }
 

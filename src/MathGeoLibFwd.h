@@ -56,9 +56,9 @@
 
 #endif
 
-#if !defined(MATH_ENABLE_STL_SUPPORT) && !defined(assert)
+#if !defined(MATH_ENABLE_STL_SUPPORT) && !defined(mgl_assert)
 #include <stdio.h>
-#define assert(x) do { if (!(x)) { printf("Error: assert(%s) failed!\n", #x); } } while(0)
+#define mgl_assert(x) do { if (!(x)) { printf("Error: assert(%s) failed!\n", #x); } } while(0)
 #endif
 
 MATH_BEGIN_NAMESPACE

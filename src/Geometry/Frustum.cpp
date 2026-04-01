@@ -288,22 +288,22 @@ void Frustum::SetWorldMatrix(const float3x4 &worldTransform)
 	else
 		front = DIR_VEC(worldTransform.Col(2)); // The camera looks towards +Z axis of the given transform.
 	up = DIR_VEC(worldTransform.Col(1)); // The camera up points towards +Y of the given transform.
-	assume1(pos.IsFinite(), pos);
-	assume2(up.IsNormalized(1e-3f), up, up.Length());
-	assume2(front.IsNormalized(1e-3f), front, front.Length());
-	assume3(up.IsPerpendicular(front), up, front, up.Dot(front));
-	assume(worldTransform.IsColOrthogonal3()); // Front and up must be orthogonal to each other.
-	assume1(EqualAbs(worldTransform.Determinant(), 1.f), worldTransform.Determinant()); // The matrix cannot contain mirroring.
+	mgl_assume1(pos.IsFinite(), pos);
+	mgl_assume2(up.IsNormalized(1e-3f), up, up.Length());
+	mgl_assume2(front.IsNormalized(1e-3f), front, front.Length());
+	mgl_assume3(up.IsPerpendicular(front), up, front, up.Dot(front));
+	mgl_assume(worldTransform.IsColOrthogonal3()); // Front and up must be orthogonal to each other.
+	mgl_assume1(EqualAbs(worldTransform.Determinant(), 1.f), worldTransform.Determinant()); // The matrix cannot contain mirroring.
 
 	WorldMatrixChanged();
 }
 
 float3x4 Frustum::ComputeWorldMatrix() const
 {
-	assume1(pos.IsFinite(), pos);
-	assume2(up.IsNormalized(1e-3f), up, up.Length());
-	assume2(front.IsNormalized(1e-3f), front, front.Length());
-	assume3(up.IsPerpendicular(front), up, front, up.Dot(front));
+	mgl_assume1(pos.IsFinite(), pos);
+	mgl_assume2(up.IsNormalized(1e-3f), up, up.Length());
+	mgl_assume2(front.IsNormalized(1e-3f), front, front.Length());
+	mgl_assume3(up.IsPerpendicular(front), up, front, up.Dot(front));
 	float3x4 m;
 	m.SetCol(0, DIR_TO_FLOAT3(WorldRight().Normalized()));
 	m.SetCol(1, DIR_TO_FLOAT3(up));
@@ -312,7 +312,7 @@ float3x4 Frustum::ComputeWorldMatrix() const
 	else
 		m.SetCol(2, DIR_TO_FLOAT3(front)); // In left-handed convention, the +Z axis must map towards the front vector.
 	m.SetCol(3, POINT_TO_FLOAT3(pos));
-	assume(!m.HasNegativeScale());
+	mgl_assume(!m.HasNegativeScale());
 	return m;
 }
 
@@ -332,14 +332,14 @@ float4x4 Frustum::ComputeProjectionMatrix() const
 {
 	if (type == InvalidFrustum || projectiveSpace == FrustumSpaceInvalid)
 		return float4x4::nan;
-	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
-	assume(projectiveSpace == FrustumSpaceGL || projectiveSpace == FrustumSpaceD3D);
-	assume(handedness == FrustumLeftHanded || handedness == FrustumRightHanded);
+	mgl_assume(type == PerspectiveFrustum || type == OrthographicFrustum);
+	mgl_assume(projectiveSpace == FrustumSpaceGL || projectiveSpace == FrustumSpaceD3D);
+	mgl_assume(handedness == FrustumLeftHanded || handedness == FrustumRightHanded);
 	if (type == PerspectiveFrustum)
 	{
 #ifdef __EMSCRIPTEN__
-		assert(projectiveSpace == FrustumSpaceGL && "TODO: D3D style 0..1 Z projection matrices are currently disabled in Emscripten builds due to code size issues");
-		assert(handedness == FrustumRightHanded && "TODO: D3D style left handed matrices are currently disabled in Emscripten builds due to code size issues");
+		mgl_assert(projectiveSpace == FrustumSpaceGL && "TODO: D3D style 0..1 Z projection matrices are currently disabled in Emscripten builds due to code size issues");
+		mgl_assert(handedness == FrustumRightHanded && "TODO: D3D style left handed matrices are currently disabled in Emscripten builds due to code size issues");
 		return float4x4::OpenGLPerspProjRH(nearPlaneDistance, farPlaneDistance, NearPlaneWidth(), NearPlaneHeight());
 #else
 		if (projectiveSpace == FrustumSpaceGL)
@@ -361,8 +361,8 @@ float4x4 Frustum::ComputeProjectionMatrix() const
 	else if (type == OrthographicFrustum)
 	{
 #ifdef __EMSCRIPTEN__
-		assert(projectiveSpace == FrustumSpaceGL && "TODO: D3D style 0..1 Z projection matrices are currently disabled in Emscripten builds due to code size issues");
-		assert(handedness == FrustumRightHanded && "TODO: D3D style left handed matrices are currently disabled in Emscripten builds due to code size issues");
+		mgl_assert(projectiveSpace == FrustumSpaceGL && "TODO: D3D style 0..1 Z projection matrices are currently disabled in Emscripten builds due to code size issues");
+		mgl_assert(handedness == FrustumRightHanded && "TODO: D3D style left handed matrices are currently disabled in Emscripten builds due to code size issues");
 		return float4x4::OpenGLOrthoProjRH(nearPlaneDistance, farPlaneDistance, orthographicWidth, orthographicHeight);
 #else
 		if (projectiveSpace == FrustumSpaceGL)
@@ -389,7 +389,7 @@ float4x4 Frustum::ComputeProjectionMatrix() const
 
 vec Frustum::NearPlanePos(float x, float y) const
 {
-	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
+	mgl_assume(type == PerspectiveFrustum || type == OrthographicFrustum);
 
 	if (type == PerspectiveFrustum)
 	{
@@ -416,7 +416,7 @@ vec Frustum::NearPlanePos(const float2 &point) const
 
 vec Frustum::FarPlanePos(float x, float y) const
 {
-	assume(type == PerspectiveFrustum || type == OrthographicFrustum);
+	mgl_assume(type == PerspectiveFrustum || type == OrthographicFrustum);
 
 	if (type == PerspectiveFrustum)
 	{
@@ -463,10 +463,10 @@ float2 Frustum::ScreenToViewportSpace(const float2 &point, int screenWidth, int 
 
 Ray Frustum::UnProject(float x, float y) const
 {
-	assume1(x >= -1.f, x);
-	assume1(x <= 1.f, x);
-	assume1(y >= -1.f, y);
-	assume1(y <= 1.f, y);
+	mgl_assume1(x >= -1.f, x);
+	mgl_assume1(x <= 1.f, x);
+	mgl_assume1(y >= -1.f, y);
+	mgl_assume1(y <= 1.f, y);
 	if (type == PerspectiveFrustum)
 	{
 		vec nearPlanePos = NearPlanePos(x, y);
@@ -490,8 +490,8 @@ Ray Frustum::UnProjectFromNearPlane(float x, float y) const
 
 vec Frustum::PointInside(float x, float y, float z) const
 {
-	assume(z >= 0.f);
-	assume(z <= 1.f);
+	mgl_assume(z >= 0.f);
+	mgl_assume(z <= 1.f);
 	return UnProjectLineSegment(x, y).GetPoint(z);
 }
 
@@ -628,7 +628,7 @@ bool Frustum::Contains(const Frustum &frustum) const
 
 bool Frustum::Contains(const Polyhedron &polyhedron) const
 {
-	assume(polyhedron.IsClosed());
+	mgl_assume(polyhedron.IsClosed());
 	for(int i = 0; i < polyhedron.NumVertices(); ++i)
 		if (!Contains(polyhedron.Vertex(i)))
 			return false;
@@ -645,7 +645,7 @@ vec Frustum::ClosestPoint(const vec &point) const
 		float halfHeight = orthographicHeight * 0.5f;
 		vec frustumCenter = pos + (frontHalfSize + nearPlaneDistance) * front;
 		vec right = Cross(front, up);
-		assert(right.IsNormalized());
+		mgl_assert(right.IsNormalized());
 		vec d = point - frustumCenter;
 		vec closestPoint = frustumCenter;
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SIMD)
@@ -688,7 +688,7 @@ bool Frustum::IsFinite() const
 
 Plane Frustum::GetPlane(int faceIndex) const
 {
-	assume(0 <= faceIndex && faceIndex <= 5);
+	mgl_assume(0 <= faceIndex && faceIndex <= 5);
 	switch(faceIndex)
 	{
 		default: // For release builds where assume() is disabled, always return the first option if out-of-bounds.
@@ -739,7 +739,7 @@ void Frustum::Translate(const vec &offset)
 
 void Frustum::Transform(const float3x3 &transform)
 {
-	assume(transform.HasUniformScale());
+	mgl_assume(transform.HasUniformScale());
 	pos = transform * pos;
 	front = transform * front;
 	float scaleFactor = front.Normalize();
@@ -755,7 +755,7 @@ void Frustum::Transform(const float3x3 &transform)
 
 void Frustum::Transform(const float3x4 &transform)
 {
-	assume(transform.HasUniformScale());
+	mgl_assume(transform.HasUniformScale());
 	pos = transform.MulPos(pos);
 	front = transform.MulDir(front);
 	float scaleFactor = front.Normalize();
@@ -771,7 +771,7 @@ void Frustum::Transform(const float3x4 &transform)
 
 void Frustum::Transform(const float4x4 &transform)
 {
-	assume(transform.Row(3).Equals(0,0,0,1));
+	mgl_assume(transform.Row(3).Equals(0,0,0,1));
 	Transform(transform.Float3x4Part());
 }
 
@@ -782,7 +782,7 @@ void Frustum::Transform(const Quat &transform)
 
 void Frustum::GetPlanes(Plane *outArray) const
 {
-	assume(outArray);
+	mgl_assume(outArray);
 	for(int i = 0; i < 6; ++i)
 		outArray[i] = GetPlane(i);
 }
@@ -794,7 +794,7 @@ vec Frustum::CenterPoint() const
 
 void Frustum::GetCornerPoints(vec *outPointArray) const
 {
-	assume(outPointArray);
+	mgl_assume(outPointArray);
 
 	if (type == PerspectiveFrustum)
 	{
@@ -844,7 +844,7 @@ void Frustum::GetCornerPoints(vec *outPointArray) const
 
 LineSegment Frustum::Edge(int edgeIndex) const
 {
-	assume(0 <= edgeIndex && edgeIndex <= 11);
+	mgl_assume(0 <= edgeIndex && edgeIndex <= 11);
 	switch(edgeIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -865,7 +865,7 @@ LineSegment Frustum::Edge(int edgeIndex) const
 
 vec Frustum::CornerPoint(int cornerIndex) const
 {
-	assume(0 <= cornerIndex && cornerIndex <= 7);
+	mgl_assume(0 <= cornerIndex && cornerIndex <= 7);
 	switch(cornerIndex)
 	{
 		default: // For release builds where assume() is disabled, return always the first option if out-of-bounds.
@@ -964,9 +964,9 @@ AABB Frustum::MinimalEnclosingAABB() const
 
 OBB Frustum::MinimalEnclosingOBB(float expandGuardband) const
 {
-	assume(IsFinite());
-	assume(front.IsNormalized());
-	assume(up.IsNormalized());
+	mgl_assume(IsFinite());
+	mgl_assume(front.IsNormalized());
+	mgl_assume(up.IsNormalized());
 
 	OBB obb;
 	obb.pos = pos + (nearPlaneDistance + farPlaneDistance) * 0.5f * front;

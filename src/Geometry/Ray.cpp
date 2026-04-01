@@ -43,13 +43,13 @@ MATH_BEGIN_NAMESPACE
 Ray::Ray(const vec &pos_, const vec &dir_)
 :pos(pos_), dir(dir_)
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Ray::Ray(const Line &line)
 :pos(line.pos), dir(line.dir)
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
 }
 
 Ray::Ray(const LineSegment &lineSegment)
@@ -64,7 +64,7 @@ bool Ray::IsFinite() const
 
 vec Ray::GetPoint(float d) const
 {
-	assume2(dir.IsNormalized(), dir, dir.LengthSq());
+	mgl_assume2(dir.IsNormalized(), dir, dir.LengthSq());
 	return pos + d * dir;
 }
 
@@ -378,7 +378,7 @@ StringT Ray::SerializeToString() const
 	s = SerializeFloat(dir.x, s); *s = ','; ++s;
 	s = SerializeFloat(dir.y, s); *s = ','; ++s;
 	s = SerializeFloat(dir.z, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -401,7 +401,7 @@ std::ostream &operator <<(std::ostream &o, const Ray &ray)
 
 Ray Ray::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return Ray(vec::nan, vec::nan);
 	Ray r;
@@ -417,19 +417,19 @@ Ray Ray::FromString(const char *str, const char **outEndStr)
 
 Ray operator *(const float3x3 &transform, const Ray &ray)
 {
-	assume(transform.IsInvertible());
+	mgl_assume(transform.IsInvertible());
 	return Ray(transform * ray.pos, (transform * ray.dir).Normalized());
 }
 
 Ray operator *(const float3x4 &transform, const Ray &ray)
 {
-	assume(transform.IsInvertible());
+	mgl_assume(transform.IsInvertible());
 	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir).Normalized());
 }
 
 Ray operator *(const float4x4 &transform, const Ray &ray)
 {
-	assume(transform.IsInvertible());
+	mgl_assume(transform.IsInvertible());
 	return Ray(transform.MulPos(ray.pos), transform.MulDir(ray.dir).Normalized());
 }
 

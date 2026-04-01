@@ -53,8 +53,8 @@ void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 	if (inc == 0 && (mul % mod == 0 || mod % mul == 0))
 		LOGW("Warning: Multiplier %u and modulus %u are not compatible since one is a multiple of the other and the increment == 0!", mul, mod);
 #endif
-	assume(mul != 0);
-	assume(mod > 1);
+	mgl_assume(mul != 0);
+	mgl_assume(mod > 1);
 
 	lastNumber = seed;
 	multiplier = mul;
@@ -64,12 +64,12 @@ void LCG::Seed(u32 seed, u32 mul, u32 inc, u32 mod)
 
 u32 LCG::IntFast()
 {
-	assert(increment == 0);
-	assert(multiplier % 2 == 1 && "Multiplier should be odd for LCG::IntFast(), since modulus==2^32 is even!");
+	mgl_assert(increment == 0);
+	mgl_assert(multiplier % 2 == 1 && "Multiplier should be odd for LCG::IntFast(), since modulus==2^32 is even!");
 // The configurable modulus and increment are not used by this function.
 	u32 mul = lastNumber * multiplier;
 	lastNumber = mul + (mul <= lastNumber?1:0); // Whenever we overflow, flip by one to avoid even multiplier always producing even results, since modulus is even.
-	assert(lastNumber != 0); // We don't use an adder in IntFast(), so must never degenerate to zero.
+	mgl_assert(lastNumber != 0); // We don't use an adder in IntFast(), so must never degenerate to zero.
 	return lastNumber;
 }
 
@@ -79,7 +79,7 @@ u32 LCG::Int()
 #warning Because of code size and performance issues, on Emscripten LCG::Int() is currently routed to LCG::IntFast() (TODO: Check if this is still needed for Wasm and rem64?)
 	return IntFast();
 #else
-	assert(modulus != 0);
+	mgl_assert(modulus != 0);
 	/// \todo Convert to using Schrage's method for approximate factorization. (Numerical Recipes in C)
 
 	// Currently we cast everything to 64-bit to avoid overflow, which is quite dumb.
@@ -98,7 +98,7 @@ u32 LCG::Int()
 //#endif
 	// Save the newly generated random number to use as seed for the next one.
 //	lastNumber = m;//(u32)newNum;
-	assert4((((u32)newNum) != 0 || increment != 0) && "LCG degenerated to producing a stream of zeroes!", lastNumber, multiplier, increment, modulus);
+	mgl_assert4((((u32)newNum) != 0 || increment != 0) && "LCG degenerated to producing a stream of zeroes!", lastNumber, multiplier, increment, modulus);
 	lastNumber = (u32)newNum;
 	return lastNumber;
 #endif
@@ -106,12 +106,12 @@ u32 LCG::Int()
 
 int LCG::Int(int a, int b)
 {
-	assert(a <= b && "Error in range!");
+	mgl_assert(a <= b && "Error in range!");
 
 //	return a + (int)(Int() * Max()/(b-a));
 	int num = a + (int)(Float() * (b-a+1));
-//	assert(num >= a);
-//	assert(num <= b);
+//	mgl_assert(num >= a);
+//	mgl_assert(num <= b);
 	///\todo Some bug here - the result is not necessarily in the proper range.
 	if (num < a)
 		num = a;
@@ -125,8 +125,8 @@ float LCG::Float()
 	u32 i = ((u32)Int() & 0x007FFFFF /* random mantissa */) | 0x3F800000 /* fixed exponent */;
 	float f = ReinterpretAsFloat(i); // f is now in range [1, 2[
 	f -= 1.f; // Map to range [0, 1[
-	assert1(f >= 0.f, f);
-	assert1(f < 1.f, f);
+	mgl_assert1(f >= 0.f, f);
+	mgl_assert1(f < 1.f, f);
 	return f;
 }
 
@@ -143,8 +143,8 @@ float LCG::Float01Incl()
 		{
 			val |= 0x3F800000;
 			float f = ReinterpretAsFloat(val) - 1.f;
-			assert1(f >= 0.f, f);
-			assert1(f <= 1.f, f);
+			mgl_assert1(f >= 0.f, f);
+			mgl_assert1(f <= 1.f, f);
 			return f;
 		}
 	}
@@ -159,14 +159,14 @@ float LCG::FloatNeg1_1()
 	float f = ReinterpretAsFloat(i); // f is now in range ]-2, -1[ union [1, 2].
 	float fone = ReinterpretAsFloat(one); // +/- 1, of same sign as f.
 	f -= fone;
-	assert1(f > -1.f, f);
-	assert1(f < 1.f, f);
+	mgl_assert1(f > -1.f, f);
+	mgl_assert1(f < 1.f, f);
 	return f;
 }
 
 float LCG::Float(float a, float b)
 {
-	assume2(a <= b && "LCG::Float(a,b): Error in range: b < a!", a, b);
+	mgl_assume2(a <= b && "LCG::Float(a,b): Error in range: b < a!", a, b);
 
 	if (a == b)
 		return a;
@@ -176,8 +176,8 @@ float LCG::Float(float a, float b)
 		float f = a + Float() * (b-a);
 		if (f != b)
 		{
-			assume2(a <= f, a, b);
-			assume2(f < b || a == b, f, b);
+			mgl_assume2(a <= f, a, b);
+			mgl_assume2(f < b || a == b, f, b);
 			return f;
 		}
 	}
@@ -186,11 +186,11 @@ float LCG::Float(float a, float b)
 
 float LCG::FloatIncl(float a, float b)
 {
-	assume(a <= b && "LCG::Float(a,b): Error in range: b < a!");
+	mgl_assume(a <= b && "LCG::Float(a,b): Error in range: b < a!");
 
 	float f = a + Float() * (b-a);
-	assume2(a <= f, a, b);
-	assume2(f <= b, f, b);
+	mgl_assume2(a <= f, a, b);
+	mgl_assume2(f <= b, f, b);
 	return f;
 }
 

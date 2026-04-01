@@ -104,7 +104,7 @@ int U32ToString_SSE(u32 i, char *str)
 	// 4e9 / 1e8 -> [ 42 (64), 94967295 (64) ]
 	//     / 1e4 -> [ .. (32), 42 (32), 9496 (32), 7295 (32) ]
 	//     / 1e2 -> [ (16), (16), (16), 42 (16), 94 (16), 96 (16), 72 (16), 95 (16) ]
-	//     / 10  -> [ 
+	//     / 10  -> [
 
 	__m128i v = INT_TO_M128((int)i);
 
@@ -155,7 +155,7 @@ RANDOMIZED_TEST(U32ToString_SSE)
 		u32 n = rng.Int();
 		U32ToString_SSE(n+m, str);
 		U32ToString(n+m, str2);
-		assert2(!strcmp(str, str2), std::string(str), std::string(str2));
+		mgl_assert2(!strcmp(str, str2), std::string(str), std::string(str2));
 	}
 }
 
@@ -218,13 +218,13 @@ RANDOMIZED_TEST(IntToString)
 		if (i == 42) i = rng.Int();
 		char str[32] = {};
 		int len = IntToString(i, str);
-		assert(len > 0);
+		mgl_assert(len > 0);
 		MARK_UNUSED(len);
-		assert(strlen(str) == (size_t)len);
+		mgl_assert(strlen(str) == (size_t)len);
 		char str2[32] = {};
 		sprintf(str2, "%d", i);
 	//	printf("i: %d, str: %s, str2: %s\n", i, str, str2);
-		assert(!strcmp(str, str2));
+		mgl_assert(!strcmp(str, str2));
 	}
 }
 
@@ -261,13 +261,13 @@ RANDOMIZED_TEST(U32ToString)
 		if (i == 42) i = (u32)rng.Int();
 		char str[32] = {};
 		int len = U32ToString(i, str);
-		assert(len > 0);
+		mgl_assert(len > 0);
 		MARK_UNUSED(len);
-		assert(strlen(str) == (size_t)len);
+		mgl_assert(strlen(str) == (size_t)len);
 		char str2[32] = {};
 		sprintf(str2, "%lu", (unsigned long)i);
 	//	printf("i: %d, str: %s, str2: %s\n", i, str, str2);
-		assert(!strcmp(str, str2));
+		mgl_assert(!strcmp(str, str2));
 	}
 }
 

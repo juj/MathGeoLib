@@ -47,12 +47,12 @@ vec UpdateSimplex(vec *s, int &n)
 		float d0 = s[0].DistanceSq(vec::zero);
 		float d1 = s[1].DistanceSq(vec::zero);
 		float d2 = LineSegment(s[0], s[1]).DistanceSq(vec::zero);
-		assert2(d2 <= d0, d2, d0);
-		assert2(d2 <= d1, d2, d1);
+		mgl_assert2(d2 <= d0, d2, d0);
+		mgl_assert2(d2 <= d1, d2, d1);
 		// Cannot be in case 0: the step 0 -> 1 must have been toward the zero direction:
-		assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
+		mgl_assert(Dot(s[1]-s[0], -s[0]) >= 0.f);
 		// Cannot be in case 1: the zero direction cannot be in the voronoi region of vertex s[1].
-		assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
+		mgl_assert(Dot(s[1]-s[0], -s[1]) <= 0.f);
 #endif
 
 		vec d01 = s[1] - s[0];
@@ -105,10 +105,10 @@ vec UpdateSimplex(vec *s, int &n)
 				minDistIndex = i;
 			}
 
-		assert4(isContainedInTriangle || dist <= d[0] + 1e-4f, d[0], dist, isContainedInTriangle, minDistIndex);
-		assert4(isContainedInTriangle || dist <= d[1] + 1e-4f, d[1], dist, isContainedInTriangle, minDistIndex);
-		assert4(isContainedInTriangle || dist <= d[2] + 1e-4f, d[2], dist, isContainedInTriangle, minDistIndex);
-		assert4(isContainedInTriangle || dist <= d[3] + 1e-4f, d[3], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[0] + 1e-4f, d[0], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[1] + 1e-4f, d[1], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[2] + 1e-4f, d[2], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(isContainedInTriangle || dist <= d[3] + 1e-4f, d[3], dist, isContainedInTriangle, minDistIndex);
 #endif
 		vec d12 = s[2]-s[1];
 		vec d02 = s[2]-s[0];
@@ -120,7 +120,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 4: Edge 1->2 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist), d[4], dist, isContainedInTriangle, minDistIndex);
+			mgl_assert4(d[4] <= dist + 1e-3f * Max(1.f, d[4], dist), d[4], dist, isContainedInTriangle, minDistIndex);
 #endif
 			vec newDir = Cross(d12, Cross(d12, s[1]));
 			s[0] = s[1];
@@ -134,7 +134,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 5: Edge 0->2 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist), d[5], dist, isContainedInTriangle, minDistIndex);
+			mgl_assert4(d[5] <= dist + 1e-3f * Max(1.f, d[5], dist), d[5], dist, isContainedInTriangle, minDistIndex);
 #endif
 			vec newDir = Cross(d02, Cross(d02, s[0]));
 			s[1] = s[2];
@@ -143,7 +143,7 @@ vec UpdateSimplex(vec *s, int &n)
 		}
 		// Cases 6)-8):
 #ifdef MATH_ASSERT_CORRECTNESS
-		assert4(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, isContainedInTriangle, minDistIndex);
+		mgl_assert4(d[6] <= dist + 1e-3f * Max(1.f, d[6], dist), d[6], dist, isContainedInTriangle, minDistIndex);
 #endif
 		float scaledSignedDistToTriangle = triNormal.Dot(s[2]);
 		float distSq = scaledSignedDistToTriangle*scaledSignedDistToTriangle;
@@ -216,7 +216,7 @@ vec UpdateSimplex(vec *s, int &n)
 		vec Tri023Normal = Cross(s[3]-s[0], s[2]-s[0]);
 		vec Tri123Normal = Cross(s[2]-s[1], s[3]-s[1]);
 		vec Tri012Normal = Cross(s[2] - s[0], s[1] - s[0]);
-		assert(Dot(Tri012Normal, s[3] - s[0]) <= 0.f);
+		mgl_assert(Dot(Tri012Normal, s[3] - s[0]) <= 0.f);
 		float InTri012 = Dot(-s[0], Tri012Normal);
 		float InTri013 = Dot(-s[3], Tri013Normal);
 		float InTri023 = Dot(-s[3], Tri023Normal);
@@ -232,13 +232,13 @@ vec UpdateSimplex(vec *s, int &n)
 					dist = d[i];
 					minDistIndex = i;
 				}
-		assert4(insideSimplex || dist <= d[0] + 1e-4 * Max(1.0, d[0], dist), d[0], dist, insideSimplex, minDistIndex);
-		assert4(insideSimplex || dist <= d[1] + 1e-4 * Max(1.0, d[1], dist), d[1], dist, insideSimplex, minDistIndex);
-		assert4(insideSimplex || dist <= d[2] + 1e-4 * Max(1.0, d[2], dist), d[2], dist, insideSimplex, minDistIndex);
-		assert4(insideSimplex || dist <= d[4] + 1e-4 * Max(1.0, d[4], dist), d[4], dist, insideSimplex, minDistIndex);
-		assert4(insideSimplex || dist <= d[5] + 1e-4 * Max(1.0, d[5], dist), d[5], dist, insideSimplex, minDistIndex);
-		assert4(insideSimplex || dist <= d[7] + 1e-4 * Max(1.0, d[7], dist), d[7], dist, insideSimplex, minDistIndex);
-		assert4(insideSimplex || dist <= d[10] + 1e-4 * Max(1.0, d[10], dist), d[10], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[0] + 1e-4 * Max(1.0, d[0], dist), d[0], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[1] + 1e-4 * Max(1.0, d[1], dist), d[1], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[2] + 1e-4 * Max(1.0, d[2], dist), d[2], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[4] + 1e-4 * Max(1.0, d[4], dist), d[4], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[5] + 1e-4 * Max(1.0, d[5], dist), d[5], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[7] + 1e-4 * Max(1.0, d[7], dist), d[7], dist, insideSimplex, minDistIndex);
+		mgl_assert4(insideSimplex || dist <= d[10] + 1e-4 * Max(1.0, d[10], dist), d[10], dist, insideSimplex, minDistIndex);
 #endif
 
 		vec d01 = s[1] - s[0];
@@ -253,8 +253,8 @@ vec UpdateSimplex(vec *s, int &n)
 		float4d D03 = POINT_TO_FLOAT4(s[3]) - POINT_TO_FLOAT4(s[0]);
 		float4d tri013NormalD = D01.Cross(D03);
 		float4d tri023NormalD = D03.Cross(D02);
-		assert3(tri013NormalD.Dot(D02) <= 0.f, tri013NormalD, D02, tri013NormalD.Dot(D02));
-		assert3(tri023NormalD.Dot(D01) <= 0.f, tri023NormalD, D01, tri023NormalD.Dot(D01));
+		mgl_assert3(tri013NormalD.Dot(D02) <= 0.f, tri013NormalD, D02, tri013NormalD.Dot(D02));
+		mgl_assert3(tri023NormalD.Dot(D01) <= 0.f, tri023NormalD, D01, tri023NormalD.Dot(D01));
 #endif
 
 		vec e03_1 = Cross(tri013Normal, d03); // The normal of edge 0->3 on triangle 013.
@@ -265,7 +265,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 6) Edge 0->3 is closest. Simplex degenerates to a line segment.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(!insideSimplex && d[6] <= dist + 1e-3f * Max(1.0, d[6], dist), d[6], dist, insideSimplex, minDistIndex);
+			mgl_assert4(!insideSimplex && d[6] <= dist + 1e-3f * Max(1.0, d[6], dist), d[6], dist, insideSimplex, minDistIndex);
 #endif
 			vec newDir = Cross(d03, Cross(d03, s[3]));
 			s[1] = s[3];
@@ -276,7 +276,7 @@ vec UpdateSimplex(vec *s, int &n)
 		vec d12 = s[2] - s[1];
 		vec d13 = s[3] - s[1];
 		vec tri123Normal = Cross(d12, d13);
-		assert(Dot(tri123Normal, -d02) <= 0.f);
+		mgl_assert(Dot(tri123Normal, -d02) <= 0.f);
 		vec e13_0 = Cross(d13, tri013Normal);
 		vec e13_2 = Cross(tri123Normal, d13);
 		float inE13_0 = Dot(e13_0, s[3]);
@@ -285,7 +285,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 8) Edge 1->3 is closest. Simplex degenerates to a line segment.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(!insideSimplex && d[8] <= dist + 1e-3f * Max(1.0, d[8], dist), d[8], dist, insideSimplex, minDistIndex);
+			mgl_assert4(!insideSimplex && d[8] <= dist + 1e-3f * Max(1.0, d[8], dist), d[8], dist, insideSimplex, minDistIndex);
 #endif
 			vec newDir = Cross(d13, Cross(d13, s[3]));
 			s[0] = s[1];
@@ -303,7 +303,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 9) Edge 2->3 is closest. Simplex degenerates to a line segment.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(!insideSimplex && d[9] <= dist + 1e-3f * Max(1.0, d[9], dist), d[9], dist, insideSimplex, minDistIndex);
+			mgl_assert4(!insideSimplex && d[9] <= dist + 1e-3f * Max(1.0, d[9], dist), d[9], dist, insideSimplex, minDistIndex);
 #endif
 			vec newDir = Cross(d23, Cross(d23, s[3]));
 			s[0] = s[2];
@@ -317,7 +317,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 11) Triangle 0->1->3 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(!insideSimplex && d[11] <= dist + 1e-3f * Max(1.0, d[11], dist), d[11], dist, insideSimplex, minDistIndex);
+			mgl_assert4(!insideSimplex && d[11] <= dist + 1e-3f * Max(1.0, d[11], dist), d[11], dist, insideSimplex, minDistIndex);
 #endif
 			s[2] = s[3];
 			n = 3;
@@ -328,7 +328,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 12) Triangle 0->2->3 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(!insideSimplex && d[12] <= dist + 1e-3f * Max(1.0, d[12], dist), d[12], dist, insideSimplex, minDistIndex);
+			mgl_assert4(!insideSimplex && d[12] <= dist + 1e-3f * Max(1.0, d[12], dist), d[12], dist, insideSimplex, minDistIndex);
 #endif
 			s[1] = s[0];
 			s[0] = s[2];
@@ -341,7 +341,7 @@ vec UpdateSimplex(vec *s, int &n)
 		{
 			// Case 13) Triangle 1->2->3 is closest.
 #ifdef MATH_ASSERT_CORRECTNESS
-			assert4(!insideSimplex && d[13] <= dist + 1e-3f * Max(1.0, d[13], dist), d[13], dist, insideSimplex, minDistIndex);
+			mgl_assert4(!insideSimplex && d[13] <= dist + 1e-3f * Max(1.0, d[13], dist), d[13], dist, insideSimplex, minDistIndex);
 #endif
 			s[0] = s[1];
 			s[1] = s[2];

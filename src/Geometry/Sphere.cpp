@@ -80,22 +80,22 @@ void Sphere::Translate(const vec &offset)
 
 void Sphere::Transform(const float3x3 &transform)
 {
-	assume(transform.HasUniformScale());
+	mgl_assume(transform.HasUniformScale());
 	pos = transform * pos;
 	r *= transform.Col(0).Length();
 }
 
 void Sphere::Transform(const float3x4 &transform)
 {
-	assume(transform.HasUniformScale());
+	mgl_assume(transform.HasUniformScale());
 	pos = transform.MulPos(pos);
 	r *= transform.Col(0).Length();
 }
 
 void Sphere::Transform(const float4x4 &transform)
 {
-	assume(transform.HasUniformScale());
-	assume(!transform.ContainsProjection());
+	mgl_assume(transform.HasUniformScale());
+	mgl_assume(!transform.ContainsProjection());
 	pos = transform.MulPos(pos);
 	r *= transform.Col3(0).Length();
 }
@@ -140,7 +140,7 @@ float Sphere::SurfaceArea() const
 vec Sphere::ExtremePoint(const vec &direction) const
 {
 	float len = direction.Length();
-	assume(len > 0.f);
+	mgl_assume(len > 0.f);
 	return pos + direction * (r / len);
 }
 
@@ -231,7 +231,7 @@ bool Sphere::Contains(const Frustum &frustum) const
 
 bool Sphere::Contains(const Polyhedron &polyhedron) const
 {
-	assume(polyhedron.IsClosed());
+	mgl_assume(polyhedron.IsClosed());
 	for(int i = 0; i < polyhedron.NumVertices(); ++i)
 		if (!Contains(polyhedron.Vertex(i)))
 			return false;
@@ -263,7 +263,7 @@ Sphere Sphere::FastEnclosingSphere(const vec *pts, int numPoints)
 		s.SetNegativeInfinity();
 		return s;
 	}
-	assume(pts || numPoints == 0);
+	mgl_assume(pts || numPoints == 0);
 
 	// First pass: Pick the cardinal axis (X,Y or Z) which has the two most distant points.
 	int minx, maxx, miny, maxy, minz, maxz;
@@ -304,7 +304,7 @@ Sphere WelzlSphere(const vec *pts, int numPoints, vec *support, int numSupports)
 	{
 		switch(numSupports)
 		{
-		default: assert(false);
+		default: mgl_assert(false);
 		case 0: return Sphere();
 		case 1: return Sphere(support[0], 0.f);
 		case 2: return Sphere(support[0], support[1]);
@@ -468,8 +468,8 @@ bool Sphere::Intersects(const Capsule &capsule) const
 int Sphere::IntersectLine(const vec &linePos, const vec &lineDir, const vec &sphereCenter,
                           float sphereRadius, float &t1, float &t2)
 {
-	assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
-	assume1(sphereRadius >= 0.f, sphereRadius);
+	mgl_assume2(lineDir.IsNormalized(), lineDir, lineDir.LengthSq());
+	mgl_assume1(sphereRadius >= 0.f, sphereRadius);
 
 	/* A line is represented explicitly by the set { linePos + t * lineDir }, where t is an arbitrary float.
 	  A sphere is represented implictly by the set of vectors that satisfy ||v - sphereCenter|| == sphereRadius.
@@ -663,11 +663,11 @@ void Sphere::Enclose(const vec &point, float epsilon)
 		pos += d * halfDist / dist;
 		r += halfDist + 1e-4f; // Use a fixed epsilon deliberately, the param is a squared epsilon, so different order of magnitude.
 #ifdef MATH_ASSERT_CORRECTNESS
-		mathassert(this->Contains(copy, epsilon));
+		mgl_mathassert(this->Contains(copy, epsilon));
 #endif
 	}
 
-	assume(this->Contains(point));
+	mgl_assume(this->Contains(point));
 }
 
 struct PointWithDistance
@@ -746,14 +746,14 @@ void Sphere::Enclose(const AABB &aabb)
 {
 	Sphere_Enclose<AABB, 8>(*this, aabb);
 
-	assume(this->Contains(aabb));
+	mgl_assume(this->Contains(aabb));
 }
 
 void Sphere::Enclose(const OBB &obb)
 {
 	Sphere_Enclose<OBB, 8>(*this, obb);
 
-	assume(this->Contains(obb));
+	mgl_assume(this->Contains(obb));
 }
 
 void Sphere::Enclose(const Sphere &sphere)
@@ -765,7 +765,7 @@ void Sphere::Enclose(const Sphere &sphere)
 	Enclose(sphere.pos + toFarthestPoint);
 	Enclose(sphere.pos - toFarthestPoint);
 
-	assume(this->Contains(sphere));
+	mgl_assume(this->Contains(sphere));
 }
 
 void Sphere::Enclose(const LineSegment &lineSegment)
@@ -784,7 +784,7 @@ void Sphere::Enclose(const LineSegment &lineSegment)
 
 void Sphere::Enclose(const vec *pointArray, int numPoints)
 {
-	assume(pointArray || numPoints == 0);
+	mgl_assume(pointArray || numPoints == 0);
 	Sphere_Enclose_pts(*this, pointArray, numPoints);
 }
 
@@ -843,11 +843,11 @@ void Sphere::ExtendRadiusToContain(const Sphere &sphere, float epsilon)
 
 int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVertices, bool ccwIsFrontFacing) const
 {
-	assume(outPos);
-	assume(numVertices >= 24 && "At minimum, sphere triangulation will contain at least 8 triangles, which is 24 vertices, but fewer were specified!");
-	assume(numVertices % 3 == 0 && "Warning:: The size of output should be divisible by 3 (each triangle takes up 3 vertices!)");
+	mgl_assume(outPos);
+	mgl_assume(numVertices >= 24 && "At minimum, sphere triangulation will contain at least 8 triangles, which is 24 vertices, but fewer were specified!");
+	mgl_assume(numVertices % 3 == 0 && "Warning:: The size of output should be divisible by 3 (each triangle takes up 3 vertices!)");
 
-	assume(this->r > 0.f);
+	mgl_assume(this->r > 0.f);
 
 	if (numVertices < 24)
 		return 0;
@@ -904,7 +904,7 @@ int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVerti
 		++oldEnd;
 	}
 	// Check that we really did tessellate as many new triangles as possible.
-	assert(((int)temp.size()-oldEnd)*3 <= numVertices && ((int)temp.size()-oldEnd)*3 + 9 > numVertices);
+	mgl_assert(((int)temp.size()-oldEnd)*3 <= numVertices && ((int)temp.size()-oldEnd)*3 + 9 > numVertices);
 
 	for(size_t i = oldEnd, j = 0; i < temp.size(); ++i, ++j)
 	{
@@ -934,7 +934,7 @@ int Sphere::Triangulate(vec *outPos, vec *outNormal, float2 *outUV, int numVerti
 
 vec Sphere::RandomPointInside(LCG &lcg)
 {
-	assume(r > 1e-3f);
+	mgl_assume(r > 1e-3f);
 	vec v = vec::zero;
 	// Rejection sampling analysis: The unit sphere fills ~52.4% of the volume of its enclosing box, so this
 	// loop is expected to take only very few iterations before succeeding.
@@ -946,7 +946,7 @@ vec Sphere::RandomPointInside(LCG &lcg)
 		if (v.LengthSq() <= r*r)
 			return pos + v;
 	}
-	assume(false && "Sphere::RandomPointInside failed!");
+	mgl_assume(false && "Sphere::RandomPointInside failed!");
 
 	// Failed to generate a point inside this sphere. Return the sphere center as fallback.
 	return pos;
@@ -967,7 +967,7 @@ vec Sphere::RandomPointOnSurface(LCG &lcg)
 			return pos + (r / Sqrt(lenSq)) * v;
 	}
 	// Astronomically small probability to reach here, and if we do so, the provided random number generator must have been in a bad state.
-	assume(false && "Sphere::RandomPointOnSurface failed!");
+	mgl_assume(false && "Sphere::RandomPointOnSurface failed!");
 
 	// Failed to generate a point inside this sphere. Return an arbitrary point on the surface as fallback.
 	return pos + DIR_VEC(r, 0, 0);
@@ -988,15 +988,15 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b)
 	Sphere s;
 	s.pos = (a + b) * 0.5f;
 	s.r = (b - s.pos).Length();
-	assume(s.pos.IsFinite());
-	assume(s.r >= 0.f);
+	mgl_assume(s.pos.IsFinite());
+	mgl_assume(s.r >= 0.f);
 
 	// Allow floating point inconsistency and expand the radius by a small epsilon so that the containment tests
 	// really contain the points (note that the points must be sufficiently near enough to the origin)
 	s.r += sEpsilon;
 
-	mathassert(s.Contains(a));
-	mathassert(s.Contains(b));
+	mgl_mathassert(s.Contains(a));
+	mgl_mathassert(s.Contains(b));
 	return s;
 }
 
@@ -1227,7 +1227,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c)
 		LOGE("A: %s, dist: %f", a.ToString().c_str(), a.Distance(sphere.pos));
 		LOGE("B: %s, dist: %f", b.ToString().c_str(), b.Distance(sphere.pos));
 		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(sphere.pos));
-		mathassert(false);
+		mgl_mathassert(false);
 	}
 #endif
 	return sphere;
@@ -1256,7 +1256,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, 
 				{
 					sphere = OptimalEnclosingSphere(b,c,d);
 					sphere.r = Max(sphere.r, a.Distance(sphere.pos) + 1e-3f); // For numerical stability, expand the radius of the sphere so it certainly contains the fourth point.
-					assume(sphere.Contains(a));
+					mgl_assume(sphere.Contains(a));
 				}
 			}
 		}
@@ -1296,7 +1296,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, 
 		LOGE("B: %s, dist: %f", b.ToString().c_str(), b.Distance(sphere.pos));
 		LOGE("C: %s, dist: %f", c.ToString().c_str(), c.Distance(sphere.pos));
 		LOGE("D: %s, dist: %f", d.ToString().c_str(), d.Distance(sphere.pos));
-		mathassert(false);
+		mgl_mathassert(false);
 	}
 #endif
 
@@ -1331,7 +1331,7 @@ Sphere Sphere::OptimalEnclosingSphere(const vec &a, const vec &b, const vec &c, 
 		return s;
 	}
 	s = OptimalEnclosingSphere(a,b,c,d);
-	mathassert(s.Contains(e, sEpsilon));
+	mgl_mathassert(s.Contains(e, sEpsilon));
 	redundantPoint = 4;
 	return s;
 }
@@ -1406,7 +1406,7 @@ StringT Sphere::SerializeToString() const
 	s = SerializeFloat(pos.y, s); *s = ','; ++s;
 	s = SerializeFloat(pos.z, s); *s = ','; ++s;
 	s = SerializeFloat(r, s);
-	assert(s+1 - str < 256);
+	mgl_assert(s+1 - str < 256);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -1431,7 +1431,7 @@ std::ostream &operator <<(std::ostream &o, const Sphere &sphere)
 
 Sphere Sphere::FromString(const char *str, const char **outEndStr)
 {
-	assume(str);
+	mgl_assume(str);
 	if (!str)
 		return Sphere(vec::nan, FLOAT_NAN);
 	Sphere s;

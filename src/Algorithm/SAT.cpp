@@ -19,10 +19,10 @@ bool HasCcwWindingOrder(const float2 *poly, int numVertices)
 
 bool SATCollide2D(const float2 *a, int numA, const float2 *b, int numB)
 {
-	assert(numA > 0 && a);
-	assert(numB > 0 && b);
-	assert(HasCcwWindingOrder(a, numA));
-	assert(HasCcwWindingOrder(b, numB));
+	mgl_assert(numA > 0 && a);
+	mgl_assert(numB > 0 && b);
+	mgl_assert(HasCcwWindingOrder(a, numA));
+	mgl_assert(HasCcwWindingOrder(b, numB));
 
 	float2 edge;
 
@@ -67,10 +67,10 @@ bool SATCollide2D(const float2 *a, int numA, const float2 *b, int numB)
 float SATCollide2D_CollisionPoint(const float2 *a, int numA, const float2 *b, int numB,
                                  float2 &outCollisionPoint, float2 &outCollisionNormal)
 {
-	assert(numA > 0 && a);
-	assert(numB > 0 && b);
-	assert(HasCcwWindingOrder(a, numA));
-	assert(HasCcwWindingOrder(b, numB));
+	mgl_assert(numA > 0 && a);
+	mgl_assert(numB > 0 && b);
+	mgl_assert(HasCcwWindingOrder(a, numA));
+	mgl_assert(HasCcwWindingOrder(b, numB));
 
 	float2 edge;
 

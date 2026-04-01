@@ -150,8 +150,8 @@ float3x4 float3x4::RotateAxisAngle(const float3 &axisDirection, float angleRadia
 
 float3x4 float3x4::RotateFromTo(const float3 &sourceDirection, const float3 &targetDirection)
 {
-	assume(sourceDirection.IsNormalized());
-	assume(targetDirection.IsNormalized());
+	mgl_assume(sourceDirection.IsNormalized());
+	mgl_assume(targetDirection.IsNormalized());
 	float3x4 r;
 	r.SetRotatePart(Quat::RotateFromTo(sourceDirection, targetDirection));
 	r.SetTranslatePart(0, 0, 0);
@@ -219,7 +219,7 @@ float3x4 float3x4::FromEulerXYX(float x2, float y, float x)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerXYX(r, x2, y, x);
-	assume(r.Equals(float3x4::RotateX(x2) * float3x4::RotateY(y) * float3x4::RotateX(x)));
+	mgl_assume(r.Equals(float3x4::RotateX(x2) * float3x4::RotateY(y) * float3x4::RotateX(x)));
 	return r;
 }
 
@@ -228,7 +228,7 @@ float3x4 float3x4::FromEulerXZX(float x2, float z, float x)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerXZX(r, x2, z, x);
-	assume(r.Equals(float3x4::RotateX(x2) * float3x4::RotateZ(z) * float3x4::RotateX(x)));
+	mgl_assume(r.Equals(float3x4::RotateX(x2) * float3x4::RotateZ(z) * float3x4::RotateX(x)));
 	return r;
 }
 
@@ -237,7 +237,7 @@ float3x4 float3x4::FromEulerYXY(float y2, float x, float y)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerYXY(r, y2, x, y);
-	assume(r.Equals(float3x4::RotateY(y2) * float3x4::RotateX(x) * float3x4::RotateY(y)));
+	mgl_assume(r.Equals(float3x4::RotateY(y2) * float3x4::RotateX(x) * float3x4::RotateY(y)));
 	return r;
 }
 
@@ -246,7 +246,7 @@ float3x4 float3x4::FromEulerYZY(float y2, float z, float y)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerYZY(r, y2, z, y);
-	assume(r.Equals(float3x4::RotateY(y2) * float3x4::RotateZ(z) * float3x4::RotateY(y)));
+	mgl_assume(r.Equals(float3x4::RotateY(y2) * float3x4::RotateZ(z) * float3x4::RotateY(y)));
 	return r;
 }
 
@@ -255,7 +255,7 @@ float3x4 float3x4::FromEulerZXZ(float z2, float x, float z)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerZXZ(r, z2, x, z);
-	assume(r.Equals(float3x4::RotateZ(z2) * float3x4::RotateX(x) * float3x4::RotateZ(z)));
+	mgl_assume(r.Equals(float3x4::RotateZ(z2) * float3x4::RotateX(x) * float3x4::RotateZ(z)));
 	return r;
 }
 
@@ -264,7 +264,7 @@ float3x4 float3x4::FromEulerZYZ(float z2, float y, float z)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerZYZ(r, z2, y, z);
-	assume(r.Equals(float3x4::RotateZ(z2) * float3x4::RotateY(y) * float3x4::RotateZ(z)));
+	mgl_assume(r.Equals(float3x4::RotateZ(z2) * float3x4::RotateY(y) * float3x4::RotateZ(z)));
 	return r;
 }
 
@@ -273,7 +273,7 @@ float3x4 float3x4::FromEulerXYZ(float x, float y, float z)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerXYZ(r, x, y, z);
-	assume(r.Equals(float3x4::RotateX(x) * float3x4::RotateY(y) * float3x4::RotateZ(z)));
+	mgl_assume(r.Equals(float3x4::RotateX(x) * float3x4::RotateY(y) * float3x4::RotateZ(z)));
 	return r;
 }
 
@@ -282,7 +282,7 @@ float3x4 float3x4::FromEulerXZY(float x, float z, float y)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerXZY(r, x, z, y);
-	assume(r.Equals(float3x4::RotateX(x) * float3x4::RotateZ(z) * float3x4::RotateY(y)));
+	mgl_assume(r.Equals(float3x4::RotateX(x) * float3x4::RotateZ(z) * float3x4::RotateY(y)));
 	return r;
 }
 
@@ -291,7 +291,7 @@ float3x4 float3x4::FromEulerYXZ(float y, float x, float z)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerYXZ(r, y, x, z);
-	assume(r.Equals(float3x4::RotateY(y) * float3x4::RotateX(x) * float3x4::RotateZ(z)));
+	mgl_assume(r.Equals(float3x4::RotateY(y) * float3x4::RotateX(x) * float3x4::RotateZ(z)));
 	return r;
 }
 
@@ -300,7 +300,7 @@ float3x4 float3x4::FromEulerYZX(float y, float z, float x)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerYZX(r, y, z, x);
-	assume(r.Equals(float3x4::RotateY(y) * float3x4::RotateZ(z) * float3x4::RotateX(x)));
+	mgl_assume(r.Equals(float3x4::RotateY(y) * float3x4::RotateZ(z) * float3x4::RotateX(x)));
 	return r;
 }
 
@@ -309,7 +309,7 @@ float3x4 float3x4::FromEulerZXY(float z, float x, float y)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerZXY(r, z, x, y);
-	assume(r.Equals(float3x4::RotateZ(z) * float3x4::RotateX(x) * float3x4::RotateY(y)));
+	mgl_assume(r.Equals(float3x4::RotateZ(z) * float3x4::RotateX(x) * float3x4::RotateY(y)));
 	return r;
 }
 
@@ -318,7 +318,7 @@ float3x4 float3x4::FromEulerZYX(float z, float y, float x)
 	float3x4 r;
 	r.SetTranslatePart(0,0,0);
 	Set3x3PartRotateEulerZYX(r, z, y, x);
-	assume(r.Equals(float3x4::RotateZ(z) * float3x4::RotateY(y) * float3x4::RotateX(x)));
+	mgl_assume(r.Equals(float3x4::RotateZ(z) * float3x4::RotateY(y) * float3x4::RotateX(x)));
 	return r;
 }
 
@@ -430,10 +430,10 @@ float3x4 float3x4::OrthographicProjectionXY()
 
 float &float3x4::At(int rowIndex, int colIndex)
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
-	assume(colIndex >= 0);
-	assume(colIndex < Cols);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
+	mgl_assume(colIndex >= 0);
+	mgl_assume(colIndex < Cols);
 #ifdef MATH_COLMAJOR_MATRICES
 	return v[colIndex][rowIndex];
 #else
@@ -443,10 +443,10 @@ float &float3x4::At(int rowIndex, int colIndex)
 
 const float &float3x4::At(int rowIndex, int colIndex) const
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
-	assume(colIndex >= 0);
-	assume(colIndex < Cols);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
+	mgl_assume(colIndex >= 0);
+	mgl_assume(colIndex < Cols);
 #ifdef MATH_COLMAJOR_MATRICES
 	return v[colIndex][rowIndex];
 #else
@@ -457,79 +457,79 @@ const float &float3x4::At(int rowIndex, int colIndex) const
 #ifdef MATH_COLMAJOR_MATRICES
 float3 &float3x4::Col(int col)
 {
-	assume(col >= 0);
-	assume(col < Cols);
+	mgl_assume(col >= 0);
+	mgl_assume(col < Cols);
 	
 	return reinterpret_cast<float3 &>(v[col]);
 }
 
 const float3 &float3x4::Col(int col) const
 {
-	assume(col >= 0);
-	assume(col < Cols);
+	mgl_assume(col >= 0);
+	mgl_assume(col < Cols);
 	
 	return reinterpret_cast<const float3 &>(v[col]);
 }
 
 float3 &float3x4::Col3(int col)
 {
-	assume(col >= 0);
-	assume(col < Cols);
+	mgl_assume(col >= 0);
+	mgl_assume(col < Cols);
 	
 	return reinterpret_cast<float3 &>(v[col]);
 }
 
 const float3 &float3x4::Col3(int col) const
 {
-	assume(col >= 0);
-	assume(col < Cols);
+	mgl_assume(col >= 0);
+	mgl_assume(col < Cols);
 	
 	return reinterpret_cast<const float3 &>(v[col]);
 }
 
 CONST_WIN32 float4 float3x4::Row(int row) const
 {
-	assume(row >= 0);
-	assume(row < Rows);
+	mgl_assume(row >= 0);
+	mgl_assume(row < Rows);
 	return float4(At(row, 0), At(row, 1), At(row, 2), At(row, 3));
 }
 #else
 float4 &float3x4::Row(int rowIndex)
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
 
 	return reinterpret_cast<float4 &>(v[rowIndex]);
 }
 
 const float4 &float3x4::Row(int rowIndex) const
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
 
 	return reinterpret_cast<const float4 &>(v[rowIndex]);
 }
 
 float3 &float3x4::Row3(int rowIndex)
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
 
 	return reinterpret_cast<float3 &>(v[rowIndex]);
 }
 
 const float3 &float3x4::Row3(int rowIndex) const
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
 
 	return reinterpret_cast<const float3 &>(v[rowIndex]);
 }
 
 CONST_WIN32 float3 float3x4::Col(int colIndex) const
 {
-	assume(colIndex >= 0);
-	assume(colIndex < Cols);
+	mgl_assume(colIndex >= 0);
+	mgl_assume(colIndex < Cols);
 	return float3(At(0, colIndex), At(1, colIndex), At(2, colIndex));
 }
 #endif
@@ -560,9 +560,9 @@ void float3x4::ScaleRow(int r, float scalar)
 
 void float3x4::ScaleCol(int colIndex, float scalar)
 {
-	assume(colIndex >= 0);
-	assume(colIndex < Cols);
-	assume(MATH_NS::IsFinite(scalar));
+	mgl_assume(colIndex >= 0);
+	mgl_assume(colIndex < Cols);
+	mgl_assume(MATH_NS::IsFinite(scalar));
 
 	At(0, colIndex) *= scalar;
 	At(1, colIndex) *= scalar;
@@ -603,12 +603,12 @@ float3 float3x4::WorldZ() const
 
 void float3x4::SetRow(int row, float m_r0, float m_r1, float m_r2, float m_r3)
 {
-	assume(row >= 0);
-	assume(row < Rows);
-	assume(MATH_NS::IsFinite(m_r0));
-	assume(MATH_NS::IsFinite(m_r1));
-	assume(MATH_NS::IsFinite(m_r2));
-	assume(MATH_NS::IsFinite(m_r3));
+	mgl_assume(row >= 0);
+	mgl_assume(row < Rows);
+	mgl_assume(MATH_NS::IsFinite(m_r0));
+	mgl_assume(MATH_NS::IsFinite(m_r1));
+	mgl_assume(MATH_NS::IsFinite(m_r2));
+	mgl_assume(MATH_NS::IsFinite(m_r3));
 
 #ifdef MATH_SIMD
 	this->row[row] = set_ps(m_r3, m_r2, m_r1, m_r0);
@@ -637,7 +637,7 @@ void float3x4::SetRow(int rowIndex, const float4 &rowVector)
 
 void float3x4::SetRow(int rowIndex, const float *data)
 {
-	assume(data);
+	mgl_assume(data);
 
 #ifdef MATH_SIMD
 
@@ -649,11 +649,11 @@ void float3x4::SetRow(int rowIndex, const float *data)
 
 void float3x4::SetCol(int column, float m_0c, float m_1c, float m_2c)
 {
-	assume(column >= 0);
-	assume(column < Cols);
-	assume(MATH_NS::IsFinite(m_0c));
-	assume(MATH_NS::IsFinite(m_1c));
-	assume(MATH_NS::IsFinite(m_2c));
+	mgl_assume(column >= 0);
+	mgl_assume(column < Cols);
+	mgl_assume(MATH_NS::IsFinite(m_0c));
+	mgl_assume(MATH_NS::IsFinite(m_1c));
+	mgl_assume(MATH_NS::IsFinite(m_2c));
 	At(0, column) = m_0c;
 	At(1, column) = m_1c;
 	At(2, column) = m_2c;
@@ -666,7 +666,7 @@ void float3x4::SetCol(int column, const float3 &columnVector)
 
 void float3x4::SetCol(int column, const float *data)
 {
-	assume(data);
+	mgl_assume(data);
 	SetCol(column, data[0], data[1], data[2]);
 }
 
@@ -698,17 +698,17 @@ void float3x4::Set(const float3x4 &rhs)
 
 void float3x4::Set(const float *values)
 {
-	assume(values);
+	mgl_assume(values);
 	float *ptr = (float*)this;
 	memcpy(ptr, values, 12*sizeof(float));
 }
 
 void float3x4::Set(int rowIndex, int colIndex, float value)
 {
-	assume(rowIndex >= 0);
-	assume(rowIndex < Rows);
-	assume(colIndex >= 0);
-	assume(colIndex < Cols);
+	mgl_assume(rowIndex >= 0);
+	mgl_assume(rowIndex < Rows);
+	mgl_assume(colIndex >= 0);
+	mgl_assume(colIndex < Cols);
 #ifdef MATH_COLMAJOR_MATRICES
 	v[colIndex][rowIndex] = value;
 #else
@@ -725,7 +725,7 @@ void float3x4::SetIdentity()
 
 void float3x4::Set3x3Part(const float3x3 &r)
 {
-	assume(r.IsFinite());
+	mgl_assume(r.IsFinite());
 	At(0, 0) = r[0][0]; At(0, 1) = r[0][1]; At(0, 2) = r[0][2];
 	At(1, 0) = r[1][0]; At(1, 1) = r[1][1]; At(1, 2) = r[1][2];
 	At(2, 0) = r[2][0]; At(2, 1) = r[2][1]; At(2, 2) = r[2][2];
@@ -733,10 +733,10 @@ void float3x4::Set3x3Part(const float3x3 &r)
 
 void float3x4::SwapColumns(int col1, int col2)
 {
-	assume(col1 >= 0);
-	assume(col1 < Cols);
-	assume(col2 >= 0);
-	assume(col2 < Cols);
+	mgl_assume(col1 >= 0);
+	mgl_assume(col1 < Cols);
+	mgl_assume(col2 >= 0);
+	mgl_assume(col2 < Cols);
 	Swap(At(0, col1), At(0, col2));
 	Swap(At(1, col1), At(1, col2));
 	Swap(At(2, col1), At(2, col2));
@@ -744,10 +744,10 @@ void float3x4::SwapColumns(int col1, int col2)
 
 void float3x4::SwapRows(int row1, int row2)
 {
-	assume(row1 >= 0);
-	assume(row1 < Rows);
-	assume(row2 >= 0);
-	assume(row2 < Rows);
+	mgl_assume(row1 >= 0);
+	mgl_assume(row1 < Rows);
+	mgl_assume(row2 >= 0);
+	mgl_assume(row2 < Rows);
 
 #ifdef MATH_SIMD
 	Swap(row[row1], row[row2]);
@@ -815,7 +815,7 @@ float3x4 &float3x4::operator =(const float3x4 &rhs)
 	// to copy around uninitialized matrices.
 	// But note that when assigning through a conversion above (float3x3 -> float3x4),
 	// we do assume the input matrix is finite.
-//	assume(rhs.IsFinite());
+//	mgl_assume(rhs.IsFinite());
 #ifdef MATH_SIMD
 	row[0] = rhs.row[0];
 	row[1] = rhs.row[1];
@@ -849,7 +849,7 @@ float3x4 &float3x4::operator =(const Quat &rhs)
 
 float float3x4::Determinant() const
 {
-	assume(Float3x3Part().IsFinite());
+	mgl_assume(Float3x3Part().IsFinite());
 //#if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	// 0,-2.873479127883911e-1,9.578263163566589e-1,1.1457166820764542e-1,1,0,0,1.101529598236084e-1,0,9.578263163566589e-1,2.873479127883911e-1,0.037929482758045197
 	// TODO: Temporarily disabled for numerical issues. Check this closer and re-enable.
@@ -900,7 +900,7 @@ bool float3x4::InverseColOrthogonal()
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	mat3x4_inverse_colorthogonal(row, row);
 #else
-	assume(IsColOrthogonal());
+	mgl_assume(IsColOrthogonal());
 	float s1 = float3(At(0, 0), At(1, 0), At(2, 0)).LengthSq();
 	float s2 = float3(At(0, 1), At(1, 1), At(2, 1)).LengthSq();
 	float s3 = float3(At(0, 2), At(1, 2), At(2, 2)).LengthSq();
@@ -918,7 +918,7 @@ bool float3x4::InverseColOrthogonal()
 	At(2, 0) *= s3; At(2, 1) *= s3; At(2, 2) *= s3;
 
 	SetTranslatePart(TransformDir(-At(0, 3), -At(1, 3), -At(2, 3)));
-	mathassert(IsRowOrthogonal());
+	mgl_mathassert(IsRowOrthogonal());
 #endif
 	return true;
 }
@@ -929,8 +929,8 @@ bool float3x4::InverseOrthogonalUniformScale()
 	mat3x4_inverse_orthogonal_uniformscale(row, row);
 	return true; ///\todo The return value is difficult here with SSE, figure out how to treat that.
 #else
-	assume(IsColOrthogonal(1e-3f));
-	assume(HasUniformScale());
+	mgl_assume(IsColOrthogonal(1e-3f));
+	mgl_assume(HasUniformScale());
 	Swap(At(0, 1), At(1, 0));
 	Swap(At(0, 2), At(2, 0));
 	Swap(At(1, 2), At(2, 1));
@@ -951,7 +951,7 @@ bool float3x4::InverseOrthogonalUniformScale()
 
 void float3x4::InverseOrthonormal()
 {
-	assume(IsOrthonormal());
+	mgl_assume(IsOrthonormal());
 
 #if defined(MATH_AUTOMATIC_SSE) && defined(MATH_SSE)
 	mat3x4_inverse_orthonormal(row, row);
@@ -1030,15 +1030,15 @@ float3x4 float3x4::InverseTransposed() const
 
 float float3x4::Trace() const
 {
-	assume(IsFinite());
+	mgl_assume(IsFinite());
 	return v[0][0] + v[1][1] + v[2][2];
 }
 
 void float3x4::Orthonormalize(int c0, int c1, int c2)
 {
 	///\todo SSE.
-	assume(c0 != c1 && c0 != c2 && c1 != c2);
-	assume(c0 >= 0 && c1 >= 0 && c2 >= 0 && c0 < Cols && c1 < Cols && c2 < Cols);
+	mgl_assume(c0 != c1 && c0 != c2 && c1 != c2);
+	mgl_assume(c0 >= 0 && c1 >= 0 && c2 >= 0 && c0 < Cols && c1 < Cols && c2 < Cols);
 
 	///@todo Optimize away copies.
 	float3 v0 = Col(c0);
@@ -1066,7 +1066,7 @@ void float3x4::RemoveScale()
 	float tz = Row3(2).Normalize();
 #endif
 
-	assume(tx != 0 && ty != 0 && tz != 0 && "float3x4::RemoveScale failed!");
+	mgl_assume(tx != 0 && ty != 0 && tz != 0 && "float3x4::RemoveScale failed!");
 	MARK_UNUSED(tx);
 	MARK_UNUSED(ty);
 	MARK_UNUSED(tz);
@@ -1086,7 +1086,7 @@ float2 float3x4::TransformPos(float tx, float ty) const
 #ifdef MATH_SSE
 	return mat3x4_mul_vec(row, set_ps(1.f, 0.f, ty, tx)).xy();
 #else
-	assume(Equal(At(2, 3), 0.f));
+	mgl_assume(Equal(At(2, 3), 0.f));
 	return float2(At(0, 0) * tx + At(0, 1) * ty + At(0, 3),
 	              At(1, 0) * tx + At(1, 1) * ty + At(1, 3));
 #endif
@@ -1153,7 +1153,7 @@ float3 float3x4::TransformDir(float tx, float ty, float tz) const
 
 float4 float3x4::TransformDir(const float4 &directionVector) const
 {
-	assume(EqualAbs(directionVector.w, 0.f));
+	mgl_assume(EqualAbs(directionVector.w, 0.f));
 	return Transform(directionVector);
 }
 
@@ -1171,15 +1171,15 @@ float4 float3x4::Transform(const float4 &vector) const
 
 void float3x4::BatchTransformPos(float3 *pointArray, int numPoints) const
 {
-	assume(pointArray);
+	mgl_assume(pointArray);
 	for(int i = 0; i < numPoints; ++i)
 		pointArray[i] = MulPos(pointArray[i]);
 }
 
 void float3x4::BatchTransformPos(float3 *pointArray, int numPoints, int stride) const
 {
-	assume(pointArray);
-	assume(stride >= (int)sizeof(float3));
+	mgl_assume(pointArray);
+	mgl_assume(stride >= (int)sizeof(float3));
 	u8 *data = reinterpret_cast<u8*>(pointArray);
 	for(int i = 0; i < numPoints; ++i)
 	{
@@ -1190,15 +1190,15 @@ void float3x4::BatchTransformPos(float3 *pointArray, int numPoints, int stride) 
 
 void float3x4::BatchTransformDir(float3 *dirArray, int numVectors) const
 {
-	assume(dirArray);
+	mgl_assume(dirArray);
 	for(int i = 0; i < numVectors; ++i)
 		dirArray[i] = MulPos(dirArray[i]);
 }
 
 void float3x4::BatchTransformDir(float3 *dirArray, int numVectors, int stride) const
 {
-	assume(dirArray);
-	assume(stride >= (int)sizeof(float3));
+	mgl_assume(dirArray);
+	mgl_assume(stride >= (int)sizeof(float3));
 	u8 *data = reinterpret_cast<u8*>(dirArray);
 	for(int i = 0; i < numVectors; ++i)
 	{
@@ -1209,15 +1209,15 @@ void float3x4::BatchTransformDir(float3 *dirArray, int numVectors, int stride) c
 
 void float3x4::BatchTransform(float4 *vectorArray, int numVectors) const
 {
-	assume(vectorArray);
+	mgl_assume(vectorArray);
 	for(int i = 0; i < numVectors; ++i)
 		vectorArray[i] = *this * vectorArray[i];
 }
 
 void float3x4::BatchTransform(float4 *vectorArray, int numVectors, int stride) const
 {
-	assume(vectorArray);
-	assume(stride >= (int)sizeof(float4));
+	mgl_assume(vectorArray);
+	mgl_assume(stride >= (int)sizeof(float4));
 	u8 *data = reinterpret_cast<u8*>(vectorArray);
 	for(int i = 0; i < numVectors; ++i)
 	{
@@ -1303,7 +1303,7 @@ float3x4 float3x4::operator *(float scalar) const
 
 float3x4 float3x4::operator /(float scalar) const
 {
-	assume(!EqualAbs(scalar, 0));
+	mgl_assume(!EqualAbs(scalar, 0));
 
 #ifdef MATH_SIMD
 	float3x4 r;
@@ -1387,7 +1387,7 @@ float3x4 &float3x4::operator *=(float scalar)
 
 float3x4 &float3x4::operator /=(float scalar)
 {
-	assume(!EqualAbs(scalar, 0));
+	mgl_assume(!EqualAbs(scalar, 0));
 
 #ifdef MATH_SIMD
 	simd4f s = set1_ps(scalar);
@@ -1478,7 +1478,7 @@ bool float3x4::IsInvertible(float epsilon) const
 	bool isSingular = EqualAbs(d, 0.f, epsilon);
 #ifdef MATH_ASSERT_CORRECTNESS
 	float3x3 temp = Float3x3Part();
-	mathassert(temp.Inverse(epsilon) != isSingular); // IsInvertible() and Inverse() must match!
+	mgl_mathassert(temp.Inverse(epsilon) != isSingular); // IsInvertible() and Inverse() must match!
 #endif
 	return !isSingular;
 }
@@ -1574,7 +1574,7 @@ StringT float3x4::SerializeToString() const
 	s = SerializeFloat(At(2, 1), s); *s = ','; ++s;
 	s = SerializeFloat(At(2, 2), s); *s = ','; ++s;
 	s = SerializeFloat(At(2, 3), s);
-	assert(s+1 - str < 512);
+	mgl_assert(s+1 - str < 512);
 	MARK_UNUSED(s);
 	return str;
 }
@@ -1595,8 +1595,8 @@ bool IsNeutralCLocale();
 
 float3x4 float3x4::FromString(const char *str, const char **outEndStr)
 {
-	assert(IsNeutralCLocale());
-	assume(str);
+	mgl_assert(IsNeutralCLocale());
+	mgl_assume(str);
 	if (!str)
 		return float3x4::nan;
 	MATH_SKIP_WORD(str, "float3x4");
@@ -1639,39 +1639,39 @@ float3 float3x4::ExtractScale() const
 
 void float3x4::Decompose(float3 &translate, Quat &rotate, float3 &scale) const
 {
-	assume(this->IsColOrthogonal());
+	mgl_assume(this->IsColOrthogonal());
 
 	float3x3 r;
 	Decompose(translate, r, scale);
 	rotate = Quat(r);
 
 	// Test that composing back yields the original float3x4.
-	assume(float3x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
+	mgl_assume(float3x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
 }
 
 void float3x4::Decompose(float3 &translate, float3x3 &rotate, float3 &scale) const
 {
-	assume(this->IsColOrthogonal());
+	mgl_assume(this->IsColOrthogonal());
 
 	translate = Col(3);
 	rotate = RotatePart();
 	scale.x = rotate.Col(0).Length();
 	scale.y = rotate.Col(1).Length();
 	scale.z = rotate.Col(2).Length();
-	assume(!EqualAbs(scale.x, 0));
-	assume(!EqualAbs(scale.y, 0));
-	assume(!EqualAbs(scale.z, 0));
+	mgl_assume(!EqualAbs(scale.x, 0));
+	mgl_assume(!EqualAbs(scale.y, 0));
+	mgl_assume(!EqualAbs(scale.z, 0));
 	rotate.ScaleCol(0, 1.f / scale.x);
 	rotate.ScaleCol(1, 1.f / scale.y);
 	rotate.ScaleCol(2, 1.f / scale.z);
 
 	// Test that composing back yields the original float3x4.
-	assume(float3x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
+	mgl_assume(float3x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
 }
 
 void float3x4::Decompose(float3 &translate, float3x4 &rotate, float3 &scale) const
 {
-	assume(this->IsColOrthogonal());
+	mgl_assume(this->IsColOrthogonal());
 
 	float3x3 r;
 	Decompose(translate, r, scale);
@@ -1679,7 +1679,7 @@ void float3x4::Decompose(float3 &translate, float3x4 &rotate, float3 &scale) con
 	rotate.SetTranslatePart(0,0,0);
 
 	// Test that composing back yields the original float3x4.
-	assume(float3x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
+	mgl_assume(float3x4::FromTRS(translate, rotate, scale).Equals(*this, 0.1f));
 }
 
 #ifdef MATH_ENABLE_STL_SUPPORT
@@ -1718,14 +1718,14 @@ float2 float3x4::MulPos(const float2 &pointVector) const { return this->Transfor
 float3 float3x4::MulPos(const float3 &pointVector) const { return this->TransformPos(pointVector); }
 float4 float3x4::MulPos(const float4 &pointVector) const
 {
-	assume(!EqualAbs(pointVector.w, 0.f));
+	mgl_assume(!EqualAbs(pointVector.w, 0.f));
 	return this->Transform(pointVector);
 }
 float2 float3x4::MulDir(const float2 &directionVector) const { return this->TransformDir(directionVector); }
 float3 float3x4::MulDir(const float3 &directionVector) const { return this->TransformDir(directionVector); }
 float4 float3x4::MulDir(const float4 &directionVector) const
 {
-	assume(EqualAbs(directionVector.w, 0.f));
+	mgl_assume(EqualAbs(directionVector.w, 0.f));
 	return this->TransformDir(directionVector);
 }
 float4 float3x4::Mul(const float4 &vector) const { return *this * vector; }

@@ -174,148 +174,148 @@ MATH_END_NAMESPACE
 
 #ifdef FAIL_USING_EXCEPTIONS
 #include <stdexcept>
-#define assume_failed(message) throw std::runtime_error((message))
+#define mgl_assume_failed(message) throw std::runtime_error((message))
 #elif defined(MATH_ASSERT_ON_ASSUME)
-#define assume(x) assert(x)
-#define assume_failed(message) do { \
+#define mgl_assume(x) mgl_assert(x)
+#define mgl_assume_failed(message) do { \
 		LOGE("Assumption %s failed! in file %s, line %d!", message, __FILE__, __LINE__); \
-		assert(false); \
+		mgl_assert(false); \
 	} while(0) 
 #elif defined(MATH_SILENT_ASSUME)
-#define assume(x) ((void)0)
-#define assume_failed(message) ((void)0)
+#define mgl_assume(x) ((void)0)
+#define mgl_assume_failed(message) ((void)0)
 #else
-#define assume_failed(message) do { \
+#define mgl_assume_failed(message) do { \
 		LOGE("Assumption \"%s\" failed! in file %s, line %d!", message, __FILE__, __LINE__); \
 		AssumeFailed(); \
 	} while (0)
 #endif
 
-#ifndef assume
-#define assume(x) \
+#ifndef mgl_assume
+#define mgl_assume(x) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed(#x " in " __FILE__ ":" STRINGIZE(__LINE__)); \
+			mgl_assume_failed(#x " in " __FILE__ ":" STRINGIZE(__LINE__)); \
 	MULTI_LINE_MACRO_END
 #endif
 
 // In assume1-assume4, print1-print4 are additional helper parameters that get printed out to log in case of failure.
-#define assume1(x, print1) \
+#define mgl_assume1(x, print1) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			mgl_assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
 	MULTI_LINE_MACRO_END
-#define assert1 assume1
+#define mgl_assert1 mgl_assume1
 
-#define assume2(x, print1, print2) \
+#define mgl_assume2(x, print1, print2) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			mgl_assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (", " #print2 ": ") + MATH_NS::ObjToString(print2) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
 	MULTI_LINE_MACRO_END
-#define assert2 assume2
+#define mgl_assert2 mgl_assume2
 
-#define assume3(x, print1, print2, print3) \
+#define mgl_assume3(x, print1, print2, print3) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			mgl_assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (", " #print2 ": ") + MATH_NS::ObjToString(print2) + \
 			                  (", " #print3 ": ") + MATH_NS::ObjToString(print3) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
 	MULTI_LINE_MACRO_END
-#define assert3 assume3
+#define mgl_assert3 mgl_assume3
 
-#define assume4(x, print1, print2, print3, print4) \
+#define mgl_assume4(x, print1, print2, print3, print4) \
 	MULTI_LINE_MACRO_BEGIN \
 		if (!(x)) \
-			assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
+			mgl_assume_failed((("\"" #x "\", " #print1 ": ") + MATH_NS::ObjToString(print1) + \
 			                  (", " #print2 ": ") + MATH_NS::ObjToString(print2) + \
 			                  (", " #print3 ": ") + MATH_NS::ObjToString(print3) + \
 			                  (", " #print4 ": ") + MATH_NS::ObjToString(print4) + \
 			                  (" in " __FILE__ ":" STRINGIZE(__LINE__))).c_str()); \
 	MULTI_LINE_MACRO_END
-#define assert4 assume4
+#define mgl_assert4 mgl_assume4
 
 // If MATH_ASSERT_CORRECTNESS is defined, the function mathassert() is enabled to test
 // that all forms of optimizations inside the math library produce proper results.
 #ifdef MATH_ASSERT_CORRECTNESS
-#define mathassert(x) assert(x)
-#define mathassert1 assert1
-#define mathassert2 assert2
-#define mathassert3 assert3
-#define mathassert4 assert4
+#define mgl_mathassert(x) mgl_assert(x)
+#define mgl_mathassert1 mgl_assert1
+#define mgl_mathassert2 mgl_assert2
+#define mgl_mathassert3 mgl_assert3
+#define mgl_mathassert4 mgl_assert4
 #else
-#define mathassert(x) ((void)0)
-#define mathassert1(...) ((void)0)
-#define mathassert2(...) ((void)0)
-#define mathassert3(...) ((void)0)
-#define mathassert4(...) ((void)0)
+#define mgl_mathassert(x) ((void)0)
+#define mgl_mathassert1(...) ((void)0)
+#define mgl_mathassert2(...) ((void)0)
+#define mgl_mathassert3(...) ((void)0)
+#define mgl_mathassert4(...) ((void)0)
 #endif
 
-// Kill both assume() and mathassert() macros in OPTIMIZED_RELEASE builds.
+// Kill both mgl_assume() and mathassert() macros in OPTIMIZED_RELEASE builds.
 #ifdef OPTIMIZED_RELEASE
-#ifdef assume
-#undef assume
+#ifdef mgl_assume
+#undef mgl_assume
 #endif
-#ifdef assume1
-#undef assume1
+#ifdef mgl_assume1
+#undef mgl_assume1
 #endif
-#ifdef assume2
-#undef assume2
+#ifdef mgl_assume2
+#undef mgl_assume2
 #endif
-#ifdef assume3
-#undef assume3
+#ifdef mgl_assume3
+#undef mgl_assume3
 #endif
-#ifdef assume4
-#undef assume4
+#ifdef mgl_assume4
+#undef mgl_assume4
 #endif
-#ifdef assert
-#undef assert
+#ifdef mgl_assert
+#undef mgl_assert
 #endif
-#ifdef assert1
-#undef assert1
+#ifdef mgl_assert1
+#undef mgl_assert1
 #endif
-#ifdef assert2
-#undef assert2
+#ifdef mgl_assert2
+#undef mgl_assert2
 #endif
-#ifdef assert3
-#undef assert3
+#ifdef mgl_assert3
+#undef mgl_assert3
 #endif
-#ifdef assert4
-#undef assert4
+#ifdef mgl_assert4
+#undef mgl_assert4
 #endif
-#ifdef mathassert
-#undef mathassert
+#ifdef mgl_mathassert
+#undef mgl_mathassert
 #endif
-#ifdef mathassert1
-#undef mathassert1
+#ifdef mgl_mathassert1
+#undef mgl_mathassert1
 #endif
-#ifdef mathassert2
-#undef mathassert2
+#ifdef mgl_mathassert2
+#undef mgl_mathassert2
 #endif
-#ifdef mathassert3
-#undef mathassert3
+#ifdef mgl_mathassert3
+#undef mgl_mathassert3
 #endif
-#ifdef mathassert4
-#undef mathassert4
+#ifdef mgl_mathassert4
+#undef mgl_mathassert4
 #endif
 
-#define assume(...) ((void)0)
-#define assume1(...) ((void)0)
-#define assume2(...) ((void)0)
-#define assume3(...) ((void)0)
-#define assume4(...) ((void)0)
-#define assert(...) ((void)0)
-#define assert1(...) ((void)0)
-#define assert2(...) ((void)0)
-#define assert3(...) ((void)0)
-#define assert4(...) ((void)0)
-#define mathassert(...) ((void)0)
-#define mathassert1(...) ((void)0)
-#define mathassert2(...) ((void)0)
-#define mathassert3(...) ((void)0)
-#define mathassert4(...) ((void)0)
+#define mgl_assume(...) ((void)0)
+#define mgl_assume1(...) ((void)0)
+#define mgl_assume2(...) ((void)0)
+#define mgl_assume3(...) ((void)0)
+#define mgl_assume4(...) ((void)0)
+#define mgl_assert(...) ((void)0)
+#define mgl_assert1(...) ((void)0)
+#define mgl_assert2(...) ((void)0)
+#define mgl_assert3(...) ((void)0)
+#define mgl_assert4(...) ((void)0)
+#define mgl_mathassert(...) ((void)0)
+#define mgl_mathassert1(...) ((void)0)
+#define mgl_mathassert2(...) ((void)0)
+#define mgl_mathassert3(...) ((void)0)
+#define mgl_mathassert4(...) ((void)0)
 
 #endif

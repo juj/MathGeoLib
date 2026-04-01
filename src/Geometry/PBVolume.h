@@ -240,10 +240,10 @@ public:
 						break;
 					}
 				}
-				assert(found);
+				mgl_assert(found);
 				MARK_UNUSED(found);
 			}
-			assert(pt[0].j == pt[pt.size()-1].k);
+			mgl_assert(pt[0].j == pt[pt.size()-1].k);
 			Polyhedron::Face face;
 			for(size_t j = 0; j < pt.size(); ++j)
 			{

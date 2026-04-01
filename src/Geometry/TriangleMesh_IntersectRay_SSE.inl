@@ -1,4 +1,4 @@
-/* Copyright Jukka Jylänki
+/* Copyright Jukka Jylï¿½nki
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
    limitations under the License. */
 
 /** @file TriangleMesh_IntersectRay_SSE.inl
-	@author Jukka Jylänki
+	@author Jukka Jylï¿½nki
 	@brief SSE implementation of ray-mesh intersection routines. */
 MATH_BEGIN_NAMESPACE
 
@@ -34,12 +34,12 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 //	std::cout << numTris << " tris: ";
 //	TRACESTART(RayTriMeshIntersectSSE);
 
-	assert(sizeof(float3) == 3*sizeof(float));
-	assert(sizeof(Triangle) == 3*sizeof(float3));
+	mgl_assert(sizeof(float3) == 3*sizeof(float));
+	mgl_assert(sizeof(Triangle) == 3*sizeof(float3));
 #ifdef _DEBUG
-	assert(vertexDataLayout == 1); // Must be SoA4 structured!
+	mgl_assert(vertexDataLayout == 1); // Must be SoA4 structured!
 #endif
-	
+
 	__m128 nearestD = _mm_set1_ps(inf);
 #ifdef MATH_GEN_UV
 	__m128 nearestU = _mm_set1_ps(inf);
@@ -63,7 +63,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 
     const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
 
-	assert(((uintptr_t)data & 0xF) == 0);
+	mgl_assert(((uintptr_t)data & 0xF) == 0);
 
 	const float *tris = reinterpret_cast<const float*>(data);
 
@@ -234,7 +234,7 @@ float TriangleMesh::IntersectRay_TriangleIndex_UV_SSE41(const Ray &ray, int &out
 //	static double avgtimes = 0.f;
 //	static double nAvgTimes = 0;
 //	static double processedBytes;
-	
+
 //	processedBytes += numTris * 3 * 4;
 
 //	avgtimes += Clock::TicksToMillisecondsD(time_RayTriMeshIntersectSSE);

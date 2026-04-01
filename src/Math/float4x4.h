@@ -364,8 +364,8 @@ public:
 	 	whether MATH_COLMAJOR_MATRICES is set, i.e. the notation is always m[y][x]. */
 	FORCE_INLINE MatrixProxy<Rows, Cols> &operator[](int row)
 	{
-		assume(row >= 0);
-		assume(row < Rows);
+		mgl_assume(row >= 0);
+		mgl_assume(row < Rows);
 
 #ifdef MATH_COLMAJOR_MATRICES
 		return *(reinterpret_cast<MatrixProxy<Rows, Cols>*>(&v[0][row]));
@@ -376,8 +376,8 @@ public:
 	
 	FORCE_INLINE const MatrixProxy<Rows, Cols> &operator[](int row) const
 	{
-		assume(row >= 0);
-		assume(row < Rows);
+		mgl_assume(row >= 0);
+		mgl_assume(row < Rows);
 
 #ifdef MATH_COLMAJOR_MATRICES
 		return *(reinterpret_cast<const MatrixProxy<Rows, Cols>*>(&v[0][row]));
@@ -1003,9 +1003,9 @@ public:
 	float4x4 Mul(const Quat &rhs) const;
 	float2 MulPos(const float2 &pointVector) const;
 	float3 MulPos(const float3 &pointVector) const;
-	inline float4 MulPos(const float4 &pointVector) const { assume(!EqualAbs(pointVector.w, 0.f)); return Mul(pointVector); }
+	inline float4 MulPos(const float4 &pointVector) const { mgl_assume(!EqualAbs(pointVector.w, 0.f)); return Mul(pointVector); }
 	float3 MulDir(const float3 &directionVector) const;
-	inline float4 MulDir(const float4 &directionVector) const { assume(EqualAbs(directionVector.w, 0.f)); return Mul(directionVector); }
+	inline float4 MulDir(const float4 &directionVector) const { mgl_assume(EqualAbs(directionVector.w, 0.f)); return Mul(directionVector); }
 	float4 Mul(const float4 &vector) const;
 };
 
