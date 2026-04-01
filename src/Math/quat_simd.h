@@ -15,7 +15,7 @@ MATH_BEGIN_NAMESPACE
 inline void quat_to_mat3x4(simd4f q, simd4f t, simd4f *m)
 {
 	simd4f one = set_ps(0, 0, 0, 1);
-	const simd4f sseX1 = set_ps_hex((int)0x80000000UL, (int)0x80000000UL, 0, (int)0x80000000UL); // [-, -, + -]
+	const simd4f sseX1 = set_ps(-0.0f, -0.0f, 0, -0.0f); // [-, -, + -]
 	simd4f q2 = add_ps(q, q);                                                     // [2w 2z 2y 2x]
 	simd4f t2 = _mm_add_ss(xor_ps(mul_ps(zwww_ps(q), zzyx_ps(q2)), sseX1), one);  // [-2xw -2yw  2zw 1-2zz]
 	const simd4f sseX0 = yzwx_ps(sseX1);                                          // [-, -, -, +]
@@ -119,7 +119,7 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	            x*r.y - y*r.x + z*r.w + w*r.z,
 	           -x*r.x - y*r.y - z*r.z + w*r.w); */
 #if defined(MATH_SSE)
-	const simd4f signy = set_ps_hex(0x80000000u, 0x80000000u, 0, 0); // [- - + +]
+	const simd4f signy = set_ps(-0.0f, -0.0f, 0, 0); // [- - + +]
 	const simd4f signz = wxxw_ps(signy);   // [- + + -]
 
 	simd4f X = xxxx_ps(q1);
@@ -148,9 +148,9 @@ FORCE_INLINE simd4f quat_mul_quat(simd4f q1, simd4f q2)
 	quat_mul_quat_asm(&q1, &q2, &ret);
 	return ret;
 #elif defined(MATH_NEON)
-	static const float32x4_t signx = set_ps_hex_const(0x80000000u, 0, 0x80000000u, 0);
-	static const float32x4_t signy = set_ps_hex_const(0x80000000u, 0x80000000u, 0, 0);
-	static const float32x4_t signz = set_ps_hex_const(0x80000000u, 0, 0, 0x80000000u);
+	static const float32x4_t signx = set_ps(-0.0f, 0, -0.0f, 0);
+	static const float32x4_t signy = set_ps(-0.0f, -0.0f, 0, 0);
+	static const float32x4_t signz = set_ps(-0.0f, 0, 0, -0.0f);
 
 	const float32_t *q1f = (const float32_t *)&q1;
 	float32x4_t X = xor_ps(signx, vdupq_n_f32(q1f[0]));
@@ -178,7 +178,7 @@ FORCE_INLINE simd4f quat_div_quat(simd4f q1, simd4f q2)
 	           -x*r.y + y*r.x + z*r.w - w*r.z,
 	            x*r.x + y*r.y + z*r.z + w*r.w); */
 
-	const simd4f signx = set_ps_hex(0x80000000u, 0, 0x80000000u, 0); // [- + - +]
+	const simd4f signx = set_ps(-0.0f, 0, -0.0f, 0); // [- + - +]
 	const simd4f signy = xxww_ps(signx);   // [- - + +]
 	const simd4f signz = wxxw_ps(signx);   // [- + + -]
 
