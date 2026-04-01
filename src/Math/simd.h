@@ -665,7 +665,12 @@ FORCE_INLINE simd4f pos_from_scalar_ps(float scalar)
 FORCE_INLINE simd4f load_vec3(const float *ptr, float w)
 {
 	float32x2_t low = vld1_f32(ptr); // [y x]
-	float32x2_t high = (float32x2_t) { ptr[2], w }; // [w z]
+#if defined(_M_ARM64) || defined(_M_ARM64EC)
+	float32x2_t high = vdup_n_f32(ptr[2]);
+	high = vset_lane_f32(w, high, 1);
+#else
+	float32x2_t high = (float32x2_t){ ptr[2], w }; // [w z]
+#endif
 	return vcombine_f32(low, high); // [w z y x]
 }
 

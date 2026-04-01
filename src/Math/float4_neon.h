@@ -53,6 +53,7 @@ FORCE_INLINE simd4f cross_ps(simd4f a, simd4f b)
 }
 
 FORCE_INLINE simd4f dot4_ps(simd4f a, simd4f b);
+FORCE_INLINE simd4f dot3_ps(simd4f a, simd4f b);
 
 FORCE_INLINE void basis_ps(simd4f v, simd4f *outB, simd4f *outC)
 {

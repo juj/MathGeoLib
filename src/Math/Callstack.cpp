@@ -101,6 +101,11 @@ StringT NOINLINE GetCallstack(const char *indent, const char *ignoreFilter)
 	stack.AddrStack.Offset    = context.Rsp;
 	stack.AddrFrame.Offset    = context.Rbp;
 	const DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
+#elif defined(_M_ARM64)
+	stack.AddrPC.Offset       = context.Pc;
+	stack.AddrStack.Offset    = context.Sp;
+	stack.AddrFrame.Offset    = context.Fp;
+	const DWORD machineType   = IMAGE_FILE_MACHINE_ARM64;
 #else
 	stack.AddrPC.Offset       = context.Eip;
 	stack.AddrStack.Offset    = context.Esp;
